@@ -34,19 +34,6 @@
 
 namespace chip {
 namespace app {
-
-struct compare
-{
-    bool operator()(const ConcreteClusterPathWithSize & x, const ConcreteClusterPathWithSize & y) const
-    {
-        if (x == y)
-        {
-            return false;
-        }
-        return x.mSize <= y.mSize;
-    }
-};
-
 /*
  * This implements an attribute cache designed to aggregate attribute data received by a client
  * from either read or subscribe interactions and keep it resident and available for clients to
@@ -75,6 +62,14 @@ struct compare
 class AttributeCache : protected ReadClient::Callback
 {
 public:
+    struct PacketBufferInfo
+    {
+        System::PacketBufferHandle mHandle;
+        DataVersion mDataVersion = 0;
+
+        PacketBufferInfo(System::PacketBufferHandle && aHandle, DataVersion aDataVersion) : mHandle(std::move(aHandle)), mDataVersion(aDataVersion) {}
+    };
+
     class Callback : public ReadClient::Callback
     {
     public:
@@ -229,37 +224,11 @@ public:
      */
     CHIP_ERROR Get(const ConcreteAttributePath & path, TLV::TLVReader & reader);
 
-    void UpdateClusterSize(ConcreteClusterPathWithSize & aCluster)
-    {
-        uint32_t totalSize = 0;
-        ForEachAttribute(aCluster.mEndpointId, aCluster.mClusterId, [this, &totalSize](const ConcreteAttributePath & path) {
-            TLV::TLVReader reader;
-            CHIP_ERROR err;
-            err = Get(path, reader);
-            if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
-            {
-                StatusIB status;
-                ReturnErrorOnFailure(GetStatus(path, status));
-                err = CHIP_NO_ERROR;
-            }
-            else if (err == CHIP_NO_ERROR)
-            {
-                // Skip to the end of the element.
-                ReturnErrorOnFailure(reader.Skip());
+    CHIP_ERROR GetVersion(const ConcreteAttributePath & path, Optional<DataVersion> & aVersion);
 
-                // Compute the amount of value data
-                totalSize += reader.GetLengthRead();
-            }
-            else
-            {
-                return err;
-            }
+    void UpdateFilterMap(std::map<DataVersionFilter, size_t> & aMap);
 
-            return CHIP_NO_ERROR;
-        });
-        aCluster.mSize = totalSize;
-    }
-
+    static void SortFilterMap(std::map<DataVersionFilter, size_t> & aMap, std::vector<std::pair<DataVersionFilter, size_t>> & aVector);
     /*
      * Execute an iterator function that is called for every attribute
      * in a given endpoint and cluster. The function when invoked is provided a concrete attribute path
@@ -354,7 +323,7 @@ public:
     }
 
 private:
-    using AttributeState = Variant<System::PacketBufferHandle, StatusIB>;
+    using AttributeState = Variant<PacketBufferInfo, StatusIB>;
     using ClusterState   = std::map<AttributeId, AttributeState>;
     using EndpointState  = std::map<ClusterId, ClusterState>;
     using NodeState      = std::map<EndpointId, EndpointState>;
@@ -409,7 +378,6 @@ private:
 private:
     Callback & mCallback;
     NodeState mCache;
-
     std::set<ConcreteDataAttributePath> mChangedAttributeSet;
 
     std::vector<EndpointId> mAddedEndpoints;

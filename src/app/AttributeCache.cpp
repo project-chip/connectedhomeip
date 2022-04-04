@@ -17,6 +17,7 @@
  */
 
 #include "system/SystemPacketBuffer.h"
+#include <assert.h>
 #include <app/AttributeCache.h>
 #include <app/InteractionModelEngine.h>
 #include <tuple>
@@ -45,7 +46,8 @@ CHIP_ERROR AttributeCache::UpdateCache(const ConcreteDataAttributePath & aPath, 
         //
         handle.RightSize();
 
-        state.Set<System::PacketBufferHandle>(std::move(handle));
+        assert(aPath.mDataVersion.HasValue());
+        state.Set<PacketBufferInfo>(std::move(handle), aPath.mDataVersion.Value());
     }
     else
     {
@@ -144,10 +146,28 @@ CHIP_ERROR AttributeCache::Get(const ConcreteAttributePath & path, TLV::TLVReade
 
     System::PacketBufferTLVReader bufReader;
 
-    bufReader.Init(attributeState->Get<System::PacketBufferHandle>().Retain());
+    bufReader.Init(attributeState->Get<PacketBufferInfo>().mHandle.Retain());
     ReturnErrorOnFailure(bufReader.Next());
 
     reader.Init(bufReader);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AttributeCache::GetVersion(const ConcreteAttributePath & path, Optional<DataVersion> & aVersion)
+{
+    CHIP_ERROR err;
+
+    auto attributeState = GetAttributeState(path.mEndpointId, path.mClusterId, path.mAttributeId, err);
+    ReturnErrorOnFailure(err);
+
+    if (attributeState->Is<StatusIB>())
+    {
+        return CHIP_ERROR_IM_STATUS_CODE_RECEIVED;
+    }
+
+    System::PacketBufferTLVReader bufReader;
+
+    aVersion.SetValue(attributeState->Get<PacketBufferInfo>().mDataVersion);
     return CHIP_NO_ERROR;
 }
 
@@ -219,6 +239,59 @@ CHIP_ERROR AttributeCache::GetStatus(const ConcreteAttributePath & path, StatusI
     return CHIP_NO_ERROR;
 }
 
+void AttributeCache::UpdateFilterMap(std::map<DataVersionFilter, size_t> & aMap)
+{
+    for(auto const& endpointIter: mCache)
+    {
+        EndpointId endpointId = endpointIter.first;
+        for(auto const& clusterIter: endpointIter.second)
+        {
+            DataVersion dataVersion = 0;
+            uint32_t clusterSize = 0;
+            ClusterId clusterId = clusterIter.first;
+            for(auto const& attributeIter: clusterIter.second)
+            {
+                if (!attributeIter.second.Is<StatusIB>())
+                {
+                    TLV::TLVReader reader;
+                    System::PacketBufferTLVReader bufReader;
+                    bufReader.Init(attributeIter.second.Get<PacketBufferInfo>().mHandle.Retain());
+                    ReturnOnFailure(bufReader.Next());
+
+                    reader.Init(bufReader);
+                    // Skip to the end of the element.
+                    ReturnOnFailure(reader.Skip());
+
+                    // Compute the amount of value data
+                    clusterSize += reader.GetLengthRead();
+
+                    dataVersion = attributeIter.second.Get<PacketBufferInfo>().mDataVersion;
+                }
+            }
+            if (clusterSize == 0)
+            {
+                continue;
+            }
+            DataVersionFilter filter(endpointId, clusterId, dataVersion);
+            aMap[filter] = clusterSize;
+        }
+    }
+}
+
+bool vector_compare(const std::pair<DataVersionFilter, size_t> & x, const std::pair<DataVersionFilter, size_t> & y)
+{
+    return x.second < y.second;
+}
+
+void AttributeCache::SortFilterMap(std::map<DataVersionFilter, size_t> & aMap, std::vector<std::pair<DataVersionFilter, size_t>> & aVector)
+{
+    for (auto item = aMap.begin(); item != aMap.end(); item++)
+    {
+        aVector.push_back(std::make_pair(item->first, item->second));
+    }
+    std::sort(aVector.begin(), aVector.end(), vector_compare);
+}
+
 uint32_t AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                                        const Span<AttributePathParams> & aAttributePaths)
 {
@@ -226,33 +299,20 @@ uint32_t AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Bui
     CHIP_ERROR err  = CHIP_NO_ERROR;
     TLV::TLVWriter backup;
 
-    std::set<ConcreteClusterPathWithSize, compare> clusterSet;
+    std::map<DataVersionFilter, size_t> filterMap;
+    UpdateFilterMap(filterMap);
+    std::vector<std::pair<DataVersionFilter, size_t>>  filterVector;
+    SortFilterMap(filterMap, filterVector);
 
-    for (auto & path : mChangedAttributeSet)
-    {
-        if (!path.mDataVersion.HasValue())
-        {
-            continue;
-        }
-        ConcreteClusterPathWithSize cluster(path.mEndpointId, path.mClusterId, path.mDataVersion.Value());
-        UpdateClusterSize(cluster);
-        if (cluster.mSize > 0)
-        {
-            clusterSet.insert(cluster);
-        }
-    }
-
-    for (auto path = clusterSet.rbegin(); path != clusterSet.rend(); path++)
+    for (auto filter = filterVector.rbegin(); filter != filterVector.rend(); filter++)
     {
         bool intersected = false;
-        DataVersionFilter dataVersionFilter(path->mEndpointId, path->mClusterId, path->mDataVersion);
         aDataVersionFilterIBsBuilder.Checkpoint(backup);
-        VerifyOrExit(dataVersionFilter.IsValidDataVersionFilter(), err = CHIP_ERROR_INCORRECT_STATE);
 
         // if the particular cached data version does not intersect with user provided attribute paths, skip the cached one
         for (auto & attribute : aAttributePaths)
         {
-            if (attribute.IsAttributePathIntersect(*path))
+            if (attribute.IsAttributePathIntersect(filter->first))
             {
                 intersected = true;
                 break;
@@ -263,18 +323,18 @@ uint32_t AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Bui
             continue;
         }
 
-        DataVersionFilterIB::Builder & filter = aDataVersionFilterIBsBuilder.CreateDataVersionFilter();
+        DataVersionFilterIB::Builder & filterIB = aDataVersionFilterIBsBuilder.CreateDataVersionFilter();
         SuccessOrExit(err = aDataVersionFilterIBsBuilder.GetError());
-        ClusterPathIB::Builder & filterPath = filter.CreatePath();
-        SuccessOrExit(err = filter.GetError());
-        SuccessOrExit(err = filterPath.Endpoint(dataVersionFilter.mEndpointId)
-                                .Cluster(dataVersionFilter.mClusterId)
+        ClusterPathIB::Builder & filterPath = filterIB.CreatePath();
+        SuccessOrExit(err = filterIB.GetError());
+        SuccessOrExit(err = filterPath.Endpoint(filter->first.mEndpointId)
+                                .Cluster(filter->first.mClusterId)
                                 .EndOfClusterPathIB()
                                 .GetError());
-        SuccessOrExit(err = filter.DataVersion(dataVersionFilter.mDataVersion.Value()).EndOfDataVersionFilterIB().GetError());
+        SuccessOrExit(err = filterIB.DataVersion(filter->first.mDataVersion.Value()).EndOfDataVersionFilterIB().GetError());
         ChipLogProgress(
             DataManagement, "Update DataVersionFilter: Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Version=%" PRIu32,
-            dataVersionFilter.mEndpointId, ChipLogValueMEI(dataVersionFilter.mClusterId), dataVersionFilter.mDataVersion.Value());
+                filter->first.mEndpointId, ChipLogValueMEI(filter->first.mClusterId), filter->first.mDataVersion.Value());
 
         number++;
     }

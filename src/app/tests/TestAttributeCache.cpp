@@ -191,6 +191,7 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
         writer.Init(std::move(handle), true);
         status            = StatusIB();
         path.mAttributeId = instruction.GetAttributeId();
+        path.mDataVersion.SetValue(1);
 
         ChipLogProgress(DataManagement, "\t -- Generating Instruction ID %d", instruction.mInstructionId);
 
@@ -612,35 +613,41 @@ void TestCache(nlTestSuite * apSuite, void * apContext)
                              AttributeInstruction(AttributeInstruction::kAttributeB, 0, AttributeInstruction::kData) });
 }
 
-void TestSortConcreteDataAttributePathWithSize(nlTestSuite * apSuite, void * apContext)
+void TestSortDataVersionFilterSet(nlTestSuite * apSuite, void * apContext)
 {
-    ConcreteClusterPathWithSize cluster1;
-    cluster1.mSize = 1;
-    ConcreteClusterPathWithSize cluster2;
-    cluster2.mSize = 1;
-    ConcreteClusterPathWithSize cluster3;
-    cluster3.mSize = 1;
-    std::set<ConcreteClusterPathWithSize, compare> clusterSet;
-    clusterSet.insert(cluster1);
-    clusterSet.insert(cluster2);
-    clusterSet.insert(cluster3);
-    NL_TEST_ASSERT(gSuite, 1 == clusterSet.size());
-    clusterSet.clear();
-    cluster1.mEndpointId = 1;
-    cluster1.mSize       = 2;
-    cluster2.mEndpointId = 2;
-    cluster2.mSize       = 4;
-    cluster3.mEndpointId = 3;
-    cluster3.mSize       = 1;
-    clusterSet.insert(cluster1);
-    clusterSet.insert(cluster2);
-    clusterSet.insert(cluster3);
-    NL_TEST_ASSERT(gSuite, 3 == clusterSet.size());
-    uint32_t temp = 0;
-    for (auto & item : clusterSet)
+    std::map<DataVersionFilter, size_t> filterMap;
+    DataVersionFilter filter1(1, 1, 1);
+    DataVersionFilter filter2(1, 1, 2);
+    filterMap[filter1] = 1;
+    filterMap[filter2] = 2;
+    NL_TEST_ASSERT(gSuite, 2 == filterMap.size());
+    DataVersionFilter filter3(1, 1, 2);
+    filterMap[filter3] = 3;
+    NL_TEST_ASSERT(gSuite, 2 == filterMap.size());
+    std::vector<std::pair<DataVersionFilter, size_t>>  filterVector;
+    AttributeCache::SortFilterMap(filterMap, filterVector);
+    size_t temp = 0;
+    for (auto & item : filterVector)
     {
-        NL_TEST_ASSERT(gSuite, temp < item.mSize);
-        temp = item.mSize;
+        NL_TEST_ASSERT(gSuite, temp < item.second);
+        temp = item.second;
+    }
+
+    filterMap.clear();
+    filterVector.clear();
+
+    DataVersionFilter filter4(1, 1, 1);
+    filterMap[filter4] = 2;
+    DataVersionFilter filter5(2, 1, 1);
+    filterMap[filter5] = 4;
+    DataVersionFilter filter6(3, 1, 1);
+    filterMap[filter6] = 3;
+    AttributeCache::SortFilterMap(filterMap, filterVector);
+    temp = 0;
+    for (auto & item : filterVector)
+    {
+        NL_TEST_ASSERT(gSuite, temp < item.second);
+        temp = item.second;
     }
 }
 
@@ -648,7 +655,7 @@ void TestSortConcreteDataAttributePathWithSize(nlTestSuite * apSuite, void * apC
 const nlTest sTests[] =
 {
     NL_TEST_DEF("TestCache", TestCache),
-    NL_TEST_DEF("TestSortConcreteDataAttributePathWithSize", TestSortConcreteDataAttributePathWithSize),
+    NL_TEST_DEF("TestSortDataVersionFilterSet", TestSortDataVersionFilterSet),
     NL_TEST_SENTINEL()
 };
 
