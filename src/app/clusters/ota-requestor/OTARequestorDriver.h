@@ -141,6 +141,9 @@ public:
     // @param[out] listExhausted - set to TRUE if the list of providers has been traversed until the end and has looped
     // back to the beginning.
     virtual bool GetNextProviderLocation(ProviderLocationType & providerLocation, bool & listExhausted) = 0;
+
+    // Inform the driver to attempt to schedule a retry
+    virtual CHIP_ERROR ScheduleRetry(bool trySameProvider) = 0;
 };
 
 } // namespace chip
