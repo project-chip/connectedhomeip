@@ -15,24 +15,24 @@ folder.
 
 ## Building a Sample Application
 
-Run `chef.sh -h` to see the available commands
+Run `chef.py -h` to see the available commands
 
 ## Building your first sample
 
 1. Make sure you have the toolchain installed for your desired target
-2. Update your SoC SDK paths on `chef_config.sh` and flip the `configured`
+2. Update your SoC SDK paths on `chef_config.py` and flip the `configured`
    variable to True
-3. Run `$ chef.sh -u` to update zap and the toolchain (on selected platforms)
-4. Run `$ chef.sh -gzbf -t <platform> -d lighting`. This command will run the
+3. Run `$ chef.py -u` to update zap and the toolchain (on selected platforms)
+4. Run `$ chef.py -gzbf -t <platform> -d lighting`. This command will run the
    ZAP GUI opening the `devices/lighting.zap` file and will allow editing. It
    will then generate the zap artifacts, place them on the `zap-generated`
    folder, run a build and flash the binary in your target
 
 ## Creating a new device type in your device library
 
-1. Run `$ chef.sh -g -d <device>` to open in the ZAP GUI a device to be used as
+1. Run `$ chef.py -g -d <device>` to open in the ZAP GUI a device to be used as
    a starting point.
 2. Edit your cluster configurations
 3. Click on `Save As` and save the file with the name of your new device type
    into the `devices` folder. This device is now available for the script. See
-   `chef.sh -h` for a list of devices available.
+   `chef.py -h` for a list of devices available.
