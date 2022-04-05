@@ -250,6 +250,12 @@ public:
      */
     bool CanEstablishReadTransaction(const ReadHandler * apReadHandler);
 
+    /**
+     * If there is a new fabric added after the subscriptions are established, we need to check if the existing subscriptions on
+     * each fabric will exceed the new limit of resource usage per fabric.
+     */
+    void CheckAndAbortExceededSubscriptions(FabricIndex aFabricIndex);
+
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     //
     // Get direct access to the underlying read handler pool

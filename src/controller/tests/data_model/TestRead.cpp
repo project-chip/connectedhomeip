@@ -183,6 +183,9 @@ public:
     static void TestReadHandler_SubscriptionAlteredReportingIntervals(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerResourceExhaustion_MultipleSubscriptions(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerResourceExhaustion_MultipleReads(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_FabricSubscriptionQuota(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_FabricSubscriptionPathQuota(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite * apSuite, void * apContext);
 
 private:
     static constexpr uint16_t kTestMinInterval = 33;
@@ -1002,6 +1005,230 @@ void TestReadInteraction::TestReadFabricScopedWithFabricFilter(nlTestSuite * apS
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
+namespace SubscriptionPathQuotaHelpers {
+class TestReadCallback : public app::ReadClient::Callback
+{
+public:
+    TestReadCallback() {}
+    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+                         const app::StatusIB & aStatus) override
+    {
+        if (apData != nullptr)
+        {
+            mAttributeCount++;
+        }
+    }
+
+    void OnDone() override { mOnDone++; }
+
+    void OnReportEnd() override { mOnReportEnd++; }
+
+    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mOnSubscriptionEstablishedCount++; }
+
+    void ClearCounters()
+    {
+        mAttributeCount                 = 0;
+        mOnReportEnd                    = 0;
+        mOnSubscriptionEstablishedCount = 0;
+        mOnDone                         = 0;
+    }
+
+    uint32_t mAttributeCount                 = 0;
+    uint32_t mOnReportEnd                    = 0;
+    uint32_t mOnSubscriptionEstablishedCount = 0;
+    uint32_t mOnDone                         = 0;
+} readCallback;
+
+// void ResubscribePolicy(uint32_t aNumCumulativeRetries, uint32_t & aNextSubscriptionIntervalMsec, bool & aShouldResubscribe)
+// {
+//     aShouldResubscribe = false;
+// }
+} // namespace SubscriptionPathQuotaHelpers
+
+void TestReadInteraction::TestReadHandler_FabricSubscriptionQuota(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx                      = *static_cast<TestContext *>(apContext);
+    auto sessionHandle                     = ctx.GetSessionBobToAlice();
+    size_t numSuccessCalls                 = 0;
+    size_t numSubscriptionEstablishedCalls = 0;
+    size_t numFailureCalls                 = 0;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        if (aError != CHIP_IM_GLOBAL_STATUS(PathsExhausted) && aError != CHIP_IM_GLOBAL_STATUS(ResourceExhausted))
+        {
+            numFailureCalls++;
+        }
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient) {
+        numSubscriptionEstablishedCalls++;
+    };
+
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
+
+    //
+    // Try to issue parallel subscriptions that will exceed the value for CHIP_IM_MAX_NUM_READ_HANDLER.
+    // Since we have limited the number of subscriptions per fabric, only a few of them can success.
+    //
+    for (int i = 0; i < (CHIP_IM_MAX_NUM_READ_HANDLER + 1); i++)
+    {
+        NL_TEST_ASSERT(apSuite,
+                       Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                           &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
+                           onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
+    }
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite,
+                   numSubscriptionEstablishedCalls ==
+                       static_cast<size_t>(CHIP_IM_MAX_NUM_READ_HANDLER / ctx.GetFabricTable().FabricCount() - 1));
+
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacity(-1);
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    ctx.DrainAndServiceIO();
+
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestReadHandler_FabricSubscriptionPathQuota(nlTestSuite * apSuite, void * apContext)
+{
+    using namespace SubscriptionPathQuotaHelpers;
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    readCallback.ClearCounters();
+
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
+
+    std::vector<std::unique_ptr<app::ReadClient>> readClients;
+
+    app::AttributePathParams attributePaths[10];
+    for (int i = 0; i < 10; i++)
+    {
+        attributePaths[i] = app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id);
+    }
+    app::ReadPrepareParams readParams(sessionHandle);
+
+    readParams.mpAttributePathParamsList    = attributePaths;
+    readParams.mAttributePathParamsListSize = 10;
+    readParams.mKeepSubscriptions           = true;
+
+    //
+    // Try to issue parallel subscriptions that will exceed the value for CHIP_IM_MAX_NUM_READ_HANDLER.
+    // Since we have limited the number of subscriptions per fabric, only a few of them can success.
+    //
+    for (int i = 0; i < (CHIP_IM_MAX_NUM_READ_HANDLER + 1); i++)
+    {
+        std::unique_ptr<app::ReadClient> readClient =
+            std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), readCallback,
+                                              app::ReadClient::InteractionType::Subscribe);
+        NL_TEST_ASSERT(apSuite, readClient->SendRequest(readParams) == CHIP_NO_ERROR);
+        readClients.push_back(std::move(readClient));
+    }
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite,
+                   readCallback.mAttributeCount <=
+                       static_cast<size_t>(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS / ctx.GetFabricTable().FabricCount() - 1));
+
+    // Shutdown all clients
+    readClients.clear();
+
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacity(-1);
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    ctx.DrainAndServiceIO();
+
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite * apSuite, void * apContext)
+{
+    using namespace SubscriptionPathQuotaHelpers;
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    readCallback.ClearCounters();
+
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
+
+    std::vector<std::unique_ptr<app::ReadClient>> readClients;
+
+    app::AttributePathParams attributePaths[10];
+    for (int i = 0; i < 10; i++)
+    {
+        attributePaths[i] = app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id);
+    }
+    app::ReadPrepareParams readParams(sessionHandle);
+    readParams.mpAttributePathParamsList    = attributePaths;
+    readParams.mAttributePathParamsListSize = 10;
+    readParams.mMaxIntervalCeilingSeconds   = 1;
+    readParams.mKeepSubscriptions           = true;
+
+    // Intentially issue read requests that exceeds the quota per fabric.
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
+    for (int i = 0; i < (CHIP_IM_MAX_NUM_READ_HANDLER + 1); i++)
+    {
+        std::unique_ptr<app::ReadClient> readClient =
+            std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), readCallback,
+                                              app::ReadClient::InteractionType::Subscribe);
+        NL_TEST_ASSERT(apSuite, readClient->SendRequest(readParams) == CHIP_NO_ERROR);
+        readClients.push_back(std::move(readClient));
+    }
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite,
+                   readCallback.mAttributeCount >
+                       static_cast<size_t>(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS / ctx.GetFabricTable().FabricCount() - 1));
+    NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablishedCount == static_cast<size_t>(CHIP_IM_MAX_NUM_READ_HANDLER + 1));
+    ChipLogError(Zcl, "Attr Cnt: %u sub cnt: %u", readCallback.mAttributeCount, readCallback.mOnSubscriptionEstablishedCount);
+
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
+    // The following check will trigger the logic in im to kill the read handlers that uses more paths than the limit per fabric.
+    {
+        std::unique_ptr<app::ReadClient> readClient =
+            std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), readCallback,
+                                              app::ReadClient::InteractionType::Subscribe);
+        NL_TEST_ASSERT(apSuite, readClient->SendRequest(readParams) == CHIP_NO_ERROR);
+        readClients.push_back(std::move(readClient));
+    }
+
+    ctx.DrainAndServiceIO();
+
+    {
+        app::AttributePathParams path;
+        path.mEndpointId  = kTestEndpointId;
+        path.mClusterId   = TestCluster::Id;
+        path.mAttributeId = TestCluster::Attributes::Int16u::Id;
+        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+    }
+    readCallback.ClearCounters();
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite,
+                   readCallback.mAttributeCount <=
+                       static_cast<size_t>(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS / ctx.GetFabricTable().FabricCount() - 1));
+
+    // Shutdown all clients
+    readClients.clear();
+
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacity(-1);
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
@@ -1021,6 +1248,9 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadHandlerResourceExhaustion_MultipleReads", TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads),
     NL_TEST_DEF("TestReadAttributeTimeout", TestReadInteraction::TestReadAttributeTimeout),
     NL_TEST_DEF("TestReadHandler_SubscriptionAlteredReportingIntervals", TestReadInteraction::TestReadHandler_SubscriptionAlteredReportingIntervals),
+    NL_TEST_DEF("TestReadHandler_FabricSubscriptionQuota", TestReadInteraction::TestReadHandler_FabricSubscriptionQuota),
+    NL_TEST_DEF("TestReadHandler_FabricSubscriptionPathQuota", TestReadInteraction::TestReadHandler_FabricSubscriptionPathQuota),
+    NL_TEST_DEF("TestReadHandler_KillOverQuotaSubscriptions", TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions),
     NL_TEST_SENTINEL()
 };
 // clang-format on
