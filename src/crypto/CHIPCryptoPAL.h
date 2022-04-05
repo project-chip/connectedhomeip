@@ -1564,7 +1564,6 @@ public:
 
     /**
      * @brief Free P256 KeyPair.
-     * @return None
      **/
     virtual void FreeP256KeyPair(P256Keypair * p256key) = 0;
 
