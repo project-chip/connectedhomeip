@@ -1,6 +1,76 @@
 # Commands will be run in CHIP project root.
 cd "{root}"
 
+# Generating linux-arm64-all-clusters
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-all-clusters'
+
+# Generating linux-arm64-all-clusters-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-all-clusters-ipv6only'
+
+# Generating linux-arm64-door-lock
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/door-lock-app/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-door-lock'
+
+# Generating linux-arm64-door-lock-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/door-lock-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-door-lock-ipv6only'
+
+# Generating linux-arm64-minmdns
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/minimal-mdns '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-minmdns'
+
+# Generating linux-arm64-minmdns-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/minimal-mdns '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-minmdns-ipv6only'
+
+# Generating linux-arm64-ota-provider
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-provider-app/linux '"'"'--args=chip_config_network_layer_ble=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-ota-provider'
+
+# Generating linux-arm64-ota-provider-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-provider-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-ota-provider-ipv6only'
+
+# Generating linux-arm64-ota-requestor
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/linux '"'"'--args=chip_config_network_layer_ble=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-ota-requestor'
+
+# Generating linux-arm64-ota-requestor-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-ota-requestor-ipv6only'
+
+# Generating linux-arm64-shell
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/standalone '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-shell'
+
+# Generating linux-arm64-shell-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/standalone '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-shell-ipv6only'
+
+# Generating linux-arm64-thermostat
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/thermostat/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-thermostat'
+
+# Generating linux-arm64-thermostat-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/thermostat/linux '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-thermostat-ipv6only'
+
 # Generating linux-fake-tests
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=chip_build_tests=true custom_toolchain="//build/toolchain/fake:fake_x64_gcc" chip_link_tests=true chip_device_platform="fake"' {out}/linux-fake-tests
 
@@ -69,6 +139,48 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 # Generating linux-x64-tv-app-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/tv-app/linux --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-tv-app-ipv6only
+
+# Building linux-arm64-all-clusters
+ninja -C {out}/linux-arm64-all-clusters
+
+# Building linux-arm64-all-clusters-ipv6only
+ninja -C {out}/linux-arm64-all-clusters-ipv6only
+
+# Building linux-arm64-door-lock
+ninja -C {out}/linux-arm64-door-lock
+
+# Building linux-arm64-door-lock-ipv6only
+ninja -C {out}/linux-arm64-door-lock-ipv6only
+
+# Building linux-arm64-minmdns
+ninja -C {out}/linux-arm64-minmdns
+
+# Building linux-arm64-minmdns-ipv6only
+ninja -C {out}/linux-arm64-minmdns-ipv6only
+
+# Building linux-arm64-ota-provider
+ninja -C {out}/linux-arm64-ota-provider
+
+# Building linux-arm64-ota-provider-ipv6only
+ninja -C {out}/linux-arm64-ota-provider-ipv6only
+
+# Building linux-arm64-ota-requestor
+ninja -C {out}/linux-arm64-ota-requestor
+
+# Building linux-arm64-ota-requestor-ipv6only
+ninja -C {out}/linux-arm64-ota-requestor-ipv6only
+
+# Building linux-arm64-shell
+ninja -C {out}/linux-arm64-shell
+
+# Building linux-arm64-shell-ipv6only
+ninja -C {out}/linux-arm64-shell-ipv6only
+
+# Building linux-arm64-thermostat
+ninja -C {out}/linux-arm64-thermostat
+
+# Building linux-arm64-thermostat-ipv6only
+ninja -C {out}/linux-arm64-thermostat-ipv6only
 
 # Building linux-fake-tests
 ninja -C {out}/linux-fake-tests check
