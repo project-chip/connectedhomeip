@@ -28,6 +28,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -40,6 +41,7 @@
 
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/KvsPersistentStorageDelegate.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
@@ -229,6 +231,8 @@ void Cleanup()
     }
     chip::trace::DeInitTrace();
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
+    // TODO(16968): Lifecycle management of storage-using components like GroupDataProvider, etc
 }
 
 } // namespace
@@ -689,24 +693,28 @@ CommissionerDiscoveryController * GetCommissionerDiscoveryController()
 
 void ChipLinuxAppMainLoop()
 {
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
+
 #if defined(ENABLE_CHIP_SHELL)
     Engine::Root().Init();
     std::thread shellThread([]() { Engine::Root().RunMainLoop(); });
     Shell::RegisterCommissioneeCommands();
 #endif
-    uint16_t securePort   = CHIP_PORT;
-    uint16_t unsecurePort = CHIP_UDC_PORT;
+    initParams.operationalServicePort        = CHIP_PORT;
+    initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
     // use a different service port to make testing possible with other sample devices running on same host
-    securePort   = LinuxDeviceOptions::GetInstance().securedDevicePort;
-    unsecurePort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
+    initParams.operationalServicePort        = LinuxDeviceOptions::GetInstance().securedDevicePort;
+    initParams.userDirectedCommissioningPort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
+    ;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
-    Inet::InterfaceId interfaceId = LinuxDeviceOptions::GetInstance().interfaceId;
+    initParams.interfaceId = LinuxDeviceOptions::GetInstance().interfaceId;
 
     // Init ZCL Data Model and CHIP App Server
-    Server::GetInstance().Init(nullptr, securePort, unsecurePort, interfaceId);
+    Server::GetInstance().Init(initParams);
 
     // Now that the server has started and we are done with our startup logging,
     // log our discovery/onboarding information again so it's not lost in the

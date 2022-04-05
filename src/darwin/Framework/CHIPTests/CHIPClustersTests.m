@@ -103,8 +103,7 @@ CHIPDevice * GetConnectedDevice(void)
 - (void)onPairingComplete:(NSError *)error
 {
     XCTAssertEqual(error.code, 0);
-    [_expectation fulfill];
-    _expectation = nil;
+    // Keep waiting for onCommissioningComplete
 }
 
 - (void)onCommissioningComplete:(NSError *)error

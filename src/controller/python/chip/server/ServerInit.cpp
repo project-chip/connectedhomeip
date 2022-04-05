@@ -172,7 +172,12 @@ void pychip_server_native_init()
     uint16_t unsecurePort = CHIP_UDC_PORT;
 
     // Init ZCL Data Model and CHIP App Server
-    chip::Server::GetInstance().Init(nullptr, securePort, unsecurePort);
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.operationalServicePort        = CHIP_PORT;
+    initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
+
+    chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
     // SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

@@ -233,10 +233,6 @@ function getManualTests()
     'Test_TC_OCC_3_1',
   ];
 
-  const OnOff = [
-    'Test_TC_OO_2_4',
-  ];
-
   const PressureMeasurement = [
     'Test_TC_PRS_2_2',
     'Test_TC_PRS_2_3',
@@ -272,7 +268,6 @@ function getManualTests()
     WindowCovering, //
     FlowMeasurement, //
     OccupancySensing, //
-    OnOff, //
     PressureMeasurement, //
     PowerSource, //
 
@@ -435,6 +430,7 @@ function getTests()
     'Test_TC_OO_2_1',
     'Test_TC_OO_2_2',
     'Test_TC_OO_2_3',
+    'Test_TC_OO_2_4',
   ];
 
   const PowerSource = [

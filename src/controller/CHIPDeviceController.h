@@ -670,6 +670,10 @@ private:
     static void OnCommissioningCompleteResponse(
         void * context,
         const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
+    static void OnDisarmFailsafe(void * context,
+                                 const app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
+    static void OnDisarmFailsafeFailure(void * context, CHIP_ERROR error);
+    void DisarmDone();
 
     /**
      * @brief
@@ -680,10 +684,25 @@ private:
      * @param[in] NOCSRElements   CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
      * @param[in] AttestationSignature       Cryptographic signature generated for all the above fields.
      * @param[in] dac               device attestation certificate
+     * @param[in] pai               Product Attestation Intermediate certificate
      * @param[in] csrNonce          certificate signing request nonce
      */
-    CHIP_ERROR ProcessCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature, ByteSpan dac,
-                          ByteSpan csrNonce);
+    CHIP_ERROR ProcessCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature,
+                          const ByteSpan & dac, const ByteSpan & pai, const ByteSpan & csrNonce);
+
+    /**
+     * @brief
+     *   This function validates the CSR information from the device.
+     *   (Reference: Specifications section 11.18.5.6. NOCSR Elements)
+     *
+     * @param[in] proxy           device proxy
+     * @param[in] NOCSRElements   CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
+     * @param[in] AttestationSignature       Cryptographic signature generated for all the above fields.
+     * @param[in] dac               device attestation certificate
+     * @param[in] csrNonce          certificate signing request nonce
+     */
+    CHIP_ERROR ValidateCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature,
+                           const ByteSpan & dac, const ByteSpan & csrNonce);
 
     /**
      * @brief
@@ -695,6 +714,7 @@ private:
 
     CommissioneeDeviceProxy * FindCommissioneeDevice(const SessionHandle & session);
     CommissioneeDeviceProxy * FindCommissioneeDevice(NodeId id);
+    CommissioneeDeviceProxy * FindCommissioneeDevice(const Transport::PeerAddress & peerAddress);
     void ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device);
 
     template <typename ClusterObjectT, typename RequestObjectT>
@@ -719,6 +739,18 @@ private:
 
     static CHIP_ERROR ConvertFromOperationalCertStatus(chip::app::Clusters::OperationalCredentials::OperationalCertStatus err);
 
+    // Sends commissioning complete callbacks to the delegate depending on the status. Sends
+    // OnCommissioningComplete and either OnCommissioningSuccess or OnCommissioningFailure depending on the given completion status.
+    void SendCommissioningCompleteCallbacks(NodeId nodeId, const CompletionStatus & completionStatus);
+
+    // Cleans up and resets failsafe as appropriate depending on the error and the failed stage.
+    // For success, sends completion report with the CommissioningDelegate and sends callbacks to the PairingDelegate
+    // For failures after AddNOC succeeds, sends completion report with the CommissioningDelegate and sends callbacks to the
+    // PairingDelegate. In this case, it does not disarm the failsafe or close the pase connection. For failures up through AddNOC,
+    // sends a command to immediately expire the failsafe, then sends completion report with the CommissioningDelegate and callbacks
+    // to the PairingDelegate upon arm failsafe command completion.
+    void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus);
+
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
@@ -731,6 +763,7 @@ private:
         nullptr; // Commissioning delegate to call when PairDevice / Commission functions are used
     CommissioningDelegate * mCommissioningDelegate =
         nullptr; // Commissioning delegate that issued the PerformCommissioningStep command
+    CompletionStatus commissioningCompletionStatus;
 
     Platform::UniquePtr<app::AttributeCache> mAttributeCache;
     Platform::UniquePtr<app::ReadClient> mReadClient;

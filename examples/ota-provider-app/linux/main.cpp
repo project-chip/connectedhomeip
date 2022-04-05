@@ -43,16 +43,16 @@ using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 // TODO: this should probably be done dynamically
 constexpr chip::EndpointId kOtaProviderEndpoint = 0;
 
+constexpr uint16_t kOptionUpdateAction              = 'a';
+constexpr uint16_t kOptionUserConsentNeeded         = 'c';
 constexpr uint16_t kOptionFilepath                  = 'f';
 constexpr uint16_t kOptionOtaImageList              = 'o';
+constexpr uint16_t kOptionDelayedApplyActionTimeSec = 'p';
 constexpr uint16_t kOptionQueryImageStatus          = 'q';
+constexpr uint16_t kOptionDelayedQueryActionTimeSec = 't';
+constexpr uint16_t kOptionUserConsentState          = 'u';
 constexpr uint16_t kOptionIgnoreQueryImage          = 'x';
 constexpr uint16_t kOptionIgnoreApplyUpdate         = 'y';
-constexpr uint16_t kOptionUserConsentState          = 'u';
-constexpr uint16_t kOptionUpdateAction              = 'a';
-constexpr uint16_t kOptionDelayedQueryActionTimeSec = 't';
-constexpr uint16_t kOptionDelayedApplyActionTimeSec = 'p';
-constexpr uint16_t kOptionUserConsentNeeded         = 'c';
 
 OTAProviderExample gOtaProvider;
 chip::ota::DefaultOTAProviderUserConsent gUserConsentProvider;
@@ -261,51 +261,52 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 }
 
 OptionDef cmdLineOptionsDef[] = {
+    { "applyUpdateAction", chip::ArgParser::kArgumentRequired, kOptionUpdateAction },
+    { "userConsentNeeded", chip::ArgParser::kNoArgument, kOptionUserConsentNeeded },
     { "filepath", chip::ArgParser::kArgumentRequired, kOptionFilepath },
     { "otaImageList", chip::ArgParser::kArgumentRequired, kOptionOtaImageList },
+    { "delayedApplyActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedApplyActionTimeSec },
     { "queryImageStatus", chip::ArgParser::kArgumentRequired, kOptionQueryImageStatus },
+    { "delayedQueryActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedQueryActionTimeSec },
+    { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
     { "ignoreQueryImage", chip::ArgParser::kArgumentRequired, kOptionIgnoreQueryImage },
     { "ignoreApplyUpdate", chip::ArgParser::kArgumentRequired, kOptionIgnoreApplyUpdate },
-    { "applyUpdateAction", chip::ArgParser::kArgumentRequired, kOptionUpdateAction },
-    { "delayedQueryActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedQueryActionTimeSec },
-    { "delayedApplyActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedApplyActionTimeSec },
-    { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
-    { "UserConsentNeeded", chip::ArgParser::kNoArgument, kOptionUserConsentNeeded },
     {},
 };
 
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
-                             "  -f/--filepath <file>\n"
-                             "        Path to a file containing an OTA image\n"
-                             "  -o/--otaImageList <file>\n"
-                             "        Path to a file containing a list of OTA images\n"
-                             "  -q/--queryImageStatus <updateAvailable | busy | updateNotAvailable>\n"
-                             "        Value for the Status field in the first QueryImageResponse.\n"
-                             "        For all subsequent responses, the value of updateAvailable will be used.\n"
-                             "  -x/--ignoreQueryImage <num_times_to_ignore>\n"
-                             "        The number of times to ignore the QueryImage Command and not send a response.\n"
-                             "  -y/--ignoreApplyUpdate <num_times_to_ignore>\n"
-                             "        The number of times to ignore the ApplyUpdate Request and not send a response.\n"
-                             "  -a/--applyUpdateAction <proceed | awaitNextAction | discontinue>\n"
+                             "  -a, --applyUpdateAction <proceed | awaitNextAction | discontinue>\n"
                              "        Value for the Action field in the first ApplyUpdateResponse.\n"
                              "        For all subsequent responses, the value of proceed will be used.\n"
-                             "  -t/--delayedQueryActionTimeSec <time>\n"
-                             "        Value in seconds for the first DelayedActionTime field in the QueryImageResponse.\n"
-                             "        Value will revert back to 0 seconds on subsequent QueryImageResponses.\n"
-                             "  -p/--delayedApplyActionTimeSec <time>\n"
-                             "        Value in seconds for the first DelayedActionTime field in the ApplyUpdateResponse.\n"
-                             "        Value will revert back to 0 seconds on subsequent ApplyUpdateResponses.\n"
-                             "  -u/--userConsentState <granted | denied | deferred>\n"
+                             "  -c, --userConsentNeeded\n"
+                             "        If supplied, value of the UserConsentNeeded field in the QueryImageResponse\n"
+                             "        is set to true. This is only applicable if value of the RequestorCanConsent\n"
+                             "        field in QueryImage Command is true.\n"
+                             "        Otherwise, value of the UserConsentNeeded field is false.\n"
+                             "  -f, --filepath <file path>\n"
+                             "        Path to a file containing an OTA image\n"
+                             "  -o, --otaImageList <file path>\n"
+                             "        Path to a file containing a list of OTA images\n"
+                             "  -p, --delayedApplyActionTimeSec <time in seconds>\n"
+                             "        Value for the DelayedActionTime field in the first ApplyUpdateResponse.\n"
+                             "        For all subsequent responses, the value of zero will be used.\n"
+                             "  -q, --queryImageStatus <updateAvailable | busy | updateNotAvailable>\n"
+                             "        Value for the Status field in the first QueryImageResponse.\n"
+                             "        For all subsequent responses, the value of updateAvailable will be used.\n"
+                             "  -t, --delayedQueryActionTimeSec <time in seconds>\n"
+                             "        Value for the DelayedActionTime field in the first QueryImageResponse.\n"
+                             "        For all subsequent responses, the value of zero will be used.\n"
+                             "  -u, --userConsentState <granted | denied | deferred>\n"
                              "        The user consent state for the first QueryImageResponse. For all subsequent\n"
-                             "        responses, the value of granted state will be used.\n"
-                             "        granted: Status field in QueryImageResponse is set to updateAvailable\n"
-                             "        denied: Status field in QueryImageResponse is set to updateNotAvailable\n"
-                             "        deferred: Status field in QueryImageResponse is set to busy\n"
-                             "        -q/--queryImageStatus overrides this option\n"
-                             "  -c/--UserConsentNeeded\n"
-                             "        If provided, and value of RequestorCanConsent field in QueryImage Command is true,\n"
-                             "        then value of UserConsentNeeded field in the QueryImageResponse is set to true.\n"
-                             "        Else, value of UserConsentNeeded is false.\n" };
+                             "        responses, the value of granted will be used.\n"
+                             "        Note that --queryImageStatus overrides this option.\n"
+                             "        granted: Status field in the first QueryImageResponse is set to updateAvailable\n"
+                             "        denied: Status field in the first QueryImageResponse is set to updateNotAvailable\n"
+                             "        deferred: Status field in the first QueryImageResponse is set to busy\n"
+                             "  -x, --ignoreQueryImage <ignore count>\n"
+                             "        The number of times to ignore the QueryImage Command and not send a response.\n"
+                             "  -y, --ignoreApplyUpdate <ignore count>\n"
+                             "        The number of times to ignore the ApplyUpdateRequest Command and not send a response.\n" };
 
 OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
 

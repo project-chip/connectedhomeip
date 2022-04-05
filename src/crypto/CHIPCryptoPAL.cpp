@@ -24,6 +24,7 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/BufferWriter.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <string.h>
@@ -797,6 +798,74 @@ CHIP_ERROR DeriveGroupSessionId(const ByteSpan & operational_key, uint16_t & ses
                                             sizeof(kGroupKeyHashSalt), kGroupKeyHashInfo, sizeof(kGroupKeyHashInfo), out_key,
                                             sizeof(out_key)));
     session_id = Encoding::BigEndian::Get16(out_key);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExtractVIDPIDFromAttributeString(DNAttrType attrType, const ByteSpan & attr,
+                                            AttestationCertVidPid & vidpidFromMatterAttr, AttestationCertVidPid & vidpidFromCNAttr)
+{
+    ReturnErrorCodeIf(attrType == DNAttrType::kUnspecified, CHIP_NO_ERROR);
+    ReturnErrorCodeIf(attr.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (attrType == DNAttrType::kMatterVID || attrType == DNAttrType::kMatterPID)
+    {
+        uint16_t matterAttr;
+        VerifyOrReturnError(attr.size() == kVIDandPIDHexLength, CHIP_ERROR_WRONG_CERT_DN);
+        VerifyOrReturnError(Encoding::UppercaseHexToUint16(reinterpret_cast<const char *>(attr.data()), attr.size(), matterAttr) ==
+                                sizeof(matterAttr),
+                            CHIP_ERROR_WRONG_CERT_DN);
+
+        if (attrType == DNAttrType::kMatterVID)
+        {
+            // Not more than one VID attribute can be present.
+            ReturnErrorCodeIf(vidpidFromMatterAttr.mVendorId.HasValue(), CHIP_ERROR_WRONG_CERT_DN);
+            vidpidFromMatterAttr.mVendorId.SetValue(static_cast<VendorId>(matterAttr));
+        }
+        else
+        {
+            // Not more than one PID attribute can be present.
+            ReturnErrorCodeIf(vidpidFromMatterAttr.mProductId.HasValue(), CHIP_ERROR_WRONG_CERT_DN);
+            vidpidFromMatterAttr.mProductId.SetValue(matterAttr);
+        }
+    }
+    // Otherwise, it is a CommonName attribute.
+    else if (!vidpidFromCNAttr.Initialized())
+    {
+        char cnAttr[kMax_CommonNameAttr_Length + 1];
+        if (attr.size() <= chip::Crypto::kMax_CommonNameAttr_Length)
+        {
+            memcpy(cnAttr, attr.data(), attr.size());
+            cnAttr[attr.size()] = 0;
+
+            char * vid = strstr(cnAttr, kVIDPrefixForCNEncoding);
+            if (vid != nullptr)
+            {
+                vid += strlen(kVIDPrefixForCNEncoding);
+                if (cnAttr + attr.size() >= vid + kVIDandPIDHexLength)
+                {
+                    uint16_t matterAttr;
+                    if (Encoding::UppercaseHexToUint16(vid, kVIDandPIDHexLength, matterAttr) == sizeof(matterAttr))
+                    {
+                        vidpidFromCNAttr.mVendorId.SetValue(static_cast<VendorId>(matterAttr));
+                    }
+                }
+            }
+
+            char * pid = strstr(cnAttr, kPIDPrefixForCNEncoding);
+            if (pid != nullptr)
+            {
+                pid += strlen(kPIDPrefixForCNEncoding);
+                if (cnAttr + attr.size() >= pid + kVIDandPIDHexLength)
+                {
+                    uint16_t matterAttr;
+                    if (Encoding::UppercaseHexToUint16(pid, kVIDandPIDHexLength, matterAttr) == sizeof(matterAttr))
+                    {
+                        vidpidFromCNAttr.mProductId.SetValue(matterAttr);
+                    }
+                }
+            }
+        }
+    }
     return CHIP_NO_ERROR;
 }
 

@@ -34,15 +34,15 @@
 namespace chip {
 
 // This class implements all of the core logic of the OTA Requestor
-class OTARequestor : public OTARequestorInterface, public BDXDownloader::StateDelegate
+class DefaultOTARequestor : public OTARequestorInterface, public BDXDownloader::StateDelegate
 {
 public:
-    OTARequestor() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
+    DefaultOTARequestor() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
 
     //////////// OTARequestorInterface Implementation ///////////////
     void Reset(void) override;
 
-    EmberAfStatus HandleAnnounceOTAProvider(
+    void HandleAnnounceOTAProvider(
         app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
         const app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) override;
 
@@ -50,7 +50,7 @@ public:
     OTATriggerResult TriggerImmediateQuery() override;
 
     // Internal API meant for use by OTARequestorDriver to send the QueryImage command and start the image update process
-    // with the Provider currently set in the OTARequestor
+    // with the Provider currently set
     void TriggerImmediateQueryInternal() override;
 
     // Initiate download of the new image
@@ -103,7 +103,7 @@ public:
                                 app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason) override;
     void OnUpdateProgressChanged(app::DataModel::Nullable<uint8_t> percent) override;
 
-    //////////// OTARequestor public APIs ///////////////
+    //////////// DefaultOTARequestor public APIs ///////////////
 
     /**
      * Called to perform some initialization. Note that some states that must be initalized in the CHIP context will be deferred to

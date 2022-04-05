@@ -130,7 +130,7 @@ public:
                                 app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason) = 0;
 
     /// Direct the driver to trigger the QueryImage command. The driver may choose to execute some internal
-    /// logic and will then call an OTARequestor API to actually send the command. The purpose of this
+    /// logic and will then call an OTARequestorInterface API to actually send the command. The purpose of this
     /// function is to allow implementation-specific logic (such as possibly cancelling an ongoing update)
     /// to be executed before triggering the image update process
     virtual void SendQueryImage() = 0;

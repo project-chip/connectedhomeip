@@ -120,9 +120,10 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     return NewNodeOperationalX509Cert(noc_request, pubkey, mIssuer, noc);
 }
 
-CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan & csrElements,
-                                                                 const ByteSpan & attestationSignature, const ByteSpan & DAC,
-                                                                 const ByteSpan & PAI, const ByteSpan & PAA,
+CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
+                                                                 const ByteSpan & attestationSignature,
+                                                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC,
+                                                                 const ByteSpan & PAI,
                                                                  Callback::Callback<OnNOCChainGeneration> * onCompletion)
 {
     jmethodID method;

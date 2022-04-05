@@ -25,6 +25,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/server/CommissioningWindowManager.h>
+#include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/Span.h>
@@ -162,13 +164,36 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
 
     FabricIndex accessingFabricIndex = commandObj->GetAccessingFabricIndex();
 
+    // We do not allow CASE connections to arm the failsafe for the first time while the commissioning window is open in order
+    // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
     if (!failSafeContext.IsFailSafeBusy() &&
         (!failSafeContext.IsFailSafeArmed() || failSafeContext.MatchesFabricIndex(accessingFabricIndex)))
     {
-        CheckSuccess(failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
-                     Failure);
-        response.errorCode = CommissioningError::kOk;
-        commandObj->AddResponse(commandPath, response);
+        // We do not allow CASE connections to arm the failsafe for the first time while the commissioning window is open in order
+        // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
+        if (!failSafeContext.IsFailSafeArmed() &&
+            Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() !=
+                AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen &&
+            commandObj->GetSubjectDescriptor().authMode == Access::AuthMode::kCase)
+        {
+            response.errorCode = CommissioningError::kBusyWithOtherAdmin;
+            commandObj->AddResponse(commandPath, response);
+        }
+        else if (commandData.expiryLengthSeconds == 0)
+        {
+            // Force the timer to expire immediately.
+            failSafeContext.ForceFailSafeTimerExpiry();
+            response.errorCode = CommissioningError::kOk;
+            commandObj->AddResponse(commandPath, response);
+        }
+        else
+        {
+            CheckSuccess(
+                failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
+                Failure);
+            response.errorCode = CommissioningError::kOk;
+            commandObj->AddResponse(commandPath, response);
+        }
     }
     else
     {

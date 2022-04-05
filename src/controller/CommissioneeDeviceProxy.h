@@ -203,6 +203,7 @@ public:
     NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
     PeerId GetPeerId() const { return mPeerId; }
     CHIP_ERROR SetPeerId(ByteSpan rcac, ByteSpan noc) override;
+    const Transport::PeerAddress & GetPeerAddress() const { return mDeviceAddress; }
 
     bool MatchesSession(const SessionHandle & session) const { return mSecureSession.Contains(session); }
 

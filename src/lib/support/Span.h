@@ -274,4 +274,15 @@ inline CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan &
     return CHIP_NO_ERROR;
 }
 
+inline CHIP_ERROR CopyCharSpanToMutableCharSpan(CharSpan cspan_to_copy, MutableCharSpan & out_buf)
+{
+    VerifyOrReturnError(IsSpanUsable(cspan_to_copy), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_buf.size() >= cspan_to_copy.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    memcpy(out_buf.data(), cspan_to_copy.data(), cspan_to_copy.size());
+    out_buf.reduce_size(cspan_to_copy.size());
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace chip

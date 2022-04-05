@@ -37,10 +37,13 @@ OT_SIMULATION_CACHE_STAMP_FILE="$CIRQUE_CACHE_PATH/ot-simulation.commit"
 CIRQUE_TESTS=(
     "EchoTest"
     "EchoOverTcpTest"
+    "FailsafeTest"
     "MobileDeviceTest"
     "CommissioningTest"
     "InteractionModelTest"
     "SplitCommissioningTest"
+    "CommissioningFailureTest"
+    "CommissioningFailureOnReportTest"
 )
 
 BOLD_GREEN_TEXT="\033[1;32m"

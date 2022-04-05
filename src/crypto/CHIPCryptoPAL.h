@@ -30,6 +30,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/Optional.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
@@ -96,6 +97,11 @@ constexpr size_t kMAX_Hash_SHA256_Context_Size = CHIP_CONFIG_SHA256_CONTEXT_SIZE
 
 constexpr size_t kSpake2p_WS_Length                 = kP256_FE_Length + 8;
 constexpr size_t kSpake2p_VerifierSerialized_Length = kP256_FE_Length + kP256_Point_Length;
+
+constexpr char kVIDPrefixForCNEncoding[]    = "Mvid:";
+constexpr char kPIDPrefixForCNEncoding[]    = "Mpid:";
+constexpr size_t kVIDandPIDHexLength        = sizeof(uint16_t) * 2;
+constexpr size_t kMax_CommonNameAttr_Length = 64;
 
 /*
  * Overhead to encode a raw ECDSA signature in X9.62 format in ASN.1 DER
@@ -1397,16 +1403,47 @@ CHIP_ERROR ExtractSKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
  **/
 CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid);
 
-enum class MatterOid
+/**
+ * Defines DN attribute types that can include endocing of VID/PID parameters.
+ */
+enum class DNAttrType
 {
-    kVendorId,
-    kProductId,
+    kUnspecified = 0,
+    kCommonName  = 1,
+    kMatterVID   = 2,
+    kMatterPID   = 3,
 };
 
 /**
- * @brief Extracts one of the IDs listed in MatterOid enum from an X509 Certificate.
+ *  @struct AttestationCertVidPid
+ *
+ *  @brief
+ *    A data structure representing Attestation Certificate VID and PID attributes.
+ */
+struct AttestationCertVidPid
+{
+    Optional<VendorId> mVendorId;
+    Optional<uint16_t> mProductId;
+
+    bool Initialized() const { return (mVendorId.HasValue() || mProductId.HasValue()); }
+};
+
+/**
+ * @brief Extracts VID and PID attributes from the DN Attribute string.
+ *        If attribute is not present the corresponding output value stays uninitialized.
+ *
+ * @return CHIP_ERROR_INVALID_ARGUMENT if wrong input is provided.
+ *         CHIP_ERROR_WRONG_CERT_DN if encoding of kMatterVID and kMatterPID attributes is wrong.
+ *         CHIP_NO_ERROR otherwise.
  **/
-CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & certificate, uint16_t & id);
+CHIP_ERROR ExtractVIDPIDFromAttributeString(DNAttrType attrType, const ByteSpan & attr,
+                                            AttestationCertVidPid & vidpidFromMatterAttr, AttestationCertVidPid & vidpidFromCNAttr);
+
+/**
+ * @brief Extracts VID and PID attributes from the Subject DN of an X509 Certificate.
+ *        If attribute is not present the corresponding output value stays uninitialized.
+ **/
+CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & x509Cert, AttestationCertVidPid & vidpid);
 
 /**
  * @brief Opaque context used to protect a symmetric key. The key operations must

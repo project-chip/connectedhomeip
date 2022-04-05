@@ -374,6 +374,18 @@ void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
     });
 }
 
+void SessionManager::ExpireAllPASEPairings()
+{
+    ChipLogDetail(Inet, "Expiring all PASE pairings");
+    mSecureSessions.ForEachSession([&](auto session) {
+        if (session->GetSecureSessionType() == Transport::SecureSession::Type::kPASE)
+        {
+            mSecureSessions.ReleaseSession(session);
+        }
+        return Loop::Continue;
+    });
+}
+
 Optional<SessionHandle> SessionManager::AllocateSession()
 {
     return mSecureSessions.CreateNewSecureSession();

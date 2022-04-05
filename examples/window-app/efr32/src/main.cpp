@@ -143,7 +143,9 @@ int main(void)
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     EFR32_LOG("Starting Platform Manager Event Loop");

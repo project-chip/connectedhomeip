@@ -15,7 +15,7 @@ list(
     APPEND ${list_chip_main_sources}
     #OTARequestor
     ${chip_dir}/src/app/clusters/ota-requestor/BDXDownloader.cpp
-    ${chip_dir}/src/app/clusters/ota-requestor/OTARequestor.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/GenericOTARequestorDriver.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp

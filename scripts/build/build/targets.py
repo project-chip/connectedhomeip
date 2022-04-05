@@ -30,6 +30,7 @@ from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
+from builders.bl602 import Bl602App, Bl602Board, Bl602Builder
 
 
 class Target:
@@ -503,7 +504,6 @@ def QorvoTargets():
     yield target.Extend('shell', board=QpgBoard.QPG6105, app=QpgApp.SHELL)
     yield target.Extend('persistent-storage', board=QpgBoard.QPG6105, app=QpgApp.PERSISTENT_STORAGE)
 
-
 def TizenTargets():
 
     # Possible build variants.
@@ -519,6 +519,11 @@ def TizenTargets():
 
     for target in builder.AllVariants():
         yield target
+        
+def Bl602Targets():
+    target = Target('bl602', Bl602Builder)
+
+    yield target.Extend('light', board=Bl602Board.BL602BOARD, app=Bl602App.LIGHT)
 
 
 ALL = []
@@ -537,6 +542,7 @@ target_generators = [
     Cyw30739Targets(),
     QorvoTargets(),
     TizenTargets(),
+    Bl602Targets(),
 ]
 
 for generator in target_generators:

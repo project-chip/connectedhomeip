@@ -141,8 +141,9 @@ extern bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCe
                      EVP_PKEY * newKey);
 extern bool ResignCert(X509 * cert, X509 * caCert, EVP_PKEY * caKey);
 
-extern bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subjectVID, uint16_t subjectPID, X509 * caCert,
-                        EVP_PKEY * caKey, const struct tm & validFrom, uint32_t validDays, X509 * newCert, EVP_PKEY * newKey);
+extern bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subjectVID, uint16_t subjectPID,
+                        bool encodeVIDandPIDasCN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom, uint32_t validDays,
+                        X509 * newCert, EVP_PKEY * newKey);
 
 extern bool GenerateKeyPair(EVP_PKEY * key);
 extern bool ReadKey(const char * fileName, EVP_PKEY * key);
