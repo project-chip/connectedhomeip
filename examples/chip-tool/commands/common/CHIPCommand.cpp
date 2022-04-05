@@ -238,7 +238,7 @@ std::string CHIPCommand::GetIdentity()
             // normalize name since it is used in persistent storage
 
             char s[24];
-            sprintf(s, "%llu", fabricId);
+            sprintf(s, "%" PRIu64, fabricId);
 
             name = s;
         }
