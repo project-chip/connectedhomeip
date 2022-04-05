@@ -4132,12 +4132,14 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer NetworkingStatus, String DebugText, Long ErrorValue) {
+    public void onSuccess(
+        Integer NetworkingStatus, Optional<String> DebugText, @Nullable Long ErrorValue) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo NetworkingStatusResponseValue =
           new CommandResponseInfo("NetworkingStatus", "Integer");
       responseValues.put(NetworkingStatusResponseValue, NetworkingStatus);
-      CommandResponseInfo DebugTextResponseValue = new CommandResponseInfo("DebugText", "String");
+      CommandResponseInfo DebugTextResponseValue =
+          new CommandResponseInfo("DebugText", "Optional<String>");
       responseValues.put(DebugTextResponseValue, DebugText);
       CommandResponseInfo ErrorValueResponseValue = new CommandResponseInfo("ErrorValue", "Long");
       responseValues.put(ErrorValueResponseValue, ErrorValue);
@@ -4195,7 +4197,7 @@ public class ClusterInfoMapping {
     @Override
     public void onSuccess(
         Integer NetworkingStatus,
-        String DebugText,
+        Optional<String> DebugText,
         Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
             WiFiScanResults,
         Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>
@@ -4204,7 +4206,8 @@ public class ClusterInfoMapping {
       CommandResponseInfo NetworkingStatusResponseValue =
           new CommandResponseInfo("NetworkingStatus", "Integer");
       responseValues.put(NetworkingStatusResponseValue, NetworkingStatus);
-      CommandResponseInfo DebugTextResponseValue = new CommandResponseInfo("DebugText", "String");
+      CommandResponseInfo DebugTextResponseValue =
+          new CommandResponseInfo("DebugText", "Optional<String>");
       responseValues.put(DebugTextResponseValue, DebugText);
       // WiFiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
       // Conversion from this type to Java is not properly implemented yet
@@ -10516,7 +10519,7 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> networkCommissioningscanNetworksCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo networkCommissioningscanNetworksssidCommandParameterInfo =
-        new CommandParameterInfo("ssid", byte[].class);
+        new CommandParameterInfo("ssid", Optional.class);
     networkCommissioningscanNetworksCommandParams.put(
         "ssid", networkCommissioningscanNetworksssidCommandParameterInfo);
 
@@ -10532,7 +10535,7 @@ public class ClusterInfoMapping {
                   .scanNetworks(
                       (ChipClusters.NetworkCommissioningCluster.ScanNetworksResponseCallback)
                           callback,
-                      (byte[]) commandArguments.get("ssid"),
+                      (Optional<byte[]>) commandArguments.get("ssid"),
                       (Optional<Long>) commandArguments.get("breadcrumb"));
             },
             () -> new DelegatedScanNetworksResponseCallback(),

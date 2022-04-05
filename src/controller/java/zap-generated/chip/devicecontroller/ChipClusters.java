@@ -11415,13 +11415,15 @@ public class ChipClusters {
     }
 
     public void scanNetworks(
-        ScanNetworksResponseCallback callback, byte[] ssid, Optional<Long> breadcrumb) {
+        ScanNetworksResponseCallback callback,
+        @Nullable Optional<byte[]> ssid,
+        Optional<Long> breadcrumb) {
       scanNetworks(chipClusterPtr, callback, ssid, breadcrumb, null);
     }
 
     public void scanNetworks(
         ScanNetworksResponseCallback callback,
-        byte[] ssid,
+        @Nullable Optional<byte[]> ssid,
         Optional<Long> breadcrumb,
         int timedInvokeTimeoutMs) {
       scanNetworks(chipClusterPtr, callback, ssid, breadcrumb, timedInvokeTimeoutMs);
@@ -11467,12 +11469,13 @@ public class ChipClusters {
     private native void scanNetworks(
         long chipClusterPtr,
         ScanNetworksResponseCallback Callback,
-        byte[] ssid,
+        @Nullable Optional<byte[]> ssid,
         Optional<Long> breadcrumb,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface ConnectNetworkResponseCallback {
-      void onSuccess(Integer networkingStatus, String debugText, Long errorValue);
+      void onSuccess(
+          Integer networkingStatus, Optional<String> debugText, @Nullable Long errorValue);
 
       void onError(Exception error);
     }
@@ -11487,7 +11490,7 @@ public class ChipClusters {
     public interface ScanNetworksResponseCallback {
       void onSuccess(
           Integer networkingStatus,
-          String debugText,
+          Optional<String> debugText,
           Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
               wiFiScanResults,
           Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>

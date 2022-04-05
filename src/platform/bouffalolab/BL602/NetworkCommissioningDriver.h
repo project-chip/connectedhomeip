@@ -21,7 +21,7 @@
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
-//#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+// #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 namespace {
 constexpr uint8_t kMaxWiFiNetworks                  = 1;
 constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
@@ -41,7 +41,7 @@ public:
         }
 
 #if 0
-        item.security = mpScanResults[mIternum].authmode;
+        item.security.SetRaw(mpScanResults[mIternum].authmode);
         item.ssidLen =
             strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
         item.channel  = mpScanResults[mIternum].primary;
@@ -131,7 +131,7 @@ private:
     ConnectCallback * mpConnectCallback;
     NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 };
-//#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+// #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 } // namespace NetworkCommissioning
 } // namespace DeviceLayer

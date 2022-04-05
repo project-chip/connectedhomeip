@@ -620,6 +620,16 @@ enum class NetworkCommissioningFeature : uint32_t
     kThreadNetworkInterface   = 0x2,
     kEthernetNetworkInterface = 0x4,
 };
+
+// Bitmap for WiFiSecurity
+enum class WiFiSecurity : uint8_t
+{
+    kUnencrypted  = 0x1,
+    kWepPersonal  = 0x2,
+    kWpaPersonal  = 0x4,
+    kWpa2Personal = 0x8,
+    kWpa3Personal = 0x10,
+};
 } // namespace NetworkCommissioning
 
 namespace DiagnosticLogs {

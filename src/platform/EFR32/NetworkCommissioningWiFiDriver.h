@@ -42,7 +42,7 @@ constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
 //             return false;
 //         }
 
-//         item.security = mpScanResults[mIternum].authmode;
+//         item.security.SetRaw(mpScanResults[mIternum].authmode);
 //         item.ssidLen =
 //             strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid),
 //             chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);

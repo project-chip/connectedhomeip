@@ -27571,16 +27571,26 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)scanNetworksWithParams:(CHIPNetworkCommissioningClusterScanNetworksParams *)params
+- (void)scanNetworksWithParams:(CHIPNetworkCommissioningClusterScanNetworksParams * _Nullable)params
              completionHandler:(void (^)(CHIPNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
     NetworkCommissioning::Commands::ScanNetworks::Type request;
-    request.ssid = [self asByteSpan:params.ssid];
-    if (params.breadcrumb != nil) {
-        auto & definedValue_0 = request.breadcrumb.Emplace();
-        definedValue_0 = params.breadcrumb.unsignedLongLongValue;
+    if (params != nil) {
+        if (params.ssid != nil) {
+            auto & definedValue_0 = request.ssid.Emplace();
+            if (params.ssid == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = [self asByteSpan:params.ssid];
+            }
+        }
+        if (params.breadcrumb != nil) {
+            auto & definedValue_0 = request.breadcrumb.Emplace();
+            definedValue_0 = params.breadcrumb.unsignedLongLongValue;
+        }
     }
 
     new CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge(

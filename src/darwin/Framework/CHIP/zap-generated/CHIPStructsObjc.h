@@ -152,7 +152,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull networkName;
 @property (strong, nonatomic) NSNumber * _Nonnull channel;
 @property (strong, nonatomic) NSNumber * _Nonnull version;
-@property (strong, nonatomic) NSNumber * _Nonnull extendedAddress;
+@property (strong, nonatomic) NSData * _Nonnull extendedAddress;
 @property (strong, nonatomic) NSNumber * _Nonnull rssi;
 @property (strong, nonatomic) NSNumber * _Nonnull lqi;
 - (instancetype)init;
