@@ -1941,7 +1941,6 @@ exit:
     return err;
 }
 
-
 /**
  *  @brief Openssl P256 key builder for Operatinal and Ephemeral keys.
  **/
@@ -1950,13 +1949,13 @@ class OpensslDefaultP256KeypairBuilder : public P256KeypairBuilder
 public:
     virtual P256Keypair * BuildP256KeyPairForOperationalKey(FabricIndex fabricIdx) override;
 
-    virtual CHIP_ERROR ConfirmP256KeyPairForOperationalKey(FabricIndex fabricIdx, P256Keypair* p256key) override;
+    virtual CHIP_ERROR ConfirmP256KeyPairForOperationalKey(FabricIndex fabricIdx, P256Keypair * p256key) override;
 
     virtual P256Keypair * GetP256KeyPairForOperationalKey(FabricIndex fabricIdx) override;
 
     virtual P256Keypair * BuildP256KeyPairForEphemeralUsage() override;
 
-    virtual void FreeP256KeyPair(P256Keypair* p256key) override;
+    virtual void FreeP256KeyPair(P256Keypair * p256key) override;
 };
 
 P256Keypair * OpensslDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKey(FabricIndex fabricIdx)
@@ -1968,18 +1967,18 @@ P256Keypair * OpensslDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKe
     return keypair;
 }
 
-CHIP_ERROR OpensslDefaultP256KeypairBuilder::ConfirmP256KeyPairForOperationalKey(FabricIndex fabricIdx, P256Keypair* p256key)
+CHIP_ERROR OpensslDefaultP256KeypairBuilder::ConfirmP256KeyPairForOperationalKey(FabricIndex fabricIdx, P256Keypair * p256key)
 {
-    //TBD
-    (void)fabricIdx;
-    (void)p256key;
+    // TBD
+    (void) fabricIdx;
+    (void) p256key;
     return CHIP_NO_ERROR;
 }
 
 P256Keypair * OpensslDefaultP256KeypairBuilder::GetP256KeyPairForOperationalKey(FabricIndex fabricIdx)
 {
-    //TBD
-    (void)fabricIdx;
+    // TBD
+    (void) fabricIdx;
     return NULL;
 }
 
@@ -1991,9 +1990,10 @@ P256Keypair * OpensslDefaultP256KeypairBuilder::BuildP256KeyPairForEphemeralUsag
     return keypair;
 }
 
-void OpensslDefaultP256KeypairBuilder::FreeP256KeyPair(P256Keypair* p256key)
+void OpensslDefaultP256KeypairBuilder::FreeP256KeyPair(P256Keypair * p256key)
 {
-    if (p256key != nullptr){
+    if (p256key != nullptr)
+    {
         p256key->Clear();
         Platform::Delete(p256key);
     }
@@ -2015,7 +2015,6 @@ void SetP256KeypairBuilder(P256KeypairBuilder * builder)
 {
     gP256KeypairBuilder = builder;
 }
-
 
 } // namespace Crypto
 } // namespace chip
