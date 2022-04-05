@@ -119,6 +119,46 @@ bool DefaultOTARequestorDriver::ProviderLocationsEqual(const ProviderLocationTyp
     return false;
 }
 
+void DefaultOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR error) 
+{
+    if( error == CHIP_NO_ERROR )
+    {
+        return;
+    }
+
+    switch(state)
+    {
+        case UpdateFailureState::kUnknown:
+            // Retry with next provider in the list
+            ScheduleRetry(false);
+            break;
+        case UpdateFailureState::kIdle:
+            // Ignore - We shouldn't be hitting this case.
+            break;
+        case UpdateFailureState::kQuerying:
+            // Retry with same provider
+            ScheduleRetry(true);
+            break;
+        case UpdateFailureState::kDownloading:
+            // Retry with same provider
+            ScheduleRetry(true);
+            break;
+        case UpdateFailureState::kApplying:
+            // Retry with same provider
+            ScheduleRetry(true);
+            break;
+        case UpdateFailureState::kNotifying:
+            // Ignore error and transition to Idle
+            break;
+        case UpdateFailureState::kAwaitingNextAction:
+            // Ignore error and transition to Idle
+            break;
+        case UpdateFailureState::kDelayedOnUserConsent:
+            // Ignore error and transition to Idle
+            break;
+    }
+}
+
 void DefaultOTARequestorDriver::HandleIdleStateExit()
 {
     // Start watchdog timer to monitor new Query Image session
@@ -461,7 +501,7 @@ bool DefaultOTARequestorDriver::GetNextProviderLocation(ProviderLocationType & p
     return false;
 }
 
-CHIP_ERROR GenericOTARequestorDriver::ScheduleRetry(bool trySameProvider)
+CHIP_ERROR DefaultOTARequestorDriver::ScheduleRetry(bool trySameProvider)
 {
     VerifyOrDie(mRequestor != nullptr);
 

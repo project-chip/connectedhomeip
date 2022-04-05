@@ -66,6 +66,7 @@ public:
     uint16_t GetMaxDownloadBlockSize() override;
     void SetMaxDownloadBlockSize(uint16_t maxDownloadBlockSize) override;
 
+    void HandleError(UpdateFailureState state, CHIP_ERROR error) override;
     void HandleIdleStateExit() override;
     void HandleIdleStateEnter(IdleStateReason reason) override;
     void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) override;
@@ -80,8 +81,7 @@ public:
                                      app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason) override;
     void SendQueryImage() override;
     bool GetNextProviderLocation(ProviderLocationType & providerLocation, bool & listExhausted) override;
-    CHIP_ERROR ScheduleRetry(bool trySameProvider) override;
-
+    
 protected:
     void StartPeriodicQueryTimer();
     void StopPeriodicQueryTimer();
@@ -93,6 +93,7 @@ protected:
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
     void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState);
     bool ProviderLocationsEqual(const ProviderLocationType & a, const ProviderLocationType & b);
+    CHIP_ERROR ScheduleRetry(bool trySameProvider);
 
     OTARequestorInterface * mRequestor           = nullptr;
     OTAImageProcessorInterface * mImageProcessor = nullptr;

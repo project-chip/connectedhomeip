@@ -94,6 +94,9 @@ public:
     /// Set maximum supported download block size
     virtual void SetMaxDownloadBlockSize(uint16_t maxDownloadBlockSize) = 0;
 
+    /// Called when an error occurs at any OTA requestor operation
+    virtual void HandleError(UpdateFailureState state, CHIP_ERROR error) = 0;
+
     /// Called when OTA Requestor has exited the Idle state for which the driver may need to take various actions
     virtual void HandleIdleStateExit() = 0;
 
@@ -141,9 +144,6 @@ public:
     // @param[out] listExhausted - set to TRUE if the list of providers has been traversed until the end and has looped
     // back to the beginning.
     virtual bool GetNextProviderLocation(ProviderLocationType & providerLocation, bool & listExhausted) = 0;
-
-    // Inform the driver to attempt to schedule a retry
-    virtual CHIP_ERROR ScheduleRetry(bool trySameProvider) = 0;
 };
 
 } // namespace chip

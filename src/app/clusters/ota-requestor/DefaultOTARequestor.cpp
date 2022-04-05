@@ -631,7 +631,6 @@ void DefaultOTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTA
     case OTADownloader::State::kIdle:
         if (reason != OTAChangeReasonEnum::kSuccess)
         {
-            mOtaRequestorDriver->ScheduleRetry(true);
             RecordErrorUpdateState(UpdateFailureState::kDownloading, CHIP_ERROR_CONNECTION_ABORTED, reason);
         }
 
@@ -705,6 +704,9 @@ void DefaultOTARequestor::RecordErrorUpdateState(UpdateFailureState failureState
     Nullable<uint8_t> progressPercent = imageProcessor->GetPercentComplete();
     Nullable<int64_t> platformCode;
     OtaRequestorServerOnDownloadError(mTargetVersion, imageProcessor->GetBytesDownloaded(), progressPercent, platformCode);
+
+    // Inform driver of the error
+    mOtaRequestorDriver->HandleError(failureState, error);
 
     // Whenever an error occurs, always reset to Idle state
     RecordNewUpdateState(OTAUpdateStateEnum::kIdle, reason, error);
