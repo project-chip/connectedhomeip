@@ -54,7 +54,7 @@ public:
 
     void _OnPlatformEvent(const ChipDeviceEvent * event);
 
-    CHIP_ERROR _GetThreadProvision(ByteSpan & netInfo);
+    CHIP_ERROR _GetThreadProvision(Thread::OperationalDataset & dataset);
 
     CHIP_ERROR _SetThreadProvision(ByteSpan netInfo);
 

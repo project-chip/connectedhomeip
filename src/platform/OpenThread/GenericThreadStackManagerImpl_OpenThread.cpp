@@ -304,7 +304,7 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadProvisioned(v
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadProvision(ByteSpan & netInfo)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadProvision(Thread::OperationalDataset & dataset)
 {
     VerifyOrReturnError(Impl()->IsThreadProvisioned(), CHIP_ERROR_INCORRECT_STATE);
     otOperationalDatasetTlvs datasetTlv;
@@ -317,8 +317,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadProvis
         return MapOpenThreadError(otErr);
     }
 
-    ReturnErrorOnFailure(mActiveDataset.Init(ByteSpan(datasetTlv.mTlvs, datasetTlv.mLength)));
-    netInfo = mActiveDataset.AsByteSpan();
+    ReturnErrorOnFailure(dataset.Init(ByteSpan(datasetTlv.mTlvs, datasetTlv.mLength)));
 
     return CHIP_NO_ERROR;
 }
@@ -1853,24 +1852,23 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_UpdateNetworkStatus()
 
     ByteSpan datasetTLV;
     Thread::OperationalDataset dataset;
-    uint8_t extpanid[chip::Thread::kSizeExtendedPanId];
+    ByteSpan extpanid;
 
     // If we have not provisioned any Thread network, return the status from last network scan,
     // If we have provisioned a network, we assume the ot-br-posix is activitely connecting to that network.
-    ReturnOnFailure(ThreadStackMgrImpl().GetThreadProvision(datasetTLV));
-    ReturnOnFailure(dataset.Init(datasetTLV));
+    ReturnOnFailure(ThreadStackMgrImpl().GetThreadProvision(dataset));
     // The Thread network is not enabled, but has a different extended pan id.
-    ReturnOnFailure(dataset.GetExtendedPanId(extpanid));
+    ReturnOnFailure(dataset.GetExtendedPanIdAsByteSpan(extpanid));
     // If we don't have a valid dataset, we are not attempting to connect the network.
 
     // We have already connected to the network, thus return success.
     if (ThreadStackMgrImpl().IsThreadAttached())
     {
-        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(ByteSpan(extpanid)), NullOptional);
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(extpanid), NullOptional);
     }
     else
     {
-        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kNetworkNotFound, MakeOptional(ByteSpan(extpanid)),
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kNetworkNotFound, MakeOptional(extpanid),
                                                          MakeOptional(static_cast<int32_t>(OT_ERROR_DETACHED)));
     }
 }
