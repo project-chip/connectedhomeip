@@ -75,7 +75,8 @@ public:
     {
         if (mOperationalKey != nullptr)
         {
-            chip::Crypto::GetP256KeypairBuilder()->FreeP256KeyPair(mOperationalKey);
+            chip::Platform::Delete(mOperationalKey);
+            mOperationalKey = nullptr;
         }
         ReleaseOperationalCerts();
     }
