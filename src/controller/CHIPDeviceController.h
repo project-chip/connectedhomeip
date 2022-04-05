@@ -28,9 +28,9 @@
 
 #pragma once
 
-#include <app/ClusterStateCache.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
+#include <app/ClusterStateCache.h>
 #include <app/OperationalDeviceProxy.h>
 #include <app/OperationalDeviceProxyPool.h>
 #include <controller/AbstractDnssdDiscoveryController.h>

@@ -29,6 +29,7 @@
 #include <lib/support/Variant.h>
 #include <list>
 #include <map>
+#include <queue>
 #include <set>
 #include <vector>
 
@@ -36,7 +37,7 @@ namespace chip {
 namespace app {
 
 /*
- * This implements an attribute cache designed to aggregate attribute data received by a client
+ * This implements a cluster state cache designed to aggregate both attribute and event data received by a client
  * from either read or subscribe interactions and keep it resident and available for clients to
  * query at any time while the cache is active.
  *
@@ -47,8 +48,10 @@ namespace app {
  * state being determined by the associated ReadClient's path set.
  *
  * The cache provides a number of getters and helper functions to iterate over the topology
- * of the received data which is organized by endpoint, cluster and attribute ID. These permit greater
+ * of the received data which is organized by endpoint, cluster and attribute ID (for attributes). These permit greater
  * flexibility when dealing with interactions that use wildcards heavily.
+ *
+ * For events, functions that permit iteration over the cached events sorted by event number are provided.
  *
  * The data is stored internally in the cache as TLV. This permits re-use of the existing cluster objects
  * to de-serialize the state on-demand.
@@ -92,8 +95,8 @@ public:
     ReadClient::Callback & GetBufferedCallback() { return mBufferedReader; }
 
     /*
-     * Retrieve the value of an attribute from the cache (if present) given a concrete path and decode
-     * is using DataModel::Decode into the in-out argument 'value'.
+     * Retrieve the value of an attribute from the cache (if present) given a concrete path by decoding
+     * it using DataModel::Decode into the in-out argument 'value'.
      *
      * For some types of attributes, the value for the attribute is directly backed by the underlying TLV buffer
      * and has pointers into that buffer. (e.g octet strings, char strings and lists).  This buffer only remains
@@ -218,6 +221,64 @@ public:
     CHIP_ERROR Get(const ConcreteAttributePath & path, TLV::TLVReader & reader);
 
     /*
+     * Retrieve the value of an event from the cache given a concrete event path by decoding
+     * it using DataModel::Decode into the in-out argument 'value'.
+     *
+     * For some types of events, the values for the fields in the event is directly backed by the underlying TLV buffer
+     * and has pointers into that buffer. (e.g octet strings, char strings and lists). Unlike its attribute counterpart,
+     * these pointers are stable and will not change until a call to `ClearEventCache` is called.
+     *
+     * The template parameter EventObjectTypeT is generally expected to be a
+     * ClusterName::Events::EventName::DecodableType, but any
+     * object that can be decoded using the DataModel::Decode machinery will work.
+     *
+     * Notable return values:
+     *      - If the provided attribute object's Cluster and Event IDs don't match that of the event in the cache,
+     *        a CHIP_ERROR_SCHEMA_MISMATCH shall be returned.
+     *
+     *      - If event doesn't exist in the cache, CHIP_ERROR_KEY_NOT_FOUND
+     *        shall be returned.
+     */
+
+    template <typename EventObjectTypeT>
+    CHIP_ERROR Get(EventNumber eventNumber, EventObjectTypeT & value)
+    {
+        TLV::TLVReader reader;
+        CHIP_ERROR err;
+
+        auto * eventData = GetEventData(eventNumber, err);
+        ReturnErrorOnFailure(err);
+
+        if (eventData->first.mPath.mClusterId != value.GetClusterId() || eventData->first.mPath.mEventId != value.GetEventId())
+        {
+            return CHIP_ERROR_SCHEMA_MISMATCH;
+        }
+
+        ReturnErrorOnFailure(Get(eventNumber, reader));
+        return DataModel::Decode(reader, value);
+    }
+
+    /*
+     * Retrieve the value of an event by updating a in-out TLVReader to be positioned
+     * right at the structure that encapsulates the event payload.
+     *
+     * Notable return values:
+     *      - If no event with a matching eventNumber exists in the cache, CHIP_ERROR_KEY_NOT_FOUND
+     *        shall be returned.
+     *
+     */
+    CHIP_ERROR Get(EventNumber eventNumber, TLV::TLVReader & reader);
+
+    /*
+     * Retrieve the StatusIB for a specific event from the event status cache (if one exists).
+     * Otherwise, a CHIP_ERROR_KEY_NOT_FOUND error will be returned.
+     *
+     * This is to be used with the `ForEachEventStatus` iterator function.
+     *
+     */
+    CHIP_ERROR GetStatus(const ConcreteEventPath & path, StatusIB & status);
+
+    /*
      * Execute an iterator function that is called for every attribute
      * in a given endpoint and cluster. The function when invoked is provided a concrete attribute path
      * to every attribute that matches in the cache.
@@ -310,11 +371,89 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    /*
+     * Execute an iterator function that is called for every event in the event data cache.
+     * This iterator is called in increasing order from the event with the lowest event number to the highest.
+     *
+     * The function is passed a const reference to the EventHeader associated with that event.
+     *
+     * The iterator is expected to have this signature:
+     *      CHIP_ERROR IteratorFunc(const EventHeader &eventHeader);
+     *
+     * Notable return values:
+     *      - If func returns an error, that will result in termination of any further iteration over events
+     *        and that error shall be returned back up to the original call to this function.
+     *
+     */
+    template <typename IteratorFunc>
+    CHIP_ERROR ForEachEventData(IteratorFunc func)
+    {
+        for (const auto & item : mEventDataCache)
+        {
+            ReturnErrorOnFailure(func(item.first));
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    /*
+     * Execute an iterator function that is called for every StatusIB in the event status cache.
+     *
+     * The iterator is expected to have this signature:
+     *      CHIP_ERROR IteratorFunc(const ConcreteEventPath &eventPath, const StatusIB &statusIB);
+     *
+     * Notable return values:
+     *      - If func returns an error, that will result in termination of any further iteration over events
+     *        and that error shall be returned back up to the original call to this function.
+     *
+     */
+    template <typename IteratorFunc>
+    CHIP_ERROR ForEachEventStatus(IteratorFunc func)
+    {
+        for (const auto & item : mEventStatusCache)
+        {
+            ReturnErrorOnFailure(func(item.first, item.second));
+        }
+    }
+
+    /*
+     * Clear out the event data and status caches.
+     *
+     * By default, this will not clear out any internally tracked event counters, specifically:
+     *   - the highest event number seen so far. This is used in reads/subscribe requests to express to the receiving
+     *    server to not send events that the client has already seen so far.
+     *
+     * That can be over-ridden by passing in 'true' to `resetTrackedEventCounters`.
+     *
+     */
+    void ClearEventCache(bool resetTrackedEventCounters = false)
+    {
+        mEventDataCache.clear();
+        if (resetTrackedEventCounters)
+        {
+            mHighestReceivedEventNumber = 0;
+        }
+    }
+
 private:
     using AttributeState = Variant<System::PacketBufferHandle, StatusIB>;
     using ClusterState   = std::map<AttributeId, AttributeState>;
     using EndpointState  = std::map<ClusterId, ClusterState>;
     using NodeState      = std::map<EndpointId, EndpointState>;
+
+    using EventData = std::pair<EventHeader, System::PacketBufferHandle>;
+
+    //
+    // This is a custom comparator for use with the std::set<EventData> below. Uniqueness
+    // is determined solely by the event number associated with each event.
+    //
+    struct EventDataCompare
+    {
+        bool operator()(const EventData & lhs, const EventData & rhs) const
+        {
+            return (lhs.first.mEventNumber < rhs.first.mEventNumber);
+        }
+    };
 
     /*
      * These functions provide a way to index into the cached state with different sub-sets of a path, returning
@@ -330,13 +469,16 @@ private:
      */
     EndpointState * GetEndpointState(EndpointId endpointId, CHIP_ERROR & err);
     ClusterState * GetClusterState(EndpointId endpointId, ClusterId clusterId, CHIP_ERROR & err);
-    AttributeState * GetAttributeState(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, CHIP_ERROR & err);
+    const AttributeState * GetAttributeState(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, CHIP_ERROR & err);
+
+    const EventData * GetEventData(EventNumber number, CHIP_ERROR & err);
 
     /*
      * Updates the state of an attribute in the cache given a reader. If the reader is null, the state is updated
      * with the provided status.
      */
     CHIP_ERROR UpdateCache(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus);
+    CHIP_ERROR UpdateEventCache(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus);
 
 private:
     //
@@ -347,10 +489,7 @@ private:
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
     void OnError(CHIP_ERROR aError) override { return mCallback.OnError(aError); }
 
-    void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override
-    {
-        return mCallback.OnEventData(aEventHeader, apData, apStatus);
-    }
+    void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override;
 
     void OnDone() override { return mCallback.OnDone(); }
     void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mCallback.OnSubscriptionEstablished(aSubscriptionId); }
@@ -365,6 +504,10 @@ private:
     NodeState mCache;
     std::set<ConcreteAttributePath> mChangedAttributeSet;
     std::vector<EndpointId> mAddedEndpoints;
+
+    std::set<EventData, EventDataCompare> mEventDataCache;
+    EventNumber mHighestReceivedEventNumber = 0;
+    std::map<ConcreteEventPath, StatusIB> mEventStatusCache;
     BufferedReadCallback mBufferedReader;
 };
 

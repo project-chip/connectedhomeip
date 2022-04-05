@@ -36,8 +36,6 @@ static_library("app") {
 
   sources = [
     "AttributeAccessInterface.cpp",
-    "ClusterStateCache.cpp",
-    "ClusterStateCache.h",
     "AttributePathExpandIterator.cpp",
     "AttributePathExpandIterator.h",
     "AttributePathParams.h",
@@ -50,6 +48,8 @@ static_library("app") {
     "CASESessionManager.h",
     "ChunkedWriteCallback.cpp",
     "ChunkedWriteCallback.h",
+    "ClusterStateCache.cpp",
+    "ClusterStateCache.h",
     "CommandHandler.cpp",
     "CommandResponseHelper.h",
     "CommandSender.cpp",

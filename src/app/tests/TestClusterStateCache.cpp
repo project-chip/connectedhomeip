@@ -400,7 +400,8 @@ private:
         }
     }
 
-    void DecodeClusterObject(const AttributeInstruction & instruction, const ConcreteAttributePath & path, ClusterStateCache * cache)
+    void DecodeClusterObject(const AttributeInstruction & instruction, const ConcreteAttributePath & path,
+                             ClusterStateCache * cache)
     {
         std::list<ClusterStateCache::AttributeStatus> statusList;
         NL_TEST_ASSERT(gSuite, cache->Get(path.mEndpointId, path.mClusterId, clusterValue, statusList) == CHIP_NO_ERROR);
