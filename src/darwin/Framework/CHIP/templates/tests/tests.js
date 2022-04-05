@@ -278,7 +278,6 @@ function getTests()
     'TestLogCommands',
     'TestOperationalCredentialsCluster',
     'TestBinding',
-    'TestUserLabelCluster',
   ];
 
   const SoftwareDiagnostics = [

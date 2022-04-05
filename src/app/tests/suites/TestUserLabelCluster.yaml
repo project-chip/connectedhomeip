@@ -18,6 +18,9 @@ config:
     nodeId: 0x12344321
     cluster: "User Label"
     endpoint: 0
+    discriminator:
+        type: INT16U
+        defaultValue: 3840
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -27,6 +30,18 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
+
+    - label: "Clear User Label List"
+      command: "writeAttribute"
+      attribute: "label list"
+      arguments:
+          value: []
+
+    - label: "Read User Label List"
+      command: "readAttribute"
+      attribute: "label list"
+      response:
+          value: []
 
     - label: "Write User Label List"
       command: "writeAttribute"
@@ -39,6 +54,22 @@ tests:
                   { label: "floor", value: "5" },
                   { label: "direction", value: "up" },
               ]
+
+    - label: "Reboot target device"
+      cluster: "SystemCommands"
+      command: "Reboot"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: discriminator
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Verify"
       command: "readAttribute"
