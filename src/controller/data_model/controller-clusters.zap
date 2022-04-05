@@ -8826,7 +8826,23 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
-              "outgoing": 0
+              "outgoing": 1
+            },
+            {
+              "name": "GetHolidaySchedule",
+              "code": 18,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "ClearHolidaySchedule",
+              "code": 19,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
             },
             {
               "name": "SetUser",
