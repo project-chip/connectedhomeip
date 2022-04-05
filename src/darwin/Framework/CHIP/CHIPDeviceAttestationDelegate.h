@@ -31,9 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Notify the delegate when device attestation fails
  *
  */
-- (void)deviceAttestation:(CHIPDeviceController *)controller
-                 deviceId:(uint64_t)deviceId
-          failedWithError:(NSError * _Nonnull)error;
+- (void)deviceAttestation:(CHIPDeviceController *)controller deviceId:(uint64_t)deviceId failedWithError:(NSError * _Nonnull)error;
 
 @end
 
