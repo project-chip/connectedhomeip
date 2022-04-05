@@ -30,7 +30,7 @@ namespace DeviceLayer {
 
 namespace {
 constexpr TLV::Tag kLabelNameTag  = TLV::ContextTag(0);
-constexpr TLV::Tag kLableValueTag = TLV::ContextTag(1);
+constexpr TLV::Tag kLabelValueTag = TLV::ContextTag(1);
 } // anonymous namespace
 
 CHIP_ERROR DeviceInfoProviderImpl::Init()
@@ -140,7 +140,7 @@ CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t in
     TLV::TLVType outerType;
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
     ReturnErrorOnFailure(writer.PutString(kLabelNameTag, userLabel.label));
-    ReturnErrorOnFailure(writer.PutString(kLableValueTag, userLabel.value));
+    ReturnErrorOnFailure(writer.PutString(kLabelValueTag, userLabel.value));
     ReturnErrorOnFailure(writer.EndContainer(outerType));
     ReturnErrorOnFailure(mStorage.WriteValueBin(keyAlloc.UserLabelIndexKey(endpoint, index), buf, writer.GetLengthWritten()));
 
@@ -188,7 +188,7 @@ bool DeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
     VerifyOrReturnError(reader.Next(kLabelNameTag) == CHIP_NO_ERROR, false);
     VerifyOrReturnError(reader.Get(label) == CHIP_NO_ERROR, false);
 
-    VerifyOrReturnError(reader.Next(kLableValueTag) == CHIP_NO_ERROR, false);
+    VerifyOrReturnError(reader.Next(kLabelValueTag) == CHIP_NO_ERROR, false);
     VerifyOrReturnError(reader.Get(value) == CHIP_NO_ERROR, false);
 
     VerifyOrReturnError(reader.VerifyEndOfContainer() == CHIP_NO_ERROR, false);
