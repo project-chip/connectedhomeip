@@ -146,7 +146,7 @@ class NrfConnectBuilder(Builder):
 
             overlays = []
             if self.enable_rpcs:
-                overlays.append("-DOVERLAY_CONFIG=rpc.overlay")
+                overlays.append("-DOVERLAY_CONFIG=../../rpc.overlay")
 
             cmd = '''
 source "$ZEPHYR_BASE/zephyr-env.sh";
