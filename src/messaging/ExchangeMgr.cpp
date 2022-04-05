@@ -114,15 +114,15 @@ ExchangeContext * ExchangeManager::NewContext(const SessionHandle & session, Exc
     return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
 }
 
-CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegate * delegate)
+CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeAcceptor * acceptor)
 {
-    return RegisterUMH(protocolId, kAnyMessageType, delegate);
+    return RegisterUMH(protocolId, kAnyMessageType, acceptor);
 }
 
 CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType,
-                                                                     ExchangeDelegate * delegate)
+                                                                     ExchangeAcceptor * acceptor)
 {
-    return RegisterUMH(protocolId, static_cast<int16_t>(msgType), delegate);
+    return RegisterUMH(protocolId, static_cast<int16_t>(msgType), acceptor);
 }
 
 CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId)
@@ -135,7 +135,7 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(Protocols
     return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
 }
 
-CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate)
+CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeAcceptor * acceptor)
 {
     UnsolicitedMessageHandler * selected = nullptr;
 
@@ -148,7 +148,7 @@ CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgTyp
         }
         else if (umh.Matches(protocolId, msgType))
         {
-            umh.Delegate = delegate;
+            umh.Acceptor = acceptor;
             return CHIP_NO_ERROR;
         }
     }
@@ -156,7 +156,7 @@ CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgTyp
     if (selected == nullptr)
         return CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS;
 
-    selected->Delegate    = delegate;
+    selected->Acceptor    = acceptor;
     selected->ProtocolId  = protocolId;
     selected->MessageType = msgType;
 
@@ -273,7 +273,20 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     // handle the message.
     if (matchingUMH != nullptr || payloadHeader.NeedsAck())
     {
-        ExchangeDelegate * delegate = matchingUMH ? matchingUMH->Delegate : nullptr;
+        ExchangeDelegate * delegate = nullptr;
+
+        // Fetch delegate from the acceptor
+        if (matchingUMH != nullptr)
+        {
+            CHIP_ERROR err = matchingUMH->Acceptor->OnUnsolicitedMessageReceived(payloadHeader, msgBuf, delegate);
+            if (err != CHIP_NO_ERROR)
+            {
+                // Using same error message for all errors to reduce code size.
+                ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
+                return;
+            }
+        }
+
         // If rcvd msg is from initiator then this exchange is created as not Initiator.
         // If rcvd msg is not from initiator then this exchange is created as Initiator.
         // Note that if matchingUMH is not null then rcvd msg if from initiator.

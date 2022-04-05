@@ -27,7 +27,7 @@
 
 namespace chip {
 
-class CASEServer : public SessionEstablishmentDelegate, public Messaging::ExchangeDelegate
+class CASEServer : public SessionEstablishmentDelegate, public Messaging::ExchangeAcceptor, public Messaging::ExchangeDelegate
 {
 public:
     CASEServer() {}
@@ -50,6 +50,10 @@ public:
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;
+
+    //// ExchangeAcceptor Implementation ////
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle & payload,
+                                            ExchangeDelegate *& newDelegate) override;
 
     //// ExchangeDelegate Implementation ////
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,

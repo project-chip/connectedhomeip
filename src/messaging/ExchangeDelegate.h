@@ -100,5 +100,31 @@ public:
     virtual ExchangeMessageDispatch & GetMessageDispatch() { return ApplicationExchangeDispatch::Instance(); }
 };
 
+/**
+ * @brief
+ *   This class handles unsolicited messages. The implementation can peek the message and creating a new exchange for it or not.
+ */
+class DLL_EXPORT ExchangeAcceptor
+{
+public:
+    virtual ~ExchangeAcceptor() {}
+
+    /**
+     * @brief
+     *   This function handles a unsolicited CHIP message.
+     *
+     *   If the implmentation returns CHIP_NO_ERROR, the message layer will create a new exchange with newDelegate, associated to
+     * the message, and using the new exchange to handle future messages.
+     *
+     *   The acceptor peek the message here, and the message payload will be sent to the new exchange regardless.
+     *
+     *  @param[in]  payloadHeader A reference to the PayloadHeader object.
+     *  @param[in]  payload       A handle to the PacketBuffer object holding the message payload.
+     *  @param[out] newDelegate   A new exchange delegate being used by the new exchange to handle future messages.
+     */
+    virtual CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle & payload,
+                                                    ExchangeDelegate *& newDelegate) = 0;
+};
+
 } // namespace Messaging
 } // namespace chip

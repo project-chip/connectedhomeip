@@ -415,6 +415,16 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeCo
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR InteractionModelEngine::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader,
+                                                                System::PacketBufferHandle & payload,
+                                                                ExchangeDelegate *& newDelegate)
+{
+    // TODO: Implement OnUnsolicitedMessageReceived, let messaging layer dispatch message to ReadHandler/ReadClient/TimedHandler
+    // directly.
+    newDelegate = this;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext,
                                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {

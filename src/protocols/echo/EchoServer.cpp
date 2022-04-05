@@ -53,6 +53,14 @@ void EchoServer::Shutdown()
     }
 }
 
+CHIP_ERROR EchoServer::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle & payload,
+                                                    ExchangeDelegate *& newDelegate)
+{
+    // Handle messages by myself
+    newDelegate = this;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                          System::PacketBufferHandle && payload)
 {
