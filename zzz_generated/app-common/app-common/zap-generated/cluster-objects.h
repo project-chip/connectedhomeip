@@ -10717,14 +10717,14 @@ enum class Fields
 struct Type
 {
 public:
-    uint64_t panId         = static_cast<uint64_t>(0);
+    uint16_t panId         = static_cast<uint16_t>(0);
     uint64_t extendedPanId = static_cast<uint64_t>(0);
     chip::CharSpan networkName;
-    uint16_t channel         = static_cast<uint16_t>(0);
-    uint8_t version          = static_cast<uint8_t>(0);
-    uint64_t extendedAddress = static_cast<uint64_t>(0);
-    int8_t rssi              = static_cast<int8_t>(0);
-    uint8_t lqi              = static_cast<uint8_t>(0);
+    uint16_t channel = static_cast<uint16_t>(0);
+    uint8_t version  = static_cast<uint8_t>(0);
+    chip::ByteSpan extendedAddress;
+    int8_t rssi = static_cast<int8_t>(0);
+    uint8_t lqi = static_cast<uint8_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -10750,7 +10750,7 @@ enum class Fields
 struct Type
 {
 public:
-    uint8_t security = static_cast<uint8_t>(0);
+    chip::BitFlags<WiFiSecurity> security = static_cast<chip::BitFlags<WiFiSecurity>>(0);
     chip::ByteSpan ssid;
     chip::ByteSpan bssid;
     uint16_t channel  = static_cast<uint16_t>(0);
@@ -10834,7 +10834,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ScanNetworks::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    chip::ByteSpan ssid;
+    Optional<DataModel::Nullable<chip::ByteSpan>> ssid;
     Optional<uint64_t> breadcrumb;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -10850,7 +10850,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ScanNetworks::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    chip::ByteSpan ssid;
+    Optional<DataModel::Nullable<chip::ByteSpan>> ssid;
     Optional<uint64_t> breadcrumb;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -10872,7 +10872,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
-    chip::CharSpan debugText;
+    Optional<chip::CharSpan> debugText;
     Optional<DataModel::List<const Structs::WiFiInterfaceScanResult::Type>> wiFiScanResults;
     Optional<DataModel::List<const Structs::ThreadInterfaceScanResult::Type>> threadScanResults;
 
@@ -10890,7 +10890,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
-    chip::CharSpan debugText;
+    Optional<chip::CharSpan> debugText;
     Optional<DataModel::DecodableList<Structs::WiFiInterfaceScanResult::DecodableType>> wiFiScanResults;
     Optional<DataModel::DecodableList<Structs::ThreadInterfaceScanResult::DecodableType>> threadScanResults;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11093,8 +11093,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
-    chip::CharSpan debugText;
-    int32_t errorValue = static_cast<int32_t>(0);
+    Optional<chip::CharSpan> debugText;
+    DataModel::Nullable<int32_t> errorValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -11110,8 +11110,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
-    chip::CharSpan debugText;
-    int32_t errorValue = static_cast<int32_t>(0);
+    Optional<chip::CharSpan> debugText;
+    DataModel::Nullable<int32_t> errorValue;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ConnectNetworkResponse

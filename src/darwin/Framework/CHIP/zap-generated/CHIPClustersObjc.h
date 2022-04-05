@@ -7414,7 +7414,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reorderNetworkWithParams:(CHIPNetworkCommissioningClusterReorderNetworkParams *)params
                completionHandler:(void (^)(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                      NSError * _Nullable error))completionHandler;
-- (void)scanNetworksWithParams:(CHIPNetworkCommissioningClusterScanNetworksParams *)params
+- (void)scanNetworksWithParams:(CHIPNetworkCommissioningClusterScanNetworksParams * _Nullable)params
              completionHandler:(void (^)(CHIPNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler;
 
@@ -15266,6 +15266,14 @@ typedef NS_OPTIONS(uint32_t, CHIPNetworkCommissioningFeature) {
     CHIPNetworkCommissioningFeatureWiFiNetworkInterface = 0x1,
     CHIPNetworkCommissioningFeatureThreadNetworkInterface = 0x2,
     CHIPNetworkCommissioningFeatureEthernetNetworkInterface = 0x4,
+};
+
+typedef NS_OPTIONS(uint8_t, CHIPNetworkCommissioningWiFiSecurity) {
+    CHIPNetworkCommissioningWiFiSecurityUnencrypted = 0x1,
+    CHIPNetworkCommissioningWiFiSecurityWepPersonal = 0x2,
+    CHIPNetworkCommissioningWiFiSecurityWpaPersonal = 0x4,
+    CHIPNetworkCommissioningWiFiSecurityWpa2Personal = 0x8,
+    CHIPNetworkCommissioningWiFiSecurityWpa3Personal = 0x10,
 };
 
 typedef NS_ENUM(uint8_t, CHIPDiagnosticLogsLogsIntent) {
