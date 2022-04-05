@@ -175,7 +175,7 @@ bool DeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
     VerifyOrReturnError(err == CHIP_NO_ERROR, false);
 
     TLV::ContiguousBufferTLVReader reader;
-    reader.Init(buf, sizeof(buf));
+    reader.Init(buf);
     err = reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag());
     VerifyOrReturnError(err == CHIP_NO_ERROR, false);
 
