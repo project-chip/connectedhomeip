@@ -105,7 +105,11 @@ void CASESession::Clear()
     mCommissioningHash.Clear();
     mCASESessionEstablished = false;
     PairingSession::Clear();
-    GetP256KeypairBuilder()->FreeP256KeyPair(mEphemeralKey);
+    if (mEphemeralKey != nullptr)
+    {
+        GetP256KeypairBuilder()->FreeP256KeyPair(mEphemeralKey);
+        mEphemeralKey = nullptr;
+    }
 
     mState = kInitialized;
     Crypto::ClearSecretData(&mIPK[0], sizeof(mIPK));
