@@ -35,6 +35,7 @@ import chip.clusters.Attribute as Attribute
 from chip.ChipStack import *
 import chip.FabricAdmin
 import copy
+import secrets
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -268,6 +269,83 @@ class BaseTestHelper:
 
     def TestUsedTestCommissioner(self):
         return self.devCtrl.GetTestCommissionerUsed()
+
+    def TestFailsafe(self, nodeid: int):
+        self.logger.info("Testing arm failsafe")
+
+        self.logger.info("Setting failsafe on CASE connection")
+        err, resp = self.devCtrl.ZCLSend("GeneralCommissioning", "ArmFailSafe", nodeid,
+                                         0, 0, dict(expiryLengthSeconds=60, breadcrumb=1), blocking=True)
+        if err != 0:
+            self.logger.error(
+                "Failed to send arm failsafe command error is {} with im response{}".format(err, resp))
+            return False
+
+        if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningError.kOk:
+            self.logger.error(
+                "Incorrect response received from arm failsafe - wanted OK, received {}".format(resp))
+            return False
+
+        self.logger.info(
+            "Attempting to open basic commissioning window - this should fail since the failsafe is armed")
+        try:
+            res = asyncio.run(self.devCtrl.SendCommand(
+                nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180), timedRequestTimeoutMs=10000))
+            # we actually want the exception here because we want to see a failure, so return False here
+            self.logger.error(
+                'Incorrectly succeeded in opening basic commissioning window')
+            return False
+        except Exception as ex:
+            pass
+
+        # TODO: pipe through the commissioning window opener so we can test enhanced properly. The pake verifier is just garbage because none of of the functions to calculate
+        # it or serialize it are available right now. However, this command should fail BEFORE that becomes an issue.
+        discriminator = 1111
+        salt = secrets.token_bytes(16)
+        iterations = 2000
+        # not the right size or the right contents, but it won't matter
+        verifier = secrets.token_bytes(32)
+        self.logger.info(
+            "Attempting to open enhanced commissioning window - this should fail since the failsafe is armed")
+        try:
+            res = asyncio.run(self.devCtrl.SendCommand(nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
+                commissioningTimeout=180, PAKEVerifier=verifier, discriminator=discriminator, iterations=iterations, salt=salt), timedRequestTimeoutMs=10000))
+            # we actually want the exception here because we want to see a failure, so return False here
+            self.logger.error(
+                'Incorrectly succeeded in opening enhanced commissioning window')
+            return False
+        except Exception as ex:
+            pass
+
+        self.logger.info("Disarming failsafe on CASE connection")
+        err, resp = self.devCtrl.ZCLSend("GeneralCommissioning", "ArmFailSafe", nodeid,
+                                         0, 0, dict(expiryLengthSeconds=0, breadcrumb=1), blocking=True)
+        if err != 0:
+            self.logger.error(
+                "Failed to send arm failsafe command error is {} with im response{}".format(err, resp))
+            return False
+
+        self.logger.info(
+            "Opening Commissioning Window - this should succeed since the failsafe was just disarmed")
+        try:
+            res = asyncio.run(self.devCtrl.SendCommand(
+                nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180), timedRequestTimeoutMs=10000))
+        except Exception as ex:
+            self.logger.error(
+                'Failed to open commissioning window after disarming failsafe')
+            return False
+
+        self.logger.info(
+            "Attempting to arm failsafe over CASE - this should fail since the commissioning window is open")
+        err, resp = self.devCtrl.ZCLSend("GeneralCommissioning", "ArmFailSafe", nodeid,
+                                         0, 0, dict(expiryLengthSeconds=60, breadcrumb=1), blocking=True)
+        if err != 0:
+            self.logger.error(
+                "Failed to send arm failsafe command error is {} with im response{}".format(err, resp))
+            return False
+        if resp.errorCode is Clusters.GeneralCommissioning.Enums.CommissioningError.kBusyWithOtherAdmin:
+            return True
+        return False
 
     async def TestMultiFabric(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Opening Commissioning Window")

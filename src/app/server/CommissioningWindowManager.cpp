@@ -22,6 +22,7 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/DeviceControlServer.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::System::Clock;
@@ -94,6 +95,11 @@ void CommissioningWindowManager::ResetState()
 void CommissioningWindowManager::Cleanup()
 {
     StopAdvertisement(/* aShuttingDown = */ false);
+    DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    if (failSafeContext.IsFailSafeArmed())
+    {
+        failSafeContext.ForceFailSafeTimerExpiry();
+    }
 
     ResetState();
 }
@@ -161,6 +167,23 @@ void CommissioningWindowManager::OnSessionEstablished()
     DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
 
     StopAdvertisement(/* aShuttingDown = */ false);
+
+    DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    // This should never be armed because we don't allow CASE sessions to arm the failsafe when the commissioning window is open and
+    // we check that the failsafe is not armed before opening the commissioning window. None the less, it is good to double-check.
+    if (failSafeContext.IsFailSafeArmed())
+    {
+        ChipLogError(AppServer, "Error - arm failsafe is already armed on PASE session establishment completion");
+    }
+    else
+    {
+        err = failSafeContext.ArmFailSafe(kUndefinedFabricId, System::Clock::Seconds16(60));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Error arming failsafe on PASE session establishment completion");
+        }
+    }
+
     ChipLogProgress(AppServer, "Device completed Rendezvous process");
 }
 
@@ -169,6 +192,8 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds16 commiss
     VerifyOrReturnError(commissioningTimeout <= MaxCommissioningTimeout() &&
                             commissioningTimeout >= mMinCommissioningTimeoutOverride.ValueOr(MinCommissioningTimeout()),
                         CHIP_ERROR_INVALID_ARGUMENT);
+    DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    VerifyOrReturnError(!failSafeContext.IsFailSafeArmed(), CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(commissioningTimeout, HandleCommissioningWindowTimeout, this));
 
