@@ -429,6 +429,7 @@ client cluster GeneralCommissioning = 48 {
   readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
   readonly attribute RegulatoryLocationType regulatoryConfig = 2;
   readonly attribute RegulatoryLocationType locationCapability = 3;
+  readonly attribute boolean supportsConcurrentConnection = 4;
   readonly global attribute command_id generatedCommandList[] = 65528;
   readonly global attribute command_id acceptedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
@@ -438,14 +439,12 @@ client cluster GeneralCommissioning = 48 {
   request struct ArmFailSafeRequest {
     INT16U expiryLengthSeconds = 0;
     INT64U breadcrumb = 1;
-    INT32U timeoutMs = 2;
   }
 
   request struct SetRegulatoryConfigRequest {
-    RegulatoryLocationType location = 0;
+    RegulatoryLocationType newRegulatoryConfig = 0;
     CHAR_STRING countryCode = 1;
     INT64U breadcrumb = 2;
-    INT32U timeoutMs = 3;
   }
 
   command ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
@@ -476,6 +475,7 @@ server cluster GeneralCommissioning = 48 {
   readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
   readonly attribute RegulatoryLocationType regulatoryConfig = 2;
   readonly attribute RegulatoryLocationType locationCapability = 3;
+  readonly attribute boolean supportsConcurrentConnection = 4;
   readonly global attribute command_id generatedCommandList[] = 65528;
   readonly global attribute command_id acceptedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
@@ -485,14 +485,12 @@ server cluster GeneralCommissioning = 48 {
   request struct ArmFailSafeRequest {
     INT16U expiryLengthSeconds = 0;
     INT64U breadcrumb = 1;
-    INT32U timeoutMs = 2;
   }
 
   request struct SetRegulatoryConfigRequest {
-    RegulatoryLocationType location = 0;
+    RegulatoryLocationType newRegulatoryConfig = 0;
     CHAR_STRING countryCode = 1;
     INT64U breadcrumb = 2;
-    INT32U timeoutMs = 3;
   }
 
   response struct ArmFailSafeResponse {
@@ -1136,34 +1134,34 @@ server cluster NetworkCommissioning = 49 {
 
   request struct ScanNetworksRequest {
     OCTET_STRING ssid = 0;
-    INT64U breadcrumb = 1;
+    optional INT64U breadcrumb = 1;
   }
 
   request struct AddOrUpdateWiFiNetworkRequest {
     OCTET_STRING ssid = 0;
     OCTET_STRING credentials = 1;
-    INT64U breadcrumb = 2;
+    optional INT64U breadcrumb = 2;
   }
 
   request struct AddOrUpdateThreadNetworkRequest {
     OCTET_STRING operationalDataset = 0;
-    INT64U breadcrumb = 1;
+    optional INT64U breadcrumb = 1;
   }
 
   request struct RemoveNetworkRequest {
     OCTET_STRING networkID = 0;
-    INT64U breadcrumb = 1;
+    optional INT64U breadcrumb = 1;
   }
 
   request struct ConnectNetworkRequest {
     OCTET_STRING networkID = 0;
-    INT64U breadcrumb = 1;
+    optional INT64U breadcrumb = 1;
   }
 
   request struct ReorderNetworkRequest {
     OCTET_STRING networkID = 0;
     INT8U networkIndex = 1;
-    INT64U breadcrumb = 2;
+    optional INT64U breadcrumb = 2;
   }
 
   response struct ScanNetworksResponse {
@@ -1175,7 +1173,8 @@ server cluster NetworkCommissioning = 49 {
 
   response struct NetworkConfigResponse {
     NetworkCommissioningStatus networkingStatus = 0;
-    CHAR_STRING debugText = 1;
+    optional CHAR_STRING debugText = 1;
+    optional INT8U networkIndex = 2;
   }
 
   response struct ConnectNetworkResponse {

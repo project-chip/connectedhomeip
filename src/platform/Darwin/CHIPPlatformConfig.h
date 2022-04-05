@@ -39,6 +39,8 @@
 
 #define CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE 1
 
+#define CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT 1
+
 // ==================== Security Adaptations ====================
 
 // ==================== General Configuration Overrides ====================

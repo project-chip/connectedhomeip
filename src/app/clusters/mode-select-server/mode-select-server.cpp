@@ -26,9 +26,11 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/mode-select-server/supported-modes-manager.h>
+#include <app/clusters/on-off-server/on-off-server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/error-mapping.h>
+#include <app/util/odd-sized-integers.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
 
@@ -134,6 +136,29 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
             // Initialise currentMode to 0
             uint8_t currentMode = 0;
             status              = Attributes::CurrentMode::Get(endpointId, &currentMode);
+#ifdef EMBER_AF_PLUGIN_ON_OFF
+            // OnMode with Power Up
+            // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
+            // value of On (turn on at power up), then the CurrentMode attribute SHALL be set to the OnMode attribute
+            // value when the server is supplied with power, except if the OnMode attribute is null.
+            if (emberAfContainsServer(endpointId, OnOff::Id) &&
+                emberAfContainsAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id, true) &&
+                emberAfContainsAttribute(endpointId, ModeSelect::Id, ModeSelect::Attributes::OnMode::Id, true))
+            {
+                Attributes::OnMode::TypeInfo::Type onMode;
+                bool onOffValueForStartUp = 0;
+                if (Attributes::OnMode::Get(endpointId, onMode) == EMBER_ZCL_STATUS_SUCCESS &&
+                    emberAfIsNonVolatileAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id, true) &&
+                    OnOffServer::Instance().getOnOffValueForStartUp(endpointId, onOffValueForStartUp) == EMBER_ZCL_STATUS_SUCCESS)
+                {
+                    if (onOffValueForStartUp && !onMode.IsNull())
+                    {
+                        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: CurrentMode is overwritten by OnMode");
+                        return;
+                    }
+                }
+            }
+#endif // EMBER_AF_PLUGIN_ON_OFF
             if (status == EMBER_ZCL_STATUS_SUCCESS && startUpMode.Value() != currentMode)
             {
                 status = Attributes::CurrentMode::Set(endpointId, startUpMode.Value());
@@ -196,6 +221,9 @@ InteractionModel::Status MatterModeSelectClusterServerPreAttributeChangedCallbac
     case ModeSelect::Attributes::StartUpMode::Id:
         result = verifyModeValue(endpointId, *value);
         break;
+    case ModeSelect::Attributes::OnMode::Id:
+        result = verifyModeValue(endpointId, *value);
+        break;
     default:
         result = InteractionModel::Status::Success;
     }
@@ -211,6 +239,10 @@ InteractionModel::Status MatterModeSelectClusterServerPreAttributeChangedCallbac
  */
 static InteractionModel::Status verifyModeValue(const EndpointId endpointId, const uint8_t newMode)
 {
+    if (NumericAttributeTraits<uint8_t>::IsNullValue(newMode)) // This indicates that the new mode is null.
+    {
+        return InteractionModel::Status::Success;
+    }
     const ModeSelect::Structs::ModeOptionStruct::Type * modeOptionPtr;
     EmberAfStatus checkSupportedModeStatus =
         ModeSelect::getSupportedModesManager()->getModeOptionByMode(endpointId, newMode, &modeOptionPtr);

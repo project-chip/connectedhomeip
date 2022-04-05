@@ -28,6 +28,7 @@
 #include <type_traits>
 
 #include <protocols/Protocols.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 /**
  *   @namespace chip::Protocols::InteractionModel
@@ -65,52 +66,6 @@ enum class MsgType : uint8_t
     TimedRequest          = 0x0a,
 };
 
-// This table comes from the IM's "Status Code Table" section from the Interaction Model spec.
-enum class Status : uint8_t
-{
-    Success                = 0x0,
-    Failure                = 0x01,
-    InvalidSubscription    = 0x7d,
-    UnsupportedAccess      = 0x7e,
-    UnsupportedEndpoint    = 0x7f,
-    InvalidAction          = 0x80,
-    UnsupportedCommand     = 0x81,
-    Deprecated82           = 0x82,
-    Deprecated83           = 0x83,
-    Deprecated84           = 0x84,
-    InvalidCommand         = 0x85,
-    UnsupportedAttribute   = 0x86,
-    ConstraintError        = 0x87,
-    InvalidValue           = ConstraintError, // Deprecated
-    UnsupportedWrite       = 0x88,
-    ResourceExhausted      = 0x89,
-    Deprecated8a           = 0x8a,
-    NotFound               = 0x8b,
-    UnreportableAttribute  = 0x8c,
-    InvalidDataType        = 0x8d,
-    Deprecated8e           = 0x8e,
-    UnsupportedRead        = 0x8f,
-    Deprecated90           = 0x90,
-    Deprecated91           = 0x91,
-    DataVersionMismatch    = 0x92,
-    Deprecated93           = 0x93,
-    Timeout                = 0x94,
-    Reserved95             = 0x95,
-    Reserved96             = 0x96,
-    Reserved97             = 0x97,
-    Reserved98             = 0x98,
-    Reserved99             = 0x99,
-    Reserved9a             = 0x9a,
-    Busy                   = 0x9c,
-    Deprecatedc0           = 0xc0,
-    Deprecatedc1           = 0xc1,
-    Deprecatedc2           = 0xc2,
-    UnsupportedCluster     = 0xc3,
-    Deprecatedc4           = 0xc4,
-    NoUpstreamSubscription = 0xc5,
-    NeedsTimedInteraction  = 0xc6,
-    UnsupportedEvent       = 0xc7,
-};
 } // namespace InteractionModel
 
 template <>

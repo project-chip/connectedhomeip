@@ -17,10 +17,10 @@
 
 #pragma once
 
+#include <credentials/GroupDataProvider.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/CASESession.h>
-#include <protocols/secure_channel/SessionIDAllocator.h>
 
 namespace chip {
 
@@ -31,10 +31,10 @@ typedef void (*OnCASEConnectionFailure)(void * context, CASEClient * client, CHI
 
 struct CASEClientInitParams
 {
-    SessionManager * sessionManager          = nullptr;
-    Messaging::ExchangeManager * exchangeMgr = nullptr;
-    SessionIDAllocator * idAllocator         = nullptr;
-    FabricInfo * fabricInfo                  = nullptr;
+    SessionManager * sessionManager                    = nullptr;
+    Messaging::ExchangeManager * exchangeMgr           = nullptr;
+    FabricInfo * fabricInfo                            = nullptr;
+    Credentials::GroupDataProvider * groupDataProvider = nullptr;
 
     Optional<ReliableMessageProtocolConfig> mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Missing();
 };

@@ -23,7 +23,7 @@
 //
 // This particular implementation of the OTARequestorDriver makes the following choices:
 // - Only a single timer can be active at any given moment
-// - The periodic query timer is running if and only if there is no update in progress (the OTARequestor
+// - The periodic query timer is running if and only if there is no update in progress (the core logic
 //   UpdateState is kIdle)
 // - AnnounceOTAProviders command is ignored if an update is in progress
 // - The provider location passed in AnnounceOTAProviders is used in a single query (possibly retried) and then discarded
@@ -275,9 +275,7 @@ void GenericOTARequestorDriver::CancelDelayedAction(System::TimerCompleteCallbac
 void GenericOTARequestorDriver::OTACommissioningCallback()
 {
     // Schedule a query. At the end of this query/update process the Default Provider timer is started
-    ScheduleDelayedAction(
-        System::Clock::Seconds32(kDelayQueryUponCommissioningSec),
-        [](System::Layer *, void * context) { static_cast<OTARequestorDriver *>(context)->SendQueryImage(); }, this);
+    ScheduleDelayedAction(System::Clock::Seconds32(kDelayQueryUponCommissioningSec), StartDelayTimerHandler, this);
 }
 
 void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(
@@ -313,7 +311,7 @@ void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(
         return;
     }
 
-    // Point the OTARequestor to the announced provider
+    // Point to the announced provider
     mRequestor->SetCurrentProviderLocation(providerLocation);
 
     ScheduleDelayedAction(System::Clock::Seconds32(secToStart), StartDelayTimerHandler, this);

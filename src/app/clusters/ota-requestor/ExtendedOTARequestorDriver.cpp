@@ -17,6 +17,7 @@
 
 #include "ExtendedOTARequestorDriver.h"
 #include "OTARequestorInterface.h"
+#include <app/server/Server.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -81,7 +82,13 @@ CHIP_ERROR ExtendedOTARequestorDriver::GetUserConsentSubject(chip::ota::UserCons
         return CHIP_ERROR_INTERNAL;
     }
 
-    // TODO: As we cannot use the src/app/Server.h in here so, figure out a way to get the node id.
+    FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(subject.fabricIndex);
+    if (fabricInfo == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "Cannot find fabric");
+        return CHIP_ERROR_INTERNAL;
+    }
+    subject.requestorNodeId = fabricInfo->GetPeerId().GetNodeId();
 
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetVendorId(subject.requestorVendorId));
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetProductId(subject.requestorProductId));

@@ -52,18 +52,10 @@ struct CASESessionManagerConfig
 class CASESessionManager
 {
 public:
-    CASESessionManager() = delete;
-
-    CASESessionManager(const CASESessionManagerConfig & params)
-    {
-        VerifyOrDie(params.sessionInitParams.Validate() == CHIP_NO_ERROR);
-
-        mConfig = params;
-    }
-
+    CASESessionManager() = default;
     virtual ~CASESessionManager() {}
 
-    CHIP_ERROR Init(chip::System::Layer * systemLayer);
+    CHIP_ERROR Init(chip::System::Layer * systemLayer, const CASESessionManagerConfig & params);
     void Shutdown() {}
 
     /**

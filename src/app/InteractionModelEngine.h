@@ -453,5 +453,11 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
  * Check if the given cluster has the given DataVersion.
  */
 bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion);
+
+/**
+ * Returns true if device type is on endpoint, false otherwise.
+ */
+bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint);
+
 } // namespace app
 } // namespace chip

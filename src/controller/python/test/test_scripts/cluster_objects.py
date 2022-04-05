@@ -272,24 +272,29 @@ class ClusterObjectTests:
         #     raise AssertionError(
         #         "Expect the fabric index matches the one current reading")
 
-    async def TriggerAndWaitForEvents(cls, devCtrl, req):
+    @classmethod
+    async def _TriggerEvent(cls, devCtrl):
         # We trigger sending an event a couple of times just to be safe.
-        res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
-        res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
-        res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
-        res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestFabricScopedEventRequest(arg1=0))
-        res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestFabricScopedEventRequest(arg1=1))
-        # Events may take some time to flush, so wait for about 10s or so to get some events.
-        for i in range(0, 10):
-            print("Reading out events..")
-            res = await devCtrl.ReadEvent(nodeid=NODE_ID, events=req)
-            if (len(res) != 0):
-                break
+        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
+        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
+        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
+        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestFabricScopedEventRequest(arg1=0))
+        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestFabricScopedEventRequest(arg1=1))
 
-            time.sleep(1)
+    @classmethod
+    async def _RetryForContent(cls, request, until, retryCount=10, intervalSeconds=1):
+        for i in range(retryCount):
+            logger.info(f"Attempt {i + 1}/{retryCount}")
+            res = await request()
+            if until(res):
+                return res
+            asyncio.sleep(1)
+        raise AssertionError("condition is not met")
 
-        if (len(res) == 0):
-            raise AssertionError("Got no events back")
+    @classmethod
+    async def TriggerAndWaitForEvents(cls, devCtrl, req):
+        await cls._TriggerEvent(devCtrl)
+        await cls._RetryForContent(request=lambda: devCtrl.ReadEvent(nodeid=NODE_ID, events=req), until=lambda res: res != 0)
 
     @classmethod
     @base.test_case
@@ -299,35 +304,35 @@ class ClusterObjectTests:
             (1, Clusters.TestCluster.Events.TestEvent, 0),
         ]
 
-        await cls.TriggerAndWaitForEvents(cls, devCtrl, req)
+        await cls.TriggerAndWaitForEvents(devCtrl, req)
 
         logger.info("2: Reading Ex Cx E*")
         req = [
             (1, Clusters.TestCluster, 0),
         ]
 
-        await cls.TriggerAndWaitForEvents(cls, devCtrl, req)
+        await cls.TriggerAndWaitForEvents(devCtrl, req)
 
         logger.info("3: Reading Ex C* E*")
         req = [
             1
         ]
 
-        await cls.TriggerAndWaitForEvents(cls, devCtrl, req)
+        await cls.TriggerAndWaitForEvents(devCtrl, req)
 
         logger.info("4: Reading E* C* E*")
         req = [
             '*'
         ]
 
-        await cls.TriggerAndWaitForEvents(cls, devCtrl, req)
+        await cls.TriggerAndWaitForEvents(devCtrl, req)
 
         logger.info("5: Reading Ex Cx E* Urgency")
         req = [
             (1, Clusters.TestCluster, 1),
         ]
 
-        await cls.TriggerAndWaitForEvents(cls, devCtrl, req)
+        await cls.TriggerAndWaitForEvents(devCtrl, req)
 
         # TODO: Add more wildcard test for IM events.
 
@@ -401,6 +406,9 @@ class ClusterObjectTests:
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
         VerifyDecodeSuccess(res)
         data_version = res[0][Clusters.Basic][DataVersion]
+
+        logger.info(res)
+        logger.info(data_version)
 
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                            attributes=[
@@ -521,6 +529,34 @@ class ClusterObjectTests:
             raise AssertionError(
                 "Failed to test parallel subscriptions, see logs above.")
 
+    async def TestMixedReadAttributeAndEvents(cls, devCtrl):
+        def attributePathPossibilities():
+            yield ('Ex Cx Ax', [
+                (0, Clusters.Basic.Attributes.VendorName),
+                (0, Clusters.Basic.Attributes.ProductID),
+                (0, Clusters.Basic.Attributes.HardwareVersion),
+            ])
+            yield ('Ex Cx A*', [(0, Clusters.Basic)])
+            yield ('E* Cx A*', [Clusters.Descriptor.Attributes.ServerList])
+            yield ('E* A* A*', ['*'])
+
+        def eventPathPossibilities():
+            yield ('Ex Cx Ex', [(1, Clusters.TestCluster.Events.TestEvent, 0)])
+            yield ('Ex Cx E*', [(1, Clusters.TestCluster, 0)])
+            yield ('Ex C* E*', [1])
+            yield ('E* C* E*', ['*'])
+            yield ('Ex Cx E* Urgent', [(1, Clusters.TestCluster, 1)])
+
+        testCount = 0
+
+        for attributes in attributePathPossibilities():
+            for events in eventPathPossibilities():
+                logging.info(
+                    f"{testCount}: Reading mixed Attributes({attributes[0]}) Events({events[0]})")
+                await cls._TriggerEvent(devCtrl)
+                res = await cls._RetryForContent(request=lambda: devCtrl.Read(nodeid=NODE_ID, attributes=attributes[1], events=events[1]), until=lambda res: res != 0)
+                VerifyDecodeSuccess(res.attributes)
+
     @classmethod
     async def RunTest(cls, setOfDevCtrl):
         try:
@@ -532,6 +568,7 @@ class ClusterObjectTests:
             await cls.TestReadWriteAttributeRequestsWithVersion(setOfDevCtrl[0])
             await cls.TestReadAttributeRequests(setOfDevCtrl[0])
             await cls.TestSubscribeAttribute(setOfDevCtrl[0])
+            await cls.TestMixedReadAttributeAndEvents(setOfDevCtrl[0])
             # Note: Write will change some attribute values, always put it after read tests
             await cls.TestWriteRequest(setOfDevCtrl[0])
             await cls.TestTimedRequest(setOfDevCtrl[0])

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@
 # Second example also generates C-Style file with those certificates/keys to be use by the SDK tests:
 #     ./credentials/test/gen-test-attestation-certs.sh ./out/debug/standalone/chip-cert src/credentials/tests/CHIPAttCert_test_vectors
 #
-# In addision to the DER/PEM files this command also generates the following C-Style files:
+# In addition to the DER/PEM files this command also generates the following C-Style files:
 #     src/credentials/tests/CHIPAttCert_test_vectors.cpp
 #     src/credentials/tests/CHIPAttCert_test_vectors.h
 #
@@ -131,13 +131,55 @@ cert_lifetime=4294967295
     done
 }
 
-# In addision to PEM format also create certificates in DER form.
+# Set #4:
+#   - PAA Subject doesn't include VID (the same PAA from Set #2 is used)
+#   - PAI Subject doesn't include VID and PID encoded using fallback method
+#   - DAC Subject VID and PID are encoded using fallback method
+{
+    pid=8003
+    dac_ids=(0018 0019 001A 001B)
+
+    pai_key_file="$dest_dir/Chip-Test-PAI-$vid-NoPID-FB-Key"
+    pai_cert_file="$dest_dir/Chip-Test-PAI-$vid-NoPID-FB-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type i --subject-cn "Matter Test PAI" --subject-vid "$vid" --vid-pid-as-cn --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --ca-key "$paa_key_file".pem --ca-cert "$paa_cert_file".pem --out-key "$pai_key_file".pem --out "$pai_cert_file".pem
+
+    for dac in "${dac_ids[@]}"; do
+        dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-FB-Key"
+        dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-FB-Cert"
+
+        "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac" --subject-vid "$vid" --subject-pid "$pid" --vid-pid-as-cn --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+    done
+}
+
+# Set #5:
+#   - PAA Subject doesn't include VID (the same PAA from Set #2 is used)
+#   - PAI Subject includes PID and both VID and PID are encoded using fallback method
+#   - DAC Subject VID and PID are encoded using fallback method
+{
+    pid=8004
+    dac_ids=(001C 001D 001E 001F)
+
+    pai_key_file="$dest_dir/Chip-Test-PAI-$vid-$pid-FB-Key"
+    pai_cert_file="$dest_dir/Chip-Test-PAI-$vid-$pid-FB-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type i --subject-cn "Matter Test PAI" --subject-vid "$vid" --subject-pid "$pid" --vid-pid-as-cn --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --ca-key "$paa_key_file".pem --ca-cert "$paa_cert_file".pem --out-key "$pai_key_file".pem --out "$pai_cert_file".pem
+
+    for dac in "${dac_ids[@]}"; do
+        dac_key_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-FB-Key"
+        dac_cert_file="$dest_dir/Chip-Test-DAC-$vid-$pid-$dac-FB-Cert"
+
+        "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac" --subject-vid "$vid" --subject-pid "$pid" --vid-pid-as-cn --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
+    done
+}
+
+# In addition to PEM format also create certificates in DER form.
 for cert_file_pem in "$dest_dir"/*Cert.pem; do
     cert_file_der="${cert_file_pem/.pem/.der}"
     "$chip_cert_tool" convert-cert "$cert_file_pem" "$cert_file_der" --x509-der
 done
 
-# In addision to PEM format also create private key in DER form.
+# In addition to PEM format also create private key in DER form.
 for key_file_pem in "$dest_dir"/*Key.pem; do
     key_file_der="${key_file_pem/.pem/.der}"
     "$chip_cert_tool" convert-key "$key_file_pem" "$key_file_der" --x509-der
@@ -148,7 +190,7 @@ if [ ! -z "$output_cstyle_file" ]; then
 
     copyright_note='/*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");

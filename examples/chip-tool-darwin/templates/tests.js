@@ -80,6 +80,10 @@ function getTests()
     'Test_TC_DM_3_1',
   ];
 
+  const DoorLock = [
+    'Test_TC_DL_1_3',
+  ];
+
   const ElectricalMeasurement = [
     'Test_TC_EMR_1_1',
   ];
@@ -170,10 +174,8 @@ function getTests()
   ];
 
   const OnOff = [
-    'Test_TC_OO_1_1',
-    'Test_TC_OO_2_1',
-    'Test_TC_OO_2_2',
-    'Test_TC_OO_2_3',
+    'Test_TC_OO_1_1', 'Test_TC_OO_2_1', 'Test_TC_OO_2_2', 'Test_TC_OO_2_3',
+    // 'Test_TC_OO_2_4', Disable this Test for now as Darwin does not support reboot commands currently
   ];
 
   const PowerSource = [
@@ -192,6 +194,10 @@ function getTests()
     'Test_TC_PCC_2_2',
     'Test_TC_PCC_2_3',
     'Test_TC_PCC_2_4',
+  ];
+
+  const PowerSourceConfiguration = [
+    'Test_TC_PSCFG_1_1',
   ];
 
   const RelativeHumidityMeasurement = [
@@ -228,6 +234,10 @@ function getTests()
     'Test_TC_DIAG_TH_NW_1_2',
   ];
 
+  const UserLabel = [
+    'Test_TC_LC_1_2',
+  ];
+
   const WiFiNetworkDiagnostics = [
     'Test_TC_WIFIDIAG_1_1',
     'Test_TC_WIFIDIAG_3_1',
@@ -259,6 +269,7 @@ function getTests()
     'TestDelayCommands',
     'TestDescriptorCluster',
     'TestBasicInformation',
+    'TestGeneralCommissioning',
     'TestGroupsCluster',
     'TestGroupKeyManagementCluster',
     'TestIdentifyCluster',
@@ -285,6 +296,7 @@ function getTests()
     ColorControl, //
     DeviceDiscovery, //
     DeviceManagement, //
+    DoorLock, //
     ElectricalMeasurement, //
     EthernetNetworkDiagnostics, //
     FlowMeasurement, //
@@ -299,12 +311,14 @@ function getTests()
     PowerSource, //
     PressureMeasurement, //
     PumpConfigurationControl, //
+    PowerSourceConfiguration, //
     RelativeHumidityMeasurement, //
     Switch, //
     TemperatureMeasurement, //
     Thermostat, //
     ThermostatUserConfiguration, //
     ThreadNetworkDiagnostics, //
+    UserLabel, //
     WiFiNetworkDiagnostics, //
     WindowCovering, //
     Others, //

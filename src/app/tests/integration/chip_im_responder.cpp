@@ -134,6 +134,12 @@ bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath,
 {
     return true;
 }
+
+bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
+{
+    return false;
+}
+
 } // namespace app
 } // namespace chip
 
@@ -191,6 +197,7 @@ int main(int argc, char * argv[])
 
     InitializeEventLogging(&gExchangeManager);
 
+    gTestPairing.Init(gSessionManager);
     err = gSessionManager.NewPairing(gSession, peer, chip::kTestControllerNodeId, &gTestPairing,
                                      chip::CryptoContext::SessionRole::kResponder, gFabricIndex);
     SuccessOrExit(err);
