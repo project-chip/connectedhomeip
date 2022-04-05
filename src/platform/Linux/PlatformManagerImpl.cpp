@@ -242,27 +242,6 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
 }
 
-CHIP_ERROR
-PlatformManagerImpl::_GetSupportedCalendarTypes(
-    AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes)
-{
-    // In Linux simulation, return following supported Calendar Types
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kBuddhist);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kChinese);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kCoptic);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kEthiopian);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kGregorian);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kHebrew);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kIndian);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kIslamic);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kJapanese);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kKorean);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kPersian);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kTaiwanese);
-
-    return CHIP_NO_ERROR;
-}
-
 void PlatformManagerImpl::HandleGeneralFault(uint32_t EventId)
 {
     GeneralDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
