@@ -50,7 +50,7 @@ void Engine::Shutdown()
     mGlobalDirtySet.ReleaseAll();
 }
 
-bool Engine::IsClusterDataVersionMatch(ObjectList<DataVersionFilter> * aDataVersionFilterList,
+bool Engine::IsClusterDataVersionMatch(const ObjectList<DataVersionFilter> * aDataVersionFilterList,
                                        const ConcreteReadAttributePath & aPath)
 {
     bool existPathMatch       = false;
@@ -111,6 +111,20 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
         // vs write paths.
         ConcreteAttributePath readPath;
 
+        ChipLogDetail(DataManagement,
+                      "Building Reports for ReadHandler with LastReportGeneration = %" PRIu64 " DirtyGeneration = %" PRIu64,
+                      apReadHandler->mPreviousReportsBeginGeneration, apReadHandler->mDirtyGeneration);
+
+        // This ReadHandler is not generating reports, so we reset the iterator for a clean start.
+        if (!apReadHandler->IsReporting())
+        {
+            apReadHandler->ResetPathIterator();
+        }
+
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+        uint32_t attributesRead = 0;
+#endif
+
         // For each path included in the interested path of the read handler...
         for (; apReadHandler->GetAttributePathExpandIterator()->Get(readPath);
              apReadHandler->GetAttributePathExpandIterator()->Next())
@@ -122,8 +136,13 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                 mGlobalDirtySet.ForEachActiveObject([&](auto * dirtyPath) {
                     if (dirtyPath->IsAttributePathSupersetOf(readPath))
                     {
-                        concretePathDirty = true;
-                        return Loop::Break;
+                        // We don't need to worry about paths that were already marked dirty before the last time this read handler
+                        // started a report that it completed: those paths already got reported.
+                        if (dirtyPath->mGeneration > apReadHandler->mPreviousReportsBeginGeneration)
+                        {
+                            concretePathDirty = true;
+                            return Loop::Break;
+                        }
                     }
                     return Loop::Continue;
                 });
@@ -142,7 +161,16 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                 }
             }
 
-            // If we are processing a read request, or the initial report of a subscription, just regard all paths as dirty paths.
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+            attributesRead++;
+            if (attributesRead > mMaxAttributesPerChunk)
+            {
+                ExitNow(err = CHIP_ERROR_BUFFER_TOO_SMALL);
+            }
+#endif
+
+            // If we are processing a read request, or the initial report of a subscription, just regard all paths as dirty
+            // paths.
             TLV::TLVWriter attributeBackup;
             attributeReportIBs.Checkpoint(attributeBackup);
             ConcreteReadAttributePath pathForRetrieval(readPath);
@@ -248,6 +276,7 @@ exit:
     if (!attributeDataWritten && err == CHIP_NO_ERROR)
     {
         aReportDataBuilder.Rollback(backup);
+        aReportDataBuilder.ResetError();
     }
 
     // hasMoreChunks + no data encoded is a flag that we have encountered some trouble when processing the attribute.
@@ -262,16 +291,16 @@ exit:
 }
 
 CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder & aReportDataBuilder, ReadHandler * apReadHandler,
-                                                     bool * apHasMoreChunks, bool * apHasEncodedData)
+                                                     bool aBufferIsUsed, bool * apHasMoreChunks, bool * apHasEncodedData)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     size_t eventCount = 0;
     TLV::TLVWriter backup;
-    bool eventClean                         = true;
-    ObjectList<EventPathParams> * eventList = apReadHandler->GetEventPathList();
-    EventNumber & eventMin                  = apReadHandler->GetEventMin();
-    EventManagement & eventManager          = EventManagement::GetInstance();
-    bool hasMoreChunks                      = false;
+    bool eventClean                = true;
+    const auto * eventList         = apReadHandler->GetEventPathList();
+    auto & eventMin                = apReadHandler->GetEventMin();
+    EventManagement & eventManager = EventManagement::GetInstance();
+    bool hasMoreChunks             = false;
 
     aReportDataBuilder.Checkpoint(backup);
 
@@ -290,8 +319,13 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     }
 
     {
-        EventReportIBs::Builder & eventReportIBs = aReportDataBuilder.CreateEventReports();
+        // Just like what we do in BuildSingleReportDataAttributeReportIBs(), we need to reserve one byte for end of container tag
+        // when encoding events to ensure we can close the container successfully.
+        const uint32_t kReservedSizeEndOfReportIBs = 1;
+        EventReportIBs::Builder & eventReportIBs   = aReportDataBuilder.CreateEventReports();
         SuccessOrExit(err = aReportDataBuilder.GetError());
+        VerifyOrExit(eventReportIBs.GetWriter() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        SuccessOrExit(err = eventReportIBs.GetWriter()->ReserveBuffer(kReservedSizeEndOfReportIBs));
         err = eventManager.FetchEventsSince(*(eventReportIBs.GetWriter()), eventList, eventMin, eventCount,
                                             apReadHandler->GetSubjectDescriptor());
 
@@ -303,9 +337,13 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
         else if ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY))
         {
             // when first cluster event is too big to fit in the packet, ignore that cluster event.
+            // However, we may have encoded some attributes before, we don't skip it in that case.
             if (eventCount == 0)
             {
-                eventMin++;
+                if (!aBufferIsUsed)
+                {
+                    eventMin++;
+                }
                 ChipLogDetail(DataManagement, "<RE:Run> first cluster event is too big so that it fails to fit in the packet!");
                 err = CHIP_NO_ERROR;
             }
@@ -328,6 +366,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
             ExitNow();
         }
 
+        SuccessOrExit(err = eventReportIBs.GetWriter()->UnreserveBuffer(kReservedSizeEndOfReportIBs));
         eventReportIBs.EndOfEventReports();
         SuccessOrExit(err = eventReportIBs.GetError());
     }
@@ -339,9 +378,13 @@ exit:
         *apHasEncodedData = !(eventCount == 0 || eventClean);
     }
 
-    if (err == CHIP_NO_ERROR && (eventCount == 0 || eventClean))
+    // Maybe encoding the attributes has already used up all space.
+    if ((err == CHIP_NO_ERROR || err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL) &&
+        (eventCount == 0 || eventClean))
     {
         aReportDataBuilder.Rollback(backup);
+        aReportDataBuilder.ResetError();
+        err = CHIP_NO_ERROR;
     }
 
     // hasMoreChunks + no data encoded is a flag that we have encountered some trouble when processing the attribute.
@@ -374,6 +417,9 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     // Reserved size for the end of report message, which is an end-of-container (i.e 1 byte for the control tag).
     const uint32_t kReservedSizeForEndOfReportMessage = 1;
 
+    // Reserved size for an empty EventReportIBs, so we can at least check if there are any events need to be reported.
+    const uint32_t kReservedSizeForEventReportIBs = 3; // type, tag, end of container
+
     VerifyOrExit(apReadHandler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(!bufHandle.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
@@ -405,7 +451,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     }
 
     SuccessOrExit(err = reportDataWriter.ReserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForIMRevision +
-                                                       kReservedSizeForEndOfReportMessage));
+                                                       kReservedSizeForEndOfReportMessage + kReservedSizeForEventReportIBs));
 
     {
         bool hasMoreChunksForAttributes = false;
@@ -416,8 +462,9 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
         err = BuildSingleReportDataAttributeReportIBs(reportDataBuilder, apReadHandler, &hasMoreChunksForAttributes,
                                                       &hasEncodedAttributes);
         SuccessOrExit(err);
-
-        err = BuildSingleReportDataEventReports(reportDataBuilder, apReadHandler, &hasMoreChunksForEvents, &hasEncodedEvents);
+        SuccessOrExit(err = reportDataWriter.UnreserveBuffer(kReservedSizeForEventReportIBs));
+        err = BuildSingleReportDataEventReports(reportDataBuilder, apReadHandler, hasEncodedAttributes, &hasMoreChunksForEvents,
+                                                &hasEncodedEvents);
         SuccessOrExit(err);
 
         hasMoreChunks = hasMoreChunksForAttributes || hasMoreChunksForEvents;
@@ -580,6 +627,8 @@ void Engine::Run()
 
     if (allReadClean)
     {
+        ChipLogDetail(DataManagement, "All ReadHandler-s are clean, clear GlobalDirtySet");
+
         mGlobalDirtySet.ReleaseAll();
     }
 }
@@ -589,10 +638,12 @@ bool Engine::MergeOverlappedAttributePath(AttributePathParams & aAttributePath)
     return Loop::Break == mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
         if (path->IsAttributePathSupersetOf(aAttributePath))
         {
+            path->mGeneration = GetDirtySetGeneration();
             return Loop::Break;
         }
         if (aAttributePath.IsAttributePathSupersetOf(*path))
         {
+            path->mGeneration  = GetDirtySetGeneration();
             path->mListIndex   = aAttributePath.mListIndex;
             path->mAttributeId = aAttributePath.mAttributeId;
             return Loop::Break;
@@ -603,6 +654,8 @@ bool Engine::MergeOverlappedAttributePath(AttributePathParams & aAttributePath)
 
 CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
 {
+    BumpDirtySetGeneration();
+
     InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aAttributePath](ReadHandler * handler) {
         // We call SetDirty for both read interactions and subscribe interactions, since we may sent inconsistent attribute data
         // between two chunks. SetDirty will be ignored automatically by read handlers which is waiting for response to last message
@@ -614,7 +667,7 @@ CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
                 if (aAttributePath.IsAttributePathSupersetOf(object->mValue) ||
                     object->mValue.IsAttributePathSupersetOf(aAttributePath))
                 {
-                    handler->SetDirty();
+                    handler->SetDirty(aAttributePath);
                     break;
                 }
             }
@@ -632,7 +685,8 @@ CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
             ChipLogError(DataManagement, "mGlobalDirtySet pool full, cannot handle more entries!");
             return CHIP_ERROR_NO_MEMORY;
         }
-        *object = aAttributePath;
+        *object             = aAttributePath;
+        object->mGeneration = GetDirtySetGeneration();
     }
 
     // Schedule work to run asynchronously on the CHIP thread. The scheduled
@@ -662,7 +716,8 @@ void Engine::UpdateReadHandlerDirty(ReadHandler & aReadHandler)
     for (auto object = aReadHandler.GetAttributePathList(); object != nullptr; object = object->mpNext)
     {
         mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
-            if (path->IsAttributePathSupersetOf(object->mValue) || object->mValue.IsAttributePathSupersetOf(*path))
+            if ((path->IsAttributePathSupersetOf(object->mValue) || object->mValue.IsAttributePathSupersetOf(*path)) &&
+                path->mGeneration > aReadHandler.mPreviousReportsBeginGeneration)
             {
                 intersected = true;
                 return Loop::Break;
@@ -676,8 +731,8 @@ void Engine::UpdateReadHandlerDirty(ReadHandler & aReadHandler)
     }
     if (!intersected)
     {
-        ChipLogDetail(InteractionModel, "clear read handler dirty in UpdateReadHandlerDirty!");
         aReadHandler.ClearDirty();
+        ChipLogDetail(InteractionModel, "clear read handler dirty in UpdateReadHandlerDirty!");
     }
 }
 

@@ -55,6 +55,7 @@
 #include <controller/CommissioningDelegate.h>
 #include <controller/CommissioningWindowOpener.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <inet/IPAddress.h>
@@ -94,6 +95,7 @@ chip::Controller::CommissioningParameters sCommissioningParameters;
 
 chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 chip::Controller::Python::StorageAdapter * sStorageAdapter = nullptr;
+chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without
@@ -160,6 +162,10 @@ pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(chip::Controller::Devi
 ChipError::StorageType pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
     chip::Controller::DeviceCommissioner * devCtrl, chip::Controller::DevicePairingDelegate_OnCommissioningCompleteFunct callback);
 
+ChipError::StorageType pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback(
+    chip::Controller::DeviceCommissioner * devCtrl,
+    chip::Controller::DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback);
+
 // BLE
 ChipError::StorageType pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::DeviceCommissioner * devCtrl);
 
@@ -216,6 +222,11 @@ ChipError::StorageType pychip_DeviceController_StackInit()
 
     FactoryInitParams factoryParams;
     factoryParams.fabricIndependentStorage = sStorageAdapter;
+
+    sGroupDataProvider.SetStorageDelegate(sStorageAdapter);
+    ReturnErrorOnFailure(sGroupDataProvider.Init().AsInteger());
+
+    factoryParams.groupDataProvider        = &sGroupDataProvider;
     factoryParams.enableServerInteractions = true;
 
     ReturnErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryParams).AsInteger());
@@ -426,7 +437,8 @@ ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Con
     {
         SetupPayload payload;
         return Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(
-                   devCtrl, nodeid, System::Clock::Seconds16(timeout), iteration, discriminator, NullOptional, payload)
+                   devCtrl, nodeid, System::Clock::Seconds16(timeout), iteration, discriminator, NullOptional, NullOptional,
+                   payload)
             .AsInteger();
     }
 
@@ -512,6 +524,14 @@ ChipError::StorageType pychip_ScriptDevicePairingDelegate_SetCommissioningComple
     chip::Controller::DeviceCommissioner * devCtrl, chip::Controller::DevicePairingDelegate_OnCommissioningCompleteFunct callback)
 {
     sPairingDelegate.SetCommissioningCompleteCallback(callback);
+    return CHIP_NO_ERROR.AsInteger();
+}
+
+ChipError::StorageType pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback(
+    chip::Controller::DeviceCommissioner * devCtrl,
+    chip::Controller::DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback)
+{
+    sPairingDelegate.SetCommissioningStatusUpdateCallback(callback);
     return CHIP_NO_ERROR.AsInteger();
 }
 

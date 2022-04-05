@@ -35,9 +35,9 @@
 #include <app/util/attribute-storage.h>
 
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
 #include <platform/EFR32/OTAImageProcessorImpl.h>
 
 #include <assert.h>
@@ -100,7 +100,7 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 // Global OTA objects
-OTARequestor gRequestorCore;
+DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
 DeviceLayer::GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
@@ -127,7 +127,9 @@ CHIP_ERROR AppTask::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Initialize device attestation config

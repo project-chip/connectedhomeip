@@ -95,6 +95,10 @@ CHIP_ERROR MessagingContext::ShutdownAndRestoreExisting(MessagingContext & exist
 
 CHIP_ERROR MessagingContext::CreateSessionBobToAlice()
 {
+    if (!mPairingBobToAlice.GetSecureSessionHandle().HasValue())
+    {
+        mPairingBobToAlice.Init(mSessionManager);
+    }
     return mSessionManager.NewPairing(mSessionBobToAlice, Optional<Transport::PeerAddress>::Value(mAliceAddress),
                                       GetAliceFabric()->GetNodeId(), &mPairingBobToAlice, CryptoContext::SessionRole::kInitiator,
                                       mBobFabricIndex);
@@ -102,6 +106,10 @@ CHIP_ERROR MessagingContext::CreateSessionBobToAlice()
 
 CHIP_ERROR MessagingContext::CreateSessionAliceToBob()
 {
+    if (!mPairingAliceToBob.GetSecureSessionHandle().HasValue())
+    {
+        mPairingAliceToBob.Init(mSessionManager);
+    }
     return mSessionManager.NewPairing(mSessionAliceToBob, Optional<Transport::PeerAddress>::Value(mBobAddress),
                                       GetBobFabric()->GetNodeId(), &mPairingAliceToBob, CryptoContext::SessionRole::kResponder,
                                       mAliceFabricIndex);
@@ -109,7 +117,7 @@ CHIP_ERROR MessagingContext::CreateSessionAliceToBob()
 
 CHIP_ERROR MessagingContext::CreateSessionBobToFriends()
 {
-    mSessionBobToFriends.Emplace(GetFriendsGroupId(), mBobFabricIndex, GetBobFabric()->GetNodeId());
+    mSessionBobToFriends.Emplace(GetFriendsGroupId(), mBobFabricIndex);
     return CHIP_NO_ERROR;
 }
 

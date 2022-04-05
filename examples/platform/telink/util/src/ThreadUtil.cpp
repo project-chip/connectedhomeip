@@ -50,16 +50,3 @@ void StartDefaultThreadNetwork(void)
     chip::DeviceLayer::ThreadStackMgr().SetThreadProvision(dataset.AsByteSpan());
     chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(true);
 }
-
-void ENFORCE_FORMAT(3, 4) tlOtPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
-{
-    va_list args;
-
-    va_start(args, aFormat);
-
-    vprintf(aFormat, args);
-
-    printf("\r\n");
-
-    va_end(args);
-}

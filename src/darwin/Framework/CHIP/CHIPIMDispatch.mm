@@ -160,6 +160,8 @@ namespace app {
         return &stub;
     }
 
+    bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) { return false; }
+
     CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
         TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
     {

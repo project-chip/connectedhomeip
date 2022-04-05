@@ -617,7 +617,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPGeneralCommissioningClusterArmFailSafeParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull expiryLengthSeconds;
 @property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
-@property (strong, nonatomic) NSNumber * _Nonnull timeoutMs;
 - (instancetype)init;
 @end
 
@@ -628,10 +627,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPGeneralCommissioningClusterSetRegulatoryConfigParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull location;
+@property (strong, nonatomic, getter=getNewRegulatoryConfig) NSNumber * _Nonnull newRegulatoryConfig;
 @property (strong, nonatomic) NSString * _Nonnull countryCode;
 @property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
-@property (strong, nonatomic) NSNumber * _Nonnull timeoutMs;
 - (instancetype)init;
 @end
 
@@ -649,7 +647,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPNetworkCommissioningClusterScanNetworksParams : NSObject
 @property (strong, nonatomic) NSData * _Nonnull ssid;
-@property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
+@property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 - (instancetype)init;
 @end
 
@@ -664,31 +662,32 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams : NSObject
 @property (strong, nonatomic) NSData * _Nonnull ssid;
 @property (strong, nonatomic) NSData * _Nonnull credentials;
-@property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
+@property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 - (instancetype)init;
 @end
 
 @interface CHIPNetworkCommissioningClusterAddOrUpdateThreadNetworkParams : NSObject
 @property (strong, nonatomic) NSData * _Nonnull operationalDataset;
-@property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
+@property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 - (instancetype)init;
 @end
 
 @interface CHIPNetworkCommissioningClusterRemoveNetworkParams : NSObject
 @property (strong, nonatomic) NSData * _Nonnull networkID;
-@property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
+@property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 - (instancetype)init;
 @end
 
 @interface CHIPNetworkCommissioningClusterNetworkConfigResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull networkingStatus;
-@property (strong, nonatomic) NSString * _Nonnull debugText;
+@property (strong, nonatomic) NSString * _Nullable debugText;
+@property (strong, nonatomic) NSNumber * _Nullable networkIndex;
 - (instancetype)init;
 @end
 
 @interface CHIPNetworkCommissioningClusterConnectNetworkParams : NSObject
 @property (strong, nonatomic) NSData * _Nonnull networkID;
-@property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
+@property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 - (instancetype)init;
 @end
 
@@ -702,7 +701,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPNetworkCommissioningClusterReorderNetworkParams : NSObject
 @property (strong, nonatomic) NSData * _Nonnull networkID;
 @property (strong, nonatomic) NSNumber * _Nonnull networkIndex;
-@property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
+@property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 - (instancetype)init;
 @end
 

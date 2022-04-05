@@ -162,18 +162,18 @@ namespace Access {
 AccessControl::Entry::Delegate AccessControl::Entry::mDefaultDelegate;
 AccessControl::EntryIterator::Delegate AccessControl::EntryIterator::mDefaultDelegate;
 
-CHIP_ERROR AccessControl::Init(AccessControl::Delegate * delegate)
+CHIP_ERROR AccessControl::Init(AccessControl::Delegate * delegate, DeviceTypeResolver & deviceTypeResolver)
 {
     VerifyOrReturnError(!IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     ChipLogProgress(DataManagement, "AccessControl: initializing");
 
-    // delegate can never be null. This was already checked
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     CHIP_ERROR retval = delegate->Init();
     if (retval == CHIP_NO_ERROR)
     {
-        mDelegate = delegate;
+        mDelegate           = delegate;
+        mDeviceTypeResolver = &deviceTypeResolver;
     }
 
     return retval;
@@ -186,6 +186,22 @@ CHIP_ERROR AccessControl::Finish()
     CHIP_ERROR retval = mDelegate->Finish();
     mDelegate         = nullptr;
     return retval;
+}
+
+CHIP_ERROR AccessControl::RemoveFabric(FabricIndex fabricIndex)
+{
+    ChipLogProgress(DataManagement, "AccessControl: removing fabric %u", fabricIndex);
+
+    CHIP_ERROR err;
+    do
+    {
+        err = DeleteEntry(0, &fabricIndex);
+    } while (err == CHIP_NO_ERROR);
+
+    // Sentinel error is OK, just means there was no such entry.
+    ReturnErrorCodeIf(err != CHIP_ERROR_SENTINEL, err);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
@@ -310,7 +326,11 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                 {
                     continue;
                 }
-                // TODO(#14431): device type target not yet supported (add lookup/match when supported)
+                if (target.flags & Entry::Target::kDeviceType &&
+                    !mDeviceTypeResolver->IsDeviceTypeOnEndpoint(target.deviceType, requestPath.endpoint))
+                {
+                    continue;
+                }
                 targetMatched = true;
                 break;
             }
@@ -385,8 +405,6 @@ bool AccessControl::IsValid(const Entry & entry)
                          (!kHasEndpoint || IsValidEndpointId(target.endpoint)) &&
                          (!kHasDeviceType || IsValidDeviceTypeId(target.deviceType)),
                      log = "invalid target");
-        // TODO(#14431): device type target not yet supported (remove check when supported)
-        VerifyOrExit(!kHasDeviceType, log = "device type target not yet supported");
     }
 
     return true;

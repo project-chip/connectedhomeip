@@ -258,6 +258,20 @@
 #endif // CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC
 
 /**
+ * CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+ *
+ * Whether a device supports "concurrent connection commissioning mode" (1) or
+ * or "non-concurrenct connection commissioning mode" (0).
+ *
+ * See section "5.5. Commissioning Flows" in spec for definition.
+ *
+ * The default value is to support concurrent connection.
+ */
+#ifndef CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+#define CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION 1
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+
+/**
  * CHIP_DEVICE_CONFIG_USER_SELECTED_MODE_TIMEOUT_SEC
  *
  * The default amount of time (in whole seconds) that the device will remain in "user selected"

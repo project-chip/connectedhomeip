@@ -35,6 +35,7 @@ assert(ti_simplelink_board != "", "ti_simplelink_board must be specified")
 if (ti_simplelink_board == "CC1352R1_LAUNCHXL") {
   ti_simplelink_device_family = "cc13x2_26x2"
   ti_simplelink_soc_family = "cc13x2"
+  ti_simplelink_isa = "m4f"
 
   # set -DDeviceFamily_CC13X2?
   ti_simplelink_soc = "cc1352r1f3"
@@ -42,6 +43,7 @@ if (ti_simplelink_board == "CC1352R1_LAUNCHXL") {
 } else if (ti_simplelink_board == "CC2652R1_LAUNCHXL") {
   ti_simplelink_device_family = "cc13x2_26x2"
   ti_simplelink_soc_family = "cc26x2"
+  ti_simplelink_isa = "m4f"
 
   # set -DDeviceFamily_CC26X2?
   ti_simplelink_soc = "cc2652r1f3"
@@ -49,6 +51,7 @@ if (ti_simplelink_board == "CC1352R1_LAUNCHXL") {
 } else if (ti_simplelink_board == "LP_CC2652R7") {
   ti_simplelink_device_family = "cc13x2x7_26x2x7"
   ti_simplelink_soc_family = "cc26x2"
+  ti_simplelink_isa = "m4f"
 
   # set -DDeviceFamily_CC26X2?
   ti_simplelink_soc = "cc2652r1f7"

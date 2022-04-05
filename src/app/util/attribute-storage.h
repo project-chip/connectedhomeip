@@ -248,7 +248,7 @@ uint16_t emberAfGetDeviceIdForEndpoint(chip::EndpointId endpoint);
 //
 // The memory backing dataVersionStorage needs to stay alive until this dynamic
 // endpoint is cleared.
-EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, EmberAfEndpointType * ep, uint16_t deviceId,
+EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep, uint16_t deviceId,
                                         uint8_t deviceVersion, const chip::Span<chip::DataVersion> & dataVersionStorage);
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);

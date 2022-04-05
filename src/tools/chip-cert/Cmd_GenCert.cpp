@@ -268,7 +268,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
 
     case 'a':
-        if (!ParseInt(arg, chip32bitAttr, 16) || chip::IsValidCASEAuthTag(chip32bitAttr))
+        if (!ParseInt(arg, chip32bitAttr, 16) || !chip::IsValidCASEAuthTag(chip32bitAttr))
         {
             PrintArgError("%s: Invalid value specified for the subject CASE Authenticated Tag (CAT) attribute: %s\n", progName,
                           arg);

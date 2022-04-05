@@ -45,7 +45,7 @@ void DiagnosticLogsCommandHandler::InvokeCommand(HandlerContext & handlerContext
                 if (mBuffer.IsEmpty())
                 {
                     response.status = chip::app::Clusters::DiagnosticLogs::LogsStatus::kNoLogs;
-                    handlerContext.mCommandHandler.AddResponseData(handlerContext.mRequestPath, response);
+                    handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, response);
                     break;
                 }
 
@@ -58,7 +58,7 @@ void DiagnosticLogsCommandHandler::InvokeCommand(HandlerContext & handlerContext
                 if (!buf)
                 {
                     response.status = chip::app::Clusters::DiagnosticLogs::LogsStatus::kBusy;
-                    handlerContext.mCommandHandler.AddResponseData(handlerContext.mRequestPath, response);
+                    handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, response);
                     break;
                 }
 
@@ -71,19 +71,19 @@ void DiagnosticLogsCommandHandler::InvokeCommand(HandlerContext & handlerContext
                 response.status    = chip::app::Clusters::DiagnosticLogs::LogsStatus::kSuccess;
                 response.content   = chip::ByteSpan(buf.get() + sizeof(timeMs), logSize - sizeof(timeMs));
                 response.timeStamp = timeMs;
-                handlerContext.mCommandHandler.AddResponseData(handlerContext.mRequestPath, response);
+                handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, response);
             }
             break;
             case chip::app::Clusters::DiagnosticLogs::LogsIntent::kNetworkDiag: {
                 chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::Type response;
                 response.status = chip::app::Clusters::DiagnosticLogs::LogsStatus::kNoLogs;
-                handlerContext.mCommandHandler.AddResponseData(handlerContext.mRequestPath, response);
+                handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, response);
             }
             break;
             case chip::app::Clusters::DiagnosticLogs::LogsIntent::kCrashLogs: {
                 chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::Type response;
                 response.status = chip::app::Clusters::DiagnosticLogs::LogsStatus::kNoLogs;
-                handlerContext.mCommandHandler.AddResponseData(handlerContext.mRequestPath, response);
+                handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, response);
             }
             break;
             }

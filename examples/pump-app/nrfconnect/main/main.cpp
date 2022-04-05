@@ -21,7 +21,7 @@
 
 #include <logging/log.h>
 
-LOG_MODULE_REGISTER(app);
+LOG_MODULE_REGISTER(app, CONFIG_MATTER_LOG_LEVEL);
 
 using namespace ::chip;
 

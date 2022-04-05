@@ -31,13 +31,13 @@
 #include <app/DeviceProxy.h>
 #include <app/util/attribute-filter.h>
 #include <app/util/basic-types.h>
+#include <credentials/GroupDataProvider.h>
 #include <lib/address_resolve/AddressResolve.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/secure_channel/CASESession.h>
-#include <protocols/secure_channel/SessionIDAllocator.h>
 #include <system/SystemLayer.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
@@ -48,11 +48,11 @@ namespace chip {
 
 struct DeviceProxyInitParams
 {
-    SessionManager * sessionManager          = nullptr;
-    Messaging::ExchangeManager * exchangeMgr = nullptr;
-    SessionIDAllocator * idAllocator         = nullptr;
-    FabricTable * fabricTable                = nullptr;
-    CASEClientPoolDelegate * clientPool      = nullptr;
+    SessionManager * sessionManager                    = nullptr;
+    Messaging::ExchangeManager * exchangeMgr           = nullptr;
+    FabricTable * fabricTable                          = nullptr;
+    CASEClientPoolDelegate * clientPool                = nullptr;
+    Credentials::GroupDataProvider * groupDataProvider = nullptr;
 
     Optional<ReliableMessageProtocolConfig> mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Missing();
 
@@ -60,8 +60,8 @@ struct DeviceProxyInitParams
     {
         ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(exchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(idAllocator == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(groupDataProvider == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(clientPool == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         return CHIP_NO_ERROR;
@@ -91,10 +91,14 @@ public:
     ~OperationalDeviceProxy() override;
     OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId) : mSecureSession(*this)
     {
-        VerifyOrReturn(params.Validate() == CHIP_NO_ERROR);
+        mInitParams = params;
+        if (params.Validate() != CHIP_NO_ERROR)
+        {
+            mState = State::Uninitialized;
+            return;
+        }
 
         mSystemLayer = params.exchangeMgr->GetSessionManager()->SystemLayer();
-        mInitParams  = params;
         mPeerId      = peerId;
         mFabricInfo  = params.fabricTable->FindFabricWithCompressedId(peerId.GetCompressedFabricId());
         mState       = State::NeedsAddress;

@@ -29,9 +29,10 @@ public:
 
     void Register(const char * clusterName, commands_list commandsList);
     int Run(int argc, char ** argv);
+    int RunInteractive(int argc, char ** argv);
 
 private:
-    CHIP_ERROR RunCommand(int argc, char ** argv);
+    CHIP_ERROR RunCommand(int argc, char ** argv, bool interactive = false);
 
     std::map<std::string, CommandsVector>::iterator GetCluster(std::string clusterName);
     Command * GetCommand(CommandsVector & commands, std::string commandName);

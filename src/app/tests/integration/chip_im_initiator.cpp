@@ -433,6 +433,7 @@ CHIP_ERROR EstablishSecureSession()
 
     chip::SecurePairingUsingTestSecret * testSecurePairingSecret = chip::Platform::New<chip::SecurePairingUsingTestSecret>();
     VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    testSecurePairingSecret->Init(gSessionManager);
 
     // Attempt to connect to the peer.
     err = gSessionManager.NewPairing(gSession,
@@ -679,6 +680,12 @@ bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath,
 {
     return true;
 }
+
+bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
+{
+    return false;
+}
+
 } // namespace app
 } // namespace chip
 

@@ -39,14 +39,34 @@ public:
                                         int> = 0>
     static CHIP_ERROR Setup(const char * label, T & request, Json::Value value)
     {
-        if (!value.isNumeric() || !chip::CanCastTo<T>(value.asLargestUInt()))
+        if (value.isNumeric())
         {
-            ChipLogError(chipTool, "Error while encoding %s as an unsigned integer.", label);
-            return CHIP_ERROR_INVALID_ARGUMENT;
+            if (chip::CanCastTo<T>(value.asLargestUInt()))
+            {
+                request = static_cast<T>(value.asLargestUInt());
+                return CHIP_NO_ERROR;
+            }
+        }
+        else if (value.isString())
+        {
+            // Check for a hex number; JSON does not support those as numbers,
+            // so they have to be done as strings.  And we might as well support
+            // string-encoded unsigned numbers in general if we're doing that.
+            bool isHexNotation = strncmp(value.asCString(), "0x", 2) == 0 || strncmp(value.asCString(), "0X", 2) == 0;
+
+            std::stringstream str;
+            isHexNotation ? str << std::hex << value.asCString() : str << value.asCString();
+            uint64_t val;
+            str >> val;
+            if (!str.fail() && str.eof() && chip::CanCastTo<T>(val))
+            {
+                request = static_cast<T>(val);
+                return CHIP_NO_ERROR;
+            }
         }
 
-        request = static_cast<T>(value.asLargestUInt());
-        return CHIP_NO_ERROR;
+        ChipLogError(chipTool, "Error while encoding %s as an unsigned integer.", label);
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     template <typename T, std::enable_if_t<std::is_signed<T>::value, bool> = true>
@@ -285,7 +305,58 @@ public:
     {
         Json::Value value;
         Json::Reader reader;
-        reader.parse(json, value);
+        if (!reader.parse(json, value))
+        {
+            std::vector<Json::Reader::StructuredError> errors = reader.getStructuredErrors();
+            ChipLogError(chipTool, "Error parsing JSON for %s:", label);
+            for (auto & error : errors)
+            {
+                ChipLogError(chipTool, "  %s", error.message.c_str());
+                ptrdiff_t error_start   = error.offset_start;
+                ptrdiff_t error_end     = error.offset_limit;
+                const char * sourceText = json;
+                // The whole JSON string might be too long to fit in our log
+                // messages.  Just include 30 chars before the error.
+                constexpr ptrdiff_t kMaxContext = 30;
+                std::string errorMsg;
+                if (error_start > kMaxContext)
+                {
+                    sourceText += (error_start - kMaxContext);
+                    error_end   = kMaxContext + (error_end - error_start);
+                    error_start = kMaxContext;
+                    ChipLogError(chipTool, "... %s", sourceText);
+                    // Add markers corresponding to the "... " above.
+                    errorMsg += "----";
+                }
+                else
+                {
+                    ChipLogError(chipTool, "%s", sourceText);
+                }
+                for (ptrdiff_t i = 0; i < error_start; ++i)
+                {
+                    errorMsg += "-";
+                }
+                errorMsg += "^";
+                if (error_start + 1 < error_end)
+                {
+                    for (ptrdiff_t i = error_start + 1; i < error_end; ++i)
+                    {
+                        errorMsg += "-";
+                    }
+                    errorMsg += "^";
+                }
+                ChipLogError(chipTool, "%s", errorMsg.c_str());
+
+                if (error.message == "Missing ',' or '}' in object declaration" && error.offset_start > 0 &&
+                    json[error.offset_start - 1] == '0' && (json[error.offset_start] == 'x' || json[error.offset_start] == 'X'))
+                {
+                    ChipLogError(chipTool,
+                                 "NOTE: JSON does not allow hex syntax beginning with 0x for numbers.  Try putting the hex number "
+                                 "in quotes (like {\"name\": \"0x100\"}).");
+                }
+            }
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
 
         return ComplexArgumentParser::Setup(label, *mRequest, value);
     }

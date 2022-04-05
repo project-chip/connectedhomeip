@@ -16,7 +16,10 @@
  *
  */
 
+#import <CHIP/CHIPCommissioningParameters.h>
 #import <CHIP/CHIPError_Internal.h>
+#import <setup_payload/ManualSetupPayloadGenerator.h>
+#import <setup_payload/SetupPayload.h>
 
 #include "../common/CHIPCommandBridge.h"
 #include "PairingCommandBridge.h"
@@ -31,9 +34,25 @@ void PairingCommandBridge::SetUpPairingDelegate()
 {
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
     CHIPToolPairingDelegate * pairing = [[CHIPToolPairingDelegate alloc] init];
+    CHIPCommissioningParameters * params = [[CHIPCommissioningParameters alloc] init];
 
-    pairing.deviceID = mNodeId;
-    pairing.commandBridge = this;
+    [pairing setDeviceID:mNodeId];
+    switch (mNetworkType) {
+    case PairingNetworkType::None:
+    case PairingNetworkType::Ethernet:
+        break;
+    case PairingNetworkType::WiFi:
+        [params setWifiSSID:[NSData dataWithBytes:mSSID.data() length:mSSID.size()]];
+        [params setWifiCredentials:[NSData dataWithBytes:mPassword.data() length:mPassword.size()]];
+        break;
+    case PairingNetworkType::Thread:
+        [params setThreadOperationalDataset:[NSData dataWithBytes:mOperationalDataset.data() length:mOperationalDataset.size()]];
+        break;
+    }
+
+    [pairing setCommandBridge:this];
+    [pairing setParams:params];
+    [pairing setCommissioner:CurrentCommissioner()];
 
     [CurrentCommissioner() setPairingDelegate:pairing queue:callbackQueue];
 }
@@ -44,10 +63,13 @@ CHIP_ERROR PairingCommandBridge::RunCommand()
     switch (mPairingMode) {
     case PairingMode::QRCode:
     case PairingMode::ManualCode:
-        PairWithCode(&error);
+        PairWithPayload(&error);
         break;
     case PairingMode::Ethernet:
         PairWithIPAddress(&error);
+        break;
+    case PairingMode::Ble:
+        PairWithCode(&error);
         break;
     }
 
@@ -55,6 +77,12 @@ CHIP_ERROR PairingCommandBridge::RunCommand()
 }
 
 void PairingCommandBridge::PairWithCode(NSError * __autoreleasing * error)
+{
+    SetUpPairingDelegate();
+    [CurrentCommissioner() pairDevice:mNodeId discriminator:mDiscriminator setupPINCode:mSetupPINCode error:error];
+}
+
+void PairingCommandBridge::PairWithPayload(NSError * __autoreleasing * error)
 {
     NSString * payload = [NSString stringWithUTF8String:mOnboardingPayload];
 

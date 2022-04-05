@@ -32,6 +32,17 @@ class AccessControl
 {
 public:
     /**
+     * Used by access control to determine if a device type resolves to an endpoint.
+     */
+    struct DeviceTypeResolver
+    {
+    public:
+        virtual ~DeviceTypeResolver() = default;
+
+        virtual bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) = 0;
+    };
+
+    /**
      * Handle to an entry in the access control list.
      *
      * Must be prepared (`AccessControl::PrepareEntry`) or read (`AccessControl::ReadEntry`) before first use.
@@ -376,12 +387,10 @@ public:
     /**
      * Initialize the access control module. Must be called before first use.
      *
-     * @param delegate - The delegate to use for acces control
-     *
      * @return CHIP_NO_ERROR on success, CHIP_ERROR_INCORRECT_STATE if called more than once,
      *         CHIP_ERROR_INVALID_ARGUMENT if delegate is null, or other fatal error.
      */
-    CHIP_ERROR Init(AccessControl::Delegate * delegate);
+    CHIP_ERROR Init(AccessControl::Delegate * delegate, DeviceTypeResolver & deviceTypeResolver);
 
     /**
      * Deinitialize the access control module. Must be called when finished.
@@ -468,6 +477,8 @@ public:
         return mDelegate->DeleteEntry(index, fabricIndex);
     }
 
+    CHIP_ERROR RemoveFabric(FabricIndex fabricIndex);
+
     /**
      * Iterates over entries in the access control list.
      *
@@ -496,6 +507,8 @@ private:
     bool IsValid(const Entry & entry);
 
     Delegate * mDelegate = nullptr;
+
+    DeviceTypeResolver * mDeviceTypeResolver = nullptr;
 };
 
 /**

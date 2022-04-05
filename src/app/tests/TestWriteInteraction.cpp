@@ -40,6 +40,12 @@ namespace {
 uint8_t attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
 size_t attributeDataTLVLen = 0;
 
+constexpr uint16_t kMaxGroupsPerFabric    = 5;
+constexpr uint16_t kMaxGroupKeysPerFabric = 8;
+
+chip::TestPersistentStorageDelegate gTestStorage;
+chip::Credentials::GroupDataProviderImpl gGroupsProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
+
 } // namespace
 namespace chip {
 namespace app {
@@ -487,12 +493,15 @@ int Test_Setup(void * inContext)
     VerifyOrReturnError(TestContext::InitializeAsync(inContext) == SUCCESS, FAILURE);
 
     TestContext & ctx = *static_cast<TestContext *>(inContext);
-    VerifyOrReturnError(CHIP_NO_ERROR == chip::GroupTesting::InitProvider(), FAILURE);
+    gTestStorage.ClearStorage();
+    gGroupsProvider.SetStorageDelegate(&gTestStorage);
+    VerifyOrReturnError(CHIP_NO_ERROR == gGroupsProvider.Init(), FAILURE);
+    chip::Credentials::SetGroupDataProvider(&gGroupsProvider);
 
     uint8_t buf[sizeof(chip::CompressedFabricId)];
     chip::MutableByteSpan span(buf);
     VerifyOrReturnError(CHIP_NO_ERROR == ctx.GetBobFabric()->GetCompressedId(span), FAILURE);
-    VerifyOrReturnError(CHIP_NO_ERROR == chip::GroupTesting::InitData(ctx.GetBobFabricIndex(), span), FAILURE);
+    VerifyOrReturnError(CHIP_NO_ERROR == chip::GroupTesting::InitData(&gGroupsProvider, ctx.GetBobFabricIndex(), span), FAILURE);
 
     return SUCCESS;
 }

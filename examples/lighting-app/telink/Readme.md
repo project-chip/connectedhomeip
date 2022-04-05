@@ -1,111 +1,39 @@
 ![Telink B91 EVK](http://wiki.telink-semi.cn/wiki/assets/Hardware/B91_Generic_Starter_Kit_Hardware_Guide/connection_chart.png)
 
-## Build
+## Build and flash
 
 1. Pull docker image from repository:
 
-    ```
+    ```bash
     $ docker pull connectedhomeip/chip-build-telink:latest
     ```
 
 1. Run docker container:
 
-    ```
-    $ docker run -it -v ${CHIP_BASE}:/root/chip connectedhomeip/chip-build-telink:latest
+    ```bash
+    $ docker run -it --rm -v ${CHIP_BASE}:/root/chip -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" connectedhomeip/chip-build-telink:latest
     ```
 
     here `${CHIP_BASE}` is directory which contains CHIP repo files **!!!Pay
     attention that OUTPUT_DIR should contains ABSOLUTE path to output dir**
 
-1. Bootstrap the build environment:
+1. Activate the build environment:
 
-    ```
-    source ./scripts/bootstrap.sh
-    ```
-
-1. Run build script:
-
-    ```
-    ./scripts/build/build_examples.py --target telink-tlsr9518adk80d-light build
+    ```bash
+    $ source ./scripts/activate.sh
     ```
 
-1. Exit docker container and collect build artifacts. Firmware binary would be
-   located in
-   **\${CHIP_BASE}/out/telink-tlsr9518adk80d-light/zephyr/zephyr.bin**
+1. In the example dir run:
 
-## Flash
-
-### Presetup
-
-To make `west flash` command works following steps should be performed just
-once:
-
-1. Download toolchain:
-    ```
-    $ wget http://wiki.telink-semi.cn/tools_and_sdk/Tools/IDE/telink_riscv_linux_toolchain.zip
-    $ unzip telink_riscv_linux_toolchain.zip
-    ```
-1. Add TELINK_TOOLCHAIN_BASE variable to environment:
-    ```
-    $ export TELINK_TOOLCHAIN_BASE=${PATH_TO_TOOLCHAIN}
-    ```
-1. Setup dependencies:
-
-    ```
-    $ sudo dpkg --add-architecture i386
-    $ sudo apt-get update
-    $ sudo apt-get install -y libc6:i386 libncurses5:i386 libstdc++6:i386
+    ```bash
+    $ west build
     ```
 
-### Flashing
+1. Flash binary:
 
-1. Go to example directory and flash board with west command
     ```
-    $ cd ${TELINK_LIGHTING_EXAMPLE_DIR} && west flash
+    $ west flash --erase
     ```
-
-## Border Router
-
-### Build
-
-Use following manual to build your own border router:
-https://openthread.io/guides/border-router/build Pay attention that border
-router should be configured as Access Point i.e next command should be executed
-in step 3:
-
-```
-$ BORDER_ROUTING=0 NETWORK_MANAGER=1 ./script/setup
-```
-
-### Setup IPv6
-
-Pay attention that border router should be configured as IPv6 access point.
-
-1. To do so perform the following command:
-    ```
-    ip -6 addr add 2001:db8:1::1/64 dev wlan0
-    ```
-2. Add following lines in **/etc/dnsmasq.conf** file:
-    ```
-    enable-ra
-    dhcp-range=2001:db8:1::, ra-only, 64, 12h
-    ```
-
-### Config network
-
-Use [Web GUI](https://openthread.io/guides/border-router/web-gui) to config
-Thread network **tlsr9518adk80d** board supports only static commissioning with
-predefined Thread credentials shown in table below:
-
-| Item                   |              Value               |
-| :--------------------- | :------------------------------: |
-| Network name           |          OpenThreadDemo          |
-| Network ExtendedPAN ID |         1111111122222222         |
-| PAN ID                 |              0x1234              |
-| Passphrase             |              123456              |
-| Master Key             | 00112233445566778899aabbccddeeff |
-| Channel                |                15                |
-| On-Mesh Prefix         |            fd11:22::             |
 
 ## Usage
 
@@ -123,11 +51,12 @@ To get output from device, connect UART to following pins:
 
 The following buttons are available on **tlsr9518adk80d** board:
 
-| Name     | Function         | Description                                                                                            |
-| :------- | :--------------- | :----------------------------------------------------------------------------------------------------- |
-| Button 1 | Factory reset    | Perform factory reset to forget currently commissioned Thread network and back to uncommissioned state |
-| Button 2 | Lighting control | Manually triggers the lighting state                                                                   |
-| Button 3 | Thread start     | Commission thread with static credentials and enables the Thread on device                             |
+| Name     | Function               | Description                                                                                            |
+| :------- | :--------------------- | :----------------------------------------------------------------------------------------------------- |
+| Button 1 | Factory reset          | Perform factory reset to forget currently commissioned Thread network and back to uncommissioned state |
+| Button 2 | Lighting control       | Manually triggers the lighting state                                                                   |
+| Button 3 | Thread start           | Commission thread with static credentials and enables the Thread on device                             |
+| Button 4 | Open commission window | The button is opening commissioning window to perform commissioning over BLE                           |
 
 ### LEDs
 
@@ -141,20 +70,6 @@ following states:
 | Blinks with whde pulses     | Device commissioned and joined to thread network as CHILD                    |
 
 **Blue** LED shows current state of lightbulb
-
-### Check connection
-
-1. With your client device (PC, Laptop etc.) connect to BorderRouterAP WiFi
-2. Press Button 3 on **tlsr9518adk80d** board and wait till it joins to Thread
-   network
-3. Find adjusted IPv6 address in UART output of **tlsr9518adk80d**
-4. Perform following command on your client device:
-    ```
-    ping -6 ${IP_ADDRESS_OF_CHIP_DEVICE}
-    ```
-    here `${IP_ADDRESS_OF_CHIP_DEVICE}` is address which you got from UART
-    output of **tlsr9518adk80d** board If everything is ok then `ping` command
-    should perform transactions without losses
 
 ### CHIP tool commands
 

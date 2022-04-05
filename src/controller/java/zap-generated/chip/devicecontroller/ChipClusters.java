@@ -7874,26 +7874,16 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public void armFailSafe(
-        ArmFailSafeResponseCallback callback,
-        Integer expiryLengthSeconds,
-        Long breadcrumb,
-        Long timeoutMs) {
-      armFailSafe(chipClusterPtr, callback, expiryLengthSeconds, breadcrumb, timeoutMs, null);
+        ArmFailSafeResponseCallback callback, Integer expiryLengthSeconds, Long breadcrumb) {
+      armFailSafe(chipClusterPtr, callback, expiryLengthSeconds, breadcrumb, null);
     }
 
     public void armFailSafe(
         ArmFailSafeResponseCallback callback,
         Integer expiryLengthSeconds,
         Long breadcrumb,
-        Long timeoutMs,
         int timedInvokeTimeoutMs) {
-      armFailSafe(
-          chipClusterPtr,
-          callback,
-          expiryLengthSeconds,
-          breadcrumb,
-          timeoutMs,
-          timedInvokeTimeoutMs);
+      armFailSafe(chipClusterPtr, callback, expiryLengthSeconds, breadcrumb, timedInvokeTimeoutMs);
     }
 
     public void commissioningComplete(CommissioningCompleteResponseCallback callback) {
@@ -7908,28 +7898,25 @@ public class ChipClusters {
 
     public void setRegulatoryConfig(
         SetRegulatoryConfigResponseCallback callback,
-        Integer location,
+        Integer newRegulatoryConfig,
         String countryCode,
-        Long breadcrumb,
-        Long timeoutMs) {
+        Long breadcrumb) {
       setRegulatoryConfig(
-          chipClusterPtr, callback, location, countryCode, breadcrumb, timeoutMs, null);
+          chipClusterPtr, callback, newRegulatoryConfig, countryCode, breadcrumb, null);
     }
 
     public void setRegulatoryConfig(
         SetRegulatoryConfigResponseCallback callback,
-        Integer location,
+        Integer newRegulatoryConfig,
         String countryCode,
         Long breadcrumb,
-        Long timeoutMs,
         int timedInvokeTimeoutMs) {
       setRegulatoryConfig(
           chipClusterPtr,
           callback,
-          location,
+          newRegulatoryConfig,
           countryCode,
           breadcrumb,
-          timeoutMs,
           timedInvokeTimeoutMs);
     }
 
@@ -7938,7 +7925,6 @@ public class ChipClusters {
         ArmFailSafeResponseCallback Callback,
         Integer expiryLengthSeconds,
         Long breadcrumb,
-        Long timeoutMs,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void commissioningComplete(
@@ -7949,10 +7935,9 @@ public class ChipClusters {
     private native void setRegulatoryConfig(
         long chipClusterPtr,
         SetRegulatoryConfigResponseCallback Callback,
-        Integer location,
+        Integer newRegulatoryConfig,
         String countryCode,
         Long breadcrumb,
-        Long timeoutMs,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface ArmFailSafeResponseCallback {
@@ -8033,6 +8018,16 @@ public class ChipClusters {
       subscribeLocationCapabilityAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readSupportsConcurrentConnectionAttribute(BooleanAttributeCallback callback) {
+      readSupportsConcurrentConnectionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeSupportsConcurrentConnectionAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeSupportsConcurrentConnectionAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
       readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
@@ -8092,6 +8087,12 @@ public class ChipClusters {
 
     private native void subscribeLocationCapabilityAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readSupportsConcurrentConnectionAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void subscribeSupportsConcurrentConnectionAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(
         long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
@@ -11336,21 +11337,26 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public void addOrUpdateThreadNetwork(
-        NetworkConfigResponseCallback callback, byte[] operationalDataset, Long breadcrumb) {
+        NetworkConfigResponseCallback callback,
+        byte[] operationalDataset,
+        Optional<Long> breadcrumb) {
       addOrUpdateThreadNetwork(chipClusterPtr, callback, operationalDataset, breadcrumb, null);
     }
 
     public void addOrUpdateThreadNetwork(
         NetworkConfigResponseCallback callback,
         byte[] operationalDataset,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         int timedInvokeTimeoutMs) {
       addOrUpdateThreadNetwork(
           chipClusterPtr, callback, operationalDataset, breadcrumb, timedInvokeTimeoutMs);
     }
 
     public void addOrUpdateWiFiNetwork(
-        NetworkConfigResponseCallback callback, byte[] ssid, byte[] credentials, Long breadcrumb) {
+        NetworkConfigResponseCallback callback,
+        byte[] ssid,
+        byte[] credentials,
+        Optional<Long> breadcrumb) {
       addOrUpdateWiFiNetwork(chipClusterPtr, callback, ssid, credentials, breadcrumb, null);
     }
 
@@ -11358,34 +11364,34 @@ public class ChipClusters {
         NetworkConfigResponseCallback callback,
         byte[] ssid,
         byte[] credentials,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         int timedInvokeTimeoutMs) {
       addOrUpdateWiFiNetwork(
           chipClusterPtr, callback, ssid, credentials, breadcrumb, timedInvokeTimeoutMs);
     }
 
     public void connectNetwork(
-        ConnectNetworkResponseCallback callback, byte[] networkID, Long breadcrumb) {
+        ConnectNetworkResponseCallback callback, byte[] networkID, Optional<Long> breadcrumb) {
       connectNetwork(chipClusterPtr, callback, networkID, breadcrumb, null);
     }
 
     public void connectNetwork(
         ConnectNetworkResponseCallback callback,
         byte[] networkID,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         int timedInvokeTimeoutMs) {
       connectNetwork(chipClusterPtr, callback, networkID, breadcrumb, timedInvokeTimeoutMs);
     }
 
     public void removeNetwork(
-        NetworkConfigResponseCallback callback, byte[] networkID, Long breadcrumb) {
+        NetworkConfigResponseCallback callback, byte[] networkID, Optional<Long> breadcrumb) {
       removeNetwork(chipClusterPtr, callback, networkID, breadcrumb, null);
     }
 
     public void removeNetwork(
         NetworkConfigResponseCallback callback,
         byte[] networkID,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         int timedInvokeTimeoutMs) {
       removeNetwork(chipClusterPtr, callback, networkID, breadcrumb, timedInvokeTimeoutMs);
     }
@@ -11394,7 +11400,7 @@ public class ChipClusters {
         NetworkConfigResponseCallback callback,
         byte[] networkID,
         Integer networkIndex,
-        Long breadcrumb) {
+        Optional<Long> breadcrumb) {
       reorderNetwork(chipClusterPtr, callback, networkID, networkIndex, breadcrumb, null);
     }
 
@@ -11402,20 +11408,21 @@ public class ChipClusters {
         NetworkConfigResponseCallback callback,
         byte[] networkID,
         Integer networkIndex,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         int timedInvokeTimeoutMs) {
       reorderNetwork(
           chipClusterPtr, callback, networkID, networkIndex, breadcrumb, timedInvokeTimeoutMs);
     }
 
-    public void scanNetworks(ScanNetworksResponseCallback callback, byte[] ssid, Long breadcrumb) {
+    public void scanNetworks(
+        ScanNetworksResponseCallback callback, byte[] ssid, Optional<Long> breadcrumb) {
       scanNetworks(chipClusterPtr, callback, ssid, breadcrumb, null);
     }
 
     public void scanNetworks(
         ScanNetworksResponseCallback callback,
         byte[] ssid,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         int timedInvokeTimeoutMs) {
       scanNetworks(chipClusterPtr, callback, ssid, breadcrumb, timedInvokeTimeoutMs);
     }
@@ -11424,7 +11431,7 @@ public class ChipClusters {
         long chipClusterPtr,
         NetworkConfigResponseCallback Callback,
         byte[] operationalDataset,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void addOrUpdateWiFiNetwork(
@@ -11432,21 +11439,21 @@ public class ChipClusters {
         NetworkConfigResponseCallback Callback,
         byte[] ssid,
         byte[] credentials,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void connectNetwork(
         long chipClusterPtr,
         ConnectNetworkResponseCallback Callback,
         byte[] networkID,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void removeNetwork(
         long chipClusterPtr,
         NetworkConfigResponseCallback Callback,
         byte[] networkID,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void reorderNetwork(
@@ -11454,14 +11461,14 @@ public class ChipClusters {
         NetworkConfigResponseCallback Callback,
         byte[] networkID,
         Integer networkIndex,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void scanNetworks(
         long chipClusterPtr,
         ScanNetworksResponseCallback Callback,
         byte[] ssid,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface ConnectNetworkResponseCallback {
@@ -11471,7 +11478,8 @@ public class ChipClusters {
     }
 
     public interface NetworkConfigResponseCallback {
-      void onSuccess(Integer networkingStatus, String debugText);
+      void onSuccess(
+          Integer networkingStatus, Optional<String> debugText, Optional<Integer> networkIndex);
 
       void onError(Exception error);
     }
