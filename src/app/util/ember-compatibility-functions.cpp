@@ -880,11 +880,16 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * attributeMetadata, 
 }
 } // namespace
 
+const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
+{
+    return emberAfLocateAttributeMetadata(aConcreteClusterPath.mEndpointId, aConcreteClusterPath.mClusterId,
+                                          aConcreteClusterPath.mAttributeId, CLUSTER_MASK_SERVER);
+}
+
 CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
                                   TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
-    const EmberAfAttributeMetadata * attributeMetadata =
-        emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER);
+    const EmberAfAttributeMetadata * attributeMetadata = GetAttributeMetadata(aPath);
 
     if (attributeMetadata == nullptr)
     {

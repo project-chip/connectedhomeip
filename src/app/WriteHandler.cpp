@@ -32,6 +32,8 @@ namespace app {
 
 using namespace Protocols::InteractionModel;
 
+constexpr uint8_t kListAttributeType = 0x48;
+
 CHIP_ERROR WriteHandler::Init()
 {
     VerifyOrReturnError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -318,7 +320,10 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         err = element.GetData(&dataReader);
         SuccessOrExit(err);
 
-        if (!dataAttributePath.IsListOperation() && dataReader.GetType() == TLV::TLVType::kTLVType_Array)
+        const auto attributeMetadata = GetAttributeMetadata(dataAttributePath);
+        bool currentAttributeIsList  = (attributeMetadata != nullptr && attributeMetadata->attributeType == kListAttributeType);
+
+        if (!dataAttributePath.IsListOperation() && currentAttributeIsList)
         {
             dataAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
         }
@@ -448,6 +453,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             ShouldReportListWriteEnd(mProcessingAttributePath, mProcessingAttributeIsList, dataAttributePath);
         bool shouldReportListWriteBegin =
             ShouldReportListWriteBegin(mProcessingAttributePath, mProcessingAttributeIsList, dataAttributePath);
+        const EmberAfAttributeMetadata * attributeMetadata = nullptr;
 
         while (iterator->Next(mapping))
         {
@@ -457,6 +463,24 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             }
 
             dataAttributePath.mEndpointId = mapping.endpoint_id;
+
+            // Try to get the metadata from for the attribute on a random endpoint, update the path info according to it and recheck
+            // if we need to report list write begin.
+            if (attributeMetadata == nullptr)
+            {
+                attributeMetadata = GetAttributeMetadata(dataAttributePath);
+                bool currentAttributeIsList =
+                    (attributeMetadata != nullptr && attributeMetadata->attributeType == kListAttributeType);
+                if (!dataAttributePath.IsListOperation() && currentAttributeIsList)
+                {
+                    dataAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
+                }
+                ConcreteDataAttributePath pathForCheckingListWriteBegin(kInvalidEndpointId, dataAttributePath.mClusterId,
+                                                                        dataAttributePath.mEndpointId, dataAttributePath.mListOp,
+                                                                        dataAttributePath.mListIndex);
+                shouldReportListWriteBegin =
+                    ShouldReportListWriteBegin(mProcessingAttributePath, mProcessingAttributeIsList, pathForCheckingListWriteBegin);
+            }
 
             if (shouldReportListWriteEnd)
             {
@@ -505,7 +529,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             MatterPostAttributeWriteCallback(dataAttributePath);
         }
 
-        mProcessingAttributeIsList = dataAttributePath.IsListOperation();
+        dataAttributePath.mEndpointId = kInvalidEndpointId;
+        mProcessingAttributeIsList    = dataAttributePath.IsListOperation();
         mProcessingAttributePath.SetValue(dataAttributePath);
         iterator->Release();
     }

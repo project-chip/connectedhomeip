@@ -56,6 +56,7 @@
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
+#include <app/util/attribute-metadata.h>
 #include <app/util/basic-types.h>
 
 namespace chip {
@@ -383,5 +384,13 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
  * Check if the given cluster has the given DataVersion.
  */
 bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion);
+
+/**
+ * Returns the metadata of the attribute for the given path.
+ *
+ * @retval The metadata of the attribute, will return null if the given attribute does not exists.
+ */
+const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath);
+
 } // namespace app
 } // namespace chip

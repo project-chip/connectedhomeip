@@ -160,7 +160,7 @@ CHIP_ERROR TestAttrAccess::Write(const app::ConcreteDataAttributePath & aPath, a
     // We only care about the number of attribute data.
     if (!aPath.IsListItemOperation())
     {
-        app::DataModel::DecodableList<ByteSpan> list;
+        app::DataModel::Nullable<app::DataModel::DecodableList<ByteSpan>> list;
         CHIP_ERROR err = aDecoder.Decode(list);
         ChipLogError(Zcl, "Decode result: %s", err.AsString());
         return err;
@@ -170,18 +170,6 @@ CHIP_ERROR TestAttrAccess::Write(const app::ConcreteDataAttributePath & aPath, a
         ByteSpan listItem;
         CHIP_ERROR err = aDecoder.Decode(listItem);
         ChipLogError(Zcl, "Decode result: %s", err.AsString());
-        return err;
-    }
-    else if (aPath.mListOp == app::ConcreteDataAttributePath::ListOperation::NotList)
-    {
-        app::DataModel::Nullable<uint8_t> data;
-        CHIP_ERROR err = aDecoder.Decode(data);
-        ChipLogError(Zcl, "Decode result: %s", err.AsString());
-        if (!data.IsNull())
-        {
-            // To simulate a nullable list.
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
         return err;
     }
     else
@@ -666,9 +654,9 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
                 .expectedStatus = { true, false },
             });
 
-    ChipLogProgress(
-        Zcl,
-        "Test 5: for nullable lists, we should receive nofications if we write some non-null value after writing a null value");
+    ChipLogProgress(Zcl,
+                    "Test 5: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
+                    "null value before non null values");
     RunTest(apSuite, ctx,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
@@ -677,9 +665,9 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
                 .expectedStatus = { true },
             });
 
-    ChipLogProgress(
-        Zcl,
-        "Test 6: for nullable lists, we should receive nofications if we write some null value after writing a non-null value");
+    ChipLogProgress(Zcl,
+                    "Test 6: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
+                    "null value after non null values");
     RunTest(apSuite, ctx,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
@@ -688,20 +676,28 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
                 .expectedStatus = { true },
             });
 
-    ChipLogProgress(
-        Zcl,
-        "Test 7: for nullable lists, we should receive nofications if we write some null value after writing a non-null value");
+    ChipLogProgress(Zcl,
+                    "Test 7: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
+                    "null value between non null values");
     RunTest(apSuite, ctx,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
                            ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
                            ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
                 .data           = { ListData::kList, ListData::kNull, ListData::kList },
-                .expectedStatus = { true, true },
+                .expectedStatus = { true },
+            });
+
+    ChipLogProgress(Zcl, "Test 8: transactional list callbacks will be called for nullable lists");
+    RunTest(apSuite, ctx,
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .data           = { ListData::kNull },
+                .expectedStatus = { true },
             });
 
     ChipLogProgress(Zcl,
-                    "Test 8: for nullable lists, we should receive notifications for unsuccessful writes when non-fatal occurred "
+                    "Test 9: for nullable lists, we should receive notifications for unsuccessful writes when non-fatal occurred "
                     "during processing the requests");
     RunTest(apSuite, ctx,
             Instructions{

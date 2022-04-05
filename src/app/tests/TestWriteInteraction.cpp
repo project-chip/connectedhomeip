@@ -333,6 +333,13 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
     ctx.DisableAsyncDispatch();
 }
 
+const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
+{
+    // Note: This test does not make use of the real attribute metadata.
+    static EmberAfAttributeMetadata stub = { .defaultValue = EmberAfDefaultOrMinMaxAttributeValue(uint16_t(0)) };
+    return &stub;
+}
+
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
                                   TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
 {
