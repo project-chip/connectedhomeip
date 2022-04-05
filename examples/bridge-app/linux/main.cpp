@@ -665,7 +665,9 @@ int main(int argc, char * argv[])
     chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 
     // Init ZCL Data Model and CHIP App Server
-    chip::Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

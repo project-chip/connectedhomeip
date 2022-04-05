@@ -22,6 +22,7 @@
  */
 
 #include <access/AccessControl.h>
+#include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
@@ -237,7 +238,52 @@ Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCom
         return Status::UnsupportedCluster;
     }
 
-    for (const CommandId * cmd = cluster->acceptedCommandList; cmd != nullptr; cmd++)
+    auto * commandHandler =
+        InteractionModelEngine::GetInstance()->FindCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
+    if (commandHandler)
+    {
+        struct Context
+        {
+            bool commandExists;
+            CommandId targetCommand;
+        } context{ false, aCommandPath.mCommandId };
+
+        CHIP_ERROR err = commandHandler->EnumerateAcceptedCommands(
+            aCommandPath,
+            [](CommandId command, void * closure) -> Loop {
+                auto * ctx = static_cast<Context *>(closure);
+                if (ctx->targetCommand == command)
+                {
+                    ctx->commandExists = true;
+                    return Loop::Break;
+                }
+                return Loop::Continue;
+            },
+            &context);
+
+        // We now have three cases:
+        // 1) handler returned CHIP_ERROR_NOT_IMPLEMENTED.  In that case we
+        //    should fall back to looking at cluster->acceptedCommandList
+        // 2) handler returned success.  In that case, the handler is the source
+        //    of truth about the set of accepted commands, and
+        //    context.commandExists indicates whether a aCommandPath.mCommandId
+        //    was in the set, and we should return either Success or
+        //    UnsupportedCommand accordingly.
+        // 3) Some other status was returned.  In this case we should probably
+        //    err on the side of not allowing the command, since we have no idea
+        //    whether to allow it or not.
+        if (err != CHIP_ERROR_NOT_IMPLEMENTED)
+        {
+            if (err == CHIP_NO_ERROR)
+            {
+                return context.commandExists ? Status::Success : Status::UnsupportedCommand;
+            }
+
+            return Status::Failure;
+        }
+    }
+
+    for (const CommandId * cmd = cluster->acceptedCommandList; cmd != nullptr && *cmd != kInvalidCommandId; cmd++)
     {
         if (*cmd == aCommandPath.mCommandId)
         {
@@ -315,6 +361,13 @@ public:
     GlobalAttributeReader(const EmberAfCluster * aCluster) : MandatoryGlobalAttributeReader(aCluster) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+private:
+    typedef CHIP_ERROR (CommandHandlerInterface::*CommandListEnumerator)(const ConcreteClusterPath & cluster,
+                                                                         CommandHandlerInterface::CommandIdCallback callback,
+                                                                         void * context);
+    static CHIP_ERROR EncodeCommandList(const ConcreteClusterPath & aClusterPath, AttributeValueEncoder & aEncoder,
+                                        CommandListEnumerator aEnumerator, const CommandId * aClusterCommandList);
 };
 
 CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -357,24 +410,55 @@ CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, 
             return CHIP_NO_ERROR;
         });
     case AcceptedCommandList::Id:
-        return aEncoder.EncodeList([this](const auto & encoder) {
-            for (const CommandId * cmd = mCluster->acceptedCommandList; cmd != nullptr && *cmd != kInvalidCommandId; cmd++)
-            {
-                ReturnErrorOnFailure(encoder.Encode(*cmd));
-            }
-            return CHIP_NO_ERROR;
-        });
+        return EncodeCommandList(aPath, aEncoder, &CommandHandlerInterface::EnumerateAcceptedCommands,
+                                 mCluster->acceptedCommandList);
     case GeneratedCommandList::Id:
-        return aEncoder.EncodeList([this](const auto & encoder) {
-            for (const CommandId * cmd = mCluster->generatedCommandList; cmd != nullptr && *cmd != kInvalidCommandId; cmd++)
-            {
-                ReturnErrorOnFailure(encoder.Encode(*cmd));
-            }
-            return CHIP_NO_ERROR;
-        });
+        return EncodeCommandList(aPath, aEncoder, &CommandHandlerInterface::EnumerateGeneratedCommands,
+                                 mCluster->generatedCommandList);
     default:
         return CHIP_NO_ERROR;
     }
+}
+
+CHIP_ERROR GlobalAttributeReader::EncodeCommandList(const ConcreteClusterPath & aClusterPath, AttributeValueEncoder & aEncoder,
+                                                    GlobalAttributeReader::CommandListEnumerator aEnumerator,
+                                                    const CommandId * aClusterCommandList)
+{
+    return aEncoder.EncodeList([&](const auto & encoder) {
+        auto * commandHandler =
+            InteractionModelEngine::GetInstance()->FindCommandHandler(aClusterPath.mEndpointId, aClusterPath.mClusterId);
+        if (commandHandler)
+        {
+            struct Context
+            {
+                decltype(encoder) & commandIdEncoder;
+                CHIP_ERROR err;
+            } context{ encoder, CHIP_NO_ERROR };
+            CHIP_ERROR err = (commandHandler->*aEnumerator)(
+                aClusterPath,
+                [](CommandId command, void * closure) -> Loop {
+                    auto * ctx = static_cast<Context *>(closure);
+                    ctx->err   = ctx->commandIdEncoder.Encode(command);
+                    if (ctx->err != CHIP_NO_ERROR)
+                    {
+                        return Loop::Break;
+                    }
+                    return Loop::Continue;
+                },
+                &context);
+            if (err != CHIP_ERROR_NOT_IMPLEMENTED)
+            {
+                return context.err;
+            }
+            // Else fall through to the list in aClusterCommandList.
+        }
+
+        for (const CommandId * cmd = aClusterCommandList; cmd != nullptr && *cmd != kInvalidCommandId; cmd++)
+        {
+            ReturnErrorOnFailure(encoder.Encode(*cmd));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 // Helper function for trying to read an attribute value via an

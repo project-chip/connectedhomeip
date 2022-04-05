@@ -15,7 +15,6 @@
 import logging
 import os
 import shlex
-
 from enum import Enum, auto
 
 from .builder import Builder

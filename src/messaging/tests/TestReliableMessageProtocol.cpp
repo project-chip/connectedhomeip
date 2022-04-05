@@ -1479,7 +1479,7 @@ struct BackoffComplianceTestVector theBackoffComplianceTestVector[] = {
     {
         .sendCount   = 4,
         .backoffBase = System::Clock::Timestamp(300),
-        .backoffMin  = System::Clock::Timestamp(1229),
+        .backoffMin  = System::Clock::Timestamp(1228),
         .backoffMax  = System::Clock::Timestamp(1536),
     },
     {

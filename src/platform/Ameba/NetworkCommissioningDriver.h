@@ -43,7 +43,7 @@ public:
         }
 
         // copy the available information into WiFiScanResponse struct, which will be copied to the result to be sent
-        item.security = mpScanResults[mIternum].security;
+        item.security.SetRaw(mpScanResults[mIternum].security);
         item.ssidLen  = mpScanResults[mIternum].SSID.len;
         item.channel  = mpScanResults[mIternum].channel;
         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;

@@ -243,60 +243,6 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
 }
 
 CHIP_ERROR
-PlatformManagerImpl::_SetUserLabelList(
-    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
-{
-    // TODO:: store the user labelList, and read back stored user labelList if it has been set. Add yaml test to verify this.
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-PlatformManagerImpl::_GetUserLabelList(
-    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
-{
-    // In Linux simulation, return following hardcoded labelList on all endpoints.
-    UserLabel::Structs::LabelStruct::Type room;
-    UserLabel::Structs::LabelStruct::Type orientation;
-    UserLabel::Structs::LabelStruct::Type floor;
-    UserLabel::Structs::LabelStruct::Type direction;
-
-    room.label = CharSpan::fromCharString("room");
-    room.value = CharSpan::fromCharString("bedroom 2");
-
-    orientation.label = CharSpan::fromCharString("orientation");
-    orientation.value = CharSpan::fromCharString("North");
-
-    floor.label = CharSpan::fromCharString("floor");
-    floor.value = CharSpan::fromCharString("2");
-
-    direction.label = CharSpan::fromCharString("direction");
-    direction.value = CharSpan::fromCharString("up");
-
-    labelList.add(room);
-    labelList.add(orientation);
-    labelList.add(floor);
-    labelList.add(direction);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-PlatformManagerImpl::_GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
-{
-    // In Linux simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
-    supportedLocales.add(CharSpan::fromCharString("en-US"));
-    supportedLocales.add(CharSpan::fromCharString("de-DE"));
-    supportedLocales.add(CharSpan::fromCharString("fr-FR"));
-    supportedLocales.add(CharSpan::fromCharString("en-GB"));
-    supportedLocales.add(CharSpan::fromCharString("es-ES"));
-    supportedLocales.add(CharSpan::fromCharString("zh-CN"));
-    supportedLocales.add(CharSpan::fromCharString("it-IT"));
-    supportedLocales.add(CharSpan::fromCharString("ja-JP"));
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
 PlatformManagerImpl::_GetSupportedCalendarTypes(
     AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes)
 {

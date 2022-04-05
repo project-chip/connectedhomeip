@@ -43,11 +43,14 @@ menu "Demo"
         config DEVICE_TYPE_ESP32_S3_DEVKITM
             bool "ESP32S3-DevKitM"
             depends on IDF_TARGET_ESP32S3
+        config DEVICE_TYPE_ESP32H2_DEVKITC
+            bool "ESP32H2-DevKitC"
+            depends on IDF_TARGET_ESP32H2
     endchoice
 
     choice LED_TYPE
         prompt "LED type"
-        default LED_TYPE_RMT if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_S3_DEVKITM
+        default LED_TYPE_RMT if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_S3_DEVKITM || DEVICE_TYPE_ESP32H2_DEVKITC
         default LED_TYPE_GPIO
         help
             Defines the default LED type used in the example
@@ -73,7 +76,7 @@ menu "Demo"
         int "LED GPIO number"
         range 0 48
         default 26 if DEVICE_TYPE_ESP32_WROVER_KIT
-        default 8 if DEVICE_TYPE_ESP32_C3_DEVKITM
+        default 8 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32H2_DEVKITC
         default 48 if DEVICE_TYPE_ESP32_S3_DEVKITM
         default 5
         help

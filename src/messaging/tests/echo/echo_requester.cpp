@@ -155,6 +155,7 @@ CHIP_ERROR EstablishSecureSession()
     chip::Optional<chip::Transport::PeerAddress> peerAddr;
     chip::SecurePairingUsingTestSecret * testSecurePairingSecret = chip::Platform::New<chip::SecurePairingUsingTestSecret>();
     VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    testSecurePairingSecret->Init(gSessionManager);
 
     if (gUseTCP)
     {

@@ -162,6 +162,10 @@ pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(chip::Controller::Devi
 ChipError::StorageType pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
     chip::Controller::DeviceCommissioner * devCtrl, chip::Controller::DevicePairingDelegate_OnCommissioningCompleteFunct callback);
 
+ChipError::StorageType pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback(
+    chip::Controller::DeviceCommissioner * devCtrl,
+    chip::Controller::DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback);
+
 // BLE
 ChipError::StorageType pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::DeviceCommissioner * devCtrl);
 
@@ -520,6 +524,14 @@ ChipError::StorageType pychip_ScriptDevicePairingDelegate_SetCommissioningComple
     chip::Controller::DeviceCommissioner * devCtrl, chip::Controller::DevicePairingDelegate_OnCommissioningCompleteFunct callback)
 {
     sPairingDelegate.SetCommissioningCompleteCallback(callback);
+    return CHIP_NO_ERROR.AsInteger();
+}
+
+ChipError::StorageType pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback(
+    chip::Controller::DeviceCommissioner * devCtrl,
+    chip::Controller::DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback)
+{
+    sPairingDelegate.SetCommissioningStatusUpdateCallback(callback);
     return CHIP_NO_ERROR.AsInteger();
 }
 

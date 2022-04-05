@@ -135,15 +135,22 @@ class DevCertBuilder:
             subject_name = 'Matter Dev PAI 0xFFF1 no PID'
             pid_flag = ''
             type_flag = '-t i'
+            vidpid_fallback_encoding_flag = ''
         elif self.cert_type == CertType.DAC:
             subject_name = 'Matter Dev DAC 0xFFF1/0x{:X}'.format(self.pid)
             pid_flag = '-P 0x{:X}'.format(self.pid)
             type_flag = '-t d'
+            # For a subset of DACs with PIDs in a range [0x8010, 0x8014]
+            # use alternative (fallback) PID/VID encoding method.
+            if self.pid >= 0x8010 and self.pid <= 0x8014:
+                vidpid_fallback_encoding_flag = ' -a'
+            else:
+                vidpid_fallback_encoding_flag = ''
         else:
             return
 
         cmd = self.chipcert + ' gen-att-cert ' + type_flag + ' -c "' + subject_name + '" -C ' + self.signer.cert_pem + ' -K ' + \
-            self.signer.key_pem + ' -V 0xFFF1 ' + pid_flag + \
+            self.signer.key_pem + ' -V 0xFFF1 ' + pid_flag + vidpid_fallback_encoding_flag + \
             ' -l 4294967295 -o ' + self.own.cert_pem + ' -O ' + self.own.key_pem
         subprocess.run(cmd, shell=True)
         cmd = 'openssl x509 -inform pem -in ' + self.own.cert_pem + \

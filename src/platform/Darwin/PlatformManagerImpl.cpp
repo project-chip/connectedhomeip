@@ -137,30 +137,6 @@ CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
 }
 
 CHIP_ERROR
-PlatformManagerImpl::_SetUserLabelList(
-    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
-{
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-PlatformManagerImpl::_GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
-{
-    // In Darwin simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
-    supportedLocales.add(CharSpan::fromCharString("Test"));
-    supportedLocales.add(CharSpan::fromCharString("en-US"));
-    supportedLocales.add(CharSpan::fromCharString("de-DE"));
-    supportedLocales.add(CharSpan::fromCharString("fr-FR"));
-    supportedLocales.add(CharSpan::fromCharString("en-GB"));
-    supportedLocales.add(CharSpan::fromCharString("es-ES"));
-    supportedLocales.add(CharSpan::fromCharString("zh-CN"));
-    supportedLocales.add(CharSpan::fromCharString("it-IT"));
-    supportedLocales.add(CharSpan::fromCharString("ja-JP"));
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
 PlatformManagerImpl::_GetSupportedCalendarTypes(
     AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes)
 {

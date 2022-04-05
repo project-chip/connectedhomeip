@@ -153,9 +153,6 @@ protected:
     virtual CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen)               = 0;
     virtual CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)          = 0;
     virtual void RunConfigUnitTest(void)                                                           = 0;
-
-private:
-    static void HandleFailSafeContextCleanup(intptr_t arg);
 };
 
 } // namespace Internal

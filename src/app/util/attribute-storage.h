@@ -268,7 +268,7 @@ CHIP_ERROR emberAfSetDeviceTypeList(chip::EndpointId endpoint, chip::Span<const 
 // An optional device type list can be passed in as well. If provided, the memory
 // backing the list needs to remain allocated until this dynamic endpoint is cleared.
 //
-EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, EmberAfEndpointType * ep,
+EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
                                         const chip::Span<chip::DataVersion> & dataVersionStorage,
                                         chip::Span<const EmberAfDeviceType> deviceTypeList = {});
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);

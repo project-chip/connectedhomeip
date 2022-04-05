@@ -44,6 +44,13 @@ public:
     CHIP_ERROR SetAddNocCommandInvoked(FabricIndex nocFabricIndex);
     CHIP_ERROR SetUpdateNocCommandInvoked();
 
+    /**
+     * @brief
+     *   Schedules a work to cleanup the FailSafe Context asynchronously after various cleanup work
+     *   has completed.
+     */
+    void ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addNocCommandInvoked, bool updateNocCommandInvoked);
+
     inline bool IsFailSafeArmed(FabricIndex accessingFabricIndex) const
     {
         return mFailSafeArmed && MatchesFabricIndex(accessingFabricIndex);
@@ -54,8 +61,6 @@ public:
     inline bool IsFailSafeBusy() const { return mFailSafeBusy; }
 
     inline bool IsFailSafeArmed() const { return mFailSafeArmed; }
-
-    inline void SetFailSafeBusy(bool val) { mFailSafeBusy = val; }
 
     inline bool MatchesFabricIndex(FabricIndex accessingFabricIndex) const
     {
@@ -72,6 +77,10 @@ public:
         VerifyOrDie(mFailSafeArmed);
         return mFabricIndex;
     }
+
+    // Immediately disarms the timer and schedules a failsafe timer expiry.
+    // If the failsafe is not armed, this is a no-op.
+    void ForceFailSafeTimerExpiry();
 
     static CHIP_ERROR LoadFromStorage(FabricIndex & fabricIndex, bool & addNocCommandInvoked, bool & updateNocCommandInvoked);
     static CHIP_ERROR DeleteFromStorage();

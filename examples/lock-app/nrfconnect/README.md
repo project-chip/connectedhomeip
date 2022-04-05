@@ -36,6 +36,7 @@ into an existing Matter network and can be controlled by this network.
     -   [Building with low-power configuration](#building-with-low-power-configuration)
     -   [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
 -   [Configuring the example](#configuring-the-example)
+    -   [Example build types](#example-build-types)
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Testing the example](#testing-the-example)
     -   [Testing using CHIPTool](#testing-using-chiptool)
@@ -375,7 +376,7 @@ following command:
 To build the example with release configuration that disables the diagnostic
 features like logs and command-line interface, run the following command:
 
-    $ west build -b build-target -- -DOVERLAY_CONFIG=third_party/connectedhomeip/config/nrfconnect/app/release.conf
+    $ west build -b build-target -- -DCONF_FILE=prj_release.conf
 
 Remember to replace _build-target_ with the build target name of the Nordic
 Semiconductor's kit you own.
@@ -390,11 +391,11 @@ To build for the low-power configuration, run the following command with
 _build-target_ replaced with the build target name of the Nordic Semiconductor's
 kit you own (for example `nrf52840dk_nrf52840`):
 
-    $ west build -b build-target -- -DOVERLAY_CONFIG=overlay-low_power.conf
+    $ west build -b build-target -- -DOVERLAY_CONFIG=../../overlay-low_power.conf
 
 For example, use the following command for `nrf52840dk_nrf52840`:
 
-    $ west build -b nrf52840dk_nrf52840 -- -DOVERLAY_CONFIG=overlay-low_power.conf
+    $ west build -b nrf52840dk_nrf52840 -- -DOVERLAY_CONFIG=../../overlay-low_power.conf
 
 ### Building with Device Firmware Upgrade support
 
@@ -404,13 +405,13 @@ To enable DFU over Bluetooth LE, run the following command with _build-target_
 replaced with the build target name of the Nordic Semiconductor kit you are
 using (for example `nrf52840dk_nrf52840`):
 
-    $ west build -b build-target -- -DBUILD_WITH_DFU=BLE
+    $ west build -b build-target -- -DCONFIG_CHIP_DFU_OVER_BT_SMP=y
 
 To completely disable support for both DFU methods, run the following command
 with _build-target_ replaced with the build target name of the Nordic
 Semiconductor kit you are using (for example `nrf52840dk_nrf52840`):
 
-    $ west build -b build-target -- -DBUILD_WITH_DFU=OFF
+    $ west build -b build-target -- -DCONF_FILE=prj_no_dfu.conf
 
 > **Note**:
 >
@@ -421,29 +422,13 @@ Semiconductor kit you are using (for example `nrf52840dk_nrf52840`):
 > upgrading the application core and network core firmware in two-core nRF5340
 > DK devices.
 
-#### Changing Device Firmware Upgrade configuration
-
-To change the default DFU configuration, edit the following overlay files
-corresponding to the selected configuration:
-
--   `overlay-mcuboot_qspi_nor_support.conf` - general file enabling MCUboot and
-    QSPI NOR support, used by all DFU configurations
--   `overlay-single_image_smp_dfu_support.conf` - file enabling single-image DFU
-    over Bluetooth LE using SMP
--   `overlay-multi_image_smp_dfu_support.conf` - file enabling multi-image DFU
-    over Bluetooth LE using SMP
--   `overlay-ota_requestor.conf` - file enabling Matter OTA Requestor support.
-
-The files are located in the `config/nrfconnect/app` directory. You can also
-define the desired options in your example's `prj.conf` file.
-
 #### Changing bootloader configuration
 
-To change the default MCUboot configuration, edit the
-`mcuboot_single_image_dfu.conf` or `mcuboot_multi_image_dfu.conf` overlay files
-depending on whether the build target device supports multi-image DFU (nRF5340
-DK) or single-image DFU (nRF52840 DK). The files are located in the
-`configuration` directory.
+To change the default MCUboot configuration, edit the `mcuboot.conf` or
+`mcuboot_release.conf` overlay files depending on whether you build the target
+with debug or release configuration. The files are located in the
+`configuration/build-target/child_image` directory (_build-target_ is your board
+name, for example `nrf52840dk_nrf52840`).
 
 Make sure to keep the configuration consistent with changes made to the
 application configuration. This is necessary for the configuration to work, as
@@ -460,7 +445,7 @@ purposes. You can change these settings by defining
 This example uses this option to define using an external flash.
 
 To modify the flash settings of your board (that is, your _build-target_, for
-example `nrf52840dk_nrf52840`), edit the `pm_static.yml` file located in the
+example `nrf52840dk_nrf52840`), edit the `pm_static_dfu.yml` file located in the
 `configuration/build-target/` directory.
 
 <hr>
@@ -482,6 +467,33 @@ Semiconductor's kit you own.
 
 Changes done with menuconfig will be lost if the `build` directory is deleted.
 To make them persistent, save the configuration options in the `prj.conf` file.
+
+### Example build types
+
+The example uses different configuration files depending on the supported
+features. Configuration files are provided for different build types and they
+are located in the `configuration/build-target` directory.
+
+The `prj.conf` file represents a debug build type. Other build types are covered
+by dedicated files with the build type added as a suffix to the prj part, as per
+the following list. For example, the release build type file name is
+`prj_release.conf`. If a board has other configuration files, for example
+associated with partition layout or child image configuration, these follow the
+same pattern.
+
+Before you start testing the application, you can select one of the build types
+supported by the sample. This sample supports the following build types,
+depending on the selected board:
+
+-   debug -- Debug version of the application - can be used to enable additional
+    features for verifying the application behavior, such as logs or
+    command-line shell.
+-   release -- Release version of the application - can be used to enable only
+    the necessary application functionalities to optimize its performance.
+-   no_dfu -- Debug version of the application without Device Firmware Upgrade
+    feature support - can be used only for the nRF52840 DK and nRF5340 DK, as
+    those platforms have DFU enabled by default.
+
 For more information, see the
 [Configuring nRF Connect SDK examples](../../../docs/guides/nrfconnect_examples_configuration.md)
 page.

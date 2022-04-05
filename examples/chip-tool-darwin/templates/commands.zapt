@@ -9,6 +9,7 @@
 #include <string>
 #include <type_traits>
 
+#include <commands/clusters/ComplexArgument.h>
 #include <app/data-model/DecodableList.h>
 #include <commands/clusters/ModelCommandBridge.h>
 
@@ -24,17 +25,16 @@
 class {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}: public ModelCommand
 {
 public:
-    {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(): ModelCommand("{{asDelimitedCommand name}}")
+    {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(): ModelCommand("{{asDelimitedCommand name}}"){{#zcl_command_arguments}}{{#if_chip_complex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if_chip_complex}}{{/zcl_command_arguments}}
     {
         {{#chip_cluster_command_arguments}}
-        {{~#*inline "field"}}m{{asUpperCamelCase label}}{{/inline~}}
-        {{#if isArray}}
-        {{else if isStruct}}
+        {{#if_chip_complex}}
+        AddArgument("{{asUpperCamelCase label}}", &mComplex_{{asUpperCamelCase label}});
         {{else if (isString type)}}
-        AddArgument("{{asUpperCamelCase label}}", &{{>field}});
+        AddArgument("{{asUpperCamelCase label}}", &m{{asUpperCamelCase label}});
         {{else}}
-        AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &{{>field}});
-        {{/if}}
+        AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &m{{asUpperCamelCase label}});
+        {{/if_chip_complex}}
         {{/chip_cluster_command_arguments}}
         ModelCommand::AddArguments();
     }
@@ -45,24 +45,21 @@ public:
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIP{{asUpperCamelCase clusterName}} * cluster = [[CHIP{{asUpperCamelCase clusterName}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        CHIP_ERROR __block chipError = CHIP_NO_ERROR;
         {{#chip_cluster_command_arguments}}
         {{#first}}
         __auto_type * params = [[CHIP{{asUpperCamelCase parent.clusterName}}Cluster{{asUpperCamelCase parent.name}}Params alloc] init];
         {{/first}}
 
-        {{~#*inline "field"}}m{{asUpperCamelCase label}}{{/inline~}}
-        {{#if isArray}}
-        // {{label}} Array parsing is not supported yet
-        {{else if isStruct}}
-        // {{label}} Struct parsing is not supported yet
+        {{#if_chip_complex}}
+        {{>decodable_value target=(concat "params." (asStructPropertyName label)) source=(concat "mRequest." (asStructPropertyName label)) cluster=parent.clusterName type=type depth=0}}
         {{else if (isOctetString type)}}
-        params.{{asStructPropertyName label}} = [[NSData alloc] initWithBytes:{{>field}}.data() length:{{>field}}.size()];
+        params.{{asStructPropertyName label}} = [[NSData alloc] initWithBytes:m{{asUpperCamelCase label}}.data() length:m{{asUpperCamelCase label}}.size()];
         {{else if (isString type)}}
-        params.{{asStructPropertyName label}} = [[NSString alloc] initWithBytes:{{>field}}.data() length:{{>field}}.size() encoding:NSUTF8StringEncoding];
+        params.{{asStructPropertyName label}} = [[NSString alloc] initWithBytes:m{{asUpperCamelCase label}}.data() length:m{{asUpperCamelCase label}}.size() encoding:NSUTF8StringEncoding];
         {{else}}
-        params.{{asStructPropertyName label}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:{{>field}}];
-        {{/if}}
+        params.{{asStructPropertyName label}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:m{{asUpperCamelCase label}}];
+        {{/if_chip_complex}}
         {{/chip_cluster_command_arguments}}
         [cluster {{asLowerCamelCase name}}With{{#if (hasArguments)}}Params:params completionHandler:{{else}}CompletionHandler:{{/if}}
         {{#if hasSpecificResponse}}
@@ -71,24 +68,25 @@ public:
         {{else}}
             ^(NSError * _Nullable error) {
         {{/if}}
-            err = [CHIPError errorToCHIPErrorCode:error];
-            ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
+            chipError = [CHIPError errorToCHIPErrorCode:error];
+            ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(chipError));
+            SetCommandExitStatus(chipError);
             }];
-        return err;
+        return chipError;
     }
 
 private:
     {{#chip_cluster_command_arguments}}
-    {{#if isArray}}
-    {{else if isStruct}}
+    {{#if_chip_complex}}
+    chip::app::Clusters::{{asUpperCamelCase parent.clusterName}}::Commands::{{asUpperCamelCase parent.name}}::Type mRequest;
+    TypedComplexArgument<{{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}> mComplex_{{asUpperCamelCase label}};
     {{else if (isOctetString type)}}
     chip::ByteSpan m{{asUpperCamelCase label}};
     {{else if (isCharString type)}}
     chip::ByteSpan m{{asUpperCamelCase label}};
     {{else}}
     {{chipType}} m{{asUpperCamelCase label}};
-    {{/if}}
+    {{/if_chip_complex}}
     {{/chip_cluster_command_arguments}}
 };
 
@@ -144,21 +142,19 @@ public:
 {{#if isWritableAttribute}}
 {{! No list support for writing yet.  Need to figure out how to represent the
     values. }}
-{{#unless isArray}}
 class Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
 {
 public:
-    Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("write")
+    Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("write"){{#if_chip_complex}}, mComplex(&mValue){{/if_chip_complex}}
     {
         AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
-        {{#if isArray}}
-        // {{label}} Array parsing is not supported yet
-        {{else if isStruct}}
+        {{#if_chip_complex}}
+        AddArgument("attr-value", &mComplex);
         {{else if (isString type)}}
         AddArgument("attr-value", &mValue);
         {{else}}
         AddArgument("attr-value", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mValue);
-        {{/if}}
+        {{/if_chip_complex}}
         ModelCommand::AddArguments();
     }
 
@@ -171,41 +167,40 @@ public:
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) WriteAttribute ({{asHex code 8}}) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIP{{asUpperCamelCase parent.name}} * cluster = [[CHIP{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        CHIP_ERROR __block chipError = CHIP_NO_ERROR;
 
-        {{#if isArray}}
-        // {{label}} Array parsing is not supported yet
-        {{else if isStruct}}
-        CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase type}} * value = [[CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase type}} alloc] init];
+        {{#if_chip_complex}}
+        {{asObjectiveCType type parent.name}} value;
+        {{>decodable_value target="value" source="mValue" cluster=parent.name errorCode="return err;" depth=0}}
         {{else if (isOctetString type)}}
         {{asObjectiveCType type parent.name}} value = [[NSData alloc] initWithBytes:mValue.data() length:mValue.size()];
         {{else if (isString type)}}
         {{asObjectiveCType type parent.name}} value = [[NSString alloc] initWithBytes:mValue.data() length:mValue.size() encoding:NSUTF8StringEncoding];
         {{else}}
         {{asObjectiveCType type parent.name}} value = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:mValue];
-        {{/if}}
+        {{/if_chip_complex}}
 
         [cluster writeAttribute{{asUpperCamelCase name}}WithValue:value completionHandler:^(NSError * _Nullable error) {
-            err = [CHIPError errorToCHIPErrorCode:error];
-            ChipLogError(chipTool, "{{asUpperCamelCase parent.name}} {{asUpperCamelCase name}} Error: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
+            chipError = [CHIPError errorToCHIPErrorCode:error];
+            ChipLogError(chipTool, "{{asUpperCamelCase parent.name}} {{asUpperCamelCase name}} Error: %s", chip::ErrorStr(chipError));
+            SetCommandExitStatus(chipError);
             }];
-        return err;
+        return chipError;
     }
 
 private:
-    {{#if isArray}}
-    {{else if isStruct}}
+    {{#if_chip_complex}}
+    {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}} mValue;
+    TypedComplexArgument<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}> mComplex;
     {{else if (isOctetString type)}}
     chip::ByteSpan mValue;
     {{else if (isCharString type)}}
     chip::ByteSpan mValue;
     {{else}}
     {{chipType}} mValue;
-    {{/if}}
+    {{/if_chip_complex}}
 };
 
-{{/unless}}
 {{/if}}
 {{#if isReportableAttribute}}
 class SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
@@ -274,11 +269,7 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{! TODO: Various types (floats, structs) not supported here. }}
         make_unique<Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{#if isWritableAttribute}}
-        {{! No list support for writing yet.  Need to figure out how to
-            represent the values. }}
-        {{#unless isArray}}
         make_unique<Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
-        {{/unless}}
         {{/if}}
         {{#if isReportableAttribute}}
         make_unique<SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //

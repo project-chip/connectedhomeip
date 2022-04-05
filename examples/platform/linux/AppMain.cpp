@@ -28,6 +28,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -40,6 +41,7 @@
 
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/KvsPersistentStorageDelegate.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
@@ -59,6 +61,10 @@
 #if defined(PW_RPC_ENABLED)
 #include <CommonRpc.h>
 #endif
+
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+#include "TraceHandlers.h"
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 #include <signal.h>
 
@@ -89,6 +95,13 @@ static constexpr uint8_t kWiFiStartCheckAttempts    = 5;
 #endif
 
 namespace {
+// To hold SPAKE2+ verifier, discriminator, passcode
+LinuxCommissionableDataProvider gCommissionableDataProvider;
+
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+chip::trace::TraceStream * gTraceStream = nullptr;
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
 void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     (void) arg;
@@ -208,8 +221,20 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
                          options.payload.discriminator);
 }
 
-// To hold SPAKE2+ verifier, discriminator, passcode
-LinuxCommissionableDataProvider gCommissionableDataProvider;
+void Cleanup()
+{
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    if (gTraceStream != nullptr)
+    {
+        delete gTraceStream;
+        gTraceStream = nullptr;
+    }
+    chip::trace::DeInitTrace();
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
+    // TODO(16968): Lifecycle management of storage-using components like GroupDataProvider, etc
+}
+
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -291,6 +316,23 @@ int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
 
     DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    if (LinuxDeviceOptions::GetInstance().traceStreamFilename.HasValue())
+    {
+        const char * traceFilename = LinuxDeviceOptions::GetInstance().traceStreamFilename.Value().c_str();
+        gTraceStream               = new chip::trace::TraceStreamFile(traceFilename);
+    }
+    else if (LinuxDeviceOptions::GetInstance().traceStreamToLogEnabled)
+    {
+        gTraceStream = new chip::trace::TraceStreamLog();
+    }
+    chip::trace::InitTrace();
+    if (gTraceStream != nullptr)
+    {
+        chip::trace::SetTraceStream(gTraceStream);
+    }
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
 #if CONFIG_NETWORK_LAYER_BLE
     DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)
     DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(LinuxDeviceOptions::GetInstance().mBleDevice, false);
@@ -320,6 +362,8 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(NotSpecified, "Failed to init Linux App: %s ", ErrorStr(err));
+        Cleanup();
+
         // End the program with non zero error code to indicate a error.
         return 1;
     }
@@ -649,24 +693,28 @@ CommissionerDiscoveryController * GetCommissionerDiscoveryController()
 
 void ChipLinuxAppMainLoop()
 {
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
+
 #if defined(ENABLE_CHIP_SHELL)
     Engine::Root().Init();
     std::thread shellThread([]() { Engine::Root().RunMainLoop(); });
     Shell::RegisterCommissioneeCommands();
 #endif
-    uint16_t securePort   = CHIP_PORT;
-    uint16_t unsecurePort = CHIP_UDC_PORT;
+    initParams.operationalServicePort        = CHIP_PORT;
+    initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
     // use a different service port to make testing possible with other sample devices running on same host
-    securePort   = LinuxDeviceOptions::GetInstance().securedDevicePort;
-    unsecurePort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
+    initParams.operationalServicePort        = LinuxDeviceOptions::GetInstance().securedDevicePort;
+    initParams.userDirectedCommissioningPort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
+    ;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
-    Inet::InterfaceId interfaceId = LinuxDeviceOptions::GetInstance().interfaceId;
+    initParams.interfaceId = LinuxDeviceOptions::GetInstance().interfaceId;
 
     // Init ZCL Data Model and CHIP App Server
-    Server::GetInstance().Init(nullptr, securePort, unsecurePort, interfaceId);
+    Server::GetInstance().Init(initParams);
 
     // Now that the server has started and we are done with our startup logging,
     // log our discovery/onboarding information again so it's not lost in the
@@ -704,4 +752,6 @@ void ChipLinuxAppMainLoop()
     Server::GetInstance().Shutdown();
 
     DeviceLayer::PlatformMgr().Shutdown();
+
+    Cleanup();
 }

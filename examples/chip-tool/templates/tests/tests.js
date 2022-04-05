@@ -197,7 +197,6 @@ function getManualTests()
   ];
 
   const PowerSourceConfiguration = [
-    'Test_TC_PSCFG_1_1',
     'Test_TC_PSCFG_2_1',
     'Test_TC_PSCFG_3_1',
   ];
@@ -232,10 +231,6 @@ function getManualTests()
     'Test_TC_OCC_2_3',
     'Test_TC_OCC_2_4',
     'Test_TC_OCC_3_1',
-  ];
-
-  const OnOff = [
-    'Test_TC_OO_2_4',
   ];
 
   const PressureMeasurement = [
@@ -273,7 +268,6 @@ function getManualTests()
     WindowCovering, //
     FlowMeasurement, //
     OccupancySensing, //
-    OnOff, //
     PressureMeasurement, //
     PowerSource, //
 
@@ -380,6 +374,10 @@ function getTests()
     'Test_TC_LVL_6_1',
   ];
 
+  const UserLabel = [
+    'Test_TC_LC_1_2',
+  ];
+
   const MediaControl = [
     'Test_TC_MC_1_1',
     'Test_TC_MC_1_2',
@@ -432,6 +430,7 @@ function getTests()
     'Test_TC_OO_2_1',
     'Test_TC_OO_2_2',
     'Test_TC_OO_2_3',
+    'Test_TC_OO_2_4',
   ];
 
   const PowerSource = [
@@ -450,6 +449,10 @@ function getTests()
     'Test_TC_PCC_2_2',
     'Test_TC_PCC_2_3',
     'Test_TC_PCC_2_4',
+  ];
+
+  const PowerSourceConfiguration = [
+    'Test_TC_PSCFG_1_1',
   ];
 
   const RelativeHumidityMeasurement = [
@@ -538,6 +541,7 @@ function getTests()
     'TestConfigVariables',
     'TestDescriptorCluster',
     'TestBasicInformation',
+    'TestGeneralCommissioning',
     'TestIdentifyCluster',
     'TestOperationalCredentialsCluster',
     'TestModeSelectCluster',
@@ -563,6 +567,7 @@ function getTests()
     'DL_UsersAndCredentials',
     'DL_LockUnlock',
     'DL_Schedules',
+    'Test_TC_DL_1_3',
   ];
 
   const Groups = [
@@ -593,6 +598,7 @@ function getTests()
     PowerSource, //
     PressureMeasurement, //
     PumpConfigurationControl, //
+    PowerSourceConfiguration, //
     RelativeHumidityMeasurement, //
     SecureChannel, //
     Switch, //
@@ -600,6 +606,7 @@ function getTests()
     Thermostat, //
     ThermostatUserConfiguration, //
     ThreadNetworkDiagnostics, //
+    UserLabel, //
     WiFiNetworkDiagnostics, //
     WindowCovering, //
     TV, //

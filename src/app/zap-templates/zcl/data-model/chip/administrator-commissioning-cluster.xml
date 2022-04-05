@@ -49,15 +49,18 @@ limitations under the License.
       <arg name="Discriminator" type="INT16U"/>
       <arg name="Iterations" type="INT32U"/>
       <arg name="Salt" type="OCTET_STRING"/>
+      <access op="invoke" privilege="administer"/>
     </command>
 
     <command source="client" code="0x01" name="OpenBasicCommissioningWindow" mustUseTimedInvoke="true" optional="false">
       <description>This command is used by a current Administrator to instruct a Node to go into commissioning mode using basic commissioning method, if the node supports it.</description>
       <arg name="CommissioningTimeout" type="INT16U"/>
+      <access op="invoke" privilege="administer"/>
     </command>
 
     <command source="client" code="0x02" name="RevokeCommissioning" mustUseTimedInvoke="true" optional="false">
       <description>This command is used by a current Administrator to instruct a Node to revoke any active Open Commissioning Window or Open Basic Commissioning Window command.</description>
+      <access op="invoke" privilege="administer"/>
     </command>
 
   </cluster>
