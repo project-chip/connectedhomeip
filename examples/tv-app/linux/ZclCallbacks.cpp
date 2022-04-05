@@ -42,7 +42,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     }
     else if (clusterId == LevelControl::Id)
     {
-        ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %" PRIu16 ", length %" PRIu16,
+        ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %" PRIu16,
                         ChipLogValueMEI(attributeId), type, *value, size);
 
         // WIP Apply attribute change to Light
