@@ -49,42 +49,68 @@ tests:
           constraints:
               type: list
 
-    #issue #11053 disabled steps below Global attributes missing from YAML framework
-    - label: "Read the global attribute: EventList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
+    - label:
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read the global attribute: AcceptedCommandList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          constraints:
-              type: list
+    - label:
+          "Read AcceptedCommandList attribute from the DUT and Verify that the
+          DUT response provides a list of supported commands,This list SHALL
+          include all the mandatory commands."
+      verification: |
+          ./chip-tool lowpower read accepted-command-list 1 1
+          [1645780756.239554][5081:5086] CHIP:TOO:   AcceptedCommandList: 1 entries
+          [1645780756.239624][5081:5086] CHIP:TOO:     [1]: 0
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read the global attribute: GeneratedCommandList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          constraints:
-              type: list
+    - label:
+          "Read GeneratedCommandList attribute from the DUT and Verify that the
+          DUT response provides a list of supported commands."
+      verification: |
+          ./chip-tool lowpower read generated-command-list 1 1
+          [1645780888.412030][5093:5098] CHIP:TOO:   GeneratedCommandList: 0 entries
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "read the optional global attribute: FeatureMap"
-      disabled: true
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          value: 0
-
-    - label: "Read the optional global attribute : FeatureMap"
-      disabled: true
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: map32
+    - label:
+          "Read FeatureMap attribute from the DUT and Verify that the DUT
+          response indicates either value 3 or throws a general error if the
+          attribute is not supported"
+      verification: |
+          ./chip-tool lowpower read feature-map 1 1
+          [1645780669.465220][5069:5074] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

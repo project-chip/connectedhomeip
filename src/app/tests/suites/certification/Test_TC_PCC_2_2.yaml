@@ -35,13 +35,21 @@ tests:
       arguments:
           value: 1
 
-    - label: "Reads the attribute: EffectiveOperationMode"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EffectiveOperationMode"
+    - label:
+          "Read EffectiveOperationMode attribute from the DUT and Verify that
+          the DUT response indicates EffectiveOperationMode attribute has the
+          value 1"
+      verification: |
+          ./chip-tool pumpconfigurationandcontrol read effective-operation-mode 1 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
       PICS: A_EFFECTIVEOPERATIONMODE
-      response:
-          value: 1
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter EffectiveOperationMode attribute value"
+              - name: "expectedValue"
+                value: 1
 
     - label: "Write 2 to the OperationMode attribute to DUT: OperationMode"
       command: "writeAttribute"
@@ -50,13 +58,21 @@ tests:
       arguments:
           value: 2
 
-    - label: "Reads the attribute: EffectiveOperationMode"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EffectiveOperationMode"
+    - label:
+          "Read EffectiveOperationMode attribute from the DUT and Verify that
+          the DUT response indicates EffectiveOperationMode attribute has the
+          value 2"
+      verification: |
+          ./chip-tool pumpconfigurationandcontrol read effective-operation-mode 1 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
       PICS: A_EFFECTIVEOPERATIONMODE
-      response:
-          value: 2
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter EffectiveOperationMode attribute value"
+              - name: "expectedValue"
+                value: 2
 
     - label: "Write 3 to the OperationMode attribute to DUT: OperationMode"
       command: "writeAttribute"
@@ -65,10 +81,18 @@ tests:
       arguments:
           value: 3
 
-    - label: "Reads the attribute: EffectiveOperationMode"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EffectiveOperationMode"
+    - label:
+          "Read EffectiveOperationMode attribute from the DUT and Verify that
+          the DUT response indicates EffectiveOperationMode attribute has the
+          value 3"
+      verification: |
+          ./chip-tool pumpconfigurationandcontrol read effective-operation-mode 1 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
       PICS: A_EFFECTIVEOPERATIONMODE
-      response:
-          value: 3
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter EffectiveOperationMode attribute value"
+              - name: "expectedValue"
+                value: 3

@@ -63,13 +63,20 @@ tests:
       arguments:
           value: 1
 
-    - label: "Reads the attribute: EffectiveControlMode"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EffectiveControlMode"
+    - label:
+          "Read EffectiveControlMode attribute from the DUT and Verify that the
+          DUT response indicates EffectiveControlMode attribute has the value 1"
+      verification: |
+          ./chip-tool pumpconfigurationandcontrol read effective-control-mode 1 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
       PICS: A_EFFECTIVECONTROLMODE
-      response:
-          value: 1
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter EffectiveControlMode attribute value"
+              - name: "expectedValue"
+                value: 1
 
     - label: "Write 2 to the ControlMode attribute to DUT"
       command: "writeAttribute"
@@ -78,13 +85,20 @@ tests:
       arguments:
           value: 2
 
-    - label: "Reads the attribute: EffectiveControlMode"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EffectiveControlMode"
+    - label:
+          "Read EffectiveControlMode attribute from the DUT and Verify that the
+          DUT response indicates EffectiveControlMode attribute has the value 2"
+      verification: |
+          ./chip-tool pumpconfigurationandcontrol read effective-control-mode 1 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
       PICS: A_EFFECTIVECONTROLMODE
-      response:
-          value: 2
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter EffectiveControlMode attribute value"
+              - name: "expectedValue"
+                value: 2
 
     - label: "Write 3 to the ControlMode attribute to DUT"
       command: "writeAttribute"
@@ -93,13 +107,20 @@ tests:
       arguments:
           value: 3
 
-    - label: "Reads the attribute: EffectiveControlMode"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EffectiveControlMode"
+    - label:
+          "Read EffectiveControlMode attribute from the DUT and Verify that the
+          DUT response indicates EffectiveControlMode attribute has the value 3"
+      verification: |
+          ./chip-tool pumpconfigurationandcontrol read effective-control-mode 1 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
       PICS: A_EFFECTIVECONTROLMODE
-      response:
-          value: 3
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter EffectiveControlMode attribute value"
+              - name: "expectedValue"
+                value: 3
 
     - label: "Write 5 to the ControlMode attribute to DUT"
       command: "writeAttribute"
@@ -108,13 +129,20 @@ tests:
       arguments:
           value: 5
 
-    - label: "Reads the attribute: EffectiveControlMode"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EffectiveControlMode"
+    - label:
+          "Read EffectiveControlMode attribute from the DUT and Verify that the
+          DUT response indicates EffectiveControlMode attribute has the value 5"
+      verification: |
+          ./chip-tool pumpconfigurationandcontrol read effective-control-mode 1 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
       PICS: A_EFFECTIVECONTROLMODE
-      response:
-          value: 5
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter EffectiveControlMode attribute value"
+              - name: "expectedValue"
+                value: 5
 
     - label: "Write 7 to the ControlMode attribute to DUT"
       command: "writeAttribute"
@@ -123,10 +151,17 @@ tests:
       arguments:
           value: 7
 
-    - label: "Reads the attribute: EffectiveControlMode"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EffectiveControlMode"
+    - label:
+          "Read EffectiveControlMode attribute from the DUT and Verify that the
+          DUT response indicates EffectiveControlMode attribute has the value 7"
+      verification: |
+          ./chip-tool pumpconfigurationandcontrol read effective-control-mode 1 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
       PICS: A_EFFECTIVECONTROLMODE
-      response:
-          value: 7
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter EffectiveControlMode attribute value"
+              - name: "expectedValue"
+                value: 7
