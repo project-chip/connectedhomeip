@@ -389,6 +389,7 @@ def main(
         if not compile_database:
             raise Exception("Could not find `compile_commands.json` in ./out")
         logging.info("Will use %s for compile", compile_database)
+        compile_database = [compile_database]
 
     context.obj = runner = ClangTidyRunner()
 
