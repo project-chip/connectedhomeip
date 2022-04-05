@@ -19443,6 +19443,41 @@ private:
 };
 
 /*
+ * Command ClearHolidaySchedule
+ */
+class DoorLockClearHolidaySchedule : public ModelCommand {
+public:
+    DoorLockClearHolidaySchedule()
+        : ModelCommand("clear-holiday-schedule")
+    {
+        AddArgument("HolidayIndex", 0, UINT8_MAX, &mHolidayIndex);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000013) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block chipError = CHIP_NO_ERROR;
+        __auto_type * params = [[CHIPDoorLockClusterClearHolidayScheduleParams alloc] init];
+
+        params.holidayIndex = [NSNumber numberWithUnsignedChar:mHolidayIndex];
+        [cluster clearHolidayScheduleWithParams:params
+                              completionHandler:^(NSError * _Nullable error) {
+                                  chipError = [CHIPError errorToCHIPErrorCode:error];
+                                  ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(chipError));
+                                  SetCommandExitStatus(chipError);
+                              }];
+        return chipError;
+    }
+
+private:
+    uint8_t mHolidayIndex;
+};
+
+/*
  * Command ClearUser
  */
 class DoorLockClearUser : public ModelCommand {
@@ -19595,6 +19630,43 @@ public:
 private:
     chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type mRequest;
     TypedComplexArgument<chip::app::Clusters::DoorLock::Structs::DlCredential::Type> mComplex_Credential;
+};
+
+/*
+ * Command GetHolidaySchedule
+ */
+class DoorLockGetHolidaySchedule : public ModelCommand {
+public:
+    DoorLockGetHolidaySchedule()
+        : ModelCommand("get-holiday-schedule")
+    {
+        AddArgument("HolidayIndex", 0, UINT8_MAX, &mHolidayIndex);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000012) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block chipError = CHIP_NO_ERROR;
+        __auto_type * params = [[CHIPDoorLockClusterGetHolidayScheduleParams alloc] init];
+
+        params.holidayIndex = [NSNumber numberWithUnsignedChar:mHolidayIndex];
+        [cluster getHolidayScheduleWithParams:params
+                            completionHandler:^(
+                                CHIPDoorLockClusterGetHolidayScheduleResponseParams * _Nullable values, NSError * _Nullable error) {
+                                NSLog(@"Values: %@", values);
+                                chipError = [CHIPError errorToCHIPErrorCode:error];
+                                ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(chipError));
+                                SetCommandExitStatus(chipError);
+                            }];
+        return chipError;
+    }
+
+private:
+    uint8_t mHolidayIndex;
 };
 
 /*
@@ -19810,6 +19882,53 @@ private:
     uint16_t mUserIndex;
     uint8_t mUserStatus;
     uint8_t mUserType;
+};
+
+/*
+ * Command SetHolidaySchedule
+ */
+class DoorLockSetHolidaySchedule : public ModelCommand {
+public:
+    DoorLockSetHolidaySchedule()
+        : ModelCommand("set-holiday-schedule")
+    {
+        AddArgument("HolidayIndex", 0, UINT8_MAX, &mHolidayIndex);
+        AddArgument("LocalStartTime", 0, UINT32_MAX, &mLocalStartTime);
+        AddArgument("LocalEndTime", 0, UINT32_MAX, &mLocalEndTime);
+        AddArgument("OperatingMode", 0, UINT8_MAX, &mOperatingMode);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000011) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block chipError = CHIP_NO_ERROR;
+        __auto_type * params = [[CHIPDoorLockClusterSetHolidayScheduleParams alloc] init];
+
+        params.holidayIndex = [NSNumber numberWithUnsignedChar:mHolidayIndex];
+
+        params.localStartTime = [NSNumber numberWithUnsignedInt:mLocalStartTime];
+
+        params.localEndTime = [NSNumber numberWithUnsignedInt:mLocalEndTime];
+
+        params.operatingMode = [NSNumber numberWithUnsignedChar:mOperatingMode];
+        [cluster setHolidayScheduleWithParams:params
+                            completionHandler:^(NSError * _Nullable error) {
+                                chipError = [CHIPError errorToCHIPErrorCode:error];
+                                ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(chipError));
+                                SetCommandExitStatus(chipError);
+                            }];
+        return chipError;
+    }
+
+private:
+    uint8_t mHolidayIndex;
+    uint32_t mLocalStartTime;
+    uint32_t mLocalEndTime;
+    uint8_t mOperatingMode;
 };
 
 /*
@@ -77163,15 +77282,18 @@ void registerClusterDoorLock(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<DoorLockClearCredential>(), //
+        make_unique<DoorLockClearHolidaySchedule>(), //
         make_unique<DoorLockClearUser>(), //
         make_unique<DoorLockClearWeekDaySchedule>(), //
         make_unique<DoorLockClearYearDaySchedule>(), //
         make_unique<DoorLockGetCredentialStatus>(), //
+        make_unique<DoorLockGetHolidaySchedule>(), //
         make_unique<DoorLockGetUser>(), //
         make_unique<DoorLockGetWeekDaySchedule>(), //
         make_unique<DoorLockGetYearDaySchedule>(), //
         make_unique<DoorLockLockDoor>(), //
         make_unique<DoorLockSetCredential>(), //
+        make_unique<DoorLockSetHolidaySchedule>(), //
         make_unique<DoorLockSetUser>(), //
         make_unique<DoorLockSetWeekDaySchedule>(), //
         make_unique<DoorLockSetYearDaySchedule>(), //
