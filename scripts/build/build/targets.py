@@ -276,7 +276,7 @@ def HostTargets():
             builder.targets.append(target)
 
     for target in builder.AllVariants():
-        if cross_compile and 'arm64' in target.name and '-no-interactive' not in target.name:
+        if cross_compile and 'chip-tool' in target.name and 'arm64' in target.name and '-no-interactive' not in target.name:
             # Interactive builds will not compile by default on arm cross compiles
             # because libreadline is not part of the default sysroot
             yield target.GlobBlacklist('Arm crosscompile does not support libreadline-dev')
