@@ -16,6 +16,7 @@
  */
 #import "CHIPDeviceController.h"
 
+#import "CHIPAttestationTrustStoreBridge.h"
 #import "CHIPCommissioningParameters.h"
 #import "CHIPControllerAccessControl.h"
 #import "CHIPDevicePairingDelegateBridge.h"
@@ -26,7 +27,6 @@
 #import "CHIPOperationalCredentialsDelegate.h"
 #import "CHIPP256KeypairBridge.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
-#import "CHIPAttestationTrustStoreBridge.h"
 #import "CHIPSetupPayload.h"
 #import <setup_payload/ManualSetupPayloadGenerator.h>
 #import <setup_payload/SetupPayload.h>
@@ -245,11 +245,10 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         params.enableServerInteractions = true;
 
         // Initialize device attestation verifier
-        if(paaCerts) {
+        if (paaCerts) {
             _attestationTrustStoreBridge->Init(paaCerts);
             chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(_attestationTrustStoreBridge));
-        }
-        else {
+        } else {
             // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
             const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
             chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
