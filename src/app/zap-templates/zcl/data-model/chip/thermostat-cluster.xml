@@ -45,7 +45,7 @@ limitations under the License.
     <attribute side="server" code="0x0016" define="MAX_HEAT_SETPOINT_LIMIT" type="INT16S" min="0x954D" max="0x7FFF" writable="true" default="0x0BB8" optional="true">max heat setpoint limit</attribute>
     <attribute side="server" code="0x0017" define="MIN_COOL_SETPOINT_LIMIT" type="INT16S" min="0x954D" max="0x7FFF" writable="true" default="0x0640" optional="true">min cool setpoint limit</attribute>
     <attribute side="server" code="0x0018" define="MAX_COOL_SETPOINT_LIMIT" type="INT16S" min="0x954D" max="0x7FFF" writable="true" default="0x0C80" optional="true">max cool setpoint limit</attribute>
-    <attribute side="server" code="0x0019" define="MIN_SETPOINT_DEAD_BAND" type="INT8S" min="0x0A" max="0x19" writable="true" default="0x19" optional="true">min setpoint dead band</attribute>
+    <attribute side="server" code="0x0019" define="MIN_SETPOINT_DEAD_BAND" type="INT8S" min="0x00" max="0x19" writable="true" default="0x19" optional="true">min setpoint dead band</attribute>
     <attribute side="server" code="0x001A" define="REMOTE_SENSING" type="BITMAP8" min="0x00" max="0x07" writable="true" default="0x00" optional="true">remote sensing</attribute>
     <attribute side="server" code="0x001B" define="CONTROL_SEQUENCE_OF_OPERATION" type="ThermostatControlSequence" min="0x00" max="0x05" writable="true" default="0x04" optional="false">control sequence of operation</attribute>
     <attribute side="server" code="0x001C" define="SYSTEM_MODE" type="ENUM8" min="0x00" max="0x07" writable="true" default="0x01" optional="false">system mode</attribute>

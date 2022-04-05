@@ -1005,7 +1005,7 @@
             { (uint16_t) 0xBB8, (uint16_t) 0x954D, (uint16_t) 0x7FFF }, /* max heat setpoint limit */                              \
             { (uint16_t) 0x640, (uint16_t) 0x954D, (uint16_t) 0x7FFF }, /* min cool setpoint limit */                              \
             { (uint16_t) 0xC80, (uint16_t) 0x954D, (uint16_t) 0x7FFF }, /* max cool setpoint limit */                              \
-            { (uint16_t) 0x19, (uint16_t) 0xA, (uint16_t) 0x19 },       /* min setpoint dead band */                               \
+            { (uint16_t) 0x19, (uint16_t) 0x0, (uint16_t) 0x19 },       /* min setpoint dead band */                               \
             { (uint16_t) 0x4, (uint16_t) 0x0, (uint16_t) 0x5 },         /* control sequence of operation */                        \
             { (uint16_t) 0x1, (uint16_t) 0x0, (uint16_t) 0x7 },         /* system mode */                                          \
                                                                                                                                    \
