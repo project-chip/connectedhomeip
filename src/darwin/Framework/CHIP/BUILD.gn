@@ -30,6 +30,7 @@ static_library("framework") {
   sources = [
     "CHIP.h",
     "CHIPCluster.mm",
+    "CHIPAttestationTrustStoreBridge.mm",
     "CHIPCommissioningParameters.m",
     "CHIPControllerAccessControl.h",
     "CHIPControllerAccessControl.mm",

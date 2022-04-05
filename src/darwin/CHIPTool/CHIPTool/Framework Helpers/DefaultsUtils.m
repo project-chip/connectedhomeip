@@ -74,7 +74,7 @@ CHIPDeviceController * InitializeCHIP(void)
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     dispatch_once(&onceToken, ^{
         storage = [[CHIPToolPersistentStorageDelegate alloc] init];
-        [controller startup:storage vendorId:kTestVendorId nocSigner:nil paaCerts:nil];
+        [controller startup:storage vendorId:kTestVendorId nocSigner:nil];
     });
 
     return controller;
@@ -85,7 +85,7 @@ void CHIPRestartController(CHIPDeviceController * controller)
     NSLog(@"Shutting down the stack");
     [controller shutdown];
     NSLog(@"Starting up the stack");
-    [controller startup:storage vendorId:kTestVendorId nocSigner:nil paaCerts:nil];
+    [controller startup:storage vendorId:kTestVendorId nocSigner:nil];
 }
 
 uint64_t CHIPGetLastPairedDeviceId(void)

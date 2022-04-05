@@ -190,14 +190,14 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 - (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
        vendorId:(uint16_t)vendorId
       nocSigner:(id<CHIPKeypair>)nocSigner
-       paaCerts:(nullable NSArray<NSData *> *)paaCerts
 {
-    return [self startup:storageDelegate vendorId:vendorId nocSigner:nocSigner ipk:nil];
+    return [self startup:storageDelegate vendorId:vendorId nocSigner:nocSigner ipk:nil paaCerts:nil];
 }
 - (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
        vendorId:(uint16_t)vendorId
       nocSigner:(id<CHIPKeypair>)nocSigner
             ipk:(NSData * _Nullable)ipk
+       paaCerts:(NSArray<NSData *> * _Nullable)paaCerts
 {
     if (vendorId == chip::VendorId::Common) {
         // Shouldn't be using the "standard" vendor ID for actual devices.

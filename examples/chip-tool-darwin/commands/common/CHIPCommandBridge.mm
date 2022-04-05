@@ -47,7 +47,7 @@ CHIP_ERROR CHIPCommandBridge::Run()
 
     ipk = [nocSigner getIPK];
 
-    if (![mController startup:storage vendorId:chip::VendorId::TestVendor1 nocSigner:nocSigner ipk:ipk]) {
+    if (![mController startup:storage vendorId:chip::VendorId::TestVendor1 nocSigner:nocSigner ipk:ipk paaCerts:nil]) {
         ChipLogError(chipTool, "Controller startup failure.");
         return CHIP_ERROR_INTERNAL;
     }
