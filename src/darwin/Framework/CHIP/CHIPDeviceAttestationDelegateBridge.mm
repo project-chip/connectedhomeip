@@ -27,12 +27,12 @@ void CHIPDeviceAttestationDelegateBridge::OnDeviceAttestionFailed(chip::Controll
         mResult = attestationResult;
 
         id<CHIPDeviceAttestationDelegate> strongDelegate = mDeviceAttestationDelegate;
-        if ([strongDelegate respondsToSelector:@selector(onDeviceAttestation:deviceId:failedWithError:)]) {
+        if ([strongDelegate respondsToSelector:@selector(deviceAttestation:deviceId:failedWithError:)]) {
 
             CHIPDeviceController * strongController = mDeviceController;
             if (strongController) {
                 NSError * error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INTEGRITY_CHECK_FAILED];
-                [strongDelegate onDeviceAttestation:mDeviceController deviceId:remoteNodeId failedWithError:error];
+                [strongDelegate deviceAttestation:mDeviceController deviceId:remoteNodeId failedWithError:error];
             }
         }
     });

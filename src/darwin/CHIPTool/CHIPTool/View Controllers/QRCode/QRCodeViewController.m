@@ -1109,7 +1109,7 @@
     return self;
 }
 
-- (void)onDeviceAttestation:(CHIPDeviceController *)controller deviceId:(uint64_t)deviceId failedWithError:(NSError * _Nonnull)error
+- (void)deviceAttestation:(CHIPDeviceController *)controller deviceId:(uint64_t)deviceId failedWithError:(NSError * _Nonnull)error
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         UIAlertController * alertController = [UIAlertController
