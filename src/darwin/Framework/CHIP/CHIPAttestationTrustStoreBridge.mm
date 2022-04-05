@@ -17,17 +17,12 @@
 
 #import "CHIPAttestationTrustStoreBridge.h"
 
-chip::ByteSpan asByteSpan(NSData * value)
-{
-    return chip::ByteSpan(static_cast<const uint8_t *>(value.bytes), value.length);
-}
+chip::ByteSpan asByteSpan(NSData * value) { return chip::ByteSpan(static_cast<const uint8_t *>(value.bytes), value.length); }
 
-void CHIPAttestationTrustStoreBridge::Init(NSArray<NSData *> *paaCerts)
-{
-    mPaaCerts = paaCerts;
-}
+void CHIPAttestationTrustStoreBridge::Init(NSArray<NSData *> * paaCerts) { mPaaCerts = paaCerts; }
 
-CHIP_ERROR CHIPAttestationTrustStoreBridge::GetProductAttestationAuthorityCert(const chip::ByteSpan & skid, chip::MutableByteSpan & outPaaDerBuffer) const
+CHIP_ERROR CHIPAttestationTrustStoreBridge::GetProductAttestationAuthorityCert(
+    const chip::ByteSpan & skid, chip::MutableByteSpan & outPaaDerBuffer) const
 {
     VerifyOrReturnError(!skid.empty() && (skid.data() != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(skid.size() == chip::Crypto::kSubjectKeyIdentifierLength, CHIP_ERROR_INVALID_ARGUMENT);
@@ -35,16 +30,14 @@ CHIP_ERROR CHIPAttestationTrustStoreBridge::GetProductAttestationAuthorityCert(c
     size_t paaIdx;
     chip::ByteSpan candidate;
 
-    for (paaIdx = 0; paaIdx < mPaaCerts.count; ++paaIdx)
-    {
+    for (paaIdx = 0; paaIdx < mPaaCerts.count; ++paaIdx) {
         uint8_t skidBuf[chip::Crypto::kSubjectKeyIdentifierLength] = { 0 };
-        candidate                                            = asByteSpan(mPaaCerts[paaIdx]);
-        chip::MutableByteSpan candidateSkidSpan{ skidBuf };
-        VerifyOrReturnError(CHIP_NO_ERROR == chip::Crypto::ExtractSKIDFromX509Cert(candidate, candidateSkidSpan),
-                            CHIP_ERROR_INTERNAL);
+        candidate = asByteSpan(mPaaCerts[paaIdx]);
+        chip::MutableByteSpan candidateSkidSpan { skidBuf };
+        VerifyOrReturnError(
+            CHIP_NO_ERROR == chip::Crypto::ExtractSKIDFromX509Cert(candidate, candidateSkidSpan), CHIP_ERROR_INTERNAL);
 
-        if (skid.data_equal(candidateSkidSpan))
-        {
+        if (skid.data_equal(candidateSkidSpan)) {
             // Found a match
             return CopySpanToMutableSpan(candidate, outPaaDerBuffer);
         }

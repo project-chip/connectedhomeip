@@ -15,23 +15,22 @@
  *    limitations under the License.
  */
 
-
 #import "CHIPError_Internal.h"
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-class CHIPAttestationTrustStoreBridge : public chip::Credentials::AttestationTrustStore
-{
+class CHIPAttestationTrustStoreBridge : public chip::Credentials::AttestationTrustStore {
 public:
-    ~CHIPAttestationTrustStoreBridge(){};
+    ~CHIPAttestationTrustStoreBridge() {};
 
-    void Init(NSArray<NSData *> *paaCerts);
+    void Init(NSArray<NSData *> * paaCerts);
 
-    CHIP_ERROR GetProductAttestationAuthorityCert(const chip::ByteSpan & skid, chip::MutableByteSpan & outPaaDerBuffer) const override;
+    CHIP_ERROR GetProductAttestationAuthorityCert(
+        const chip::ByteSpan & skid, chip::MutableByteSpan & outPaaDerBuffer) const override;
 
 private:
-    NSArray<NSData *> *mPaaCerts;
+    NSArray<NSData *> * mPaaCerts;
 };
 
 NS_ASSUME_NONNULL_END
