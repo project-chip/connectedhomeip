@@ -109,13 +109,13 @@ public:
      *
      *  @param[in]    protocolId      The protocol identifier of the received message.
      *
-     *  @param[in]    delegate        A pointer to ExchangeDelegate.
+     *  @param[in]    acceptor        A pointer to ExchangeAcceptor.
      *
      *  @retval #CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
      *                                                             is full and a new one cannot be allocated.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegate * delegate);
+    CHIP_ERROR RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeAcceptor * acceptor);
 
     /**
      *  Register an unsolicited message handler for a given protocol identifier and message type.
@@ -124,22 +124,22 @@ public:
      *
      *  @param[in]    msgType         The message type of the corresponding protocol.
      *
-     *  @param[in]    delegate        A pointer to ExchangeDelegate.
+     *  @param[in]    acceptor        A pointer to ExchangeAcceptor.
      *
      *  @retval #CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
      *                                                             is full and a new one cannot be allocated.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR RegisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType, ExchangeDelegate * delegate);
+    CHIP_ERROR RegisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType, ExchangeAcceptor * acceptor);
 
     /**
      * A strongly-message-typed version of RegisterUnsolicitedMessageHandlerForType.
      */
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
-    CHIP_ERROR RegisterUnsolicitedMessageHandlerForType(MessageType msgType, ExchangeDelegate * delegate)
+    CHIP_ERROR RegisterUnsolicitedMessageHandlerForType(MessageType msgType, ExchangeAcceptor * acceptor)
     {
         return RegisterUnsolicitedMessageHandlerForType(Protocols::MessageTypeTraits<MessageType>::ProtocolId(),
-                                                        to_underlying(msgType), delegate);
+                                                        to_underlying(msgType), acceptor);
     }
 
     /**
@@ -204,15 +204,15 @@ private:
     {
         UnsolicitedMessageHandler() : ProtocolId(Protocols::NotSpecified) {}
 
-        constexpr void Reset() { Delegate = nullptr; }
-        constexpr bool IsInUse() const { return Delegate != nullptr; }
+        constexpr void Reset() { Acceptor = nullptr; }
+        constexpr bool IsInUse() const { return Acceptor != nullptr; }
         // Matches() only returns a sensible value if IsInUse() is true.
         constexpr bool Matches(Protocols::Id aProtocolId, int16_t aMessageType) const
         {
             return ProtocolId == aProtocolId && MessageType == aMessageType;
         }
 
-        ExchangeDelegate * Delegate;
+        ExchangeAcceptor * Acceptor;
         Protocols::Id ProtocolId;
         // Message types are normally 8-bit unsigned ints, but we use
         // kAnyMessageType, which is negative, to represent a wildcard handler,
@@ -234,7 +234,7 @@ private:
 
     UnsolicitedMessageHandler UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
 
-    CHIP_ERROR RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate);
+    CHIP_ERROR RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeAcceptor * acceptor);
     CHIP_ERROR UnregisterUMH(Protocols::Id protocolId, int16_t msgType);
 
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, const SessionHandle & session,
