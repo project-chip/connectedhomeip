@@ -141,10 +141,6 @@ static void InitOTARequestor(void)
 
 static void InitServer(intptr_t context)
 {
-#if CONFIG_ENABLE_OTA_REQUESTOR
-    InitOTARequestor();
-#endif
-
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     initParams.InitializeStaticResourcesBeforeServerInit();
@@ -153,6 +149,10 @@ static void InitServer(intptr_t context)
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     NetWorkCommissioningInstInit();
+
+#if CONFIG_ENABLE_OTA_REQUESTOR
+    InitOTARequestor();
+#endif
 
     if (RTW_SUCCESS != wifi_is_connected_to_ap())
     {
