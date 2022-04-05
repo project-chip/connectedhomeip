@@ -31,10 +31,10 @@ CHIP_ERROR CHIPAttestationTrustStoreBridge::GetProductAttestationAuthorityCert(c
 {
     VerifyOrReturnError(!skid.empty() && (skid.data() != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(skid.size() == chip::Crypto::kSubjectKeyIdentifierLength, CHIP_ERROR_INVALID_ARGUMENT);
-    
+
     size_t paaIdx;
     chip::ByteSpan candidate;
-    
+
     for (paaIdx = 0; paaIdx < mPaaCerts.count; ++paaIdx)
     {
         uint8_t skidBuf[chip::Crypto::kSubjectKeyIdentifierLength] = { 0 };
@@ -42,7 +42,7 @@ CHIP_ERROR CHIPAttestationTrustStoreBridge::GetProductAttestationAuthorityCert(c
         chip::MutableByteSpan candidateSkidSpan{ skidBuf };
         VerifyOrReturnError(CHIP_NO_ERROR == chip::Crypto::ExtractSKIDFromX509Cert(candidate, candidateSkidSpan),
                             CHIP_ERROR_INTERNAL);
-        
+
         if (skid.data_equal(candidateSkidSpan))
         {
             // Found a match
@@ -51,4 +51,3 @@ CHIP_ERROR CHIPAttestationTrustStoreBridge::GetProductAttestationAuthorityCert(c
     }
     return CHIP_ERROR_CA_CERT_NOT_FOUND;
 }
-

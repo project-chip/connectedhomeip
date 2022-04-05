@@ -125,7 +125,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         if ([self checkForInitError:(_persistentStorageDelegateBridge != nullptr) logMsg:kErrorPersistentStorageInit]) {
             return nil;
         }
-        
+
         _attestationTrustStoreBridge = new CHIPAttestationTrustStoreBridge();
         if ([self checkForInitError:(_attestationTrustStoreBridge != nullptr) logMsg:kErrorAttestationTrustStoreInit]) {
             return nil;
@@ -682,7 +682,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         delete _persistentStorageDelegateBridge;
         _persistentStorageDelegateBridge = NULL;
     }
-    
+
     if (_attestationTrustStoreBridge) {
         delete _attestationTrustStoreBridge;
         _attestationTrustStoreBridge = NULL;
