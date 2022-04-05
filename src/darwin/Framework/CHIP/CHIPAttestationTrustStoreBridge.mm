@@ -24,7 +24,7 @@ void CHIPAttestationTrustStoreBridge::Init(NSArray<NSData *> * paaCerts) { mPaaC
 CHIP_ERROR CHIPAttestationTrustStoreBridge::GetProductAttestationAuthorityCert(
     const chip::ByteSpan & skid, chip::MutableByteSpan & outPaaDerBuffer) const
 {
-    VerifyOrReturnError(!skid.empty() && (skid.data() != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!skid.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(skid.size() == chip::Crypto::kSubjectKeyIdentifierLength, CHIP_ERROR_INVALID_ARGUMENT);
 
     size_t paaIdx;
