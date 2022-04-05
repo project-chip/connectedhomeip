@@ -379,7 +379,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     }
     ReturnErrorOnFailure(err);
 
-    VerifyOrReturnError(InteractionModelEngine::GetInstance()->CheckResourceQuotaForCurrentFabric(this), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(InteractionModelEngine::GetInstance()->CanEstablishReadTransaction(this), CHIP_ERROR_NO_MEMORY);
 
     ReturnErrorOnFailure(readRequestParser.GetIsFabricFiltered(&mIsFabricFiltered));
     ReturnErrorOnFailure(readRequestParser.ExitContainer());
@@ -721,7 +721,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     }
     ReturnErrorOnFailure(err);
 
-    VerifyOrReturnError(InteractionModelEngine::GetInstance()->CheckResourceQuotaForCurrentFabric(this), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(InteractionModelEngine::GetInstance()->CanEstablishSubscribeTransaction(this), CHIP_ERROR_NO_MEMORY);
 
     ReturnErrorOnFailure(subscribeRequestParser.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
     ReturnErrorOnFailure(subscribeRequestParser.GetMaxIntervalCeilingSeconds(&mMaxIntervalCeilingSeconds));

@@ -240,9 +240,15 @@ public:
     bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath);
 
     /**
-     * Checks if we have enough remaining available slots in the cluster info pool.
+     * Checks if the given read handler will exceed the limitations for the fabric accessed.
      */
-    bool CheckResourceQuotaForCurrentFabric(const ReadHandler * apReadHandler);
+    bool CanEstablishSubscribeTransaction(const ReadHandler * apReadHandler);
+
+    /**
+     * We only allow one active read transactions per fabric, we only allow 3 attribute paths, 3 event paths and 3 data version
+     * filters per fabric. This function will check if the given ReadHandler will exceed the limitations for the fabric accessed.
+     */
+    bool CanEstablishReadTransaction(const ReadHandler * apReadHandler);
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     //
@@ -257,6 +263,13 @@ public:
     // If -1 is passed in, no override is instituted and default behavior resumes.
     //
     void SetHandlerCapacity(int32_t sz) { mReadHandlerCapacityOverride = sz; }
+
+    //
+    // We won't limit the handler used per fabric on platforms that are using heap for memory pools, so we introduces a flag to
+    // enforce such check based on the configured size. This flag is used for unit tests only, there is another compare time flag
+    // CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK for stress tests.
+    //
+    void SetForceHandlerQuota(bool forceHandlerQuota) { mForceHandlerQuota = forceHandlerQuota; }
 
     //
     // When testing subscriptions using the high-level APIs in src/controller/ReadInteraction.h,
@@ -384,6 +397,11 @@ private:
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     int mReadHandlerCapacityOverride = -1;
+
+    // We won't limit the handler used per fabric on platforms that are using heap for memory pools, so we introduces a flag to
+    // enforce such check based on the configured size. This flag is used for unit tests only, there is another compare time flag
+    // CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK for stress tests.
+    bool mForceHandlerQuota = false;
 #endif
 
     FabricTable * mpFabricTable;

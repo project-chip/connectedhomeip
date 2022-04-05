@@ -492,74 +492,93 @@ void InteractionModelEngine::AddReadClient(ReadClient * apReadClient)
     mpActiveReadClientList = apReadClient;
 }
 
-bool InteractionModelEngine::CheckResourceQuotaForCurrentFabric(const ReadHandler * apReadHandler)
+bool InteractionModelEngine::CanEstablishReadTransaction(const ReadHandler * apReadHandler)
 {
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
-    // If the resources are allocated on the heap, we should be able to handle as many Read / Subscribe requests as possible.
-    return true;
-#else
-    FabricIndex currentFabricIndex                     = apReadHandler->GetAccessingFabricIndex();
-    uint8_t fabricCount                                = mpFabricTable->FabricCount();
-    size_t attributePathsSubscribedByCurrentFabric     = 0;
-    size_t attributePathsUsedByCurrentFabric           = 0;
-    size_t eventPathsSubscribedByCurrentFabric         = 0;
-    size_t eventPathsUsedByCurrentFabric               = 0;
-    size_t dataVersionFiltersSubscribedByCurrentFabric = 0;
-    size_t dataVersionFiltersUsedByCurrentFabric       = 0;
-    size_t subscriptionsEstablishedByCurrentFabric     = 0;
-    size_t activeReadHandlersByCurrentFabric           = 0;
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    if (!mForceHandlerQuota)
+    {
+#endif
+        // If the resources are allocated on the heap, we should be able to handle as many Read / Subscribe requests as possible.
+        return true;
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    }
+#endif
+#endif
+    FabricIndex currentFabricIndex           = apReadHandler->GetAccessingFabricIndex();
+    size_t activeReadHandlersOnCurrentFabric = 0;
 
     // It is safe to use & here since this function will be called on current stack.
     mReadHandlers.ForEachActiveObject([&](ReadHandler * handler) {
-        if (handler->GetAccessingFabricIndex() == currentFabricIndex)
+        if (handler->GetAccessingFabricIndex() == currentFabricIndex && handler->IsType(ReadHandler::InteractionType::Read))
         {
-            if (handler->IsType(ReadHandler::InteractionType::Subscribe))
-            {
-                attributePathsSubscribedByCurrentFabric += handler->GetAttributePathCount();
-                eventPathsSubscribedByCurrentFabric += handler->GetEventPathCount();
-                dataVersionFiltersSubscribedByCurrentFabric += handler->GetDataVersionFilterCount();
-
-                subscriptionsEstablishedByCurrentFabric++;
-            }
-            attributePathsUsedByCurrentFabric += handler->GetAttributePathCount();
-            eventPathsUsedByCurrentFabric += handler->GetEventPathCount();
-            dataVersionFiltersUsedByCurrentFabric += handler->GetDataVersionFilterCount();
-            activeReadHandlersByCurrentFabric++;
+            activeReadHandlersOnCurrentFabric++;
         }
         return Loop::Continue;
     });
 
-    // Ensure the total number of subscriptions and ongoing read requests don't exceed the limit per fabric.
-    VerifyOrReturnError((subscriptionsEstablishedByCurrentFabric + kReservedReadHandlerForReadRequests) * fabricCount <=
-                            CHIP_IM_MAX_NUM_READ_HANDLER,
-                        false);
-    VerifyOrReturnError(activeReadHandlersByCurrentFabric * fabricCount <= CHIP_IM_MAX_NUM_READ_HANDLER, false);
-
-    // For all transactions, ensure we won't use up the quota of paths assigned to current fabric.
-    VerifyOrReturnError(attributePathsUsedByCurrentFabric * fabricCount <= CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS, false);
-    // For all transactions, ensure we won't use up the quota of paths assigned to current fabric.
-    VerifyOrReturnError(eventPathsUsedByCurrentFabric * fabricCount <= CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS, false);
-    // For all transactions, ensure we won't use up the quota of paths assigned to current fabric.
-    VerifyOrReturnError(dataVersionFiltersUsedByCurrentFabric * fabricCount <= CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS, false);
-
-    if (apReadHandler->IsType(ReadHandler::InteractionType::Read))
-    {
-        return true;
-    }
-
-    if (fabricCount == 0)
+    // The incoming read handler here is also counted above.
+    if (activeReadHandlersOnCurrentFabric > kReservedReadHandlerForReadRequests)
     {
         return false;
     }
 
-    // Similar to the check above, but always ensure we can process a read request with 9 paths.
-    return (attributePathsSubscribedByCurrentFabric + kReservedPathPoolForReadRequests) * fabricCount <=
+    return apReadHandler->GetAttributePathCount() <= kReservedPathPoolForReadRequests &&
+        apReadHandler->GetEventPathCount() <= kReservedPathPoolForReadRequests &&
+        apReadHandler->GetDataVersionFilterCount() <= kReservedPathPoolForReadRequests;
+}
+
+bool InteractionModelEngine::CanEstablishSubscribeTransaction(const ReadHandler * apReadHandler)
+{
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    if (!mForceHandlerQuota)
+    {
+#endif
+        // If the resources are allocated on the heap, we should be able to handle as many Read / Subscribe requests as possible.
+        return true;
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    }
+#endif
+#endif
+
+    FabricIndex currentFabricIndex                     = apReadHandler->GetAccessingFabricIndex();
+    uint8_t fabricCount                                = mpFabricTable->FabricCount();
+    size_t attributePathsSubscribedByCurrentFabric     = 0;
+    size_t eventPathsSubscribedByCurrentFabric         = 0;
+    size_t dataVersionFiltersSubscribedByCurrentFabric = 0;
+    size_t subscriptionsEstablishedByCurrentFabric     = 0;
+
+    // If fabricCount is 0, means the device is not commissioned, thus we cannot handle subscription requests.
+    // If currentFabricIndex is kUndefinedFabricIndex, means the incoming subscription uses a PASE session, and we cannot establish
+    // subscribe transaction in this case.
+    if (fabricCount == 0 || currentFabricIndex == kUndefinedFabricIndex)
+    {
+        return false;
+    }
+
+    // It is safe to use & here since this function will be called on current stack.
+    mReadHandlers.ForEachActiveObject([&](ReadHandler * handler) {
+        if (handler->GetAccessingFabricIndex() == currentFabricIndex && handler->IsType(ReadHandler::InteractionType::Subscribe))
+        {
+            attributePathsSubscribedByCurrentFabric += handler->GetAttributePathCount();
+            eventPathsSubscribedByCurrentFabric += handler->GetEventPathCount();
+            dataVersionFiltersSubscribedByCurrentFabric += handler->GetDataVersionFilterCount();
+
+            subscriptionsEstablishedByCurrentFabric++;
+        }
+        return Loop::Continue;
+    });
+
+    // Ensure the total number of subscriptions and paths used don't exceed the limit per fabric.
+    return (subscriptionsEstablishedByCurrentFabric + kReservedReadHandlerForReadRequests) * fabricCount <=
+        CHIP_IM_MAX_NUM_READ_HANDLER &&
+        (attributePathsSubscribedByCurrentFabric + kReservedPathPoolForReadRequests) * fabricCount <=
         CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS &&
         (eventPathsSubscribedByCurrentFabric + kReservedPathPoolForReadRequests) * fabricCount <=
         CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS &&
         (dataVersionFiltersSubscribedByCurrentFabric + kReservedPathPoolForReadRequests) * fabricCount <=
         CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS;
-#endif
 }
 
 void InteractionModelEngine::RemoveReadClient(ReadClient * apReadClient)

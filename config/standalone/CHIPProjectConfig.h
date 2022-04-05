@@ -83,10 +83,15 @@
 // In tests like TestReadHandler_MultipleSubscriptions, we are trying to issue as many as read / subscription requests as possible
 // in parallel. Since the default config says we supports 16 fabrics, and we will have 4 read handlers for each fabric (3
 // subscriptions + 1 reserved for read) that is read transactions in parallel. Since the report handlers is allocating on the heap,
-// we will issue 65 requests in total and that is 130 EC, we also need the same number of ECs on the server side, that is 260 ECs
-// required, then rounding up to 300 EC.
+// we will issue 65 requests in total and that is 130 EC. Round this up to 150 EC
 //
-#define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS 512
+#define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS 150
+
+// Default RMP retrans table size equals to the number of max exchange contexts, which is enough for real devices, however, we are
+// closing and creating new exchanges at a high frequency in unit tests while the retrans table won't be cleared when the exchange
+// context is closed (it will wait for the asynchronous ACK from the other side for remove the retrans record), so we double the
+// size of retrans table for unit tests.
+#define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE (2 * CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS)
 
 //
 // Default of 4 parallel reports is too small for some unit tests that try to validate multiple simultaneous interactions and will
