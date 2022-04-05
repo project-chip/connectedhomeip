@@ -59,6 +59,7 @@ static_library("framework") {
     "CHIPQRCodeSetupPayloadParser.mm",
     "CHIPSetupPayload.h",
     "CHIPSetupPayload.mm",
+    "CHIPDeviceAttestationDelegateBridge.mm",
     "zap-generated/CHIPAttributeTLVValueDecoder.mm",
     "zap-generated/CHIPCallbackBridge.mm",
     "zap-generated/CHIPClustersObjc.h",
