@@ -209,6 +209,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
         "CHIP_DEVICE_ENABLE_DATA_MODEL=${chip_enable_data_model}",
       ]
+    } else if (chip_device_platform == "bl602") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_BL602=1",
+        "CHIP_DEVICE_LAYER_TARGET=bouffalolab/BL602",
+      ]
     } else if (chip_device_platform == "fake") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_FAKE=1",
@@ -290,6 +295,7 @@ if (chip_device_platform != "none") {
       "../include/platform/FailSafeContext.h",
       "../include/platform/GeneralUtils.h",
       "../include/platform/KeyValueStoreManager.h",
+      "../include/platform/KvsPersistentStorageDelegate.h",
       "../include/platform/PersistedStorage.h",
       "../include/platform/PlatformManager.h",
       "../include/platform/TestOnlyCommissionableDataProvider.h",
@@ -321,6 +327,7 @@ if (chip_device_platform != "none") {
       "../include/platform/internal/testing/ConfigUnitTest.h",
       "CommissionableDataProvider.cpp",
       "DeviceControlServer.cpp",
+      "DeviceInfoProvider.cpp",
       "DiagnosticDataProvider.cpp",
       "Entropy.cpp",
       "FailSafeContext.cpp",
@@ -381,6 +388,8 @@ if (chip_device_platform != "none") {
       _platform_target = "Ameba"
     } else if (chip_device_platform == "webos") {
       _platform_target = "webos"
+    } else if (chip_device_platform == "bl602") {
+      _platform_target = "bouffalolab/BL602"
     } else if (chip_device_platform == "fake") {
       _platform_target = "fake"
     } else if (chip_device_platform == "cyw30739") {

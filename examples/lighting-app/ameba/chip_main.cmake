@@ -15,9 +15,9 @@ list(
     APPEND ${list_chip_main_sources}
     #OTARequestor
     ${chip_dir}/src/app/clusters/ota-requestor/BDXDownloader.cpp
-    ${chip_dir}/src/app/clusters/ota-requestor/OTARequestor.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
-    ${chip_dir}/src/app/clusters/ota-requestor/GenericOTARequestorDriver.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
 )
 endif (matter_enable_ota_requestor)
@@ -75,7 +75,7 @@ target_include_directories(
 list(
     APPEND chip_main_flags
 
-    -DINET_CONFIG_ENABLE_IPV4=1
+    -DINET_CONFIG_ENABLE_IPV4=0
     -DCHIP_PROJECT=1
     -DCHIP_DEVICE_LAYER_TARGET=Ameba
     -DUSE_ZAP_CONFIG

@@ -60,23 +60,27 @@ void FailSafeContext::HandleDisarmFailSafe(intptr_t arg)
 
 void FailSafeContext::FailSafeTimerExpired()
 {
-    ChipDeviceEvent event;
-    event.Type                                                = DeviceEventType::kFailSafeTimerExpired;
-    event.FailSafeTimerExpired.PeerFabricIndex                = mFabricIndex;
-    event.FailSafeTimerExpired.AddNocCommandHasBeenInvoked    = mAddNocCommandHasBeenInvoked;
-    event.FailSafeTimerExpired.UpdateNocCommandHasBeenInvoked = mUpdateNocCommandHasBeenInvoked;
-    CHIP_ERROR status                                         = PlatformMgr().PostEvent(&event);
+    ScheduleFailSafeCleanup(mFabricIndex, mAddNocCommandHasBeenInvoked, mUpdateNocCommandHasBeenInvoked);
+}
 
+void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addNocCommandInvoked, bool updateNocCommandInvoked)
+{
     mFailSafeArmed                  = false;
     mAddNocCommandHasBeenInvoked    = false;
     mUpdateNocCommandHasBeenInvoked = false;
+    mFailSafeBusy                   = true;
+
+    ChipDeviceEvent event;
+    event.Type                                                = DeviceEventType::kFailSafeTimerExpired;
+    event.FailSafeTimerExpired.PeerFabricIndex                = fabricIndex;
+    event.FailSafeTimerExpired.AddNocCommandHasBeenInvoked    = addNocCommandInvoked;
+    event.FailSafeTimerExpired.UpdateNocCommandHasBeenInvoked = updateNocCommandInvoked;
+    CHIP_ERROR status                                         = PlatformMgr().PostEvent(&event);
 
     if (status != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to post fail-safe timer expired: %" CHIP_ERROR_FORMAT, status.Format());
     }
-
-    mFailSafeBusy = true;
 
     PlatformMgr().ScheduleWork(HandleDisarmFailSafe, reinterpret_cast<intptr_t>(this));
 }
@@ -117,10 +121,9 @@ CHIP_ERROR FailSafeContext::SetAddNocCommandInvoked(FabricIndex nocFabricIndex)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FailSafeContext::SetUpdateNocCommandInvoked(FabricIndex nocFabricIndex)
+CHIP_ERROR FailSafeContext::SetUpdateNocCommandInvoked()
 {
     mUpdateNocCommandHasBeenInvoked = true;
-    mFabricIndex                    = nocFabricIndex;
 
     ReturnErrorOnFailure(CommitToStorage());
 
@@ -181,6 +184,16 @@ CHIP_ERROR FailSafeContext::DeleteFromStorage()
     DefaultStorageKeyAllocator keyAlloc;
 
     return PersistedStorage::KeyValueStoreMgr().Delete(keyAlloc.FailSafeContextKey());
+}
+
+void FailSafeContext::ForceFailSafeTimerExpiry()
+{
+    if (!IsFailSafeArmed())
+    {
+        return;
+    }
+    DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafeTimer, this);
+    FailSafeTimerExpired();
 }
 
 } // namespace DeviceLayer

@@ -1,7 +1,7 @@
 # Matter CC1352 CC2652 Lock Example Application
 
 An example application showing the use of [Matter][matter] on the Texas
-Instruments CC13X2_26X2 family of Wireless MCUs.
+Instruments CC13XX_26XX family of Wireless MCUs.
 
 ---
 
@@ -28,14 +28,11 @@ Instruments CC13X2_26X2 family of Wireless MCUs.
 
 ![CC1352R1_LAUNCHXL](doc/images/cc1352r1_launchxl.jpg)
 
-The CC13X2_26X2 lock example application provides a working demonstration of a
+The CC13XX_26XX lock example application provides a working demonstration of a
 connected door lock device. This uses the open-source Matter implementation and
-the Texas Instruments SimpleLink™ CC13x2 and CC26x2 software development kit.
+the Texas Instruments SimpleLink™ CC13XX and CC26XX software development kit.
 
-This example is enabled to build for CC2652R7 devices. This upcoming devices are
-currently not yet in full production. For more information on device
-availability or early access to an engineering build of our Matter-enabled SDK,
-please reach out [here][ti_cc13x2_26x2_r7_matter_request].
+This example is enabled to build for CC2652R7 devices.
 
 The lock example is intended to serve both as a means to explore the workings of
 Matter, as well as a template for creating real products based on the Texas
@@ -65,68 +62,16 @@ Some initial setup is necessary for preparing the build environment. This
 section will need to be done when migrating to new versions of the SDK. This
 guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
--   An engineering SDK from TI is required. Please request access for it
-    [here][ti_cc13x2_26x2_r7_matter_request].
-
-    -   Follow the default installation instructions when executing the
-        installer.
-
-    -   The version of OpenThread used in this repository is newer than the one
-        packaged with the TI SDK. Check the following section for a list of
-        changes needed.
-
 -   Download and install [SysConfig][sysconfig] ([recommended
-    version][sysconfig_recommended])
-
-    -   This may have already been installed with your SimpleLink SDK install.
-
--   If you have installed different versions, the build defaults will need to be
-    changed to reflect this in
-    `${chip_root}/examples/build_overrides/ti_simplelink_sdk.gni`.
-
--   Install Python 3.8 for the GN build system:
+    version][sysconfig_recommended]). This can be done simply with the following
+    commands.
 
     ```
-    # Linux
-    $ sudo apt-get install python3.8 python3.8-distutils python3.8-dev python3.8-venv
-    # Distutils listed due to a package manager error on Ubuntu 18.04
-
+    $ cd ~
+    $ wget https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.11.0_2225-setup.run
+    $ chmod +x sysconfig-1.11.0_2225-setup.run
+    $ ./sysconfig-1.11.0_2225-setup.run
     ```
-
-    -   You will have to ensure that the default version of Python 3 is Python
-        3.8.
-
-        -   Check python3 version:
-
-        ```
-        $ python3 --version
-        Python 3.8.0
-        ```
-
-        -   If it is not Python 3.8:
-
-        ```
-        $ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1
-        ```
-
-            -   This may affect your environment in other ways if there was a
-                specific dependency on the prior python3 version (e.g. apt).
-                After completing the build process for this example, you can
-                revert the python3 version, for instance:
-
-                ```
-                $ sudo update-alternatives --config python3
-                There are 2 choices for the alternative python3 (providing /usr/bin/python3).
-
-                  Selection    Path                Priority    Status
-                -------------------------------------------------------------
-                  0            /usr/bin/python3.8   1          auto mode
-                  1            /usr/bin/python3.6   1          manual mode
-                * 2            /usr/bin/python3.8   1          manual mode
-
-                Press <enter> to keep the current choice[*], or type selection number: 1
-                update-alternatives: using /usr/bin/python3.6 to provide /usr/bin/python3 (python3) in manual mode
-                ```
 
 -   Run the bootstrap script to setup the build environment.
 
@@ -152,16 +97,13 @@ Ninja to build the executable.
 -   Run the build to produce a default executable. By default on Linux both the
     TI SimpleLink SDK and Sysconfig are located in a `ti` folder in the user's
     home directory, and you must provide the absolute path to them. For example
-    `/home/username/ti/simplelink_cc13xx_cc26xx_sdk_5_30_03_01_eng` and
-    `/home/username/ti/sysconfig_1.10.0`. On Windows the default directory is
+    `/home/username/ti/sysconfig_1.11.0`. On Windows the default directory is
     `C:\ti`. Take note of this install path, as it will be used in the next
     step.
 
     ```
     $ cd ~/connectedhomeip/examples/lock-app/cc13x2x7_26x2x7
-    $ export TI_SIMPLELINK_SDK_ROOT=$HOME/ti/simplelink_cc13xx_cc26xx_sdk_5_30_03_01_eng
-    $ export TI_SYSCONFIG_ROOT=$HOME/ti/sysconfig_1.10.0
-    $ gn gen out/debug --args="ti_simplelink_sdk_root=\"${TI_SIMPLELINK_SDK_ROOT}\" ti_sysconfig_root=\"${TI_SYSCONFIG_ROOT}\""
+    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.11.0\""
     $ ninja -C out/debug
 
     ```
@@ -250,11 +192,13 @@ an existing Thread network. The following sections assume that a Thread network
 is already active, and has at least one [OpenThread Border
 Router][ot_border_router_setup].
 
+For insight into what other components are needed to run this example, please
+refer to our [Matter Getting Started Guide][matter-e2e-faq].
+
 ### Provisioning
 
-The first step to bring the Matter device onto the network is to provision it.
-Our example accomplishes this with Bluetooth Low Energy (BLE) and the
-[CHIPTool](../../../src/android/CHIPTool/README.md) mobile app.
+Interacting with the application begins by enabling BLE advertisements and then
+pairing the device into a Thread network.
 
 #### Bluetooth LE Advertising
 
@@ -265,10 +209,11 @@ fully provisioned, BLE advertising will stop.
 
 #### Bluetooth LE Rendezvous
 
-To commission and control this application within a Matter-enabled Thread
-network, consult the [CHIPTool README](../../../src/android/CHIPTool/README.md)
-for information on the Android smartphone application. Reference the Device
-Configuration information printed in the Logging Output of this application.
+Pairing this application with `ble-thread` can be done with any of the enabled
+[CHIP Controller](../../../src/controller/README.md) applications. Use the
+information printed on the console to aide in pairing the device. The controller
+application can also be used to control the example app with the cluster
+commands.
 
 ## TI Support
 
@@ -287,11 +232,12 @@ Additionally, we welcome any feedback.
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-method
 [cc1352r1_launchxl]: https://www.ti.com/tool/LAUNCHXL-CC1352R1
 [e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-and-thread
+[matter-e2e-faq]:
+    https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum/1082428/faq-cc2652r7-matter----getting-started-guide
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG
 [sysconfig_recommended]:
-    https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.10.0_2163-setup.run
+    https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.11.0_2225-setup.run
 [ti_thread_dnd]:
     https://www.ti.com/wireless-connectivity/thread/design-development.html
-[ti_cc13x2_26x2_r7_matter_request]: https://ti.com/chip_sdk
 [ot_border_router_setup]: https://openthread.io/guides/border-router/build
 [uniflash]: https://www.ti.com/tool/download/UNIFLASH

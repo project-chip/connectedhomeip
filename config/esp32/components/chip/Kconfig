@@ -85,7 +85,7 @@ menu "CHIP Core"
 
         config USE_MINIMAL_MDNS
             bool "Use the minimal mDNS implementation shipped in the CHIP library"
-            default y
+            default n
             help
                 The CHIP library is shipped with a minimal mDNS implementation,
                 enable this config to use it rather than the mDNS library in IDF.
@@ -509,6 +509,18 @@ menu "CHIP Device Layer"
             help
                 Automatically disable CHIP-over-BLE (WoBLE) advertising when the device transitions
                 to a fully provisioned state.
+
+    endmenu
+
+    menu "CHIP Thread Options"
+        visible if OPENTHREAD_ENABLED
+
+        config THREAD_TASK_STACK_SIZE
+            int "Thread task stack size"
+            default 5120
+            depends on OPENTHREAD_ENABLED
+            help
+                Stack size of Thread task.
 
     endmenu
 

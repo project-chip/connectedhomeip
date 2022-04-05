@@ -325,7 +325,7 @@ def console(device: str, baudrate: int,
     serial_impl = SerialWithLogging
 
     if socket_addr is None:
-        serial_device = serial_impl(device, baudrate, timeout=1)
+        serial_device = serial_impl(device, baudrate, timeout=0)
         def read(): return serial_device.read(8192)
         write = serial_device.write
     else:

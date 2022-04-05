@@ -26,6 +26,7 @@
 
 #define WC_PERCENT100THS_MIN_OPEN 0
 #define WC_PERCENT100THS_MAX_CLOSED 10000
+#define WC_PERCENT100THS_MIDDLE 5000
 
 namespace chip {
 namespace app {
@@ -113,8 +114,8 @@ bool HasFeature(chip::EndpointId endpoint, WcFeature feature);
 bool HasFeaturePaLift(chip::EndpointId endpoint);
 bool HasFeaturePaTilt(chip::EndpointId endpoint);
 
-void TypeSet(chip::EndpointId endpoint, EmberAfWcType type);
-EmberAfWcType TypeGet(chip::EndpointId endpoint);
+void TypeSet(chip::EndpointId endpoint, Type type);
+Type TypeGet(chip::EndpointId endpoint);
 
 void ConfigStatusSet(chip::EndpointId endpoint, const ConfigStatus & status);
 const ConfigStatus ConfigStatusGet(chip::EndpointId endpoint);
@@ -125,9 +126,10 @@ const OperationalStatus OperationalStatusGet(chip::EndpointId endpoint);
 
 OperationalState ComputeOperationalState(uint16_t target, uint16_t current);
 OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths current);
+Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths previous, Percent100ths delta);
 
-void EndProductTypeSet(chip::EndpointId endpoint, EmberAfWcEndProductType type);
-EmberAfWcEndProductType EndProductTypeGet(chip::EndpointId endpoint);
+void EndProductTypeSet(chip::EndpointId endpoint, EndProductType type);
+EndProductType EndProductTypeGet(chip::EndpointId endpoint);
 
 void ModeSet(chip::EndpointId endpoint, const Mode & mode);
 const Mode ModeGet(chip::EndpointId endpoint);
@@ -142,11 +144,11 @@ bool IsPercent100thsValid(NPercent100ths npercent100ths);
 
 uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift);
 uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths);
-void LiftPositionSet(chip::EndpointId endpoint, uint16_t percent100ths);
+void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths position);
 
 uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt);
 uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths);
-void TiltPositionSet(chip::EndpointId endpoint, uint16_t percent100ths);
+void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths position);
 
 } // namespace WindowCovering
 } // namespace Clusters

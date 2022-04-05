@@ -56,7 +56,9 @@ apk
 AppConfig
 AppImpl
 ApplianceControl
+applianceeventsandalert
 ApplianceIdentification
+appliancestatistics
 ApplicationBasic
 ApplicationId
 ApplicationIdentifier
@@ -247,6 +249,7 @@ ColorControl
 Comcast
 Commandline
 Commissionable
+commissionables
 CommissioningFlow
 commondatastorage
 CONF
@@ -320,6 +323,7 @@ dcc
 DCHIP
 DCL
 DCMAKE
+DCONF
 DCONFIG
 debianutils
 debugText
@@ -479,6 +483,7 @@ fb
 fbb
 fbd
 FC
+FCJ
 FDDE
 fddead
 fde
@@ -612,6 +617,7 @@ InetLayer
 Infineon
 ini
 init
+InitArgs
 inlined
 InputLoop
 installDebug
@@ -860,6 +866,7 @@ NTAG
 nullable
 nullptr
 NUM
+NVM
 nwk
 NXP
 objcopy
@@ -1174,6 +1181,7 @@ subtype
 sudo
 SulfateConcentrationMeasurement
 SulfurDioxideConcentrationMeasurement
+suppressResponse
 svg
 SVR
 SWD
@@ -1330,6 +1338,7 @@ VSCode
 WaitNewInputEvent
 WakeOnLan
 WantedBy
+watchdogTimeout
 webpage
 wget
 whde
@@ -1444,3 +1453,4 @@ localedef
 nameserver
 nmcli
 tsan
+bouffalolab

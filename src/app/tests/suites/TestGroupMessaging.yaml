@@ -129,53 +129,60 @@ tests:
                       Subjects: null,
                       Targets: null,
                   },
-                  # Any group can operate
+                  # Any group can manage
                   {
                       FabricIndex: 0,
-                      Privilege: 3, # operate
+                      Privilege: 4, # manage
                       AuthMode: 3, # group
                       Subjects: null,
                       Targets: null,
                   },
               ]
 
-    # Test Pair 1 : Sends a Group Write Attribute
-    - label: "Group Write Attribute"
-      command: "writeAttribute"
-      attribute: "location"
-      groupId: 0x0102
-      arguments:
-          value: "US"
-
-      # Test Pair 1 : Validates previous group write attribute with a unicast to read
-    - label: "Read back Attribute"
+    # Test Pair 1 : Check initial value (ensure it's not the test value)
+    - label: "Read initial Attribute value"
       command: "readAttribute"
-      attribute: "location"
+      attribute: "nodeLabel"
       response:
-          value: "US"
+          value: ""
 
     # Test Pair 2 : Sends a Group Write Attribute
-    - label: "Restore initial location value"
+    - label: "Group Write Attribute"
       command: "writeAttribute"
-      attribute: "location"
+      attribute: "nodeLabel"
       groupId: 0x0102
       arguments:
-          value: "XX"
+          value: "xyzzy"
 
-    # Test Pair 2 : Validates previous group write attribute with a unicast to read
+      # Test Pair 2 : Validates previous group write attribute with a unicast to read
     - label: "Read back Attribute"
       command: "readAttribute"
-      attribute: "location"
+      attribute: "nodeLabel"
       response:
-          value: "XX"
+          value: "xyzzy"
 
-    # Test Pair 3 : Sends a Group command
+    # Test Pair 3 : Sends a Group Write Attribute
+    - label: "Restore initial Attribute value"
+      command: "writeAttribute"
+      attribute: "nodeLabel"
+      groupId: 0x0102
+      arguments:
+          value: ""
+
+    # Test Pair 3 : Validates previous group write attribute with a unicast to read
+    - label: "Read back Attribute"
+      command: "readAttribute"
+      attribute: "nodeLabel"
+      response:
+          value: ""
+
+    # Test Pair 4 : Sends a Group command
     - label: "Turn On the light to see attribute change"
       cluster: "On/Off"
       command: "On"
       groupId: 0x0101
 
-    # Test Pair 3 : Validates previous group command with a unicast to read
+    # Test Pair 4 : Validates previous group command with a unicast to read
     - label:
           "Check on/off attribute value is true after on command for endpoint 1"
       cluster: "On/Off"

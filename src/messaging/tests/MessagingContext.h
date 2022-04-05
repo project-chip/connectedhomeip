@@ -71,8 +71,9 @@ class MessagingContext : public PlatformMemoryUser
 public:
     MessagingContext() :
         mInitialized(false), mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
-        mBobAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)), mPairingAliceToBob(kBobKeyId, kAliceKeyId),
-        mPairingBobToAlice(kAliceKeyId, kBobKeyId)
+        mBobAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)),
+        mPairingAliceToBob(kBobKeyId, kAliceKeyId, GetSecureSessionManager()),
+        mPairingBobToAlice(kAliceKeyId, kBobKeyId, GetSecureSessionManager())
     {}
     ~MessagingContext() { VerifyOrDie(mInitialized == false); }
 

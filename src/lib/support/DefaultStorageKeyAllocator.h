@@ -26,7 +26,14 @@
 namespace chip {
 
 /**
- * This is the common key allocation policy for all classes using PersistentStorageDelegate storage
+ * This is the common key allocation policy for all classes using
+ * PersistentStorageDelegate storage.
+ *
+ * Keys should have the following formats:
+ *
+ * * Keys that are not tied to a specific fabric: "g/....".
+ * * Keys that are tied to a specific fabric: "f/%x/...." where the %x gets
+ *   replaced by the fabric index.
  */
 class DefaultStorageKeyAllocator
 {
@@ -45,22 +52,26 @@ public:
     // FailSafeContext
     const char * FailSafeContextKey() { return Format("g/fsc"); }
 
-    // Access Control List
+    // Access Control
+    const char * AccessControlExtensionEntry(FabricIndex fabric) { return Format("f/%x/ac/1", fabric); }
 
-    const char * AccessControlList() { return Format("acl"); }
+    // TODO: We should probably store the fabric-specific parts of the ACL list
+    // under keys starting with "f/%x/".
+    const char * AccessControlList() { return Format("g/acl"); }
     const char * AccessControlEntry(size_t index)
     {
         // This cast will never overflow because the number of ACL entries will be low.
-        return Format("acl/%x", static_cast<unsigned int>(index));
+        return Format("g/acl/%x", static_cast<unsigned int>(index));
     }
 
     // Group Message Counters
-    const char * GroupDataCounter() { return Format("gdc"); }
-    const char * GroupControlCounter() { return Format("gcc"); }
+    const char * GroupDataCounter() { return Format("g/gdc"); }
+    const char * GroupControlCounter() { return Format("g/gcc"); }
 
     // Group Data Provider
 
-    const char * FabricTable() { return Format("f/t"); }
+    // List of fabric indices that have endpoint-to-group associations defined.
+    const char * GroupFabricList() { return Format("g/gfl"); }
     const char * FabricGroups(chip::FabricIndex fabric) { return Format("f/%x/g", fabric); }
     const char * FabricGroup(chip::FabricIndex fabric, chip::GroupId group) { return Format("f/%x/g/%x", fabric, group); }
     const char * FabricGroupKey(chip::FabricIndex fabric, uint16_t index) { return Format("f/%x/gk/%x", fabric, index); }
@@ -72,19 +83,21 @@ public:
 
     const char * AttributeValue(const app::ConcreteAttributePath & aPath)
     {
-        // Needs at most 24 chars: 4 for "a///", 4 for the endpoint id, 8 each
+        // Needs at most 26 chars: 6 for "g/a///", 4 for the endpoint id, 8 each
         // for the cluster and attribute ids.
-        return Format("a/%" PRIx16 "/%" PRIx32 "/%" PRIx32, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+        return Format("g/a/%" PRIx16 "/%" PRIx32 "/%" PRIx32, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
     }
 
-    const char * BindingTable() { return Format("bt"); }
-    const char * BindingTableEntry(uint8_t index) { return Format("bt/%x", index); }
+    // TODO: Should store fabric-specific parts of the binding list under keys
+    // starting with "f/%x/".
+    const char * BindingTable() { return Format("g/bt"); }
+    const char * BindingTableEntry(uint8_t index) { return Format("g/bt/%x", index); }
 
-    static const char * OTADefaultProviders() { return "o/dp"; }
-    static const char * OTACurrentProvider() { return "o/cp"; }
-    static const char * OTAUpdateToken() { return "o/ut"; }
-    static const char * OTACurrentUpdateState() { return "o/us"; }
-    static const char * OTATargetVersion() { return "o/tv"; }
+    static const char * OTADefaultProviders() { return "g/o/dp"; }
+    static const char * OTACurrentProvider() { return "g/o/cp"; }
+    static const char * OTAUpdateToken() { return "g/o/ut"; }
+    static const char * OTACurrentUpdateState() { return "g/o/us"; }
+    static const char * OTATargetVersion() { return "g/o/tv"; }
 
     // [G]lobal [D]NS-related keys
     static const char * DNSExtendedDiscoveryTimeout() { return "g/d/edt"; }

@@ -38,6 +38,7 @@ constexpr chip::FabricId kIdentityNullFabricId  = chip::kUndefinedFabricId;
 constexpr chip::FabricId kIdentityAlphaFabricId = 1;
 constexpr chip::FabricId kIdentityBetaFabricId  = 2;
 constexpr chip::FabricId kIdentityGammaFabricId = 3;
+constexpr chip::FabricId kIdentityOtherFabricId = 4;
 
 namespace {
 const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStore(const char * paaTrustStorePath)
@@ -72,8 +73,20 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     ReturnLogErrorOnFailure(mDefaultStorage.Init());
 
     chip::Controller::FactoryInitParams factoryInitParams;
+
     factoryInitParams.fabricIndependentStorage = &mDefaultStorage;
-    uint16_t port                              = mDefaultStorage.GetListenPort();
+
+    // Init group data provider that will be used for all group keys and IPKs for the
+    // chip-tool-configured fabrics. This is OK to do once since the fabric tables
+    // and the DeviceControllerFactory all "share" in the same underlying data.
+    // Different commissioner implementations may want to use alternate implementations
+    // of GroupDataProvider for injection through factoryInitParams.
+    mGroupDataProvider.SetStorageDelegate(&mDefaultStorage);
+    ReturnLogErrorOnFailure(mGroupDataProvider.Init());
+    chip::Credentials::SetGroupDataProvider(&mGroupDataProvider);
+    factoryInitParams.groupDataProvider = &mGroupDataProvider;
+
+    uint16_t port = mDefaultStorage.GetListenPort();
     if (port != 0)
     {
         // Make sure different commissioners run on different ports.
@@ -101,8 +114,14 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityBeta, kIdentityBetaFabricId, trustStore));
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityGamma, kIdentityGammaFabricId, trustStore));
 
-    // Initialize Group Data
-    ReturnLogErrorOnFailure(chip::GroupTesting::InitProvider(mDefaultStorage));
+    std::string name        = GetIdentity();
+    chip::FabricId fabricId = strtoull(name.c_str(), nullptr, 0);
+    if (fabricId >= kIdentityOtherFabricId)
+    {
+        ReturnLogErrorOnFailure(InitializeCommissioner(name.c_str(), fabricId, trustStore));
+    }
+
+    // Initialize Group Data, including IPK
     for (auto it = mCommissioners.begin(); it != mCommissioners.end(); it++)
     {
         chip::FabricInfo * fabric = it->second->GetFabricInfo();
@@ -111,7 +130,17 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
             uint8_t compressed_fabric_id[sizeof(uint64_t)];
             chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
             ReturnLogErrorOnFailure(fabric->GetCompressedId(compressed_fabric_id_span));
-            ReturnLogErrorOnFailure(chip::GroupTesting::InitData(fabric->GetFabricIndex(), compressed_fabric_id_span));
+
+            ReturnLogErrorOnFailure(
+                chip::GroupTesting::InitData(&mGroupDataProvider, fabric->GetFabricIndex(), compressed_fabric_id_span));
+
+            // Configure the default IPK for all fabrics used by CHIP-tool. The epoch
+            // key is the same, but the derived keys will be different for each fabric.
+            // This has to be done here after we know the Compressed Fabric ID of all
+            // chip-tool-managed fabrics
+            chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+            ReturnLogErrorOnFailure(chip::Credentials::SetSingleIpkEpochKey(&mGroupDataProvider, fabric->GetFabricIndex(),
+                                                                            defaultIpk, compressed_fabric_id_span));
         }
     }
 
@@ -134,6 +163,13 @@ CHIP_ERROR CHIPCommand::MaybeTearDownStack()
     ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityAlpha));
     ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityBeta));
     ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityGamma));
+
+    std::string name        = GetIdentity();
+    chip::FabricId fabricId = strtoull(name.c_str(), nullptr, 0);
+    if (fabricId >= kIdentityOtherFabricId)
+    {
+        ReturnLogErrorOnFailure(ShutdownCommissioner(name.c_str()));
+    }
 
     StopTracing();
 
@@ -180,10 +216,10 @@ void CHIPCommand::SetIdentity(const char * identity)
 {
     std::string name = std::string(identity);
     if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0 &&
-        name.compare(kIdentityNull) != 0)
+        name.compare(kIdentityNull) != 0 && strtoull(name.c_str(), nullptr, 0) < kIdentityOtherFabricId)
     {
-        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(), kIdentityAlpha,
-                     kIdentityBeta, kIdentityGamma);
+        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s, 4, 5...]", name.c_str(),
+                     kIdentityAlpha, kIdentityBeta, kIdentityGamma);
         chipDie();
     }
 
@@ -196,9 +232,22 @@ std::string CHIPCommand::GetIdentity()
     if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0 &&
         name.compare(kIdentityNull) != 0)
     {
-        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(), kIdentityAlpha,
-                     kIdentityBeta, kIdentityGamma);
-        chipDie();
+        chip::FabricId fabricId = strtoull(name.c_str(), nullptr, 0);
+        if (fabricId >= kIdentityOtherFabricId)
+        {
+            // normalize name since it is used in persistent storage
+
+            char s[24];
+            sprintf(s, "%" PRIu64, fabricId);
+
+            name = s;
+        }
+        else
+        {
+            ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s, 4, 5...]", name.c_str(),
+                         kIdentityAlpha, kIdentityBeta, kIdentityGamma);
+            chipDie();
+        }
     }
 
     return name;
@@ -225,10 +274,10 @@ chip::FabricId CHIPCommand::CurrentCommissionerId()
     {
         id = kIdentityNullFabricId;
     }
-    else
+    else if ((id = strtoull(name.c_str(), nullptr, 0)) < kIdentityOtherFabricId)
     {
-        VerifyOrDieWithMsg(false, chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(),
-                           kIdentityAlpha, kIdentityBeta, kIdentityGamma);
+        VerifyOrDieWithMsg(false, chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s, 4, 5...]",
+                           name.c_str(), kIdentityAlpha, kIdentityBeta, kIdentityGamma);
     }
 
     return id;
@@ -287,7 +336,8 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
         commissionerParams.controllerNOC      = nocSpan;
     }
 
-    commissionerParams.storageDelegate                = &mCommissionerStorage;
+    commissionerParams.storageDelegate = &mCommissionerStorage;
+    // TODO: Initialize IPK epoch key in ExampleOperationalCredentials issuer rather than relying on DefaultIpkValue
     commissionerParams.operationalCredentialsDelegate = mCredIssuerCmds->GetCredentialIssuer();
     commissionerParams.controllerVendorId             = chip::VendorId::TestVendor1;
 
