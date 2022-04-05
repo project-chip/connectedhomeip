@@ -39,6 +39,7 @@ executable("chip-${chip_tests_zap_config}") {
   sources = [
     "main.cpp",
     "static-supported-modes-manager.cpp",
+    "src/bridged-actions-stub.cpp",
   ]
 
   deps = [
