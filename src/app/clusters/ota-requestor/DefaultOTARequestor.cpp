@@ -631,7 +631,7 @@ void DefaultOTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTA
     case OTADownloader::State::kIdle:
         if (reason != OTAChangeReasonEnum::kSuccess)
         {
-            // TODO: Should we call some driver API to give it a chance to reschedule?
+            mOtaRequestorDriver->ScheduleRetry(true);
             RecordErrorUpdateState(UpdateFailureState::kDownloading, CHIP_ERROR_CONNECTION_ABORTED, reason);
         }
 
