@@ -485,14 +485,20 @@ async function chip_tests(list, options)
     test.tests = await Promise.all(test.tests.map(async function(item) {
       item.global = global;
       if (item.isCommand) {
-        let command        = await assertCommandOrAttributeOrEvent(item);
-        item.commandObject = command;
+        let command               = await assertCommandOrAttributeOrEvent(item);
+        item.commandObject        = command;
+        item.hasSpecificArguments = true;
+        item.hasSpecificResponse  = command.hasSpecificResponse;
       } else if (item.isAttribute) {
-        let attr             = await assertCommandOrAttributeOrEvent(item);
-        item.attributeObject = attr;
+        let attr                  = await assertCommandOrAttributeOrEvent(item);
+        item.attributeObject      = attr;
+        item.hasSpecificArguments = item.isWriteAttribute;
+        item.hasSpecificResponse  = item.isReadAttribute || item.isSubscribeAttribute || item.isWaitForReport;
       } else if (item.isEvent) {
-        let evt          = await assertCommandOrAttributeOrEvent(item);
-        item.eventObject = evt;
+        let evt                   = await assertCommandOrAttributeOrEvent(item);
+        item.eventObject          = evt;
+        item.hasSpecificArguments = false;
+        item.hasSpecificResponse  = true;
       }
       return item;
     }));

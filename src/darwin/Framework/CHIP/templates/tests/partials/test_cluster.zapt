@@ -24,7 +24,7 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
 
 {{#if (isTestOnlyCluster cluster)}}
     dispatch_queue_t queue = dispatch_get_main_queue();
-    {{command}}(expectation, queue{{#chip_tests_item_parameters}}, {{#if (isString type)}}@"{{/if}}{{> defined_value}}{{#if (isString type)}}"{{/if}}{{/chip_tests_item_parameters}}{{additionalArguments}});
+    {{command}}(expectation, queue{{#chip_tests_item_parameters}}, {{#if (isString type)}}@"{{/if}}{{> defined_value}}{{#if (isString type)}}"{{/if}}{{/chip_tests_item_parameters}});
 {{else}}
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
