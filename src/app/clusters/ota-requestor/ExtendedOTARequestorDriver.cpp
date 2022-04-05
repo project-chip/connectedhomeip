@@ -58,7 +58,7 @@ void ExtendedOTARequestorDriver::UpdateAvailable(const UpdateDescription & updat
         return;
     }
 
-    GenericOTARequestorDriver::UpdateAvailable(update, delay);
+    DefaultOTARequestorDriver::UpdateAvailable(update, delay);
 }
 
 void ExtendedOTARequestorDriver::PollUserConsentState()

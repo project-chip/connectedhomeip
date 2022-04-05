@@ -29,7 +29,7 @@ class OTAImageProcessorInterface;
 
 namespace DeviceLayer {
 
-class GenericOTARequestorDriver : public OTARequestorDriver
+class DefaultOTARequestorDriver : public OTARequestorDriver
 {
 public:
     /**

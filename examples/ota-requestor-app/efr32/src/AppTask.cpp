@@ -36,8 +36,8 @@
 
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
 #include <platform/EFR32/OTAImageProcessorImpl.h>
 
 #include <assert.h>
@@ -102,7 +102,7 @@ using namespace ::chip::DeviceLayer;
 // Global OTA objects
 DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
-DeviceLayer::GenericOTARequestorDriver gRequestorUser;
+DeviceLayer::DefaultOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 

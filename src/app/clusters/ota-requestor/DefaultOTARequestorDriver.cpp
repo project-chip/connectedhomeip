@@ -35,7 +35,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
 
-#include "GenericOTARequestorDriver.h"
+#include "DefaultOTARequestorDriver.h"
 #include "OTARequestorInterface.h"
 
 namespace chip {
@@ -49,14 +49,14 @@ constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending
 constexpr uint32_t kImmediateStartDelaySec         = 1;  // Delay before sending a query in response to UrgentUpdateAvailable
 constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(120);
 
-GenericOTARequestorDriver * ToDriver(void * context)
+DefaultOTARequestorDriver * ToDriver(void * context)
 {
-    return static_cast<GenericOTARequestorDriver *>(context);
+    return static_cast<DefaultOTARequestorDriver *>(context);
 }
 
 } // namespace
 
-void GenericOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImageProcessorInterface * processor)
+void DefaultOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImageProcessorInterface * processor)
 {
     mRequestor          = requestor;
     mImageProcessor     = processor;
@@ -89,22 +89,22 @@ void GenericOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImage
     }
 }
 
-bool GenericOTARequestorDriver::CanConsent()
+bool DefaultOTARequestorDriver::CanConsent()
 {
     return false;
 }
 
-uint16_t GenericOTARequestorDriver::GetMaxDownloadBlockSize()
+uint16_t DefaultOTARequestorDriver::GetMaxDownloadBlockSize()
 {
     return 1024;
 }
 
 void StartDelayTimerHandler(System::Layer * systemLayer, void * appState)
 {
-    static_cast<GenericOTARequestorDriver *>(appState)->SendQueryImage();
+    ToDriver(appState)->SendQueryImage();
 }
 
-bool GenericOTARequestorDriver::ProviderLocationsEqual(const ProviderLocationType & a, const ProviderLocationType & b)
+bool DefaultOTARequestorDriver::ProviderLocationsEqual(const ProviderLocationType & a, const ProviderLocationType & b)
 {
     if ((a.fabricIndex == b.fabricIndex) && (a.providerNodeID == b.providerNodeID) && (a.endpoint == b.endpoint))
     {
@@ -116,15 +116,15 @@ bool GenericOTARequestorDriver::ProviderLocationsEqual(const ProviderLocationTyp
     }
 }
 
-void GenericOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR error) {}
+void DefaultOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR error) {}
 
-void GenericOTARequestorDriver::HandleIdleStateExit()
+void DefaultOTARequestorDriver::HandleIdleStateExit()
 {
     // Start watchdog timer to monitor new Query Image session
     StartSelectedTimer(SelectedTimer::kWatchdogTimer);
 }
 
-void GenericOTARequestorDriver::HandleIdleState(IdleStateReason reason)
+void DefaultOTARequestorDriver::HandleIdleState(IdleStateReason reason)
 {
     switch (reason)
     {
@@ -143,7 +143,7 @@ void GenericOTARequestorDriver::HandleIdleState(IdleStateReason reason)
     }
 }
 
-void GenericOTARequestorDriver::UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay)
+void DefaultOTARequestorDriver::UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay)
 {
     // IMPLEMENTATION CHOICE:
     // This implementation unconditionally downloads an available update
@@ -153,7 +153,7 @@ void GenericOTARequestorDriver::UpdateAvailable(const UpdateDescription & update
         delay, [](System::Layer *, void * context) { ToDriver(context)->mRequestor->DownloadUpdate(); }, this);
 }
 
-void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay)
+void DefaultOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay)
 {
     VerifyOrDie(mRequestor != nullptr);
 
@@ -211,20 +211,20 @@ void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, Syst
     }
 }
 
-void GenericOTARequestorDriver::UpdateDownloaded()
+void DefaultOTARequestorDriver::UpdateDownloaded()
 {
     VerifyOrDie(mRequestor != nullptr);
     mRequestor->ApplyUpdate();
 }
 
-void GenericOTARequestorDriver::UpdateConfirmed(System::Clock::Seconds32 delay)
+void DefaultOTARequestorDriver::UpdateConfirmed(System::Clock::Seconds32 delay)
 {
     VerifyOrDie(mImageProcessor != nullptr);
     ScheduleDelayedAction(
         delay, [](System::Layer *, void * context) { ToDriver(context)->mImageProcessor->Apply(); }, this);
 }
 
-void GenericOTARequestorDriver::UpdateSuspended(System::Clock::Seconds32 delay)
+void DefaultOTARequestorDriver::UpdateSuspended(System::Clock::Seconds32 delay)
 {
     VerifyOrDie(mRequestor != nullptr);
 
@@ -237,7 +237,7 @@ void GenericOTARequestorDriver::UpdateSuspended(System::Clock::Seconds32 delay)
         delay, [](System::Layer *, void * context) { ToDriver(context)->mRequestor->ApplyUpdate(); }, this);
 }
 
-void GenericOTARequestorDriver::UpdateDiscontinued()
+void DefaultOTARequestorDriver::UpdateDiscontinued()
 {
     VerifyOrDie(mImageProcessor != nullptr);
     mImageProcessor->Abort();
@@ -250,7 +250,7 @@ void GenericOTARequestorDriver::UpdateDiscontinued()
 }
 
 // Cancel all OTA update timers
-void GenericOTARequestorDriver::UpdateCancelled()
+void DefaultOTARequestorDriver::UpdateCancelled()
 {
     // Cancel all OTA Update timers started by  OTARequestorDriver regardless of whether thery are running or not
     CancelDelayedAction([](System::Layer *, void * context) { ToDriver(context)->mRequestor->DownloadUpdate(); }, this);
@@ -259,26 +259,26 @@ void GenericOTARequestorDriver::UpdateCancelled()
     CancelDelayedAction([](System::Layer *, void * context) { ToDriver(context)->mRequestor->ApplyUpdate(); }, this);
 }
 
-void GenericOTARequestorDriver::ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action,
+void DefaultOTARequestorDriver::ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action,
                                                       void * aAppState)
 {
     VerifyOrDie(SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(delay), action, aAppState) ==
                 CHIP_NO_ERROR);
 }
 
-void GenericOTARequestorDriver::CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState)
+void DefaultOTARequestorDriver::CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState)
 {
     SystemLayer().CancelTimer(action, aAppState);
 }
 
 // Device commissioning has completed, schedule a provider query
-void GenericOTARequestorDriver::OTACommissioningCallback()
+void DefaultOTARequestorDriver::OTACommissioningCallback()
 {
     // Schedule a query. At the end of this query/update process the Default Provider timer is started
     ScheduleDelayedAction(System::Clock::Seconds32(kDelayQueryUponCommissioningSec), StartDelayTimerHandler, this);
 }
 
-void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(
+void DefaultOTARequestorDriver::ProcessAnnounceOTAProviders(
     const ProviderLocationType & providerLocation,
     app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason)
 {
@@ -317,7 +317,7 @@ void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(
     ScheduleDelayedAction(System::Clock::Seconds32(secToStart), StartDelayTimerHandler, this);
 }
 
-void GenericOTARequestorDriver::SendQueryImage()
+void DefaultOTARequestorDriver::SendQueryImage()
 {
     Optional<ProviderLocationType> lastUsedProvider;
     mRequestor->GetProviderLocation(lastUsedProvider);
@@ -348,7 +348,7 @@ void GenericOTARequestorDriver::SendQueryImage()
     DeviceLayer::SystemLayer().ScheduleLambda([this] { mRequestor->TriggerImmediateQueryInternal(); });
 }
 
-void GenericOTARequestorDriver::PeriodicQueryTimerHandler(System::Layer * systemLayer, void * appState)
+void DefaultOTARequestorDriver::PeriodicQueryTimerHandler(System::Layer * systemLayer, void * appState)
 {
     ChipLogProgress(SoftwareUpdate, "Default Provider timer handler is invoked");
 
@@ -366,29 +366,23 @@ void GenericOTARequestorDriver::PeriodicQueryTimerHandler(System::Layer * system
     SendQueryImage();
 }
 
-void GenericOTARequestorDriver::StartPeriodicQueryTimer()
+void DefaultOTARequestorDriver::StartPeriodicQueryTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Starting the periodic query timer, timeout: %u seconds",
                     (unsigned int) mPeriodicQueryTimeInterval);
     ScheduleDelayedAction(
         System::Clock::Seconds32(mPeriodicQueryTimeInterval),
-        [](System::Layer *, void * context) {
-            (static_cast<GenericOTARequestorDriver *>(context))->PeriodicQueryTimerHandler(nullptr, context);
-        },
-        this);
+        [](System::Layer *, void * context) { (ToDriver(context))->PeriodicQueryTimerHandler(nullptr, context); }, this);
 }
 
-void GenericOTARequestorDriver::StopPeriodicQueryTimer()
+void DefaultOTARequestorDriver::StopPeriodicQueryTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Stopping the Periodic Query timer");
-    CancelDelayedAction(
-        [](System::Layer *, void * context) {
-            (static_cast<GenericOTARequestorDriver *>(context))->PeriodicQueryTimerHandler(nullptr, context);
-        },
-        this);
+    CancelDelayedAction([](System::Layer *, void * context) { (ToDriver(context))->PeriodicQueryTimerHandler(nullptr, context); },
+                        this);
 }
 
-void GenericOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer, void * appState)
+void DefaultOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer, void * appState)
 {
     ChipLogError(SoftwareUpdate, "Watchdog timer detects state stuck at %u. Cancelling download and resetting state.",
                  to_underlying(mRequestor->GetCurrentUpdateState()));
@@ -400,28 +394,21 @@ void GenericOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer
     StartPeriodicQueryTimer();
 }
 
-void GenericOTARequestorDriver::StartWatchdogTimer()
+void DefaultOTARequestorDriver::StartWatchdogTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Starting the watchdog timer, timeout: %u seconds", (unsigned int) mWatchdogTimeInterval);
     ScheduleDelayedAction(
         System::Clock::Seconds32(mWatchdogTimeInterval),
-        [](System::Layer *, void * context) {
-            (static_cast<GenericOTARequestorDriver *>(context))->WatchdogTimerHandler(nullptr, context);
-        },
-        this);
+        [](System::Layer *, void * context) { (ToDriver(context))->WatchdogTimerHandler(nullptr, context); }, this);
 }
 
-void GenericOTARequestorDriver::StopWatchdogTimer()
+void DefaultOTARequestorDriver::StopWatchdogTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Stopping the watchdog timer");
-    CancelDelayedAction(
-        [](System::Layer *, void * context) {
-            (static_cast<GenericOTARequestorDriver *>(context))->WatchdogTimerHandler(nullptr, context);
-        },
-        this);
+    CancelDelayedAction([](System::Layer *, void * context) { (ToDriver(context))->WatchdogTimerHandler(nullptr, context); }, this);
 }
 
-void GenericOTARequestorDriver::StartSelectedTimer(SelectedTimer timer)
+void DefaultOTARequestorDriver::StartSelectedTimer(SelectedTimer timer)
 {
     switch (timer)
     {
@@ -441,7 +428,7 @@ void GenericOTARequestorDriver::StartSelectedTimer(SelectedTimer timer)
  * circular list and return the next value (based on the last used provider). If the list of DefaultOtaProviders is empty, FALSE is
  * returned.
  */
-bool GenericOTARequestorDriver::GetNextProviderLocation(ProviderLocationType & providerLocation, bool & listExhausted)
+bool DefaultOTARequestorDriver::GetNextProviderLocation(ProviderLocationType & providerLocation, bool & listExhausted)
 {
     Optional<ProviderLocationType> lastUsedProvider;
     mRequestor->GetProviderLocation(lastUsedProvider);

@@ -126,7 +126,7 @@ void CustomOTARequestorDriver::UpdateDownloaded()
     if (gAutoApplyImage)
     {
         // Let the default driver take further action to apply the image
-        GenericOTARequestorDriver::UpdateDownloaded();
+        DefaultOTARequestorDriver::UpdateDownloaded();
     }
     else
     {

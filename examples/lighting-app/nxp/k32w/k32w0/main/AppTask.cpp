@@ -38,8 +38,8 @@
 #include "OtaSupport.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
 
 #include "Keyboard.h"
 #include "LED.h"
@@ -87,7 +87,7 @@ AppTask AppTask::sAppTask;
 /* OTA related variables */
 static DefaultOTARequestor gRequestorCore;
 static DefaultOTARequestorStorage gRequestorStorage;
-static DeviceLayer::GenericOTARequestorDriver gRequestorUser;
+static DeviceLayer::DefaultOTARequestorDriver gRequestorUser;
 static BDXDownloader gDownloader;
 static OTAImageProcessorImpl gImageProcessor;
 
