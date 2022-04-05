@@ -37,7 +37,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
     if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
     {
-        ChipLogProgress(Zcl, "OnOff attribute ID: " ChipLogFormatMEI " Type: %u Value: %" PRIu16 ", length %" PRIu16,
+        ChipLogProgress(Zcl, "OnOff attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %" PRIu16,
                         ChipLogValueMEI(attributeId), type, *value, size);
     }
     else if (clusterId == LevelControl::Id)
