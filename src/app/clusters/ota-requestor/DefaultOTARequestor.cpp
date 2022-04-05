@@ -212,7 +212,7 @@ void DefaultOTARequestor::OnQueryImageResponse(void * context, const QueryImageR
         {
             requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kDelayedOnQuery, OTAChangeReasonEnum::kDelayByProvider);
         }
-        
+
         break;
     case OTAQueryStatus::kNotAvailable:
         status = requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kNotAvailable,
