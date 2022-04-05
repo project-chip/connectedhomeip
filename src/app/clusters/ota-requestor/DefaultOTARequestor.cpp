@@ -194,18 +194,18 @@ void DefaultOTARequestor::OnQueryImageResponse(void * context, const QueryImageR
                           update.softwareVersion, requestorCore->mCurrentVersion);
 
             requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kUpToDate,
-                                                              System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+                                                               System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
             requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
         }
 
         break;
     }
     case OTAQueryStatus::kBusy:
-        status = requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kBusy,
-                                                           System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
-        if( status == CHIP_ERROR_MAX_RETRY_EXCEEDED )
+        status = requestorCore->mOtaRequestorDriver->UpdateNotFound(
+            UpdateNotFoundReason::kBusy, System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+        if (status == CHIP_ERROR_MAX_RETRY_EXCEEDED)
         {
-            //Go back to idle to start Periodic Query timer
+            // Go back to idle to start Periodic Query timer
             requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
         }
         else
@@ -215,9 +215,9 @@ void DefaultOTARequestor::OnQueryImageResponse(void * context, const QueryImageR
 
         break;
     case OTAQueryStatus::kNotAvailable:
-        status = requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kNotAvailable,
-                                                         System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
-        if(status == CHIP_ERROR_MAX_RETRY_EXCEEDED)
+        status = requestorCore->mOtaRequestorDriver->UpdateNotFound(
+            UpdateNotFoundReason::kNotAvailable, System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+        if (status == CHIP_ERROR_MAX_RETRY_EXCEEDED)
         {
             requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
         }

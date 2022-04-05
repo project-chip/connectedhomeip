@@ -189,7 +189,7 @@ CHIP_ERROR DefaultOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason
         if ((GetNextProviderLocation(providerLocation, listExhausted) != true) || (listExhausted == true))
         {
             willTryAnotherQuery = false;
-            status = CHIP_ERROR_MAX_RETRY_EXCEEDED;
+            status              = CHIP_ERROR_MAX_RETRY_EXCEEDED;
         }
         else
         {
@@ -471,23 +471,22 @@ CHIP_ERROR GenericOTARequestorDriver::ScheduleRetry(bool trySameProvider)
     VerifyOrDie(mRequestor != nullptr);
 
     ProviderLocationType providerLocation;
-    CHIP_ERROR status = CHIP_NO_ERROR;
+    CHIP_ERROR status        = CHIP_NO_ERROR;
     bool willTryAnotherQuery = true;
 
-    if( trySameProvider == false)
+    if (trySameProvider == false)
     {
         bool listExhausted = false;
         if ((GetNextProviderLocation(providerLocation, listExhausted) != true) || (listExhausted == true))
         {
             willTryAnotherQuery = false;
-            status = CHIP_ERROR_MAX_RETRY_EXCEEDED;
+            status              = CHIP_ERROR_MAX_RETRY_EXCEEDED;
         }
         else
         {
             willTryAnotherQuery = true;
             mRequestor->SetCurrentProviderLocation(providerLocation);
         }
-
     }
 
     if (willTryAnotherQuery == true)
