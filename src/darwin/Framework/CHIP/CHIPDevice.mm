@@ -27,9 +27,9 @@
 #include "lib/core/CHIPError.h"
 #include "lib/core/DataModelTypes.h"
 
-#include <app/ClusterStateCache.h>
 #include <app/AttributePathParams.h>
 #include <app/BufferedReadCallback.h>
+#include <app/ClusterStateCache.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
 #include <app/util/error-mapping.h>
