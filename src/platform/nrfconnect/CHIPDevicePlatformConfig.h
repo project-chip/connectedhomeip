@@ -73,6 +73,13 @@
 #define CHIP_DEVICE_CONFIG_SERVER_SHUTDOWN_ACTIONS_SLEEP_MS 10
 #endif // CHIP_DEVICE_CONFIG_SERVER_SHUTDOWN_ACTIONS_SLEEP_MS
 
+#ifndef CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
+#if !defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_NEWLIB_LIBC)
+/// Use mallinfo() to obtain the heap usage statistics exposed by SoftwareDiagnostics cluster attributes.
+#define CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO 1
+#endif // !defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_NEWLIB_LIBC)
+#endif // CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
+
 // ========== Platform-specific Configuration Overrides =========
 
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY

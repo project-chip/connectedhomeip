@@ -107,8 +107,7 @@ class {{filename}}: public TestCommandBridge
           {{else}}
           {{#if (isString type)}}@"{{/if}}{{definedValue}}{{#if (isString type)}}"{{/if}}
           {{~/if~}}
-        {{/chip_tests_item_parameters}}
-        {{additionalArguments}});
+        {{/chip_tests_item_parameters}});
         {{else}}
         CHIPDevice * device = GetConnectedDevice();
         CHIPTest{{asUpperCamelCase cluster}} * cluster = [[CHIPTest{{asUpperCamelCase cluster}} alloc] initWithDevice:device endpoint:{{endpoint}} queue:mCallbackQueue];

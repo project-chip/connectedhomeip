@@ -213,7 +213,7 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase38Representation(std::string 
 {
     size_t tlvDataLengthInBytes = 0;
 
-    VerifyOrReturnError(mPayload.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mAllowInvalidPayload || mPayload.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(generateTLVFromOptionalData(mPayload, tlvDataStart, tlvDataStartSize, tlvDataLengthInBytes));
 
     std::vector<uint8_t> bits(kTotalPayloadDataSizeInBytes + tlvDataLengthInBytes);

@@ -117,73 +117,7 @@ void PASESession::DiscardExchange()
     }
 }
 
-CHIP_ERROR PASESession::Serialize(PASESessionSerialized & output)
-{
-    PASESessionSerializable serializable;
-    VerifyOrReturnError(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner), CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(ToSerializable(serializable));
-
-    uint16_t serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
-                                                static_cast<uint16_t>(sizeof(serializable)), Uint8::to_char(output.inner));
-    VerifyOrReturnError(serializedLen > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(serializedLen < sizeof(output.inner), CHIP_ERROR_INVALID_ARGUMENT);
-    output.inner[serializedLen] = '\0';
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PASESession::Deserialize(PASESessionSerialized & input)
-{
-    PASESessionSerializable serializable;
-    size_t maxlen            = BASE64_ENCODED_LEN(sizeof(serializable));
-    size_t len               = strnlen(Uint8::to_char(input.inner), maxlen);
-    uint16_t deserializedLen = 0;
-
-    VerifyOrReturnError(len < sizeof(PASESessionSerialized), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_INVALID_ARGUMENT);
-
-    memset(&serializable, 0, sizeof(serializable));
-    deserializedLen =
-        Base64Decode(Uint8::to_const_char(input.inner), static_cast<uint16_t>(len), Uint8::to_uchar((uint8_t *) &serializable));
-
-    VerifyOrReturnError(deserializedLen > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(deserializedLen <= sizeof(serializable), CHIP_ERROR_INVALID_ARGUMENT);
-
-    return FromSerializable(serializable);
-}
-
-CHIP_ERROR PASESession::ToSerializable(PASESessionSerializable & serializable)
-{
-    VerifyOrReturnError(CanCastTo<uint16_t>(mKeLen), CHIP_ERROR_INTERNAL);
-
-    memset(&serializable, 0, sizeof(serializable));
-    serializable.mKeLen           = static_cast<uint16_t>(mKeLen);
-    serializable.mPairingComplete = (mPairingComplete) ? 1 : 0;
-    serializable.mLocalSessionId  = GetLocalSessionId();
-    serializable.mPeerSessionId   = GetPeerSessionId();
-
-    memcpy(serializable.mKe, mKe, mKeLen);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PASESession::FromSerializable(const PASESessionSerializable & serializable)
-{
-    mPairingComplete = (serializable.mPairingComplete == 1);
-    mKeLen           = static_cast<size_t>(serializable.mKeLen);
-
-    VerifyOrReturnError(mKeLen <= sizeof(mKe), CHIP_ERROR_INVALID_ARGUMENT);
-    memset(mKe, 0, sizeof(mKe));
-    memcpy(mKe, serializable.mKe, mKeLen);
-
-    SetLocalSessionId(serializable.mLocalSessionId);
-    SetPeerSessionId(serializable.mPeerSessionId);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PASESession::Init(uint16_t mySessionId, uint32_t setupCode, SessionEstablishmentDelegate * delegate)
+CHIP_ERROR PASESession::Init(SessionManager & sessionManager, uint32_t setupCode, SessionEstablishmentDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -194,9 +128,9 @@ CHIP_ERROR PASESession::Init(uint16_t mySessionId, uint32_t setupCode, SessionEs
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ Uint8::from_const_char(kSpake2pContext), strlen(kSpake2pContext) }));
 
     mDelegate = delegate;
-
-    ChipLogDetail(SecureChannel, "Assigned local session key ID %d", mySessionId);
-    SetLocalSessionId(mySessionId);
+    ReturnErrorOnFailure(AllocateSecureSession(sessionManager));
+    VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    ChipLogDetail(SecureChannel, "Assigned local session key ID %u", GetLocalSessionId().Value());
 
     ReturnErrorCodeIf(setupCode >= (1 << kSetupPINCodeFieldLengthInBits), CHIP_ERROR_INVALID_ARGUMENT);
     mSetupPINCode = setupCode;
@@ -232,8 +166,8 @@ CHIP_ERROR PASESession::SetupSpake2p()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PASESession::WaitForPairing(const Spake2pVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
-                                       uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
+CHIP_ERROR PASESession::WaitForPairing(SessionManager & sessionManager, const Spake2pVerifier & verifier, uint32_t pbkdf2IterCount,
+                                       const ByteSpan & salt, Optional<ReliableMessageProtocolConfig> mrpConfig,
                                        SessionEstablishmentDelegate * delegate)
 {
     // Return early on error here, as we have not initialized any state yet
@@ -242,7 +176,7 @@ CHIP_ERROR PASESession::WaitForPairing(const Spake2pVerifier & verifier, uint32_
     ReturnErrorCodeIf(salt.size() < kSpake2p_Min_PBKDF_Salt_Length || salt.size() > kSpake2p_Max_PBKDF_Salt_Length,
                       CHIP_ERROR_INVALID_ARGUMENT);
 
-    CHIP_ERROR err = Init(mySessionId, kSetupPINCodeUndefinedValue, delegate);
+    CHIP_ERROR err = Init(sessionManager, kSetupPINCodeUndefinedValue, delegate);
     // From here onwards, let's go to exit on error, as some state might have already
     // been initialized
     SuccessOrExit(err);
@@ -279,13 +213,13 @@ exit:
     return err;
 }
 
-CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t mySessionId,
+CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode,
                              Optional<ReliableMessageProtocolConfig> mrpConfig, Messaging::ExchangeContext * exchangeCtxt,
                              SessionEstablishmentDelegate * delegate)
 {
     MATTER_TRACE_EVENT_SCOPE("Pair", "PASESession");
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    CHIP_ERROR err = Init(mySessionId, peerSetUpPINCode, delegate);
+    CHIP_ERROR err = Init(sessionManager, peerSetUpPINCode, delegate);
     SuccessOrExit(err);
 
     mExchangeCtxt = exchangeCtxt;
@@ -334,6 +268,9 @@ CHIP_ERROR PASESession::DeriveSecureSession(CryptoContext & session, CryptoConte
 CHIP_ERROR PASESession::SendPBKDFParamRequest()
 {
     MATTER_TRACE_EVENT_SCOPE("SendPBKDFParamRequest", "PASESession");
+
+    VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
+
     ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
 
     const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
@@ -353,7 +290,7 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(1), mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId()));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId().Value()));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), kDefaultCommissioningPasscodeId));
     ReturnErrorOnFailure(tlvWriter.PutBoolean(TLV::ContextTag(4), mHavePBKDFParameters));
     if (mLocalMRPConfig.HasValue())
@@ -442,6 +379,9 @@ exit:
 CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool initiatorHasPBKDFParams)
 {
     MATTER_TRACE_EVENT_SCOPE("SendPBKDFParamResponse", "PASESession");
+
+    VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
+
     ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
 
     const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
@@ -464,7 +404,7 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
     // The initiator random value is being sent back in the response as required by the specifications
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), initiatorRandom));
     ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(2), mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), GetLocalSessionId()));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), GetLocalSessionId().Value()));
 
     if (!initiatorHasPBKDFParams)
     {

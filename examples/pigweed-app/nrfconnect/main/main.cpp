@@ -28,7 +28,7 @@
 #include <dk_buttons_and_leds.h>
 #include <logging/log.h>
 
-LOG_MODULE_REGISTER(app);
+LOG_MODULE_REGISTER(app, CONFIG_MATTER_LOG_LEVEL);
 
 namespace {
 LEDWidget sStatusLED;

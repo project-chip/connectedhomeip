@@ -47,7 +47,7 @@
 #include <logging/log.h>
 #include <zephyr.h>
 
-LOG_MODULE_DECLARE(app);
+LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -168,7 +168,11 @@ CHIP_ERROR AppTask::Init()
     // Initialize CHIP server
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(kExtDiscoveryTimeoutSecs);
-    ReturnErrorOnFailure(chip::Server::GetInstance().Init());
+
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
+    ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 #if CONFIG_CHIP_OTA_REQUESTOR
     InitBasicOTARequestor();
 #endif

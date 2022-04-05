@@ -166,6 +166,21 @@ gn gen --check --fail-on-unused-args {out}/android-x86-chip-tool '--args=target_
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
+# Generating bl602-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=bl602_board="BL-HWC-G1"' {out}/bl602-light
+
+# Generating cc13x2x7_26x2x7-lock-ftd
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT" chip_openthread_ftd=true' {out}/cc13x2x7_26x2x7-lock-ftd
+
+# Generating cc13x2x7_26x2x7-lock-mtd
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT" chip_openthread_ftd=false' {out}/cc13x2x7_26x2x7-lock-mtd
+
+# Generating cc13x2x7_26x2x7-pump
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/pump-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-pump
+
+# Generating cc13x2x7_26x2x7-pump-controller
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/pump-controller-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-pump-controller
+
 # Generating cyw30739-cyw930739m2evb_01-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/cyw30739 {out}/cyw30739-cyw930739m2evb_01-light
 
@@ -895,6 +910,27 @@ west build --cmake-only -d {out}/telink-tlsr9518adk80d-light -b tlsr9518adk80d {
 # Generating tizen-arm-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light
 
+# Generating tizen-arm-light-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=is_asan=true target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-asan
+
+# Generating tizen-arm-light-no-ble
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_config_network_layer_ble=false target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-no-ble
+
+# Generating tizen-arm-light-no-ble-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_config_network_layer_ble=false is_asan=true target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-no-ble-asan
+
+# Generating tizen-arm-light-no-ble-no-wifi
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_config_network_layer_ble=false chip_enable_wifi=false target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-no-ble-no-wifi
+
+# Generating tizen-arm-light-no-ble-no-wifi-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_config_network_layer_ble=false chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-no-ble-no-wifi-asan
+
+# Generating tizen-arm-light-no-wifi
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_enable_wifi=false target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-no-wifi
+
+# Generating tizen-arm-light-no-wifi-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-no-wifi-asan
+
 # Building ameba-amebad-all-clusters
 ninja -C {out}/ameba-amebad-all-clusters
 
@@ -1112,6 +1148,21 @@ cp {out}/android-x86-chip-tool/lib/src/platform/android/AndroidPlatform.jar {roo
 
 # Building APP android-x86-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-x86-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tool assembleDebug
+
+# Building bl602-light
+ninja -C {out}/bl602-light
+
+# Building cc13x2x7_26x2x7-lock-ftd
+ninja -C {out}/cc13x2x7_26x2x7-lock-ftd
+
+# Building cc13x2x7_26x2x7-lock-mtd
+ninja -C {out}/cc13x2x7_26x2x7-lock-mtd
+
+# Building cc13x2x7_26x2x7-pump
+ninja -C {out}/cc13x2x7_26x2x7-pump
+
+# Building cc13x2x7_26x2x7-pump-controller
+ninja -C {out}/cc13x2x7_26x2x7-pump-controller
 
 # Building cyw30739-cyw930739m2evb_01-light
 ninja -C {out}/cyw30739-cyw930739m2evb_01-light
@@ -1738,3 +1789,24 @@ ninja -C {out}/telink-tlsr9518adk80d-light
 
 # Building tizen-arm-light
 ninja -C {out}/tizen-arm-light
+
+# Building tizen-arm-light-asan
+ninja -C {out}/tizen-arm-light-asan
+
+# Building tizen-arm-light-no-ble
+ninja -C {out}/tizen-arm-light-no-ble
+
+# Building tizen-arm-light-no-ble-asan
+ninja -C {out}/tizen-arm-light-no-ble-asan
+
+# Building tizen-arm-light-no-ble-no-wifi
+ninja -C {out}/tizen-arm-light-no-ble-no-wifi
+
+# Building tizen-arm-light-no-ble-no-wifi-asan
+ninja -C {out}/tizen-arm-light-no-ble-no-wifi-asan
+
+# Building tizen-arm-light-no-wifi
+ninja -C {out}/tizen-arm-light-no-wifi
+
+# Building tizen-arm-light-no-wifi-asan
+ninja -C {out}/tizen-arm-light-no-wifi-asan

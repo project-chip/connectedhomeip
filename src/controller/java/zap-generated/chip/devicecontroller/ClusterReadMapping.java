@@ -3765,6 +3765,21 @@ public class ClusterReadMapping {
     readGeneralCommissioningInteractionInfo.put(
         "readLocationCapabilityAttribute",
         readGeneralCommissioningLocationCapabilityAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readGeneralCommissioningSupportsConcurrentConnectionCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readGeneralCommissioningSupportsConcurrentConnectionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GeneralCommissioningCluster) cluster)
+                  .readSupportsConcurrentConnectionAttribute(
+                      (ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readGeneralCommissioningSupportsConcurrentConnectionCommandParams);
+    readGeneralCommissioningInteractionInfo.put(
+        "readSupportsConcurrentConnectionAttribute",
+        readGeneralCommissioningSupportsConcurrentConnectionAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readGeneralCommissioningGeneratedCommandListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readGeneralCommissioningGeneratedCommandListAttributeInteractionInfo =

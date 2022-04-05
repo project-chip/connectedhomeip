@@ -154,7 +154,6 @@ AttestationVerificationResult MapError(CertificateChainValidationResult certific
 
 bool Cmd_ValidateAttCert(int argc, char * argv[])
 {
-    CHIP_ERROR err;
     uint8_t dacBuf[kMaxDERCertLength] = { 0 };
     uint8_t paiBuf[kMaxDERCertLength] = { 0 };
     uint8_t paaBuf[kMaxDERCertLength] = { 0 };
@@ -220,39 +219,33 @@ bool Cmd_ValidateAttCert(int argc, char * argv[])
 
     // Verify that VID and PID in the certificates match.
     {
-        uint16_t dacVid = VendorId::NotSpecified;
-        uint16_t paiVid = VendorId::NotSpecified;
-        uint16_t paaVid = VendorId::NotSpecified;
-        uint16_t dacPid = 0;
-        uint16_t paiPid = 0;
-        uint16_t paaPid = 0;
+        AttestationCertVidPid dacVidPid;
+        AttestationCertVidPid paiVidPid;
+        AttestationCertVidPid paaVidPid;
 
-        VerifyOrExit(ExtractDNAttributeFromX509Cert(MatterOid::kVendorId, dac, dacVid) == CHIP_NO_ERROR,
+        VerifyOrExit(ExtractVIDPIDFromX509Cert(dac, dacVidPid) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kDacFormatInvalid);
-        VerifyOrExit(ExtractDNAttributeFromX509Cert(MatterOid::kVendorId, pai, paiVid) == CHIP_NO_ERROR,
+        VerifyOrExit(ExtractVIDPIDFromX509Cert(pai, paiVidPid) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kPaiFormatInvalid);
-        VerifyOrExit(paiVid == dacVid, attestationError = AttestationVerificationResult::kDacVendorIdMismatch);
-
-        err = ExtractDNAttributeFromX509Cert(MatterOid::kVendorId, paa, paaVid);
-        VerifyOrExit(err == CHIP_NO_ERROR || err == CHIP_ERROR_KEY_NOT_FOUND,
+        VerifyOrExit(ExtractVIDPIDFromX509Cert(paa, paaVidPid) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kPaaFormatInvalid);
-        if (err != CHIP_ERROR_KEY_NOT_FOUND)
+
+        VerifyOrExit(dacVidPid.mVendorId.HasValue() && dacVidPid.mVendorId == paiVidPid.mVendorId,
+                     attestationError = AttestationVerificationResult::kDacVendorIdMismatch);
+
+        if (paaVidPid.mVendorId.HasValue())
         {
-            VerifyOrExit(dacVid == paaVid, attestationError = AttestationVerificationResult::kDacVendorIdMismatch);
+            VerifyOrExit(dacVidPid.mVendorId == paaVidPid.mVendorId,
+                         attestationError = AttestationVerificationResult::kPaiVendorIdMismatch);
         }
 
-        VerifyOrExit(ExtractDNAttributeFromX509Cert(MatterOid::kProductId, dac, dacPid) == CHIP_NO_ERROR,
-                     attestationError = AttestationVerificationResult::kDacFormatInvalid);
-        err = ExtractDNAttributeFromX509Cert(MatterOid::kProductId, pai, paiPid);
-        VerifyOrExit(err == CHIP_NO_ERROR || err == CHIP_ERROR_KEY_NOT_FOUND,
-                     attestationError = AttestationVerificationResult::kPaiFormatInvalid);
-        if (err != CHIP_ERROR_KEY_NOT_FOUND)
+        if (paiVidPid.mProductId.HasValue())
         {
-            VerifyOrExit(dacPid == paiPid, attestationError = AttestationVerificationResult::kDacProductIdMismatch);
+            VerifyOrExit(dacVidPid.mProductId == paiVidPid.mProductId,
+                         attestationError = AttestationVerificationResult::kDacProductIdMismatch);
         }
 
-        VerifyOrExit(ExtractDNAttributeFromX509Cert(MatterOid::kProductId, paa, paaPid) == CHIP_ERROR_KEY_NOT_FOUND,
-                     attestationError = AttestationVerificationResult::kPaaFormatInvalid);
+        VerifyOrExit(!paaVidPid.mProductId.HasValue(), attestationError = AttestationVerificationResult::kPaaFormatInvalid);
     }
 
     // Validate certificate chain.

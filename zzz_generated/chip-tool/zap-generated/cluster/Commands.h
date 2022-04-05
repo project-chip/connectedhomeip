@@ -27,6 +27,7 @@
 #include <commands/clusters/ClusterCommand.h>
 #include <commands/clusters/ComplexArgument.h>
 #include <commands/clusters/ReportCommand.h>
+#include <commands/clusters/SubscriptionsCommands.h>
 #include <commands/clusters/WriteAttributeCommand.h>
 
 /*----------------------------------------------------------------------------*\
@@ -5581,6 +5582,7 @@ private:
 | * BasicCommissioningInfo                                            | 0x0001 |
 | * RegulatoryConfig                                                  | 0x0002 |
 | * LocationCapability                                                | 0x0003 |
+| * SupportsConcurrentConnection                                      | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -5601,7 +5603,6 @@ public:
     {
         AddArgument("ExpiryLengthSeconds", 0, UINT16_MAX, &mRequest.expiryLengthSeconds);
         AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
         ClusterCommand::AddArguments();
     }
 
@@ -5632,10 +5633,9 @@ public:
     GeneralCommissioningSetRegulatoryConfig(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("set-regulatory-config", credsIssuerConfig)
     {
-        AddArgument("Location", 0, UINT8_MAX, &mRequest.location);
+        AddArgument("NewRegulatoryConfig", 0, UINT8_MAX, &mRequest.newRegulatoryConfig);
         AddArgument("CountryCode", &mRequest.countryCode);
         AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
         ClusterCommand::AddArguments();
     }
 
@@ -20705,19 +20705,23 @@ void registerClusterGeneralCommissioning(Commands & commands, CredentialIssuerCo
         make_unique<ReadAttribute>(Id, "basic-commissioning-info", Attributes::BasicCommissioningInfo::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "regulatory-config", Attributes::RegulatoryConfig::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "location-capability", Attributes::LocationCapability::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                    //
-        make_unique<WriteGeneralCommissioningBreadcrumb>(credsIssuerConfig),                                                   //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                //
-        make_unique<SubscribeAttribute>(Id, "breadcrumb", Attributes::Breadcrumb::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "supports-concurrent-connection", Attributes::SupportsConcurrentConnection::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<WriteGeneralCommissioningBreadcrumb>(credsIssuerConfig),                                               //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                            //
+        make_unique<SubscribeAttribute>(Id, "breadcrumb", Attributes::Breadcrumb::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "basic-commissioning-info", Attributes::BasicCommissioningInfo::Id,
+                                        credsIssuerConfig),                                                                //
+        make_unique<SubscribeAttribute>(Id, "regulatory-config", Attributes::RegulatoryConfig::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "location-capability", Attributes::LocationCapability::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "supports-concurrent-connection", Attributes::SupportsConcurrentConnection::Id,
                                         credsIssuerConfig),                                                                     //
-        make_unique<SubscribeAttribute>(Id, "regulatory-config", Attributes::RegulatoryConfig::Id, credsIssuerConfig),          //
-        make_unique<SubscribeAttribute>(Id, "location-capability", Attributes::LocationCapability::Id, credsIssuerConfig),      //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -26421,4 +26425,5 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterApplianceEventsAndAlert(commands, credsIssuerConfig);
     registerClusterApplianceStatistics(commands, credsIssuerConfig);
     registerClusterElectricalMeasurement(commands, credsIssuerConfig);
+    registerClusterSubscriptions(commands, credsIssuerConfig);
 }

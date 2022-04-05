@@ -184,7 +184,48 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, size == sizeof(buf));
 }
 
-const nlTest sTests[] = { NL_TEST_DEF("Test basic API", TestBasicApi), NL_TEST_SENTINEL() };
+// ClearStorage is not a PersistentStorageDelegate base class method, it only
+// appears in the TestPersistentStorageDelegate.
+void TestClearStorage(nlTestSuite * inSuite, void * inContext)
+{
+    TestPersistentStorageDelegate storage;
+
+    uint8_t buf[16];
+    uint16_t size = sizeof(buf);
+
+    // Key not there
+    CHIP_ERROR err;
+    memset(&buf[0], 0, sizeof(buf));
+    size = sizeof(buf);
+    err  = storage.SyncGetKeyValue("roboto", &buf[0], size);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    NL_TEST_ASSERT(inSuite, size == sizeof(buf));
+
+    // Add basic key, read it back
+    const char * kStringValue1 = "abcd";
+    err                        = storage.SyncSetKeyValue("roboto", kStringValue1, static_cast<uint16_t>(strlen(kStringValue1)));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    memset(&buf[0], 0, sizeof(buf));
+    size = sizeof(buf);
+    err  = storage.SyncGetKeyValue("roboto", &buf[0], size);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, size == strlen(kStringValue1));
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], kStringValue1, strlen(kStringValue1)));
+
+    // Clear storage, make sure it's gone
+    storage.ClearStorage();
+
+    memset(&buf[0], 0, sizeof(buf));
+    size = sizeof(buf);
+    err  = storage.SyncGetKeyValue("roboto", &buf[0], size);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    NL_TEST_ASSERT(inSuite, size == sizeof(buf));
+}
+
+const nlTest sTests[] = { NL_TEST_DEF("Test basic API", TestBasicApi),
+                          NL_TEST_DEF("Test ClearStorage method of TestPersistentStorageDelegate", TestClearStorage),
+                          NL_TEST_SENTINEL() };
 
 } // namespace
 

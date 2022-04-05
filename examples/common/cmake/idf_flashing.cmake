@@ -70,7 +70,7 @@ macro(flashing_script)
   add_custom_target(flashing_script
     ALL
     COMMAND ${python}
-            "${project_path}/../../../scripts/flashing/gen_flashing_script.py" ${board_type}
+            "${project_path}/third_party/connectedhomeip/scripts/flashing/gen_flashing_script.py" ${board_type}
             --output "${build_dir}/${flashing_script}"
             --port "$ENV{ESPPORT}"
             --baud 460800

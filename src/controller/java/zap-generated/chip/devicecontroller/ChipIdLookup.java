@@ -1117,6 +1117,9 @@ public final class ChipIdLookup {
       if (attributeId == 3L) {
         return "LocationCapability";
       }
+      if (attributeId == 4L) {
+        return "SupportsConcurrentConnection";
+      }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
       }
