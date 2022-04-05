@@ -37,9 +37,9 @@
 #include "OTAImageProcessorImpl.h"
 #include "OtaSupport.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
 
 #include "Keyboard.h"
 #include "LED.h"
@@ -85,7 +85,7 @@ using namespace chip;
 AppTask AppTask::sAppTask;
 
 /* OTA related variables */
-static OTARequestor gRequestorCore;
+static DefaultOTARequestor gRequestorCore;
 static DefaultOTARequestorStorage gRequestorStorage;
 static DeviceLayer::GenericOTARequestorDriver gRequestorUser;
 static BDXDownloader gDownloader;
@@ -489,7 +489,7 @@ void AppTask::OTAHandler(AppEvent * aEvent)
         return;
     }
 
-    static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
+    static_cast<DefaultOTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
 }
 
 void AppTask::BleHandler(AppEvent * aEvent)

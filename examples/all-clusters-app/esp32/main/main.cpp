@@ -38,9 +38,9 @@
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/util/af.h>
 #include <binding-handler.h>
@@ -77,7 +77,7 @@ static DeviceCallbacks EchoCallbacks;
 namespace {
 
 #if CONFIG_ENABLE_OTA_REQUESTOR
-OTARequestor gRequestorCore;
+DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
 GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
