@@ -243,11 +243,9 @@ void TxtRecord(nlTestSuite * inSuite, void * inContext)
 }
 
 const nlTest sTests[] = {
-    NL_TEST_DEF("SrvRecordSimpleParsing", SrvRecordSimpleParsing), //
-    NL_TEST_DEF("SrvWithPtrRecord", SrvWithPtrRecord),             //
-#if INET_CONFIG_ENABLE_IPV4
+    NL_TEST_DEF("SrvRecordSimpleParsing", SrvRecordSimpleParsing),   //
+    NL_TEST_DEF("SrvWithPtrRecord", SrvWithPtrRecord),               //
     NL_TEST_DEF("ARecordParsing", ARecordParsing),                   //
-#endif                                                               // INET_CONFIG_ENABLE_IPV4
     NL_TEST_DEF("AAAARecordParsing", AAAARecordParsing),             //
     NL_TEST_DEF("PtrRecordSimpleParsing", PtrRecordSimpleParsing),   //
     NL_TEST_DEF("PtrRecordComplexParsing", PtrRecordComplexParsing), //
