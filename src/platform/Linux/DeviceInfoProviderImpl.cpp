@@ -267,5 +267,80 @@ bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & outpu
     }
 }
 
+DeviceInfoProvider::SupportedCalendarTypesIterator * DeviceInfoProviderImpl::IterateSupportedCalendarTypes()
+{
+    return new SupportedCalendarTypesIteratorImpl();
+}
+
+size_t DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Count()
+{
+    // In Linux Simulation, return the size of the hardcoded list of Strings that are valid values for the Calendar Types.
+    // {("kBuddhist"), ("kChinese"), ("kCoptic"), ("kEthiopian"), ("kGregorian"), ("kHebrew"), ("kIndian"), ("kJapanese"),
+    //  ("kKorean"), ("kPersian"), ("kTaiwanese"), ("kIslamic")}
+
+    return 12;
+}
+
+bool DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarType & output)
+{
+    // In Linux Simulation, return following hardcoded list of Strings that are valid values for the Calendar Types.
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrReturnError(mIndex < 12, false);
+
+    switch (mIndex)
+    {
+    case 0:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kBuddhist;
+        break;
+    case 1:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kChinese;
+        break;
+    case 2:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kCoptic;
+        break;
+    case 3:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kEthiopian;
+        break;
+    case 4:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kGregorian;
+        break;
+    case 5:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kHebrew;
+        break;
+    case 6:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kIndian;
+        break;
+    case 7:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kJapanese;
+        break;
+    case 8:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kKorean;
+        break;
+    case 9:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kPersian;
+        break;
+    case 10:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kTaiwanese;
+        break;
+    case 11:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kIslamic;
+        break;
+    default:
+        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+        break;
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        mIndex++;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 } // namespace DeviceLayer
 } // namespace chip
