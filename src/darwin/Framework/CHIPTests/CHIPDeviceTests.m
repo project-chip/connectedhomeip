@@ -45,6 +45,7 @@ static const uint32_t kSetupPINCode = 20202021;
 static const uint16_t kRemotePort = 5540;
 static const uint16_t kLocalPort = 5541;
 static NSString * kAddress = @"::1";
+static uint16_t kTestVendorId = 0xFFF1u;
 
 // This test suite reuses a device object to speed up the test process for CI.
 // The following global variable holds the reference to the device object.
@@ -144,7 +145,7 @@ static CHIPDevice * GetConnectedDevice(void)
     [controller setListenPort:kLocalPort];
     [controller setPairingDelegate:pairing queue:callbackQueue];
 
-    BOOL started = [controller startup:nil vendorId:0 nocSigner:nil];
+    BOOL started = [controller startup:nil vendorId:kTestVendorId nocSigner:nil];
     XCTAssertTrue(started);
 
     NSError * error;

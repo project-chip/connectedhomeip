@@ -76,7 +76,7 @@ limitations under the License.
     <cluster>
         <name>Network Commissioning</name>
         <domain>CHIP</domain>
-        <description>TODO</description>
+        <description>Functionality to configure, enable, disable network credentials and access on a Matter device.</description>
         <code>0x0031</code>
         <define>NETWORK_COMMISSIONING_CLUSTER</define>
         <client tick="false" init="false">true</client>
@@ -92,54 +92,55 @@ limitations under the License.
         <attribute side="server" code="0x0007" define="LAST_CONNECT_ERROR_VALUE" type="INT32S" writable="false" optional="false" isNullable="true">LastConnectErrorValue</attribute>
 
         <command source="client" code="0x00" name="ScanNetworks" optional="false" response="ScanNetworksResponse" cli="chip network_commissioning scannetworks">
-            <description>TODO</description>
+            <description>Detemine the set of networks the device sees as available.</description>
             <arg name="SSID" type="OCTET_STRING"/>
-            <arg name="Breadcrumb" type="INT64U"/>
+            <arg name="Breadcrumb" type="INT64U" optional="true"/>
         </command>
         <command source="server" code="0x01" name="ScanNetworksResponse" optional="false" cli="chip network_commissioning scannetworksresponse">
-            <description>TODO</description>
+            <description>Relay the set of networks the device sees as available back to the client.</description>
             <arg name="NetworkingStatus" type="NetworkCommissioningStatus"/>
             <arg name="DebugText" type="CHAR_STRING"/>
             <arg name="WiFiScanResults" type="WiFiInterfaceScanResult" array="true" optional="true"/>
             <arg name="ThreadScanResults" type="ThreadInterfaceScanResult" array="true" optional="true"/>
         </command>
         <command source="client" code="0x02" name="AddOrUpdateWiFiNetwork" optional="true" response="NetworkConfigResponse" cli="chip network_commissioning addorupdatewifinetwork">
-            <description>TODO</description>
+            <description>Add or update the credentials for a given Wi-Fi network.</description>
             <arg name="SSID" type="OCTET_STRING"/>
             <arg name="Credentials" type="OCTET_STRING"/>
-            <arg name="breadcrumb" type="INT64U"/>
+            <arg name="breadcrumb" type="INT64U" optional="true"/>
         </command>
         <command source="client" code="0x03" name="AddOrUpdateThreadNetwork" optional="true" response="NetworkConfigResponse" cli="chip network_commissioning addorupdatethreadnetwork">
-            <description>TODO</description>
+            <description>Add or update the credentials for a given Thread network.</description>
             <arg name="OperationalDataset" type="OCTET_STRING"/>
-            <arg name="Breadcrumb" type="INT64U"/>
+            <arg name="Breadcrumb" type="INT64U" optional="true"/>
         </command>
         <command source="client" code="0x04" name="RemoveNetwork" optional="false" response="NetworkConfigResponse" cli="chip network_commissioning removenetwork">
-            <description>TODO</description>
+            <description>Remove the definition of a given network (including its credentials).</description>
             <arg name="NetworkID" type="OCTET_STRING"/>
-            <arg name="Breadcrumb" type="INT64U"/>
+            <arg name="Breadcrumb" type="INT64U" optional="true"/>
         </command>
         <command source="server" code="0x05" name="NetworkConfigResponse" optional="true" cli="chip network_commissioning addwifiresponse">
-            <description>TODO</description>
+            <description>Response command for various commands that add/remove/modify network credentials.</description>
             <arg name="NetworkingStatus" type="NetworkCommissioningStatus"/>
-            <arg name="DebugText" type="CHAR_STRING"/>
+            <arg name="DebugText" type="CHAR_STRING" optional="true" />
+            <arg name="NetworkIndex" type="INT8U" optional="true" />
         </command>
         <command source="client" code="0x06" name="ConnectNetwork" optional="false" response="ConnectNetworkResponse" cli="chip network_commissioning connectnetwork">
-            <description>TODO</description>
+            <description>Connect to the specified network, using previously-defined credentials.</description>
             <arg name="NetworkID" type="OCTET_STRING"/>
-            <arg name="Breadcrumb" type="INT64U"/>
+            <arg name="Breadcrumb" type="INT64U" optional="true"/>
         </command>
         <command source="server" code="0x07" name="ConnectNetworkResponse" optional="false" cli="chip network_commissioning connectnetworkresponse">
-            <description>TODO</description>
+            <description>Command that indicates whether we have succcessfully connected to a network.</description>
             <arg name="NetworkingStatus" type="NetworkCommissioningStatus"/>
             <arg name="DebugText" type="CHAR_STRING"/>
             <arg name="ErrorValue" type="INT32S"/>
         </command>
         <command source="client" code="0x08" name="ReorderNetwork" optional="false" response="NetworkConfigResponse" cli="chip network_commissioning connectnetwork">
-            <description>TODO</description>
+            <description>Modify the order in which networks will be presented in the Networks attribute.</description>
             <arg name="NetworkID" type="OCTET_STRING"/>
             <arg name="NetworkIndex" type="INT8U"/>
-            <arg name="Breadcrumb" type="INT64U"/>
+            <arg name="Breadcrumb" type="INT64U" optional="true"/>
         </command>
     </cluster>
     <bitmap name="NetworkCommissioningFeature" type="BITMAP32">

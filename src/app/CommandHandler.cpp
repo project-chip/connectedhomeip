@@ -481,10 +481,13 @@ CHIP_ERROR CommandHandler::AddClusterSpecificFailure(const ConcreteCommandPath &
 CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aCommandPath, bool aStartDataStruct)
 {
     ReturnErrorOnFailure(AllocateBuffer());
+
+    mInvokeResponseBuilder.Checkpoint(mBackupWriter);
     //
     // We must not be in the middle of preparing a command, or having prepared or sent one.
     //
     VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
+    MoveToState(State::Preparing);
     InvokeResponseIBs::Builder & invokeResponses = mInvokeResponseBuilder.GetInvokeResponses();
     InvokeResponseIB::Builder & invokeResponse   = invokeResponses.CreateInvokeResponse();
     ReturnErrorOnFailure(invokeResponses.GetError());
@@ -526,6 +529,7 @@ CHIP_ERROR CommandHandler::PrepareStatus(const ConcreteCommandPath & aCommandPat
     // We must not be in the middle of preparing a command, or having prepared or sent one.
     //
     VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
+    MoveToState(State::Preparing);
     InvokeResponseIBs::Builder & invokeResponses = mInvokeResponseBuilder.GetInvokeResponses();
     InvokeResponseIB::Builder & invokeResponse   = invokeResponses.CreateInvokeResponse();
     ReturnErrorOnFailure(invokeResponses.GetError());
@@ -547,6 +551,17 @@ CHIP_ERROR CommandHandler::FinishStatus()
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses().GetError());
     ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage().GetError());
     MoveToState(State::AddedCommand);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CommandHandler::RollbackResponse()
+{
+    VerifyOrReturnError(mState == State::Preparing || mState == State::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
+    mInvokeResponseBuilder.Rollback(mBackupWriter);
+    mInvokeResponseBuilder.ResetError();
+    // Note: We only support one command per request, so we reset the state to Idle here, need to review the states when adding
+    // supports of having multiple requests in the same transaction.
+    MoveToState(State::Idle);
     return CHIP_NO_ERROR;
 }
 
@@ -606,6 +621,9 @@ const char * CommandHandler::GetStateStr() const
     {
     case State::Idle:
         return "Idle";
+
+    case State::Preparing:
+        return "Preparing";
 
     case State::AddingCommand:
         return "AddingCommand";

@@ -16,398 +16,143 @@ name: 22.1.4. [TC-MF-1.4] Node Behavior using BCM [DUT - Commissionee]
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    nodeId2:
+        type: NODE_ID
+        defaultValue: 0xCAFE
     endpoint: 0
+    discriminator:
+        type: INT16U
+        defaultValue: 3840
+    payload:
+        type: CHAR_STRING
+        defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
 
 tests:
+    - label: "Reboot target device"
+      cluster: "SystemCommands"
+      command: "Reboot"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: discriminator
+
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
-      verification:
-          "1. Provision the device using 1st python controller on the raspi (use
-          above instructions) "
-      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
 
     - label:
-          "If (PICS_MF_BCM) TH_CR1 opens a commissioning window on DUT_CE using
-          a commissioning timeout of PIXIT_COMM_WIN seconds using BCM"
-      verification:
-          "On 1st controller, using chip tool open commissioning window using
-          BCM ./chip-tool administratorcommissioning
-          open-basic-commissioning-window 500 1 0 [1635865295.457120][3918:3923]
-          CHIP:DMG: InvokeCommand = [1635865295.457189][3918:3923] CHIP:DMG: {
-          [1635865295.457248][3918:3923] CHIP:DMG: CommandList =
-          [1635865295.457310][3918:3923] CHIP:DMG: [
-          [1635865295.457372][3918:3923] CHIP:DMG: CommandDataIB =
-          [1635865295.457483][3918:3923] CHIP:DMG: {
-          [1635865295.457550][3918:3923] CHIP:DMG: CommandPathIB =
-          [1635865295.457622][3918:3923] CHIP:DMG: {
-          [1635865295.457695][3918:3923] CHIP:DMG: EndpointId = 0x0,
-          [1635865295.457770][3918:3923] CHIP:DMG: ClusterId = 0x3c,
-          [1635865295.457844][3918:3923] CHIP:DMG: CommandId = 0x1,
-          [1635865295.457913][3918:3923] CHIP:DMG: },
-          [1635865295.457989][3918:3923] CHIP:DMG:
-          [1635865295.458054][3918:3923] CHIP:DMG: StatusIB =
-          [1635865295.458122][3918:3923] CHIP:DMG: {
-          [1635865295.458192][3918:3923] CHIP:DMG: status = 0x0,
-          [1635865295.458261][3918:3923] CHIP:DMG: },
-          [1635865295.458331][3918:3923] CHIP:DMG:
-          [1635865295.458387][3918:3923] CHIP:DMG: },
-          [1635865295.458459][3918:3923] CHIP:DMG:
-          [1635865295.458516][3918:3923] CHIP:DMG: ],
-          [1635865295.458585][3918:3923] CHIP:DMG:
-          [1635865295.458638][3918:3923] CHIP:DMG: }
-          [1635865295.458735][3918:3923] CHIP:DMG: Received Command Response
-          Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001
-          Status=0x0 [1635865295.458802][3918:3923] CHIP:TOO: Default Success
-          Response"
-      disabled: true
+          "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
+          attribute of DUT_CE"
+      command: "writeAttribute"
+      cluster: "Basic"
+      attribute: "NodeLabel"
+      arguments:
+          value: "chiptest"
 
     - label:
-          "TH_CR1 writes and reads the Basic Information Clusters NodeLabel
-          mandatory attribute of DUT_CE"
-      verification:
-          "On 1st controller, using chip tool, write and read Basic Information
-          Clusters NodeLabel mandatory attribute of DUT_CE ./chip-tool basic
-          write node-label te5new 1 0 [1635865352.166872][3925:3930] CHIP:DMG:
-          WriteResponse = [1635865352.166936][3925:3930] CHIP:DMG: {
-          [1635865352.166970][3925:3930] CHIP:DMG: AttributeStatusList =
-          [1635865352.167031][3925:3930] CHIP:DMG: [
-          [1635865352.167064][3925:3930] CHIP:DMG: AttributeStatusIB =
-          [1635865352.167105][3925:3930] CHIP:DMG: {
-          [1635865352.167168][3925:3930] CHIP:DMG: AttributePath =
-          [1635865352.167236][3925:3930] CHIP:DMG: {
-          [1635865352.167279][3925:3930] CHIP:DMG: FieldTag = 0x0000_0005,
-          [1635865352.167347][3925:3930] CHIP:DMG: NodeId = 0x0,
-          [1635865352.167399][3925:3930] CHIP:DMG: ClusterId = 0x28,
-          [1635865352.167467][3925:3930] CHIP:DMG: EndpointId = 0x0,
-          [1635865352.167533][3925:3930] CHIP:DMG: }
-          [1635865352.167582][3925:3930] CHIP:DMG:
-          [1635865352.167623][3925:3930] CHIP:DMG: StatusIB =
-          [1635865352.167683][3925:3930] CHIP:DMG: {
-          [1635865352.167734][3925:3930] CHIP:DMG: status = 0x0,
-          [1635865352.167799][3925:3930] CHIP:DMG: },
-          [1635865352.167846][3925:3930] CHIP:DMG:
-          [1635865352.167889][3925:3930] CHIP:DMG: },
-          [1635865352.167936][3925:3930] CHIP:DMG:
-          [1635865352.167980][3925:3930] CHIP:DMG: ],
-          [1635865352.168030][3925:3930] CHIP:DMG:
-          [1635865352.168221][3925:3930] CHIP:DMG: }
-          [1635865352.168320][3925:3930] CHIP:ZCL: WriteResponse:
-          [1635865352.168363][3925:3930] CHIP:ZCL: status: Success (0x0000)
-          [1635865352.168410][3925:3930] CHIP:TOO: Default Success Response
-          ./chip-tool basic read node-label 1 0 [1635865391.357044][3934:3939]
-          CHIP:DMG: ReportData = [1635865391.357075][3934:3939] CHIP:DMG: {
-          [1635865391.357103][3934:3939] CHIP:DMG: AttributeDataList =
-          [1635865391.357138][3934:3939] CHIP:DMG: [
-          [1635865391.357167][3934:3939] CHIP:DMG: AttributeDataElement =
-          [1635865391.357223][3934:3939] CHIP:DMG: {
-          [1635865391.357258][3934:3939] CHIP:DMG: AttributePath =
-          [1635865391.357317][3934:3939] CHIP:DMG: {
-          [1635865391.357362][3934:3939] CHIP:DMG: NodeId = 0x1,
-          [1635865391.357454][3934:3939] CHIP:DMG: EndpointId = 0x0,
-          [1635865391.357533][3934:3939] CHIP:DMG: ClusterId = 0x28,
-          [1635865391.357633][3934:3939] CHIP:DMG: FieldTag = 0x0000_0005,
-          [1635865391.357697][3934:3939] CHIP:DMG: }
-          [1635865391.357741][3934:3939] CHIP:DMG:
-          [1635865391.357792][3934:3939] CHIP:DMG: Data = 'te5new',
-          [1635865391.357870][3934:3939] CHIP:DMG: DataElementVersion = 0x0,
-          [1635865391.357939][3934:3939] CHIP:DMG: },
-          [1635865391.357981][3934:3939] CHIP:DMG:
-          [1635865391.358026][3934:3939] CHIP:DMG: ],
-          [1635865391.358065][3934:3939] CHIP:DMG:
-          [1635865391.358095][3934:3939] CHIP:DMG: }
-          [1635865391.358236][3934:3939] CHIP:ZCL: ReadAttributesResponse:
-          [1635865391.358267][3934:3939] CHIP:ZCL: ClusterId: 0x0000_0028
-          [1635865391.358311][3934:3939] CHIP:ZCL: attributeId: 0x0000_0005
-          [1635865391.358337][3934:3939] CHIP:ZCL: status: Success (0x0000)
-          [1635865391.358400][3934:3939] CHIP:ZCL: attribute TLV Type: 0x0c
-          [1635865391.358435][3934:3939] CHIP:TOO: CharString attribute
-          Response: te5new"
-      disabled: true
+          "TH_CR1 reads the Basic Information Clusters NodeLabel mandatory
+          attribute of DUT_CE"
+      command: "readAttribute"
+      cluster: "Basic"
+      attribute: "NodeLabel"
+      response:
+          constraints:
+              type: string
+              maxLength: 32
+              value: "chiptest"
+
+    - label: "Commission from beta"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithQRCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
-      verification:
-          "1. On 2nd controller, using chip-tool connect to the accessory
-          ./chip-tool pairing onnetwork 1 20202021"
-      disabled: true
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
 
-    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
-      verification:
-          "On first controller, using chip tool read fabrics list ./chip-tool
-          operationalcredentials read fabrics-list 1 0
-          [1635865583.364833][3951:3956] CHIP:DMG: ReportData =
-          [1635865583.364869][3951:3956] CHIP:DMG: {
-          [1635865583.364899][3951:3956] CHIP:DMG: AttributeDataList =
-          [1635865583.364938][3951:3956] CHIP:DMG: [
-          [1635865583.364971][3951:3956] CHIP:DMG: AttributeDataElement =
-          [1635865583.365009][3951:3956] CHIP:DMG: {
-          [1635865583.365043][3951:3956] CHIP:DMG: AttributePath =
-          [1635865583.365111][3951:3956] CHIP:DMG: {
-          [1635865583.365168][3951:3956] CHIP:DMG: NodeId = 0x1,
-          [1635865583.365208][3951:3956] CHIP:DMG: EndpointId = 0x0,
-          [1635865583.365271][3951:3956] CHIP:DMG: ClusterId = 0x3e,
-          [1635865583.365335][3951:3956] CHIP:DMG: FieldTag = 0x0000_0001,
-          [1635865583.365371][3951:3956] CHIP:DMG: }
-          [1635865583.365441][3951:3956] CHIP:DMG:
-          [1635865583.365516][3951:3956] CHIP:DMG: Data = [
-          [1635865583.365564][3951:3956] CHIP:DMG:
-          [1635865583.365625][3951:3956] CHIP:DMG: {
-          [1635865583.365689][3951:3956] CHIP:DMG: 0x0 = 1,
-          [1635865583.365755][3951:3956] CHIP:DMG: 0x1 = [
-          [1635865583.365814][3951:3956] CHIP:DMG: 0x4, 0x9e, 0x26, 0x54, 0x2,
-          0x45, 0x18, 0xca, 0x68, 0x9c, 0xa0, 0x77, 0xef, 0xb4, 0x37, 0x0, 0xce,
-          0xb7, 0x15, 0x8d, 0x4a, 0xc7, 0x6a, 0x67, 0x31, 0xf2, 0xba, 0x52,
-          0x8f, 0xb9, 0xfd, 0x93, 0xed, 0xc0, 0xdc, 0xce, 0xf7, 0x9d, 0x3, 0x3b,
-          0xc8, 0x63, 0 [1635865583.365863][3951:3956] CHIP:DMG: ]
-          [1635865583.365929][3951:3956] CHIP:DMG: 0x2 = 30024,
-          [1635865583.365969][3951:3956] CHIP:DMG: 0x3 = 0,
-          [1635865583.366048][3951:3956] CHIP:DMG: 0x4 = 1,
-          [1635865583.366266][3951:3956] CHIP:DMG: 0x5 = ',
-          [1635865583.366411][3951:3956] CHIP:DMG: },
-          [1635865583.366502][3951:3956] CHIP:DMG: {
-          [1635865583.366570][3951:3956] CHIP:DMG: 0x0 = 2,
-          [1635865583.366682][3951:3956] CHIP:DMG: 0x1 = [
-          [1635865583.366814][3951:3956] CHIP:DMG: 0x4, 0x5b, 0x93, 0x38, 0xab,
-          0x50, 0x6, 0x85, 0xc0, 0x50, 0xfe, 0x7d, 0x6c, 0xeb, 0x9d, 0xbd, 0x55,
-          0x90, 0x5e, 0x4f, 0x54, 0xed, 0x94, 0x21, 0xc0, 0x8d, 0x9d, 0x4f,
-          0x60, 0x48, 0xdb, 0x38, 0x4a, 0xf4, 0xe2, 0xa3, 0xf9, 0xd0, 0x55,
-          0xd5, 0x63, 0xd0, [1635865583.366901][3951:3956] CHIP:DMG: ]
-          [1635865583.366970][3951:3956] CHIP:DMG: 0x2 = 45896,
-          [1635865583.367068][3951:3956] CHIP:DMG: 0x3 = 0,
-          [1635865583.367123][3951:3956] CHIP:DMG: 0x4 = 2,
-          [1635865583.367272][3951:3956] CHIP:DMG: 0x5 = '',
-          [1635865583.367358][3951:3956] CHIP:DMG: },
-          [1635865583.367499][3951:3956] CHIP:DMG: ],
-          [1635865583.367581][3951:3956] CHIP:DMG: DataElementVersion = 0x0,
-          [1635865583.367653][3951:3956] CHIP:DMG: },
-          [1635865583.367720][3951:3956] CHIP:DMG:
-          [1635865583.367764][3951:3956] CHIP:DMG: ],
-          [1635865583.367829][3951:3956] CHIP:DMG:
-          [1635865583.367871][3951:3956] CHIP:DMG: }
-          [1635865583.368097][3951:3956] CHIP:ZCL: ReadAttributesResponse:
-          [1635865583.368144][3951:3956] CHIP:ZCL: ClusterId: 0x0000_003E
-          [1635865583.368188][3951:3956] CHIP:ZCL: attributeId: 0x0000_0001
-          [1635865583.368228][3951:3956] CHIP:ZCL: status: Success (0x0000)
-          [1635865583.368319][3951:3956] CHIP:ZCL: attribute TLV Type: 0x16
-          [1635865583.368389][3951:3956] CHIP:TOO:
-          OnOperationalCredentialsFabricsListListAttributeResponse: 2 entries
-          [1635865583.368513][3951:3956] CHIP:TOO: FabricDescriptor[1]:
-          [1635865583.368555][3951:3956] CHIP:TOO: fabricIndex: 1
-          [1635865583.368593][3951:3956] CHIP:ZCL: RootPublicKey: 65
-          [1635865583.368630][3951:3956] CHIP:TOO: vendorId: 30024
-          [1635865583.368665][3951:3956] CHIP:TOO: fabricId: 0
-          [1635865583.368696][3951:3956] CHIP:TOO: nodeId: 1
-          [1635865583.368729][3951:3956] CHIP:ZCL: Label:
-          [1635865583.368777][3951:3956] CHIP:TOO: FabricDescriptor[2]:
-          [1635865583.368816][3951:3956] CHIP:TOO: fabricIndex: 2
-          [1635865583.368862][3951:3956] CHIP:ZCL: RootPublicKey: 65
-          [1635865583.368895][3951:3956] CHIP:TOO: vendorId: 45896
-          [1635865583.368971][3951:3956] CHIP:TOO: fabricId: 0
-          [1635865583.369011][3951:3956] CHIP:TOO: nodeId: 2"
-      disabled: true
+    - label: "Query fabrics list"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "Fabrics"
+      response:
+          value: [{ Label: "", nodeId: nodeId }]
+          constraints:
+              type: list
 
-    - label: "TH_CR2 reads the list of Fabrics on DUT_CE"
-      verification:
-          "On second controller, using chip tool read fabrics list ./chip-tool
-          operationalcredentials read fabrics-list 2 0
-          [1635865632.342329][6067:6072] CHIP:DMG: ReportData =
-          [1635865632.342404][6067:6072] CHIP:DMG: {
-          [1635865632.342434][6067:6072] CHIP:DMG: AttributeDataList =
-          [1635865632.342485][6067:6072] CHIP:DMG: [
-          [1635865632.342524][6067:6072] CHIP:DMG: AttributeDataElement =
-          [1635865632.342567][6067:6072] CHIP:DMG: {
-          [1635865632.342610][6067:6072] CHIP:DMG: AttributePath =
-          [1635865632.342665][6067:6072] CHIP:DMG: {
-          [1635865632.342715][6067:6072] CHIP:DMG: NodeId = 0x2,
-          [1635865632.342908][6067:6072] CHIP:DMG: EndpointId = 0x0,
-          [1635865632.343032][6067:6072] CHIP:DMG: ClusterId = 0x3e,
-          [1635865632.343088][6067:6072] CHIP:DMG: FieldTag = 0x0000_0001,
-          [1635865632.343138][6067:6072] CHIP:DMG: }
-          [1635865632.343248][6067:6072] CHIP:DMG:
-          [1635865632.343311][6067:6072] CHIP:DMG: Data = [
-          [1635865632.343451][6067:6072] CHIP:DMG:
-          [1635865632.343507][6067:6072] CHIP:DMG: {
-          [1635865632.343559][6067:6072] CHIP:DMG: 0x0 = 1,
-          [1635865632.343611][6067:6072] CHIP:DMG: 0x1 = [
-          [1635865632.343674][6067:6072] CHIP:DMG: 0x4, 0x9e, 0x26, 0x54, 0x2,
-          0x45, 0x18, 0xca, 0x68, 0x9c, 0xa0, 0x77, 0xef, 0xb4, 0x37, 0x0, 0xce,
-          0xb7, 0x15, 0x8d, 0x4a, 0xc7, 0x6a, 0x67, 0x31, 0xf2, 0xba, 0x52,
-          0x8f, 0xb9, 0xfd, 0x93, 0xed, 0xc0, 0xdc, 0xce, 0xf7, 0x9d, 0x3, 0x3b,
-          0xc8, 0x63, 0 [1635865632.343784][6067:6072] CHIP:DMG: ]
-          [1635865632.344026][6067:6072] CHIP:DMG: 0x2 = 30024,
-          [1635865632.344261][6067:6072] CHIP:DMG: 0x3 = 0,
-          [1635865632.344518][6067:6072] CHIP:DMG: 0x4 = 1,
-          [1635865632.344584][6067:6072] CHIP:DMG: 0x5 = '',
-          [1635865632.344755][6067:6072] CHIP:DMG: },
-          [1635865632.344959][6067:6072] CHIP:DMG: {
-          [1635865632.345007][6067:6072] CHIP:DMG: 0x0 = 2,
-          [1635865632.345229][6067:6072] CHIP:DMG: 0x1 = [
-          [1635865632.345471][6067:6072] CHIP:DMG: 0x4, 0x5b, 0x93, 0x38, 0xab,
-          0x50, 0x6, 0x85, 0xc0, 0x50, 0xfe, 0x7d, 0x6c, 0xeb, 0x9d, 0xbd, 0x55,
-          0x90, 0x5e, 0x4f, 0x54, 0xed, 0x94, 0x21, 0xc0, 0x8d, 0x9d, 0x4f,
-          0x60, 0x48, 0xdb, 0x38, 0x4a, 0xf4, 0xe2, 0xa3, 0xf9, 0xd0, 0x55,
-          0xd5, 0x63, 0xd0, [1635865632.345519][6067:6072] CHIP:DMG: ]
-          [1635865632.345706][6067:6072] CHIP:DMG: 0x2 = 45896,
-          [1635865632.345929][6067:6072] CHIP:DMG: 0x3 = 0,
-          [1635865632.346157][6067:6072] CHIP:DMG: 0x4 = 2,
-          [1635865632.346383][6067:6072] CHIP:DMG: 0x5 = '',
-          [1635865632.346611][6067:6072] CHIP:DMG: },
-          [1635865632.346838][6067:6072] CHIP:DMG: ],
-          [1635865632.347060][6067:6072] CHIP:DMG: DataElementVersion = 0x0,
-          [1635865632.347139][6067:6072] CHIP:DMG: },
-          [1635865632.347249][6067:6072] CHIP:DMG:
-          [1635865632.347281][6067:6072] CHIP:DMG: ],
-          [1635865632.347323][6067:6072] CHIP:DMG:
-          [1635865632.347352][6067:6072] CHIP:DMG: }
-          [1635865632.347473][6067:6072] CHIP:ZCL: ReadAttributesResponse:
-          [1635865632.347502][6067:6072] CHIP:ZCL: ClusterId: 0x0000_003E
-          [1635865632.347534][6067:6072] CHIP:ZCL: attributeId: 0x0000_0001
-          [1635865632.347562][6067:6072] CHIP:ZCL: status: Success (0x0000)
-          [1635865632.347590][6067:6072] CHIP:ZCL: attribute TLV Type: 0x16
-          [1635865632.347640][6067:6072] CHIP:TOO:
-          OnOperationalCredentialsFabricsListListAttributeResponse: 2 entries
-          [1635865632.347721][6067:6072] CHIP:TOO: FabricDescriptor[1]:
-          [1635865632.347752][6067:6072] CHIP:TOO: fabricIndex: 1
-          [1635865632.347779][6067:6072] CHIP:ZCL: RootPublicKey: 65
-          [1635865632.347806][6067:6072] CHIP:TOO: vendorId: 30024
-          [1635865632.347832][6067:6072] CHIP:TOO: fabricId: 0
-          [1635865632.347859][6067:6072] CHIP:TOO: nodeId: 1
-          [1635865632.347884][6067:6072] CHIP:ZCL: Label:
-          [1635865632.347922][6067:6072] CHIP:TOO: FabricDescriptor[2]:
-          [1635865632.347949][6067:6072] CHIP:TOO: fabricIndex: 2
-          [1635865632.347972][6067:6072] CHIP:ZCL: RootPublicKey: 65
-          [1635865632.347997][6067:6072] CHIP:TOO: vendorId: 45896
-          [1635865632.348023][6067:6072] CHIP:TOO: fabricId: 0
-          [1635865632.348049][6067:6072] CHIP:TOO: nodeId: 2"
-      disabled: true
-
-    - label: ""
-      verification:
-          "1. Verify if the DUT is broadcasting using $ avahi-browse -rt
-          _matter._tcp"
-      disabled: true
+    - label: "Query fabrics list"
+      identity: "beta"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "Fabrics"
+      response:
+          value: [{ Label: "", nodeId: nodeId2 }]
+          constraints:
+              type: list
 
     - label:
-          "TH_CR1 writes and reads the Basic Information Clusters NodeLabel
-          mandatory attribute of DUT_CE"
-      verification:
-          "On 1st controller, using chip tool, write and read Basic Information
-          Clusters NodeLabel mandatory attribute of DUT_CE ./chip-tool basic
-          write user-label te5new 1 0 1635866078.503500][3977:3982] CHIP:DMG:
-          WriteResponse = [1635866078.503533][3977:3982] CHIP:DMG: {
-          [1635866078.503566][3977:3982] CHIP:DMG: AttributeStatusList =
-          [1635866078.503604][3977:3982] CHIP:DMG: [
-          [1635866078.503640][3977:3982] CHIP:DMG: AttributeStatusIB =
-          [1635866078.503686][3977:3982] CHIP:DMG: {
-          [1635866078.503721][3977:3982] CHIP:DMG: AttributePath =
-          [1635866078.503769][3977:3982] CHIP:DMG: {
-          [1635866078.503815][3977:3982] CHIP:DMG: FieldTag = 0x0000_0005,
-          [1635866078.503862][3977:3982] CHIP:DMG: NodeId = 0x0,
-          [1635866078.503908][3977:3982] CHIP:DMG: ClusterId = 0x28,
-          [1635866078.503952][3977:3982] CHIP:DMG: EndpointId = 0x0,
-          [1635866078.503994][3977:3982] CHIP:DMG: }
-          [1635866078.504041][3977:3982] CHIP:DMG:
-          [1635866078.504081][3977:3982] CHIP:DMG: StatusIB =
-          [1635866078.504123][3977:3982] CHIP:DMG: {
-          [1635866078.504164][3977:3982] CHIP:DMG: status = 0x0,
-          [1635866078.504210][3977:3982] CHIP:DMG: },
-          [1635866078.504256][3977:3982] CHIP:DMG:
-          [1635866078.504294][3977:3982] CHIP:DMG: },
-          [1635866078.504338][3977:3982] CHIP:DMG:
-          [1635866078.504370][3977:3982] CHIP:DMG: ],
-          [1635866078.504413][3977:3982] CHIP:DMG:
-          [1635866078.504445][3977:3982] CHIP:DMG: }
-          [1635866078.504520][3977:3982] CHIP:ZCL: WriteResponse:
-          [1635866078.504555][3977:3982] CHIP:ZCL: status: Success (0x0000)
-          [1635866078.504593][3977:3982] CHIP:TOO: Default Success Response
-          ./chip-tool basic read user-label 1 0 [1635866121.659967][3984:3989]
-          CHIP:DMG: ReportData = [1635866121.660011][3984:3989] CHIP:DMG: {
-          [1635866121.660047][3984:3989] CHIP:DMG: AttributeDataList =
-          [1635866121.660090][3984:3989] CHIP:DMG: [
-          [1635866121.660126][3984:3989] CHIP:DMG: AttributeDataElement =
-          [1635866121.660194][3984:3989] CHIP:DMG: {
-          [1635866121.660259][3984:3989] CHIP:DMG: AttributePath =
-          [1635866121.660310][3984:3989] CHIP:DMG: {
-          [1635866121.660363][3984:3989] CHIP:DMG: NodeId = 0x1,
-          [1635866121.660440][3984:3989] CHIP:DMG: EndpointId = 0x0,
-          [1635866121.660489][3984:3989] CHIP:DMG: ClusterId = 0x28,
-          [1635866121.660565][3984:3989] CHIP:DMG: FieldTag = 0x0000_0005,
-          [1635866121.660619][3984:3989] CHIP:DMG: }
-          [1635866121.660696][3984:3989] CHIP:DMG:
-          [1635866121.660746][3984:3989] CHIP:DMG: Data = 'te5new',
-          [1635866121.660825][3984:3989] CHIP:DMG: DataElementVersion = 0x0,
-          [1635866121.660865][3984:3989] CHIP:DMG: },
-          [1635866121.660934][3984:3989] CHIP:DMG:
-          [1635866121.660975][3984:3989] CHIP:DMG: ],
-          [1635866121.661023][3984:3989] CHIP:DMG:
-          [1635866121.661082][3984:3989] CHIP:DMG: }
-          [1635866121.661200][3984:3989] CHIP:ZCL: ReadAttributesResponse:
-          [1635866121.661240][3984:3989] CHIP:ZCL: ClusterId: 0x0000_0028
-          [1635866121.661282][3984:3989] CHIP:ZCL: attributeId: 0x0000_0005
-          [1635866121.661313][3984:3989] CHIP:ZCL: status: Success (0x0000)
-          [1635866121.661348][3984:3989] CHIP:ZCL: attribute TLV Type: 0x0c
-          [1635866121.661476][3984:3989] CHIP:TOO: CharString attribute
-          Response: te5new"
-      disabled: true
+          "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
+          attribute of DUT_CE"
+      command: "writeAttribute"
+      cluster: "Basic"
+      attribute: "NodeLabel"
+      arguments:
+          value: "chiptest"
 
     - label:
-          "TH_CR2 writes and reads the Basic Information Clusters NodeLabel
-          mandatory attribute of DUT_CE"
-      verification:
-          "On 2nd controller, using chip tool, write and read Basic Information
-          Clusters NodeLabel mandatory attribute of DUT_CE ./chip-tool basic
-          write user-label te5new 2 0 [1635866189.702833][6110:6115] CHIP:DMG:
-          WriteResponse = [1635866189.702874][6110:6115] CHIP:DMG: {
-          [1635866189.702929][6110:6115] CHIP:DMG: AttributeStatusList =
-          [1635866189.702966][6110:6115] CHIP:DMG: [
-          [1635866189.703022][6110:6115] CHIP:DMG: AttributeStatusIB =
-          [1635866189.703092][6110:6115] CHIP:DMG: {
-          [1635866189.703163][6110:6115] CHIP:DMG: AttributePath =
-          [1635866189.703242][6110:6115] CHIP:DMG: {
-          [1635866189.703306][6110:6115] CHIP:DMG: FieldTag = 0x0000_0005,
-          [1635866189.703353][6110:6115] CHIP:DMG: NodeId = 0x0,
-          [1635866189.703408][6110:6115] CHIP:DMG: ClusterId = 0x28,
-          [1635866189.703504][6110:6115] CHIP:DMG: EndpointId = 0x0,
-          [1635866189.703574][6110:6115] CHIP:DMG: }
-          [1635866189.703624][6110:6115] CHIP:DMG:
-          [1635866189.703676][6110:6115] CHIP:DMG: StatusIB =
-          [1635866189.703757][6110:6115] CHIP:DMG: {
-          [1635866189.703797][6110:6115] CHIP:DMG: status = 0x0,
-          [1635866189.703859][6110:6115] CHIP:DMG: },
-          [1635866189.703935][6110:6115] CHIP:DMG:
-          [1635866189.703972][6110:6115] CHIP:DMG: },
-          [1635866189.704035][6110:6115] CHIP:DMG:
-          [1635866189.704072][6110:6115] CHIP:DMG: ],
-          [1635866189.704116][6110:6115] CHIP:DMG:
-          [1635866189.704164][6110:6115] CHIP:DMG: }
-          [1635866189.704313][6110:6115] CHIP:ZCL: WriteResponse:
-          [1635866189.704383][6110:6115] CHIP:ZCL: status: Success (0x0000)
-          [1635866189.704435][6110:6115] CHIP:TOO: Default Success Response
-          ./chip-tool basic read user-label 2 0 [1635866228.009768][6121:6126]
-          CHIP:DMG: ReportData = [1635866228.009831][6121:6126] CHIP:DMG: {
-          [1635866228.009866][6121:6126] CHIP:DMG: AttributeDataList =
-          [1635866228.009906][6121:6126] CHIP:DMG: [
-          [1635866228.009939][6121:6126] CHIP:DMG: AttributeDataElement =
-          [1635866228.009999][6121:6126] CHIP:DMG: {
-          [1635866228.010048][6121:6126] CHIP:DMG: AttributePath =
-          [1635866228.010124][6121:6126] CHIP:DMG: {
-          [1635866228.010201][6121:6126] CHIP:DMG: NodeId = 0x2,
-          [1635866228.010293][6121:6126] CHIP:DMG: EndpointId = 0x0,
-          [1635866228.010372][6121:6126] CHIP:DMG: ClusterId = 0x28,
-          [1635866228.010437][6121:6126] CHIP:DMG: FieldTag = 0x0000_0005,
-          [1635866228.010501][6121:6126] CHIP:DMG: }
-          [1635866228.010572][6121:6126] CHIP:DMG:
-          [1635866228.010618][6121:6126] CHIP:DMG: Data = 'te5new',
-          [1635866228.010690][6121:6126] CHIP:DMG: DataElementVersion = 0x0,
-          [1635866228.010752][6121:6126] CHIP:DMG: },
-          [1635866228.010818][6121:6126] CHIP:DMG:
-          [1635866228.010857][6121:6126] CHIP:DMG: ],
-          [1635866228.010903][6121:6126] CHIP:DMG:
-          [1635866228.010937][6121:6126] CHIP:DMG: }
-          [1635866228.011043][6121:6126] CHIP:ZCL: ReadAttributesResponse:
-          [1635866228.011077][6121:6126] CHIP:ZCL: ClusterId: 0x0000_0028
-          [1635866228.011113][6121:6126] CHIP:ZCL: attributeId: 0x0000_0005
-          [1635866228.011146][6121:6126] CHIP:ZCL: status: Success (0x0000)
-          [1635866228.011178][6121:6126] CHIP:ZCL: attribute TLV Type: 0x0c
-          [1635866228.011216][6121:6126] CHIP:TOO: CharString attribute
-          Response: te5new"
-      disabled: true
+          "TH_CR1 reads the Basic Information Clusters NodeLabel mandatory
+          attribute of DUT_CE"
+      command: "readAttribute"
+      cluster: "Basic"
+      attribute: "NodeLabel"
+      response:
+          constraints:
+              type: string
+              maxLength: 32
+              value: "chiptest"
+
+    - label:
+          "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
+          attribute of DUT_CE"
+      identity: "beta"
+      command: "writeAttribute"
+      cluster: "Basic"
+      attribute: "NodeLabel"
+      arguments:
+          value: "chiptest"
+
+    - label:
+          "TH_CR1 reads the Basic Information Clusters NodeLabel mandatory
+          attribute of DUT_CE"
+      identity: "beta"
+      command: "readAttribute"
+      cluster: "Basic"
+      attribute: "NodeLabel"
+      response:
+          constraints:
+              type: string
+              maxLength: 32
+              value: "chiptest"

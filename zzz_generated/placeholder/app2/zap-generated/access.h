@@ -29,16 +29,28 @@
 
 // Parallel array data (*cluster*, attribute, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
+    /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
+    /* Cluster: Basic, Attribute: Location, Privilege: view */ \
+    /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
+    /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
+    /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
+    /* Cluster: Basic, Attribute: Location, Privilege: view */ \
+    /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
+    /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
+    /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
+    /* Cluster: Basic, Attribute: Location, Privilege: view */ \
+    /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
+    /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
 
@@ -46,16 +58,28 @@
 
 // Parallel array data (*cluster*, attribute, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
+    40, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
+    40, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
+    40, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     258, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
+    5, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
+    6, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
+    16, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     23, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
+    kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
 
@@ -63,6 +87,9 @@
 
 // Parallel array data (*cluster*, command, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER { \
+    48, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
+    48, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
+    48, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
@@ -76,6 +103,9 @@
 
 // Parallel array data (cluster, *command*, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__COMMAND { \
+    0, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
+    2, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
+    4, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
     0, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
     2, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
     4, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
@@ -89,6 +119,9 @@
 
 // Parallel array data (cluster, command, *privilege*) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__PRIVILEGE { \
+    kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \

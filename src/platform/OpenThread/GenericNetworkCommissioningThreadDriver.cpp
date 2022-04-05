@@ -70,83 +70,62 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
     return CHIP_NO_ERROR;
 }
 
-Status GenericThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset)
+Status GenericThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan & outDebugText,
+                                               uint8_t & outNetworkIndex)
 {
-    uint8_t extpanid[kSizeExtendedPanId];
-    uint8_t newExtpanid[kSizeExtendedPanId];
+    ByteSpan newExtpanid;
     Thread::OperationalDataset newDataset;
 
-    newDataset.Init(operationalDataset);
-    VerifyOrReturnError(newDataset.IsCommissioned(), Status::kOutOfRange);
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
 
-    newDataset.GetExtendedPanId(newExtpanid);
-    mStagingNetwork.GetExtendedPanId(extpanid);
+    VerifyOrReturnError(newDataset.Init(operationalDataset) == CHIP_NO_ERROR && newDataset.IsCommissioned(), Status::kOutOfRange);
+    newDataset.GetExtendedPanIdAsByteSpan(newExtpanid);
 
     // We only support one active operational dataset. Add/Update based on either:
     // Staging network not commissioned yet (active) or we are updating the dataset with same Extended Pan ID.
-    VerifyOrReturnError(!mStagingNetwork.IsCommissioned() || memcmp(extpanid, newExtpanid, kSizeExtendedPanId) == 0,
+    VerifyOrReturnError(!mStagingNetwork.IsCommissioned() || MatchesNetworkId(mStagingNetwork, newExtpanid) == Status::kSuccess,
                         Status::kBoundsExceeded);
 
     mStagingNetwork = newDataset;
     return Status::kSuccess;
 }
 
-Status GenericThreadDriver::RemoveNetwork(ByteSpan networkId)
+Status GenericThreadDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
-    uint8_t extpanid[kSizeExtendedPanId];
-    if (!mStagingNetwork.IsCommissioned())
-    {
-        return Status::kNetworkNotFound;
-    }
-    else if (mStagingNetwork.GetExtendedPanId(extpanid) != CHIP_NO_ERROR)
-    {
-        return Status::kUnknownError;
-    }
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
 
-    VerifyOrReturnError(networkId.size() == kSizeExtendedPanId && memcmp(networkId.data(), extpanid, kSizeExtendedPanId) == 0,
-                        Status::kNetworkNotFound);
+    NetworkCommissioning::Status status = MatchesNetworkId(mStagingNetwork, networkId);
+
+    VerifyOrReturnError(status == Status::kSuccess, status);
     mStagingNetwork.Clear();
+
     return Status::kSuccess;
 }
 
-Status GenericThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index)
+Status GenericThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
-    uint8_t extpanid[kSizeExtendedPanId];
-    if (!mStagingNetwork.IsCommissioned())
-    {
-        return Status::kNetworkNotFound;
-    }
-    else if (mStagingNetwork.GetExtendedPanId(extpanid) != CHIP_NO_ERROR)
-    {
-        return Status::kUnknownError;
-    }
+    outDebugText.reduce_size(0);
 
-    VerifyOrReturnError(networkId.size() == kSizeExtendedPanId && memcmp(networkId.data(), extpanid, kSizeExtendedPanId) == 0,
-                        Status::kNetworkNotFound);
+    NetworkCommissioning::Status status = MatchesNetworkId(mStagingNetwork, networkId);
+
+    VerifyOrReturnError(status == Status::kSuccess, status);
+    VerifyOrReturnError(index == 0, Status::kOutOfRange);
 
     return Status::kSuccess;
 }
 
 void GenericThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
 {
-    NetworkCommissioning::Status status = Status::kSuccess;
-    uint8_t extpanid[kSizeExtendedPanId];
-    if (!mStagingNetwork.IsCommissioned())
+    NetworkCommissioning::Status status = MatchesNetworkId(mStagingNetwork, networkId);
+
+    if (status == Status::kSuccess &&
+        DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork.AsByteSpan(), callback) != CHIP_NO_ERROR)
     {
-        ExitNow(status = Status::kNetworkNotFound);
-    }
-    else if (mStagingNetwork.GetExtendedPanId(extpanid) != CHIP_NO_ERROR)
-    {
-        ExitNow(status = Status::kUnknownError);
+        status = Status::kUnknownError;
     }
 
-    VerifyOrExit((networkId.size() == kSizeExtendedPanId && memcmp(networkId.data(), extpanid, kSizeExtendedPanId) == 0),
-                 status = Status::kNetworkNotFound);
-
-    VerifyOrExit(DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork.AsByteSpan(), callback) == CHIP_NO_ERROR,
-                 status = Status::kUnknownError);
-
-exit:
     if (status != Status::kSuccess)
     {
         callback->OnResult(status, CharSpan(), 0);
@@ -166,6 +145,23 @@ void GenericThreadDriver::ScanNetworks(ThreadDriver::ScanCallback * callback)
         // OpenThread's "scan" will always success once started, so we can set the value of scan result here.
         mScanStatus.SetValue(Status::kSuccess);
     }
+}
+
+Status GenericThreadDriver::MatchesNetworkId(const Thread::OperationalDataset & dataset, const ByteSpan & networkId) const
+{
+    ByteSpan extpanid;
+
+    if (!dataset.IsCommissioned())
+    {
+        return Status::kNetworkIDNotFound;
+    }
+
+    if (dataset.GetExtendedPanIdAsByteSpan(extpanid) != CHIP_NO_ERROR)
+    {
+        return Status::kUnknownError;
+    }
+
+    return networkId.data_equal(extpanid) ? Status::kSuccess : Status::kNetworkIDNotFound;
 }
 
 size_t GenericThreadDriver::ThreadNetworkIterator::Count()

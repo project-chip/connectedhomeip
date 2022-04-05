@@ -50,7 +50,6 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
-    bool failSafeArmed;
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<EFR32Config>::Init();
@@ -64,12 +63,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     rebootCause = RMU_ResetCauseGet();
     RMU_ResetCauseClear();
 
-    // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
-    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
-    {
-        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
-        InitiateFactoryReset();
-    }
     err = CHIP_NO_ERROR;
 
 exit:
@@ -291,9 +284,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-#if CHIP_KVS_AVAILABLE
     PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
-#endif // CHIP_KVS_AVAILABLE
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
     ChipLogProgress(DeviceLayer, "Clearing WiFi provision");

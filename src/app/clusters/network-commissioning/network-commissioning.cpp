@@ -286,28 +286,67 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
     }
 }
 
+namespace {
+
+void FillDebugTextAndNetworkIndex(Commands::NetworkConfigResponse::Type & response, MutableCharSpan debugText, uint8_t networkIndex)
+{
+    if (debugText.size() > 0)
+    {
+        response.debugText.SetValue(CharSpan(debugText.data(), debugText.size()));
+    }
+    if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
+    {
+        response.networkIndex.SetValue(networkIndex);
+    }
+}
+
+} // namespace
+
 void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleAddOrUpdateWiFiNetwork", "NetworkCommissioning");
     Commands::NetworkConfigResponse::Type response;
-    response.networkingStatus = ToClusterObjectEnum(mpDriver.Get<WiFiDriver *>()->AddOrUpdateNetwork(req.ssid, req.credentials));
-    ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
+    MutableCharSpan debugText;
+#if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
+    char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE];
+    debugText = MutableCharSpan(debugTextBuffer);
+#endif
+    uint8_t outNetworkIndex   = 0;
+    response.networkingStatus = ToClusterObjectEnum(
+        mpDriver.Get<WiFiDriver *>()->AddOrUpdateNetwork(req.ssid, req.credentials, debugText, outNetworkIndex));
+    FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
 void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Commands::AddOrUpdateThreadNetwork::DecodableType & req)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleAddOrUpdateThreadNetwork", "NetworkCommissioning");
     Commands::NetworkConfigResponse::Type response;
-    response.networkingStatus = ToClusterObjectEnum(mpDriver.Get<ThreadDriver *>()->AddOrUpdateNetwork(req.operationalDataset));
-    ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
+    MutableCharSpan debugText;
+#if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
+    char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE];
+    debugText = MutableCharSpan(debugTextBuffer);
+#endif
+    uint8_t outNetworkIndex = 0;
+    response.networkingStatus =
+        ToClusterObjectEnum(mpDriver.Get<ThreadDriver *>()->AddOrUpdateNetwork(req.operationalDataset, debugText, outNetworkIndex));
+    FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
 void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveNetwork::DecodableType & req)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleRemoveNetwork", "NetworkCommissioning");
     Commands::NetworkConfigResponse::Type response;
-    response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->RemoveNetwork(req.networkID));
-    ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
+    MutableCharSpan debugText;
+#if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
+    char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE];
+    debugText = MutableCharSpan(debugTextBuffer);
+#endif
+    uint8_t outNetworkIndex   = 0;
+    response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->RemoveNetwork(req.networkID, debugText, outNetworkIndex));
+    FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
 void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::ConnectNetwork::DecodableType & req)
@@ -330,8 +369,14 @@ void Instance::HandleReorderNetwork(HandlerContext & ctx, const Commands::Reorde
 {
     MATTER_TRACE_EVENT_SCOPE("HandleReorderNetwork", "NetworkCommissioning");
     Commands::NetworkConfigResponse::Type response;
-    response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->ReorderNetwork(req.networkID, req.networkIndex));
-    ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
+    MutableCharSpan debugText;
+#if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
+    char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE];
+    debugText = MutableCharSpan(debugTextBuffer);
+#endif
+    response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->ReorderNetwork(req.networkID, req.networkIndex, debugText));
+    FillDebugTextAndNetworkIndex(response, debugText, req.networkIndex);
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
 void Instance::OnResult(Status commissioningError, CharSpan errorText, int32_t interfaceStatus)
@@ -349,7 +394,7 @@ void Instance::OnResult(Status commissioningError, CharSpan errorText, int32_t i
     response.networkingStatus = ToClusterObjectEnum(commissioningError);
     response.debugText        = errorText;
     response.errorValue       = interfaceStatus;
-    commandHandle->AddResponseData(mPath, response);
+    commandHandle->AddResponse(mPath, response);
 
     mLastNetworkIDLen = mConnectingNetworkIDLen;
     memcpy(mLastNetworkID, mConnectingNetworkID, mLastNetworkIDLen);
@@ -366,8 +411,8 @@ void Instance::OnResult(Status commissioningError, CharSpan errorText, int32_t i
 
     if (commissioningError == Status::kSuccess)
     {
-        // TODO: Pass the actual network id to device control server.
-        DeviceLayer::DeviceControlServer::DeviceControlSvr().ConnectNetworkForOperational(ByteSpan());
+        DeviceLayer::DeviceControlServer::DeviceControlSvr().ConnectNetworkForOperational(
+            ByteSpan(mLastNetworkID, mLastNetworkIDLen));
     }
 }
 

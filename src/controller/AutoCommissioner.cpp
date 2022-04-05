@@ -121,6 +121,13 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kSecurePairing:
         return CommissioningStage::kReadCommissioningInfo;
     case CommissioningStage::kReadCommissioningInfo:
+        if (mDeviceCommissioningInfo.general.breadcrumb > 0)
+        {
+            // If the breadcrumb is 0, the failsafe was disarmed.
+            // We failed on network setup or later, the node failsafe has not been re-armed and the breadcrumb has not been reset.
+            // Per the spec, we restart from after adding the NOC.
+            return GetNextCommissioningStage(CommissioningStage::kSendNOC, lastErr);
+        }
         return CommissioningStage::kArmFailsafe;
     case CommissioningStage::kArmFailsafe:
         return CommissioningStage::kConfigRegulatory;
@@ -135,6 +142,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kAttestationVerification:
         return CommissioningStage::kSendOpCertSigningRequest;
     case CommissioningStage::kSendOpCertSigningRequest:
+        return CommissioningStage::kValidateCSR;
+    case CommissioningStage::kValidateCSR:
         return CommissioningStage::kGenerateNOCChain;
     case CommissioningStage::kGenerateNOCChain:
         return CommissioningStage::kSendTrustedRootCert;
@@ -312,25 +321,33 @@ CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, Byte
 
 CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
 {
+    CompletionStatus completionStatus;
+    completionStatus.err = err;
+    ChipLogProgress(Controller, "Finished commissioning step '%s' with error '%s'", StageToString(report.stageCompleted),
+                    err.AsString());
     if (err != CHIP_NO_ERROR)
     {
+        completionStatus.failedStage = MakeOptional(report.stageCompleted);
         ChipLogError(Controller, "Failed to perform commissioning step %d", static_cast<int>(report.stageCompleted));
-        if ((report.stageCompleted == CommissioningStage::kAttestationVerification) &&
-            ((report.Get<AdditionalErrorInfo>().attestationResult ==
-              Credentials::AttestationVerificationResult::kDacProductIdMismatch) ||
-             (report.Get<AdditionalErrorInfo>().attestationResult ==
-              Credentials::AttestationVerificationResult::kDacVendorIdMismatch)))
+        if (report.stageCompleted == CommissioningStage::kAttestationVerification)
         {
-            ChipLogError(Controller,
-                         "Failed device attestation. Device vendor and/or product ID do not match the IDs expected. "
-                         "Verify DAC certificate chain and certification declaration to ensure spec rules followed.");
+            if (report.Is<AdditionalErrorInfo>())
+            {
+                completionStatus.attestationResult = MakeOptional(report.Get<AdditionalErrorInfo>().attestationResult);
+                if ((report.Get<AdditionalErrorInfo>().attestationResult ==
+                     Credentials::AttestationVerificationResult::kDacProductIdMismatch) ||
+                    (report.Get<AdditionalErrorInfo>().attestationResult ==
+                     Credentials::AttestationVerificationResult::kDacVendorIdMismatch))
+                {
+                    ChipLogError(Controller,
+                                 "Failed device attestation. Device vendor and/or product ID do not match the IDs expected. "
+                                 "Verify DAC certificate chain and certification declaration to ensure spec rules followed.");
+                }
+            }
         }
     }
     else
     {
-        ChipLogProgress(Controller, "Finished commissioning step '%s' with error '%s'", StageToString(report.stageCompleted),
-                        err.AsString());
-
         switch (report.stageCompleted)
         {
         case CommissioningStage::kReadCommissioningInfo:
@@ -383,7 +400,6 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             ReleaseDAC();
             mCommissioneeDeviceProxy = nullptr;
             mOperationalDeviceProxy  = nullptr;
-            mParams                  = CommissioningParameters();
             mDeviceCommissioningInfo = ReadCommissioningInfo();
             return CHIP_NO_ERROR;
         default:
@@ -410,7 +426,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    mParams.SetCompletionStatus(err);
+    mParams.SetCompletionStatus(completionStatus);
     mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, GetEndpoint(nextStage), GetCommandTimeout(nextStage));
     return CHIP_NO_ERROR;
 }

@@ -79,6 +79,8 @@
 /** @name Attribute Storage */
 // @{
 
+static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
+
 /**
  * @brief locate attribute metadata
  *

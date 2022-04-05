@@ -224,7 +224,17 @@ public:
         return AddArgument(name, min, max, reinterpret_cast<double *>(value), flags | Argument::kNullable);
     }
 
+    void ResetArguments();
+
     virtual CHIP_ERROR Run() = 0;
+
+    bool IsInteractive() { return mIsInteractive; }
+
+    CHIP_ERROR RunAsInteractive()
+    {
+        mIsInteractive = true;
+        return Run();
+    }
 
 private:
     bool InitArgument(size_t argIndex, char * argValue);
@@ -237,6 +247,7 @@ private:
      */
     size_t AddArgumentToList(Argument && argument);
 
-    const char * mName = nullptr;
+    const char * mName  = nullptr;
+    bool mIsInteractive = false;
     std::vector<Argument> mArgs;
 };

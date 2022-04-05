@@ -74,7 +74,7 @@ class K32WBuilder(GnBuilder):
             args.append('chip_with_low_power=1')
         else:
             args.append('chip_with_low_power=0')
-            
+
         if self.tokenizer:
             args.append('chip_pw_tokenizer_logging=true')
 
