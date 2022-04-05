@@ -222,8 +222,8 @@ def HostTargets():
     targets = [target_native]
 
     # x64 linux  supports cross compile
-    if (HostBoard.NATIVE.PlatformName() == 'linux') and (
-            HostBoard.NATIVE.BoardName() != HostBoard.ARM64.BoardName()):
+    cross_compile = (HostBoard.NATIVE.PlatformName() == 'linux') and (HostBoard.NATIVE.BoardName() != HostBoard.ARM64.BoardName())
+    if cross_compile:
         targets.append(target.Extend('arm64', board=HostBoard.ARM64))
 
     app_targets = []
@@ -276,7 +276,12 @@ def HostTargets():
             builder.targets.append(target)
 
     for target in builder.AllVariants():
-        yield target
+        if cross_compile and '-no-interactive' not in target.name:
+            # Interactive builds will not compile by default on arm cross compiles
+            # because libreadline is not part of the default sysroot
+            yield target.GlobBlacklist('Arm crosscompile does not support libreadline-dev')
+        else:
+            yield target
 
     # Without extra build variants
     yield target_native.Extend('chip-cert', app=HostApp.CERT_TOOL)
