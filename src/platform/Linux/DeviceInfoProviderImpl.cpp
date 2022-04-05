@@ -194,8 +194,8 @@ bool DeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
     VerifyOrReturnError(reader.VerifyEndOfContainer() == CHIP_NO_ERROR, false);
     VerifyOrReturnError(reader.ExitContainer(containerType) == CHIP_NO_ERROR, false);
 
-    Platform::CopyString(mUserLabelNameBuf, kMaxLabelNameLength + 1, label);
-    Platform::CopyString(mUserLabelValueBuf, kMaxLabelValueLength + 1, value);
+    Platform::CopyString(mUserLabelNameBuf, label);
+    Platform::CopyString(mUserLabelValueBuf, value);
 
     output.label = CharSpan::fromCharString(mUserLabelNameBuf);
     output.value = CharSpan::fromCharString(mUserLabelValueBuf);
