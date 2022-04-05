@@ -1092,6 +1092,48 @@ server cluster WiFiNetworkDiagnostics = 54 {
 }
 
 server cluster WindowCovering = 258 {
+  enum EndProductType : ENUM8 {
+    kRollerShade = 0;
+    kRomanShade = 1;
+    kBalloonShade = 2;
+    kWovenWood = 3;
+    kPleatedShade = 4;
+    kCellularShade = 5;
+    kLayeredShade = 6;
+    kLayeredShade2D = 7;
+    kSheerShade = 8;
+    kTiltOnlyInteriorBlind = 9;
+    kInteriorBlind = 10;
+    kVerticalBlindStripCurtain = 11;
+    kInteriorVenetianBlind = 12;
+    kExteriorVenetianBlind = 13;
+    kLateralLeftCurtain = 14;
+    kLateralRightCurtain = 15;
+    kCentralCurtain = 16;
+    kRollerShutter = 17;
+    kExteriorVerticalScreen = 18;
+    kAwningTerracePatio = 19;
+    kAwningVerticalScreen = 20;
+    kTiltOnlyPergola = 21;
+    kSwingingShutter = 22;
+    kSlidingShutter = 23;
+    kUnknown = 255;
+  }
+
+  enum Type : ENUM8 {
+    kRollerShade = 0;
+    kRollerShade2Motor = 1;
+    kRollerShadeExterior = 2;
+    kRollerShadeExterior2Motor = 3;
+    kDrapery = 4;
+    kAwning = 5;
+    kShutter = 6;
+    kTiltBlindTiltOnly = 7;
+    kTiltBlindLiftAndTilt = 8;
+    kProjectorScreen = 9;
+    kUnknown = 255;
+  }
+
   bitmap WcConfigStatus : BITMAP8 {
     kOperational = 0x1;
     kOnline = 0x2;
@@ -1114,7 +1156,7 @@ server cluster WindowCovering = 258 {
     kMotorDirectionReversed = 0x1;
     kCalibrationMode = 0x2;
     kMaintenanceMode = 0x4;
-    kLEDFeedback = 0x8;
+    kLedFeedback = 0x8;
   }
 
   bitmap WcOperationalStatus : BITMAP8 {
@@ -1138,7 +1180,7 @@ server cluster WindowCovering = 258 {
     kProtection = 0x800;
   }
 
-  readonly attribute enum8 type = 0;
+  readonly attribute Type type = 0;
   readonly attribute nullable int16u currentPositionLift = 3;
   readonly attribute nullable int16u currentPositionTilt = 4;
   readonly attribute bitmap8 configStatus = 7;
@@ -1147,7 +1189,7 @@ server cluster WindowCovering = 258 {
   readonly attribute bitmap8 operationalStatus = 10;
   readonly attribute nullable Percent100ths targetPositionLiftPercent100ths = 11;
   readonly attribute nullable Percent100ths targetPositionTiltPercent100ths = 12;
-  readonly attribute enum8 endProductType = 13;
+  readonly attribute EndProductType endProductType = 13;
   readonly attribute nullable Percent100ths currentPositionLiftPercent100ths = 14;
   readonly attribute nullable Percent100ths currentPositionTiltPercent100ths = 15;
   readonly attribute int16u installedOpenLimitLift = 16;

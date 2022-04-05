@@ -1377,6 +1377,52 @@ enum class DoorLockFeature : uint32_t
 
 namespace WindowCovering {
 
+// Enum for EndProductType
+enum class EndProductType : uint8_t
+{
+    kRollerShade               = 0x00,
+    kRomanShade                = 0x01,
+    kBalloonShade              = 0x02,
+    kWovenWood                 = 0x03,
+    kPleatedShade              = 0x04,
+    kCellularShade             = 0x05,
+    kLayeredShade              = 0x06,
+    kLayeredShade2D            = 0x07,
+    kSheerShade                = 0x08,
+    kTiltOnlyInteriorBlind     = 0x09,
+    kInteriorBlind             = 0x0A,
+    kVerticalBlindStripCurtain = 0x0B,
+    kInteriorVenetianBlind     = 0x0C,
+    kExteriorVenetianBlind     = 0x0D,
+    kLateralLeftCurtain        = 0x0E,
+    kLateralRightCurtain       = 0x0F,
+    kCentralCurtain            = 0x10,
+    kRollerShutter             = 0x11,
+    kExteriorVerticalScreen    = 0x12,
+    kAwningTerracePatio        = 0x13,
+    kAwningVerticalScreen      = 0x14,
+    kTiltOnlyPergola           = 0x15,
+    kSwingingShutter           = 0x16,
+    kSlidingShutter            = 0x17,
+    kUnknown                   = 0xFF,
+};
+
+// Enum for Type
+enum class Type : uint8_t
+{
+    kRollerShade               = 0x00,
+    kRollerShade2Motor         = 0x01,
+    kRollerShadeExterior       = 0x02,
+    kRollerShadeExterior2Motor = 0x03,
+    kDrapery                   = 0x04,
+    kAwning                    = 0x05,
+    kShutter                   = 0x06,
+    kTiltBlindTiltOnly         = 0x07,
+    kTiltBlindLiftAndTilt      = 0x08,
+    kProjectorScreen           = 0x09,
+    kUnknown                   = 0xFF,
+};
+
 // Bitmap for WcConfigStatus
 enum class WcConfigStatus : uint8_t
 {
@@ -1405,7 +1451,7 @@ enum class WcMode : uint8_t
     kMotorDirectionReversed = 0x1,
     kCalibrationMode        = 0x2,
     kMaintenanceMode        = 0x4,
-    kLEDFeedback            = 0x8,
+    kLedFeedback            = 0x8,
 };
 
 // Bitmap for WcOperationalStatus

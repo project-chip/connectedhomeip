@@ -790,8 +790,6 @@ function isWeaklyTypedEnum(label)
     "StatusCode",
     "StepMode",
     "TemperatureDisplayMode",
-    "WcEndProductType",
-    "WcType",
     "WiFiVersionType",
   ].includes(label);
 }

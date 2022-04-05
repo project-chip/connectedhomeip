@@ -20367,9 +20367,9 @@ namespace Attributes {
 namespace Type {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::WindowCovering::Type;
+    using DecodableType    = chip::app::Clusters::WindowCovering::Type;
+    using DecodableArgType = chip::app::Clusters::WindowCovering::Type;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Type::Id; }
@@ -20523,9 +20523,9 @@ struct TypeInfo
 namespace EndProductType {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::WindowCovering::EndProductType;
+    using DecodableType    = chip::app::Clusters::WindowCovering::EndProductType;
+    using DecodableArgType = chip::app::Clusters::WindowCovering::EndProductType;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EndProductType::Id; }
@@ -20697,7 +20697,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Type::TypeInfo::DecodableType type                                       = static_cast<uint8_t>(0);
+        Attributes::Type::TypeInfo::DecodableType type = static_cast<chip::app::Clusters::WindowCovering::Type>(0);
         Attributes::PhysicalClosedLimitLift::TypeInfo::DecodableType physicalClosedLimitLift = static_cast<uint16_t>(0);
         Attributes::PhysicalClosedLimitTilt::TypeInfo::DecodableType physicalClosedLimitTilt = static_cast<uint16_t>(0);
         Attributes::CurrentPositionLift::TypeInfo::DecodableType currentPositionLift;
@@ -20710,7 +20710,8 @@ struct TypeInfo
         Attributes::OperationalStatus::TypeInfo::DecodableType operationalStatus = static_cast<uint8_t>(0);
         Attributes::TargetPositionLiftPercent100ths::TypeInfo::DecodableType targetPositionLiftPercent100ths;
         Attributes::TargetPositionTiltPercent100ths::TypeInfo::DecodableType targetPositionTiltPercent100ths;
-        Attributes::EndProductType::TypeInfo::DecodableType endProductType = static_cast<uint8_t>(0);
+        Attributes::EndProductType::TypeInfo::DecodableType endProductType =
+            static_cast<chip::app::Clusters::WindowCovering::EndProductType>(0);
         Attributes::CurrentPositionLiftPercent100ths::TypeInfo::DecodableType currentPositionLiftPercent100ths;
         Attributes::CurrentPositionTiltPercent100ths::TypeInfo::DecodableType currentPositionTiltPercent100ths;
         Attributes::InstalledOpenLimitLift::TypeInfo::DecodableType installedOpenLimitLift     = static_cast<uint16_t>(0);
