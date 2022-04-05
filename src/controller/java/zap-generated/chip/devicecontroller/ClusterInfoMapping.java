@@ -9120,6 +9120,25 @@ public class ClusterInfoMapping {
             doorLockclearCredentialCommandParams);
     doorLockClusterInteractionInfoMap.put(
         "clearCredential", doorLockclearCredentialInteractionInfo);
+    Map<String, CommandParameterInfo> doorLockclearHolidayScheduleCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLockclearHolidayScheduleholidayIndexCommandParameterInfo =
+        new CommandParameterInfo("holidayIndex", Integer.class);
+    doorLockclearHolidayScheduleCommandParams.put(
+        "holidayIndex", doorLockclearHolidayScheduleholidayIndexCommandParameterInfo);
+
+    InteractionInfo doorLockclearHolidayScheduleInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .clearHolidaySchedule(
+                      (DefaultClusterCallback) callback,
+                      (Integer) commandArguments.get("holidayIndex"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLockclearHolidayScheduleCommandParams);
+    doorLockClusterInteractionInfoMap.put(
+        "clearHolidaySchedule", doorLockclearHolidayScheduleInteractionInfo);
     Map<String, CommandParameterInfo> doorLockclearUserCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockclearUseruserIndexCommandParameterInfo =
@@ -9202,6 +9221,25 @@ public class ClusterInfoMapping {
             doorLockgetCredentialStatusCommandParams);
     doorLockClusterInteractionInfoMap.put(
         "getCredentialStatus", doorLockgetCredentialStatusInteractionInfo);
+    Map<String, CommandParameterInfo> doorLockgetHolidayScheduleCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLockgetHolidayScheduleholidayIndexCommandParameterInfo =
+        new CommandParameterInfo("holidayIndex", Integer.class);
+    doorLockgetHolidayScheduleCommandParams.put(
+        "holidayIndex", doorLockgetHolidayScheduleholidayIndexCommandParameterInfo);
+
+    InteractionInfo doorLockgetHolidayScheduleInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .getHolidaySchedule(
+                      (ChipClusters.DoorLockCluster.GetHolidayScheduleResponseCallback) callback,
+                      (Integer) commandArguments.get("holidayIndex"));
+            },
+            () -> new DelegatedGetHolidayScheduleResponseCallback(),
+            doorLockgetHolidayScheduleCommandParams);
+    doorLockClusterInteractionInfoMap.put(
+        "getHolidaySchedule", doorLockgetHolidayScheduleInteractionInfo);
     Map<String, CommandParameterInfo> doorLockgetUserCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockgetUseruserIndexCommandParameterInfo =
@@ -9331,6 +9369,43 @@ public class ClusterInfoMapping {
             () -> new DelegatedSetCredentialResponseCallback(),
             doorLocksetCredentialCommandParams);
     doorLockClusterInteractionInfoMap.put("setCredential", doorLocksetCredentialInteractionInfo);
+    Map<String, CommandParameterInfo> doorLocksetHolidayScheduleCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLocksetHolidayScheduleholidayIndexCommandParameterInfo =
+        new CommandParameterInfo("holidayIndex", Integer.class);
+    doorLocksetHolidayScheduleCommandParams.put(
+        "holidayIndex", doorLocksetHolidayScheduleholidayIndexCommandParameterInfo);
+
+    CommandParameterInfo doorLocksetHolidaySchedulelocalStartTimeCommandParameterInfo =
+        new CommandParameterInfo("localStartTime", Long.class);
+    doorLocksetHolidayScheduleCommandParams.put(
+        "localStartTime", doorLocksetHolidaySchedulelocalStartTimeCommandParameterInfo);
+
+    CommandParameterInfo doorLocksetHolidaySchedulelocalEndTimeCommandParameterInfo =
+        new CommandParameterInfo("localEndTime", Long.class);
+    doorLocksetHolidayScheduleCommandParams.put(
+        "localEndTime", doorLocksetHolidaySchedulelocalEndTimeCommandParameterInfo);
+
+    CommandParameterInfo doorLocksetHolidayScheduleoperatingModeCommandParameterInfo =
+        new CommandParameterInfo("operatingMode", Integer.class);
+    doorLocksetHolidayScheduleCommandParams.put(
+        "operatingMode", doorLocksetHolidayScheduleoperatingModeCommandParameterInfo);
+
+    InteractionInfo doorLocksetHolidayScheduleInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .setHolidaySchedule(
+                      (DefaultClusterCallback) callback,
+                      (Integer) commandArguments.get("holidayIndex"),
+                      (Long) commandArguments.get("localStartTime"),
+                      (Long) commandArguments.get("localEndTime"),
+                      (Integer) commandArguments.get("operatingMode"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLocksetHolidayScheduleCommandParams);
+    doorLockClusterInteractionInfoMap.put(
+        "setHolidaySchedule", doorLocksetHolidayScheduleInteractionInfo);
     Map<String, CommandParameterInfo> doorLocksetUserCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLocksetUseroperationTypeCommandParameterInfo =
