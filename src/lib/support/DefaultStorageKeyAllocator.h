@@ -52,7 +52,8 @@ public:
     // FailSafeContext
     const char * FailSafeContextKey() { return Format("g/fsc"); }
 
-    // Access Control List
+    // Access Control
+    const char * AccessControlExtensionEntry(FabricIndex fabric) { return Format("f/%x/ac/1", fabric); }
 
     // TODO: We should probably store the fabric-specific parts of the ACL list
     // under keys starting with "f/%x/".
