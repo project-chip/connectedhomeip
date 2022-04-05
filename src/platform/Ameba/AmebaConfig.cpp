@@ -45,6 +45,18 @@ namespace Internal {
 const char AmebaConfig::kConfigNamespace_ChipFactory[]  = "chip-factory";
 const char AmebaConfig::kConfigNamespace_ChipConfig[]   = "chip-config";
 const char AmebaConfig::kConfigNamespace_ChipCounters[] = "chip-counters";
+const char AmebaConfig::kConfigNamespace_ChipFabric1[]  = "chip-fabric-1";
+const char AmebaConfig::kConfigNamespace_ChipFabric2[]  = "chip-fabric-2";
+const char AmebaConfig::kConfigNamespace_ChipFabric3[]  = "chip-fabric-3";
+const char AmebaConfig::kConfigNamespace_ChipFabric4[]  = "chip-fabric-4";
+const char AmebaConfig::kConfigNamespace_ChipFabric5[]  = "chip-fabric-5";
+const char AmebaConfig::kConfigNamespace_ChipACL[]  = "chip-acl";
+const char AmebaConfig::kConfigNamespace_ChipGroupMsgCounters[]  = "chip-groupmsgcounters";
+const char AmebaConfig::kConfigNamespace_ChipAttributes[]  = "chip-attributes";
+const char AmebaConfig::kConfigNamespace_ChipBindingTable[]  = "chip-bindingtable";
+const char AmebaConfig::kConfigNamespace_ChipOTA[]  = "chip-ota";
+const char AmebaConfig::kConfigNamespace_ChipDNS[]  = "chip-dns";
+const char AmebaConfig::kConfigNamespace_ChipOthers[]  = "chip-others";
 
 // Keys stored in the chip-factory namespace
 const AmebaConfig::Key AmebaConfig::kConfigKey_SerialNum             = { kConfigNamespace_ChipFactory, "serial-num" };
@@ -266,6 +278,19 @@ CHIP_ERROR AmebaConfig::EnsureNamespace(const char * ns)
     if (success != 0)
     {
         ChipLogError(DeviceLayer, "dct_register_module failed\n");
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AmebaConfig::EnsureNamespace2(const char * ns)
+{
+    int32_t success = -1;
+
+    success = registerPref2(ns);
+    if (success != 0)
+    {
+        ChipLogError(DeviceLayer, "dct_register_module2 failed\n");
     }
 
     return CHIP_NO_ERROR;
