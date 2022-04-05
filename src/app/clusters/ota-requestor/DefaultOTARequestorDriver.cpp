@@ -119,43 +119,43 @@ bool DefaultOTARequestorDriver::ProviderLocationsEqual(const ProviderLocationTyp
     return false;
 }
 
-void DefaultOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR error) 
+void DefaultOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR error)
 {
-    if( error == CHIP_NO_ERROR )
+    if (error == CHIP_NO_ERROR)
     {
         return;
     }
 
-    switch(state)
+    switch (state)
     {
-        case UpdateFailureState::kUnknown:
-            // Retry with next provider in the list
-            ScheduleRetry(false);
-            break;
-        case UpdateFailureState::kIdle:
-            // Ignore - We shouldn't be hitting this case.
-            break;
-        case UpdateFailureState::kQuerying:
-            // Retry with same provider
-            ScheduleRetry(true);
-            break;
-        case UpdateFailureState::kDownloading:
-            // Retry with same provider
-            ScheduleRetry(true);
-            break;
-        case UpdateFailureState::kApplying:
-            // Retry with same provider
-            ScheduleRetry(true);
-            break;
-        case UpdateFailureState::kNotifying:
-            // Ignore error and transition to Idle
-            break;
-        case UpdateFailureState::kAwaitingNextAction:
-            // Ignore error and transition to Idle
-            break;
-        case UpdateFailureState::kDelayedOnUserConsent:
-            // Ignore error and transition to Idle
-            break;
+    case UpdateFailureState::kUnknown:
+        // Retry with next provider in the list
+        ScheduleRetry(false);
+        break;
+    case UpdateFailureState::kIdle:
+        // Ignore - We shouldn't be hitting this case.
+        break;
+    case UpdateFailureState::kQuerying:
+        // Retry with same provider
+        ScheduleRetry(true);
+        break;
+    case UpdateFailureState::kDownloading:
+        // Retry with same provider
+        ScheduleRetry(true);
+        break;
+    case UpdateFailureState::kApplying:
+        // Retry with same provider
+        ScheduleRetry(true);
+        break;
+    case UpdateFailureState::kNotifying:
+        // Ignore error and transition to Idle
+        break;
+    case UpdateFailureState::kAwaitingNextAction:
+        // Ignore error and transition to Idle
+        break;
+    case UpdateFailureState::kDelayedOnUserConsent:
+        // Ignore error and transition to Idle
+        break;
     }
 }
 
@@ -227,7 +227,7 @@ CHIP_ERROR DefaultOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason
         if ((GetNextProviderLocation(providerLocation, listExhausted) != true) || (listExhausted == true))
         {
             willTryAnotherQuery = false;
-            status = CHIP_ERROR_MAX_RETRY_EXCEEDED;
+            status              = CHIP_ERROR_MAX_RETRY_EXCEEDED;
         }
         else
         {
@@ -506,23 +506,22 @@ CHIP_ERROR DefaultOTARequestorDriver::ScheduleRetry(bool trySameProvider)
     VerifyOrDie(mRequestor != nullptr);
 
     ProviderLocationType providerLocation;
-    CHIP_ERROR status = CHIP_NO_ERROR;
+    CHIP_ERROR status        = CHIP_NO_ERROR;
     bool willTryAnotherQuery = true;
 
-    if( trySameProvider == false)
+    if (trySameProvider == false)
     {
         bool listExhausted = false;
         if ((GetNextProviderLocation(providerLocation, listExhausted) != true) || (listExhausted == true))
         {
             willTryAnotherQuery = false;
-            status = CHIP_ERROR_MAX_RETRY_EXCEEDED;
+            status              = CHIP_ERROR_MAX_RETRY_EXCEEDED;
         }
         else
         {
             willTryAnotherQuery = true;
             mRequestor->SetCurrentProviderLocation(providerLocation);
         }
-
     }
 
     if (willTryAnotherQuery == true)
