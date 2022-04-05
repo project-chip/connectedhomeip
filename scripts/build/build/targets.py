@@ -504,6 +504,7 @@ def QorvoTargets():
     yield target.Extend('shell', board=QpgBoard.QPG6105, app=QpgApp.SHELL)
     yield target.Extend('persistent-storage', board=QpgBoard.QPG6105, app=QpgApp.PERSISTENT_STORAGE)
 
+
 def TizenTargets():
 
     # Possible build variants.
@@ -519,7 +520,8 @@ def TizenTargets():
 
     for target in builder.AllVariants():
         yield target
-        
+
+
 def Bl602Targets():
     target = Target('bl602', Bl602Builder)
 
