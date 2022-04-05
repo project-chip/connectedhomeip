@@ -42,6 +42,8 @@ typedef void (*CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType)(
     void *, const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetCredentialStatusResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetUserResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType)(
@@ -8226,6 +8228,19 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & data);
+};
+
+class CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType>
+{
+public:
+    CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data);
 };
 
 class CHIPDoorLockClusterGetUserResponseCallbackBridge : public CHIPCallbackBridge<CHIPDoorLockClusterGetUserResponseCallbackType>
