@@ -110,8 +110,7 @@ DataVersion fixedEndpointDataVersions[ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT];
 #if !defined(EMBER_SCRIPTED_TEST)
 #define endpointNumber(x) fixedEndpoints[x]
 #define endpointDeviceTypeList(x)                                                                                                  \
-    Span<const EmberAfDeviceType>(&fixedDeviceTypeList[fixedDeviceTypeListOffsets[x]],                                             \
-                                  fixedDeviceTypeListLengths[fixedDeviceTypeListOffsets[x]])
+    Span<const EmberAfDeviceType>(&fixedDeviceTypeList[fixedDeviceTypeListOffsets[x]], fixedDeviceTypeListLengths[x])
 // Added 'Macro' to silence MISRA warning about conflict with synonymous vars.
 #define endpointTypeMacro(x) (&(generatedEmberAfEndpointTypes[fixedEmberAfEndpointTypes[x]]))
 #endif

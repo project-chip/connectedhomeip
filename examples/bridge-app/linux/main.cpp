@@ -76,7 +76,7 @@ static Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 
 // Device types for dynamic endpoints: TODO Need a generated file from ZAP to define these!
 // (taken from chip-devices.xml)
-#define DEVICE_TYPE_BRIDGE_NODE 0x0013
+#define DEVICE_TYPE_BRIDGED_NODE 0x0013
 // (taken from lo-devices.xml)
 #define DEVICE_TYPE_LO_ON_OFF_LIGHT 0x0100
 // (taken from lo-devices.xml)
@@ -597,9 +597,10 @@ void ApplicationInit() {}
 
 const EmberAfDeviceType gBridgedRootDeviceTypes[] = { { DEVICE_TYPE_ROOT_NODE, 1 }, { DEVICE_TYPE_BRIDGE, 1 } };
 
-const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT, 1 }, { DEVICE_TYPE_BRIDGE_NODE, 1 } };
+const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT, 1 }, { DEVICE_TYPE_BRIDGED_NODE, 1 } };
 
-const EmberAfDeviceType gBridgedSwitchDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT_SWITCH, 1 }, { DEVICE_TYPE_BRIDGE_NODE, 1 } };
+const EmberAfDeviceType gBridgedSwitchDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT_SWITCH, 1 },
+                                                        { DEVICE_TYPE_BRIDGED_NODE, 1 } };
 
 int main(int argc, char * argv[])
 {
