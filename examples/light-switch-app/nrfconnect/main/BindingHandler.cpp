@@ -89,7 +89,7 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindin
         else
         {
             Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
-            ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId, onCommand);
+            ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId, offCommand);
         }
         break;
     default:
