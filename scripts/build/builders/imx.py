@@ -17,6 +17,7 @@ from enum import Enum, auto
 
 from .host import HostBuilder
 
+
 class IMXApp(Enum):
     CHIP_TOOL = auto()
     LIGHT = auto()
@@ -35,6 +36,7 @@ class IMXApp(Enum):
             yield 'chip-lighting-app'
             yield 'chip-lighting-app.map'
 
+
 class IMXBuilder(HostBuilder):
 
     def __init__(self,
@@ -43,9 +45,9 @@ class IMXBuilder(HostBuilder):
                  app: IMXApp,
                  release: bool = False):
         super(IMXBuilder, self).__init__(
-                root=root,
-                runner=runner,
-                app=app)
+            root=root,
+            runner=runner,
+            app=app)
         self.release = release
 
     def GnBuildEnv(self):
@@ -55,20 +57,19 @@ class IMXBuilder(HostBuilder):
 
     def GnBuildArgs(self):
         args = [
-                    'target_os="linux"',
-                    'target_cpu="arm64"',
-                    'arm_arch="armv8-a"',
-                    'import(\"//build_overrides/build.gni\")',
-                    'custom_toolchain=\"${build_root}/toolchain/custom\"',
-                    'sysroot="%s"' % self.SysRootPath('SDKTARGETSYSROOT'),
-                    'target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\\"mlan0\\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\\"udhcpc -b -i %s \\"" ]',
-                    'target_cc="%s/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc"' % self.SysRootPath('OECORE_NATIVE_SYSROOT'),
-                    'target_cxx="%s/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++"' % self.SysRootPath('OECORE_NATIVE_SYSROOT'),
-                    'target_ar="%s/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar"' % self.SysRootPath('OECORE_NATIVE_SYSROOT'),
-               ]
+            'target_os="linux"',
+            'target_cpu="arm64"',
+            'arm_arch="armv8-a"',
+            'import(\"//build_overrides/build.gni\")',
+            'custom_toolchain=\"${build_root}/toolchain/custom\"',
+            'sysroot="%s"' % self.SysRootPath('SDKTARGETSYSROOT'),
+            'target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\\"mlan0\\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\\"udhcpc -b -i %s \\"" ]',
+            'target_cc="%s/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc"' % self.SysRootPath('OECORE_NATIVE_SYSROOT'),
+            'target_cxx="%s/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++"' % self.SysRootPath('OECORE_NATIVE_SYSROOT'),
+            'target_ar="%s/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar"' % self.SysRootPath('OECORE_NATIVE_SYSROOT'),
+        ]
 
         if self.release:
             args.append('is_debug=false')
 
         return args
-

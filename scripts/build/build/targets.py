@@ -527,11 +527,13 @@ def Bl602Targets():
 
     yield target.Extend('light', board=Bl602Board.BL602BOARD, app=Bl602App.LIGHT)
 
+
 def IMXTargets():
     target = Target('imx', IMXBuilder)
 
     yield target.Extend('chip-tool', app=IMXApp.CHIP_TOOL)
     yield target.Extend('lighting-app', app=IMXApp.LIGHT)
+
 
 ALL = []
 
