@@ -104,10 +104,10 @@ public:
  * @brief
  *   This class handles unsolicited messages. The implementation can peek the message and creating a new exchange for it or not.
  */
-class DLL_EXPORT ExchangeAcceptor
+class DLL_EXPORT UnsolicitedMessageHandler
 {
 public:
-    virtual ~ExchangeAcceptor() {}
+    virtual ~UnsolicitedMessageHandler() {}
 
     /**
      * @brief
@@ -122,8 +122,16 @@ public:
      *  @param[in]  payload       A handle to the PacketBuffer object holding the message payload.
      *  @param[out] newDelegate   A new exchange delegate being used by the new exchange to handle future messages.
      */
-    virtual CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle & payload,
-                                                    ExchangeDelegate *& newDelegate) = 0;
+    virtual CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) = 0;
+
+    /**
+     * @brief
+     *   This function is called when OnUnsolicitedMessageReceived successfully returns a new delegate, but the session manager
+     *   fails to assign the delegate to a new exchange, then the delegate should be released to avoid resource leak.
+     *
+     *  @param[in] delegate   The exchange delegate to be released.
+     */
+    virtual void ReleaseDelegate(ExchangeDelegate * delegate) {}
 };
 
 } // namespace Messaging

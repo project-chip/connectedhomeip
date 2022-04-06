@@ -59,11 +59,10 @@ enum : uint8_t
 
 TestContext sContext;
 
-class MockAppDelegate : public ExchangeAcceptor, public ExchangeDelegate
+class MockAppDelegate : public UnsolicitedMessageHandler, public ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle & payload,
-                                            ExchangeDelegate *& newDelegate) override
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
     {
         newDelegate = this;
         return CHIP_NO_ERROR;
