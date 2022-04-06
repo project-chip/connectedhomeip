@@ -42,7 +42,7 @@ public:
 
     chip::Optional<uint16_t> FailSafeExpiryTimeoutSecs() const override { return mExpiryTimeoutSecs; }
 
-    void OnDeviceAttestionFailed(chip::Controller::DeviceCommissioner * deviceCommissioner, chip::DeviceProxy * device,
+    void OnDeviceAttestationFailed(chip::Controller::DeviceCommissioner * deviceCommissioner, chip::DeviceProxy * device,
         chip::Credentials::AttestationVerificationResult attestationResult) override;
 
     chip::Credentials::AttestationVerificationResult attestationVerificationResult() const { return mResult; }

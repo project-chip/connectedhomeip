@@ -18,7 +18,7 @@
 #import "CHIPDeviceAttestationDelegateBridge.h"
 #import "CHIPError_Internal.h"
 
-void CHIPDeviceAttestationDelegateBridge::OnDeviceAttestionFailed(chip::Controller::DeviceCommissioner * deviceCommissioner,
+void CHIPDeviceAttestationDelegateBridge::OnDeviceAttestationFailed(chip::Controller::DeviceCommissioner * deviceCommissioner,
     chip::DeviceProxy * device, chip::Credentials::AttestationVerificationResult attestationResult)
 {
     dispatch_async(mQueue, ^{
