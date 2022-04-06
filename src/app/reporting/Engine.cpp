@@ -645,7 +645,7 @@ bool Engine::MergeOverlappedAttributePath(const AttributePathParams & aAttribute
         {
             // TODO: the wildcard input path may be superset of next paths in globalDirtySet, it is fine at this moment, since
             // when building report, it would use the first path of globalDirtySet to compare against interested paths read clients
-            // wants.
+            // want.
             // It is better to eliminate the duplicate wildcard paths in follow-up
             path->mGeneration  = GetDirtySetGeneration();
             path->mEndpointId  = aAttributePath.mEndpointId;
