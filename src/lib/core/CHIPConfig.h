@@ -109,7 +109,7 @@
  *
  *  @brief
  *    Enable (1) or disable (0) support for a chip-provided
- *    implementation of chipMatter memory-management
+ *    implementation of Matter memory-management
  *    functions based on the C Standard Library malloc / free
  *    functions.
  *
