@@ -121,7 +121,7 @@ struct Transitions
         {
             return mFactory.CreateState2();
         }
-        else if (state.Is<State2>() && event.Is<Event1>())
+        if (state.Is<State2>() && event.Is<Event1>())
         {
             return mFactory.CreateState1();
         }

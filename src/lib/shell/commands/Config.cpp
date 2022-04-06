@@ -157,10 +157,8 @@ static CHIP_ERROR ConfigDiscriminator(int argc, char ** argv)
     {
         return ConfigGetSetupDiscriminator(false);
     }
-    else
-    {
-        return ConfigSetSetupDiscriminator(argv[0]);
-    }
+
+    return ConfigSetSetupDiscriminator(argv[0]);
 }
 
 static CHIP_ERROR PrintAllConfigs()

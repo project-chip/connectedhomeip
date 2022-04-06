@@ -78,8 +78,8 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
                 return CHIP_NO_ERROR;
             });
         }
-        else if (aPath.mClusterId == app::Clusters::TestCluster::Id &&
-                 aPath.mAttributeId == app::Clusters::TestCluster::Attributes::Int16u::Id)
+        if (aPath.mClusterId == app::Clusters::TestCluster::Id &&
+            aPath.mAttributeId == app::Clusters::TestCluster::Attributes::Int16u::Id)
         {
             AttributeValueEncoder::AttributeEncodeState state =
                 (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
@@ -147,10 +147,8 @@ bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath,
     {
         return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)

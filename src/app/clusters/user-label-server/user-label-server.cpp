@@ -117,7 +117,7 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath &
 
         return provider->SetUserLabelList(endpoint, labelList);
     }
-    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         Structs::LabelStruct::DecodableType entry;
         ReturnErrorOnFailure(aDecoder.Decode(entry));

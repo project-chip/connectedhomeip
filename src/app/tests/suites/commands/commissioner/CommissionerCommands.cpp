@@ -58,7 +58,7 @@ chip::app::StatusIB ConvertToStatusIB(CHIP_ERROR err)
     {
         return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidPublicKey));
     }
-    else if (CHIP_ERROR_WRONG_NODE_ID == err)
+    if (CHIP_ERROR_WRONG_NODE_ID == err)
     {
         return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNodeOpId));
     }

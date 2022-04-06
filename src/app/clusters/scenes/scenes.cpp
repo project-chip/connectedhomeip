@@ -508,7 +508,7 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(chip::FabricIndex fa
             index = i;
             break;
         }
-        else if (index == EMBER_AF_SCENE_TABLE_NULL_INDEX && entry.endpoint == EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID)
+        if (index == EMBER_AF_SCENE_TABLE_NULL_INDEX && entry.endpoint == EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID)
         {
             index = i;
         }
@@ -785,7 +785,7 @@ bool emberAfPluginScenesServerParseAddScene(
             index = i;
             break;
         }
-        else if (index == EMBER_AF_SCENE_TABLE_NULL_INDEX && entry.endpoint == EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID)
+        if (index == EMBER_AF_SCENE_TABLE_NULL_INDEX && entry.endpoint == EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID)
         {
             index = i;
         }

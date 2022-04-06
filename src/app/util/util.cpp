@@ -554,10 +554,8 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
             {
                 return -1;
             }
-            else
-            {
-                return 0;
-            }
+
+            return 0;
         }
         else
         { // not supported
@@ -578,10 +576,6 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
             if (k > j)
             {
                 return -1;
-            }
-            else
-            {
-                // MISRA requires ..else if.. to have terminating else.
             }
         }
         return 0;

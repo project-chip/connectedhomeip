@@ -69,12 +69,10 @@ public:
             size = CanCastTo<uint16_t>(valueSize) ? static_cast<uint16_t>(valueSize) : 0;
             return CHIP_ERROR_BUFFER_TOO_SMALL;
         }
-        else
-        {
-            size = static_cast<uint16_t>(valueSize);
-            memcpy(buffer, value.data(), size);
-            return CHIP_NO_ERROR;
-        }
+
+        size = static_cast<uint16_t>(valueSize);
+        memcpy(buffer, value.data(), size);
+        return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
@@ -93,10 +91,8 @@ public:
                 mStorage[key] = std::vector<uint8_t>();
                 return CHIP_NO_ERROR;
             }
-            else
-            {
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
+
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
         // Handle non-empty values
         else

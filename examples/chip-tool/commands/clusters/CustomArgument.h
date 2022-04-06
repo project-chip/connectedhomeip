@@ -56,7 +56,7 @@ public:
             {
                 return CustomArgumentParser::PutOctetString(writer, tag, value);
             }
-            else if (IsUnsignedNumberPrefix(value))
+            if (IsUnsignedNumberPrefix(value))
             {
                 return CustomArgumentParser::PutUnsignedFromString(writer, tag, value);
             }

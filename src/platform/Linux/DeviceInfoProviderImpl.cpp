@@ -110,10 +110,8 @@ bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & outpu
 
         return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelLength(EndpointId endpoint, size_t val)
@@ -270,10 +268,8 @@ bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & outpu
 
         return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 DeviceInfoProvider::SupportedCalendarTypesIterator * DeviceInfoProviderImpl::IterateSupportedCalendarTypes()
@@ -345,10 +341,8 @@ bool DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarTy
         mIndex++;
         return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 } // namespace DeviceLayer

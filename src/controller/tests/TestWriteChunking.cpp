@@ -141,7 +141,7 @@ CHIP_ERROR TestAttrAccess::Write(const app::ConcreteDataAttributePath & aPath, a
         ChipLogError(Zcl, "Decode result: %s", err.AsString());
         return err;
     }
-    else if (aPath.mListOp == app::ConcreteDataAttributePath::ListOperation::AppendItem)
+    if (aPath.mListOp == app::ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         ByteSpan listItem;
         CHIP_ERROR err = aDecoder.Decode(listItem);

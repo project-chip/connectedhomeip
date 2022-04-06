@@ -96,7 +96,7 @@ CHIP_ERROR StorageAdapter::SyncGetKeyValue(const char * key, void * value, uint1
         ChipLogDetail(Controller, "Key Not Found\n");
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
-    else if (size < tmpSize)
+    if (size < tmpSize)
     {
         ChipLogDetail(Controller, "Buf not big enough\n");
         size = tmpSize;

@@ -104,7 +104,7 @@ static CHIP_ERROR RendezvousStringToFlag(char * str, chip::RendezvousInformation
         *aRendezvousFlags = chip::RendezvousInformationFlag::kNone;
         return CHIP_NO_ERROR;
     }
-    else if (strcmp(str, "softap") == 0)
+    if (strcmp(str, "softap") == 0)
     {
         *aRendezvousFlags = chip::RendezvousInformationFlag::kSoftAP;
         return CHIP_NO_ERROR;
@@ -146,7 +146,7 @@ static CHIP_ERROR OnboardingHandler(int argc, char ** argv)
     {
         return GetOnboardingQRCode(false, aRendezvousFlags);
     }
-    else if (strcmp(argv[1], "qrcodeurl") == 0)
+    if (strcmp(argv[1], "qrcodeurl") == 0)
     {
         return GetOnboardingQRCodeUrl(false, aRendezvousFlags);
     }

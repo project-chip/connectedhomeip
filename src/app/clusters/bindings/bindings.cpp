@@ -196,7 +196,7 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
         LogErrorOnFailure(NotifyBindingsChanged());
         return CHIP_NO_ERROR;
     }
-    else if (path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    if (path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         TargetStructType target;
         ReturnErrorOnFailure(decoder.Decode(target));

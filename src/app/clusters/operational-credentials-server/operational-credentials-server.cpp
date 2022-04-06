@@ -545,7 +545,7 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
     {
         return OperationalCertStatus::kSuccess;
     }
-    else if (err == CHIP_ERROR_INVALID_PUBLIC_KEY)
+    if (err == CHIP_ERROR_INVALID_PUBLIC_KEY)
     {
         return OperationalCertStatus::kInvalidPublicKey;
     }

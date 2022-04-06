@@ -231,7 +231,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
         fprintf(stderr, "Please specify at least one of the 'salt' or 'salt-len' parameters.\n");
         return false;
     }
-    else if (gSalt != nullptr && gSaltLen != 0 && gSaltLen != strlen(gSalt))
+    if (gSalt != nullptr && gSaltLen != 0 && gSaltLen != strlen(gSalt))
     {
         fprintf(stderr, "The specified 'salt-len' doesn't match the length of 'salt' parameter.\n");
         return false;

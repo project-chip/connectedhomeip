@@ -267,7 +267,7 @@ CHIP_ERROR TestAttrAccess::WriteListInt8uAttribute(const ConcreteDataAttributePa
 
         return iter.GetStatus();
     }
-    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         VerifyOrReturnError(gListUint8DataLen < kAttributeListLength, CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(aDecoder.Decode(gListUint8Data[gListUint8DataLen]));
@@ -316,7 +316,7 @@ CHIP_ERROR TestAttrAccess::WriteListOctetStringAttribute(const ConcreteDataAttri
 
         return iter.GetStatus();
     }
-    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         ByteSpan entry;
         ReturnErrorOnFailure(aDecoder.Decode(entry));
@@ -368,7 +368,7 @@ CHIP_ERROR TestAttrAccess::WriteListLongOctetStringAttribute(const ConcreteDataA
 
         return iter.GetStatus();
     }
-    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         ByteSpan entry;
         ReturnErrorOnFailure(aDecoder.Decode(entry));
@@ -434,7 +434,7 @@ CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(const ConcreteDat
 
         return CHIP_NO_ERROR;
     }
-    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType entry;
         ReturnErrorOnFailure(aDecoder.Decode(entry));
@@ -481,7 +481,7 @@ CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(const C
 
         return CHIP_NO_ERROR;
     }
-    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         // And we only support one entry in the list.
         VerifyOrReturnError(count == 0, CHIP_ERROR_INVALID_ARGUMENT);
@@ -664,7 +664,7 @@ CHIP_ERROR TestAttrAccess::WriteListFabricScopedAttribute(const ConcreteDataAttr
         gListFabricScopedAttributeLen = dstIndex;
         return iter.GetStatus();
     }
-    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         VerifyOrReturnError(gListFabricScopedAttributeLen < kAttributeListLength, CHIP_ERROR_INVALID_ARGUMENT);
 
