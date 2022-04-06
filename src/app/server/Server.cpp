@@ -244,9 +244,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             .clientPool        = &mCASEClientPool,
             .groupDataProvider = mGroupsProvider,
         },
-#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-        .dnsCache          = nullptr,
-#endif
         .devicePool        = &mDevicePool,
     };
 
