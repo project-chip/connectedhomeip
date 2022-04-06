@@ -31,6 +31,7 @@ from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 from builders.bl602 import Bl602App, Bl602Board, Bl602Builder
+from builders.imx import IMXApp, IMXBuilder
 
 
 class Target:
@@ -538,6 +539,21 @@ def Bl602Targets():
     yield target.Extend('light', board=Bl602Board.BL602BOARD, app=Bl602App.LIGHT)
 
 
+def IMXTargets():
+    target = Target('imx', IMXBuilder)
+
+    yield target.Extend('chip-tool', app=IMXApp.CHIP_TOOL)
+    yield target.Extend('lighting-app', app=IMXApp.LIGHT)
+    yield target.Extend('thermostat', app=IMXApp.THERMOSTAT)
+    yield target.Extend('all-clusters-app', app=IMXApp.ALL_CLUSTERS)
+    yield target.Extend('ota-provider-app', app=IMXApp.OTA_PROVIDER)
+    yield target.Extend('chip-tool-release', app=IMXApp.CHIP_TOOL, release=True)
+    yield target.Extend('lighting-app-release', app=IMXApp.LIGHT, release=True)
+    yield target.Extend('thermostat-release', app=IMXApp.THERMOSTAT, release=True)
+    yield target.Extend('all-clusters-app-release', app=IMXApp.ALL_CLUSTERS, release=True)
+    yield target.Extend('ota-provider-app-release', app=IMXApp.OTA_PROVIDER, release=True)
+
+
 ALL = []
 
 target_generators = [
@@ -555,6 +571,7 @@ target_generators = [
     QorvoTargets(),
     TizenTargets(),
     Bl602Targets(),
+    IMXTargets(),
 ]
 
 for generator in target_generators:
