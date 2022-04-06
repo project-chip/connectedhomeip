@@ -136,8 +136,11 @@ void DefaultOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR
         // Ignore - We shouldn't be hitting this case.
         break;
     case UpdateFailureState::kQuerying:
-        // Retry with same provider
-        ScheduleRetry(true);
+        if (error != CHIP_ERROR_BUFFER_TOO_SMALL)
+        {
+            // Retry with same provider
+            ScheduleRetry(true);
+        }
         break;
     case UpdateFailureState::kDownloading:
         // Retry with same provider

@@ -200,7 +200,7 @@ void DefaultOTARequestor::OnQueryImageResponse(void * context, const QueryImageR
             if (update.fileDesignator.size() > fileDesignator.size())
             {
                 ChipLogError(SoftwareUpdate, "File designator size %zu is too large to store", update.fileDesignator.size());
-                requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, err);
+                requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, CHIP_ERROR_BUFFER_TOO_SMALL);
                 return;
             }
             memcpy(fileDesignator.data(), update.fileDesignator.data(), update.fileDesignator.size());
@@ -352,12 +352,7 @@ void DefaultOTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comman
 
 void DefaultOTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 {
-    if (mServer == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "Server not set");
-        RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
-        return;
-    }
+    VerifyOrDie(mServer != nullptr);
 
     if (!mProviderLocation.HasValue())
     {
@@ -393,12 +388,7 @@ void DefaultOTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 
 void DefaultOTARequestor::DisconnectFromProvider()
 {
-    if (mServer == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "Server not set");
-        RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
-        return;
-    }
+    VerifyOrDie(mServer != nullptr);
 
     if (!mProviderLocation.HasValue())
     {
