@@ -42,6 +42,9 @@ namespace NetworkCommissioning {
 // KVS slot upon any changes and restored when the fail-safe timeout is triggered or the device
 // reboots without completing all the changes.
 
+// Not all KVS implementations support zero-length values, so use this special value, that is not a valid
+// dataset, to represent an empty dataset. We need that to be able to revert the network configuration
+// in the case of an unsuccessful commissioning.
 constexpr uint8_t kEmptyDataset[1] = {};
 
 CHIP_ERROR GenericThreadDriver::Init(Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
@@ -88,7 +91,13 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
 
     // Not all KVS implementations support zero-length values, so handle a special value representing an empty dataset.
     ByteSpan dataset(datasetBytes, datasetLength);
-    ReturnErrorOnFailure(mStagingNetwork.Init(dataset.data_equal(ByteSpan(kEmptyDataset)) ? ByteSpan{} : dataset));
+
+    if (dataset.data_equal(ByteSpan(kEmptyDataset)))
+    {
+        dataset = {};
+    }
+
+    ReturnErrorOnFailure(mStagingNetwork.Init(dataset));
 
     return DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork, /* callback */ nullptr);
 }
