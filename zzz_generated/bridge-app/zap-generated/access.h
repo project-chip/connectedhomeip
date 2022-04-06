@@ -35,6 +35,7 @@
     /* Cluster: Basic, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
+    /* Cluster: Level Control, Attribute: start up current level, Privilege: view */ \
     62, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
 }
 
@@ -46,6 +47,7 @@
     /* Cluster: Basic, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
+    /* Cluster: Level Control, Attribute: start up current level, Privilege: view */ \
     0, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
 }
 
@@ -57,6 +59,7 @@
     /* Cluster: Basic, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
+    /* Cluster: Level Control, Attribute: start up current level, Privilege: view */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
 }
 
@@ -70,6 +73,7 @@
     40, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
     40, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
     48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
+    8, /* Cluster: Level Control, Attribute: start up current level, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for write attribute
@@ -80,6 +84,7 @@
     6, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
     16, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
     0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
+    16384, /* Cluster: Level Control, Attribute: start up current level, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
@@ -90,6 +95,7 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Level Control, Attribute: start up current level, Privilege: manage */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
