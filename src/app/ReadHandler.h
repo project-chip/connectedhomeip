@@ -266,9 +266,9 @@ private:
     uint32_t GetLastWrittenEventsBytes() const { return mLastWrittenEventsBytes; }
 
     // Returns the number of interested paths, including wildcard and corcrete paths.
-    size_t GetAttributePathCount() const { return mAttributePathCount; };
-    size_t GetEventPathCount() const { return mEventPathCount; };
-    size_t GetDataVersionFilterCount() const { return mDataVersionFilterCount; };
+    size_t GetAttributePathCount() const { return mpAttributePathList == nullptr ? 0 : mpAttributePathList->size(); };
+    size_t GetEventPathCount() const { return mpEventPathList == nullptr ? 0 : mpEventPathList->size(); };
+    size_t GetDataVersionFilterCount() const { return mpDataVersionFilterList == nullptr ? 0 : mpDataVersionFilterList->size(); };
 
     CHIP_ERROR SendStatusReport(Protocols::InteractionModel::Status aStatus);
 
@@ -420,10 +420,6 @@ private:
      */
 
     uint32_t mLastWrittenEventsBytes = 0;
-    // The number of interested paths, including wildcard and corcrete paths.
-    size_t mAttributePathCount     = 0;
-    size_t mEventPathCount         = 0;
-    size_t mDataVersionFilterCount = 0;
 
     SubjectDescriptor mSubjectDescriptor;
     // The detailed encoding state for a single attribute, used by list chunking feature.

@@ -503,17 +503,17 @@ void InteractionModelEngine::AddReadClient(ReadClient * apReadClient)
 
 void InteractionModelEngine::CheckAndAbortExceededSubscriptions(FabricIndex aFabricIndex)
 {
+    const bool shouldAbort =
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    if (!mForceHandlerQuota)
-    {
-#endif
-        // If the resources are allocated on the heap, we should be able to handle as many Read / Subscribe requests as possible.
-        return;
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    }
-#endif
-#endif
+        mForceHandlerQuota;
+#else  // CONFIG_IM_BUILD_FOR_UNIT_TEST
+       // If the resources are allocated on the heap, we should be able to handle as many Read / Subscribe requests as possible.
+        false;
+#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+#else  // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
+        true;
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
 
     uint8_t fabricCount                                = mpFabricTable->FabricCount();
     size_t attributePathsSubscribedByCurrentFabric     = 0;
@@ -545,14 +545,17 @@ void InteractionModelEngine::CheckAndAbortExceededSubscriptions(FabricIndex aFab
             dataVersionFiltersUsed + dataVersionFiltersUsed > maxNumberOfPathsCanBeUsed ||
             subscriptionsEstablishedByCurrentFabric + 1 > maxNumberOfSubscriptions)
         {
-            //
-            // Deleting an item can shift down the contents of the underlying pool storage,
-            // rendering any tracker using positional indexes invalid. Let's reset it,
-            // based on which readHandler we are getting rid of.
-            //
-            mReportingEngine.ResetReadHandlerTracker(handler);
+            if (shouldAbort)
+            {
+                //
+                // Deleting an item can shift down the contents of the underlying pool storage,
+                // rendering any tracker using positional indexes invalid. Let's reset it,
+                // based on which readHandler we are getting rid of.
+                //
+                mReportingEngine.ResetReadHandlerTracker(handler);
 
-            mReadHandlers.ReleaseObject(handler);
+                mReadHandlers.ReleaseObject(handler);
+            }
         }
         else
         {
@@ -568,17 +571,17 @@ void InteractionModelEngine::CheckAndAbortExceededSubscriptions(FabricIndex aFab
 
 bool InteractionModelEngine::CanEstablishReadTransaction(const ReadHandler * apReadHandler)
 {
+    const bool overrideResult =
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    if (!mForceHandlerQuota)
-    {
-#endif
-        // If the resources are allocated on the heap, we should be able to handle as many Read / Subscribe requests as possible.
-        return true;
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    }
-#endif
-#endif
+        !mForceHandlerQuota;
+#else  // CONFIG_IM_BUILD_FOR_UNIT_TEST
+       // If the resources are allocated on the heap, we should be able to handle as many Read / Subscribe requests as possible.
+        true;
+#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+#else  // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
+        false;
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
     FabricIndex currentFabricIndex           = apReadHandler->GetAccessingFabricIndex();
     size_t activeReadHandlersOnCurrentFabric = 0;
 
@@ -594,27 +597,28 @@ bool InteractionModelEngine::CanEstablishReadTransaction(const ReadHandler * apR
     // The incoming read handler here is also counted above.
     if (activeReadHandlersOnCurrentFabric > kReservedReadHandlerForReadRequests)
     {
-        return false;
+        return overrideResult;
     }
 
-    return apReadHandler->GetAttributePathCount() <= kReservedPathPoolForReadRequests &&
-        apReadHandler->GetEventPathCount() <= kReservedPathPoolForReadRequests &&
-        apReadHandler->GetDataVersionFilterCount() <= kReservedPathPoolForReadRequests;
+    return (apReadHandler->GetAttributePathCount() <= kReservedPathPoolForReadRequests &&
+            apReadHandler->GetEventPathCount() <= kReservedPathPoolForReadRequests &&
+            apReadHandler->GetDataVersionFilterCount() <= kReservedPathPoolForReadRequests) ||
+        overrideResult;
 }
 
 bool InteractionModelEngine::CanEstablishSubscribeTransaction(const ReadHandler * apReadHandler)
 {
+    const bool overrideResult =
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    if (!mForceHandlerQuota)
-    {
-#endif
-        // If the resources are allocated on the heap, we should be able to handle as many Read / Subscribe requests as possible.
-        return true;
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    }
-#endif
-#endif
+        !mForceHandlerQuota;
+#else  // CONFIG_IM_BUILD_FOR_UNIT_TEST
+       // If the resources are allocated on the heap, we should be able to handle as many Read / Subscribe requests as possible.
+        true;
+#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+#else  // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
+        false;
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
 
     FabricIndex currentFabricIndex                     = apReadHandler->GetAccessingFabricIndex();
     uint8_t fabricCount                                = mpFabricTable->FabricCount();
@@ -628,7 +632,7 @@ bool InteractionModelEngine::CanEstablishSubscribeTransaction(const ReadHandler 
     // subscribe transaction in this case.
     if (fabricCount == 0 || currentFabricIndex == kUndefinedFabricIndex)
     {
-        return false;
+        return overrideResult;
     }
 
     // It is safe to use & here since this function will be called on current stack.
@@ -645,14 +649,15 @@ bool InteractionModelEngine::CanEstablishSubscribeTransaction(const ReadHandler 
     });
 
     // Ensure the total number of subscriptions and paths used don't exceed the limit per fabric.
-    return (subscriptionsEstablishedByCurrentFabric + kReservedReadHandlerForReadRequests) * fabricCount <=
-        CHIP_IM_MAX_NUM_READ_HANDLER &&
-        (attributePathsSubscribedByCurrentFabric + kReservedPathPoolForReadRequests) * fabricCount <=
-        CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS &&
-        (eventPathsSubscribedByCurrentFabric + kReservedPathPoolForReadRequests) * fabricCount <=
-        CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS &&
-        (dataVersionFiltersSubscribedByCurrentFabric + kReservedPathPoolForReadRequests) * fabricCount <=
-        CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS;
+    return ((subscriptionsEstablishedByCurrentFabric + kReservedReadHandlerForReadRequests) * fabricCount <=
+                CHIP_IM_MAX_NUM_READ_HANDLER &&
+            (attributePathsSubscribedByCurrentFabric + kReservedPathPoolForReadRequests) * fabricCount <=
+                CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS &&
+            (eventPathsSubscribedByCurrentFabric + kReservedPathPoolForReadRequests) * fabricCount <=
+                CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS &&
+            (dataVersionFiltersSubscribedByCurrentFabric + kReservedPathPoolForReadRequests) * fabricCount <=
+                CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS) ||
+        overrideResult;
 }
 
 void InteractionModelEngine::RemoveReadClient(ReadClient * apReadClient)

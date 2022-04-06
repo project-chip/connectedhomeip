@@ -1388,7 +1388,9 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * paths for each fabric.
  */
 #ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
-#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS (CHIP_CONFIG_MAX_FABRICS * 18)
+// #define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS (CHIP_CONFIG_MAX_FABRICS * 18)
+// TODO: (#17085) Should be 3 sub * 3 path + 9 path (for read) = 18
+#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS (CHIP_CONFIG_MAX_FABRICS * 13)
 #endif
 
 /**

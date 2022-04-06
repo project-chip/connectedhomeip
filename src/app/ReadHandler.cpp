@@ -334,10 +334,6 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     ReturnErrorOnFailure(readRequestParser.CheckSchemaValidity());
 #endif
 
-    mAttributePathCount     = 0;
-    mEventPathCount         = 0;
-    mDataVersionFilterCount = 0;
-
     err = readRequestParser.GetAttributeRequests(&attributePathListParser);
     if (err == CHIP_END_OF_TLV)
     {
@@ -400,10 +396,8 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAtt
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
     aAttributePathListParser.GetReader(&reader);
-    mAttributePathCount = 0;
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        mAttributePathCount++; // No need to care about the order here, since we won't use this value on error.
         VerifyOrExit(TLV::AnonymousTag() == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
         AttributePathParams attribute;
         AttributePathIB::Parser path;
@@ -475,10 +469,8 @@ CHIP_ERROR ReadHandler::ProcessDataVersionFilterList(DataVersionFilterIBs::Parse
     TLV::TLVReader reader;
 
     aDataVersionFilterListParser.GetReader(&reader);
-    mDataVersionFilterCount = 0;
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        mDataVersionFilterCount++; // No need to care about the order here, since we won't use this value on error.
         VerifyOrReturnError(TLV::AnonymousTag() == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
         DataVersionFilter versionFilter;
         ClusterPathIB::Parser path;
@@ -507,10 +499,8 @@ CHIP_ERROR ReadHandler::ProcessEventPaths(EventPathIBs::Parser & aEventPathsPars
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
     aEventPathsParser.GetReader(&reader);
-    mEventPathCount = 0;
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        mEventPathCount++; // No need to care about the order here, since we won't use this value on error.
         VerifyOrReturnError(TLV::AnonymousTag() == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
         EventPathParams event;
         EventPathIB::Parser path;

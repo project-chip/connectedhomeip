@@ -81,5 +81,5 @@
 
 // Limit the number of device admins to ensure enough ressources for handling them
 #ifndef CHIP_CONFIG_MAX_FABRICS
-#define CHIP_CONFIG_MAX_FABRICS 5
-#endif // CHIP_CONFIG_MAX_FABRICS
+#define CHIP_CONFIG_MAX_FABRICS 4 // 3 fabrics + 1 for rotation slack
+#endif                            // CHIP_CONFIG_MAX_FABRICS

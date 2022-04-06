@@ -99,10 +99,12 @@ public:
      * Spec 8.5.1 A publisher SHALL always ensure that every fabric the node is commissioned into can create at least three
      * subscriptions to the publisher and that each subscription SHALL support at least 3 attribute/event paths.
      */
-    static constexpr size_t kMinSupportedSubscriptionPerFabric  = 3;
-    static constexpr size_t kMinSupportedPathPerSubscription    = 3;
-    static constexpr size_t kReservedPathPoolForReadRequests    = 3;
+    static constexpr size_t kMinSupportedSubscriptionPerFabric  = 2;
+    static constexpr size_t kMinSupportedPathPerSubscription    = 2;
+    static constexpr size_t kReservedPathPoolForReadRequests    = 9;
     static constexpr size_t kReservedReadHandlerForReadRequests = 1;
+    // TODO: Per spec, the above number should be 3, 3, 9, 1, however, we use a lower limit to reduce the memory usage and should
+    // fix it when we reduced the memory footrprint of ReadHandlers.
 
     InteractionModelEngine(void);
 
