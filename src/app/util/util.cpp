@@ -561,24 +561,23 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
         // not supported
         return 0;
     }
-    else
-    { // regular unsigned number comparison
-        for (i = 0; i < len; i++)
-        {
-            j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
-            k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
 
-            if (j > k)
-            {
-                return 1;
-            }
-            if (k > j)
-            {
-                return -1;
-            }
+    // regular unsigned number comparison
+    for (i = 0; i < len; i++)
+    {
+        j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
+        k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
+
+        if (j > k)
+        {
+            return 1;
         }
-        return 0;
+        if (k > j)
+        {
+            return -1;
+        }
     }
+    return 0;
 }
 
 #if 0

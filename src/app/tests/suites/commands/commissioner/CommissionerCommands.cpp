@@ -66,7 +66,7 @@ chip::app::StatusIB ConvertToStatusIB(CHIP_ERROR err)
     {
         return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNOC));
     }
-    else if (CHIP_ERROR_FABRIC_EXISTS == err)
+    if (CHIP_ERROR_FABRIC_EXISTS == err)
     {
         return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kFabricConflict));
     }

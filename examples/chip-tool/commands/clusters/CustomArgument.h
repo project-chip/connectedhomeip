@@ -64,7 +64,7 @@ public:
             {
                 return CustomArgumentParser::PutSignedFromString(writer, tag, value);
             }
-            else if (IsFloatNumberPrefix(value))
+            if (IsFloatNumberPrefix(value))
             {
                 return CustomArgumentParser::PutFloatFromString(writer, tag, value);
             }
