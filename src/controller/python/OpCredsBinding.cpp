@@ -105,7 +105,7 @@ extern chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 class TestCommissioner : public chip::Controller::AutoCommissioner
 {
 public:
-    TestCommissioner()  { Reset(); }
+    TestCommissioner() { Reset(); }
     ~TestCommissioner() {}
     CHIP_ERROR SetCommissioningParameters(const chip::Controller::CommissioningParameters & params) override
     {

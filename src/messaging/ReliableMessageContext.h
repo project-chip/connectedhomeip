@@ -229,7 +229,6 @@ private:
     // will send that ack at some point.
     void SetPendingPeerAckMessageCounter(uint32_t aPeerAckMessageCounter);
 
-
     friend class ReliableMessageMgr;
     friend class ExchangeContext;
     friend class ExchangeMessageDispatch;

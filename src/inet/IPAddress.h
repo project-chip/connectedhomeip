@@ -125,7 +125,6 @@ public:
     static constexpr uint16_t kMaxStringLength = INET6_ADDRSTRLEN;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
-
     IPAddress()                        = default;
     IPAddress(const IPAddress & other) = default;
 

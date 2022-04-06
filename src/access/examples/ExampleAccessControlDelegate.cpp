@@ -130,7 +130,6 @@ public:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-
     CHIP_ERROR Serialize(chip::TLV::TLVWriter & writer) const { return writer.Put(chip::TLV::AnonymousTag(), mNode); }
 
     CHIP_ERROR Deserialize(chip::TLV::TLVReader & reader)
@@ -142,9 +141,7 @@ public:
 private:
     static bool IsValid(NodeId node) { return node != kUndefinedNodeId; }
 
-
     static_assert(sizeof(NodeId) == 8, "Expecting 8 byte node ID");
-
 
     NodeId mNode;
 };
@@ -194,7 +191,6 @@ public:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-
     CHIP_ERROR Serialize(chip::TLV::TLVWriter & writer) const
     {
         ReturnErrorOnFailure(writer.Put(chip::TLV::AnonymousTag(), mCluster));
@@ -240,7 +236,6 @@ private:
             !((target.flags & Target::kEndpoint) && !IsValidEndpoint(target.endpoint)) &&
             !((target.flags & Target::kDeviceType) && !IsValidDeviceType(target.deviceType));
     }
-
 
     void Decode(Target & target) const
     {
@@ -297,7 +292,6 @@ private:
         }
     }
 
-
     static_assert(sizeof(ClusterId) == 4, "Expecting 4 byte cluster ID");
     static_assert(sizeof(EndpointId) == 2, "Expecting 2 byte endpoint ID");
     static_assert(sizeof(DeviceTypeId) == 4, "Expecting 4 byte device type ID");
@@ -346,7 +340,6 @@ private:
     // (mDeviceType >> kEndpointShift) --> extract endpoint from mDeviceType
     static constexpr int kEndpointShift = 16;
 
-
     ClusterId mCluster;
     DeviceTypeId mDeviceType;
 };
@@ -390,7 +383,6 @@ public:
         return nullptr;
     }
 
-
     // Pool support
     static EntryStorage pool[kEntryStoragePoolSize];
 
@@ -418,7 +410,6 @@ public:
         constexpr auto * end = pool + ArraySize(pool);
         return pool <= this && this < end;
     }
-
 
     EntryStorage() = default;
 
@@ -456,7 +447,6 @@ public:
             target.Clear();
         }
     }
-
 
     enum class ConvertDirection
     {
@@ -511,7 +501,6 @@ public:
         }
         index = found ? toIndex : ArraySize(acl);
     }
-
 
     static constexpr uint8_t kTagInUse       = 1;
     static constexpr uint8_t kTagFabricIndex = 2;
@@ -598,7 +587,6 @@ public:
         return reader.ExitContainer(container);
     }
 
-
     static constexpr size_t kMaxSubjects = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY;
     static constexpr size_t kMaxTargets  = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY;
 
@@ -647,7 +635,6 @@ public:
         constexpr auto * end = pool + ArraySize(pool);
         return pool <= &delegate && &delegate < end;
     }
-
 
     void Release() override
     {
@@ -840,7 +827,6 @@ public:
         return CHIP_ERROR_SENTINEL;
     }
 
-
     void Init(Entry & entry, EntryStorage & storage)
     {
         entry.SetDelegate(*this);
@@ -922,7 +908,6 @@ public:
         return pool <= &delegate && &delegate < end;
     }
 
-
     void Release() override { mInUse = false; }
 
     CHIP_ERROR Next(Entry & entry) override
@@ -962,7 +947,6 @@ public:
         }
         return CHIP_ERROR_SENTINEL;
     }
-
 
     void Init(EntryIterator & iterator, const FabricIndex * fabricIndex)
     {
@@ -1244,7 +1228,6 @@ public:
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-
 
     void SetStorageDelegate(chip::PersistentStorageDelegate * storageDelegate) { mStorageDelegate = storageDelegate; }
 

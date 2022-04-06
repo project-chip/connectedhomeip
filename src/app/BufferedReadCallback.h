@@ -63,7 +63,6 @@ private:
      */
     CHIP_ERROR BufferData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apReader);
 
-
     //
     // ReadClient::Callback
     //
@@ -83,7 +82,6 @@ private:
     {
         return mCallback.OnDeallocatePaths(std::move(aReadPrepareParams));
     }
-
 
     /*
      * Given a reader positioned at a list element, allocate a packet buffer, copy the list item where
