@@ -57,10 +57,16 @@
 #define LOG_WARN "<warn  > "
 #define LOG_INFO "<info  > "
 #define LOG_DETAIL "<detail> "
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #define LOG_LWIP "<lwip  > "
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 #define LOG_EFR32 "<efr32 > "
 // If a new category string LOG_* is created, add it in the MaxStringLength arguments below
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 static constexpr size_t kMaxCategoryStrLen = chip::MaxStringLength(LOG_ERROR, LOG_WARN, LOG_INFO, LOG_DETAIL, LOG_LWIP, LOG_EFR32);
+#else
+static constexpr size_t kMaxCategoryStrLen = chip::MaxStringLength(LOG_ERROR, LOG_WARN, LOG_INFO, LOG_DETAIL, LOG_EFR32);
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if EFR32_LOG_ENABLED
 static bool sLogInitialized = false;
@@ -218,6 +224,8 @@ void LogV(const char * module, uint8_t category, const char * aFormat, va_list v
 } // namespace Logging
 } // namespace chip
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+
 /**
  * LwIP log output function.
  */
@@ -251,7 +259,7 @@ extern "C" void LwIPLog(const char * aFormat, ...)
 #endif // EFR32_LOG_ENABLED
     va_end(v);
 }
-
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 /**
  * Platform logging function for OpenThread
  */
