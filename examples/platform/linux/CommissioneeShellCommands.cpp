@@ -111,33 +111,32 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
         return CHIP_NO_ERROR;
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    else if (strcmp(argv[0], "restartmdns") == 0)
+    if (strcmp(argv[0], "restartmdns") == 0)
     {
-        if (argc < 2)
+                if (argc < 2)
         {
             return PrintAllCommands();
-        }
+                }
         if (strcmp(argv[1], "disabled") == 0)
         {
-            chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kDisabled);
-            return CHIP_NO_ERROR;
+                    chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kDisabled);
+                    return CHIP_NO_ERROR;
         }
-        if (strcmp(argv[1], "enabled_basic") == 0)
+        if (strcmp(argv[1],         "enabled_basic") == 0)
         {
             chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kEnabledBasic);
-            return CHIP_NO_ERROR;
+                    return CHIP_NO_ERROR;
         }
-        else if (strcmp(argv[1], "enabled_enhanced") == 0)
-        {
+        if (strcmp(argv[1],         "enabled_enhanced") == 0)
+                {
             chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kEnabledEnhanced);
-            return CHIP_NO_ERROR;
+                            return CHIP_NO_ERROR;
         }
         return PrintAllCommands();
-    }
-    else
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+            }
+    
+            return CHIP_ERROR_INVALID_ARGUMENT;
+           
     return error;
 }
 

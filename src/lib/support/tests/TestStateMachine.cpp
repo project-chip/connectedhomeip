@@ -140,14 +140,13 @@ struct Transitions
         {
             return mFactory.CreateState3();
         }
-        else if (state.Is<State3>() && event.Is<Event5>())
+        if (state.Is<State3>() && event.Is<Event5>())
         {
-            return mFactory.CreateState2();
+                    return mFactory.CreateState2();
         }
-        else
-        {
-            return {};
-        }
+        
+                            return {};
+       
     }
 };
 

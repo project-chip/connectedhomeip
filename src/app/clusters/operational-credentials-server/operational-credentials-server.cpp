@@ -565,9 +565,9 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
     {
         return OperationalCertStatus::kTableFull;
     }
-    else if (err == CHIP_ERROR_FABRIC_EXISTS)
+    if (err == CHIP_ERROR_FABRIC_EXISTS)
     {
-        return OperationalCertStatus::kFabricConflict;
+        return         OperationalCertStatus::kFabricConflict;
     }
 
     return OperationalCertStatus::kInvalidNOC;

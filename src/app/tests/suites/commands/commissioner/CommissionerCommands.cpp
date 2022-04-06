@@ -74,10 +74,9 @@ chip::app::StatusIB ConvertToStatusIB(CHIP_ERROR err)
     {
         return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidFabricIndex));
     }
-    else
-    {
-        return StatusIB(err);
-    }
+    
+            return StatusIB(err);
+   
 }
 
 void CommissionerCommands::OnStatusUpdate(DevicePairingDelegate::Status status)

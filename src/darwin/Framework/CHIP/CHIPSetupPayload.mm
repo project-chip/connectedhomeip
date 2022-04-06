@@ -34,11 +34,10 @@
     }
     if (value.Has(chip::RendezvousInformationFlag::kSoftAP)) {
         return kRendezvousInformationSoftAP;
-    } else if (value.Has(chip::RendezvousInformationFlag::kOnNetwork)) {
+    } if (value.Has(chip::RendezvousInformationFlag::kOnNetwork))         {
         return kRendezvousInformationOnNetwork;
-    } else {
-        return kRendezvousInformationNone;
-    }
+    }                 return kRendezvousInformationNone;
+   
 }
 
 - (CHIPCommissioningFlow)convertCommissioningFlow:(chip::CommissioningFlow)value
@@ -48,11 +47,10 @@
     }
     if (value == chip::CommissioningFlow::kUserActionRequired) {
         return kCommissioningFlowUserActionRequired;
-    } else if (value == chip::CommissioningFlow::kCustom) {
-        return kCommissioningFlowCustom;
-    } else {
-        return kCommissioningFlowInvalid;
-    }
+    } if (value == chip::CommissioningFlow::kCustom) {
+                return kCommissioningFlowCustom;
+    }         return kCommissioningFlowInvalid;
+           
 }
 
 - (id)initWithSetupPayload:(chip::SetupPayload)setupPayload
