@@ -10,7 +10,6 @@ event: event_priority "event"i id "=" number "{" struct_field* "}"
 
 attribute: attribute_tag* "attribute"i struct_field
 attribute_tag: "readonly"i -> attr_readonly
-             | "global"i -> attr_global
              | "nosubscribe"i -> attr_nosubscribe
 
 request_struct: "request"i struct
