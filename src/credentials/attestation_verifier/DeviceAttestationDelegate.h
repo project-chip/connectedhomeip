@@ -54,8 +54,8 @@ public:
      *   @param device The proxy represent the device being commissioned
      *   @param attestationResult The failure code for the device attestation validation operation
      */
-    virtual void OnDeviceAttestionFailed(chip::Controller::DeviceCommissioner * deviceCommissioner, DeviceProxy * device,
-                                         chip::Credentials::AttestationVerificationResult attestationResult) = 0;
+    virtual void OnDeviceAttestationFailed(Controller::DeviceCommissioner * deviceCommissioner, DeviceProxy * device,
+                                         AttestationVerificationResult attestationResult) = 0;
 };
 
 } // namespace Credentials

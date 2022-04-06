@@ -809,10 +809,15 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestationFailure(DevicePro
                                                                        Credentials::AttestationVerificationResult attestationResult)
 {
     MATTER_TRACE_EVENT_SCOPE("continueCommissioningDevice", "DeviceCommissioner");
+    if (device == nullptr || device != mDeviceBeingCommissioned) 
+    {
+        ChipLogError(Controller, "Invalid device for commissioning %p", device);
+        return CHIP_ERROR_INCORRECT_STATE;    
+    }
     CommissioneeDeviceProxy * commissioneeDevice = FindCommissioneeDevice(device->GetDeviceId());
     if (commissioneeDevice == nullptr || !commissioneeDevice->IsSecureConnected() || commissioneeDevice != mDeviceBeingCommissioned)
     {
-        ChipLogError(Controller, "Invalid device for commissioning af" ChipLogFormatX64,
+        ChipLogError(Controller, "Invalid device for commissioning after attestation failure: 0x" ChipLogFormatX64,
                      ChipLogValueX64(commissioneeDevice->GetDeviceId()));
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -829,13 +834,13 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestationFailure(DevicePro
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    ChipLogProgress(Controller, "Continuing commissioning after attestation failure for node ID 0x" ChipLogFormatX64,
+    ChipLogProgress(Controller, "Continuing commissioning after attestation failure for device ID 0x" ChipLogFormatX64,
                     ChipLogValueX64(commissioneeDevice->GetDeviceId()));
 
     if (attestationResult != AttestationVerificationResult::kSuccess)
     {
-        ChipLogError(Controller, "Client selected error: %hu for failed 'Attestation Information' for device",
-                     static_cast<uint16_t>(attestationResult));
+        ChipLogError(Controller, "Client selected error: %u for failed 'Attestation Information' for device",
+                     to_underlying(attestationResult));
 
         CommissioningDelegate::CommissioningReport report;
         report.Set<AdditionalErrorInfo>(attestationResult);
@@ -1038,7 +1043,7 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
         // Go look at AttestationVerificationResult enum in src/credentials/attestation_verifier/DeviceAttestationVerifier.h to
         // understand the errors.
 
-        auto params = commissioner->mDefaultCommissioner->GetCommissioningParameters();
+        auto & params = commissioner->mDefaultCommissioner->GetCommissioningParameters();
         Credentials::DeviceAttestationDelegate * deviceAttestationDelegate = params.GetDeviceAttestationDelegate();
 
         // If a device attestation status delegate is installed, delegate handling of failure to the client and let them
@@ -1062,6 +1067,7 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
 void DeviceCommissioner::OnArmFailSafeExtendedForFailedDeviceAttestation(
     void * context, const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
 {
+    // If this function starts using "data", need to fix ExtendArmFailSafeForFailedDeviceAttestation accordingly.
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
     if (!commissioner->mDeviceBeingCommissioned)
@@ -1069,13 +1075,13 @@ void DeviceCommissioner::OnArmFailSafeExtendedForFailedDeviceAttestation(
         return;
     }
 
-    auto params = commissioner->mDefaultCommissioner->GetCommissioningParameters();
+    auto & params = commissioner->mDefaultCommissioner->GetCommissioningParameters();
     Credentials::DeviceAttestationDelegate * deviceAttestationDelegate = params.GetDeviceAttestationDelegate();
     if (deviceAttestationDelegate)
     {
         ChipLogProgress(Controller, "Device attestation failed, delegating error handling to client");
-        deviceAttestationDelegate->OnDeviceAttestionFailed(commissioner, commissioner->mDeviceBeingCommissioned,
-                                                           commissioner->mAttestationResult);
+        deviceAttestationDelegate->OnDeviceAttestationFailed(commissioner, commissioner->mDeviceBeingCommissioned,
+                                                             commissioner->mAttestationResult);
     }
     else
     {
@@ -1100,7 +1106,7 @@ void DeviceCommissioner::ExtendArmFailSafeForFailedDeviceAttestation(Attestation
 {
     mAttestationResult = result;
 
-    auto params                                                        = mDefaultCommissioner->GetCommissioningParameters();
+    auto & params                                                      = mDefaultCommissioner->GetCommissioningParameters();
     Credentials::DeviceAttestationDelegate * deviceAttestationDelegate = params.GetDeviceAttestationDelegate();
     auto expiryLengthSeconds                                           = deviceAttestationDelegate->FailSafeExpiryTimeoutSecs();
     if (expiryLengthSeconds.HasValue())
@@ -1115,6 +1121,7 @@ void DeviceCommissioner::ExtendArmFailSafeForFailedDeviceAttestation(Attestation
     else
     {
         ChipLogProgress(Controller, "Proceeding without changing fail-safe timer value as delegate has not set it");
+        // Callee does not use data argument.
         const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType data;
         OnArmFailSafeExtendedForFailedDeviceAttestation(this, data);
     }
