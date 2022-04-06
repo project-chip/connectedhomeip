@@ -1056,7 +1056,12 @@ bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath,
 
 bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
 {
-    auto deviceTypeList = emberAfDeviceTypeListFromEndpoint(endpoint);
+    CHIP_ERROR err;
+    auto deviceTypeList = emberAfDeviceTypeListFromEndpoint(endpoint, err);
+    if (err != CHIP_NO_ERROR)
+    {
+        return false;
+    }
 
     for (auto & device : deviceTypeList)
     {

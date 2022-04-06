@@ -1060,17 +1060,18 @@ const EmberAfCluster * emberAfGetClusterByIndex(EndpointId endpoint, uint8_t clu
     return &(definedEndpoint->endpointType->cluster[clusterIndex]);
 }
 
-const chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(EndpointId endpoint)
+const chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::EndpointId endpoint, CHIP_ERROR & err)
 {
-    chip::Span<const EmberAfDeviceType> ret;
-
     uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
+    chip::Span<const EmberAfDeviceType> ret;
 
     if (endpointIndex == 0xFFFF)
     {
+        err = CHIP_ERROR_INVALID_ARGUMENT;
         return ret;
     }
 
+    err = CHIP_NO_ERROR;
     return emAfEndpoints[endpointIndex].deviceTypeList;
 }
 
