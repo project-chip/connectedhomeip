@@ -231,6 +231,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
         }
     }
 
+    DeviceLayer::DeviceControlServer::DeviceControlSvr().SetBreadcrumb(0);
     commandObj->AddResponse(commandPath, response);
 
     return true;
