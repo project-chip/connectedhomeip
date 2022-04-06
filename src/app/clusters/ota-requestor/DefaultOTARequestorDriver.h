@@ -106,8 +106,6 @@ protected:
     // Maximum number of times to retry a BUSY OTA provider before moving to the next available one
     static constexpr uint8_t kMaxBusyProviderRetryCount = 3;
     uint8_t mProviderRetryCount; // Track retry count for the current provider
-    chip::Optional<UpdateNotFoundReason> mUpdateNotFoundReason;
-    chip::Optional<System::Clock::Seconds32> mRetryDelaySec;
 };
 
 } // namespace DeviceLayer
