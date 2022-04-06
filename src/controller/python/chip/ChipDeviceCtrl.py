@@ -839,7 +839,7 @@ class ChipDeviceController():
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
             When not provided, a read request will be sent.
         '''
-        res = await self.Read(nodeid=nodeid, events=events, reportInterval=reportInterval, keepSubscription=keepSubscriptions)
+        res = await self.Read(nodeid=nodeid, events=events, reportInterval=reportInterval, keepSubscriptions=keepSubscriptions)
         if isinstance(res, ClusterAttribute.SubscriptionTransaction):
             return res
         else:

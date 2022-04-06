@@ -1386,11 +1386,14 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *
  * The default value comes from 3path per subsctipion * 3sub per fabric * max number of fabrics, then reserve 1 read client with 9
  * paths for each fabric.
+ *
+ * Note: CHIP_CONFIG_MAX_FABRICS = actual max number of fabrics + 1 reserved for rotation, so CHIP_CONFIG_MAX_FABRICS - 1 is the
+ * actual maximum number of fabrics supported.
  */
 #ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
-// #define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS (CHIP_CONFIG_MAX_FABRICS * 18)
+// #define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS ((CHIP_CONFIG_MAX_FABRICS - 1) * 18)
 // TODO: (#17085) Should be 3 sub * 3 path + 9 path (for read) = 18
-#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS (CHIP_CONFIG_MAX_FABRICS * 13)
+#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS ((CHIP_CONFIG_MAX_FABRICS - 1) * 13)
 #endif
 
 /**

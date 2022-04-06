@@ -383,9 +383,13 @@ private:
     reporting::Engine mReportingEngine;
 
 #if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS >= CHIP_CONFIG_MAX_FABRICS *
+    // CHIP_CONFIG_MAX_FABRICS = actual max number of fabrics + 1 reserved for rotation, so CHIP_CONFIG_MAX_FABRICS - 1 is the
+    // actual maximum number of fabrics supported.
+    static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS >= (CHIP_CONFIG_MAX_FABRICS - 1) *
                           (kMinSupportedPathPerSubscription * kMinSupportedSubscriptionPerFabric +
                            kReservedPathPoolForReadRequests),
+                  "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS is too small to match the requirements of spec 8.5.1");
+    static_assert(CHIP_IM_MAX_NUM_READ_HANDLER >= (CHIP_CONFIG_MAX_FABRICS - 1) * (kMinSupportedSubscriptionPerFabric + 1),
                   "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS is too small to match the requirements of spec 8.5.1");
 #endif
 
@@ -393,10 +397,6 @@ private:
     ObjectPool<ObjectList<EventPathParams>, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mEventPathPool;
     ObjectPool<ObjectList<DataVersionFilter>, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mDataVersionFilterPool;
 
-#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    static_assert(CHIP_IM_MAX_NUM_READ_HANDLER >= CHIP_CONFIG_MAX_FABRICS * (kMinSupportedSubscriptionPerFabric + 1),
-                  "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS is too small to match the requirements of spec 8.5.1");
-#endif
     ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READ_HANDLER> mReadHandlers;
 
     ReadClient * mpActiveReadClientList = nullptr;
