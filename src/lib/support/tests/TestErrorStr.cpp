@@ -185,8 +185,8 @@ int TestErrorStr(void)
 	{
         "-Error-Strings",
         &sTests[0],
-        NULL,
-        NULL
+        nullptr,
+        nullptr
     };
     // clang-format on
 

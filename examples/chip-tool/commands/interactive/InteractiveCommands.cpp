@@ -114,7 +114,7 @@ bool InteractiveStartCommand::ParseCommand(char * command)
         }
 
         args[argsCount++] = token;
-        token             = strtok(NULL, " ");
+        token             = strtok(nullptr, " ");
     }
 
     ClearLine();

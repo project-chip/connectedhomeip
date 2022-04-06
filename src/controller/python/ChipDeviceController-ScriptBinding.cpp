@@ -281,7 +281,7 @@ const char * pychip_DeviceController_ErrorToString(ChipError::StorageType err)
 const char * pychip_DeviceController_StatusReportToString(uint32_t profileId, uint16_t statusCode)
 {
     // return chip::StatusReportStr(profileId, statusCode);
-    return NULL;
+    return nullptr;
 }
 
 uint8_t pychip_DeviceController_GetLogFilter()
@@ -580,7 +580,7 @@ const char * pychip_Stack_ErrorToString(ChipError::StorageType err)
 const char * pychip_Stack_StatusReportToString(uint32_t profileId, uint16_t statusCode)
 {
     // return chip::StatusReportStr(profileId, statusCode);
-    return NULL;
+    return nullptr;
 }
 
 namespace {
