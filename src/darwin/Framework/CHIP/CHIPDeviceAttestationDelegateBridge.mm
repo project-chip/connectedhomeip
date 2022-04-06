@@ -19,7 +19,7 @@
 #import "CHIPError_Internal.h"
 
 void CHIPDeviceAttestationDelegateBridge::OnDeviceAttestionFailed(chip::Controller::DeviceCommissioner * deviceCommissioner,
-                                    chip::DeviceProxy * device, chip::Credentials::AttestationVerificationResult attestationResult)
+    chip::DeviceProxy * device, chip::Credentials::AttestationVerificationResult attestationResult)
 {
     dispatch_async(mQueue, ^{
         NSLog(@"CHIPDeviceAttestationDelegateBridge::OnDeviceAttestionFailed failed with result: %hu", attestationResult);
