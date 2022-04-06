@@ -557,10 +557,9 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
 
             return 0;
         }
-        
+
         // not supported
-            return 0;
-       
+        return 0;
     }
     else
     { // regular unsigned number comparison

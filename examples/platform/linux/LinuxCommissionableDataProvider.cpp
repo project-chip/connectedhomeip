@@ -96,16 +96,16 @@ CHIP_ERROR LinuxCommissionableDataProvider::Init(chip::Optional<std::vector<uint
     }
     if (!havePaseSalt)
     {
-        ChipLogProgress(Support,         "LinuxCommissionableDataProvider didn't get a PASE salt, generating one."        );
+        ChipLogProgress(Support, "LinuxCommissionableDataProvider didn't get a PASE salt, generating one.");
         std::vector<uint8_t> spake2pSaltVector;
         err = GeneratePaseSalt(spake2pSaltVector);
-                if (err != CHIP_NO_ERROR)
+        if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Support,         "Failed to generate PASE salt: %" CHIP_ERROR_FORMAT, err.Format());
-                    return err;
+            ChipLogError(Support, "Failed to generate PASE salt: %" CHIP_ERROR_FORMAT, err.Format());
+            return err;
         }
         spake2pSalt.SetValue(std::move(spake2pSaltVector));
-            }
+    }
 
     bool havePasscode = setupPasscode.HasValue();
     Spake2pVerifier passcodeVerifier;

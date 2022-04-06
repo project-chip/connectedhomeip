@@ -111,14 +111,14 @@ static CHIP_ERROR RendezvousStringToFlag(char * str, chip::RendezvousInformation
     }
     if (strcmp(str, "ble") == 0)
     {
-        *aRendezvousFlags         = chip::RendezvousInformationFlag::kBLE;
+        *aRendezvousFlags = chip::RendezvousInformationFlag::kBLE;
         return CHIP_NO_ERROR;
-            }
+    }
     else if (strcmp(str, "onnetwork") == 0)
     {
-        *aRendezvousFlags         = chip::RendezvousInformationFlag::kOnNetwork;
+        *aRendezvousFlags = chip::RendezvousInformationFlag::kOnNetwork;
         return CHIP_NO_ERROR;
-            }
+    }
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
@@ -152,12 +152,12 @@ static CHIP_ERROR OnboardingHandler(int argc, char ** argv)
     }
     if (strcmp(argv[1], "manualpairingcode") == 0)
     {
-                return GetOnboardingManualPairingCode(false, aRendezvousFlags);
-            }
+        return GetOnboardingManualPairingCode(false, aRendezvousFlags);
+    }
     else
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
-            }
+    }
 }
 
 void RegisterOnboardingCodesCommands()

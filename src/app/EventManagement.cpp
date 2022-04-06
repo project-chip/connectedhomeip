@@ -410,9 +410,8 @@ CHIP_ERROR EventManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, si
         return ctx->mpWriter->Put(TLV::ContextTag(to_underlying(EventDataIB::Tag::kDeltaEpochTimestamp)),
                                   ctx->mpContext->mCurrentTime.mValue - ctx->mpContext->mPreviousTime.mValue);
     }
-    
-            return ctx->mpWriter->CopyElement(reader);
-   
+
+    return ctx->mpWriter->CopyElement(reader);
 }
 
 void EventManagement::VendEventNumber()

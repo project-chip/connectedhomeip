@@ -123,9 +123,8 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath &
         ReturnErrorOnFailure(aDecoder.Decode(entry));
         return provider->AppendUserLabel(endpoint, entry);
     }
-    
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-   
+
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR UserLabelAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
