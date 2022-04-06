@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,15 +16,19 @@
  *    limitations under the License.
  */
 
+#pragma once
+
 #include "AppMain.h"
-#include "AppOptions.h"
-#include "binding-handler.h"
 
-int main(int argc, char * argv[])
+#include <app/tests/suites/credentials/TestHarnessDACProvider.h>
+
+class AppOptions
 {
-    VerifyOrDie(ChipLinuxAppInit(argc, argv, AppOptions::GetOptions()) == 0);
-    VerifyOrDie(InitBindingHandlers() == CHIP_NO_ERROR);
+public:
+    static chip::ArgParser::OptionSet * GetOptions();
+    static chip::Credentials::DeviceAttestationCredentialsProvider * GetDACProvider();
 
-    ChipLinuxAppMainLoop(AppOptions::GetDACProvider());
-    return 0;
-}
+private:
+    static bool HandleOptions(const char * program, chip::ArgParser::OptionSet * options, int identifier, const char * name,
+                              const char * value);
+};
