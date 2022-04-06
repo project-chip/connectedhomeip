@@ -390,12 +390,12 @@ enum
 /**
  * @brief Struct that maps actual endpoint type, onto a specific endpoint.
  */
-typedef struct
+struct EmberAfDefinedEndpoint
 {
     /**
      * Actual zigbee endpoint number.
      */
-    chip::EndpointId endpoint;
+    chip::EndpointId endpoint = chip::kInvalidEndpointId;
 
     /**
      * Span pointing to a list of supported device types
@@ -405,17 +405,17 @@ typedef struct
     /**
      * Meta-data about the endpoint
      */
-    EmberAfEndpointBitmask bitmask;
+    EmberAfEndpointBitmask bitmask = 0;
     /**
      * Endpoint type for this endpoint.
      */
-    const EmberAfEndpointType * endpointType;
+    const EmberAfEndpointType * endpointType = nullptr;
     /**
      * Pointer to the DataVersion storage for the server clusters on this
      * endpoint
      */
-    chip::DataVersion * dataVersions;
-} EmberAfDefinedEndpoint;
+    chip::DataVersion * dataVersions = nullptr;
+};
 
 // Cluster specific types
 

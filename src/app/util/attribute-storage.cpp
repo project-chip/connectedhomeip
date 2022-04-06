@@ -171,12 +171,6 @@ void emberAfEndpointConfigure(void)
     {
         // This is assuming that EMBER_AF_ENDPOINT_DISABLED is 0
         static_assert(EMBER_AF_ENDPOINT_DISABLED == 0, "We are creating enabled dynamic endpoints!");
-        memset(&emAfEndpoints[FIXED_ENDPOINT_COUNT], 0,
-               sizeof(EmberAfDefinedEndpoint) * (MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT));
-        for (ep = FIXED_ENDPOINT_COUNT; ep < MAX_ENDPOINT_COUNT; ep++)
-        {
-            emAfEndpoints[ep].endpoint = kInvalidEndpointId;
-        }
     }
 #endif
 }
