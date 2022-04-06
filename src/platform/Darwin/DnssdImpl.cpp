@@ -501,7 +501,7 @@ static CHIP_ERROR GetAddrInfo(void * context, DnssdResolveCallback callback, uin
 
         return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
     }
-    
+
             sockaddr_in6 sockaddr;
         memset(&sockaddr,         0, sizeof(sockaddr));
         sockaddr.sin6_len    = sizeof(sockaddr);
@@ -512,12 +512,12 @@ static CHIP_ERROR GetAddrInfo(void * context, DnssdResolveCallback callback, uin
         uint32_t interface   = 0;   // Set interface         to ANY (0) - network stack can decide how to route this.
         OnGetAddrInfo(nullptr,         0 /* flags */, interface, kDNSServiceErr_NoError, hostname,
                               reinterpret_cast<struct sockaddr *>(&sockaddr), ttl, sdCtx);
-        
+
         // Don't leak memory.
         sdCtx->serviceRef = nullptr;
                 MdnsContexts::GetInstance().Delete(sdCtx);
         return CHIP_NO_ERROR;
-           
+
 }
 
 static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceId, DNSServiceErrorType err,

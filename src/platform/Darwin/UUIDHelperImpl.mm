@@ -37,7 +37,7 @@
             return [CBUUID UUIDWithData:[NSData dataWithBytes:(svcId->bytes + 2) length:2]];
         }             // we need to use 4 bytes
             return         [CBUUID UUIDWithData:[NSData dataWithBytes:svcId->bytes length:4]];
-               
+
     } else {
         // it cannot be shortened as it doesn't match with the BLE Service UUID Base
         return [CBUUID UUIDWithData:[NSData dataWithBytes:svcId->bytes length:16]];

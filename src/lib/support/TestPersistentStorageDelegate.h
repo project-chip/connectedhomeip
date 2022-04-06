@@ -95,11 +95,11 @@ public:
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         // Handle non-empty values
-        
+
                     const uint8_t * bytes = static_cast<const uint8_t         *>(value);
             mStorage[key]         = std::vector<uint8_t>(bytes,         bytes + size);
             return CHIP_NO_ERROR;
-       
+
     }
 
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override

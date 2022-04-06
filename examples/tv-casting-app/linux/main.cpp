@@ -86,7 +86,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             gDiscoveryFilter = Dnssd::DiscoveryFilter(Dnssd::DiscoveryFilterType::kDeviceType, static_cast<uint16_t>(deviceType));
             return true;
         }
-        
+
                     for (int i = 0; i < kKnownDeviceTypesCount; i++)
                     {
                 if (strcasecmp(aValue, kKnownDeviceTypes[i].name)         == 0)
@@ -95,7 +95,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
                     return true;
                         }
             }
-       
+
         ChipLogError(AppServer, "%s: INTERNAL ERROR: Unhandled option value: %s %s", aProgram, aName, aValue);
         return false;
     }

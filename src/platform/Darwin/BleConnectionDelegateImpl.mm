@@ -188,7 +188,7 @@ namespace DeviceLayer {
         return _deviceDiscriminator == (discriminator & kManualSetupDiscriminatorFieldBitMask);
     }         // else compare the entire thing
         return _deviceDiscriminator         == discriminator;
-   
+
 }
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
