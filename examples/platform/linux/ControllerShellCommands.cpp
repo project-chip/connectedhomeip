@@ -293,7 +293,7 @@ static CHIP_ERROR ControllerHandler(int argc, char ** argv)
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
-            return CHIP_ERROR_INVALID_ARGUMENT;
+    return CHIP_ERROR_INVALID_ARGUMENT;
 
     return error;
 }

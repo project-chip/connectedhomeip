@@ -275,8 +275,7 @@ CHIP_ERROR TestAttrAccess::WriteListInt8uAttribute(const ConcreteDataAttributePa
         return CHIP_NO_ERROR;
     }
 
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR TestAttrAccess::ReadListOctetStringAttribute(AttributeValueEncoder & aEncoder)
@@ -328,8 +327,7 @@ CHIP_ERROR TestAttrAccess::WriteListOctetStringAttribute(const ConcreteDataAttri
         return CHIP_NO_ERROR;
     }
 
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR TestAttrAccess::ReadListLongOctetStringAttribute(AttributeValueEncoder & aEncoder)
@@ -377,8 +375,7 @@ CHIP_ERROR TestAttrAccess::WriteListLongOctetStringAttribute(const ConcreteDataA
         return CHIP_NO_ERROR;
     }
 
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR TestAttrAccess::ReadListStructOctetStringAttribute(AttributeValueEncoder & aEncoder)
@@ -449,8 +446,7 @@ CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(const ConcreteDat
         return CHIP_NO_ERROR;
     }
 
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR TestAttrAccess::ReadListNullablesAndOptionalsStructAttribute(AttributeValueEncoder & aEncoder)
@@ -521,8 +517,7 @@ CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(const C
         return CHIP_NO_ERROR;
     }
 
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR TestAttrAccess::ReadStructAttribute(AttributeValueEncoder & aEncoder)
@@ -671,8 +666,7 @@ CHIP_ERROR TestAttrAccess::WriteListFabricScopedAttribute(const ConcreteDataAttr
         return CHIP_NO_ERROR;
     }
 
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 } // namespace

@@ -200,9 +200,9 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             return imcode::InvalidValue;
         if (AutoSupported)
         {
-            if (requested >         OccupiedCoolingSetpoint - DeadBandTemp)
+            if (requested > OccupiedCoolingSetpoint - DeadBandTemp)
                 return imcode::InvalidValue;
-                }
+        }
         return imcode::Success;
     }
 
@@ -215,9 +215,9 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             return imcode::InvalidValue;
         if (AutoSupported)
         {
-            if (requested <         OccupiedHeatingSetpoint + DeadBandTemp)
+            if (requested < OccupiedHeatingSetpoint + DeadBandTemp)
                 return imcode::InvalidValue;
-                }
+        }
         return imcode::Success;
     }
 
@@ -230,9 +230,9 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             return imcode::InvalidValue;
         if (AutoSupported)
         {
-            if (requested >         UnoccupiedCoolingSetpoint - DeadBandTemp)
+            if (requested > UnoccupiedCoolingSetpoint - DeadBandTemp)
                 return imcode::InvalidValue;
-                }
+        }
         return imcode::Success;
     }
     case UnoccupiedCoolingSetpoint::Id: {
@@ -244,9 +244,9 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             return imcode::InvalidValue;
         if (AutoSupported)
         {
-            if (requested <         UnoccupiedHeatingSetpoint + DeadBandTemp)
+            if (requested < UnoccupiedHeatingSetpoint + DeadBandTemp)
                 return imcode::InvalidValue;
-                }
+        }
         return imcode::Success;
     }
 
@@ -258,9 +258,9 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             return imcode::InvalidValue;
         if (AutoSupported)
         {
-            if (requested >         MinCoolSetpointLimit - DeadBandTemp)
+            if (requested > MinCoolSetpointLimit - DeadBandTemp)
                 return imcode::InvalidValue;
-                }
+        }
         return imcode::Success;
     }
     case MaxHeatSetpointLimit::Id: {
@@ -271,9 +271,9 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             return imcode::InvalidValue;
         if (AutoSupported)
         {
-            if (requested >         MaxCoolSetpointLimit - DeadBandTemp)
+            if (requested > MaxCoolSetpointLimit - DeadBandTemp)
                 return imcode::InvalidValue;
-                }
+        }
         return imcode::Success;
     }
     case MinCoolSetpointLimit::Id: {
@@ -284,9 +284,9 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             return imcode::InvalidValue;
         if (AutoSupported)
         {
-            if (requested <         MinHeatSetpointLimit + DeadBandTemp)
+            if (requested < MinHeatSetpointLimit + DeadBandTemp)
                 return imcode::InvalidValue;
-                }
+        }
         return imcode::Success;
     }
     case MaxCoolSetpointLimit::Id: {
@@ -297,9 +297,9 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             return imcode::InvalidValue;
         if (AutoSupported)
         {
-            if (requested <         MaxHeatSetpointLimit + DeadBandTemp)
+            if (requested < MaxHeatSetpointLimit + DeadBandTemp)
                 return imcode::InvalidValue;
-                }
+        }
         return imcode::Success;
     }
     case MinSetpointDeadBand::Id: {

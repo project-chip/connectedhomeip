@@ -64,16 +64,16 @@ chip::app::StatusIB ConvertToStatusIB(CHIP_ERROR err)
     }
     if (CHIP_ERROR_UNSUPPORTED_CERT_FORMAT == err)
     {
-                return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNOC));
-            }
+        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNOC));
+    }
     else if (CHIP_ERROR_FABRIC_EXISTS == err)
     {
-        return         StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kFabricConflict));
-            }
+        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kFabricConflict));
+    }
     else if (CHIP_ERROR_INVALID_FABRIC_ID == err)
     {
-                return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidFabricIndex));
-            }
+        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidFabricIndex));
+    }
     else
     {
         return StatusIB(err);

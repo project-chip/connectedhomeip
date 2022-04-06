@@ -239,7 +239,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
     if (gSaltLen == 0)
     {
         gSaltLen = static_cast<uint8_t>(strlen(gSalt));
-            }
+    }
 
     if (gOutFileName == nullptr)
     {

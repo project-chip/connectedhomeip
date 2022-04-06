@@ -149,8 +149,7 @@ CHIP_ERROR TestAttrAccess::Write(const app::ConcreteDataAttributePath & aPath, a
         return err;
     }
 
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 /*

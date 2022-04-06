@@ -411,8 +411,7 @@ CHIP_ERROR EventManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, si
                                   ctx->mpContext->mCurrentTime.mValue - ctx->mpContext->mPreviousTime.mValue);
     }
 
-            return ctx->mpWriter->CopyElement(reader);
-
+    return ctx->mpWriter->CopyElement(reader);
 }
 
 void EventManagement::VendEventNumber()
