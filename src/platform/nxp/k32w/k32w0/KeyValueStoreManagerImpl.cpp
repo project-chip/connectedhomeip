@@ -38,7 +38,7 @@ namespace DeviceLayer {
 namespace PersistedStorage {
 
 /* TODO: adjust these values */
-constexpr size_t kMaxNumberOfKeys  = 20;
+constexpr size_t kMaxNumberOfKeys  = 30;
 constexpr size_t kMaxKeyValueBytes = 255;
 
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
@@ -118,7 +118,7 @@ CHIP_ERROR RestoreFromFlash()
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset_bytes)
 {
-    CHIP_ERROR err     = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    CHIP_ERROR err     = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     uint8_t pdm_id_kvs = chip::DeviceLayer::Internal::K32WConfig::kPDMId_KVS;
     std::unordered_map<std::string, uint8_t>::const_iterator it;
     size_t read_bytes        = 0;
@@ -194,7 +194,8 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
             pdm_internal_id = chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id + kMaxNumberOfKeys);
             ChipLogProgress(DeviceLayer, "KVS, save in flash the Matter key [%s] with PDM id: %i", key, pdm_internal_id);
 
-            err = chip::DeviceLayer::Internal::K32WConfig::WriteConfigValueStr(pdm_internal_id, key, strlen(key));
+            /* TODO (MATTER-132): do we need to make sure that "key" is NULL-terminated? */
+            err = chip::DeviceLayer::Internal::K32WConfig::WriteConfigValueStr(pdm_internal_id, key, strlen(key) + 1);
 
             if (err != CHIP_NO_ERROR)
             {

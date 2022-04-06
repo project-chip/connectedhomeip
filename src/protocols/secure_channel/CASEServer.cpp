@@ -33,19 +33,24 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
 #if CONFIG_NETWORK_LAYER_BLE
                                                      Ble::BleLayer * bleLayer,
 #endif
-                                                     SessionManager * sessionManager, FabricTable * fabrics)
+                                                     SessionManager * sessionManager, FabricTable * fabrics,
+                                                     SessionResumptionStorage * sessionResumptionStorage,
+                                                     Credentials::GroupDataProvider * responderGroupDataProvider)
 {
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(fabrics != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(responderGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CONFIG_NETWORK_LAYER_BLE
     mBleLayer = bleLayer;
 #endif
-    mSessionManager  = sessionManager;
-    mFabrics         = fabrics;
-    mExchangeManager = exchangeManager;
+    mSessionManager           = sessionManager;
+    mSessionResumptionStorage = sessionResumptionStorage;
+    mFabrics                  = fabrics;
+    mExchangeManager          = exchangeManager;
+    mGroupDataProvider        = responderGroupDataProvider;
 
     Cleanup();
     return CHIP_NO_ERROR;
@@ -71,11 +76,11 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
     }
 #endif
 
-    ReturnErrorOnFailure(mSessionIDAllocator.Allocate(mSessionKeyId));
-
     // Setup CASE state machine using the credentials for the current fabric.
-    ReturnErrorOnFailure(GetSession().ListenForSessionEstablishment(
-        mSessionKeyId, mFabrics, this, Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig())));
+    GetSession().SetGroupDataProvider(mGroupDataProvider);
+    ReturnErrorOnFailure(
+        GetSession().ListenForSessionEstablishment(*mSessionManager, mFabrics, mSessionResumptionStorage, this,
+                                                   Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig())));
 
     // Hand over the exchange context to the CASE session.
     ec->SetDelegate(&GetSession());
@@ -119,7 +124,6 @@ void CASEServer::Cleanup()
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 {
     ChipLogError(Inet, "CASE Session establishment failed: %s", ErrorStr(err));
-    mSessionIDAllocator.Free(mSessionKeyId);
     Cleanup();
 }
 

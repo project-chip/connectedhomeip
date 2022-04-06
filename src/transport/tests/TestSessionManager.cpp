@@ -168,12 +168,12 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
 
     SessionHolder aliceToBobSession;
-    SecurePairingUsingTestSecret aliceToBobPairing(1, 2);
+    SecurePairingUsingTestSecret aliceToBobPairing(1, 2, sessionManager);
     err = sessionManager.NewPairing(aliceToBobSession, peer, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
                                     &aliceToBobPairing, CryptoContext::SessionRole::kInitiator, aliceFabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret bobToAlicePairing(2, 1);
+    SecurePairingUsingTestSecret bobToAlicePairing(2, 1, sessionManager);
     SessionHolder bobToAliceSession;
     err = sessionManager.NewPairing(bobToAliceSession, peer, fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
                                     &bobToAlicePairing, CryptoContext::SessionRole::kResponder, bobFabricIndex);
@@ -283,12 +283,12 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
 
     SessionHolder aliceToBobSession;
-    SecurePairingUsingTestSecret aliceToBobPairing(1, 2);
+    SecurePairingUsingTestSecret aliceToBobPairing(1, 2, sessionManager);
     err = sessionManager.NewPairing(aliceToBobSession, peer, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
                                     &aliceToBobPairing, CryptoContext::SessionRole::kInitiator, aliceFabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret bobToAlicePairing(2, 1);
+    SecurePairingUsingTestSecret bobToAlicePairing(2, 1, sessionManager);
     SessionHolder bobToAliceSession;
     err = sessionManager.NewPairing(bobToAliceSession, peer, fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
                                     &bobToAlicePairing, CryptoContext::SessionRole::kResponder, bobFabricIndex);
@@ -384,12 +384,12 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
 
     SessionHolder aliceToBobSession;
-    SecurePairingUsingTestSecret aliceToBobPairing(1, 2);
+    SecurePairingUsingTestSecret aliceToBobPairing(1, 2, sessionManager);
     err = sessionManager.NewPairing(aliceToBobSession, peer, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
                                     &aliceToBobPairing, CryptoContext::SessionRole::kInitiator, aliceFabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret bobToAlicePairing(2, 1);
+    SecurePairingUsingTestSecret bobToAlicePairing(2, 1, sessionManager);
     SessionHolder bobToAliceSession;
     err = sessionManager.NewPairing(bobToAliceSession, peer, fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
                                     &bobToAlicePairing, CryptoContext::SessionRole::kResponder, bobFabricIndex);
@@ -497,36 +497,36 @@ void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
     SessionHolderWithDelegate session5(callback);
 
     // First pairing
-    SecurePairingUsingTestSecret pairing1(1, 1);
     callback.mOldConnectionDropped = false;
+    SecurePairingUsingTestSecret pairing1(1, 1, sessionManager);
     err = sessionManager.NewPairing(session1, peer, kSourceNodeId, &pairing1, CryptoContext::SessionRole::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with different peer node ID and different local key ID (same peer key ID)
-    SecurePairingUsingTestSecret pairing2(1, 2);
     callback.mOldConnectionDropped = false;
+    SecurePairingUsingTestSecret pairing2(1, 2, sessionManager);
     err = sessionManager.NewPairing(session2, peer, kSourceNodeId, &pairing2, CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with undefined node ID and different local key ID (same peer key ID)
-    SecurePairingUsingTestSecret pairing3(1, 3);
     callback.mOldConnectionDropped = false;
+    SecurePairingUsingTestSecret pairing3(1, 3, sessionManager);
     err = sessionManager.NewPairing(session3, peer, kUndefinedNodeId, &pairing3, CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with same local key ID, and a given node ID
-    SecurePairingUsingTestSecret pairing4(1, 2);
     callback.mOldConnectionDropped = false;
+    SecurePairingUsingTestSecret pairing4(1, 2, sessionManager);
     err = sessionManager.NewPairing(session4, peer, kSourceNodeId, &pairing4, CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, callback.mOldConnectionDropped);
 
     // New pairing with same local key ID, and undefined node ID
-    SecurePairingUsingTestSecret pairing5(1, 1);
     callback.mOldConnectionDropped = false;
+    SecurePairingUsingTestSecret pairing5(1, 1, sessionManager);
     err = sessionManager.NewPairing(session5, peer, kUndefinedNodeId, &pairing5, CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, callback.mOldConnectionDropped);
@@ -590,12 +590,12 @@ void SendPacketWithOldCounterTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
 
     SessionHolder aliceToBobSession;
-    SecurePairingUsingTestSecret aliceToBobPairing(1, 2);
+    SecurePairingUsingTestSecret aliceToBobPairing(1, 2, sessionManager);
     err = sessionManager.NewPairing(aliceToBobSession, peer, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
                                     &aliceToBobPairing, CryptoContext::SessionRole::kInitiator, aliceFabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret bobToAlicePairing(2, 1);
+    SecurePairingUsingTestSecret bobToAlicePairing(2, 1, sessionManager);
     SessionHolder bobToAliceSession;
     err = sessionManager.NewPairing(bobToAliceSession, peer, fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
                                     &bobToAlicePairing, CryptoContext::SessionRole::kResponder, bobFabricIndex);
@@ -704,12 +704,12 @@ void SendPacketWithTooOldCounterTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
 
     SessionHolder aliceToBobSession;
-    SecurePairingUsingTestSecret aliceToBobPairing(1, 2);
+    SecurePairingUsingTestSecret aliceToBobPairing(1, 2, sessionManager);
     err = sessionManager.NewPairing(aliceToBobSession, peer, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
                                     &aliceToBobPairing, CryptoContext::SessionRole::kInitiator, aliceFabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret bobToAlicePairing(2, 1);
+    SecurePairingUsingTestSecret bobToAlicePairing(2, 1, sessionManager);
     SessionHolder bobToAliceSession;
     err = sessionManager.NewPairing(bobToAliceSession, peer, fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
                                     &bobToAlicePairing, CryptoContext::SessionRole::kResponder, bobFabricIndex);
@@ -764,6 +764,124 @@ void SendPacketWithTooOldCounterTest(nlTestSuite * inSuite, void * inContext)
     sessionManager.Shutdown();
 }
 
+static void RandomSessionIdAllocatorOffset(nlTestSuite * inSuite, SessionManager & sessionManager, int max)
+{
+    // Allocate + free a pseudo-random number of sessions to create a
+    // pseudo-random offset in mNextSessionId.
+    const int bound = rand() % max;
+    for (int i = 0; i < bound; ++i)
+    {
+        auto handle = sessionManager.AllocateSession();
+        NL_TEST_ASSERT(inSuite, handle.HasValue());
+        sessionManager.ExpirePairing(handle.Value());
+    }
+}
+
+void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
+{
+    SessionManager sessionManager;
+    TestSessionReleaseCallback callback;
+
+    // Allocate a session.
+    uint16_t sessionId1;
+    {
+        auto handle = sessionManager.AllocateSession();
+        NL_TEST_ASSERT(inSuite, handle.HasValue());
+        SessionHolderWithDelegate session(handle.Value(), callback);
+        sessionId1 = session->AsSecureSession()->GetLocalSessionId();
+    }
+
+    // Allocate a session at a colliding ID, verify eviction.
+    {
+        callback.mOldConnectionDropped = false;
+        auto handle                    = sessionManager.AllocateSession(sessionId1);
+        NL_TEST_ASSERT(inSuite, handle.HasValue());
+        SessionHolderWithDelegate session(handle.Value(), callback);
+    }
+
+    // Verify that we increment session ID by 1 for each allocation, except for
+    // the wraparound case where we skip session ID 0.
+    auto prevSessionId = sessionId1;
+    for (uint32_t i = 0; i < 10; ++i)
+    {
+        auto handle = sessionManager.AllocateSession();
+        if (!handle.HasValue())
+        {
+            break;
+        }
+        auto sessionId = handle.Value()->AsSecureSession()->GetLocalSessionId();
+        NL_TEST_ASSERT(inSuite, sessionId - prevSessionId == 1 || (sessionId == 1 && prevSessionId == 65535));
+        NL_TEST_ASSERT(inSuite, sessionId != 0);
+        prevSessionId = sessionId;
+    }
+
+    // Reconstruct the Session Manager to reset state.
+    sessionManager.~SessionManager();
+    new (&sessionManager) SessionManager();
+
+    prevSessionId = 0;
+    // Verify that we increment session ID by 1 for each allocation (except for
+    // the wraparound case where we skip session ID 0), even when allocated
+    // sessions are immediately freed.
+    for (uint32_t i = 0; i < UINT16_MAX + 10; ++i)
+    {
+        auto handle = sessionManager.AllocateSession();
+        NL_TEST_ASSERT(inSuite, handle.HasValue());
+        auto sessionId = handle.Value()->AsSecureSession()->GetLocalSessionId();
+        NL_TEST_ASSERT(inSuite, sessionId - prevSessionId == 1 || (sessionId == 1 && prevSessionId == 65535));
+        NL_TEST_ASSERT(inSuite, sessionId != 0);
+        prevSessionId = sessionId;
+        sessionManager.ExpirePairing(handle.Value());
+    }
+
+    // Verify that the allocator does not give colliding IDs.
+    constexpr int collisionTestIterations = 1;
+    for (int i = 0; i < collisionTestIterations; ++i)
+    {
+        // Allocate some session handles at pseudo-random offsets in the session
+        // ID space.
+        constexpr size_t numHandles = CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE - 1;
+        Optional<SessionHandle> handles[numHandles];
+        uint16_t sessionIds[numHandles];
+        for (size_t h = 0; h < numHandles; ++h)
+        {
+            constexpr int maxOffset = 5000;
+            handles[h]              = sessionManager.AllocateSession();
+            NL_TEST_ASSERT(inSuite, handles[h].HasValue());
+            sessionIds[h] = handles[h].Value()->AsSecureSession()->GetLocalSessionId();
+            RandomSessionIdAllocatorOffset(inSuite, sessionManager, maxOffset);
+        }
+
+        // Verify that none collide each other.
+        for (size_t h = 0; h < numHandles; ++h)
+        {
+            NL_TEST_ASSERT(inSuite, sessionIds[h] != sessionIds[(h + 1) % numHandles]);
+        }
+
+        // Allocate through the entire session ID space and verify that none of
+        // these collide either.
+        for (int j = 0; j < UINT16_MAX; ++j)
+        {
+            auto handle = sessionManager.AllocateSession();
+            NL_TEST_ASSERT(inSuite, handle.HasValue());
+            auto potentialCollision = handle.Value()->AsSecureSession()->GetLocalSessionId();
+            for (size_t h = 0; h < numHandles; ++h)
+            {
+                NL_TEST_ASSERT(inSuite, potentialCollision != sessionIds[h]);
+            }
+            sessionManager.ExpirePairing(handle.Value());
+        }
+
+        // Free our allocated sessions.
+        for (size_t h = 0; h < numHandles; ++h)
+        {
+            sessionManager.ExpirePairing(handles[h].Value());
+        }
+    }
+
+    sessionManager.Shutdown();
+}
+
 // Test Suite
 
 /**
@@ -779,6 +897,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Drop stale connection Test",     StaleConnectionDropTest),
     NL_TEST_DEF("Old counter Test",               SendPacketWithOldCounterTest),
     NL_TEST_DEF("Too-old counter Test",           SendPacketWithTooOldCounterTest),
+    NL_TEST_DEF("Session Allocation Test",        SessionAllocationTest),
 
     NL_TEST_SENTINEL()
 };

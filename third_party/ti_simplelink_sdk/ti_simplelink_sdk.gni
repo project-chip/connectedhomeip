@@ -28,7 +28,8 @@ import("ti_simplelink_board.gni")
 
 declare_args() {
   # Location of the TI SimpleLink SDK.
-  ti_simplelink_sdk_root = ""
+  ti_simplelink_sdk_root =
+      "${chip_root}/third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx"
   ti_sysconfig_root = ""
 }
 
@@ -81,7 +82,8 @@ template("ti_sysconfig") {
     args = [
       ti_sysconfig_root,
       "-s",
-      ti_simplelink_sdk_root + "/.metadata/product.json",
+      rebase_path(ti_simplelink_sdk_root + "/.metadata/product.json",
+                  root_build_dir),
       "-o",
       rebase_path(output_dir, root_build_dir),
       "--compiler",
@@ -145,8 +147,8 @@ template("ti_simplelink_sdk") {
              "ti_simplelink_device_family must be specified")
 
       libs += [
-        "${ti_simplelink_sdk_root}/source/ti/drivers/lib/gcc/m4f/drivers_${ti_simplelink_soc_family}.a",
-        "${ti_simplelink_sdk_root}/source/ti/drivers/rf/lib/rf_multiMode_${ti_simplelink_soc_family}.am4fg",
+        "${ti_simplelink_sdk_root}/source/ti/drivers/lib/gcc/${ti_simplelink_isa}/drivers_${ti_simplelink_soc_family}.a",
+        "${ti_simplelink_sdk_root}/source/ti/drivers/rf/lib/gcc/${ti_simplelink_isa}/rf_multiMode_${ti_simplelink_soc_family}.a",
       ]
     }
 
@@ -390,8 +392,12 @@ template("ti_simplelink_sdk") {
     cflags = [
       "-Wno-conversion",
       "-Wno-comment",
-      "@${ti_simplelink_sdk_root}/source/ti/ble5stack/config/build_components.opt",
-      "@${ti_simplelink_sdk_root}/source/ti/ble5stack/config/factory_config.opt",
+      "@" + rebase_path(ti_simplelink_sdk_root +
+                            "/source/ti/ble5stack/config/build_components.opt",
+                        root_build_dir),
+      "@" + rebase_path(ti_simplelink_sdk_root +
+                            "/source/ti/ble5stack/config/factory_config.opt",
+                        root_build_dir),
     ]
   }
 

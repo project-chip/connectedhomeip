@@ -111,9 +111,9 @@ jobs:
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Lighting App on nRF52840 DK with RPC
               if: github.event_name == 'push' || steps.changed_paths.outputs.nrfconnect == 'true'
-              timeout-minutes: 10
+              timeout-minutes: 20
               run: |
-                  scripts/examples/nrfconnect_example.sh lighting-app nrf52840dk_nrf52840 -DOVERLAY_CONFIG=rpc.overlay
+                  scripts/examples/nrfconnect_example.sh lighting-app nrf52840dk_nrf52840 -DOVERLAY_CONFIG=../../rpc.overlay
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf52840dk_nrf52840+rpc lighting-app \
                     examples/lighting-app/nrfconnect/build/zephyr/zephyr.elf \
@@ -175,7 +175,7 @@ jobs:
             - name: Build example nRF Connect SDK All Clusters App on nRF52840 DK
               timeout-minutes: 10
               run: |
-                  scripts/examples/nrfconnect_example.sh all-clusters-app nrf52840dk_nrf52840 -DBUILD_WITH_DFU=1
+                  scripts/examples/nrfconnect_example.sh all-clusters-app nrf52840dk_nrf52840 -DCONF_FILE=prj_dfu.conf
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf52840dk_nrf52840 all-clusters-app \
                     examples/all-clusters-app/nrfconnect/build/zephyr/zephyr.elf \

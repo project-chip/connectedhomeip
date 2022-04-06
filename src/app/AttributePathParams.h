@@ -86,5 +86,6 @@ struct AttributePathParams
     EndpointId mEndpointId   = kInvalidEndpointId;  // uint16
     ListIndex mListIndex     = kInvalidListIndex;   // uint16
 };
+
 } // namespace app
 } // namespace chip

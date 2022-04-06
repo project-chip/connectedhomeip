@@ -26,7 +26,7 @@ concurrency:
 jobs:
     build_linux_gcc_debug:
         name: Build on Linux (gcc_debug)
-        timeout-minutes: 60
+        timeout-minutes: 65
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -73,7 +73,7 @@ jobs:
               timeout-minutes: 20
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Run Tests
-              timeout-minutes: 5
+              timeout-minutes: 15
               run: scripts/tests/gn_tests.sh
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
@@ -160,13 +160,22 @@ jobs:
                   for BUILD_TYPE  in gcc_release clang; do
                       case $BUILD_TYPE in
                           "gcc_release") GN_ARGS='is_debug=false';;
-                          "clang") GN_ARGS='is_clang=true pw_command_launcher="`pwd`/../scripts/helpers/clang-tidy-launcher.py"';;
+                          "clang") GN_ARGS='is_clang=true';;
                       esac
 
-                      scripts/build/gn_gen.sh --args="$GN_ARGS"
-                      scripts/run_in_build_env.sh "ninja -C ./out"
-                      scripts/tests/gn_tests.sh
+                      BUILD_TYPE=$BUILD_TYPE scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
+                      scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
+                      BUILD_TYPE=$BUILD_TYPE scripts/tests/gn_tests.sh
                   done
+            - name: Clang-tidy validation
+              timeout-minutes: 45
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/run-clang-tidy-on-compile-commands.py \
+                       --no-log-timestamps \
+                       --compile-database out/clang/compile_commands.json \
+                       check \
+                    "
             - name: Run Tests with sanitizers
               timeout-minutes: 30
               env:
@@ -189,13 +198,12 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --no-log-timestamps \
-                       --target linux-x64-all-clusters-ipv6only \
-                       --target linux-x64-chip-tool-ipv6only \
-                       --target linux-x64-minmdns-ipv6only \
+                       --target linux-x64-all-clusters-ipv6only-clang \
+                       --target linux-x64-chip-tool-ipv6only-clang \
+                       --target linux-x64-minmdns-ipv6only-clang \
                        --target linux-x64-rpc-console \
                        build \
                     "
-
             - name: Run fake linux tests with build_examples
               timeout-minutes: 15
               run: |
@@ -335,13 +343,22 @@ jobs:
                           #   use that on Darwin.
                           # * the "host clang" build, which uses the pigweed
                           #   clang.
-                          "default") GN_ARGS='target_os="all" is_asan=true enable_host_clang_build=false enable_host_gcc_mbedtls_build=false pw_command_launcher="`pwd`/../scripts/helpers/clang-tidy-launcher.py"';;
+                          "default") GN_ARGS='target_os="all" is_asan=true enable_host_clang_build=false enable_host_gcc_mbedtls_build=false';;
                           "python_lib") GN_ARGS='enable_rtti=true enable_pylib=true';;
                       esac
-                      scripts/build/gn_gen.sh --args="$GN_ARGS"
-                      scripts/run_in_build_env.sh "ninja -C ./out"
-                      scripts/tests/gn_tests.sh
+                      BUILD_TYPE=$BUILD_TYPE scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
+                      scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
+                      BUILD_TYPE=$BUILD_TYPE scripts/tests/gn_tests.sh
                   done
+            - name: Clang-tidy validation
+              timeout-minutes: 45
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/run-clang-tidy-on-compile-commands.py \
+                       --no-log-timestamps \
+                       --compile-database out/default/compile_commands.json \
+                       check \
+                    "
             - name: Uploading diagnostic logs
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}

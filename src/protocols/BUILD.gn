@@ -21,6 +21,8 @@ static_library("protocols") {
     "echo/Echo.h",
     "echo/EchoClient.cpp",
     "echo/EchoServer.cpp",
+    "interaction_model/StatusCode.cpp",
+    "interaction_model/StatusCode.h",
     "secure_channel/MessageCounterManager.cpp",
     "secure_channel/MessageCounterManager.h",
     "user_directed_commissioning/UDCClientState.h",

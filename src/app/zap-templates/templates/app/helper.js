@@ -754,7 +754,6 @@ function isWeaklyTypedEnum(label)
     "AttributeWritePermission",
     "BarrierControlBarrierPosition",
     "BarrierControlMovingState",
-    "BootReasonType",
     "ColorControlOptions",
     "ColorLoopAction",
     "ColorLoopDirection",
@@ -791,8 +790,6 @@ function isWeaklyTypedEnum(label)
     "StatusCode",
     "StepMode",
     "TemperatureDisplayMode",
-    "WcEndProductType",
-    "WcType",
     "WiFiVersionType",
   ].includes(label);
 }

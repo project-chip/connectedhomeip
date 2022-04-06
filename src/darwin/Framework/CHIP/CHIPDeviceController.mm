@@ -16,6 +16,7 @@
  */
 #import "CHIPDeviceController.h"
 
+#import "CHIPAttestationTrustStoreBridge.h"
 #import "CHIPCommissioningParameters.h"
 #import "CHIPControllerAccessControl.h"
 #import "CHIPDevicePairingDelegateBridge.h"
@@ -37,20 +38,28 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
+#include <controller/CommissioningWindowOpener.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
+#include <system/SystemClock.h>
 
 static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.commissioner.device_id";
 
 static NSString * const kErrorMemoryInit = @"Init Memory failure";
 static NSString * const kErrorKVSInit = @"Init Key Value Store failure";
 static NSString * const kErrorCommissionerInit = @"Init failure while initializing a commissioner";
+static NSString * const kErrorGroupProviderInit = @"Init failure while initializing group data provider";
+static NSString * const kErrorIPKInit = @"Init failure while initializing IPK";
 static NSString * const kErrorOperationalCredentialsInit = @"Init failure while creating operational credentials delegate";
 static NSString * const kErrorPairingInit = @"Init failure while creating a pairing delegate";
 static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
+static NSString * const kErrorAttestationTrustStoreInit = @"Init failure while creating the attestation trust store";
 static NSString * const kErrorPairDevice = @"Failure while pairing the device";
 static NSString * const kErrorUnpairDevice = @"Failure while unpairing the device";
 static NSString * const kErrorStopPairing = @"Failure while trying to stop the pairing process";
@@ -65,8 +74,14 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 @property (atomic, readonly) dispatch_queue_t chipWorkQueue;
 
 @property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
+// We use TestPersistentStorageDelegate just to get an in-memory store to back
+// our group data provider impl.  We initialize this store correctly on every
+// controller startup, so don't need to actually persist it.
+@property (readonly) chip::TestPersistentStorageDelegate * groupStorageDelegate;
+@property (readonly) chip::Credentials::GroupDataProviderImpl * groupDataProvider;
 @property (readonly) CHIPDevicePairingDelegateBridge * pairingDelegateBridge;
 @property (readonly) CHIPPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
+@property (readonly) CHIPAttestationTrustStoreBridge * attestationTrustStoreBridge;
 @property (readonly) CHIPOperationalCredentialsDelegate * operationalCredentialsDelegate;
 @property (readonly) CHIPP256KeypairBridge keypairBridge;
 @property (readonly) chip::NodeId localDeviceId;
@@ -111,8 +126,30 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
             return nil;
         }
 
+        _attestationTrustStoreBridge = new CHIPAttestationTrustStoreBridge();
+        if ([self checkForInitError:(_attestationTrustStoreBridge != nullptr) logMsg:kErrorAttestationTrustStoreInit]) {
+            return nil;
+        }
+
         _operationalCredentialsDelegate = new CHIPOperationalCredentialsDelegate();
         if ([self checkForInitError:(_operationalCredentialsDelegate != nullptr) logMsg:kErrorOperationalCredentialsInit]) {
+            return nil;
+        }
+
+        _groupStorageDelegate = new chip::TestPersistentStorageDelegate();
+        if ([self checkForInitError:(_groupStorageDelegate != nullptr) logMsg:kErrorGroupProviderInit]) {
+            return nil;
+        }
+
+        // For now default args are fine, since we are just using this for the IPK.
+        _groupDataProvider = new chip::Credentials::GroupDataProviderImpl();
+        if ([self checkForInitError:(_groupDataProvider != nullptr) logMsg:kErrorGroupProviderInit]) {
+            return nil;
+        }
+
+        _groupDataProvider->SetStorageDelegate(_groupStorageDelegate);
+        errorCode = _groupDataProvider->Init();
+        if ([self checkForInitError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorGroupProviderInit]) {
             return nil;
         }
     }
@@ -129,6 +166,15 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     dispatch_async(_chipWorkQueue, ^{
         if (self->_cppCommissioner) {
             CHIP_LOG_DEBUG("%@", kInfoStackShutdown);
+            chip::FabricIndex fabricIdx;
+            CHIP_ERROR err = self->_cppCommissioner->GetFabricIndex(&fabricIdx);
+            if (err == CHIP_NO_ERROR && self->_groupDataProvider) {
+                // Clear out out group keys for this fabric index, just in case
+                // we get a different fabric index assigned when we are started
+                // again, since _groupDataProvider lives across shutdown/startup
+                // cycles.
+                self->_groupDataProvider->RemoveGroupKeys(fabricIdx);
+            }
             self->_cppCommissioner->Shutdown();
             delete self->_cppCommissioner;
             self->_cppCommissioner = nullptr;
@@ -145,6 +191,20 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
        vendorId:(uint16_t)vendorId
       nocSigner:(id<CHIPKeypair>)nocSigner
 {
+    return [self startup:storageDelegate vendorId:vendorId nocSigner:nocSigner ipk:nil paaCerts:nil];
+}
+- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
+       vendorId:(uint16_t)vendorId
+      nocSigner:(id<CHIPKeypair>)nocSigner
+            ipk:(NSData * _Nullable)ipk
+       paaCerts:(NSArray<NSData *> * _Nullable)paaCerts
+{
+    if (vendorId == chip::VendorId::Common) {
+        // Shouldn't be using the "standard" vendor ID for actual devices.
+        CHIP_LOG_ERROR("%d is not a valid vendorId to initialize a device controller with", vendorId);
+        return NO;
+    }
+
     chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
 
     __block BOOL commissionerInitialized = NO;
@@ -170,7 +230,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
             _keypairBridge.Init(nocSigner);
             nativeBridge.reset(new chip::Crypto::CHIPP256KeypairNativeBridge(_keypairBridge));
         }
-        errorCode = _operationalCredentialsDelegate->init(_persistentStorageDelegateBridge, std::move(nativeBridge));
+        errorCode = _operationalCredentialsDelegate->init(_persistentStorageDelegateBridge, std::move(nativeBridge), ipk);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorOperationalCredentialsInit]) {
             return;
         }
@@ -179,7 +239,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         [self _getControllerNodeId];
 
         _cppCommissioner = new chip::Controller::DeviceCommissioner();
-        if ([self checkForInitError:(_cppCommissioner != nullptr) logMsg:kErrorMemoryInit]) {
+        if ([self checkForStartError:(_cppCommissioner != nullptr) logMsg:kErrorCommissionerInit]) {
             return;
         }
 
@@ -192,10 +252,16 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         params.enableServerInteractions = true;
 
         // Initialize device attestation verifier
-        // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
-        const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-        chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
+        if (paaCerts) {
+            _attestationTrustStoreBridge->Init(paaCerts);
+            chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(_attestationTrustStoreBridge));
+        } else {
+            // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+            const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+            chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
+        }
 
+        params.groupDataProvider = _groupDataProvider;
         params.fabricIndependentStorage = _persistentStorageDelegateBridge;
         commissionerParams.storageDelegate = _persistentStorageDelegateBridge;
         commissionerParams.pairingDelegate = _pairingDelegateBridge;
@@ -230,7 +296,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 
         if (_kvsPath != nullptr) {
             errorCode = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(_kvsPath);
-            if ([self checkForInitError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorKVSInit]) {
+            if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorKVSInit]) {
                 return;
             }
         }
@@ -244,6 +310,25 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 
         errorCode = factory.SetupCommissioner(commissionerParams, *_cppCommissioner);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
+            return;
+        }
+
+        chip::FabricIndex fabricIdx = 0;
+        errorCode = _cppCommissioner->GetFabricIndex(&fabricIdx);
+        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorIPKInit]) {
+            return;
+        }
+
+        uint8_t compressedIdBuffer[sizeof(uint64_t)];
+        chip::MutableByteSpan compressedId(compressedIdBuffer);
+        errorCode = _cppCommissioner->GetFabricInfo()->GetCompressedId(compressedId);
+        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorIPKInit]) {
+            return;
+        }
+
+        errorCode = chip::Credentials::SetSingleIpkEpochKey(
+            _groupDataProvider, fabricIdx, _operationalCredentialsDelegate->GetIPK(), compressedId);
+        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorIPKInit]) {
             return;
         }
 
@@ -482,9 +567,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         return NO;
     }
 
-    chip::SetupPayload setupPayload;
-    err = self.cppCommissioner->OpenCommissioningWindow(deviceID, (uint16_t) duration, 0, 0,
-        chip::Controller::DeviceController::CommissioningWindowOption::kOriginalSetupCode, setupPayload);
+    err = chip::Controller::AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(
+        self.cppCommissioner, deviceID, chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)));
 
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));
@@ -505,8 +589,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::SetupPayload setupPayload;
-
     if (duration > UINT16_MAX) {
         CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
         if (error) {
@@ -521,15 +603,15 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
             *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
         return nil;
-    } else {
-        setupPayload.discriminator = (uint16_t) discriminator;
     }
 
     setupPIN &= ((1 << chip::kSetupPINCodeFieldLengthInBits) - 1);
-    setupPayload.setUpPINCode = (uint32_t) setupPIN;
 
-    err = self.cppCommissioner->OpenCommissioningWindow(deviceID, (uint16_t) duration, 1000, (uint16_t) discriminator,
-        chip::Controller::DeviceController::CommissioningWindowOption::kTokenWithProvidedPIN, setupPayload);
+    chip::SetupPayload setupPayload;
+    err = chip::Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(self.cppCommissioner, deviceID,
+        chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)), chip::Crypto::kSpake2p_Min_PBKDF_Iterations,
+        static_cast<uint16_t>(discriminator), chip::MakeOptional(static_cast<uint32_t>(setupPIN)), chip::NullOptional,
+        setupPayload);
 
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));
@@ -607,6 +689,22 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         _persistentStorageDelegateBridge = NULL;
     }
 
+    if (_attestationTrustStoreBridge) {
+        delete _attestationTrustStoreBridge;
+        _attestationTrustStoreBridge = NULL;
+    }
+
+    if (_groupDataProvider) {
+        _groupDataProvider->Finish();
+        delete _groupDataProvider;
+        _groupDataProvider = NULL;
+    }
+
+    if (_groupStorageDelegate) {
+        delete _groupStorageDelegate;
+        _groupStorageDelegate = NULL;
+    }
+
     return YES;
 }
 
@@ -619,6 +717,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     CHIP_LOG_ERROR("Error: %@", logMsg);
 
     if (_cppCommissioner) {
+        _cppCommissioner->Shutdown();
         delete _cppCommissioner;
         _cppCommissioner = NULL;
     }

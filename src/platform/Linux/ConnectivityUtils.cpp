@@ -632,7 +632,7 @@ CHIP_ERROR ConnectivityUtils::GetEthFullDuplex(const char * ifname, bool & fullD
     }
     else
     {
-        fullDuplex = (ecmd.duplex == DUPLEX_FULL) ? true : false;
+        fullDuplex = ecmd.duplex == DUPLEX_FULL;
         err        = CHIP_NO_ERROR;
     }
 

@@ -123,6 +123,7 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
     }
 
+    gTestPairing.Init(gSessionManager);
     err = gSessionManager.NewPairing(gSession, peer, chip::kTestControllerNodeId, &gTestPairing,
                                      chip::CryptoContext::SessionRole::kResponder, gFabricIndex);
     SuccessOrExit(err);

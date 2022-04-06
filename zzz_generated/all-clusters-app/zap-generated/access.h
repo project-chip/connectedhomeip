@@ -31,6 +31,9 @@
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
     31, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     31, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
+    /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
+    /* Cluster: Basic, Attribute: Location, Privilege: view */ \
+    /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: view */ \
@@ -44,6 +47,8 @@
     /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
+    /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
+    62, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
 
@@ -51,6 +56,9 @@
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
     0, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     1, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
+    /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
+    /* Cluster: Basic, Attribute: Location, Privilege: view */ \
+    /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: view */ \
@@ -64,6 +72,8 @@
     /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
+    /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
+    0, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
 
@@ -71,6 +81,9 @@
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
     kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
+    /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
+    /* Cluster: Basic, Attribute: Location, Privilege: view */ \
+    /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: view */ \
@@ -84,6 +97,8 @@
     /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
+    /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
 
@@ -93,6 +108,9 @@
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
     31, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     31, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
+    40, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
+    40, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
+    40, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
     257, /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: manage */ \
     257, /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: manage */ \
     257, /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: manage */ \
@@ -106,6 +124,7 @@
     257, /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: administer */ \
     257, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
     257, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
+    48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     258, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
 
@@ -113,6 +132,9 @@
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
     0, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     1, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
+    5, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
+    6, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
+    16, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
     4, /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: manage */ \
     5, /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: manage */ \
     6, /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: manage */ \
@@ -126,6 +148,7 @@
     48, /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: administer */ \
     49, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
     51, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
+    0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     23, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
 
@@ -133,6 +156,9 @@
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
     kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: manage */ \
@@ -146,6 +172,7 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
 
@@ -153,32 +180,77 @@
 
 // Parallel array data (*cluster*, command, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER { \
-    257, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
+    60, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
+    60, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
+    60, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    48, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
+    48, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
+    48, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: AddNOC, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: UpdateNOC, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: RemoveTrustedRootCertificate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *command*, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__COMMAND { \
-    38, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
-    29, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
-    36, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
-    27, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
-    34, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
+    0, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
+    1, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
+    2, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
     26, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
+    27, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
+    29, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
+    34, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
+    36, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
+    38, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    0, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
+    2, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
+    4, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
+    0, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
+    2, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
+    4, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
+    6, /* Cluster: Operational Credentials, Command: AddNOC, Privilege: administer */ \
+    7, /* Cluster: Operational Credentials, Command: UpdateNOC, Privilege: administer */ \
+    9, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
+    10, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
+    11, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
+    12, /* Cluster: Operational Credentials, Command: RemoveTrustedRootCertificate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, command, *privilege*) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__PRIVILEGE { \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: AddNOC, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: UpdateNOC, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: RemoveTrustedRootCertificate, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

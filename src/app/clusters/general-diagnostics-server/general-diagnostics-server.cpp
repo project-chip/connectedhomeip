@@ -36,13 +36,6 @@ using chip::DeviceLayer::ConnectivityMgr;
 using chip::DeviceLayer::DiagnosticDataProvider;
 using chip::DeviceLayer::GetDiagnosticDataProvider;
 
-static_assert(sizeof(chip::DeviceLayer::BootReasonType) == sizeof(EmberAfBootReasonType),
-              "BootReasonType size doesn't match EmberAfBootReasonType size");
-static_assert(static_cast<uint8_t>(chip::DeviceLayer::BootReasonType::Unspecified) == EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED &&
-                  static_cast<uint8_t>(chip::DeviceLayer::BootReasonType::SoftwareReset) ==
-                      EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET,
-              "BootReasonType and EmberAfBootReasonType values does not match.");
-
 namespace {
 
 class GeneralDiagosticsAttrAccess : public AttributeAccessInterface
@@ -71,7 +64,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticDa
     CHIP_ERROR err = (GetDiagnosticDataProvider().*getter)(data);
     if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
-        data = 0;
+        data = {};
     }
     else if (err != CHIP_NO_ERROR)
     {
@@ -195,7 +188,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
     }
 
     // Gets called when the device has been rebooted.
-    void OnDeviceRebooted(chip::DeviceLayer::BootReasonType bootReason) override
+    void OnDeviceRebooted(BootReasonType bootReason) override
     {
         ChipLogDetail(Zcl, "GeneralDiagnosticsDelegate: OnDeviceRebooted");
 
@@ -203,7 +196,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
 
         // GeneralDiagnostics cluster should exist only for endpoint 0.
 
-        Events::BootReason::Type event{ static_cast<EmberAfBootReasonType>(bootReason) };
+        Events::BootReason::Type event{ bootReason };
         EventNumber eventNumber;
 
         CHIP_ERROR err = LogEvent(event, 0, eventNumber);

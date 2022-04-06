@@ -3897,6 +3897,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("networkingStatus", indent + 1, value.networkingStatus));
     ReturnErrorOnFailure(DataModelLogger::LogValue("debugText", indent + 1, value.debugText));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("networkIndex", indent + 1, value.networkIndex));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -6641,6 +6642,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LocationCapability", 1, value);
+        }
+        case GeneralCommissioning::Attributes::SupportsConcurrentConnection::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportsConcurrentConnection", 1, value);
         }
         case GeneralCommissioning::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -9798,7 +9804,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case WindowCovering::Attributes::Type::Id: {
-            uint8_t value;
+            chip::app::Clusters::WindowCovering::Type value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Type", 1, value);
         }
@@ -9863,7 +9869,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("TargetPositionTiltPercent100ths", 1, value);
         }
         case WindowCovering::Attributes::EndProductType::Id: {
-            uint8_t value;
+            chip::app::Clusters::WindowCovering::EndProductType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EndProductType", 1, value);
         }

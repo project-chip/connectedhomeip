@@ -50,6 +50,19 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Commission from alpha when the commissioning window is not opened"
+      identity: "alpha"
+      cluster: "CommissionerCommands"
+      command: "PairWithQRCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeIdForDuplicateCommissioning
+              - name: "payload"
+                value: payload
+      response:
+          error: FAILURE
+
     - label: "Open Commissioning Window from alpha"
       cluster: "AdministratorCommissioning"
       command: "OpenBasicCommissioningWindow"
@@ -57,19 +70,21 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 120
+                value: 180
 
     - label: "Commission from alpha again"
       identity: "alpha"
       cluster: "CommissionerCommands"
       command: "PairWithQRCode"
-      additionalArguments: ", CHIP_ERROR_FABRIC_EXISTS"
       arguments:
           values:
               - name: "nodeId"
                 value: nodeIdForDuplicateCommissioning
               - name: "payload"
                 value: payload
+      response:
+          error: FAILURE
+          clusterError: 0x09 #OperationalCertStatus::kFabricConflict
 
     - label: "Check that we just have the one fabric and did not add a new one"
       identity: "alpha"
@@ -92,7 +107,7 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 120
+                value: 180
 
     - label: "Commission from beta"
       identity: "beta"
@@ -122,7 +137,7 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 120
+                value: 180
 
     - label: "Commission from gamma"
       identity: "gamma"

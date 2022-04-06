@@ -138,6 +138,14 @@ tests:
               - name: "GroupKeySetIDs"
                 value: [0x01a1, 0x01a2]
 
+    - label: "Write Group Keys (invalid)"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value: [{ FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0 }]
+      response:
+          error: CONSTRAINT_ERROR
+
     - label: "Write Group Keys"
       command: "writeAttribute"
       attribute: "GroupKeyMap"

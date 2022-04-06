@@ -95,7 +95,7 @@ limitations under the License.
     <define>COLOR_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
+    <globalAttribute side="either" code="0xFFFD" value="5"/>
     <attribute side="server" code="0x0000" define="COLOR_CONTROL_CURRENT_HUE" type="INT8U" min="0x00" max="0xFE" writable="false" reportable="true" default="0x00" optional="true">current hue</attribute>
     <!-- CURRENT_HUE -->
     <attribute side="server" code="0x0001" define="COLOR_CONTROL_CURRENT_SATURATION" type="INT8U" min="0x00" max="0xFE" writable="false" reportable="true" default="0x00" optional="true">current saturation</attribute>
@@ -284,6 +284,14 @@ limitations under the License.
       <arg name="optionsOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
     </command>
   </cluster>
+  <bitmap name="ColorControlFeature" type="BITMAP32">
+    <cluster code="0x0300" />
+    <field name="HueAndSaturation" mask="0x01" />
+    <field name="EnhancedHue" mask="0x02" />
+    <field name="ColorLoop" mask="0x04" />
+    <field name="XY" mask="0x08" />
+    <field name="ColorTemperature" mask="0x10" />
+  </bitmap>
   <cluster>
     <name>Ballast Configuration</name>
     <domain>Lighting</domain>

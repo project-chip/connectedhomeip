@@ -347,7 +347,7 @@ via 2002::2
 
 -   To use the chip-rpc console after it has been installed run:
 
-    `python3 -m chip_rpc.console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
+    `chip-console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
 
 -   Then you can simulate a button press or release using the following command
     where : idx = 0 or 1 for Button PB0 or PB1 action = 0 for PRESSED, 1 for
@@ -406,3 +406,12 @@ is_debug
 show_qr_code
 
     $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "show_qr_code=false"
+
+### KVS maximum entry count
+
+kvs_max_entries
+
+    Set the maximum Kvs entries that can be stored in NVM (Default 75)
+    Thresholds: 30 <= kvs_max_entries <= 255
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A kvs_max_entries=50

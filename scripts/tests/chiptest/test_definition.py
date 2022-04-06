@@ -201,7 +201,7 @@ class TestDefinition:
     run_name: str
     target: TestTarget
 
-    def Run(self, runner, apps_register, paths: ApplicationPaths):
+    def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str):
         """
         Executes the given test case using the provided runner for execution.
         """
@@ -247,7 +247,8 @@ class TestDefinition:
 
             runner.RunSubprocess(
                 tool_cmd + ['tests', self.run_name] +
-                ['--paa-trust-store-path', DEVELOPMENT_PAA_LIST],
+                ['--paa-trust-store-path', DEVELOPMENT_PAA_LIST] +
+                ['--PICS', pics_file],
                 name='TEST', dependencies=[apps_register])
 
         except Exception:

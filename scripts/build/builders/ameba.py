@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os
-
 from enum import Enum, auto
 
 from .builder import Builder
@@ -85,4 +84,13 @@ class AmebaBuilder(Builder):
                 os.path.join(self.output_dir, 'asdk', 'target_image2.axf'),
             self.app.AppNamePrefix + '.map':
                 os.path.join(self.output_dir, 'asdk', 'target_image2.map'),
+            'km0_boot_all.bin':
+                os.path.join(self.output_dir, 'asdk',
+                             'bootloader', 'km0_boot_all.bin'),
+            'km4_boot_all.bin':
+                os.path.join(self.output_dir, 'asdk',
+                             'bootloader', 'km4_boot_all.bin'),
+            'km0_km4_image2.bin':
+                os.path.join(self.output_dir, 'asdk',
+                             'image', 'km0_km4_image2.bin'),
         }

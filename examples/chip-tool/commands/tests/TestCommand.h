@@ -86,6 +86,12 @@ protected:
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
+    bool IsUnsupported(const chip::app::StatusIB & status)
+    {
+        return status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute ||
+            status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedCommand;
+    }
+
     void Wait()
     {
         if (mDelayInMs.HasValue())

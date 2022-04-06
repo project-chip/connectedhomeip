@@ -733,7 +733,7 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
     return err;
 }
 
-CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ObjectList<EventPathParams> * apEventPathList,
+CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, const ObjectList<EventPathParams> * apEventPathList,
                                              EventNumber & aEventMin, size_t & aEventCount,
                                              const Access::SubjectDescriptor & aSubjectDescriptor)
 {
@@ -760,7 +760,16 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ObjectList<Eve
     }
 
 exit:
-    aEventMin = context.mCurrentEventNumber + 1;
+    if (err == CHIP_ERROR_BUFFER_TOO_SMALL || err == CHIP_ERROR_NO_MEMORY)
+    {
+        // We failed to fetch the current event because the buffer is too small, we will start from this one the next time.
+        aEventMin = context.mCurrentEventNumber;
+    }
+    else
+    {
+        // For all other cases, continue from the next event.
+        aEventMin = context.mCurrentEventNumber + 1;
+    }
     aEventCount += context.mEventCount;
     return err;
 }

@@ -18,8 +18,6 @@
 #import <CHIP/CHIP.h>
 #import <Foundation/Foundation.h>
 
-#define kCHIPToolTmpVendorId 0x1771
-
 extern NSString * const kCHIPToolDefaultsDomain;
 extern NSString * const kNetworkSSIDDefaultsKey;
 extern NSString * const kNetworkPasswordDefaultsKey;

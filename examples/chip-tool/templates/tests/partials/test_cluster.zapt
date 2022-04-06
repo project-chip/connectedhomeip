@@ -83,25 +83,31 @@ class {{filename}}Suite: public TestCommand
 
     {{>setupSaveAs}}
 
-    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & value) override
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
-      bool isExpectedDnssdResult = false;
-      {{#chip_tests_items}}
-      {{#if (isStrEqual cluster "DiscoveryCommands")}}
-      if ((mTestIndex - 1) == {{index}})
-      {
-          isExpectedDnssdResult = true;
-          {{#chip_tests_item_response_parameters}}
-          {{>maybeCheckExpectedValue}}
-          {{>maybeCheckExpectedConstraints}}
-          {{>maybeSaveAs}}
-          {{/chip_tests_item_response_parameters}}
-      }
-      {{/if}}
-      {{/chip_tests_items}}
+        bool shouldContinue = false;
 
-      VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
-      NextTest();
+        switch (mTestIndex - 1)
+        {
+        {{#chip_tests_items}}
+        {{!
+            This check can be removed once the cluster APIs have been converted from Invoke to
+            ReadClient/WriteClient/CommandSender
+        }}
+        {{~#if (isTestOnlyCluster cluster)~}}
+        case {{index}}:
+            {{>test_step_response}}
+            break;
+        {{/if~}}
+        {{/chip_tests_items}}
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
     }
 
     {{! Helper around zapTypeToDecodableClusterObjectType that lets us set the
@@ -203,8 +209,7 @@ class {{filename}}Suite: public TestCommand
           {{~else if (isString type)}}"{{definedValue}}"
           {{else}}{{definedValue}}
           {{~/if~}}
-          {{/chip_tests_item_parameters}}
-          {{additionalArguments}});
+          {{/chip_tests_item_parameters}});
     }
     {{else if isWait}}
     CHIP_ERROR {{>testCommand}}()
@@ -212,7 +217,7 @@ class {{filename}}Suite: public TestCommand
       const chip::EndpointId endpoint = {{#if (chip_tests_config_has "endpoint")}}mEndpoint.HasValue() ? mEndpoint.Value() : {{/if}}{{endpoint}};
       ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: {{cluster}} {{#if isAttribute}}Attribute: {{attribute}}{{else}}Command: {{wait}}{{/if}}] {{label}}", endpoint);
       {{#*inline "waitForTypeName"}}{{#if isAttribute}}Attribute{{else}}Command{{/if}}{{/inline}}
-      {{#*inline "waitForTypeId"}}chip::app::Clusters::{{asUpperCamelCase cluster}}::{{#if isAttribute}}Attributes::{{attribute}}{{else}}Commands::{{wait}}{{/if}}::Id{{/inline}}
+      {{#*inline "waitForTypeId"}}chip::app::Clusters::{{asUpperCamelCase cluster}}::{{#if isAttribute}}Attributes::{{asUpperCamelCase attribute}}{{else}}Commands::{{asUpperCamelCase wait}}{{/if}}::Id{{/inline}}
       ClearAttributeAndCommandPaths();
       m{{>waitForTypeName}}Path = chip::app::Concrete{{>waitForTypeName}}Path(endpoint, chip::app::Clusters::{{asUpperCamelCase cluster}}::Id, {{>waitForTypeId}});
       return CHIP_NO_ERROR;
@@ -276,11 +281,9 @@ class {{filename}}Suite: public TestCommand
         {{> maybeWait }}
         {{else}}
         chip::Controller::{{asUpperCamelCase cluster}}ClusterTest cluster;
-        {{#if isGroupCommand}}
-        cluster.AssociateWithGroup({{>device}}, groupId);
-        {{else}}
+        {{#unless isGroupCommand}}
         cluster.Associate({{>device}}, endpoint);
-        {{/if}}
+        {{/unless}}
 
         {{#if (chip_tests_item_has_list)}} ListFreer listFreer;{{/if}}
         {{#chip_tests_item_parameters}}
@@ -289,11 +292,18 @@ class {{filename}}Suite: public TestCommand
         {{/chip_tests_item_parameters}}
 
         {{#if isWriteAttribute}}
-          ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}
+        {{#if isGroupCommand}}
+          ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>(groupId, {{>device}}->GetSecureSession().Value()->GetFabricIndex(), {{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}
             {{~> maybeTimedInteractionTimeout ~}}
-            {{~#if isGroupCommand}}, {{>staticDoneResponse}}{{/if~}}
+            , {{>staticDoneResponse}}
             ));
           {{> maybeWait }}
+        {{else}}
+          ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}
+            {{~> maybeTimedInteractionTimeout ~}}
+            ));
+          {{> maybeWait }}
+        {{/if}}
         {{else if isReadEvent}}
           ReturnErrorOnFailure(cluster.ReadEvent<{{zapTypeToDecodableClusterObjectType event ns=cluster isArgument=true}}>(this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}));
         {{else if isSubscribeEvent}}

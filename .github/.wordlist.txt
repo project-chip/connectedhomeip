@@ -12,6 +12,7 @@ aabbccddeeff
 aarch
 abcdef
 abfb
+appwrite
 ABI
 ABIs
 ables
@@ -56,7 +57,9 @@ apk
 AppConfig
 AppImpl
 ApplianceControl
+applianceeventsandalert
 ApplianceIdentification
+appliancestatistics
 ApplicationBasic
 ApplicationId
 ApplicationIdentifier
@@ -173,6 +176,7 @@ CatalogVendorId
 CBB
 cbd
 ccf
+csg
 CCMP
 CCS
 CCSTUDIO
@@ -247,6 +251,7 @@ ColorControl
 Comcast
 Commandline
 Commissionable
+commissionables
 CommissioningFlow
 commondatastorage
 CONF
@@ -312,6 +317,7 @@ dataset
 datasets
 DataVersion
 dbf
+doru
 DBG
 dBm
 DBUILD
@@ -320,6 +326,7 @@ dcc
 DCHIP
 DCL
 DCMAKE
+DCONF
 DCONFIG
 debianutils
 debugText
@@ -479,6 +486,7 @@ fb
 fbb
 fbd
 FC
+FCJ
 FDDE
 fddead
 fde
@@ -589,8 +597,10 @@ IDF
 IDL
 IDLs
 idx
+ifconfig
 ifdef
 ifdefs
+itsfoss
 IGMP
 ignoreApplyUpdate
 ignoreQueryImage
@@ -612,6 +622,7 @@ InetLayer
 Infineon
 ini
 init
+InitArgs
 inlined
 InputLoop
 installDebug
@@ -860,6 +871,7 @@ NTAG
 nullable
 nullptr
 NUM
+NVM
 nwk
 NXP
 objcopy
@@ -890,11 +902,14 @@ optionOverride
 optionsMask
 optionsOverride
 orgs
+otaissues
+otatesting
 OTA
 OTADownloader
 otaDownloadPath
 otaImageList
 OTAImageProcessorDriver
+OTAImageProcessorImpl
 OTAImageProcessorInterface
 OTAProvider
 OTAProviderIpAddress
@@ -913,6 +928,7 @@ outgoingCommands
 OxygenConcentrationMeasurement
 OzoneConcentrationMeasurement
 PAA
+PAAs
 PacketBuffer
 PAI
 PairDevice
@@ -931,7 +947,10 @@ pbxproj
 PCA
 pcaps
 PDFs
+PDM
 PDK
+PSECT
+pdm
 peerAddrStr
 peerNodeId
 peerSessionId
@@ -940,6 +959,7 @@ percentageLiftValue
 periodicQueryTimeout
 pexpect
 pickString
+psect
 PID
 Pigweed
 PinCode
@@ -1010,6 +1030,7 @@ QRCodeUrl
 QSPI
 QueryImage
 QueryImageResponse
+Quickstart
 queryImageStatus
 qvCHIP
 RADVD
@@ -1019,6 +1040,7 @@ rAv
 RCP
 ReadAttribute
 ReadConfigValue
+RPis
 readelf
 readfds
 README
@@ -1080,6 +1102,7 @@ scalable
 scm
 sco
 scp
+ssbl
 ScriptBinding
 SDC
 SDHC
@@ -1110,6 +1133,7 @@ SetupQRCode
 sexualized
 SHA
 ShadeConfiguration
+SSBL
 showDocumentation
 shubhamdp
 SIGINT
@@ -1172,9 +1196,11 @@ subtype
 sudo
 SulfateConcentrationMeasurement
 SulfurDioxideConcentrationMeasurement
+suppressResponse
 svg
 SVR
 SWD
+SWU
 symlinks
 sysconfdir
 SysConfig
@@ -1247,6 +1273,7 @@ TotalTrihalomethanesConcentrationMeasurement
 trackAlloc
 trackFree
 transitionTime
+TransferSession
 TransportMgrBase
 TrustedRootCertificates
 TSG
@@ -1326,12 +1353,14 @@ VSCode
 WaitNewInputEvent
 WakeOnLan
 WantedBy
+watchdogTimeout
 webpage
 wget
 whde
 whitespace
 whitespaces
 whl
+wg
 wic
 WiFiNetworkDiagnostics
 WindowCovering
@@ -1353,12 +1382,14 @@ xab
 xaver
 xb
 xbef
+xBEEF
 xc
 xcd
 Xcode
 xcodeproj
 xcworkspace
 xd
+xDEAD
 xDEADBEEF
 xdeadbeefcafe
 xds
@@ -1438,3 +1469,4 @@ localedef
 nameserver
 nmcli
 tsan
+bouffalolab

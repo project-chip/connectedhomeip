@@ -113,6 +113,21 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
       nocSigner:(nullable id<CHIPKeypair>)nocSigner;
 
 /**
+ * Start the CHIP Stack. Repeated calls to startup without calls to shutdown in between are NO-OPs. Use the isRunning property to
+ * check if the stack needs to be started up.
+ *
+ * @param[in] storageDelegate The delegate for persistent storage
+ * @param[in] vendorId The vendor ID of the commissioner application
+ * @param[in] nocSigner The CHIPKeypair that is used to generate and sign Node Operational Credentials
+ * @param[in] ipk The IPK  to use for Operational Credentials.
+ * @param[in] paaCerts The PAA certificates used for device attestation
+ */
+- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
+       vendorId:(uint16_t)vendorId
+      nocSigner:(id<CHIPKeypair>)nocSigner
+            ipk:(NSData * _Nullable)ipk
+       paaCerts:(NSArray<NSData *> * _Nullable)paaCerts;
+/**
  * Shutdown the CHIP Stack. Repeated calls to shutdown without calls to startup in between are NO-OPs.
  */
 - (BOOL)shutdown;

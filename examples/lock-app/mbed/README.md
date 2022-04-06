@@ -256,7 +256,7 @@ parameters as arguments:
 
 Example:
 
-    python -m chip_rpc.console -d /dev/ttyUSB0 -b 115200 -o /tmp/pw_rpc.out
+    chip-console -d /dev/ttyUSB0 -b 115200 -o /tmp/pw_rpc.out
 
 To control the lock type the following command, where you define if 'on' state
 is true or false:

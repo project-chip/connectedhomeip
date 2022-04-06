@@ -108,12 +108,12 @@ extern const uint8_t kDevelopmentDAC_PublicKey_FFF1_800F[65];
 extern const uint8_t kDevelopmentDAC_PrivateKey_FFF1_800F[32];
 #endif
 #if CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID == 0x8010
-extern const uint8_t kDevelopmentDAC_Cert_FFF1_8010[492];
+extern const uint8_t kDevelopmentDAC_Cert_FFF1_8010[491];
 extern const uint8_t kDevelopmentDAC_PublicKey_FFF1_8010[65];
 extern const uint8_t kDevelopmentDAC_PrivateKey_FFF1_8010[32];
 #endif
 #if CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID == 0x8011
-extern const uint8_t kDevelopmentDAC_Cert_FFF1_8011[492];
+extern const uint8_t kDevelopmentDAC_Cert_FFF1_8011[493];
 extern const uint8_t kDevelopmentDAC_PublicKey_FFF1_8011[65];
 extern const uint8_t kDevelopmentDAC_PrivateKey_FFF1_8011[32];
 #endif
@@ -123,12 +123,12 @@ extern const uint8_t kDevelopmentDAC_PublicKey_FFF1_8012[65];
 extern const uint8_t kDevelopmentDAC_PrivateKey_FFF1_8012[32];
 #endif
 #if CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID == 0x8013
-extern const uint8_t kDevelopmentDAC_Cert_FFF1_8013[491];
+extern const uint8_t kDevelopmentDAC_Cert_FFF1_8013[492];
 extern const uint8_t kDevelopmentDAC_PublicKey_FFF1_8013[65];
 extern const uint8_t kDevelopmentDAC_PrivateKey_FFF1_8013[32];
 #endif
 #if CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID == 0x8014
-extern const uint8_t kDevelopmentDAC_Cert_FFF1_8014[491];
+extern const uint8_t kDevelopmentDAC_Cert_FFF1_8014[492];
 extern const uint8_t kDevelopmentDAC_PublicKey_FFF1_8014[65];
 extern const uint8_t kDevelopmentDAC_PrivateKey_FFF1_8014[32];
 #endif

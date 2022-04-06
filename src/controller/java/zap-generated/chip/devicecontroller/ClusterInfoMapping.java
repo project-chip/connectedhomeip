@@ -4132,12 +4132,14 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer NetworkingStatus, String DebugText, Long ErrorValue) {
+    public void onSuccess(
+        Integer NetworkingStatus, Optional<String> DebugText, @Nullable Long ErrorValue) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo NetworkingStatusResponseValue =
           new CommandResponseInfo("NetworkingStatus", "Integer");
       responseValues.put(NetworkingStatusResponseValue, NetworkingStatus);
-      CommandResponseInfo DebugTextResponseValue = new CommandResponseInfo("DebugText", "String");
+      CommandResponseInfo DebugTextResponseValue =
+          new CommandResponseInfo("DebugText", "Optional<String>");
       responseValues.put(DebugTextResponseValue, DebugText);
       CommandResponseInfo ErrorValueResponseValue = new CommandResponseInfo("ErrorValue", "Long");
       responseValues.put(ErrorValueResponseValue, ErrorValue);
@@ -4161,13 +4163,18 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer NetworkingStatus, String DebugText) {
+    public void onSuccess(
+        Integer NetworkingStatus, Optional<String> DebugText, Optional<Integer> NetworkIndex) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo NetworkingStatusResponseValue =
           new CommandResponseInfo("NetworkingStatus", "Integer");
       responseValues.put(NetworkingStatusResponseValue, NetworkingStatus);
-      CommandResponseInfo DebugTextResponseValue = new CommandResponseInfo("DebugText", "String");
+      CommandResponseInfo DebugTextResponseValue =
+          new CommandResponseInfo("DebugText", "Optional<String>");
       responseValues.put(DebugTextResponseValue, DebugText);
+      CommandResponseInfo NetworkIndexResponseValue =
+          new CommandResponseInfo("NetworkIndex", "Optional<Integer>");
+      responseValues.put(NetworkIndexResponseValue, NetworkIndex);
       callback.onSuccess(responseValues);
     }
 
@@ -4190,7 +4197,7 @@ public class ClusterInfoMapping {
     @Override
     public void onSuccess(
         Integer NetworkingStatus,
-        String DebugText,
+        Optional<String> DebugText,
         Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
             WiFiScanResults,
         Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>
@@ -4199,7 +4206,8 @@ public class ClusterInfoMapping {
       CommandResponseInfo NetworkingStatusResponseValue =
           new CommandResponseInfo("NetworkingStatus", "Integer");
       responseValues.put(NetworkingStatusResponseValue, NetworkingStatus);
-      CommandResponseInfo DebugTextResponseValue = new CommandResponseInfo("DebugText", "String");
+      CommandResponseInfo DebugTextResponseValue =
+          new CommandResponseInfo("DebugText", "Optional<String>");
       responseValues.put(DebugTextResponseValue, DebugText);
       // WiFiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
       // Conversion from this type to Java is not properly implemented yet
@@ -9551,11 +9559,6 @@ public class ClusterInfoMapping {
     generalCommissioningarmFailSafeCommandParams.put(
         "breadcrumb", generalCommissioningarmFailSafebreadcrumbCommandParameterInfo);
 
-    CommandParameterInfo generalCommissioningarmFailSafetimeoutMsCommandParameterInfo =
-        new CommandParameterInfo("timeoutMs", Long.class);
-    generalCommissioningarmFailSafeCommandParams.put(
-        "timeoutMs", generalCommissioningarmFailSafetimeoutMsCommandParameterInfo);
-
     InteractionInfo generalCommissioningarmFailSafeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
@@ -9564,8 +9567,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.GeneralCommissioningCluster.ArmFailSafeResponseCallback)
                           callback,
                       (Integer) commandArguments.get("expiryLengthSeconds"),
-                      (Long) commandArguments.get("breadcrumb"),
-                      (Long) commandArguments.get("timeoutMs"));
+                      (Long) commandArguments.get("breadcrumb"));
             },
             () -> new DelegatedArmFailSafeResponseCallback(),
             generalCommissioningarmFailSafeCommandParams);
@@ -9588,10 +9590,12 @@ public class ClusterInfoMapping {
         "commissioningComplete", generalCommissioningcommissioningCompleteInteractionInfo);
     Map<String, CommandParameterInfo> generalCommissioningsetRegulatoryConfigCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo generalCommissioningsetRegulatoryConfiglocationCommandParameterInfo =
-        new CommandParameterInfo("location", Integer.class);
+    CommandParameterInfo
+        generalCommissioningsetRegulatoryConfignewRegulatoryConfigCommandParameterInfo =
+            new CommandParameterInfo("newRegulatoryConfig", Integer.class);
     generalCommissioningsetRegulatoryConfigCommandParams.put(
-        "location", generalCommissioningsetRegulatoryConfiglocationCommandParameterInfo);
+        "newRegulatoryConfig",
+        generalCommissioningsetRegulatoryConfignewRegulatoryConfigCommandParameterInfo);
 
     CommandParameterInfo generalCommissioningsetRegulatoryConfigcountryCodeCommandParameterInfo =
         new CommandParameterInfo("countryCode", String.class);
@@ -9603,11 +9607,6 @@ public class ClusterInfoMapping {
     generalCommissioningsetRegulatoryConfigCommandParams.put(
         "breadcrumb", generalCommissioningsetRegulatoryConfigbreadcrumbCommandParameterInfo);
 
-    CommandParameterInfo generalCommissioningsetRegulatoryConfigtimeoutMsCommandParameterInfo =
-        new CommandParameterInfo("timeoutMs", Long.class);
-    generalCommissioningsetRegulatoryConfigCommandParams.put(
-        "timeoutMs", generalCommissioningsetRegulatoryConfigtimeoutMsCommandParameterInfo);
-
     InteractionInfo generalCommissioningsetRegulatoryConfigInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
@@ -9615,10 +9614,9 @@ public class ClusterInfoMapping {
                   .setRegulatoryConfig(
                       (ChipClusters.GeneralCommissioningCluster.SetRegulatoryConfigResponseCallback)
                           callback,
-                      (Integer) commandArguments.get("location"),
+                      (Integer) commandArguments.get("newRegulatoryConfig"),
                       (String) commandArguments.get("countryCode"),
-                      (Long) commandArguments.get("breadcrumb"),
-                      (Long) commandArguments.get("timeoutMs"));
+                      (Long) commandArguments.get("breadcrumb"));
             },
             () -> new DelegatedSetRegulatoryConfigResponseCallback(),
             generalCommissioningsetRegulatoryConfigCommandParams);
@@ -10384,7 +10382,7 @@ public class ClusterInfoMapping {
 
     CommandParameterInfo
         networkCommissioningaddOrUpdateThreadNetworkbreadcrumbCommandParameterInfo =
-            new CommandParameterInfo("breadcrumb", Long.class);
+            new CommandParameterInfo("breadcrumb", Optional.class);
     networkCommissioningaddOrUpdateThreadNetworkCommandParams.put(
         "breadcrumb", networkCommissioningaddOrUpdateThreadNetworkbreadcrumbCommandParameterInfo);
 
@@ -10396,7 +10394,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.NetworkCommissioningCluster.NetworkConfigResponseCallback)
                           callback,
                       (byte[]) commandArguments.get("operationalDataset"),
-                      (Long) commandArguments.get("breadcrumb"));
+                      (Optional<Long>) commandArguments.get("breadcrumb"));
             },
             () -> new DelegatedNetworkConfigResponseCallback(),
             networkCommissioningaddOrUpdateThreadNetworkCommandParams);
@@ -10415,7 +10413,7 @@ public class ClusterInfoMapping {
         "credentials", networkCommissioningaddOrUpdateWiFiNetworkcredentialsCommandParameterInfo);
 
     CommandParameterInfo networkCommissioningaddOrUpdateWiFiNetworkbreadcrumbCommandParameterInfo =
-        new CommandParameterInfo("breadcrumb", Long.class);
+        new CommandParameterInfo("breadcrumb", Optional.class);
     networkCommissioningaddOrUpdateWiFiNetworkCommandParams.put(
         "breadcrumb", networkCommissioningaddOrUpdateWiFiNetworkbreadcrumbCommandParameterInfo);
 
@@ -10428,7 +10426,7 @@ public class ClusterInfoMapping {
                           callback,
                       (byte[]) commandArguments.get("ssid"),
                       (byte[]) commandArguments.get("credentials"),
-                      (Long) commandArguments.get("breadcrumb"));
+                      (Optional<Long>) commandArguments.get("breadcrumb"));
             },
             () -> new DelegatedNetworkConfigResponseCallback(),
             networkCommissioningaddOrUpdateWiFiNetworkCommandParams);
@@ -10442,7 +10440,7 @@ public class ClusterInfoMapping {
         "networkID", networkCommissioningconnectNetworknetworkIDCommandParameterInfo);
 
     CommandParameterInfo networkCommissioningconnectNetworkbreadcrumbCommandParameterInfo =
-        new CommandParameterInfo("breadcrumb", Long.class);
+        new CommandParameterInfo("breadcrumb", Optional.class);
     networkCommissioningconnectNetworkCommandParams.put(
         "breadcrumb", networkCommissioningconnectNetworkbreadcrumbCommandParameterInfo);
 
@@ -10454,7 +10452,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.NetworkCommissioningCluster.ConnectNetworkResponseCallback)
                           callback,
                       (byte[]) commandArguments.get("networkID"),
-                      (Long) commandArguments.get("breadcrumb"));
+                      (Optional<Long>) commandArguments.get("breadcrumb"));
             },
             () -> new DelegatedConnectNetworkResponseCallback(),
             networkCommissioningconnectNetworkCommandParams);
@@ -10468,7 +10466,7 @@ public class ClusterInfoMapping {
         "networkID", networkCommissioningremoveNetworknetworkIDCommandParameterInfo);
 
     CommandParameterInfo networkCommissioningremoveNetworkbreadcrumbCommandParameterInfo =
-        new CommandParameterInfo("breadcrumb", Long.class);
+        new CommandParameterInfo("breadcrumb", Optional.class);
     networkCommissioningremoveNetworkCommandParams.put(
         "breadcrumb", networkCommissioningremoveNetworkbreadcrumbCommandParameterInfo);
 
@@ -10480,7 +10478,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.NetworkCommissioningCluster.NetworkConfigResponseCallback)
                           callback,
                       (byte[]) commandArguments.get("networkID"),
-                      (Long) commandArguments.get("breadcrumb"));
+                      (Optional<Long>) commandArguments.get("breadcrumb"));
             },
             () -> new DelegatedNetworkConfigResponseCallback(),
             networkCommissioningremoveNetworkCommandParams);
@@ -10499,7 +10497,7 @@ public class ClusterInfoMapping {
         "networkIndex", networkCommissioningreorderNetworknetworkIndexCommandParameterInfo);
 
     CommandParameterInfo networkCommissioningreorderNetworkbreadcrumbCommandParameterInfo =
-        new CommandParameterInfo("breadcrumb", Long.class);
+        new CommandParameterInfo("breadcrumb", Optional.class);
     networkCommissioningreorderNetworkCommandParams.put(
         "breadcrumb", networkCommissioningreorderNetworkbreadcrumbCommandParameterInfo);
 
@@ -10512,7 +10510,7 @@ public class ClusterInfoMapping {
                           callback,
                       (byte[]) commandArguments.get("networkID"),
                       (Integer) commandArguments.get("networkIndex"),
-                      (Long) commandArguments.get("breadcrumb"));
+                      (Optional<Long>) commandArguments.get("breadcrumb"));
             },
             () -> new DelegatedNetworkConfigResponseCallback(),
             networkCommissioningreorderNetworkCommandParams);
@@ -10521,12 +10519,12 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> networkCommissioningscanNetworksCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo networkCommissioningscanNetworksssidCommandParameterInfo =
-        new CommandParameterInfo("ssid", byte[].class);
+        new CommandParameterInfo("ssid", Optional.class);
     networkCommissioningscanNetworksCommandParams.put(
         "ssid", networkCommissioningscanNetworksssidCommandParameterInfo);
 
     CommandParameterInfo networkCommissioningscanNetworksbreadcrumbCommandParameterInfo =
-        new CommandParameterInfo("breadcrumb", Long.class);
+        new CommandParameterInfo("breadcrumb", Optional.class);
     networkCommissioningscanNetworksCommandParams.put(
         "breadcrumb", networkCommissioningscanNetworksbreadcrumbCommandParameterInfo);
 
@@ -10537,8 +10535,8 @@ public class ClusterInfoMapping {
                   .scanNetworks(
                       (ChipClusters.NetworkCommissioningCluster.ScanNetworksResponseCallback)
                           callback,
-                      (byte[]) commandArguments.get("ssid"),
-                      (Long) commandArguments.get("breadcrumb"));
+                      (Optional<byte[]>) commandArguments.get("ssid"),
+                      (Optional<Long>) commandArguments.get("breadcrumb"));
             },
             () -> new DelegatedScanNetworksResponseCallback(),
             networkCommissioningscanNetworksCommandParams);

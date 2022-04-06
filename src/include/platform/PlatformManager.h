@@ -37,9 +37,6 @@ class DiscoveryImplPlatform;
 
 namespace DeviceLayer {
 
-static constexpr size_t kMaxFixedLabels   = 10;
-static constexpr size_t kMaxUserLabels    = 10;
-static constexpr size_t kMaxLanguageTags  = 254; // Maximum number of entry type 'ARRAY' supports
 static constexpr size_t kMaxCalendarTypes = 12;
 
 class PlatformManagerImpl;
@@ -194,16 +191,6 @@ public:
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool IsChipStackLockedByCurrentThread() const;
 #endif
-
-    CHIP_ERROR GetFixedLabelList(EndpointId endpoint,
-                                 AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList);
-    CHIP_ERROR SetUserLabelList(EndpointId endpoint,
-                                AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
-    CHIP_ERROR GetUserLabelList(EndpointId endpoint,
-                                AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
-    CHIP_ERROR GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales);
-    CHIP_ERROR GetSupportedCalendarTypes(
-        AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes);
 
     /*
      * PostEvent can be called safely on any thread without locking the stack.
@@ -455,37 +442,6 @@ inline void PlatformManager::DispatchEvent(const ChipDeviceEvent * event)
 inline CHIP_ERROR PlatformManager::StartChipTimer(System::Clock::Timeout duration)
 {
     return static_cast<ImplClass *>(this)->_StartChipTimer(duration);
-}
-
-inline CHIP_ERROR PlatformManager::GetFixedLabelList(
-    EndpointId endpoint, AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
-{
-    return static_cast<ImplClass *>(this)->_GetFixedLabelList(endpoint, labelList);
-}
-
-inline CHIP_ERROR
-PlatformManager::SetUserLabelList(EndpointId endpoint,
-                                  AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
-{
-    return static_cast<ImplClass *>(this)->_SetUserLabelList(endpoint, labelList);
-}
-
-inline CHIP_ERROR
-PlatformManager::GetUserLabelList(EndpointId endpoint,
-                                  AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
-{
-    return static_cast<ImplClass *>(this)->_GetUserLabelList(endpoint, labelList);
-}
-
-inline CHIP_ERROR PlatformManager::GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
-{
-    return static_cast<ImplClass *>(this)->_GetSupportedLocales(supportedLocales);
-}
-
-inline CHIP_ERROR PlatformManager::GetSupportedCalendarTypes(
-    AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes)
-{
-    return static_cast<ImplClass *>(this)->_GetSupportedCalendarTypes(supportedCalendarTypes);
 }
 
 } // namespace DeviceLayer

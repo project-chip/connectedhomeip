@@ -29,7 +29,9 @@ config("darwin_config") {
 static_library("framework") {
   sources = [
     "CHIP.h",
+    "CHIPAttestationTrustStoreBridge.mm",
     "CHIPCluster.mm",
+    "CHIPCommissioningParameters.m",
     "CHIPControllerAccessControl.h",
     "CHIPControllerAccessControl.mm",
     "CHIPDevice.h",
