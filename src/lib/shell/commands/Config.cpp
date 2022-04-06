@@ -211,7 +211,6 @@ void RegisterConfigCommands()
 
     // Register the root `config` command with the top-level shell.
     Engine::Root().RegisterCommands(&sConfigComand, 1);
-    return;
 }
 
 } // namespace Shell

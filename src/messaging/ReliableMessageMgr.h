@@ -69,7 +69,7 @@ public:
                                                        including both successfully and failure send. */
     };
 
-public:
+
     ReliableMessageMgr(BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool);
     ~ReliableMessageMgr();
 

@@ -41,7 +41,7 @@ namespace chip {
 namespace Messaging {
 
 ReliableMessageMgr::RetransTableEntry::RetransTableEntry(ReliableMessageContext * rc) :
-    ec(*rc->GetExchangeContext()), retainedBuf(EncryptedPacketBufferHandle()), nextRetransTime(0), sendCount(0)
+    ec(*rc->GetExchangeContext()),  nextRetransTime(0), sendCount(0)
 {
     ec->SetMessageNotAcked(true);
 }
@@ -91,8 +91,7 @@ void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
 #else
 void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
 {
-    return;
-}
+    }
 #endif // RMP_TICKLESS_DEBUG
 
 void ReliableMessageMgr::ExecuteActions()

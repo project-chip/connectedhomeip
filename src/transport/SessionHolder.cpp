@@ -24,7 +24,7 @@ SessionHolder::~SessionHolder()
     Release();
 }
 
-SessionHolder::SessionHolder(const SessionHolder & that) : IntrusiveListNodeBase()
+SessionHolder::SessionHolder(const SessionHolder & that)  
 {
     mSession = that.mSession;
     if (mSession.HasValue())
@@ -33,7 +33,7 @@ SessionHolder::SessionHolder(const SessionHolder & that) : IntrusiveListNodeBase
     }
 }
 
-SessionHolder::SessionHolder(SessionHolder && that) : IntrusiveListNodeBase()
+SessionHolder::SessionHolder(SessionHolder && that)  
 {
     mSession = that.mSession;
     if (mSession.HasValue())
