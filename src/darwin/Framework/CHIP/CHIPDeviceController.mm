@@ -676,33 +676,33 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 
     if (_cppCommissioner) {
         delete _cppCommissioner;
-        _cppCommissioner = NULL;
+        _cppCommissioner = nullptr;
     }
 
     if (_pairingDelegateBridge) {
         delete _pairingDelegateBridge;
-        _pairingDelegateBridge = NULL;
+        _pairingDelegateBridge = nullptr;
     }
 
     if (_persistentStorageDelegateBridge) {
         delete _persistentStorageDelegateBridge;
-        _persistentStorageDelegateBridge = NULL;
+        _persistentStorageDelegateBridge = nullptr;
     }
 
     if (_attestationTrustStoreBridge) {
         delete _attestationTrustStoreBridge;
-        _attestationTrustStoreBridge = NULL;
+        _attestationTrustStoreBridge = nullptr;
     }
 
     if (_groupDataProvider) {
         _groupDataProvider->Finish();
         delete _groupDataProvider;
-        _groupDataProvider = NULL;
+        _groupDataProvider = nullptr;
     }
 
     if (_groupStorageDelegate) {
         delete _groupStorageDelegate;
-        _groupStorageDelegate = NULL;
+        _groupStorageDelegate = nullptr;
     }
 
     return YES;
@@ -719,7 +719,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     if (_cppCommissioner) {
         _cppCommissioner->Shutdown();
         delete _cppCommissioner;
-        _cppCommissioner = NULL;
+        _cppCommissioner = nullptr;
     }
 
     return YES;
