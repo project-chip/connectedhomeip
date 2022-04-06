@@ -122,22 +122,57 @@ void TestReportingEngine::TestMergeOverlappedAttributePath(nlTestSuite * apSuite
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     AttributePathParams * clusterInfo = InteractionModelEngine::GetInstance()->GetReportingEngine().mGlobalDirtySet.CreateObject();
+    clusterInfo->mEndpointId          = 1;
+    clusterInfo->mClusterId           = 1;
     clusterInfo->mAttributeId         = 1;
 
     {
         AttributePathParams testClusterInfo;
+        testClusterInfo.mEndpointId  = 1;
+        testClusterInfo.mClusterId   = 1;
         testClusterInfo.mAttributeId = 3;
         NL_TEST_ASSERT(apSuite,
                        !InteractionModelEngine::GetInstance()->GetReportingEngine().MergeOverlappedAttributePath(testClusterInfo));
     }
     {
         AttributePathParams testClusterInfo;
+        testClusterInfo.mEndpointId  = 1;
+        testClusterInfo.mClusterId   = 1;
         testClusterInfo.mAttributeId = 1;
         testClusterInfo.mListIndex   = 2;
         NL_TEST_ASSERT(apSuite,
                        InteractionModelEngine::GetInstance()->GetReportingEngine().MergeOverlappedAttributePath(testClusterInfo));
     }
 
+    {
+        AttributePathParams testClusterInfo;
+        testClusterInfo.mEndpointId  = 1;
+        testClusterInfo.mClusterId   = 1;
+        testClusterInfo.mAttributeId = kInvalidAttributeId;
+        NL_TEST_ASSERT(apSuite,
+                       InteractionModelEngine::GetInstance()->GetReportingEngine().MergeOverlappedAttributePath(testClusterInfo));
+    }
+
+    {
+        AttributePathParams testClusterInfo;
+        testClusterInfo.mClusterId   = kInvalidClusterId;
+        testClusterInfo.mAttributeId = kInvalidAttributeId;
+        NL_TEST_ASSERT(apSuite,
+                       InteractionModelEngine::GetInstance()->GetReportingEngine().MergeOverlappedAttributePath(testClusterInfo));
+        NL_TEST_ASSERT(apSuite, clusterInfo->mClusterId == kInvalidClusterId && clusterInfo->mAttributeId == kInvalidAttributeId);
+    }
+
+    {
+        AttributePathParams testClusterInfo;
+        testClusterInfo.mEndpointId  = kInvalidEndpointId;
+        testClusterInfo.mClusterId   = kInvalidClusterId;
+        testClusterInfo.mAttributeId = kInvalidAttributeId;
+        NL_TEST_ASSERT(apSuite,
+                       InteractionModelEngine::GetInstance()->GetReportingEngine().MergeOverlappedAttributePath(testClusterInfo));
+        NL_TEST_ASSERT(apSuite,
+                       clusterInfo->mEndpointId == kInvalidEndpointId && clusterInfo->mClusterId == kInvalidClusterId &&
+                           clusterInfo->mAttributeId == kInvalidAttributeId);
+    }
     InteractionModelEngine::GetInstance()->GetReportingEngine().Shutdown();
 }
 
