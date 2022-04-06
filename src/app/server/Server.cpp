@@ -115,7 +115,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mCommissioningWindowManager.SetAppDelegate(initParams.appDelegate);
 
     // Initialize PersistentStorageDelegate-based storage
-    mDeviceStorage = initParams.persistentStorageDelegate;
+    mDeviceStorage            = initParams.persistentStorageDelegate;
+    mSessionResumptionStorage = initParams.sessionResumptionStorage;
 
     // Set up attribute persistence before we try to bring up the data model
     // handler.
@@ -237,6 +238,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     caseSessionManagerConfig = {
         .sessionInitParams =  {
             .sessionManager    = &mSessions,
+            .sessionResumptionStorage = mSessionResumptionStorage,
             .exchangeMgr       = &mExchangeMgr,
             .fabricTable       = &mFabrics,
             .clientPool        = &mCASEClientPool,
@@ -255,7 +257,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #if CONFIG_NETWORK_LAYER_BLE
                                                     chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
 #endif
-                                                    &mSessions, &mFabrics, mGroupsProvider);
+                                                    &mSessions, &mFabrics, mSessionResumptionStorage, mGroupsProvider);
     SuccessOrExit(err);
 
     // This code is necessary to restart listening to existing groups after a reboot
