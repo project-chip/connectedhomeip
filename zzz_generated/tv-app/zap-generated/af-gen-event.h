@@ -79,4 +79,3 @@
         { 0x2, 0x8, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfLevelControlClusterServerTickCallbackControl2 },
 
 #endif // __AF_GEN_EVENT__
-
