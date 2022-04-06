@@ -412,6 +412,14 @@ server cluster ColorControl = 768 {
     kColorTemperatureSupported = 0x10;
   }
 
+  bitmap ColorControlFeature : BITMAP32 {
+    kHueAndSaturation = 0x1;
+    kEnhancedHue = 0x2;
+    kColorLoop = 0x4;
+    kXy = 0x8;
+    kColorTemperature = 0x10;
+  }
+
   bitmap ColorLoopUpdateFlags : BITMAP8 {
     kUpdateAction = 0x1;
     kUpdateDirection = 0x2;
@@ -471,6 +479,7 @@ server cluster ColorControl = 768 {
   readonly attribute int16u colorTempPhysicalMax = 16396;
   readonly attribute int16u coupleColorTempToLevelMinMireds = 16397;
   attribute int16u startUpColorTemperatureMireds = 16400;
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct MoveToHueRequest {
