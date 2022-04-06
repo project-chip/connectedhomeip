@@ -558,20 +558,19 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     {
         PUBLISH_RECORDS(Commissioner);
     }
-    else
-    {
-        ADD_TXT_RECORD(LongDiscriminator);
+    
+            ADD_TXT_RECORD(LongDiscriminator);
         ADD_TXT_RECORD(CommissioningMode);
-        ADD_TXT_RECORD(RotatingDeviceId);
+                ADD_TXT_RECORD(RotatingDeviceId);
         ADD_TXT_RECORD(PairingHint);
-        ADD_TXT_RECORD(PairingInstruction);
+                ADD_TXT_RECORD(PairingInstruction);
 
         ADD_PTR_RECORD(ShortDiscriminator);
-        ADD_PTR_RECORD(LongDiscriminator);
+                ADD_PTR_RECORD(LongDiscriminator);
         ADD_PTR_RECORD(CommissioningMode);
-
+        
         PUBLISH_RECORDS(Commissionable);
-    }
+   
 }
 
 CHIP_ERROR DiscoveryImplPlatform::RemoveServices()

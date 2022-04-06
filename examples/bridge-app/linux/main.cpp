@@ -221,8 +221,8 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, uint16_t deviceTyp
                                     gCurrentEndpointId, index);
                     return index;
                 }
-                else if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
-                {
+                if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
+                        {
                     return -1;
                 }
                 // Handle wrap condition

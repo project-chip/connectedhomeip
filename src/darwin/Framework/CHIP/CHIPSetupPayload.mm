@@ -31,12 +31,12 @@
 {
     if (value.Has(chip::RendezvousInformationFlag::kBLE)) {
         return kRendezvousInformationBLE;
-    } else if (value.Has(chip::RendezvousInformationFlag::kSoftAP)) {
-        return kRendezvousInformationSoftAP;
-    } else if (value.Has(chip::RendezvousInformationFlag::kOnNetwork)) {
+    } if (value.Has(chip::RendezvousInformationFlag::kSoftAP)) {
+                return kRendezvousInformationSoftAP;
+    } else if (value.Has(chip::RendezvousInformationFlag::kOnNetwork))         {
         return kRendezvousInformationOnNetwork;
     } else {
-        return kRendezvousInformationNone;
+                return kRendezvousInformationNone;
     }
 }
 
@@ -44,11 +44,11 @@
 {
     if (value == chip::CommissioningFlow::kStandard) {
         return kCommissioningFlowStandard;
-    } else if (value == chip::CommissioningFlow::kUserActionRequired) {
+    } if (value == chip::CommissioningFlow::kUserActionRequired)         {
         return kCommissioningFlowUserActionRequired;
-    } else if (value == chip::CommissioningFlow::kCustom) {
+    } else if (value         == chip::CommissioningFlow::kCustom) {
         return kCommissioningFlowCustom;
-    } else {
+            } else {
         return kCommissioningFlowInvalid;
     }
 }

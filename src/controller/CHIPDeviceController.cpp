@@ -677,12 +677,11 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             // connection completes
             return CHIP_NO_ERROR;
         }
-        else
-        {
-            // Something has gone strange. Delete the old device, try again.
-            ChipLogError(Controller, "Found unconnected device, removing");
+        
+                    // Something has gone strange. Delete the old         device, try again.
+            ChipLogError(Controller, "Found unconnected         device, removing");
             ReleaseCommissioneeDevice(current);
-        }
+               
     }
 
     device = mCommissioneeDevicePool.CreateObject();

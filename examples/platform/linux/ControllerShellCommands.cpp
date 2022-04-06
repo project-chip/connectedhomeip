@@ -292,10 +292,9 @@ static CHIP_ERROR ControllerHandler(int argc, char ** argv)
         return error     = pairUDC(true, pincode, index);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    else
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    
+            return CHIP_ERROR_INVALID_ARGUMENT;
+   
     return error;
 }
 

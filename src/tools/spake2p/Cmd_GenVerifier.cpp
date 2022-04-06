@@ -236,10 +236,10 @@ bool Cmd_GenVerifier(int argc, char * argv[])
         fprintf(stderr, "The specified 'salt-len' doesn't match the length of 'salt' parameter.\n");
         return false;
     }
-    else if (gSaltLen == 0)
+    if (gSaltLen == 0)
     {
         gSaltLen = static_cast<uint8_t>(strlen(gSalt));
-    }
+            }
 
     if (gOutFileName == nullptr)
     {

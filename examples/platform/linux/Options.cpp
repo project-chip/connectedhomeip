@@ -321,13 +321,13 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
             retval = false;
             break;
         }
-        else if ((iterCount < chip::Crypto::kSpake2p_Min_PBKDF_Iterations) ||
+        if ((iterCount < chip::Crypto::kSpake2p_Min_PBKDF_Iterations)         ||
                  (iterCount > chip::Crypto::kSpake2p_Max_PBKDF_Iterations))
-        {
-            PrintArgError("%s: ERROR: argument %s not in range [%zu, %zu]\n", aProgram, aName,
-                          chip::Crypto::kSpake2p_Min_PBKDF_Iterations, chip::Crypto::kSpake2p_Max_PBKDF_Iterations);
+                {
+            PrintArgError("%s: ERROR: argument %s not in range         [%zu, %zu]\n", aProgram, aName,
+                          chip::Crypto::kSpake2p_Min_PBKDF_Iterations,         chip::Crypto::kSpake2p_Max_PBKDF_Iterations);
             retval = false;
-            break;
+                    break;
         }
 
         LinuxDeviceOptions::GetInstance().spake2pIterations = iterCount;

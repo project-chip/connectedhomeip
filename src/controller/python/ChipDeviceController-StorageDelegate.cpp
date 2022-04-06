@@ -102,12 +102,11 @@ CHIP_ERROR StorageAdapter::SyncGetKeyValue(const char * key, void * value, uint1
         size = tmpSize;
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
-    else
-    {
-        ChipLogDetail(Controller, "Key Found %d\n", tmpSize);
-        size = tmpSize;
+    
+            ChipLogDetail(Controller, "Key Found %d\n", tmpSize);
+                size = tmpSize;
         return CHIP_NO_ERROR;
-    }
+   
 }
 
 CHIP_ERROR StorageAdapter::SyncSetKeyValue(const char * key, const void * value, uint16_t size)

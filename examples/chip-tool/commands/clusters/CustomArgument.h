@@ -60,17 +60,17 @@ public:
             {
                 return CustomArgumentParser::PutUnsignedFromString(writer, tag, value);
             }
-            else if (IsSignedNumberPrefix(value))
+            if (IsSignedNumberPrefix(value))
             {
-                return CustomArgumentParser::PutSignedFromString(writer, tag, value);
-            }
+                        return CustomArgumentParser::PutSignedFromString(writer, tag, value);
+                    }
             else if (IsFloatNumberPrefix(value))
-            {
-                return CustomArgumentParser::PutFloatFromString(writer, tag, value);
+                    {
+                return CustomArgumentParser::PutFloatFromString(writer,         tag, value);
             }
             else if (IsDoubleNumberPrefix(value))
-            {
-                return CustomArgumentParser::PutDoubleFromString(writer, tag, value);
+                    {
+                return CustomArgumentParser::PutDoubleFromString(writer,         tag, value);
             }
 
             return CustomArgumentParser::PutCharString(writer, tag, value);

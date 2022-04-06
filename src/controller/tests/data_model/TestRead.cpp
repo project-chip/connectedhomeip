@@ -88,38 +88,37 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
 
             return valueEncoder.Encode(++totalReadCount);
         }
-        else
-        {
-            AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
+        
+                    AttributeReportIB::Builder & attributeReport =         aAttributeReports.CreateAttributeReport();
             ReturnErrorOnFailure(aAttributeReports.GetError());
-            AttributeDataIB::Builder & attributeData = attributeReport.CreateAttributeData();
-            ReturnErrorOnFailure(attributeReport.GetError());
-            TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
-            TestCluster::Structs::TestListStructOctet::Type valueBuf[4];
-
+                    AttributeDataIB::Builder & attributeData = attributeReport.CreateAttributeData();
+                    ReturnErrorOnFailure(attributeReport.GetError());
+                    TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
+                    TestCluster::Structs::TestListStructOctet::Type valueBuf[4];
+        
             value = valueBuf;
 
             uint8_t i = 0;
-            for (auto & item : valueBuf)
+                    for (auto & item : valueBuf)
             {
-                item.fabricIndex = i;
+                item.fabricIndex         = i;
                 i++;
             }
 
             attributeData.DataVersion(kDataVersion);
-            ReturnErrorOnFailure(attributeData.GetError());
-            AttributePathIB::Builder & attributePath = attributeData.CreatePath();
-            attributePath.Endpoint(aPath.mEndpointId)
+                    ReturnErrorOnFailure(attributeData.GetError());
+                    AttributePathIB::Builder & attributePath = attributeData.CreatePath();
+                    attributePath.Endpoint(aPath.mEndpointId)
                 .Cluster(aPath.mClusterId)
-                .Attribute(aPath.mAttributeId)
+                        .Attribute(aPath.mAttributeId)
                 .EndOfAttributePathIB();
-            ReturnErrorOnFailure(attributePath.GetError());
+                    ReturnErrorOnFailure(attributePath.GetError());
 
-            ReturnErrorOnFailure(DataModel::Encode(*(attributeData.GetWriter()),
-                                                   TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), value));
+                    ReturnErrorOnFailure(DataModel::Encode(*(attributeData.GetWriter()),
+                                                           TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)),         value));
             ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB().GetError());
-            return attributeReport.EndOfAttributeReportIB().GetError();
-        }
+                    return attributeReport.EndOfAttributeReportIB().GetError();
+               
     }
     else
     {
