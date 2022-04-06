@@ -218,7 +218,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateRootCertKeys()
         (id) kSecValueData : [keypairData base64EncodedDataWithOptions:0],
     };
 
-    OSStatus status = SecItemAdd((__bridge CFDictionaryRef) addParams, NULL);
+    OSStatus status = SecItemAdd((__bridge CFDictionaryRef) addParams, nullptr);
     // TODO: Enable SecItemAdd for Darwin unit tests
     if (status != errSecSuccess && !isRunningTests()) {
         NSLog(@"Failed in storing key : %d", status);
@@ -246,7 +246,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateIPK()
         (id) kSecValueData : [ipkAdata base64EncodedDataWithOptions:0],
     };
 
-    OSStatus status = SecItemAdd((__bridge CFDictionaryRef) addParams, NULL);
+    OSStatus status = SecItemAdd((__bridge CFDictionaryRef) addParams, nullptr);
     // TODO: Enable SecItemAdd for Darwin unit tests
     if (status != errSecSuccess && !isRunningTests()) {
         NSLog(@"Failed in storing IPK : %d", status);

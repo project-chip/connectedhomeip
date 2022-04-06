@@ -413,7 +413,7 @@ void pychip_OpCreds_FreeDelegate(OpCredsContext * context)
 
 ChipError::StorageType pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl)
 {
-    if (devCtrl != NULL)
+    if (devCtrl != nullptr)
     {
         devCtrl->Shutdown();
         delete devCtrl;
