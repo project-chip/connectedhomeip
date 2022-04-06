@@ -136,7 +136,7 @@ struct Transitions
             // mCtx.Dispatch(Event::Create<Event2>()); // dispatching an event and returning a transition would be illegal
             return mFactory.CreateState1();
         }
-        else if (state.Is<State1>() && event.Is<Event5>())
+        if (state.Is<State1>() && event.Is<Event5>())
         {
             return mFactory.CreateState3();
         }

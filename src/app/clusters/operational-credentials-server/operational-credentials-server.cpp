@@ -561,7 +561,7 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
     {
         return OperationalCertStatus::kInvalidNOC;
     }
-    else if (err == CHIP_ERROR_NO_MEMORY)
+    if (err == CHIP_ERROR_NO_MEMORY)
     {
         return OperationalCertStatus::kTableFull;
     }

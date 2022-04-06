@@ -68,7 +68,7 @@ public:
             {
                 return CustomArgumentParser::PutFloatFromString(writer, tag, value);
             }
-            else if (IsDoubleNumberPrefix(value))
+            if (IsDoubleNumberPrefix(value))
             {
                 return CustomArgumentParser::PutDoubleFromString(writer, tag, value);
             }

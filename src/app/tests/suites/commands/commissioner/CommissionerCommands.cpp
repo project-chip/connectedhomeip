@@ -70,7 +70,7 @@ chip::app::StatusIB ConvertToStatusIB(CHIP_ERROR err)
     {
         return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kFabricConflict));
     }
-    else if (CHIP_ERROR_INVALID_FABRIC_ID == err)
+    if (CHIP_ERROR_INVALID_FABRIC_ID == err)
     {
         return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidFabricIndex));
     }
