@@ -55,7 +55,7 @@ public:
      *   @param attestationResult The failure code for the device attestation validation operation
      */
     virtual void OnDeviceAttestationFailed(Controller::DeviceCommissioner * deviceCommissioner, DeviceProxy * device,
-                                         AttestationVerificationResult attestationResult) = 0;
+                                           AttestationVerificationResult attestationResult) = 0;
 };
 
 } // namespace Credentials
