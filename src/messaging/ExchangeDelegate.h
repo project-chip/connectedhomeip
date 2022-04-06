@@ -123,7 +123,7 @@ public:
      *  @param[in]  payloadHeader A reference to the PayloadHeader object for
                                   the unsolicited message.  The protocol and
                                   message type of this header match the
-				  UnsolicitedMessageHandler.
+                                  UnsolicitedMessageHandler.
      *  @param[out] newDelegate   A new exchange delegate to be used by the new exchange created to handle the message.
      */
     virtual CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) = 0;
