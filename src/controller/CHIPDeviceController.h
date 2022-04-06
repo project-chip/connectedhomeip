@@ -420,13 +420,13 @@ public:
      *   This function instructs the commissioner to proceed to the next stage of commissioning after
      *   attestation failure is reported to an installed attestation delegate.
      *
-     * @param[in] remoteDeviceId        The remote device Id.
+     * @param[in] device                The device being commissioned.
      * @param[in] attestationResult     The attestation result to use instead of whatever the device
      *                                  attestation verifier came up with. May be a success or an error result.
      */
     CHIP_ERROR
-    ContinueCommissioningAfterDeviceAttestationFailure(NodeId remoteDeviceId,
-                                                       chip::Credentials::AttestationVerificationResult attestationResult);
+    ContinueCommissioningAfterDeviceAttestationFailure(DeviceProxy * device,
+                                                       Credentials::AttestationVerificationResult attestationResult);
 
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
 

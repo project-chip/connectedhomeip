@@ -1109,7 +1109,7 @@
     return self;
 }
 
-- (void)deviceAttestation:(CHIPDeviceController *)controller deviceId:(uint64_t)deviceId failedWithError:(NSError * _Nonnull)error
+- (void)deviceAttestation:(CHIPDeviceController *)controller failedForDevice:(void *)device error:(NSError * _Nonnull)error
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         UIAlertController * alertController = [UIAlertController
@@ -1121,7 +1121,7 @@
                                                             style:UIAlertActionStyleDefault
                                                           handler:^(UIAlertAction * action) {
                                                               NSError * err;
-                                                              [controller continueCommissioningDevice:deviceId
+                                                              [controller continueCommissioningDevice:device
                                                                              ignoreAttestationFailure:NO
                                                                                                 error:&err];
                                                           }]];
@@ -1130,7 +1130,7 @@
                                                             style:UIAlertActionStyleDefault
                                                           handler:^(UIAlertAction * action) {
                                                               NSError * err;
-                                                              [controller continueCommissioningDevice:deviceId
+                                                              [controller continueCommissioningDevice:device
                                                                              ignoreAttestationFailure:YES
                                                                                                 error:&err];
                                                           }]];

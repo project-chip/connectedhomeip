@@ -23,6 +23,8 @@
 
 namespace chip {
 
+class DeviceProxy;
+
 namespace Controller {
 class DeviceCommissioner;
 } // namespace Controller
@@ -49,10 +51,10 @@ public:
      *   handling the failure has the option to continue commissionning or fail the operation.
      *
      *   @param deviceCommissioner The commissioner object that is commissioning the device
-     *   @param remoteNodeId The NodeId of the Commissionee device
+     *   @param device The proxy represent the device being commissioned
      *   @param attestationResult The failure code for the device attestation validation operation
      */
-    virtual void OnDeviceAttestionFailed(chip::Controller::DeviceCommissioner * deviceCommissioner, chip::NodeId remoteNodeId,
+    virtual void OnDeviceAttestionFailed(chip::Controller::DeviceCommissioner * deviceCommissioner, DeviceProxy * device,
                                          chip::Credentials::AttestationVerificationResult attestationResult) = 0;
 };
 

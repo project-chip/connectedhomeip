@@ -803,14 +803,14 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
 }
 
 CHIP_ERROR
-DeviceCommissioner::ContinueCommissioningAfterDeviceAttestationFailure(NodeId remoteDeviceId,
+DeviceCommissioner::ContinueCommissioningAfterDeviceAttestationFailure(DeviceProxy * device,
                                                                        Credentials::AttestationVerificationResult attestationResult)
 {
     MATTER_TRACE_EVENT_SCOPE("continueCommissioningDevice", "DeviceCommissioner");
-    CommissioneeDeviceProxy * device = FindCommissioneeDevice(remoteDeviceId);
-    if (device == nullptr || !device->IsSecureConnected() || device != mDeviceBeingCommissioned)
+    CommissioneeDeviceProxy * commissioneeDevice = FindCommissioneeDevice(device->GetDeviceId());
+    if (commissioneeDevice == nullptr || !commissioneeDevice->IsSecureConnected() || commissioneeDevice != mDeviceBeingCommissioned)
     {
-        ChipLogError(Controller, "Invalid device for commissioning af" ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
+        ChipLogError(Controller, "Invalid device for commissioning af" ChipLogFormatX64, ChipLogValueX64(commissioneeDevice->GetDeviceId()));
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
@@ -827,7 +827,7 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestationFailure(NodeId re
     }
 
     ChipLogProgress(Controller, "Continuing commissioning after attestation failure for node ID 0x" ChipLogFormatX64,
-                    ChipLogValueX64(remoteDeviceId));
+                    ChipLogValueX64(commissioneeDevice->GetDeviceId()));
 
     if (attestationResult != AttestationVerificationResult::kSuccess)
     {
@@ -1071,8 +1071,7 @@ void DeviceCommissioner::OnArmFailSafeExtendedForFailedDeviceAttestation(
     if (deviceAttestationDelegate)
     {
         ChipLogProgress(Controller, "Device attestation failed, delegating error handling to client");
-        NodeId remoteNodeId = commissioner->mDeviceBeingCommissioned->GetDeviceId();
-        deviceAttestationDelegate->OnDeviceAttestionFailed(commissioner, remoteNodeId, commissioner->mAttestationResult);
+        deviceAttestationDelegate->OnDeviceAttestionFailed(commissioner, commissioner->mDeviceBeingCommissioned, commissioner->mAttestationResult);
     }
     else
     {
