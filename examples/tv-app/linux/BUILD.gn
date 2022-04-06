@@ -43,6 +43,7 @@ executable("chip-tv-app") {
     "AppImpl.cpp",
     "AppImpl.h",
     "AppPlatformShellCommands.cpp",
+    "ZclCallbacks.cpp",
     "include/account-login/AccountLoginManager.cpp",
     "include/account-login/AccountLoginManager.h",
     "include/application-basic/ApplicationBasicManager.cpp",
@@ -72,7 +73,6 @@ executable("chip-tv-app") {
     "include/wake-on-lan/WakeOnLanManager.cpp",
     "include/wake-on-lan/WakeOnLanManager.h",
     "main.cpp",
-    "ZclCallbacks.cpp",
   ]
 
   deps = [
