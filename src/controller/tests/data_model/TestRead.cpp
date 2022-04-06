@@ -794,7 +794,16 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
                            onSubscriptionEstablishedCb, false, true, dataVersion) == CHIP_NO_ERROR);
     }
 
-    ctx.DrainAndServiceIO();
+    // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
+    // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
+    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(30), [&]() {
+        return numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1) &&
+            numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1);
+    });
+
+    ChipLogError(Zcl, "Success call cnt: %u (expect %u) subscription cnt: %u (expect %u)", numSuccessCalls,
+                 uint32_t(CHIP_IM_MAX_NUM_READ_HANDLER + 1), numSubscriptionEstablishedCalls,
+                 uint32_t(CHIP_IM_MAX_NUM_READ_HANDLER + 1));
 
     NL_TEST_ASSERT(apSuite, numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
     NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
@@ -1176,7 +1185,7 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
 
     // Intentially issue read requests that exceeds the quota per fabric.
     app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
-    for (int i = 0; i < (CHIP_IM_MAX_NUM_READ_HANDLER + 1); i++)
+    for (int i = 0; i < CHIP_IM_MAX_NUM_READ_HANDLER; i++)
     {
         std::unique_ptr<app::ReadClient> readClient =
             std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), readCallback,
@@ -1184,12 +1193,17 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
         NL_TEST_ASSERT(apSuite, readClient->SendRequest(readParams) == CHIP_NO_ERROR);
         readClients.push_back(std::move(readClient));
     }
-    ctx.DrainAndServiceIO();
+
+    // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
+    // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
+    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(60), [&]() {
+        return readCallback.mOnSubscriptionEstablishedCount == static_cast<size_t>(CHIP_IM_MAX_NUM_READ_HANDLER);
+    });
 
     NL_TEST_ASSERT(apSuite,
                    readCallback.mAttributeCount >
                        static_cast<size_t>(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS / ctx.GetFabricTable().FabricCount() - 1));
-    NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablishedCount == static_cast<size_t>(CHIP_IM_MAX_NUM_READ_HANDLER + 1));
+    NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablishedCount == static_cast<size_t>(CHIP_IM_MAX_NUM_READ_HANDLER));
     ChipLogError(Zcl, "Attr Cnt: %u sub cnt: %u", readCallback.mAttributeCount, readCallback.mOnSubscriptionEstablishedCount);
 
     app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
