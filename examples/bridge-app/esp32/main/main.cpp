@@ -144,35 +144,41 @@ DataVersion gLight4DataVersions[ArraySize(bridgedLightClusters)];
 #define ZCL_FIXED_LABEL_CLUSTER_REVISION (1u)
 #define ZCL_ON_OFF_CLUSTER_REVISION (4u)
 
-CHIP_ERROR AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, uint16_t deviceType,
-                             const Span<DataVersion> & dataVersionStorage)
+int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
+                      const Span<DataVersion> & dataVersionStorage)
 {
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         if (NULL == gDevices[index])
         {
-            dev->SetEndpointId(gCurrentEndpointId);
             gDevices[index] = dev;
             EmberAfStatus ret;
-            ret = emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, deviceType, DEVICE_VERSION_DEFAULT, dataVersionStorage);
-            if (ret == EMBER_ZCL_STATUS_SUCCESS)
+            while (1)
             {
-                ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", dev->GetName(),
-                                gCurrentEndpointId, index);
-                gCurrentEndpointId++;
-                return CHIP_NO_ERROR;
-            }
-            else if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
-            {
-                ChipLogProgress(DeviceLayer, "Failed to add dynamic endpoint, Insufficient space");
-                return CHIP_ERROR_INTERNAL;
+                dev->SetEndpointId(gCurrentEndpointId);
+                ret = emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList);
+                if (ret == EMBER_ZCL_STATUS_SUCCESS)
+                {
+                    ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", dev->GetName(),
+                                    gCurrentEndpointId, index);
+                    return index;
+                }
+                else if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
+                {
+                    return -1;
+                }
+                // Handle wrap condition
+                if (++gCurrentEndpointId < gFirstDynamicEndpointId)
+                {
+                    gCurrentEndpointId = gFirstDynamicEndpointId;
+                }
             }
         }
         index++;
     }
     ChipLogProgress(DeviceLayer, "Failed to add dynamic endpoint: No endpoints available!");
-    return CHIP_ERROR_INTERNAL;
+    return -1;
 }
 
 CHIP_ERROR RemoveDeviceEndpoint(Device * dev)
