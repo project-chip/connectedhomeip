@@ -810,7 +810,8 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestationFailure(DevicePro
     CommissioneeDeviceProxy * commissioneeDevice = FindCommissioneeDevice(device->GetDeviceId());
     if (commissioneeDevice == nullptr || !commissioneeDevice->IsSecureConnected() || commissioneeDevice != mDeviceBeingCommissioned)
     {
-        ChipLogError(Controller, "Invalid device for commissioning af" ChipLogFormatX64, ChipLogValueX64(commissioneeDevice->GetDeviceId()));
+        ChipLogError(Controller, "Invalid device for commissioning af" ChipLogFormatX64,
+                     ChipLogValueX64(commissioneeDevice->GetDeviceId()));
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
@@ -1071,7 +1072,8 @@ void DeviceCommissioner::OnArmFailSafeExtendedForFailedDeviceAttestation(
     if (deviceAttestationDelegate)
     {
         ChipLogProgress(Controller, "Device attestation failed, delegating error handling to client");
-        deviceAttestationDelegate->OnDeviceAttestionFailed(commissioner, commissioner->mDeviceBeingCommissioned, commissioner->mAttestationResult);
+        deviceAttestationDelegate->OnDeviceAttestionFailed(commissioner, commissioner->mDeviceBeingCommissioned,
+                                                           commissioner->mAttestationResult);
     }
     else
     {
