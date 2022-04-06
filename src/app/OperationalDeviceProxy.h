@@ -60,7 +60,7 @@ struct DeviceProxyInitParams
     CHIP_ERROR Validate() const
     {
         ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(sessionResumptionStorage == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        // sessionResumptionStorage can be nullptr when resumption is disabled
         ReturnErrorCodeIf(exchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(groupDataProvider == nullptr, CHIP_ERROR_INCORRECT_STATE);

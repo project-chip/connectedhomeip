@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <app/AppBuildConfig.h>
+
 #include <access/AccessControl.h>
 #include <access/examples/ExampleAccessControlDelegate.h>
 #include <app/CASEClientPool.h>
@@ -38,7 +40,9 @@
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
+#if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
 #include <protocols/secure_channel/SimpleSessionResumptionStorage.h>
+#endif
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
@@ -84,6 +88,9 @@ struct ServerInitParams
     // Persistent storage delegate: MUST be injected. Used to maintain storage by much common code.
     // Must be initialized before being provided.
     PersistentStorageDelegate * persistentStorageDelegate = nullptr;
+    // Session resumption storage: Optional. Support session resumption when provided.
+    // Must be initialized before being provided.
+    SessionResumptionStorage * sessionResumptionStorage = nullptr;
     // Group data provider: MUST be injected. Used to maintain critical keys such as the Identity
     // Protection Key (IPK) for CASE. Must be initialized before being provided.
     Credentials::GroupDataProvider * groupDataProvider = nullptr;
@@ -140,6 +147,9 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
     {
         static chip::KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
         static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
+#if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
+        static chip::SimpleSessionResumptionStorage sSessionResumptionStorage;
+#endif
 
         // KVS-based persistent storage delegate injection
         chip::DeviceLayer::PersistedStorage::KeyValueStoreManager & kvsManager = DeviceLayer::PersistedStorage::KeyValueStoreMgr();
@@ -150,6 +160,13 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         sGroupDataProvider.SetStorageDelegate(&sKvsPersistenStorageDelegate);
         ReturnErrorOnFailure(sGroupDataProvider.Init());
         this->groupDataProvider = &sGroupDataProvider;
+
+#if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
+        ReturnErrorOnFailure(sSessionResumptionStorage.Init(&sKvsPersistenStorageDelegate));
+        this->sessionResumptionStorage = &sSessionResumptionStorage;
+#else
+        this->sessionResumptionStorage = nullptr;
+#endif
 
         // Inject access control delegate
         this->accessDelegate = Access::Examples::GetAccessControlDelegate(&sKvsPersistenStorageDelegate);
@@ -199,7 +216,7 @@ public:
 
     SessionManager & GetSecureSessionManager() { return mSessions; }
 
-    SessionResumptionStorage & GetSessionResumptionStorage() { return mSessionResumptionStorage; }
+    SessionResumptionStorage * GetSessionResumptionStorage() { return mSessionResumptionStorage; }
 
     TransportMgrBase & GetTransportManager() { return mTransports; }
 
@@ -301,7 +318,6 @@ private:
 
     ServerTransportMgr mTransports;
     SessionManager mSessions;
-    SimpleSessionResumptionStorage mSessionResumptionStorage;
     CASEServer mCASEServer;
 
     CASESessionManager mCASESessionManager;
@@ -317,6 +333,7 @@ private:
     CommissioningWindowManager mCommissioningWindowManager;
 
     PersistentStorageDelegate * mDeviceStorage;
+    SessionResumptionStorage * mSessionResumptionStorage;
     Credentials::GroupDataProvider * mGroupsProvider;
     app::DefaultAttributePersistenceProvider mAttributePersister;
     GroupDataProviderListener mListener;
