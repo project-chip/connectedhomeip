@@ -633,7 +633,7 @@ void Engine::Run()
     }
 }
 
-bool Engine::MergeOverlappedAttributePath(AttributePathParams & aAttributePath)
+bool Engine::MergeOverlappedAttributePath(const AttributePathParams & aAttributePath)
 {
     return Loop::Break == mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
         if (path->IsAttributePathSupersetOf(aAttributePath))
@@ -643,7 +643,12 @@ bool Engine::MergeOverlappedAttributePath(AttributePathParams & aAttributePath)
         }
         if (aAttributePath.IsAttributePathSupersetOf(*path))
         {
+            //TODO: the wildcard input path may be superset of next paths in globalDirtySet, it is fine at this moment, since
+            //when building report, it would use the first path of globalDirySet to compare against interested paths read clients wants.
+            // It is better to eliminate the duplicate wildcard paths in follow-up
             path->mGeneration  = GetDirtySetGeneration();
+            path->mEndpointId  = aAttributePath.mEndpointId;
+            path->mClusterId   = aAttributePath.mClusterId;
             path->mListIndex   = aAttributePath.mListIndex;
             path->mAttributeId = aAttributePath.mAttributeId;
             return Loop::Break;
