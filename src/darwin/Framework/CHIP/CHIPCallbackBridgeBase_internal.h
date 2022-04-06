@@ -36,6 +36,10 @@ public:
         , mSuccess(OnSuccessFn, this)
         , mFailure(OnFailureFn, this)
     {
+        mRequestTime = [NSDate date];
+        // Generate a unique cookie to track this operation
+        mCookie = [NSString stringWithFormat:@"Response Time: %s+%u", typeid(T).name(), arc4random()];
+        ChipLogDetail(Controller, "%s", mCookie.UTF8String);
         __block CHIP_ERROR err = CHIP_NO_ERROR;
         dispatch_sync(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
             err = action(mSuccess.Cancel(), mFailure.Cancel());
@@ -81,6 +85,8 @@ private:
         }
 
         dispatch_async(callbackBridge->mQueue, ^{
+            ChipLogDetail(Controller, "%s %f seconds", callbackBridge->mCookie.UTF8String,
+                -[callbackBridge->mRequestTime timeIntervalSinceNow]);
             callbackBridge->mHandler(value, error);
 
             if (!callbackBridge->mKeepAlive) {
@@ -94,4 +100,8 @@ private:
 
     chip::Callback::Callback<T> mSuccess;
     chip::Callback::Callback<CHIPDefaultFailureCallbackType> mFailure;
+
+    // Measure the time it took for the callback to trigger
+    NSDate * mRequestTime;
+    NSString * mCookie;
 };

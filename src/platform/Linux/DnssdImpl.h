@@ -107,7 +107,7 @@ public:
     CHIP_ERROR Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context);
     CHIP_ERROR Shutdown();
     CHIP_ERROR SetHostname(const char * hostname);
-    CHIP_ERROR PublishService(const DnssdService & service);
+    CHIP_ERROR PublishService(const DnssdService & service, DnssdPublishCallback callback, void * context);
     CHIP_ERROR StopPublish();
     CHIP_ERROR Browse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
                       chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context);

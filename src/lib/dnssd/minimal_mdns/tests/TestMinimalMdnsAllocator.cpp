@@ -306,12 +306,22 @@ const nlTest sTests[] = {
     NL_TEST_SENTINEL() //
 };
 
+int TestSetup(void * inContext)
+{
+    return chip::Platform::MemoryInit() == CHIP_NO_ERROR ? SUCCESS : FAILURE;
+}
+
+int TestTeardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 } // namespace
 
 int TestMinimalMdnsAllocator(void)
 {
-    chip::Platform::MemoryInit();
-    nlTestSuite theSuite = { "MinimalMdnsAllocator", &sTests[0], nullptr, nullptr };
+    nlTestSuite theSuite = { "MinimalMdnsAllocator", &sTests[0], &TestSetup, &TestTeardown };
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

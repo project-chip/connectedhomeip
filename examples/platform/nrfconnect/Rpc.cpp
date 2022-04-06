@@ -23,7 +23,7 @@
 
 #include <kernel.h>
 
-LOG_MODULE_DECLARE(app);
+LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 #include "pigweed/rpc_services/Attributes.h"
@@ -32,6 +32,10 @@ LOG_MODULE_DECLARE(app);
 #if defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
 #include "pigweed/rpc_services/Button.h"
 #endif // defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
+
+#if defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
+#include "pigweed/rpc_services/Descriptor.h"
+#endif // defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
 
 #if defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 #include "pigweed/rpc_services/Device.h"
@@ -44,6 +48,14 @@ LOG_MODULE_DECLARE(app);
 #if defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
 #include "pigweed/rpc_services/Locking.h"
 #endif // defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
+
+#if defined(PW_RPC_OTCLI_SERVICE) && PW_RPC_OTCLI_SERVICE
+#include "pigweed/rpc_services/OtCli.h"
+#endif // defined(PW_RPC_OTCLI_SERVICE) && PW_RPC_OTCLI_SERVICE
+
+#if defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
+#include "pigweed/rpc_services/Thread.h"
+#endif // defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
 
 #if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
 #define PW_TRACE_BUFFER_SIZE_BYTES 1024
@@ -116,6 +128,10 @@ Attributes attributes_service;
 NrfButton button_service;
 #endif // defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
 
+#if defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
+Descriptor descriptor_service;
+#endif // defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
+
 #if defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 NrfDevice device_service;
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
@@ -127,6 +143,14 @@ Lighting lighting_service;
 #if defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
 Locking locking;
 #endif // defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
+
+#if defined(PW_RPC_OTCLI_SERVICE) && PW_RPC_OTCLI_SERVICE
+OtCli ot_cli_service;
+#endif // defined(PW_RPC_OTCLI_SERVICE) && PW_RPC_OTCLI_SERVICE
+
+#if defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
+Thread thread;
+#endif // defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
 
 #if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
 pw::trace::TraceService trace_service;
@@ -142,6 +166,10 @@ void RegisterServices(pw::rpc::Server & server)
     server.RegisterService(button_service);
 #endif // defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
 
+#if defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
+    server.RegisterService(descriptor_service);
+#endif // defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
+
 #if defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
     server.RegisterService(device_service);
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
@@ -153,6 +181,14 @@ void RegisterServices(pw::rpc::Server & server)
 #if defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
     server.RegisterService(locking);
 #endif // defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
+
+#if defined(PW_RPC_OTCLI_SERVICE) && PW_RPC_OTCLI_SERVICE
+    server.RegisterService(ot_cli_service);
+#endif // defined(PW_RPC_OTCLI_SERVICE) && PW_RPC_OTCLI_SERVICE
+
+#if defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
+    server.RegisterService(thread);
+#endif // defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
 
 #if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
     server.RegisterService(trace_service);

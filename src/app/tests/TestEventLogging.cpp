@@ -22,11 +22,12 @@
  *
  */
 
-#include <app/ClusterInfo.h>
+#include <access/SubjectDescriptor.h>
 #include <app/EventLoggingDelegate.h>
 #include <app/EventLoggingTypes.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
+#include <app/ObjectList.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -45,7 +46,6 @@
 
 namespace {
 
-static const chip::NodeId kTestDeviceNodeId1      = 0x18B4300000000001ULL;
 static const chip::ClusterId kLivenessClusterId   = 0x00000022;
 static const uint32_t kLivenessChangeEvent        = 1;
 static const chip::EndpointId kTestEndpointId1    = 2;
@@ -60,9 +60,9 @@ static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 class TestContext : public chip::Test::AppContext
 {
 public:
-    static int Initialize(void * context)
+    static int InitializeAsync(void * context)
     {
-        if (AppContext::Initialize(context) != SUCCESS)
+        if (AppContext::InitializeAsync(context) != SUCCESS)
             return FAILURE;
 
         auto * ctx = static_cast<TestContext *>(context);
@@ -132,7 +132,7 @@ static void CheckLogState(nlTestSuite * apSuite, chip::app::EventManagement & aL
 }
 
 static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & alogMgmt, chip::EventNumber startingEventNumber,
-                            size_t expectedNumEvents, chip::app::ClusterInfo * clusterInfo)
+                            size_t expectedNumEvents, chip::app::ObjectList<chip::app::EventPathParams> * clusterInfo)
 {
     CHIP_ERROR err;
     chip::TLV::TLVReader reader;
@@ -141,7 +141,7 @@ static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & 
     uint8_t backingStore[1024];
     size_t totalNumElements;
     writer.Init(backingStore, 1024);
-    err = alogMgmt.FetchEventsSince(writer, clusterInfo, startingEventNumber, eventCount, 0);
+    err = alogMgmt.FetchEventsSince(writer, clusterInfo, startingEventNumber, eventCount, chip::Access::SubjectDescriptor{});
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV);
 
     reader.Init(backingStore, writer.GetLengthWritten());
@@ -223,22 +223,20 @@ static void CheckLogEventWithEvictToNextBuffer(nlTestSuite * apSuite, void * apC
     NL_TEST_ASSERT(apSuite, (eid4 + 1) == eid5);
     NL_TEST_ASSERT(apSuite, (eid5 + 1) == eid6);
 
-    chip::app::ClusterInfo testClusterInfo1;
-    testClusterInfo1.mNodeId     = kTestDeviceNodeId1;
-    testClusterInfo1.mEndpointId = kTestEndpointId1;
-    testClusterInfo1.mClusterId  = kLivenessClusterId;
-    chip::app::ClusterInfo testClusterInfo2;
-    testClusterInfo2.mNodeId     = kTestDeviceNodeId1;
-    testClusterInfo2.mEndpointId = kTestEndpointId2;
-    testClusterInfo2.mClusterId  = kLivenessClusterId;
-    testClusterInfo2.mEventId    = kLivenessChangeEvent;
+    chip::app::ObjectList<chip::app::EventPathParams> testEventPathParams1;
+    testEventPathParams1.mValue.mEndpointId = kTestEndpointId1;
+    testEventPathParams1.mValue.mClusterId  = kLivenessClusterId;
+    chip::app::ObjectList<chip::app::EventPathParams> testEventPathParams2;
+    testEventPathParams2.mValue.mEndpointId = kTestEndpointId2;
+    testEventPathParams2.mValue.mClusterId  = kLivenessClusterId;
+    testEventPathParams2.mValue.mEventId    = kLivenessChangeEvent;
 
-    CheckLogReadOut(apSuite, logMgmt, 0, 3, &testClusterInfo1);
-    CheckLogReadOut(apSuite, logMgmt, 1, 2, &testClusterInfo1);
-    CheckLogReadOut(apSuite, logMgmt, 2, 1, &testClusterInfo1);
-    CheckLogReadOut(apSuite, logMgmt, 3, 3, &testClusterInfo2);
-    CheckLogReadOut(apSuite, logMgmt, 4, 2, &testClusterInfo2);
-    CheckLogReadOut(apSuite, logMgmt, 5, 1, &testClusterInfo2);
+    CheckLogReadOut(apSuite, logMgmt, 0, 3, &testEventPathParams1);
+    CheckLogReadOut(apSuite, logMgmt, 1, 2, &testEventPathParams1);
+    CheckLogReadOut(apSuite, logMgmt, 2, 1, &testEventPathParams1);
+    CheckLogReadOut(apSuite, logMgmt, 3, 3, &testEventPathParams2);
+    CheckLogReadOut(apSuite, logMgmt, 4, 2, &testEventPathParams2);
+    CheckLogReadOut(apSuite, logMgmt, 5, 1, &testEventPathParams2);
 }
 
 static void CheckLogEventWithDiscardLowEvent(nlTestSuite * apSuite, void * apContext)
@@ -294,7 +292,7 @@ nlTestSuite sSuite =
 {
     "EventLogging",
     &sTests[0],
-    TestContext::Initialize,
+    TestContext::InitializeAsync,
     TestContext::Finalize
 };
 // clang-format on

@@ -95,7 +95,7 @@ CHIP_ERROR MessageCounterManager::OnMessageReceived(Messaging::ExchangeContext *
     {
         return HandleMsgCounterSyncReq(exchangeContext, std::move(msgBuf));
     }
-    else if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp))
+    if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp))
     {
         return HandleMsgCounterSyncResp(exchangeContext, std::move(msgBuf));
     }
@@ -222,26 +222,19 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncResp(Messaging::ExchangeCont
                                                          FixedByteSpan<kChallengeSize> challenge)
 {
     System::PacketBufferHandle msgBuf;
-
     VerifyOrDie(exchangeContext->HasSessionHandle());
 
-    // Allocate new buffer.
-    msgBuf = MessagePacketBuffer::New(kSyncRespMsgSize);
-    VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(exchangeContext->GetSessionHandle()->IsGroupSession(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    {
-        uint8_t * msg = msgBuf->Start();
-        Encoding::LittleEndian::BufferWriter bbuf(msg, kSyncRespMsgSize);
-        bbuf.Put32(
-            exchangeContext->GetSessionHandle()->AsSecureSession()->GetSessionMessageCounter().GetLocalMessageCounter().Value());
-        bbuf.Put(challenge.data(), kChallengeSize);
-        VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
-    }
+    // NOTE: not currently implemented. When implementing, the following should be done:
+    //    - allocate a new buffer: MessagePacketBuffer::New
+    //    - setup payload and place the local message counter + challange in it
+    //    - exchangeContext->SendMessage(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp, ...)
+    //
+    // You can view the history of this file for a partial implementation that got
+    // removed due to it using non-group sessions.
 
-    msgBuf->SetDataLength(kSyncRespMsgSize);
-
-    return exchangeContext->SendMessage(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp, std::move(msgBuf),
-                                        Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext,

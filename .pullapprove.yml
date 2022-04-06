@@ -39,9 +39,10 @@ overrides:
     ############################################################
     #  Required status checks
     ############################################################
-    - if: "'*restyle*' not in statuses.successful"
-      status: failure
-      explanation: "Style must be inline before reviewing can be complete"
+#     Disabled given restyled seems broken right now
+#     - if: "'*restyle*' not in statuses.successful"
+#       status: failure
+#       explanation: "Style must be inline before reviewing can be complete"
 
     ############################################################
     #  Fast tracking
@@ -164,7 +165,7 @@ groups:
             requests.
         type: required
         requirements:
-            - len(groups.approved.include('shared-reviewers-*')) >= 3
+            - len(groups.approved.include('shared-reviewers-*')) >= 2
         reviews:
             required: 0
         labels:

@@ -26,11 +26,11 @@ The CHIP demo application is supported on
 
 -   Pull docker image:
 
-          $ docker pull pankore/chip-build-ameba:latest
+          $ docker pull connectedhomeip/chip-build-ameba:latest
 
 -   Run docker container:
 
-          $ docker run -it -v ${CHIP_DIR}:/root/chip pankore/chip-build-ameba:latest
+          $ docker run -it -v ${CHIP_DIR}:/root/chip connectedhomeip/chip-build-ameba:latest
 
 -   Setup build environment:
 
@@ -65,7 +65,6 @@ There are two commissioning modes supported by Ameba platform:
 
 1. In "connectedhomeip/config/ameba/args.gni"
 
-    - set `chip_bypass_rendezvous = false`
     - Set `chip_config_network_layer_ble = true`
 
 2. In "connectedhomeip/src/platform/Ameba/CHIPDevicePlatformConfig.h"
@@ -73,17 +72,15 @@ There are two commissioning modes supported by Ameba platform:
     - Set `#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1`
 
 3. Build and Flash
-4. Use ATS\$ command to run all-cluster example.
+4. The all-clusters example will run automatically after booting the Ameba
+   board.
 5. Test with
    [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
-   or
-   [Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/python_chip_controller_building.md).
 
 ### IP mode
 
 1. In "connectedhomeip/config/ameba/args.gni"
 
-    - set `chip_bypass_rendezvous = false`
     - Set `chip_config_network_layer_ble = false`
 
 2. In "connectedhomeip/src/platform/Ameba/CHIPDevicePlatformConfig.h"
@@ -91,12 +88,11 @@ There are two commissioning modes supported by Ameba platform:
     - Set `#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0`
 
 3. Build and Flash
-4. Use ATS\$ command to run all-cluster example.
+4. The all-clusters example will run automatically after booting the Ameba
+   board.
 5. Connect to AP using `ATW0, ATW1, ATWC` commands
 6. Test with
    [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
-   or
-   [Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/python_chip_controller_building.md).
 
 ## Cluster Control
 
@@ -107,13 +103,8 @@ to be On or Off.
 -   Via
     [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool#using-the-client-to-send-matter-commands)
 
-          $ ./chip-tool onoff on 1
-          $ ./chip-tool onoff off 1
-
--   Via
-    [Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/python_chip_controller_building.md#step-8-control-application-zcl-clusters)
-
-          $ chip-device-ctrl > zcl OnOff Toggle 1234 1 0
+          $ ./chip-tool onoff on ${NODE_ID_TO_ASSIGN} 1
+          $ ./chip-tool onoff off ${NODE_ID_TO_ASSIGN} 1
 
 ## Running RPC Console
 
@@ -134,9 +125,9 @@ to be On or Off.
 
             $ pip3 install out/debug/chip_rpc_console_wheels/*.whl
 
--   Launch the chip-rpc console after inputting `ATS$` command
+-   Launch the chip-rpc console after resetting Ameba board
 
-            $ python3 -m chip_rpc.console --device /dev/tty<port connected to USB-TTL adapter> -b 115200
+            $ chip-console --device /dev/tty<port connected to USB-TTL adapter> -b 115200
 
 -   Get and Set lighting directly using the RPC console
 

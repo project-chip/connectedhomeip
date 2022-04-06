@@ -38,10 +38,10 @@ namespace {
 Shell::Engine sShellDnsBrowseSubcommands;
 Shell::Engine sShellDnsSubcommands;
 
-class DnsShellResolverDelegate : public Dnssd::ResolverDelegate
+class DnsShellResolverDelegate : public Dnssd::OperationalResolveDelegate, public Dnssd::CommissioningResolveDelegate
 {
 public:
-    void OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData) override
+    void OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeData) override
     {
         streamer_printf(streamer_get(), "DNS resolve for " ChipLogFormatX64 "-" ChipLogFormatX64 " succeeded:\r\n",
                         ChipLogValueX64(nodeData.mPeerId.GetCompressedFabricId()), ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
@@ -65,9 +65,9 @@ public:
         streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.mSupportsTcp ? "yes" : "no");
     }
 
-    void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override {}
+    void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override {}
 
-    void OnNodeDiscoveryComplete(const Dnssd::DiscoveredNodeData & nodeData) override
+    void OnNodeDiscovered(const Dnssd::DiscoveredNodeData & nodeData) override
     {
         if (!nodeData.IsValid())
         {
@@ -126,7 +126,7 @@ CHIP_ERROR ResolveHandler(int argc, char ** argv)
     peerId.SetCompressedFabricId(strtoull(argv[0], NULL, 10));
     peerId.SetNodeId(strtoull(argv[1], NULL, 10));
 
-    return sResolverProxy.ResolveNodeId(peerId, Inet::IPAddressType::kAny, Dnssd::Resolver::CacheBypass::On);
+    return sResolverProxy.ResolveNodeId(peerId, Inet::IPAddressType::kAny);
 }
 
 bool ParseSubType(int argc, char ** argv, Dnssd::DiscoveryFilter & filter)
@@ -224,7 +224,8 @@ CHIP_ERROR DnsHandler(int argc, char ** argv)
     }
 
     sResolverProxy.Init(DeviceLayer::UDPEndPointManager());
-    sResolverProxy.SetResolverDelegate(&sDnsShellResolverDelegate);
+    sResolverProxy.SetOperationalDelegate(&sDnsShellResolverDelegate);
+    sResolverProxy.SetCommissioningDelegate(&sDnsShellResolverDelegate);
 
     return sShellDnsSubcommands.ExecCommand(argc, argv);
 }

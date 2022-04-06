@@ -1,1 +1,1 @@
-0.5.52 Version bump reason: add python packages to zap image, for use by the python control scripts
+0.5.61 Version bump reason: [Tizen] Update Tizen docker image for thread

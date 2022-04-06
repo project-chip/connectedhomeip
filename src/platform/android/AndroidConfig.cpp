@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -78,6 +78,9 @@ const AndroidConfig::Key AndroidConfig::kConfigKey_ProductLabel          = { kCo
 const AndroidConfig::Key AndroidConfig::kConfigKey_LocalConfigDisabled = { kConfigNamespace_ChipFactory, "local-config-disabled" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_Reachable           = { kConfigNamespace_ChipFactory, "reachable" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_UniqueId            = { kConfigNamespace_ChipFactory, "uniqueId" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_Spake2pIterationCount = { kConfigNamespace_ChipFactory, "iteration-count" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_Spake2pSalt           = { kConfigNamespace_ChipFactory, "salt" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_Spake2pVerifier       = { kConfigNamespace_ChipFactory, "verifier" };
 
 // Keys stored in the Chip-config namespace
 const AndroidConfig::Key AndroidConfig::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };

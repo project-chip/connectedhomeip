@@ -100,6 +100,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         imageProcessor->mDownloader->OnPreparedForDownload(ESP32Utils::MapError(err));
         return;
     }
+    imageProcessor->mHeaderParser.Init();
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
 
@@ -156,13 +157,25 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         ChipLogError(SoftwareUpdate, "mDownloader is null");
         return;
     }
-    esp_err_t err = esp_ota_write(imageProcessor->mOTAUpdateHandle, imageProcessor->mBlock.data(), imageProcessor->mBlock.size());
+
+    ByteSpan block = ByteSpan(imageProcessor->mBlock.data(), imageProcessor->mBlock.size());
+
+    CHIP_ERROR error = imageProcessor->ProcessHeader(block);
+    if (error != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to process OTA image header");
+        imageProcessor->mDownloader->EndDownload(error);
+        return;
+    }
+
+    esp_err_t err = esp_ota_write(imageProcessor->mOTAUpdateHandle, block.data(), block.size());
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "esp_ota_write failed (%s)", esp_err_to_name(err));
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+        return;
     }
-    imageProcessor->mParams.downloadedBytes += imageProcessor->mBlock.size();
+    imageProcessor->mParams.downloadedBytes += block.size();
     imageProcessor->mDownloader->FetchNextData();
 }
 
@@ -219,4 +232,23 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
     mBlock = MutableByteSpan();
     return CHIP_NO_ERROR;
 }
+
+CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
+{
+    if (mHeaderParser.IsInitialized())
+    {
+        OTAImageHeader header;
+        CHIP_ERROR error = mHeaderParser.AccumulateAndDecode(block, header);
+
+        // Need more data to decode the header
+        ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(error);
+
+        mParams.totalFileBytes = header.mPayloadSize;
+        mHeaderParser.Clear();
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace chip

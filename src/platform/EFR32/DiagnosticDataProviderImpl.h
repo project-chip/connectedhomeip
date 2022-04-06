@@ -43,7 +43,7 @@ public:
     CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) override;
     CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark) override;
     CHIP_ERROR GetRebootCount(uint16_t & rebootCount) override;
-    CHIP_ERROR GetBootReason(uint8_t & bootReason) override;
+    CHIP_ERROR GetBootReason(BootReasonType & bootReason) override;
     CHIP_ERROR GetUpTime(uint64_t & upTime) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
     CHIP_ERROR GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults) override;

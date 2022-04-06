@@ -49,7 +49,7 @@ CHIP_ERROR IOContext::Shutdown()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ShutdownNetwork();
-    gSystemLayer.Shutdown();
+    ShutdownSystemLayer();
     Platform::MemoryShutdown();
 
     return err;

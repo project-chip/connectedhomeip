@@ -18,6 +18,11 @@ The Android chip-tool is located in [../android/CHIPTool](../android/CHIPTool).
 The POSIX CLI chip-tool is located in
 [../../examples/chip-tool](../../examples/chip-tool).
 
+### Darwin CLI
+
+The POSIX CLI chip-tool is located in
+[../../examples/chip-tool-darwin](../../examples/chip-tool).
+
 ### Python
 
 The Python chip-device-ctrl is located in

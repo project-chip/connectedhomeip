@@ -37,12 +37,9 @@
 
 #include <bluetooth/addr.h>
 #include <bluetooth/gatt.h>
-#include <logging/log.h>
 #include <random/rand32.h>
 #include <sys/byteorder.h>
 #include <sys/util.h>
-
-LOG_MODULE_DECLARE(chip);
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -75,7 +72,8 @@ _bt_gatt_ccc CHIPoBLEChar_TX_CCC = BT_GATT_CCC_INITIALIZER(nullptr, BLEManagerIm
 
 // clang-format off
 
-struct bt_gatt_attr sChipoBleAttributes[] = {    BT_GATT_PRIMARY_SERVICE(&UUID16_CHIPoBLEService.uuid),
+struct bt_gatt_attr sChipoBleAttributes[] = {
+    BT_GATT_PRIMARY_SERVICE(&UUID16_CHIPoBLEService.uuid),
         BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_RX.uuid,
                                BT_GATT_CHRC_WRITE | BT_GATT_CHRC_WRITE_WITHOUT_RESP,
                                BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
@@ -251,8 +249,6 @@ struct BLEManagerImpl::ServiceData
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
     int err                       = 0;
-    const char * deviceName       = bt_get_name();
-    const uint8_t advFlags        = BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR;
     const bool isAdvertisingRerun = mFlags.Has(Flags::kAdvertising);
 
     // At first run always select fast advertising, on the next attempt slow down interval.
@@ -264,11 +260,17 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     bt_le_adv_param advParams =
         BT_LE_ADV_PARAM_INIT(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME, intervalMin, intervalMax, nullptr);
 
-    // Define advertising data
+    // Define advertising and, if BLE device name is set, scan response data
     ServiceData serviceData;
-    bt_data ad[] = { BT_DATA(BT_DATA_FLAGS, &advFlags, sizeof(advFlags)),
-                     BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData)),
-                     BT_DATA(BT_DATA_NAME_COMPLETE, deviceName, static_cast<uint8_t>(strlen(deviceName))) };
+    const uint8_t advFlags          = BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR;
+    const bt_data advertisingData[] = { BT_DATA(BT_DATA_FLAGS, &advFlags, sizeof(advFlags)),
+                                        BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData)) };
+
+    const char * deviceName             = bt_get_name();
+    const uint8_t deviceNameSize        = static_cast<uint8_t>(strlen(deviceName));
+    const bt_data scanResponseData[]    = { BT_DATA(BT_DATA_NAME_COMPLETE, deviceName, deviceNameSize) };
+    const bt_data * scanResponseDataPtr = deviceNameSize > 0 ? scanResponseData : nullptr;
+    const size_t scanResponseDataLen    = deviceNameSize > 0 ? ARRAY_SIZE(scanResponseData) : 0u;
 
     // Register dynamically CHIPoBLE GATT service
     if (!mFlags.Has(Flags::kChipoBleGattServiceRegister))
@@ -292,23 +294,11 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     ReturnErrorOnFailure(PrepareC3CharData());
 #endif
 
-    if (!isAdvertisingRerun)
-    {
-#if CONFIG_BT_PRIVACY
-        static_assert((CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT / 1000) <= CONFIG_BT_RPA_TIMEOUT,
-                      "BLE advertising timeout is too long relative to RPA timeout");
-        // Generate new private BLE address
-        bt_le_oob bleOobInfo;
-        err = bt_le_oob_get_local(advParams.id, &bleOobInfo);
-        VerifyOrReturnError(err == 0, MapErrorZephyr(err));
-#endif // CONFIG_BT_PRIVACY
-    }
-
     // Restart advertising
     err = bt_le_adv_stop();
     VerifyOrReturnError(err == 0, MapErrorZephyr(err));
 
-    err = bt_le_adv_start(&advParams, ad, ARRAY_SIZE(ad), nullptr, 0u);
+    err = bt_le_adv_start(&advParams, advertisingData, ARRAY_SIZE(advertisingData), scanResponseDataPtr, scanResponseDataLen);
     VerifyOrReturnError(err == 0, MapErrorZephyr(err));
 
     // Transition to the Advertising state...
@@ -458,7 +448,7 @@ CHIP_ERROR BLEManagerImpl::HandleGAPConnect(const ChipDeviceEvent * event)
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "BLE connection failed (reason: 0x%02" PRIx16 ")", connEvent->HciResult);
+        ChipLogError(DeviceLayer, "BLE connection failed (reason: 0x%02" PRIx16 ")", connEvent->HciResult);
     }
 
     ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%" PRIu16, NumConnections(), CONFIG_BT_MAX_CONN);
@@ -586,22 +576,23 @@ CHIP_ERROR BLEManagerImpl::HandleTXCharComplete(const ChipDeviceEvent * event)
 CHIP_ERROR BLEManagerImpl::PrepareC3CharData()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    char serialNumber[ConfigurationManager::kMaxSerialNumberLength + 1] = {};
-    uint16_t lifetimeCounter                                            = 0;
     BitFlags<AdditionalDataFields> additionalDataFields;
+    AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
 
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
-    err = ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber));
-    SuccessOrExit(err);
-    err = ConfigurationMgr().GetLifetimeCounter(lifetimeCounter);
-    SuccessOrExit(err);
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    uint8_t rotatingDeviceIdUniqueId[ConfigurationManager::kRotatingDeviceIDUniqueIDLength] = {};
+    MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
 
+    err = ConfigurationMgr().GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
+    SuccessOrExit(err);
+    err = ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter);
+    SuccessOrExit(err);
+    additionalDataPayloadParams.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
-#endif
+#endif /* CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID) */
 
-    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(lifetimeCounter, serialNumber, strlen(serialNumber),
-                                                                         c3CharDataBufferHandle, additionalDataFields);
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(additionalDataPayloadParams, c3CharDataBufferHandle,
+                                                                         additionalDataFields);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -767,7 +758,7 @@ bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQU
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
-    // Intentionally empty.
+    CloseConnection(conId);
 }
 
 bool BLEManagerImpl::IsSubscribed(bt_conn * conn)
@@ -811,16 +802,6 @@ ssize_t BLEManagerImpl::HandleRXWrite(struct bt_conn * conId, const struct bt_ga
     ChipDeviceEvent event;
     PacketBufferHandle packetBuf = PacketBufferHandle::NewWithData(buf, len);
 
-    // Unfortunately the Zephyr logging macros end up assigning uint16_t
-    // variables to uint16_t:10 fields, which triggers integer conversion
-    // warnings.  And treating the Zephyr headers as system headers does not
-    // help, apparently.  Just turn off that warning around this log call.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-    LOG_HEXDUMP_DBG(buf, len, "Rx char write");
-#pragma GCC diagnostic pop
-
-    // If successful...
     if (!packetBuf.IsNull())
     {
         // Arrange to post a CHIPoBLERXWriteEvent event to the CHIP queue.

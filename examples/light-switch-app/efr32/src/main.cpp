@@ -132,7 +132,6 @@ int main(void)
     EFR32_LOG("Init CHIP Stack");
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
-    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
 
     CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
@@ -155,8 +154,9 @@ int main(void)
 #else // CHIP_DEVICE_CONFIG_THREAD_FTD
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
+#else  // CHIP_DEVICE_CONFIG_ENABLE_SED
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 #endif // CHIP_DEVICE_CONFIG_THREAD_FTD
     if (ret != CHIP_NO_ERROR)
     {
@@ -165,6 +165,13 @@ int main(void)
     }
 #endif // CHIP_ENABLE_OPENTHREAD
 
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    // Init ZCL Data Model
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
     EFR32_LOG("Starting Platform Manager Event Loop");
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
@@ -172,6 +179,7 @@ int main(void)
         EFR32_LOG("PlatformMgr().StartEventLoopTask() failed");
         appError(ret);
     }
+
 #ifdef WF200_WIFI
     // Start wfx bus communication task.
     wfx_bus_start();

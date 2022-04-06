@@ -21,12 +21,12 @@
 #include <app/clusters/application-launcher-server/application-launcher-server.h>
 #include <list>
 
-using chip::CharSpan;
+using chip::ByteSpan;
 using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
-using ApplicationLauncherDelegate        = chip::app::Clusters::ApplicationLauncher::Delegate;
-using ApplicationLauncherApplicationType = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type;
-using LauncherResponseType               = chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type;
+using ApplicationLauncherDelegate = chip::app::Clusters::ApplicationLauncher::Delegate;
+using ApplicationType             = chip::app::Clusters::ApplicationLauncher::Structs::Application::Type;
+using LauncherResponseType        = chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type;
 
 class ApplicationLauncherManager : public ApplicationLauncherDelegate
 {
@@ -36,10 +36,8 @@ public:
 
     CHIP_ERROR HandleGetCatalogList(AttributeValueEncoder & aEncoder) override;
 
-    void HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const CharSpan & data,
-                         const ApplicationLauncherApplicationType & application) override;
-    void HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper,
-                       const ApplicationLauncherApplicationType & application) override;
-    void HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper,
-                       const ApplicationLauncherApplicationType & application) override;
+    void HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
+                         const ApplicationType & application) override;
+    void HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper, const ApplicationType & application) override;
+    void HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper, const ApplicationType & application) override;
 };

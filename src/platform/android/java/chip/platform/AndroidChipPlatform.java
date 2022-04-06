@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2021-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,14 +25,16 @@ public final class AndroidChipPlatform {
       KeyValueStoreManager kvm,
       ConfigurationManager cfg,
       ServiceResolver resolver,
-      ChipMdnsCallback chipMdnsCallback) {
+      ChipMdnsCallback chipMdnsCallback,
+      DiagnosticDataProvider dataProvider) {
     // Order is important here: initChipStack() initializes the BLEManagerImpl, which depends on the
-    // BLEManager being set. setConfigurationManager() depends on the CHIP stack being initialized.
+    // BLEManager being set.
     setBLEManager(ble);
-    initChipStack();
     setKeyValueStoreManager(kvm);
     setConfigurationManager(cfg);
     setServiceResolver(resolver, chipMdnsCallback);
+    setDiagnosticDataProviderManager(dataProvider);
+    initChipStack();
   }
 
   // for BLEManager
@@ -87,4 +89,24 @@ public final class AndroidChipPlatform {
 
   private native void nativeSetServiceResolver(
       ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback);
+
+  private native void setDiagnosticDataProviderManager(DiagnosticDataProvider dataProviderCallback);
+
+  /**
+   * update commission info
+   *
+   * @param spake2pVerifierBase64 base64 encoded spake2p verifier, ref
+   *     CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER. using null to generate it from passcode.
+   * @param Spake2pSaltBase64 base64 encoded spake2p salt, ref
+   *     CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT. using null to generate a random one.
+   * @param spake2pIterationCount Spake2p iteration count, or 0 to use
+   *     CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
+   * @return true on success of false on failed
+   */
+  public native boolean updateCommissionableDataProviderData(
+      String spake2pVerifierBase64,
+      String Spake2pSaltBase64,
+      int spake2pIterationCount,
+      long setupPasscode,
+      int discriminator);
 }

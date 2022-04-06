@@ -35,52 +35,6 @@ class DLL_EXPORT ColorControlCluster : public ClusterBase
 public:
     ColorControlCluster() : ClusterBase(app::Clusters::ColorControl::Id) {}
     ~ColorControlCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ColorLoopSet(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t updateFlags,
-                            uint8_t action, uint8_t direction, uint16_t time, uint16_t startHue, uint8_t optionsMask,
-                            uint8_t optionsOverride);
-    CHIP_ERROR EnhancedMoveHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t moveMode,
-                               uint16_t rate, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR EnhancedMoveToHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                 uint16_t enhancedHue, uint8_t direction, uint16_t transitionTime, uint8_t optionsMask,
-                                 uint8_t optionsOverride);
-    CHIP_ERROR EnhancedMoveToHueAndSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                              uint16_t enhancedHue, uint8_t saturation, uint16_t transitionTime,
-                                              uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR EnhancedStepHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t stepMode,
-                               uint16_t stepSize, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR MoveColor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, int16_t rateX,
-                         int16_t rateY, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR MoveHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t moveMode,
-                       uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR MoveSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t moveMode,
-                              uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR MoveToColor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t colorX,
-                           uint16_t colorY, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR MoveToColorTemperature(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                      uint16_t colorTemperature, uint16_t transitionTime, uint8_t optionsMask,
-                                      uint8_t optionsOverride);
-    CHIP_ERROR MoveToHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t hue,
-                         uint8_t direction, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR MoveToHueAndSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                      uint8_t hue, uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
-                                      uint8_t optionsOverride);
-    CHIP_ERROR MoveToSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR StepColor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, int16_t stepX,
-                         int16_t stepY, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR StepHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t stepMode,
-                       uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR StepSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t stepMode,
-                              uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
-};
-
-class DLL_EXPORT GroupsCluster : public ClusterBase
-{
-public:
-    GroupsCluster() : ClusterBase(app::Clusters::Groups::Id) {}
-    ~GroupsCluster() {}
 };
 
 class DLL_EXPORT IdentifyCluster : public ClusterBase
@@ -95,16 +49,6 @@ class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 public:
     OtaSoftwareUpdateProviderCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateProvider::Id) {}
     ~OtaSoftwareUpdateProviderCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ApplyUpdateRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  chip::ByteSpan updateToken, uint32_t newVersion);
-    CHIP_ERROR NotifyUpdateApplied(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   chip::ByteSpan updateToken, uint32_t softwareVersion);
-    CHIP_ERROR QueryImage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                          chip::VendorId vendorId, uint16_t productId, uint32_t softwareVersion, uint8_t protocolsSupported,
-                          uint16_t hardwareVersion, chip::CharSpan location, bool requestorCanConsent,
-                          chip::ByteSpan metadataForProvider);
 };
 
 class DLL_EXPORT OnOffCluster : public ClusterBase

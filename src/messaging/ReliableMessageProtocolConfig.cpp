@@ -24,13 +24,31 @@
 
 #include <messaging/ReliableMessageProtocolConfig.h>
 
+#include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
 
 namespace chip {
 
 using namespace System::Clock::Literals;
 
-const ReliableMessageProtocolConfig gDefaultMRPConfig(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL,
-                                                      CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
+ReliableMessageProtocolConfig GetLocalMRPConfig()
+{
+    ReliableMessageProtocolConfig config(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL,
+                                         CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    DeviceLayer::ConnectivityManager::SEDPollingConfig sedPollingConfig;
+
+    if (DeviceLayer::ConnectivityMgr().GetSEDPollingConfig(sedPollingConfig) == CHIP_NO_ERROR)
+    {
+        // Increase default MRP retry intervals by SED polling intervals. That is, intervals for
+        // which the device can be at sleep and not be able to receive any messages).
+        config.mIdleRetransTimeout += sedPollingConfig.SlowPollingIntervalMS;
+        config.mActiveRetransTimeout += sedPollingConfig.FastPollingIntervalMS;
+    }
+#endif
+
+    return config;
+}
 
 } // namespace chip

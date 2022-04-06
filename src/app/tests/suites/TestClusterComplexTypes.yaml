@@ -15,6 +15,7 @@
 name: Test Cluster Complex Types Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Test Cluster"
     endpoint: 1
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Send Test Command with optional arg set to null."
       # Not in TestCluster.yaml for now because this test depends on
@@ -197,36 +202,3 @@ tests:
       attribute: "boolean"
       arguments:
           value: false
-
-    # Struct-typed attribute
-    - label: "Write struct-typed attribute"
-      command: "writeAttribute"
-      attribute: "struct_attr"
-      arguments:
-          value:
-              {
-                  a: 5,
-                  b: true,
-                  c: 2,
-                  d: "abc",
-                  e: "",
-                  f: 17,
-                  g: 1.5,
-                  h: 3.14159265358979,
-              }
-
-    - label: "Read struct-typed attribute"
-      command: "readAttribute"
-      attribute: "struct_attr"
-      response:
-          value:
-              {
-                  a: 5,
-                  b: true,
-                  c: 2,
-                  d: "abc",
-                  e: "",
-                  f: 17,
-                  g: 1.5,
-                  h: 3.14159265358979,
-              }

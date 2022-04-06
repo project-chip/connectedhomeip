@@ -86,15 +86,15 @@ pw_proto_library(locking_service
 
 pw_proto_library(wifi_service
   SOURCES
-    ${chip_dir}/examples/ipv6only-app/common/wifi_service/wifi_service.proto
+    ${chip_dir}/examples/common/pigweed/protos/wifi_service.proto
   INPUTS
-    ${chip_dir}/examples/ipv6only-app/common/wifi_service/wifi_service.options
+    ${chip_dir}/examples/common/pigweed/protos/wifi_service.options
   PREFIX
     wifi_service
   DEPS
     pw_protobuf.common_protos
   STRIP_PREFIX
-    ${chip_dir}/examples/ipv6only-app/common/wifi_service
+    ${chip_dir}/examples/common/pigweed/protos
 )
 
 endif(matter_enable_rpc)
@@ -117,7 +117,9 @@ list(
     APPEND ${list_chip_main_sources}
     #OTARequestor
     ${chip_dir}/src/app/clusters/ota-requestor/BDXDownloader.cpp
-    ${chip_dir}/src/app/clusters/ota-requestor/OTARequestor.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
 )
 endif (matter_enable_ota_requestor)
@@ -125,10 +127,8 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/zzz_generated/all-clusters-app/zap-generated/CHIPClientCallbacks.cpp
     ${chip_dir}/zzz_generated/all-clusters-app/zap-generated/callback-stub.cpp
     ${chip_dir}/zzz_generated/all-clusters-app/zap-generated/IMClusterCommandHandler.cpp
-    ${chip_dir}/zzz_generated/all-clusters-app/zap-generated/CHIPClusters.cpp
 
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
@@ -218,12 +218,13 @@ endif (matter_enable_rpc)
 list(
     APPEND chip_main_flags
 
-    -DINET_CONFIG_ENABLE_IPV4=1
+    -DINET_CONFIG_ENABLE_IPV4=0
     -DCHIP_PROJECT=1
     -DCHIP_DEVICE_LAYER_TARGET=Ameba
     -DUSE_ZAP_CONFIG
     -DCHIP_HAVE_CONFIG_H
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
+    -DMATTER_ALL_CLUSTERS_APP=1
 )
 
 if (matter_enable_rpc)
@@ -264,4 +265,3 @@ add_custom_command(
     POST_BUILD
     COMMAND cp lib${chip_main}.a ${CMAKE_CURRENT_SOURCE_DIR}/lib/application
 )
-

@@ -31,22 +31,22 @@ const { getClusters, getCommands, getAttributes, getEvents, isTestOnlyCluster }
 const { asBlocks, ensureClusters } = require('./ClustersHelper.js');
 const { Variables }                = require('./variables/Variables.js');
 
-const kIdentityName           = 'identity';
-const kClusterName            = 'cluster';
-const kEndpointName           = 'endpoint';
-const kGroupId                = 'groupId';
-const kCommandName            = 'command';
-const kWaitCommandName        = 'wait';
-const kIndexName              = 'index';
-const kValuesName             = 'values';
-const kConstraintsName        = 'constraints';
-const kArgumentsName          = 'arguments';
-const kResponseName           = 'response';
-const kDisabledName           = 'disabled';
-const kResponseErrorName      = 'error';
-const kResponseWrongErrorName = 'errorWrongValue';
-const kPICSName               = 'PICS';
-const kSaveAsName             = 'saveAs';
+const kIdentityName      = 'identity';
+const kClusterName       = 'cluster';
+const kEndpointName      = 'endpoint';
+const kGroupId           = 'groupId';
+const kCommandName       = 'command';
+const kWaitCommandName   = 'wait';
+const kIndexName         = 'index';
+const kValuesName        = 'values';
+const kConstraintsName   = 'constraints';
+const kArgumentsName     = 'arguments';
+const kResponseName      = 'response';
+const kDisabledName      = 'disabled';
+const kResponseErrorName = 'error';
+const kPICSName          = 'PICS';
+const kSaveAsName        = 'saveAs';
+const kFabricFiltered    = 'fabricFiltered';
 
 class NullObject {
   toString()
@@ -139,6 +139,9 @@ function setDefaultTypeForCommand(test)
     test.commandName     = 'Read';
     test.isAttribute     = true;
     test.isReadAttribute = true;
+    if (!(kFabricFiltered in test)) {
+      test[kFabricFiltered] = true;
+    }
     break;
 
   case 'writeAttribute':
@@ -156,6 +159,9 @@ function setDefaultTypeForCommand(test)
     test.isAttribute          = true;
     test.isSubscribe          = true;
     test.isSubscribeAttribute = true;
+    if (!(kFabricFiltered in test)) {
+      test[kFabricFiltered] = true;
+    }
     break;
 
   case 'waitForReport':
@@ -172,6 +178,13 @@ function setDefaultTypeForCommand(test)
       test.groupId        = parseInt(test[kGroupId], 10);
     }
     break;
+  }
+
+  // Sanity Check for GroupId usage
+  // Only two types of actions can be send to Group : Write attribute, and Commands
+  // Spec : Action 8.2.4
+  if ((kGroupId in test) && !test.isGroupCommand) {
+    printErrorAndExit(this, 'Wrong Yaml configuration. Action : ' + test.commandName + " can't be sent to group " + test[kGroupId]);
   }
 
   test.isWait = false;
@@ -228,11 +241,10 @@ function setDefaultResponse(test)
   const defaultResponse = {};
   setDefault(test, kResponseName, defaultResponse);
 
-  const hasResponseError = (kResponseErrorName in test[kResponseName]) || (kResponseWrongErrorName in test[kResponseName]);
+  const hasResponseError = (kResponseErrorName in test[kResponseName]);
 
   const defaultResponseError = 0;
   setDefault(test[kResponseName], kResponseErrorName, defaultResponseError);
-  setDefault(test[kResponseName], kResponseWrongErrorName, defaultResponseError);
 
   const defaultResponseValues = [];
   setDefault(test[kResponseName], kValuesName, defaultResponseValues);
@@ -261,7 +273,6 @@ function setDefaultResponse(test)
   }
 
   ensureValidError(test[kResponseName], kResponseErrorName);
-  ensureValidError(test[kResponseName], kResponseWrongErrorName);
 
   // Step that waits for a particular event does not requires constraints nor expected values.
   if (test.isWait) {
@@ -375,7 +386,6 @@ function parse(filename)
   });
 
   yaml.filename   = filename;
-  yaml.timeout    = yaml.config.timeout;
   yaml.totalTests = yaml.tests.length;
 
   return yaml;
@@ -383,7 +393,7 @@ function parse(filename)
 
 function printErrorAndExit(context, msg)
 {
-  console.log(context.testName, ': ', context.label);
+  console.log("\nERROR:\n", context.testName, ': ', context.label);
   console.log(msg);
   process.exit(1);
 }
@@ -475,14 +485,20 @@ async function chip_tests(list, options)
     test.tests = await Promise.all(test.tests.map(async function(item) {
       item.global = global;
       if (item.isCommand) {
-        let command        = await assertCommandOrAttributeOrEvent(item);
-        item.commandObject = command;
+        let command               = await assertCommandOrAttributeOrEvent(item);
+        item.commandObject        = command;
+        item.hasSpecificArguments = true;
+        item.hasSpecificResponse  = command.hasSpecificResponse;
       } else if (item.isAttribute) {
-        let attr             = await assertCommandOrAttributeOrEvent(item);
-        item.attributeObject = attr;
+        let attr                  = await assertCommandOrAttributeOrEvent(item);
+        item.attributeObject      = attr;
+        item.hasSpecificArguments = item.isWriteAttribute;
+        item.hasSpecificResponse  = item.isReadAttribute || item.isSubscribeAttribute || item.isWaitForReport;
       } else if (item.isEvent) {
-        let evt          = await assertCommandOrAttributeOrEvent(item);
-        item.eventObject = evt;
+        let evt                   = await assertCommandOrAttributeOrEvent(item);
+        item.eventObject          = evt;
+        item.hasSpecificArguments = false;
+        item.hasSpecificResponse  = true;
       }
       return item;
     }));
@@ -504,6 +520,12 @@ function chip_tests_items(options)
 
 function getVariable(context, key, name)
 {
+  if (!(typeof name == "string" || (typeof name == "object" && (name instanceof String)))) {
+    // Non-string key; don't try to look it up.  Could end up looking like a
+    // variable name by accident when stringified.
+    return null;
+  }
+
   while (!('variables' in context) && context.parent) {
     context = context.parent;
   }
@@ -567,22 +589,26 @@ function chip_tests_config_get_type(name, options)
 // test_cluster_command_value and test_cluster_value-equals are recursive partials using #each. At some point the |global|
 // context is lost and it fails. Make sure to attach the global context as a property of the | value |
 // that is evaluated.
-function attachGlobal(global, value)
+//
+// errorContext should have "thisVal" and "name" properties that will be used
+// for error reporting via printErrorAndExit.
+function attachGlobal(global, value, errorContext)
 {
   if (Array.isArray(value)) {
-    value = value.map(v => attachGlobal(global, v));
+    value = value.map(v => attachGlobal(global, v, errorContext));
   } else if (value instanceof Object) {
     for (key in value) {
       if (key == "global") {
         continue;
       }
-      value[key] = attachGlobal(global, value[key]);
+      value[key] = attachGlobal(global, value[key], errorContext);
     }
   } else if (value === null) {
     value = new NullObject();
   } else {
     switch (typeof value) {
     case 'number':
+      checkNumberSanity(value, errorContext);
       value = new Number(value);
       break;
     case 'string':
@@ -598,6 +624,21 @@ function attachGlobal(global, value)
 
   value.global = global;
   return value;
+}
+
+/**
+ * Ensure the given value is not a possibly-corrupted-by-going-through-double
+ * integer.  If it is, tell the user (using that errorContext.name to describe
+ * it) and die.
+ */
+function checkNumberSanity(value, errorContext)
+{
+  // Number.isInteger is false for non-Numbers.
+  if (Number.isInteger(value) && !Number.isSafeInteger(value)) {
+    printErrorAndExit(errorContext.thisVal,
+        `${errorContext.name} value ${
+            value} is too large to represent exactly as an integer in YAML.  Put quotes around it to treat it as a string.\n\n`);
+  }
 }
 
 function chip_tests_item_parameters(options)
@@ -627,7 +668,8 @@ function chip_tests_item_parameters(options)
             'Missing "' + commandArg.name + '" in arguments list: \n\t* '
                 + commandValues.map(command => command.name).join('\n\t* '));
       }
-      commandArg.definedValue = attachGlobal(this.global, expected.value);
+
+      commandArg.definedValue = attachGlobal(this.global, expected.value, { thisVal : this, name : commandArg.name });
 
       return commandArg;
     });
@@ -656,12 +698,13 @@ function chip_tests_item_response_parameters(options)
         const expected = responseValues.splice(expectedIndex, 1)[0];
         if ('value' in expected) {
           responseArg.hasExpectedValue = true;
-          responseArg.expectedValue    = attachGlobal(this.global, expected.value);
+          responseArg.expectedValue    = attachGlobal(this.global, expected.value, { thisVal : this, name : responseArg.name });
         }
 
         if ('constraints' in expected) {
           responseArg.hasExpectedConstraints = true;
-          responseArg.expectedConstraints    = expected.constraints;
+          responseArg.expectedConstraints
+              = attachGlobal(this.global, expected.constraints, { thisVal : this, name : responseArg.name });
         }
 
         if ('saveAs' in expected) {
@@ -697,12 +740,9 @@ function octetStringEscapedForCLiteral(value)
   // Escape control characters, things outside the ASCII range, and single
   // quotes (because that's our string terminator).
   return value.replace(/\p{Control}|\P{ASCII}|"/gu, ch => {
-    let code = ch.charCodeAt(0);
-    code     = code.toString(16);
-    if (code.length == 1) {
-      code = "0" + code;
-    }
-    return "\\x" + code;
+    var code = ch.charCodeAt(0).toString(8)
+    return "\\" +
+        "0".repeat(3 - code.length) + code;
   });
 }
 
@@ -721,11 +761,47 @@ function if_include_struct_item_value(structValue, name, options)
   return options.inverse(this);
 }
 
+// To be used to verify that things are actually arrays before trying to use
+// #each with them, since that silently treats non-arrays as empty arrays.
+function ensureIsArray(value, options)
+{
+  if (!(value instanceof Array)) {
+    printErrorAndExit(this, `Expected array but instead got ${typeof value}: ${JSON.stringify(value)}\n`);
+  }
+}
+
+function chip_tests_item_has_list(options)
+{
+  function hasList(args)
+  {
+    for (let i = 0; i < args.length; i++) {
+      if (args[i].isArray) {
+        return true;
+      }
+
+      if (args[i].isStruct && hasList(args[i].items)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  return assertCommandOrAttributeOrEvent(this).then(item => {
+    if (this.isWriteAttribute || this.isCommand) {
+      return hasList(item.arguments);
+    }
+
+    return false;
+  });
+}
+
 //
 // Module exports
 //
 exports.chip_tests                          = chip_tests;
 exports.chip_tests_items                    = chip_tests_items;
+exports.chip_tests_item_has_list            = chip_tests_item_has_list;
 exports.chip_tests_item_parameters          = chip_tests_item_parameters;
 exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
 exports.chip_tests_pics                     = chip_tests_pics;
@@ -740,3 +816,4 @@ exports.isTestOnlyCluster                   = isTestOnlyCluster;
 exports.isLiteralNull                       = isLiteralNull;
 exports.octetStringEscapedForCLiteral       = octetStringEscapedForCLiteral;
 exports.if_include_struct_item_value        = if_include_struct_item_value;
+exports.ensureIsArray                       = ensureIsArray;

@@ -13,6 +13,8 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
     -   [Running RPC console](#running-rpc-console)
+    -   [Memory settings](#memory-settings)
+    -   [OTA Software Update](#ota-software-update)
 
 <hr>
 
@@ -250,24 +252,17 @@ combination with JLinkRTTClient as follows:
 *   You can provision and control the Chip device using the python controller,
     Chip tool standalone, Android or iOS app
 
-    [Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/README.md)
+*   You can provision and control the Chip device using the python controller,
+    Chip tool standalone, Android or iOS app
 
-    Here is an example with the Python controller:
+    [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
+
+    Here is an example with the CHIPTool:
 
     ```
-      chip-device-ctrl
+    chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
 
-      connect -ble 3840 73141520 1234
-
-      zcl NetworkCommissioning AddOrUpdateThreadNetwork 1234 0 0 operationalDataset=hex:0e080000000000000000000300000b35060004001fffe00208dead00beef00cafe0708fddead00beef000005108e11d8ea8ffaa875713699f59e8807e0030a4f70656e5468726561640102c2980410edc641eb63b100b87e90a9980959befc0c0402a0fff8 breadcrumb=0
-
-      zcl NetworkCommissioning ConnectNetwork 1234 0 0 networkID=hex:dead00beef00cafe breadcrumb=0
-
-      close-ble
-
-      resolve 1234
-
-      zcl OnOff Toggle 1234 1 0
+    chip-tool onoff on 1 1
     ```
 
 ### Notes
@@ -295,7 +290,7 @@ via 2002::2
     `pip3 install out/debug/chip_rpc_console_wheels/*.whl`
 
 -   To use the chip-rpc console after it has been installed run:
-    `python3 -m chip_rpc.console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
+    `chip-console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
 
 -   Then you can simulate a button press or release using the following command
     where : idx = 0 or 1 for Button PB0 or PB1 action = 0 for PRESSED, 1 for
@@ -322,3 +317,51 @@ console the RAM usage of each individual task and the number of Memory
 allocation and Free. While this is not extensive monitoring you're welcome to
 modify `examples/platform/efr32/MemMonitoring.cpp` to add your own memory
 tracking code inside the `trackAlloc` and `trackFree` function
+
+## OTA Software Update
+
+For the description of Software Update process with EFR32 example applications
+see
+[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
+
+## Group Communication (Multicast)
+
+With this lighting example you can also use group communication to send Lighting
+commands to multiples devices at once. Please refer to the
+[chip-tool documentation](../../chip-tool/README.md) _Configuring the server
+side for Group Commands_ and _Using the Client to Send Group (Multicast) Matter
+Commands_
+
+## Building options
+
+All of Silabs's examples within the Matter repo have all the features enabled by
+default, as to provide the best end user experience. However some of those
+features can easily be toggled on or off. Here is a short list of options to be
+passed to the build scripts.
+
+### Disabling logging
+
+chip_progress_logging, chip_detail_logging, chip_automation_logging
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
+
+### Debug build / release build
+
+is_debug
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "is_debug=false"
+
+### Disabling LCD
+
+show_qr_code
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "show_qr_code=false"
+
+### KVS maximum entry count
+
+kvs_max_entries
+
+    Set the maximum Kvs entries that can be stored in NVM (Default 75)
+    Thresholds: 30 <= kvs_max_entries <= 255
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A kvs_max_entries=50

@@ -106,7 +106,7 @@ const QNamePart kCmSubParts[]                          = { "_CM", "_sub", "_matt
 const QNamePart kLongSubParts[]                        = { "_L22", "_sub", "_matterc", "_udp", "local" };
 const QNamePart kShortSubParts[]                       = { "_S2", "_sub", "_matterc", "_udp", "local" };
 const QNamePart kVendorSubParts[]                      = { "_V555", "_sub", "_matterc", "_udp", "local" };
-const QNamePart kDeviceTypeSubParts[]                  = { "_T25", "_sub", "_matterc", "_udp", "local" };
+const QNamePart kDeviceTypeSubParts[]                  = { "_T70000", "_sub", "_matterc", "_udp", "local" };
 const FullQName kMatterCommissionableNodeQueryName     = FullQName(kMatterCommissionableNodeQueryParts);
 FullQName kLongSubFullLenName                          = FullQName(kLongSubPartsFullLen);
 FullQName kShortSubFullLenName                         = FullQName(kShortSubPartsFullLen);
@@ -150,14 +150,14 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
         .SetLongDiscriminator(22)
         .SetShortDiscriminator(2)
         .SetVendorId(chip::Optional<uint16_t>(555))
-        .SetDeviceType(chip::Optional<uint16_t>(25))
+        .SetDeviceType(chip::Optional<uint32_t>(70000))
         .SetCommissioningMode(CommissioningMode::kEnabledBasic)
         .SetDeviceName(chip::Optional<const char *>("testy-test"))
         .SetPairingHint(chip::Optional<uint16_t>(3))
         .SetPairingInstruction(chip::Optional<const char *>("Pair me"))
         .SetProductId(chip::Optional<uint16_t>(897))
         .SetRotatingDeviceId(chip::Optional<const char *>("id_that_spins"));
-QNamePart txtCommissionableNodeParamsLargeBasicParts[] = { "D=22",          "VP=555+897",       "CM=1",       "DT=25",
+QNamePart txtCommissionableNodeParamsLargeBasicParts[] = { "D=22",          "VP=555+897",       "CM=1",       "DT=70000",
                                                            "DN=testy-test", "RI=id_that_spins", "PI=Pair me", "PH=3" };
 FullQName txtCommissionableNodeParamsLargeBasicName    = FullQName(txtCommissionableNodeParamsLargeBasicParts);
 TxtResourceRecord txtCommissionableNodeParamsLargeBasic =
@@ -170,7 +170,7 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeEnhanced =
         .SetLongDiscriminator(22)
         .SetShortDiscriminator(2)
         .SetVendorId(chip::Optional<uint16_t>(555))
-        .SetDeviceType(chip::Optional<uint16_t>(25))
+        .SetDeviceType(chip::Optional<uint32_t>(70000))
         .SetCommissioningMode(CommissioningMode::kEnabledEnhanced)
         .SetDeviceName(chip::Optional<const char *>("testy-test"))
         .SetPairingHint(chip::Optional<uint16_t>(3))
@@ -180,7 +180,7 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeEnhanced =
         .SetTcpSupported(chip::Optional<bool>(true))
         // 3600005 is more than the max so should be adjusted down
         .SetMRPConfig(ReliableMessageProtocolConfig(3600000_ms32, 3600005_ms32));
-QNamePart txtCommissionableNodeParamsLargeEnhancedParts[] = { "D=22",          "VP=555+897",       "CM=2",       "DT=25",
+QNamePart txtCommissionableNodeParamsLargeEnhancedParts[] = { "D=22",          "VP=555+897",       "CM=2",       "DT=70000",
                                                               "DN=testy-test", "RI=id_that_spins", "PI=Pair me", "PH=3",
                                                               "CRA=3600000",   "CRI=3600000",      "T=1" };
 FullQName txtCommissionableNodeParamsLargeEnhancedName    = FullQName(txtCommissionableNodeParamsLargeEnhancedParts);
@@ -328,13 +328,11 @@ void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
 
-    // We should be able to add up to 5 operational networks total
+    // All devices should support at least 5 operational network additions (spec min)
+    // however larger devices may support more.
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams3) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams4) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams5) == CHIP_NO_ERROR);
-
-    // Adding a 6th should return an error
-    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams6) == CHIP_ERROR_NO_MEMORY);
 }
 
 void CommissionableAdverts(nlTestSuite * inSuite, void * inContext)
@@ -559,6 +557,10 @@ int TestAdvertiser(void)
     nlTestRunner(&theSuite, &server);
     server.Shutdown();
     context.Shutdown();
+    mdnsAdvertiser.RemoveServices();
+    mdnsAdvertiser.Shutdown();
+    chip::Platform::MemoryShutdown();
+
     return nlTestRunnerStats(&theSuite);
 }
 

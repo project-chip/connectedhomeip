@@ -15,6 +15,7 @@
 name: Keypad Input Cluster Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Keypad Input"
     endpoint: 1
 
@@ -22,9 +23,13 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Send Key Command"
-      command: "sendKeyRequest"
+      command: "sendKey"
       arguments:
           values:
               - name: "keyCode"

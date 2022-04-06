@@ -1,6 +1,7 @@
 name: 10.3.3. [TC-DM-3.3] Network Commissioning Commands [DUT - Commissioner]
 
 config:
+    nodeId: 0x12344321
     cluster: "Network Commissioning"
     endpoint: 0
 

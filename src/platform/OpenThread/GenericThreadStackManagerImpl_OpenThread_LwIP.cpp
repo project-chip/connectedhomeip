@@ -233,36 +233,14 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
 
 // Multicast won't work with LWIP on top of OT
 // Duplication of listeners, unecessary timers, buffer duplication, hardfault etc...
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
             // Refresh Multicast listening
             if (GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadAttachedNoLock())
             {
                 ChipLogDetail(DeviceLayer, "Thread Attached updating Multicast address");
-
-                Credentials::GroupDataProvider * provider = Credentials::GetGroupDataProvider();
-                TransportMgrBase * transportMgr           = &(chip::Server::GetInstance().GetTransportManager());
-                Credentials::GroupDataProvider::GroupInfo group;
-                CHIP_ERROR err = CHIP_NO_ERROR;
-                for (const FabricInfo & fabricInfo : Server::GetInstance().GetFabricTable())
-                {
-                    auto it = provider->IterateGroupInfo(fabricInfo.GetFabricIndex());
-                    if (it)
-                    {
-                        while (it->Next(group))
-                        {
-                            err = transportMgr->MulticastGroupJoinLeave(
-                                Transport::PeerAddress::Multicast(fabricInfo.GetFabricIndex(), group.group_id), true);
-                            if (err != CHIP_NO_ERROR)
-                            {
-                                ChipLogError(DeviceLayer, "Failed to Join Multicast Group: %s", err.AsString());
-                                break;
-                            }
-                        }
-                        it->Release();
-                    }
-                }
+                Server::GetInstance().RejoinExistingMulticastGroups();
             }
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
         }
 
         ChipLogDetail(DeviceLayer, "LwIP Thread interface addresses %s", isInterfaceUp ? "updated" : "cleared");

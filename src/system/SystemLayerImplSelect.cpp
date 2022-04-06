@@ -75,9 +75,8 @@ CHIP_ERROR LayerImplSelect::Shutdown()
             dispatch_source_cancel(timer->mTimerSource);
             dispatch_release(timer->mTimerSource);
         }
-
-        mTimerPool.Release(timer);
     }
+    mTimerPool.ReleaseAll();
 #else  // CHIP_SYSTEM_CONFIG_USE_DISPATCH
     mTimerList.Clear();
     mTimerPool.ReleaseAll();
@@ -140,8 +139,8 @@ CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallba
 
         timer->mTimerSource = timerSource;
         dispatch_source_set_timer(
-            timerSource, dispatch_walltime(NULL, static_cast<int64_t>(Clock::Milliseconds64(delay).count() * NSEC_PER_MSEC)), 0,
-            2 * NSEC_PER_MSEC);
+            timerSource, dispatch_walltime(NULL, static_cast<int64_t>(Clock::Milliseconds64(delay).count() * NSEC_PER_MSEC)),
+            DISPATCH_TIME_FOREVER, 2 * NSEC_PER_MSEC);
         dispatch_source_set_event_handler(timerSource, ^{
             dispatch_source_cancel(timerSource);
             dispatch_release(timerSource);
@@ -220,7 +219,7 @@ CHIP_ERROR LayerImplSelect::StartWatchingSocket(int fd, SocketWatchToken * token
             // Duplicate registration is an error.
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        else if ((w.mFD == kInvalidFd) && (watch == nullptr))
+        if ((w.mFD == kInvalidFd) && (watch == nullptr))
         {
             watch = &w;
         }

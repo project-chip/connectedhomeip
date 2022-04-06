@@ -42,15 +42,15 @@ using namespace chip::app::Clusters::WindowCovering;
 #define CHECK_BOUNDS_INVALID(MIN, VAL, MAX) ((VAL < MIN) || (VAL > MAX))
 #define CHECK_BOUNDS_VALID(MIN, VAL, MAX) (!CHECK_BOUNDS_INVALID(MIN, VAL, MAX))
 
+#define FAKE_MOTION_DELAY_MS 5000
+
 /*
  * ConvertValue: Converts values from one range to another
  * Range In  -> from  inputLowValue to   inputHighValue
  * Range Out -> from outputLowValue to outputtHighValue
- * offset true  -> allows to take into account the minimum of each range in the conversion
- * offset false -> applies only the basic "rule of three" for the conversion
  */
 static uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, uint16_t outputLowValue, uint16_t outputHighValue,
-                             uint16_t value, bool offset)
+                             uint16_t value)
 {
     uint16_t inputMin = inputLowValue, inputMax = inputHighValue, inputRange = UINT16_MAX;
     uint16_t outputMin = outputLowValue, outputMax = outputHighValue, outputRange = UINT16_MAX;
@@ -70,29 +70,19 @@ static uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, ui
     inputRange  = static_cast<uint16_t>(inputMax - inputMin);
     outputRange = static_cast<uint16_t>(outputMax - outputMin);
 
-    if (offset)
+    if (value < inputMin)
     {
-        if (value < inputMin)
-        {
-            return outputMin;
-        }
-
-        if (value > inputMax)
-        {
-            return outputMax;
-        }
-
-        if (inputRange > 0)
-        {
-            return static_cast<uint16_t>(outputMin + ((outputRange * (value - inputMin) / inputRange)));
-        }
+        return outputMin;
     }
-    else
+
+    if (value > inputMax)
     {
-        if (inputRange > 0)
-        {
-            return static_cast<uint16_t>((outputRange * (value) / inputRange));
-        }
+        return outputMax;
+    }
+
+    if (inputRange > 0)
+    {
+        return static_cast<uint16_t>(outputMin + ((outputRange * (value - inputMin) / inputRange)));
     }
 
     return outputMax;
@@ -100,12 +90,12 @@ static uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, ui
 
 static Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute)
 {
-    return ConvertValue(limits.open, limits.closed, WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, absolute, true);
+    return ConvertValue(limits.open, limits.closed, WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, absolute);
 }
 
 static uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative)
 {
-    return ConvertValue(WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, limits.open, limits.closed, relative, true);
+    return ConvertValue(WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, limits.open, limits.closed, relative);
 }
 
 static OperationalState ValueToOperationalState(uint8_t value)
@@ -158,26 +148,26 @@ bool HasFeature(chip::EndpointId endpoint, WcFeature feature)
     return hasFeature;
 }
 
-static bool HasFeaturePaLift(chip::EndpointId endpoint)
+bool HasFeaturePaLift(chip::EndpointId endpoint)
 {
     return (HasFeature(endpoint, WcFeature::kLift) && HasFeature(endpoint, WcFeature::kPositionAwareLift));
 }
 
-static bool HasFeaturePaTilt(chip::EndpointId endpoint)
+bool HasFeaturePaTilt(chip::EndpointId endpoint)
 {
     return (HasFeature(endpoint, WcFeature::kTilt) && HasFeature(endpoint, WcFeature::kPositionAwareTilt));
 }
 
-void TypeSet(chip::EndpointId endpoint, EmberAfWcType type)
+void TypeSet(chip::EndpointId endpoint, Type type)
 {
-    Attributes::Type::Set(endpoint, chip::to_underlying(type));
+    Attributes::Type::Set(endpoint, type);
 }
 
-EmberAfWcType TypeGet(chip::EndpointId endpoint)
+Type TypeGet(chip::EndpointId endpoint)
 {
-    std::underlying_type<EmberAfWcType>::type value;
+    Type value;
     Attributes::Type::Get(endpoint, &value);
-    return static_cast<EmberAfWcType>(value);
+    return value;
 }
 
 void ConfigStatusSet(chip::EndpointId endpoint, const ConfigStatus & status)
@@ -246,16 +236,17 @@ const OperationalStatus OperationalStatusGet(chip::EndpointId endpoint)
     return status;
 }
 
-void EndProductTypeSet(chip::EndpointId endpoint, EmberAfWcEndProductType type)
+void EndProductTypeSet(chip::EndpointId endpoint, EndProductType type)
 {
-    Attributes::EndProductType::Set(endpoint, chip::to_underlying(type));
+    Attributes::EndProductType::Set(endpoint, type);
 }
 
-EmberAfWcEndProductType EndProductTypeGet(chip::EndpointId endpoint)
+EndProductType EndProductTypeGet(chip::EndpointId endpoint)
 {
-    std::underlying_type<EmberAfWcType>::type value;
+    EndProductType value;
     Attributes::EndProductType::Get(endpoint, &value);
-    return static_cast<EmberAfWcEndProductType>(value);
+
+    return value;
 }
 
 void ModeSet(chip::EndpointId endpoint, const Mode & mode)
@@ -377,15 +368,26 @@ uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths)
     return Percent100thsToValue(limits, percent100ths);
 }
 
-void LiftPositionSet(chip::EndpointId endpoint, uint16_t percent100ths)
+void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
 {
-    uint8_t percent = static_cast<uint8_t>(percent100ths / 100);
-    uint16_t lift   = Percent100thsToLift(endpoint, percent100ths);
+    NPercent percent;
+    NAbsolute rawpos;
 
-    Attributes::CurrentPositionLift::Set(endpoint, lift);
+    if (percent100ths.IsNull())
+    {
+        percent.SetNull();
+        rawpos.SetNull();
+        emberAfWindowCoveringClusterPrint("Lift[%u] Position Set to Null", endpoint);
+    }
+    else
+    {
+        percent.SetNonNull(static_cast<uint8_t>(percent100ths.Value() / 100));
+        rawpos.SetNonNull(Percent100thsToLift(endpoint, percent100ths.Value()));
+        emberAfWindowCoveringClusterPrint("Lift[%u] Position Set: %u", endpoint, percent100ths.Value());
+    }
+    Attributes::CurrentPositionLift::Set(endpoint, rawpos);
     Attributes::CurrentPositionLiftPercentage::Set(endpoint, percent);
     Attributes::CurrentPositionLiftPercent100ths::Set(endpoint, percent100ths);
-    emberAfWindowCoveringClusterPrint("Lift Position Set: %u%%", percent);
 }
 
 uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt)
@@ -412,15 +414,26 @@ uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths)
     return Percent100thsToValue(limits, percent100ths);
 }
 
-void TiltPositionSet(chip::EndpointId endpoint, uint16_t percent100ths)
+void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
 {
-    uint8_t percent = static_cast<uint8_t>(percent100ths / 100);
-    uint16_t tilt   = Percent100thsToTilt(endpoint, percent100ths);
+    NPercent percent;
+    NAbsolute rawpos;
 
-    Attributes::CurrentPositionTilt::Set(endpoint, tilt);
+    if (percent100ths.IsNull())
+    {
+        percent.SetNull();
+        rawpos.SetNull();
+        emberAfWindowCoveringClusterPrint("Tilt[%u] Position Set to Null", endpoint);
+    }
+    else
+    {
+        percent.SetNonNull(static_cast<uint8_t>(percent100ths.Value() / 100));
+        rawpos.SetNonNull(Percent100thsToTilt(endpoint, percent100ths.Value()));
+        emberAfWindowCoveringClusterPrint("Tilt[%u] Position Set: %u", endpoint, percent100ths.Value());
+    }
+    Attributes::CurrentPositionTilt::Set(endpoint, rawpos);
     Attributes::CurrentPositionTiltPercentage::Set(endpoint, percent);
     Attributes::CurrentPositionTiltPercent100ths::Set(endpoint, percent100ths);
-    emberAfWindowCoveringClusterPrint("Tilt Position Set: %u%%", percent);
 }
 
 OperationalState ComputeOperationalState(uint16_t target, uint16_t current)
@@ -441,6 +454,169 @@ OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths c
         return ComputeOperationalState(target.Value(), current.Value());
     }
     return OperationalState::Stall;
+}
+
+Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths previous, Percent100ths delta)
+{
+    Percent100ths percent100ths = previous;
+
+    switch (direction)
+    {
+    case OperationalState::MovingDownOrClose:
+        if (percent100ths < (WC_PERCENT100THS_MAX_CLOSED - delta))
+        {
+            percent100ths = static_cast<Percent100ths>(percent100ths + delta);
+        }
+        else
+        {
+            percent100ths = WC_PERCENT100THS_MAX_CLOSED;
+        }
+        break;
+    case OperationalState::MovingUpOrOpen:
+        if (percent100ths > (WC_PERCENT100THS_MIN_OPEN + delta))
+        {
+            percent100ths = static_cast<Percent100ths>(percent100ths - delta);
+        }
+        else
+        {
+            percent100ths = WC_PERCENT100THS_MIN_OPEN;
+        }
+        break;
+    default:
+        // nothing to do we keep previous value, simple passthrought
+        break;
+    }
+
+    if (percent100ths > WC_PERCENT100THS_MAX_CLOSED)
+        return WC_PERCENT100THS_MAX_CLOSED;
+
+    return percent100ths;
+}
+
+void emberAfPluginWindowCoveringFinalizeFakeMotionEventHandler(EndpointId endpoint)
+{
+    NPercent100ths position;
+    OperationalStatus opStatus = OperationalStatusGet(endpoint);
+    emberAfWindowCoveringClusterPrint("WC DELAYED CALLBACK 100ms w/ OpStatus=0x%02X", (unsigned char) opStatus.global);
+
+    /* Update position to simulate movement to pass the CI */
+    if (OperationalState::Stall != opStatus.lift)
+    {
+        Attributes::TargetPositionLiftPercent100ths::Get(endpoint, position);
+        if (!position.IsNull())
+        {
+            LiftPositionSet(endpoint, position);
+        }
+    }
+
+    /* Update position to simulate movement to pass the CI */
+    if (OperationalState::Stall != opStatus.tilt)
+    {
+        Attributes::TargetPositionTiltPercent100ths::Get(endpoint, position);
+        if (!position.IsNull())
+        {
+            TiltPositionSet(endpoint, position);
+        }
+    }
+}
+
+/**
+ * @brief Get event control object for an endpoint
+ *
+ * @param[in] endpoint
+ * @return EmberEventControl*
+ */
+EmberEventControl * GetEventControl(EndpointId endpoint)
+{
+    static EmberEventControl eventControls[EMBER_AF_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT];
+    uint16_t index            = emberAfFindClusterServerEndpointIndex(endpoint, WindowCovering::Id);
+    EmberEventControl * event = nullptr;
+
+    if (index < ArraySize(eventControls))
+    {
+        event = &eventControls[index];
+    }
+    return event;
+}
+
+/**
+ * @brief Configure Fake Motion event control object for an endpoint
+ *
+ * @param[in] endpoint
+ * @return EmberEventControl*
+ */
+EmberEventControl * ConfigureFakeMotionEventControl(EndpointId endpoint)
+{
+    EmberEventControl * controller = GetEventControl(endpoint);
+
+    controller->endpoint = endpoint;
+    controller->callback = &emberAfPluginWindowCoveringFinalizeFakeMotionEventHandler;
+
+    return controller;
+}
+
+/**
+ * @brief PostAttributeChange is called when an Attribute is modified
+ *
+ * @param[in] endpoint
+ * @param[in] attributeId
+ */
+void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId)
+{
+    // all-cluster-app: simulation for the CI testing
+    // otherwise it is defined for manufacturer specific implementation */
+    NPercent100ths current, target;
+    OperationalStatus prevOpStatus = OperationalStatusGet(endpoint);
+    OperationalStatus opStatus     = prevOpStatus;
+
+    emberAfWindowCoveringClusterPrint("WC POST ATTRIBUTE=%u OpStatus global=0x%02X lift=0x%02X tilt=0x%02X",
+                                      (unsigned int) attributeId, (unsigned int) opStatus.global, (unsigned int) opStatus.lift,
+                                      (unsigned int) opStatus.tilt);
+
+    switch (attributeId)
+    {
+    /* RO OperationalStatus */
+    case Attributes::OperationalStatus::Id:
+        if (OperationalState::Stall != opStatus.global)
+        {
+            // Finish the fake motion attribute update:
+            emberEventControlSetDelayMS(ConfigureFakeMotionEventControl(endpoint), FAKE_MOTION_DELAY_MS);
+        }
+        break;
+    /* ============= Positions for Position Aware ============= */
+    case Attributes::CurrentPositionLiftPercent100ths::Id:
+        if (OperationalState::Stall != opStatus.lift)
+        {
+            opStatus.lift = OperationalState::Stall;
+            emberAfWindowCoveringClusterPrint("Lift stop");
+        }
+        break;
+    case Attributes::CurrentPositionTiltPercent100ths::Id:
+        if (OperationalState::Stall != opStatus.tilt)
+        {
+            opStatus.tilt = OperationalState::Stall;
+            emberAfWindowCoveringClusterPrint("Tilt stop");
+        }
+        break;
+    /* For a device supporting Position Awareness : Changing the Target triggers motions on the real or simulated device */
+    case Attributes::TargetPositionLiftPercent100ths::Id:
+        Attributes::TargetPositionLiftPercent100ths::Get(endpoint, target);
+        Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, current);
+        opStatus.lift = ComputeOperationalState(target, current);
+        break;
+    /* For a device supporting Position Awareness : Changing the Target triggers motions on the real or simulated device */
+    case Attributes::TargetPositionTiltPercent100ths::Id:
+        Attributes::TargetPositionTiltPercent100ths::Get(endpoint, target);
+        Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, current);
+        opStatus.tilt = ComputeOperationalState(target, current);
+        break;
+    default:
+        break;
+    }
+
+    /* This decides and triggers fake motion for the selected endpoint */
+    if ((opStatus.lift != prevOpStatus.lift) || (opStatus.tilt != prevOpStatus.tilt))
+        OperationalStatusSetWithGlobalUpdated(endpoint, opStatus);
 }
 
 } // namespace WindowCovering
@@ -508,9 +684,8 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
 /**
  * @brief  Cluster StopMotion Command callback (from client)
  */
-bool __attribute__((weak))
-emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                               const Commands::StopMotion::DecodableType & fields)
+bool emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                    const Commands::StopMotion::DecodableType & fields)
 {
     emberAfWindowCoveringClusterPrint("StopMotion command received");
     app::DataModel::Nullable<Percent100ths> current;
@@ -568,13 +743,12 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("GoToLiftPercentage Percentage command received");
+    emberAfWindowCoveringClusterPrint("GoToLiftPercentage %u%% %u command received", liftPercentageValue, liftPercent100thsValue);
     if (HasFeaturePaLift(endpoint))
     {
         if (IsPercent100thsValid(liftPercent100thsValue))
         {
-            Attributes::TargetPositionLiftPercent100ths::Set(
-                endpoint, static_cast<uint16_t>(liftPercentageValue > 100 ? liftPercent100thsValue : liftPercentageValue * 100));
+            Attributes::TargetPositionLiftPercent100ths::Set(endpoint, liftPercent100thsValue);
             emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
         }
         else
@@ -627,13 +801,12 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("GoToTiltPercentage command received");
+    emberAfWindowCoveringClusterPrint("GoToTiltPercentage %u%% %u command received", tiltPercentageValue, tiltPercent100thsValue);
     if (HasFeaturePaTilt(endpoint))
     {
         if (IsPercent100thsValid(tiltPercent100thsValue))
         {
-            Attributes::TargetPositionTiltPercent100ths::Set(
-                endpoint, static_cast<uint16_t>(tiltPercentageValue > 100 ? tiltPercent100thsValue : tiltPercentageValue * 100));
+            Attributes::TargetPositionTiltPercent100ths::Set(endpoint, tiltPercent100thsValue);
             emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
         }
         else
@@ -649,4 +822,16 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
     return true;
 }
 
+/**
+ * @brief Cluster Attribute Changed Callback
+ */
+void __attribute__((weak))
+MatterWindowCoveringClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
+{
+    PostAttributeChange(attributePath.mEndpointId, attributePath.mAttributeId);
+}
+
+/**
+ * @brief Cluster Plugin Init Callback
+ */
 void MatterWindowCoveringPluginServerInitCallback() {}

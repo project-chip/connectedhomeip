@@ -38,6 +38,7 @@
 
 /* Platform include headers */
 #if CHIP_HAVE_CONFIG_H
+#include <platform/CHIPDeviceBuildConfig.h>
 #include <system/SystemBuildConfig.h>
 #endif
 
@@ -319,6 +320,18 @@
 #ifndef CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
 #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 15
 #endif /* CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE */
+
+/**
+ *  @def CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE
+ *
+ *  @brief
+ *      LwIP @pbuf_type for System::PacketBuffer allocations.
+ *
+ *      Note that this does not affect allocations by LwIP itself, e.g. the normal receive path.
+ */
+#ifndef CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE PBUF_POOL
+#endif /* CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE */
 
 /**
  *  @def CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX

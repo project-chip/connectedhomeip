@@ -25,6 +25,7 @@ pw_python_package("idl") {
     "matter_grammar.lark",
 
     # Templates used for generation
+    "generators/java/ChipClustersCpp.jinja",
     "generators/java/ChipClustersRead.jinja",
 
     # Unit test data
@@ -34,11 +35,17 @@ pw_python_package("idl") {
     "tests/inputs/several_clusters.matter",
     "tests/inputs/simple_attribute.matter",
     "tests/outputs/cluster_struct_attribute/jni/DemoClusterClient-ReadImpl.cpp",
+    "tests/outputs/cluster_struct_attribute/jni/DemoClusterClient-InvokeSubscribeImpl.cpp",
     "tests/outputs/global_struct_attribute/jni/DemoClusterClient-ReadImpl.cpp",
+    "tests/outputs/global_struct_attribute/jni/DemoClusterClient-InvokeSubscribeImpl.cpp",
     "tests/outputs/several_clusters/jni/FirstClient-ReadImpl.cpp",
     "tests/outputs/several_clusters/jni/SecondClient-ReadImpl.cpp",
     "tests/outputs/several_clusters/jni/ThirdClient-ReadImpl.cpp",
+    "tests/outputs/several_clusters/jni/FirstClient-InvokeSubscribeImpl.cpp",
+    "tests/outputs/several_clusters/jni/SecondClient-InvokeSubscribeImpl.cpp",
+    "tests/outputs/several_clusters/jni/ThirdClient-InvokeSubscribeImpl.cpp",
     "tests/outputs/simple_attribute/jni/MyClusterClient-ReadImpl.cpp",
+    "tests/outputs/simple_attribute/jni/MyClusterClient-InvokeSubscribeImpl.cpp",
   ]
 
   sources = [

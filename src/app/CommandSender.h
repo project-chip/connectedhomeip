@@ -27,7 +27,6 @@
 #include <type_traits>
 
 #include <app/CommandPathParams.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/InvokeRequestMessage.h>
 #include <app/MessageDef/InvokeResponseMessage.h>
 #include <app/MessageDef/StatusIB.h>
@@ -60,7 +59,7 @@ public:
      *
      * See Abort() for details on when that might occur.
      */
-    virtual ~CommandSender() { Abort(); }
+    ~CommandSender() override { Abort(); }
 
     /**
      * Gets the inner exchange context object, without ownership.
@@ -111,7 +110,6 @@ public:
          * receives an OnDone call to destroy and free the object.
          *
          * @param[in] apCommandSender The command sender object that initiated the command transaction.
-         * @param[in] aStatusIB       The status code including IM status code and optional cluster status code
          * @param[in] aError          A system error code that conveys the overall error code.
          */
         virtual void OnError(const CommandSender * apCommandSender, CHIP_ERROR aError) {}
@@ -137,6 +135,8 @@ public:
      * Constructor.
      *
      * The callback passed in has to outlive this CommandSender object.
+     * If used in a groups setting, callbacks do not need to be passed.
+     * If callbacks are passed the only one that will be called in a group sesttings is the onDone
      */
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false);
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
@@ -181,8 +181,9 @@ public:
      */
     template <typename CommandDataT>
     CHIP_ERROR AddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                                          const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+                                          const Optional<uint16_t> & aTimedInvokeTimeoutMs, bool aSuppressResponse = false)
     {
+        mSuppressResponse = aSuppressResponse;
         return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs);
     }
 #endif // CONFIG_IM_BUILD_FOR_UNIT_TEST

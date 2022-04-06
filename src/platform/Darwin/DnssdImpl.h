@@ -19,6 +19,9 @@
 
 #include <dns_sd.h>
 #include <lib/dnssd/platform/Dnssd.h>
+#include <lib/support/CHIPMemString.h>
+
+#include <string.h>
 #include <string>
 #include <vector>
 
@@ -42,12 +45,16 @@ struct GenericContext
 
 struct RegisterContext : public GenericContext
 {
+    DnssdPublishCallback callback;
     char mType[kDnssdTypeMaxSize + 1];
-    RegisterContext(const char * sType, void * cbContext)
+
+    RegisterContext(const char * sType, DnssdPublishCallback cb, void * cbContext)
     {
-        type = ContextType::Register;
-        strncpy(mType, sType, sizeof(mType));
-        context = cbContext;
+        type     = ContextType::Register;
+        context  = cbContext;
+        callback = cb;
+
+        Platform::CopyString(mType, sType);
     }
 
     bool matches(const char * sType) { return (strcmp(mType, sType) == 0); }
@@ -77,17 +84,19 @@ struct ResolveContext : public GenericContext
 
     ResolveContext(void * cbContext, DnssdResolveCallback cb, const char * cbContextName, chip::Inet::IPAddressType cbAddressType)
     {
-        type     = ContextType::Resolve;
-        context  = cbContext;
-        callback = cb;
-        strncpy(name, cbContextName, sizeof(name));
+        type        = ContextType::Resolve;
+        context     = cbContext;
+        callback    = cb;
         addressType = cbAddressType;
+
+        Platform::CopyString(name, cbContextName);
     }
 };
 
 struct GetAddrInfoContext : public GenericContext
 {
     DnssdResolveCallback callback;
+    std::vector<Inet::IPAddress> addresses;
     std::vector<TextEntry> textEntries;
     char name[Common::kInstanceNameMaxLength + 1];
     uint32_t interfaceId;
@@ -101,7 +110,8 @@ struct GetAddrInfoContext : public GenericContext
         callback    = cb;
         interfaceId = cbInterfaceId;
         port        = cbContextPort;
-        strncpy(name, cbContextName, sizeof(name));
+
+        Platform::CopyString(name, cbContextName);
     }
 };
 

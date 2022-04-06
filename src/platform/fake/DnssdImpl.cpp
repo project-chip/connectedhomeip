@@ -101,7 +101,7 @@ CHIP_ERROR ChipDnssdShutdown()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
+CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
     return test::CheckExpected(test::CallType::kStart, service);
 }

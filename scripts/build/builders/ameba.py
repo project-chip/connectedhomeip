@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os
-
 from enum import Enum, auto
 
 from .builder import Builder
@@ -63,8 +62,15 @@ class AmebaBuilder(Builder):
         self.app = app
 
     def generate(self):
-        cmd = '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh %s ninja %s %s' % (
-            self.root, self.output_dir, self.app.ExampleName)
+        cmd = '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh '
+        if self.app.ExampleName == 'pigweed-app':
+            # rpc flag: -r
+            cmd += '-r '
+
+        # <build root> <build_system> <output_directory> <application>
+        cmd += ' '.join([self.root, 'ninja', self.output_dir,
+                        self.app.ExampleName])
+
         self._Execute(['bash', '-c', cmd],
                       title='Generating ' + self.identifier)
 
@@ -78,4 +84,13 @@ class AmebaBuilder(Builder):
                 os.path.join(self.output_dir, 'asdk', 'target_image2.axf'),
             self.app.AppNamePrefix + '.map':
                 os.path.join(self.output_dir, 'asdk', 'target_image2.map'),
+            'km0_boot_all.bin':
+                os.path.join(self.output_dir, 'asdk',
+                             'bootloader', 'km0_boot_all.bin'),
+            'km4_boot_all.bin':
+                os.path.join(self.output_dir, 'asdk',
+                             'bootloader', 'km4_boot_all.bin'),
+            'km0_km4_image2.bin':
+                os.path.join(self.output_dir, 'asdk',
+                             'image', 'km0_km4_image2.bin'),
         }

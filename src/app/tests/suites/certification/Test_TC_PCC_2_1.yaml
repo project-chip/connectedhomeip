@@ -15,6 +15,7 @@
 name: 15.2.1. [TC-PCC-2.1] Attributes with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Pump Configuration and Control"
     endpoint: 1
 
@@ -22,13 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
-
-    - label: "read the mandatory attribute: MaxPressure"
-      disabled: true
-      command: "readAttribute"
-      attribute: "MaxPressure"
-      response:
-          value: null
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "read the mandatory attribute: MaxPressure"
       command: "readAttribute"
@@ -38,25 +36,11 @@ tests:
               type: int16
 
     - label: "read the mandatory attribute: MaxSpeed"
-      disabled: true
-      command: "readAttribute"
-      attribute: "MaxSpeed"
-      response:
-          value: null
-
-    - label: "read the mandatory attribute: MaxSpeed"
       command: "readAttribute"
       attribute: "MaxSpeed"
       response:
           constraints:
               type: uint16
-
-    - label: "read the mandatory attribute: MaxFlow"
-      disabled: true
-      command: "readAttribute"
-      attribute: "MaxFlow"
-      response:
-          value: null
 
     - label: "read the mandatory attribute: MaxFlow"
       command: "readAttribute"
@@ -66,13 +50,6 @@ tests:
               type: uint16
 
     - label: "read the mandatory attribute: EffectiveOperationMode"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EffectiveOperationMode"
-      response:
-          value: desc
-
-    - label: "read the mandatory attribute: EffectiveOperationMode"
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
       response:
@@ -80,25 +57,11 @@ tests:
               type: enum8
 
     - label: "read the mandatory attribute: EffectiveControlMode"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EffectiveControlMode"
-      response:
-          value: desc
-
-    - label: "read the mandatory attribute: EffectiveControlMode"
       command: "readAttribute"
       attribute: "EffectiveControlMode"
       response:
           constraints:
               type: enum8
-
-    - label: "read the mandatory attribute: Capacity"
-      disabled: true
-      command: "readAttribute"
-      attribute: "Capacity"
-      response:
-          value: null
 
     - label: "read the mandatory attribute: Capacity"
       command: "readAttribute"
@@ -248,7 +211,6 @@ tests:
     #issue #11670 Null check is not implemented in YAML framework.
     - label: "read the optional attribute: MinConstPressure"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MinConstPressure"
       response:
@@ -264,7 +226,6 @@ tests:
 
     - label: "read the optional attribute: MaxConstPressure"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MaxConstPressure"
       response:
@@ -280,7 +241,6 @@ tests:
 
     - label: "read the optional attribute: MinCompPressure"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MinCompPressure"
       response:
@@ -296,7 +256,6 @@ tests:
 
     - label: "read the optional attribute: MaxCompPressure"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MaxCompPressure"
       response:
@@ -312,7 +271,6 @@ tests:
 
     - label: "read the optional attribute: MinConstSpeed"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MinConstSpeed"
       response:
@@ -328,7 +286,6 @@ tests:
 
     - label: "read the optional attribute: MaxConstSpeed"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MaxConstSpeed"
       response:
@@ -344,7 +301,6 @@ tests:
 
     - label: "read the optional attribute: MinConstFlow"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MinConstFlow"
       response:
@@ -360,7 +316,6 @@ tests:
 
     - label: "read the optional attribute: MaxConstFlow"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MaxConstFlow"
       response:
@@ -376,7 +331,6 @@ tests:
 
     - label: "read the optional attribute: MinConstTemp"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MinConstTemp"
       response:
@@ -393,7 +347,6 @@ tests:
 
     - label: "read the optional attribute: MaxConstTemp"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MaxConstTemp"
       response:
@@ -425,7 +378,6 @@ tests:
 
     - label: "read the optional attribute: Speed"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "Speed"
       response:
@@ -456,7 +408,6 @@ tests:
 
     - label: "read the optional attribute: Power"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "Power"
       response:
@@ -487,7 +438,6 @@ tests:
 
     - label: "write to the optional attribute: MinConstPressure"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "MinConstPressure"
       arguments:
@@ -497,7 +447,6 @@ tests:
 
     - label: "write to the optional attribute: MaxConstPressure"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "MaxConstPressure"
       arguments:
@@ -507,7 +456,6 @@ tests:
 
     - label: "write to the optional attribute: MinCompPressure"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "MinCompPressure"
       arguments:
@@ -517,7 +465,6 @@ tests:
 
     - label: "write to the optional attribute: MaxCompPressure"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "MaxCompPressure"
       arguments:
@@ -527,7 +474,6 @@ tests:
 
     - label: "write to the optional attribute: MinConstSpeed"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "MinConstSpeed"
       arguments:
@@ -537,7 +483,6 @@ tests:
 
     - label: "write to the optional attribute: MaxConstSpeed"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "MaxConstSpeed"
       arguments:
@@ -547,7 +492,6 @@ tests:
 
     - label: "write to the optional attribute: MinConstFlow"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "MinConstFlow"
       arguments:
@@ -557,7 +501,6 @@ tests:
 
     - label: "write to the optional attribute: MaxConstFlow"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "MaxConstFlow"
       arguments:
@@ -567,7 +510,6 @@ tests:
 
     - label: "write to the optional attribute: MinConstTemp"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "MinConstTemp"
       arguments:
@@ -577,7 +519,6 @@ tests:
 
     - label: "write to the optional attribute: MaxConstTemp"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "MaxConstTemp"
       arguments:
@@ -587,7 +528,6 @@ tests:
 
     - label: "write to the optional attribute: PumpStatus"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "PumpStatus"
       arguments:
@@ -597,7 +537,6 @@ tests:
 
     - label: "write to the optional attribute: Speed"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "Speed"
       arguments:
@@ -607,7 +546,6 @@ tests:
 
     - label: "write to the optional attribute: LifetimeRunningHours"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "LifetimeRunningHours"
       arguments:
@@ -615,7 +553,6 @@ tests:
 
     - label: "write to the optional attribute: Power"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "Power"
       arguments:
@@ -632,7 +569,6 @@ tests:
 
     - label: "read the optional attribute: MinConstPressure"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MinConstPressure"
       response:
@@ -648,7 +584,6 @@ tests:
 
     - label: "read the optional attribute: MaxConstPressure"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MaxConstPressure"
       response:
@@ -664,7 +599,6 @@ tests:
 
     - label: "read the optional attribute: MinCompPressure"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MinCompPressure"
       response:
@@ -680,7 +614,6 @@ tests:
 
     - label: "read the optional attribute: MaxCompPressure"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MaxCompPressure"
       response:
@@ -696,7 +629,6 @@ tests:
 
     - label: "read the optional attribute: MinConstSpeed"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MinConstSpeed"
       response:
@@ -712,7 +644,6 @@ tests:
 
     - label: "read the optional attribute: MaxConstSpeed"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MaxConstSpeed"
       response:
@@ -728,7 +659,6 @@ tests:
 
     - label: "read the optional attribute: MinConstFlow"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MinConstFlow"
       response:
@@ -744,7 +674,6 @@ tests:
 
     - label: "read the optional attribute: MaxConstFlow"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MaxConstFlow"
       response:
@@ -760,7 +689,6 @@ tests:
 
     - label: "read the optional attribute: MinConstTemp"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MinConstTemp"
       response:
@@ -774,10 +702,10 @@ tests:
           constraints:
               type: int16
               minValue: -27315
+              maxValue: 32767
 
     - label: "read the optional attribute: MaxConstTemp"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MaxConstTemp"
       response:
@@ -791,6 +719,7 @@ tests:
           constraints:
               type: int16
               minValue: -27315
+              maxValue: 32767
 
     - label: "read the optional attribute: PumpStatus"
       optional: true
@@ -809,7 +738,6 @@ tests:
 
     - label: "read the optional attribute: Speed"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "Speed"
       response:
@@ -839,7 +767,6 @@ tests:
 
     - label: "read the optional attribute: Power"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "Power"
       response:

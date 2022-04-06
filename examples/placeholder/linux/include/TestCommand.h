@@ -23,8 +23,12 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 
+#include <app/tests/suites/commands/delay/DelayCommands.h>
+#include <app/tests/suites/commands/discovery/DiscoveryCommands.h>
 #include <app/tests/suites/commands/log/LogCommands.h>
+#include <app/tests/suites/include/ConstraintsChecker.h>
 #include <app/tests/suites/include/PICSChecker.h>
+#include <app/tests/suites/include/ValueChecker.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -34,14 +38,19 @@ constexpr const char kIdentityAlpha[] = "";
 constexpr const char kIdentityBeta[]  = "";
 constexpr const char kIdentityGamma[] = "";
 
-class TestCommand : public PICSChecker, public LogCommands
+class TestCommand : public PICSChecker,
+                    public LogCommands,
+                    public DiscoveryCommands,
+                    public DelayCommands,
+                    public ValueChecker,
+                    public ConstraintsChecker
 {
 public:
     TestCommand(const char * commandName) : mCommandPath(0, 0, 0), mAttributePath(0, 0, 0) {}
     virtual ~TestCommand() {}
 
     virtual void NextTest() = 0;
-    void Wait() {}
+
     void SetCommandExitStatus(CHIP_ERROR status)
     {
         chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
@@ -60,10 +69,23 @@ public:
         return 0;
     }
 
-    CHIP_ERROR ContinueOnChipMainThread() override
+    CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) override
     {
-        NextTest();
+        if (CHIP_NO_ERROR == err)
+        {
+            NextTest();
+        }
+        else
+        {
+            Exit(chip::ErrorStr(err));
+        }
         return CHIP_NO_ERROR;
+    }
+
+    void Exit(std::string message) override
+    {
+        ChipLogError(chipTool, " ***** Test Failure: %s\n", message.c_str());
+        SetCommandExitStatus(CHIP_ERROR_INTERNAL);
     }
 
     static void ScheduleNextTest(intptr_t context)
@@ -72,12 +94,6 @@ public:
         command->isRunning    = true;
         command->NextTest();
         chip::DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEvent, context);
-    }
-
-    CHIP_ERROR WaitForCommissioning()
-    {
-        isRunning = false;
-        return chip::DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEvent, reinterpret_cast<intptr_t>(this));
     }
 
     static void OnPlatformEvent(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
@@ -128,4 +144,14 @@ protected:
     chip::app::ConcreteAttributePath mAttributePath;
     chip::Optional<chip::EndpointId> mEndpointId;
     void SetIdentity(const char * name){};
+    void Wait(){};
+
+    /////////// DelayCommands Interface /////////
+    void OnWaitForMs() override { NextTest(); }
+
+    CHIP_ERROR WaitForCommissioning() override
+    {
+        isRunning = false;
+        return chip::DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEvent, reinterpret_cast<intptr_t>(this));
+    }
 };

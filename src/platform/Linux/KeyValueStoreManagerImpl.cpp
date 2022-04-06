@@ -52,11 +52,11 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     {
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
-    else if ((err != CHIP_NO_ERROR) && (err != CHIP_ERROR_BUFFER_TOO_SMALL))
+    if ((err != CHIP_NO_ERROR) && (err != CHIP_ERROR_BUFFER_TOO_SMALL))
     {
         return err;
     }
-    else if (offset_bytes > read_size)
+    if (offset_bytes > read_size)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }

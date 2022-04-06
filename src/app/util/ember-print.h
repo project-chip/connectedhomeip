@@ -35,7 +35,11 @@ void emberAfPrint(int category, const char * format, ...) ENFORCE_FORMAT(2, 3);
  * @param category - Currently ignored as zcl categories do not map to chip categories. Defaults to kLogCategory_Progress
  * @param format - Format string to print
  * */
+#if CHIP_PW_TOKENIZER_LOGGING
+#define emberAfPrintln(MOD, MSG, ...) ChipLogProgress(Zcl, MSG, __VA_ARGS__);
+#else
 void emberAfPrintln(int category, const char * format, ...) ENFORCE_FORMAT(2, 3);
+#endif
 
 /**
  * @brief Prints a buffer

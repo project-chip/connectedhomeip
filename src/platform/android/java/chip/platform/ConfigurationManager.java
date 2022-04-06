@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2021-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,6 +46,9 @@ public interface ConfigurationManager {
   String kConfigKey_LocalConfigDisabled = "local-config-disabled";
   String kConfigKey_Reachable = "reachable";
   String kConfigKey_UniqueId = "uniqueId";
+  String kConfigKey_Spake2pIterationCount = "iteration-count";
+  String kConfigKey_Spake2pSalt = "salt";
+  String kConfigKey_Spake2pVerifier = "verifier";
 
   // Keys stored in the Chip-config namespace
   String kConfigKey_FabricId = "fabric-id";

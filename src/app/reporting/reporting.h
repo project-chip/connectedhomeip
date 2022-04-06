@@ -61,3 +61,8 @@ void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::Clu
  * Same but with a nicer attribute path.
  */
 void MatterReportingAttributeChangeCallback(const chip::app::ConcreteAttributePath & aPath);
+
+/*
+ * Same but only with an EndpointId, this is used when adding / enabling an endpoint during runtime.
+ */
+void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint);

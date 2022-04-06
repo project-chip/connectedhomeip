@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,7 +47,7 @@ public:
 private:
     static constexpr uint8_t mMaxEntryCount = 1 + /* For the global message counter */
         1 +                                       /* For the admin key count */
-        CHIP_CONFIG_MAX_DEVICE_ADMINS + 1 +       /* For the session key count */
+        CHIP_CONFIG_MAX_FABRICS + 1 +             /* For the session key count */
         CHIP_CONFIG_MAX_SESSION_KEYS;
 
     struct KeyEntry

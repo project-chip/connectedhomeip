@@ -18,16 +18,16 @@
 
 #pragma once
 
+#include <app/ConcreteEventPath.h>
 #include <app/util/basic-types.h>
-
-#include <app/ClusterInfo.h>
+#include <lib/core/CHIPCore.h>
 
 namespace chip {
 namespace app {
 struct EventPathParams
 {
-    EventPathParams(EndpointId aEndpointId, ClusterId aClusterId, EventId aEventId) :
-        mEndpointId(aEndpointId), mClusterId(aClusterId), mEventId(aEventId)
+    EventPathParams(EndpointId aEndpointId, ClusterId aClusterId, EventId aEventId, bool aUrgentEvent = false) :
+        mClusterId(aClusterId), mEventId(aEventId), mEndpointId(aEndpointId), mIsUrgentEvent(aUrgentEvent)
     {}
     EventPathParams() {}
     bool IsSamePath(const EventPathParams & other) const
@@ -44,9 +44,19 @@ struct EventPathParams
     inline bool HasWildcardClusterId() const { return mClusterId == kInvalidClusterId; }
     inline bool HasWildcardEventId() const { return mEventId == kInvalidEventId; }
 
-    EndpointId mEndpointId = kInvalidEndpointId;
-    ClusterId mClusterId   = kInvalidClusterId;
-    EventId mEventId       = kInvalidEventId;
+    bool IsEventPathSupersetOf(const ConcreteEventPath & other) const
+    {
+        VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
+        VerifyOrReturnError(HasWildcardEventId() || mEventId == other.mEventId, false);
+
+        return true;
+    }
+
+    ClusterId mClusterId   = kInvalidClusterId;  // uint32
+    EventId mEventId       = kInvalidEventId;    // uint32
+    EndpointId mEndpointId = kInvalidEndpointId; // uint16
+    bool mIsUrgentEvent    = false;              // uint8
 };
 } // namespace app
 } // namespace chip

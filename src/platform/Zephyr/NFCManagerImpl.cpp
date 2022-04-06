@@ -31,7 +31,7 @@
 namespace chip {
 namespace DeviceLayer {
 namespace {
-void nfcCallback(void * /* context */, nfc_t2t_event, const uint8_t * /* data */, size_t /* data_length */) {}
+void nfcCallback(void * /* context */, nfc_t2t_event_t, const uint8_t * /* data */, size_t /* data_length */) {}
 } // namespace
 
 NFCManagerImpl NFCManagerImpl::sInstance;
@@ -81,7 +81,7 @@ CHIP_ERROR NFCManagerImpl::_StartTagEmulation(const char * payload, size_t paylo
 
 exit:
     if (error != CHIP_NO_ERROR)
-        ChipLogProgress(DeviceLayer, "Starting NFC Tag emulation failed: %s", chip::ErrorStr(error));
+        ChipLogError(DeviceLayer, "Starting NFC Tag emulation failed: %s", chip::ErrorStr(error));
     return error;
 }
 

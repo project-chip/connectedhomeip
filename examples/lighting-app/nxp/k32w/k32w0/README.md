@@ -23,9 +23,14 @@ network.
 -   [Device UI](#device-ui)
 -   [Building](#building)
 -   [Flashing and debugging](#flashdebug)
--   [Testing the example](#testing-the-example)
-
-<hr>
+-   [Pigweed Tokenizer](#tokenizer)
+    -   [Detokenizer script](#detokenizer)
+    -   [Notes](#detokenizer-notes)
+    -   [Known issues](#detokenizer-known-issues)
+-   [OTA](#ota) - [Writing the SSBL](#ssbl) - [Writing the PSECT](#psect) -
+    [Writing the application](#appwrite) - [OTA Testing](#otatesting) -
+    [Known issues](#otaissues)
+    </hr>
 
 <a name="intro"></a>
 
@@ -222,9 +227,273 @@ All you have to do is to replace the Openthread binaries from the above
 documentation with _out/debug/chip-k32w061-light-example.bin_ if DK6Programmer
 is used or with _out/debug/chip-k32w061-light-example_ if MCUXpresso is used.
 
-## Testing the example
+<a name="tokenizer"></a>
 
-The app can be deployed against any generic OpenThread Border Router. See the
-guide
-[Commissioning NXP K32W using Android CHIPTool](../../../docs/guides/nxp_k32w_android_commissioning.md)
-for step-by-step instructions.
+## Pigweed tokenizer
+
+The tokenizer is a pigweed module that allows hashing the strings. This greatly
+reduces the flash needed for logs. The module can be enabled by building with
+the gn argument _chip_pw_tokenizer_logging=true_. The detokenizer script is
+needed for parsing the hashed scripts.
+
+<a name="detokenizer"></a>
+
+### Detokenizer script
+
+The python3 script detokenizer.py is a script that decodes the tokenized logs
+either from a file or from a serial port. The script can be used in the
+following ways:
+
+```
+usage: detokenizer.py serial [-h] -i INPUT -d DATABASE [-o OUTPUT]
+usage: detokenizer.py file [-h] -i INPUT -d DATABASE -o OUTPUT
+```
+
+The first parameter is either _serial_ or _file_ and it selects between decoding
+from a file or from a serial port.
+
+The second parameter is _-i INPUT_ and it must se set to the path of the file or
+the serial to decode from.
+
+The third parameter is _-d DATABASE_ and represents the path to the token
+database to be used for decoding. The default path is
+_out/debug/chip-k32w061-light-example-database.bin_ after a successful build.
+
+The forth parameter is _-o OUTPUT_ and it represents the path to the output file
+where the decoded logs will be stored. This parameter is required for file usage
+and optional for serial usage. If not provided when used with serial port, it
+will show the decoded log only at the stdout and not save it to file.
+
+<a name="detokenizer-notes"></a>
+
+### Notes
+
+The token database is created automatically after building the binary if the
+argument _chip_pw_tokenizer_logging=true_ was used.
+
+The detokenizer script must be run inside the example's folder after a
+successful run of the _scripts/activate.sh_ script. The pw_tokenizer module used
+by the script is loaded by the environment.
+
+<a name="detokenizer-known-issues"></a>
+
+### Known issues
+
+The building process will not update the token database if it already exists. In
+case that new strings are added and the database already exists in the output
+folder, it must be deleted so that it will be recreated at the next build.
+
+Not all tokens will be decoded. This is due to a gcc/pw_tokenizer issue. The
+pw_tokenizer creates special elf sections using attributes where the tokens and
+strings will be stored. This sections will be used by the database creation
+script. For template C++ functions, gcc ignores these attributes and places all
+the strings by default in the .rodata section. As a result the database creation
+script won't find them in the special-created sections.
+
+If run, closed and rerun with the serial option on the same serial port, the
+detokenization script will get stuck and not show any logs. The solution is to
+unplug and plug the board and then rerun the script.
+
+<a name="ota"></a>
+
+## OTA
+
+The internal flash needs to be prepared for the OTA process. First 16K of the
+internal flash needs to be populated with a Secondary Stage Bootloader (SSBL)
+related data while the last 8.5K of flash space is holding image directory
+related data (PSECT). The space between these two zones will be filled by the
+application.
+
+<a name="ssbl"></a>
+
+### Writing the SSBL
+
+The SSBL can ge generated from one of the SDK demo examples. The SDK demo
+example needs to be compiled inside MCUXpresso with the define _PDM_EXT_FLASH_.
+The SSBL demo application can be imported from the _Quickstart panel_: _Import
+SDK example(s)_ -> select _wireless->framework->ssbl_ application.
+
+![SSBL Application Select](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_select.JPG)
+
+The SSBL project must be compiled using the PDM_EXT_FLASH define.
+
+![PDM_EXT_FLASH](../../../../platform/nxp/k32w/k32w0/doc/images/pdm_ext_flash.JPG)
+
+Once compiled, the required ssbl file is called k32w061dk6_ssbl.bin
+
+![SSBL_BIN](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_bin.JPG)
+
+Before writing the SSBL, it it recommanded to fully erase the internal flash:
+
+```
+DK6Programmer.exe -V 5 -P 1000000 -s <COM_PORT> -e Flash
+```
+
+k32w061dk6_ssbl.bin must be written at address 0 in the internal flash:
+
+```
+DK6Programmer.exe -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x00="k32w061dk6_ssbl.bin"
+```
+
+<a name="psect"></a>
+
+### Writing the PSECT
+
+First, image directory 0 must be written:
+
+```
+DK6Programmer.exe -V5 -s <COM port> -P 1000000 -w image_dir_0=0000000010000000
+```
+
+Here is the interpretation of the fields:
+
+```
+00000000 -> start address 0x00000000
+1000     -> size = 0x0010 pages of 512-bytes (= 8kB)
+00       -> not bootable (only used by the SSBL to support SSBL update)
+00       -> SSBL Image Type
+```
+
+Second, image directory 1 must be written:
+
+```
+DK6Programmer.exe -V5 -s <COM port> -P 1000000 -w image_dir_1=00400000CD040101
+```
+
+Here is the interpretation of the fields:
+
+```
+00400000 -> start address 0x00004000
+CD04     -> 0x4CD pages of 512-bytes (= 614,5kB)
+01       -> bootable flag
+01       -> image type for the application
+```
+
+<a name="appwrite"></a>
+
+### Writing the application
+
+DK6Programmer can be used for flashing the application:
+
+```
+DK6Programmer.exe -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x4000="chip-k32w061-light-example.bin"
+```
+
+If debugging is needed, MCUXpresso can be used then for flashing the
+application. Please make sure that the application is written at address 0x4000:
+
+![FLASH_LOCATION](../../../../platform/nxp/k32w/k32w0/doc/images/flash_location.JPG)
+
+<a name="otatesting"></a>
+
+### OTA Testing
+
+The OTA topology used for OTA testing is illustrated in the figure below.
+Topology is similar with the one used for Matter Test Events.
+
+![OTA_TOPOLOGY](../../../../platform/nxp/k32w/k32w0/doc/images/ota_topology.JPG)
+
+The concept for OTA is the next one:
+
+-   there is an OTA Provider Application that holds the OTA image. In our case,
+    this is a Linux application running on an Ubuntu based-system;
+-   the OTA Requestor functionality is embedded inside the Lighting Application.
+    It will be used for requesting OTA blocks from the OTA Provider;
+-   the controller (a linux application called chip-tool) will be used for
+    commissioning both the device and the OTA Provider App. The device will be
+    commissioned using the standard Matter flow (BLE + IEEE 802.15.4) while the
+    OTA Provider Application will be commissioned using the _onnetwork_ option
+    of chip-tool;
+-   during commissioning, each device is assigned a node id by the chip-tool
+    (can be specified manually by the user). Using the node id of the device and
+    of the lighting application, chip-tool triggers the OTA transfer by invoking
+    the _announce-ota-provider_ command - basically, the OTA Requestor is
+    informed of the node id of the OTA Provider Application.
+
+_Computer #1_ can be any system running an Ubuntu distribution. We recommand
+using TE 7.5 instructions from
+[here](https://groups.csa-iot.org/wg/matter-csg/document/24839), where RPi 4 are
+proposed. Also, TE 7.5 instructions document point to the OS/Docker images that
+should be used on the RPis. For compatibility reasons, we recommand compiling
+chip-tool and OTA Provider applications with the same commit id that was used
+for compiling the Lighting Application. Also, please note that there is a single
+controller (chip-tool) running on Computer #1 which is used for commissioning
+both the device and the OTA Provider Application. If needed,
+[these instructions](https://itsfoss.com/connect-wifi-terminal-ubuntu/) could be
+used for connecting the RPis to WiFi.
+
+Build the Linux OTA provider application:
+
+```
+doru@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota-provider-app chip_config_network_layer_ble=false
+```
+
+Build OTA image and start the OTA Provider Application:
+
+```
+doru@computer1:~/connectedhomeip$ : ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 chip-k32w061-light-example.bin chip-k32w061-light-example.ota
+doru@computer1:~/connectedhomeip$ : rm -rf /tmp/chip_*
+doru@computer1:~/connectedhomeip$ : ./out/ota-provider-app/chip-ota-provider-app -f chip-k32w061-light-example.ota
+```
+
+Build Linux chip-tool:
+
+```
+doru@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples/chip-tool out/chip-tool-app
+```
+
+Provision the OTA provider application and assign node id _1_. Also, grant ACL
+entries to allow OTA requestors:
+
+```
+doru@computer1:~/connectedhomeip$ : rm -rf /tmp/chip_*
+doru@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing onnetwork 1 20202021
+doru@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0
+```
+
+Provision the device and assign node id _2_:
+
+```
+doru@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing ble-thread 2 hex:<operationalDataset> 20202021   3840
+```
+
+Start the OTA process:
+
+```
+doru@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+```
+
+<a name="otaissues"></a>
+
+## Known issues
+
+-   SRP cache on the openthread border router needs to flushed each time a new
+    commissioning process is attempted. For this, factory reset the device, then
+    execute _ot-ctl server disable_ followed by _ot-ctl server enable_. After
+    this step, the commissioning process of the device can start;
+-   Due to some MDNS issues, the commissioning of the OTA Provider Application
+    may fail. Please make sure that the SRP cache is disabled (_ot-ctl srp
+    server disable_) on the openthread border router while commissioning the OTA
+    Provider Application;
+-   No other Docker image should be running (e.g.: Docker image needed by Test
+    Harness) except the OTBR one. A docker image can be killed using the
+    command:
+
+```
+doru@computer1:~/connectedhomeip$ : sudo docker kill $container_id
+```
+
+-   In order to avoid MDNS issues, only one interface should be active at one
+    time. E.g.: if WiFi is used then disable the Ethernet interface and also
+    disable multicast on that interface:
+
+```
+doru@computer1:~/connectedhomeip$ sudo ip link set dev eth0 down
+doru@computer1:~/connectedhomeip$ sudo ifconfig eth0 -multicast
+```
+
+-   If OTBR Docker image is used, then the "-B" parameter should point to the
+    interface used for the backbone.
+
+-   If Wi-Fi is used on a RPI4, then a 5Ghz network should be selected.
+    Otherwise, issues related to BLE-WiFi combo may appear.

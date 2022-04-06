@@ -36,6 +36,7 @@ public:
     CHIP_ERROR Start() override;
     void Finish() override;
     void PostEvent(const WindowApp::Event & event) override;
+    void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId) override;
     friend void sl_button_on_change(const sl_button_t * handle);
 
 protected:
@@ -71,6 +72,7 @@ protected:
     static void OnIconTimeout(WindowApp::Timer & timer);
 
 private:
+    void DispatchEventAttributeChange(chip::EndpointId endpoint, chip::AttributeId attribute);
     TaskHandle_t mHandle = nullptr;
     QueueHandle_t mQueue = nullptr;
     LEDWidget mStatusLED;

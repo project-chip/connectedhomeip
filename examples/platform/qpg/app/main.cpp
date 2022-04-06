@@ -33,11 +33,18 @@
 #include "qvCHIP.h"
 
 // CHIP includes
-#include <app/server/Dnssd.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+
+#if PW_RPC_ENABLED
+#include "Rpc.h"
+#endif // PW_RPC_ENABLED
+
+#if ENABLE_CHIP_SHELL
+#include "shell_common/shell.h"
+#endif // ENABLE_CHIP_SHELL
 
 // Application level logic
 #include "AppTask.h"
@@ -82,14 +89,33 @@ int Application_Init(void)
 
 CHIP_ERROR CHIP_Init(void)
 {
-    CHIP_ERROR ret = chip::Platform::MemoryInit();
+    CHIP_ERROR ret = CHIP_NO_ERROR;
+
+#if PW_RPC_ENABLED
+    ret = (CHIP_ERROR) chip::rpc::Init();
+    if (ret != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "rpc::Init() failed");
+        goto exit;
+    }
+#endif
+
+    ret = chip::Platform::MemoryInit();
     if (ret != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Platform::MemoryInit() failed");
         goto exit;
     }
 
-    ChipLogProgress(NotSpecified, "Init CHIP Stack");
+#if ENABLE_CHIP_SHELL
+    ret = (CHIP_ERROR) ShellTask::Start();
+    if (ret != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "ShellTask::Start() failed");
+        goto exit;
+    }
+#endif // ENABLE_CHIP_SHELL
+
     ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
@@ -126,10 +152,6 @@ CHIP_ERROR CHIP_Init(void)
         goto exit;
     }
 #endif // CHIP_ENABLE_OPENTHREAD
-
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
-#endif
 
     ChipLogProgress(NotSpecified, "Starting Platform Manager Event Loop");
     ret = PlatformMgr().StartEventLoopTask();

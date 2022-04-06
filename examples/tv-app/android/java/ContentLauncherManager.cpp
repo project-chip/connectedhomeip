@@ -27,6 +27,7 @@
 
 using namespace std;
 using namespace chip;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ContentLauncher;
 
 void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
@@ -44,7 +45,7 @@ void ContentLauncherManager::NewManager(jint endpoint, jobject manager)
 }
 
 void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
-                                                 const std::list<Parameter> & parameterList, bool autoplay,
+                                                 const DecodableList<ParameterType> & parameterList, bool autoplay,
                                                  const chip::CharSpan & data)
 {
     Commands::LaunchResponse::Type response;
@@ -85,7 +86,7 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
         JniUtfString dataStr(env, jdataStr);
 
         response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
-        response.data   = dataStr.charSpan();
+        response.data   = chip::Optional<CharSpan>(dataStr.charSpan());
 
         err = helper.Success(response);
     }
@@ -99,7 +100,7 @@ exit:
 
 void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const chip::CharSpan & contentUrl,
                                              const chip::CharSpan & displayString,
-                                             const std::list<BrandingInformation> & brandingInformation)
+                                             const BrandingInformationType & brandingInformation)
 {
     Commands::LaunchResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -140,7 +141,7 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
         JniUtfString dataStr(env, jdataStr);
 
         response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
-        response.data   = dataStr.charSpan();
+        response.data   = chip::Optional<CharSpan>(dataStr.charSpan());
 
         err = helper.Success(response);
     }

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
@@ -26,9 +26,10 @@
 #pragma once
 
 #include <lib/support/BitFlags.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
 #include <lib/support/LifetimePersistedCounter.h>
 #endif
 
@@ -38,6 +39,11 @@ namespace DeviceLayer {
 class ProvisioningDataSet;
 
 namespace Internal {
+
+#if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
+template <class ConfigClass>
+class LegacyTemporaryCommissionableDataProvider;
+#endif // CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
 
 /**
  * Provides a generic implementation of ConfigurationManager features that works on multiple platforms.
@@ -62,6 +68,7 @@ public:
     CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer) override;
     CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override;
+    CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer) override;
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override;
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override;
     CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override;
@@ -71,17 +78,16 @@ public:
     CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf) override;
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) override;
     CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) override;
-    CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode) override;
-    CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode) override;
-    CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
-    CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator) override;
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override;
     CHIP_ERROR IncrementLifetimeCounter() override;
+    CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
+#endif
     CHIP_ERROR GetFailSafeArmed(bool & val) override;
     CHIP_ERROR SetFailSafeArmed(bool val) override;
     CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override;
     bool IsCommissionableDeviceTypeEnabled() override;
-    CHIP_ERROR GetDeviceTypeId(uint16_t & deviceType) override;
+    CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType) override;
     bool IsCommissionableDeviceNameEnabled() override;
     CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint) override;
@@ -108,6 +114,8 @@ public:
     CHIP_ERROR GetLocalConfigDisabled(bool & disabled) override;
     CHIP_ERROR GetReachable(bool & reachable) override;
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override;
+    CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen) override;
+    CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize) override;
     CHIP_ERROR RunUnitTests(void) override;
     bool IsFullyProvisioned() override;
     void InitiateFactoryReset() override;
@@ -118,12 +126,17 @@ public:
 #endif
     void LogDeviceConfig() override;
 
-    virtual ~GenericConfigurationManagerImpl() = default;
+    ~GenericConfigurationManagerImpl() override = default;
 
 protected:
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     chip::LifetimePersistedCounter mLifetimePersistedCounter;
 #endif
+
+#if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
+    friend LegacyTemporaryCommissionableDataProvider<ConfigClass>;
+#endif // CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
+
     CHIP_ERROR PersistProvisioningData(ProvisioningDataSet & provData);
 
     // Methods to read and write configuration values, as well as run the configuration unit test.
@@ -141,48 +154,6 @@ protected:
     virtual CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)          = 0;
     virtual void RunConfigUnitTest(void)                                                           = 0;
 };
-
-template <class ConfigClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetVendorId(uint16_t & vendorId)
-{
-    vendorId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
-    return CHIP_NO_ERROR;
-}
-
-template <class ConfigClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductId(uint16_t & productId)
-{
-    productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
-    return CHIP_NO_ERROR;
-}
-
-template <class ConfigClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSoftwareVersion(uint32_t & softwareVer)
-{
-    softwareVer = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
-    return CHIP_NO_ERROR;
-}
-
-template <class ConfigClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetDeviceTypeId(uint16_t & deviceType)
-{
-    deviceType = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_TYPE);
-    return CHIP_NO_ERROR;
-}
-
-template <class ConfigClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetInitialPairingHint(uint16_t & pairingHint)
-{
-    pairingHint = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_PAIRING_INITIAL_HINT);
-    return CHIP_NO_ERROR;
-}
-
-template <class ConfigClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSecondaryPairingHint(uint16_t & pairingHint)
-{
-    pairingHint = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_HINT);
-    return CHIP_NO_ERROR;
-}
 
 } // namespace Internal
 } // namespace DeviceLayer

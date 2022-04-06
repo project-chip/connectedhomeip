@@ -1,7 +1,7 @@
 [BASIC]
-disable=too-few-public-methods,bad-whitespace
+disable=too-few-public-methods,bad-whitespace,broad-except
 
-no-docstring-rgx=main
+no-docstring-rgx=main|__init__
 docstring-min-length=5
 min-public-methods=1
 max-args=7

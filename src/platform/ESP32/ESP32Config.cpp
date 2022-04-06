@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -50,15 +50,18 @@ const char ESP32Config::kConfigNamespace_ChipConfig[]   = "chip-config";
 const char ESP32Config::kConfigNamespace_ChipCounters[] = "chip-counters";
 
 // Keys stored in the chip-factory namespace
-const ESP32Config::Key ESP32Config::kConfigKey_SerialNum           = { kConfigNamespace_ChipFactory, "serial-num" };
-const ESP32Config::Key ESP32Config::kConfigKey_MfrDeviceId         = { kConfigNamespace_ChipFactory, "device-id" };
-const ESP32Config::Key ESP32Config::kConfigKey_MfrDeviceCert       = { kConfigNamespace_ChipFactory, "device-cert" };
-const ESP32Config::Key ESP32Config::kConfigKey_MfrDeviceICACerts   = { kConfigNamespace_ChipFactory, "device-ca-certs" };
-const ESP32Config::Key ESP32Config::kConfigKey_MfrDevicePrivateKey = { kConfigNamespace_ChipFactory, "device-key" };
-const ESP32Config::Key ESP32Config::kConfigKey_HardwareVersion     = { kConfigNamespace_ChipFactory, "hardware-ver" };
-const ESP32Config::Key ESP32Config::kConfigKey_ManufacturingDate   = { kConfigNamespace_ChipFactory, "mfg-date" };
-const ESP32Config::Key ESP32Config::kConfigKey_SetupPinCode        = { kConfigNamespace_ChipFactory, "pin-code" };
-const ESP32Config::Key ESP32Config::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };
+const ESP32Config::Key ESP32Config::kConfigKey_SerialNum             = { kConfigNamespace_ChipFactory, "serial-num" };
+const ESP32Config::Key ESP32Config::kConfigKey_MfrDeviceId           = { kConfigNamespace_ChipFactory, "device-id" };
+const ESP32Config::Key ESP32Config::kConfigKey_MfrDeviceCert         = { kConfigNamespace_ChipFactory, "device-cert" };
+const ESP32Config::Key ESP32Config::kConfigKey_MfrDeviceICACerts     = { kConfigNamespace_ChipFactory, "device-ca-certs" };
+const ESP32Config::Key ESP32Config::kConfigKey_MfrDevicePrivateKey   = { kConfigNamespace_ChipFactory, "device-key" };
+const ESP32Config::Key ESP32Config::kConfigKey_HardwareVersion       = { kConfigNamespace_ChipFactory, "hardware-ver" };
+const ESP32Config::Key ESP32Config::kConfigKey_ManufacturingDate     = { kConfigNamespace_ChipFactory, "mfg-date" };
+const ESP32Config::Key ESP32Config::kConfigKey_SetupPinCode          = { kConfigNamespace_ChipFactory, "pin-code" };
+const ESP32Config::Key ESP32Config::kConfigKey_SetupDiscriminator    = { kConfigNamespace_ChipFactory, "discriminator" };
+const ESP32Config::Key ESP32Config::kConfigKey_Spake2pIterationCount = { kConfigNamespace_ChipFactory, "iteration-count" };
+const ESP32Config::Key ESP32Config::kConfigKey_Spake2pSalt           = { kConfigNamespace_ChipFactory, "salt" };
+const ESP32Config::Key ESP32Config::kConfigKey_Spake2pVerifier       = { kConfigNamespace_ChipFactory, "verifier" };
 
 // Keys stored in the chip-config namespace
 const ESP32Config::Key ESP32Config::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };
@@ -69,9 +72,10 @@ const ESP32Config::Key ESP32Config::kConfigKey_GroupKeyIndex      = { kConfigNam
 const ESP32Config::Key ESP32Config::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
 const ESP32Config::Key ESP32Config::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
 const ESP32Config::Key ESP32Config::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
-const ESP32Config::Key ESP32Config::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
+const ESP32Config::Key ESP32Config::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "reg-location" };
 const ESP32Config::Key ESP32Config::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
 const ESP32Config::Key ESP32Config::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
+const ESP32Config::Key ESP32Config::kConfigKey_UniqueId           = { kConfigNamespace_ChipFactory, "unique-id" };
 
 // Keys stored in the Chip-counters namespace
 const ESP32Config::Key ESP32Config::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
@@ -314,82 +318,19 @@ CHIP_ERROR ESP32Config::ClearConfigValue(Key key)
 
 bool ESP32Config::ConfigValueExists(Key key)
 {
-    ScopedNvsHandle handle;
-
-    if (handle.Open(key.Namespace, NVS_READONLY) != CHIP_NO_ERROR)
+    nvs_iterator_t iterator = nvs_entry_find(NVS_DEFAULT_PART_NAME, key.Namespace, NVS_TYPE_ANY);
+    for (; iterator; iterator = nvs_entry_next(iterator))
     {
-        return false;
+        nvs_entry_info_t info;
+        nvs_entry_info(iterator, &info);
+        if (strcmp(info.key, key.Name) == 0)
+        {
+            nvs_release_iterator(iterator);
+            return true;
+        }
     }
-
-    // This code is a rather unfortunate consequence of the limitations
-    // in the ESP NVS API.  As defined, there is no API for determining
-    // whether a particular key exists.  Furthermore, calling one of the
-    // nvs_get_* APIs will result in a ESP_ERR_NVS_NOT_FOUND in the case
-    // where the key exists, but the requested data type does not match.
-    // (This is true despite the existence of the ESP_ERR_NVS_TYPE_MISMATCH
-    // error, which would seem to be the obvious correct response).
-    //
-    // Thus the solution is to exhaustively check for the key using
-    // each possible value type.
-    esp_err_t err;
-    {
-        uint8_t v;
-        err = nvs_get_u8(handle, key.Name, &v);
-    }
-    if (err == ESP_ERR_NVS_NOT_FOUND)
-    {
-        int8_t v;
-        err = nvs_get_i8(handle, key.Name, &v);
-    }
-    if (err == ESP_ERR_NVS_NOT_FOUND)
-    {
-        uint16_t v;
-        err = nvs_get_u16(handle, key.Name, &v);
-    }
-    if (err == ESP_ERR_NVS_NOT_FOUND)
-    {
-        int16_t v;
-        err = nvs_get_i16(handle, key.Name, &v);
-    }
-    if (err == ESP_ERR_NVS_NOT_FOUND)
-    {
-        uint32_t v;
-        err = nvs_get_u32(handle, key.Name, &v);
-    }
-    if (err == ESP_ERR_NVS_NOT_FOUND)
-    {
-        int32_t v;
-        err = nvs_get_i32(handle, key.Name, &v);
-    }
-    if (err == ESP_ERR_NVS_NOT_FOUND)
-    {
-        uint64_t v;
-        err = nvs_get_u64(handle, key.Name, &v);
-    }
-    if (err == ESP_ERR_NVS_NOT_FOUND)
-    {
-        int64_t v;
-        err = nvs_get_i64(handle, key.Name, &v);
-    }
-    if (err == ESP_ERR_NVS_NOT_FOUND)
-    {
-        size_t sz;
-        err = nvs_get_str(handle, key.Name, NULL, &sz);
-    }
-    if (err == ESP_ERR_NVS_NOT_FOUND)
-    {
-        size_t sz;
-        err = nvs_get_blob(handle, key.Name, NULL, &sz);
-    }
-
-    // In the case of blob and string, ESP_ERR_NVS_INVALID_LENGTH means
-    // the key exists.
-    if (err == ESP_ERR_NVS_INVALID_LENGTH)
-    {
-        err = ESP_OK;
-    }
-
-    return err == ESP_OK;
+    // if nvs_entry_find() or nvs_entry_next() returns NULL, then no need to release the iterator.
+    return false;
 }
 
 CHIP_ERROR ESP32Config::EnsureNamespace(const char * ns)

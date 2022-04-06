@@ -62,6 +62,7 @@ extern bool gDone;
 void InitTestInetCommon();
 void InitSystemLayer();
 void ShutdownSystemLayer();
+void ShutdownTestInetCommon();
 void InetFailError(CHIP_ERROR err, const char * msg);
 
 void InitNetwork();

@@ -94,13 +94,9 @@ CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
 
 CHIP_ERROR ExchangeManager::Shutdown()
 {
-    mReliableMessageMgr.Shutdown();
+    VerifyOrReturnError(mState == State::kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
 
-    mContextPool.ForEachActiveObject([](auto * ec) {
-        // There should be no active object in the pool
-        VerifyOrDie(false);
-        return Loop::Continue;
-    });
+    mReliableMessageMgr.Shutdown();
 
     if (mSessionManager != nullptr)
     {

@@ -29,6 +29,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
+    case ZCL_ACCESS_CONTROL_CLUSTER_ID:
+        emberAfAccessControlClusterInitCallback(endpoint);
+        break;
     case ZCL_ACCOUNT_LOGIN_CLUSTER_ID:
         emberAfAccountLoginClusterInitCallback(endpoint);
         break;
@@ -56,14 +59,8 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_BINDING_CLUSTER_ID:
         emberAfBindingClusterInitCallback(endpoint);
         break;
-    case ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID:
-        emberAfBridgedDeviceBasicClusterInitCallback(endpoint);
-        break;
     case ZCL_CHANNEL_CLUSTER_ID:
         emberAfChannelClusterInitCallback(endpoint);
-        break;
-    case ZCL_COLOR_CONTROL_CLUSTER_ID:
-        emberAfColorControlClusterInitCallback(endpoint);
         break;
     case ZCL_CONTENT_LAUNCH_CLUSTER_ID:
         emberAfContentLauncherClusterInitCallback(endpoint);
@@ -74,17 +71,11 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_DIAGNOSTIC_LOGS_CLUSTER_ID:
         emberAfDiagnosticLogsClusterInitCallback(endpoint);
         break;
-    case ZCL_DOOR_LOCK_CLUSTER_ID:
-        emberAfDoorLockClusterInitCallback(endpoint);
-        break;
     case ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfEthernetNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
     case ZCL_FIXED_LABEL_CLUSTER_ID:
         emberAfFixedLabelClusterInitCallback(endpoint);
-        break;
-    case ZCL_FLOW_MEASUREMENT_CLUSTER_ID:
-        emberAfFlowMeasurementClusterInitCallback(endpoint);
         break;
     case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
         emberAfGeneralCommissioningClusterInitCallback(endpoint);
@@ -125,20 +116,11 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_OTA_PROVIDER_CLUSTER_ID:
         emberAfOtaSoftwareUpdateProviderClusterInitCallback(endpoint);
         break;
-    case ZCL_OCCUPANCY_SENSING_CLUSTER_ID:
-        emberAfOccupancySensingClusterInitCallback(endpoint);
-        break;
     case ZCL_ON_OFF_CLUSTER_ID:
         emberAfOnOffClusterInitCallback(endpoint);
         break;
     case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
         emberAfOperationalCredentialsClusterInitCallback(endpoint);
-        break;
-    case ZCL_PRESSURE_MEASUREMENT_CLUSTER_ID:
-        emberAfPressureMeasurementClusterInitCallback(endpoint);
-        break;
-    case ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID:
-        emberAfRelativeHumidityMeasurementClusterInitCallback(endpoint);
         break;
     case ZCL_SCENES_CLUSTER_ID:
         emberAfScenesClusterInitCallback(endpoint);
@@ -152,14 +134,8 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_TARGET_NAVIGATOR_CLUSTER_ID:
         emberAfTargetNavigatorClusterInitCallback(endpoint);
         break;
-    case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
-        emberAfTemperatureMeasurementClusterInitCallback(endpoint);
-        break;
     case ZCL_TEST_CLUSTER_ID:
         emberAfTestClusterClusterInitCallback(endpoint);
-        break;
-    case ZCL_THERMOSTAT_CLUSTER_ID:
-        emberAfThermostatClusterInitCallback(endpoint);
         break;
     case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfThreadNetworkDiagnosticsClusterInitCallback(endpoint);
@@ -179,15 +155,17 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfWiFiNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
-    case ZCL_WINDOW_COVERING_CLUSTER_ID:
-        emberAfWindowCoveringClusterInitCallback(endpoint);
-        break;
     default:
         // Unrecognized cluster ID
         break;
     }
 }
 
+void __attribute__((weak)) emberAfAccessControlClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfAccountLoginClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -233,17 +211,7 @@ void __attribute__((weak)) emberAfBindingClusterInitCallback(EndpointId endpoint
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfBridgedDeviceBasicClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
 void __attribute__((weak)) emberAfChannelClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfColorControlClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -263,22 +231,12 @@ void __attribute__((weak)) emberAfDiagnosticLogsClusterInitCallback(EndpointId e
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfDoorLockClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
 void __attribute__((weak)) emberAfEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfFixedLabelClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfFlowMeasurementClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -348,27 +306,12 @@ void __attribute__((weak)) emberAfOtaSoftwareUpdateProviderClusterInitCallback(E
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfOccupancySensingClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
 void __attribute__((weak)) emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfOperationalCredentialsClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfPressureMeasurementClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfRelativeHumidityMeasurementClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -393,17 +336,7 @@ void __attribute__((weak)) emberAfTargetNavigatorClusterInitCallback(EndpointId 
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfTemperatureMeasurementClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
 void __attribute__((weak)) emberAfTestClusterClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfThermostatClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -434,11 +367,6 @@ void __attribute__((weak)) emberAfWakeOnLanClusterInitCallback(EndpointId endpoi
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfWindowCoveringClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -486,14 +414,14 @@ bool __attribute__((weak)) emberAfMessageSentCallback(const MessageSendDestinati
 }
 
 EmberAfStatus __attribute__((weak))
-emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, EmberAfAttributeMetadata * attributeMetadata,
+emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
                                      uint8_t * buffer, uint16_t maxReadLength)
 {
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
 EmberAfStatus __attribute__((weak))
-emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, EmberAfAttributeMetadata * attributeMetadata,
+emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
                                       uint8_t * buffer)
 {
     return EMBER_ZCL_STATUS_FAILURE;

@@ -61,15 +61,52 @@ public:
         kUndefined = 0,
         kPASE      = 1,
         kCASE      = 2,
+        // kPending denotes a secure session object that is internally
+        // reserved by the stack before and during session establishment.
+        //
+        // Although the stack can tolerate eviction of these (releasing one
+        // out from under the holder would exhibit as CHIP_ERROR_INCORRECT_STATE
+        // during CASE or PASE), intent is that we should not and would leave
+        // these untouched until CASE or PASE complete.
+        kPending = 3,
     };
 
     SecureSession(Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId,
                   FabricIndex fabric, const ReliableMessageProtocolConfig & config) :
         mSecureSessionType(secureSessionType),
         mPeerNodeId(peerNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId),
-        mFabric(fabric), mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
+        mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
+    {
+        SetFabricIndex(fabric);
+    }
+
+    /**
+     * @brief
+     *   Construct a secure session object to associate with a pending secure
+     *   session establishment attempt.  The object for the pending session
+     *   receives a local session ID, but no other state.
+     */
+    SecureSession(uint16_t localSessionId) :
+        SecureSession(Type::kPending, localSessionId, kUndefinedNodeId, CATValues{}, 0, kUndefinedFabricIndex, GetLocalMRPConfig())
     {}
-    ~SecureSession() { NotifySessionReleased(); }
+
+    /**
+     * @brief
+     *   Activate a pending Secure Session that had been reserved during CASE or
+     *   PASE, setting internal state according to the parameters used and
+     *   discovered during session establishment.
+     */
+    void Activate(Type secureSessionType, NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric,
+                  const ReliableMessageProtocolConfig & config)
+    {
+        mSecureSessionType = secureSessionType;
+        mPeerNodeId        = peerNodeId;
+        mPeerCATs          = peerCATs;
+        mPeerSessionId     = peerSessionId;
+        mMRPConfig         = config;
+        SetFabricIndex(fabric);
+    }
+    ~SecureSession() override { NotifySessionReleased(); }
 
     SecureSession(SecureSession &&)      = delete;
     SecureSession(const SecureSession &) = delete;
@@ -81,6 +118,7 @@ public:
     const char * GetSessionTypeString() const override { return "secure"; };
 #endif
 
+    ScopedNodeId GetPeer() const override;
     Access::SubjectDescriptor GetSubjectDescriptor() const override;
 
     bool RequireMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }
@@ -112,7 +150,6 @@ public:
 
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
     uint16_t GetPeerSessionId() const { return mPeerSessionId; }
-    FabricIndex GetFabricIndex() const { return mFabric; }
 
     // Should only be called for PASE sessions, which start with undefined fabric,
     // to migrate to a newly commissioned fabric after successful
@@ -123,10 +160,10 @@ public:
         // TODO(#13711): this check won't work until the issue is addressed
         if (mSecureSessionType == Type::kPASE)
         {
-            mFabric = fabricIndex;
+            SetFabricIndex(fabricIndex);
         }
 #else
-        mFabric = fabricIndex;
+        SetFabricIndex(fabricIndex);
 #endif
         return CHIP_NO_ERROR;
     }
@@ -136,30 +173,14 @@ public:
 
     CryptoContext & GetCryptoContext() { return mCryptoContext; }
 
-    CHIP_ERROR EncryptBeforeSend(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
-                                 MessageAuthenticationCode & mac) const
-    {
-        return mCryptoContext.Encrypt(input, input_length, output, header, mac);
-    }
-
-    CHIP_ERROR DecryptOnReceive(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
-                                const MessageAuthenticationCode & mac) const
-    {
-        return mCryptoContext.Decrypt(input, input_length, output, header, mac);
-    }
-
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
 private:
-    const Type mSecureSessionType;
-    const NodeId mPeerNodeId;
-    const CATValues mPeerCATs;
+    Type mSecureSessionType;
+    NodeId mPeerNodeId;
+    CATValues mPeerCATs;
     const uint16_t mLocalSessionId;
-    const uint16_t mPeerSessionId;
-
-    // PASE sessions start with undefined fabric, but are migrated to a newly
-    // commissioned fabric after successful OperationalCredentialsCluster::AddNOC
-    FabricIndex mFabric;
+    uint16_t mPeerSessionId;
 
     PeerAddress mPeerAddress;
     System::Clock::Timestamp mLastActivityTime;

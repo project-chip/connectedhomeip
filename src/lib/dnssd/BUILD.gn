@@ -46,6 +46,8 @@ static_library("dnssd") {
     ]
   } else if (chip_mdns == "minimal") {
     sources += [
+      "ActiveResolveAttempts.cpp",
+      "ActiveResolveAttempts.h",
       "Advertiser_ImplMinimalMdns.cpp",
       "MinimalMdnsServer.cpp",
       "MinimalMdnsServer.h",

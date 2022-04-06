@@ -15,6 +15,7 @@
 name: 62.1.1. [TC-PS-1.1] Global attributes with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Power Source"
     endpoint: 1
 
@@ -22,31 +23,12 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "read the global attribute: ClusterRevision"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
-          value: 1
-
-    - label: "Read the global attribute constraints: ClusterRevision"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
-          constraints:
-              type: uint16
-
-    - label:
-          "write the default values to mandatory global attribute:
-          ClusterRevision"
-      command: "writeAttribute"
-      attribute: "ClusterRevision"
-      arguments:
-          value: 1
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "reads back global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -68,27 +50,16 @@ tests:
           constraints:
               type: list
 
-    - label: "Read the global attribute: ClientGeneratedCommandList"
-      disabled: true
+    - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
-      attribute: "ClientGeneratedCommandList"
+      attribute: "AcceptedCommandList"
       response:
           constraints:
               type: list
 
-    - label: "Read the global attribute: ServerGeneratedCommandList"
-      disabled: true
+    - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
-      attribute: "ServerGeneratedCommandList"
+      attribute: "GeneratedCommandList"
       response:
           constraints:
               type: list
-
-    #disabled due to issue #13442
-    - label: "Read the optional global attribute : FeatureMap"
-      disabled: true
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: map32

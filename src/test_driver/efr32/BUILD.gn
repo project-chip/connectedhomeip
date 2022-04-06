@@ -57,6 +57,9 @@ efr32_sdk("sdk") {
     "BOARD_ID=${efr32_board}",
     "EFR32_LOG_ENABLED=1",
     "PW_RPC_ENABLED",
+
+    # Thread is built but test driver do not have the NETWORK_COMMISSIONING cluster or zap config.
+    "_NO_NETWORK_COMMISSIONING_DRIVER_",
   ]
 }
 
@@ -70,9 +73,12 @@ efr32_executable("efr32_device_tests") {
     "${examples_plat_dir}/PigweedLogger.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/uart.cpp",
     "src/main.cpp",
   ]
+
+  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
+    sources += [ "${examples_plat_dir}/uart.cpp" ]
+  }
 
   deps = [
     ":nl_test_service.nanopb_rpc",

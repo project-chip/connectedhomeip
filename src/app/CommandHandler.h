@@ -25,7 +25,6 @@
 #pragma once
 
 #include <app/ConcreteCommandPath.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -37,6 +36,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
+#include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
@@ -75,9 +75,13 @@ public:
                                      TLV::TLVReader & apPayload) = 0;
 
         /*
-         * Check to see if a command implementation exists for a specific concrete command path.
+         * Check to see if a command implementation exists for a specific
+         * concrete command path.  If it does, Success will be returned.  If
+         * not, one of UnsupportedEndpoint, UnsupportedCluster, or
+         * UnsupportedCommand will be returned, depending on how the command
+         * fails to exist.
          */
-        virtual bool CommandExists(const ConcreteCommandPath & aCommandPath) = 0;
+        virtual Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) = 0;
     };
 
     class Handle
@@ -152,7 +156,7 @@ public:
 
     CHIP_ERROR ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke);
     CHIP_ERROR PrepareCommand(const ConcreteCommandPath & aCommandPath, bool aStartDataStruct = true);
-    CHIP_ERROR FinishCommand(bool aStartDataStruct = true);
+    CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
     CHIP_ERROR PrepareStatus(const ConcreteCommandPath & aCommandPath);
     CHIP_ERROR FinishStatus();
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
@@ -171,13 +175,42 @@ public:
     template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        ConcreteCommandPath path = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId, CommandData::GetCommandId() };
-        ReturnErrorOnFailure(PrepareCommand(path, false));
-        TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
-        VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)), aData));
+        // TryAddResponseData will ensure we are in the correct state when calling AddResponseData.
+        CHIP_ERROR err = TryAddResponseData(aRequestCommandPath, aData);
+        if (err != CHIP_NO_ERROR)
+        {
+            // The state guarantees that either we can rollback or we don't have to rollback the buffer, so we don't care about the
+            // return value of RollbackResponse.
+            RollbackResponse();
+        }
+        return err;
+    }
 
-        return FinishCommand(/* aEndDataStruct = */ false);
+    /**
+     * API for adding a response.  This will try to encode a data response (response command), and if that fails will encode a a
+     * Protocols::InteractionModel::Status::Failure status response instead.
+     *
+     * The template parameter T is generally expected to be a ClusterName::Commands::CommandName::Type struct, but any object that
+     * can be encoded using the DataModel::Encode machinery and exposes the right command id will work.
+     *
+     * Since the function will call AddStatus when it fails to encode the data, it cannot send any response when it fails to encode
+     * a status code since another AddStatus call will also fail. The error from AddStatus will just be logged.
+     *
+     * @param [in] aRequestCommandPath the concrete path of the command we are
+     *             responding to.
+     * @param [in] aData the data for the response.
+     */
+    template <typename CommandData>
+    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
+    {
+        if (CHIP_NO_ERROR != AddResponseData(aRequestCommandPath, aData))
+        {
+            CHIP_ERROR err = AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DataManagement, "Failed to encode status: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+        }
     }
 
     /**
@@ -194,6 +227,8 @@ public:
      */
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
 
+    Access::SubjectDescriptor GetSubjectDescriptor() const { return mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor(); }
+
 private:
     friend class TestCommandInteraction;
     friend class CommandHandler::Handle;
@@ -201,6 +236,7 @@ private:
     enum class State
     {
         Idle,                ///< Default state that the object starts out in, where no work has commenced
+        Preparing,           ///< We are prepaing the command or status header.
         AddingCommand,       ///< In the process of adding a command.
         AddedCommand,        ///< A command has been completely encoded and is awaiting transmission.
         CommandSent,         ///< The command has been sent successfully.
@@ -209,6 +245,11 @@ private:
 
     void MoveToState(const State aTargetState);
     const char * GetStateStr() const;
+
+    /**
+     * Rollback the state to before encoding the current ResponseData (before calling PrepareCommand / PrepareStatus)
+     */
+    CHIP_ERROR RollbackResponse();
 
     /*
      * This forcibly closes the exchange context if a valid one is pointed to. Such a situation does
@@ -264,6 +305,26 @@ private:
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
                                  const Optional<ClusterStatus> & aClusterStatus);
 
+    /**
+     * If this function fails, it may leave our TLV buffer in an inconsistent state.  Callers should snapshot as needed before
+     * calling this function, and roll back as needed afterward.
+     *
+     * @param [in] aRequestCommandPath the concrete path of the command we are
+     *             responding to.
+     * @param [in] aData the data for the response.
+     */
+    template <typename CommandData>
+    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
+    {
+        ConcreteCommandPath path = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId, CommandData::GetCommandId() };
+        ReturnErrorOnFailure(PrepareCommand(path, false));
+        TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
+        VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)), aData));
+
+        return FinishCommand(/* aEndDataStruct = */ false);
+    }
+
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     Callback * mpCallback                      = nullptr;
     InvokeResponseMessage::Builder mInvokeResponseBuilder;
@@ -274,6 +335,7 @@ private:
 
     State mState = State::Idle;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
+    TLV::TLVWriter mBackupWriter;
     bool mBufferAllocated = false;
 };
 

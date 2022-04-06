@@ -23,6 +23,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <lib/core/ClusterEnums.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/GeneralFaults.h>
 
@@ -36,6 +37,13 @@ static constexpr size_t kMaxThreadNameLength = 32;
 // 48-bit IEEE MAC Address or a 64-bit IEEE MAC Address (e.g. EUI-64).
 constexpr size_t kMaxHardwareAddrSize = 8;
 
+constexpr size_t kMaxIPv4AddrSize  = 4;
+constexpr size_t kMaxIPv6AddrSize  = 16;
+constexpr size_t kMaxIPv4AddrCount = 4;
+constexpr size_t kMaxIPv6AddrCount = 8;
+
+using BootReasonType = app::Clusters::GeneralDiagnostics::BootReasonType;
+
 struct ThreadMetrics : public app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type
 {
     char NameBuf[kMaxThreadNameLength + 1];
@@ -46,6 +54,10 @@ struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::Net
 {
     char Name[Inet::InterfaceId::kMaxIfNameLength];
     uint8_t MacAddress[kMaxHardwareAddrSize];
+    uint8_t Ipv4AddressesBuffer[kMaxIPv4AddrCount][kMaxIPv4AddrSize];
+    uint8_t Ipv6AddressesBuffer[kMaxIPv6AddrCount][kMaxIPv6AddrSize];
+    chip::ByteSpan Ipv4AddressSpans[kMaxIPv4AddrCount];
+    chip::ByteSpan Ipv6AddressSpans[kMaxIPv6AddrCount];
     NetworkInterface * Next; /* Pointer to the next structure.  */
 };
 
@@ -61,7 +73,7 @@ public:
      * @brief
      *   Called after the current device is rebooted.
      */
-    virtual void OnDeviceRebooted() {}
+    virtual void OnDeviceRebooted(BootReasonType bootReason) {}
 
     /**
      * @brief
@@ -133,17 +145,6 @@ public:
 class DiagnosticDataProvider
 {
 public:
-    enum BootReasonType : uint8_t
-    {
-        Unspecified             = 0,
-        PowerOnReboot           = 1,
-        BrownOutReset           = 2,
-        SoftwareWatchdogReset   = 3,
-        HardwareWatchdogReset   = 4,
-        SoftwareUpdateCompleted = 5,
-        SoftwareReset           = 6,
-    };
-
     void SetGeneralDiagnosticsDelegate(GeneralDiagnosticsDelegate * delegate) { mGeneralDiagnosticsDelegate = delegate; }
     GeneralDiagnosticsDelegate * GetGeneralDiagnosticsDelegate() const { return mGeneralDiagnosticsDelegate; }
 
@@ -159,7 +160,7 @@ public:
     virtual CHIP_ERROR GetRebootCount(uint16_t & rebootCount);
     virtual CHIP_ERROR GetUpTime(uint64_t & upTime);
     virtual CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
-    virtual CHIP_ERROR GetBootReason(uint8_t & bootReason);
+    virtual CHIP_ERROR GetBootReason(BootReasonType & bootReason);
     virtual CHIP_ERROR GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults);
     virtual CHIP_ERROR GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults);
     virtual CHIP_ERROR GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults);
@@ -190,7 +191,7 @@ public:
     /**
      * Ethernet network diagnostics methods
      */
-    virtual CHIP_ERROR GetEthPHYRate(uint8_t & pHYRate);
+    virtual CHIP_ERROR GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateType & pHYRate);
     virtual CHIP_ERROR GetEthFullDuplex(bool & fullDuplex);
     virtual CHIP_ERROR GetEthCarrierDetect(bool & carrierDetect);
     virtual CHIP_ERROR GetEthTimeSinceReset(uint64_t & timeSinceReset);
@@ -287,7 +288,7 @@ inline CHIP_ERROR DiagnosticDataProvider::GetTotalOperationalHours(uint32_t & to
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-inline CHIP_ERROR DiagnosticDataProvider::GetBootReason(uint8_t & bootReason)
+inline CHIP_ERROR DiagnosticDataProvider::GetBootReason(BootReasonType & bootReason)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -314,7 +315,7 @@ inline CHIP_ERROR DiagnosticDataProvider::GetNetworkInterfaces(NetworkInterface 
 
 inline void DiagnosticDataProvider::ReleaseNetworkInterfaces(NetworkInterface * netifp) {}
 
-inline CHIP_ERROR DiagnosticDataProvider::GetEthPHYRate(uint8_t & pHYRate)
+inline CHIP_ERROR DiagnosticDataProvider::GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateType & pHYRate)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

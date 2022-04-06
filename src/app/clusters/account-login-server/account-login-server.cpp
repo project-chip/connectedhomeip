@@ -28,6 +28,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/app-platform/ContentAppPlatform.h>
@@ -41,12 +42,15 @@ using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using chip::app::Clusters::AccountLogin::Delegate;
 
+static constexpr size_t kAccountLoginDeletageTableSize =
+    EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
 // -----------------------------------------------------------------------------
 // Delegate Implementation
 
 namespace {
 
-Delegate * gDelegateTable[EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
+Delegate * gDelegateTable[kAccountLoginDeletageTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
@@ -101,9 +105,8 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 // -----------------------------------------------------------------------------
 // Matter Framework Callbacks Implementation
 
-bool emberAfAccountLoginClusterGetSetupPINRequestCallback(app::CommandHandler * command,
-                                                          const app::ConcreteCommandPath & commandPath,
-                                                          const Commands::GetSetupPINRequest::DecodableType & commandData)
+bool emberAfAccountLoginClusterGetSetupPINCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                   const Commands::GetSetupPIN::DecodableType & commandData)
 {
     CHIP_ERROR err               = CHIP_NO_ERROR;
     EndpointId endpoint          = commandPath.mEndpointId;
@@ -128,8 +131,8 @@ exit:
     return true;
 }
 
-bool emberAfAccountLoginClusterLoginRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                    const Commands::LoginRequest::DecodableType & commandData)
+bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                             const Commands::Login::DecodableType & commandData)
 {
     CHIP_ERROR err               = CHIP_NO_ERROR;
     EndpointId endpoint          = commandPath.mEndpointId;
@@ -142,7 +145,7 @@ bool emberAfAccountLoginClusterLoginRequestCallback(app::CommandHandler * comman
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfAccountLoginClusterLoginRequestCallback error: %s", err.AsString());
+        ChipLogError(Zcl, "emberAfAccountLoginClusterLoginCallback error: %s", err.AsString());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
@@ -152,8 +155,8 @@ exit:
     return true;
 }
 
-bool emberAfAccountLoginClusterLogoutRequestCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                     const Commands::LogoutRequest::DecodableType & commandData)
+bool emberAfAccountLoginClusterLogoutCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                              const Commands::Logout::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -162,7 +165,7 @@ bool emberAfAccountLoginClusterLogoutRequestCallback(app::CommandHandler * comma
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfAccountLoginClusterLogoutRequestCallback error: %s", err.AsString());
+        ChipLogError(Zcl, "emberAfAccountLoginClusterLogoutCallback error: %s", err.AsString());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 

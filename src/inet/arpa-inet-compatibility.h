@@ -31,10 +31,18 @@
 #include <lwip/opt.h>
 
 #if defined(LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS)
+#ifndef htons
 #define htons(x) lwip_htons(x)
+#endif
+#ifndef ntohs
 #define ntohs(x) lwip_ntohs(x)
+#endif
+#ifndef htonl
 #define htonl(x) lwip_htonl(x)
+#endif
+#ifndef ntohl
 #define ntohl(x) lwip_ntohl(x)
+#endif
 #endif // defined(LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS)
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP

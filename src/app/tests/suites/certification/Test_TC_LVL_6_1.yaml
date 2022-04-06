@@ -15,6 +15,7 @@
 name: 24.6.1. [TC-LVL-6.1] Stop Verification (DUT as Server)
 
 config:
+    nodeId: 0x12344321
     cluster: "Level Control"
     endpoint: 1
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Sending on command"
       cluster: "On/Off"
@@ -53,6 +58,7 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
+          saveAs: CurrentLevelValue
           constraints:
               minValue: 0
               maxValue: 1
@@ -92,8 +98,7 @@ tests:
       attribute: "current level"
       response:
           constraints:
-              minValue: 2
-              maxValue: 3
+              notValue: CurrentLevelValue
 
     - label: "Reset level to 254"
       command: "MoveToLevel"

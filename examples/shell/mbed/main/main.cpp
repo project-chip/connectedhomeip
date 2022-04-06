@@ -17,6 +17,7 @@
 
 #include "mbedtls/platform.h"
 #include <ChipShellCollection.h>
+#include <DFUManager.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Engine.h>
 #include <lib/support/CHIPMem.h>
@@ -71,14 +72,18 @@ int main()
     }
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    ConnectivityManagerImpl().StartWiFiManagement();
-#endif
-
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Shell, "Chip stack start failed: %s", err.AsString());
+        ret = EXIT_FAILURE;
+        goto exit;
+    }
+
+    err = GetDFUManager().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "DFU manager initialization failed: %s", err.AsString());
         ret = EXIT_FAILURE;
         goto exit;
     }
@@ -95,6 +100,7 @@ int main()
     cmd_otcli_init();
     cmd_ping_init();
     cmd_send_init();
+    cmd_app_server_init();
 
     ChipLogProgress(NotSpecified, "Mbed shell example application run");
 

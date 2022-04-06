@@ -22,7 +22,7 @@
 
 """Provides Python APIs for CHIP."""
 import enum
-from .delegate import AttributePath, AttributePathIBstruct, EventPath, EventPathIBstruct
+from .delegate import AttributePath, AttributePathIBstruct, EventPath, EventPathIBstruct, DataVersionFilterIBstruct
 
 from chip.exceptions import ChipStackException
 
@@ -53,7 +53,7 @@ class Status(enum.IntEnum):
     UnsupportedRead = 0x8f
     Deprecated90 = 0x90
     Deprecated91 = 0x91
-    Reserved92 = 0x92
+    DataVersionMismatch = 0x92
     Deprecated93 = 0x93
     Timeout = 0x94
     Reserved95 = 0x95

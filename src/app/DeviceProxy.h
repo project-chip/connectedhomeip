@@ -27,9 +27,7 @@
 #pragma once
 
 #include <app/CommandSender.h>
-#include <app/DeviceControllerInteractionModelDelegate.h>
 #include <app/InteractionModelEngine.h>
-#include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/DLLUtil.h>
@@ -55,14 +53,6 @@ public:
 
     virtual CHIP_ERROR SendCommands(app::CommandSender * commandObj, chip::Optional<System::Clock::Timeout> timeout = NullOptional);
 
-    // Interaction model uses the object and callback interface instead of sequence number to mark different transactions.
-    virtual void AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSuccessCallback,
-                                      Callback::Cancelable * onFailureCallback, app::TLVDataFilter tlvDataFilter = nullptr);
-
-    virtual void CancelIMResponseHandler(void * commandObj);
-
-    virtual Controller::DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() = 0;
-
     virtual Messaging::ExchangeManager * GetExchangeManager() const = 0;
 
     virtual chip::Optional<SessionHandle> GetSecureSession() const = 0;
@@ -78,9 +68,7 @@ protected:
 
     virtual uint8_t GetNextSequenceNumber() = 0;
 
-    app::CHIPDeviceCallbacksMgr & mCallbacksMgr = app::CHIPDeviceCallbacksMgr::GetInstance();
-
-    ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
+    ReliableMessageProtocolConfig mMRPConfig = GetLocalMRPConfig();
 };
 
 } // namespace chip

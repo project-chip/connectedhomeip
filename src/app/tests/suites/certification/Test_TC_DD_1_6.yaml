@@ -15,6 +15,7 @@
 name: 7.1.6. [TC-DD-1.6] QR Code Format and Label
 
 config:
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 

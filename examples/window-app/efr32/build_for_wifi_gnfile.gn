@@ -23,6 +23,6 @@ check_system_includes = true
 default_args = {
   target_cpu = "arm"
   target_os = "freertos"
-  use_thread = false
+  chip_enable_wifi = true
   import("//build_for_wifi_args.gni")
 }

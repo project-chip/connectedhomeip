@@ -31,11 +31,16 @@
 #include <app/util/DataModelHandler.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
+#include <functional>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/TimeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <lib/support/UnitTestUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <map>
 #include <messaging/tests/MessagingContext.h>
 #include <nlunit-test.h>
+#include <utility>
 
 using TestContext = chip::Test::AppContext;
 using namespace chip;
@@ -45,6 +50,7 @@ namespace {
 
 uint32_t gIterationCount = 0;
 nlTestSuite * gSuite     = nullptr;
+TestContext * gCtx       = nullptr;
 
 //
 // The generated endpoint_config for the controller app has Endpoint 1
@@ -53,7 +59,10 @@ nlTestSuite * gSuite     = nullptr;
 //
 constexpr EndpointId kTestEndpointId = 2;
 // Another endpoint, with a list attribute only.
-constexpr EndpointId kTestEndpointId3    = 3;
+constexpr EndpointId kTestEndpointId3 = 3;
+// Another endpoint, for adding / enabling during running.
+constexpr EndpointId kTestEndpointId4    = 4;
+constexpr EndpointId kTestEndpointId5    = 5;
 constexpr AttributeId kTestListAttribute = 6;
 constexpr AttributeId kTestBadAttribute  = 7; // Reading this attribute will return CHIP_NO_MEMORY but nothing is actually encoded.
 
@@ -64,6 +73,8 @@ public:
     static void TestChunking(nlTestSuite * apSuite, void * apContext);
     static void TestListChunking(nlTestSuite * apSuite, void * apContext);
     static void TestBadChunking(nlTestSuite * apSuite, void * apContext);
+    static void TestDynamicEndpoint(nlTestSuite * apSuite, void * apContext);
+    static void TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void * apContext);
 
 private:
 };
@@ -75,7 +86,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(0x00000001, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE(0x
     DECLARE_DYNAMIC_ATTRIBUTE(0x00000005, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters)
-DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrs), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 
@@ -84,9 +95,27 @@ DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute, ARRAY, 1, 0), DECLARE_DYNAMIC_ATTR
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpoint3Clusters)
-DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint3), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint3, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint3, testEndpoint3Clusters);
+
+DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint4)
+DECLARE_DYNAMIC_ATTRIBUTE(0x00000001, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+
+DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpoint4Clusters)
+DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint4, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+
+DECLARE_DYNAMIC_ENDPOINT(testEndpoint4, testEndpoint4Clusters);
+
+// Unlike endpoint 1, we can modify the values for values in endpoint 5
+DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint5)
+DECLARE_DYNAMIC_ATTRIBUTE(0x00000001, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE(0x00000002, INT8U, 1, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(0x00000003, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+
+DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpoint5Clusters)
+DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint5, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+
+DECLARE_DYNAMIC_ENDPOINT(testEndpoint5, testEndpoint5Clusters);
 
 //clang-format on
 
@@ -103,15 +132,50 @@ public:
 
     void OnReportEnd() override { mOnReportEnd = true; }
 
-    uint32_t mAttributeCount = 0;
-    bool mOnReportEnd        = false;
+    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mOnSubscriptionEstablished = true; }
+
+    uint32_t mAttributeCount        = 0;
+    bool mOnReportEnd               = false;
+    bool mOnSubscriptionEstablished = false;
     app::BufferedReadCallback mBufferedCallback;
 };
 
 void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                                        const app::StatusIB & aStatus)
 {
-    if (aPath.mAttributeId != kTestListAttribute)
+    if (aPath.mAttributeId == Globals::Attributes::GeneratedCommandList::Id)
+    {
+        app::DataModel::DecodableList<CommandId> v;
+        NL_TEST_ASSERT(gSuite, app::DataModel::Decode(*apData, v) == CHIP_NO_ERROR);
+        auto it          = v.begin();
+        size_t arraySize = 0;
+        while (it.Next())
+        {
+            NL_TEST_ASSERT(gSuite, false);
+        }
+        NL_TEST_ASSERT(gSuite, it.GetStatus() == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(gSuite, v.ComputeSize(&arraySize) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(gSuite, arraySize == 0);
+    }
+    else if (aPath.mAttributeId == Globals::Attributes::AcceptedCommandList::Id)
+    {
+        app::DataModel::DecodableList<CommandId> v;
+        NL_TEST_ASSERT(gSuite, app::DataModel::Decode(*apData, v) == CHIP_NO_ERROR);
+        auto it          = v.begin();
+        size_t arraySize = 0;
+        while (it.Next())
+        {
+            NL_TEST_ASSERT(gSuite, false);
+        }
+        NL_TEST_ASSERT(gSuite, it.GetStatus() == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(gSuite, v.ComputeSize(&arraySize) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(gSuite, arraySize == 0);
+    }
+    else if (aPath.mAttributeId == Globals::Attributes::AttributeList::Id)
+    {
+        // Nothing to check for this one; depends on the endpoint.
+    }
+    else if (aPath.mAttributeId != kTestListAttribute)
     {
         uint8_t v;
         NL_TEST_ASSERT(gSuite, app::DataModel::Decode(*apData, v) == CHIP_NO_ERROR);
@@ -129,25 +193,75 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
         }
         NL_TEST_ASSERT(gSuite, it.GetStatus() == CHIP_NO_ERROR);
         NL_TEST_ASSERT(gSuite, v.ComputeSize(&arraySize) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(gSuite, arraySize = 5);
+        NL_TEST_ASSERT(gSuite, arraySize == 5);
     }
     mAttributeCount++;
 }
 
 void TestReadCallback::OnDone() {}
 
+class TestMutableAttrAccess
+{
+public:
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder);
+
+    void SetDirty(AttributeId attr)
+    {
+        app::AttributePathParams path;
+        path.mEndpointId  = kTestEndpointId5;
+        path.mClusterId   = TestCluster::Id;
+        path.mAttributeId = attr;
+        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+    }
+
+    // These setters
+    void SetVal(uint8_t attribute, uint8_t newVal)
+    {
+        uint8_t index = static_cast<uint8_t>(attribute - 1);
+        if (index < ArraySize(val) && val[index] != newVal)
+        {
+            val[index] = newVal;
+            SetDirty(attribute);
+        }
+    }
+
+    void Reset() { val[0] = val[1] = val[2] = 0; }
+
+    uint8_t val[3] = { 0, 0, 0 };
+};
+
+CHIP_ERROR TestMutableAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
+{
+    uint8_t index = static_cast<uint8_t>(aPath.mAttributeId - 1);
+    VerifyOrReturnError(aPath.mEndpointId == kTestEndpointId5 && index < ArraySize(val), CHIP_ERROR_NOT_FOUND);
+    return aEncoder.Encode(val[index]);
+}
+
+TestMutableAttrAccess gMutableAttrAccess;
+
 class TestAttrAccess : public app::AttributeAccessInterface
 {
 public:
     // Register for the Test Cluster cluster on all endpoints.
-    TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), TestCluster::Id) {}
+    TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), TestCluster::Id)
+    {
+        registerAttributeAccessOverride(this);
+    }
 
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder) override;
 };
 
+TestAttrAccess gAttrAccess;
+
 CHIP_ERROR TestAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
 {
+    CHIP_ERROR err = gMutableAttrAccess.Read(aPath, aEncoder);
+    if (err != CHIP_ERROR_NOT_FOUND)
+    {
+        return err;
+    }
+
     switch (aPath.mAttributeId)
     {
     case kTestListAttribute:
@@ -174,6 +288,58 @@ CHIP_ERROR TestAttrAccess::Write(const app::ConcreteDataAttributePath & aPath, a
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
+class TestMutableReadCallback : public app::ReadClient::Callback
+{
+public:
+    TestMutableReadCallback() : mBufferedCallback(*this) {}
+    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+                         const app::StatusIB & aStatus) override;
+
+    void OnDone() override {}
+
+    void OnReportBegin() override { mAttributeCount = 0; }
+
+    void OnReportEnd() override { mOnReportEnd = true; }
+
+    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mOnSubscriptionEstablished = true; }
+
+    uint32_t mAttributeCount = 0;
+    // We record every dataversion field from every attribute IB.
+    std::map<std::pair<EndpointId, AttributeId>, DataVersion> mDataVersions;
+    std::map<std::pair<EndpointId, AttributeId>, uint8_t> mValues;
+    std::map<std::pair<EndpointId, AttributeId>, std::function<void()>> mActionOn;
+    bool mOnReportEnd               = false;
+    bool mOnSubscriptionEstablished = false;
+    app::BufferedReadCallback mBufferedCallback;
+};
+
+void TestMutableReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+                                              const app::StatusIB & aStatus)
+{
+    VerifyOrReturn(apData != nullptr);
+    NL_TEST_ASSERT(gSuite, aPath.mClusterId == TestCluster::Id);
+
+    mAttributeCount++;
+    if (aPath.mAttributeId <= 5)
+    {
+        uint8_t v;
+        NL_TEST_ASSERT(gSuite, app::DataModel::Decode(*apData, v) == CHIP_NO_ERROR);
+        mValues[std::make_pair(aPath.mEndpointId, aPath.mAttributeId)] = v;
+
+        auto action = mActionOn.find(std::make_pair(aPath.mEndpointId, aPath.mAttributeId));
+        if (action != mActionOn.end() && action->second)
+        {
+            action->second();
+        }
+    }
+
+    if (aPath.mDataVersion.HasValue())
+    {
+        mDataVersions[std::make_pair(aPath.mEndpointId, aPath.mAttributeId)] = aPath.mDataVersion.Value();
+    }
+    // Ignore all other attributes, we don't care above the global attributes.
+}
+
 /*
  * This validates all the various corner cases encountered during chunking by
  * artificially reducing the size of a packet buffer used to encode attribute data
@@ -196,16 +362,13 @@ void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContex
     TestContext & ctx                    = *static_cast<TestContext *>(apContext);
     auto sessionHandle                   = ctx.GetSessionBobToAlice();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
-    TestAttrAccess testServer;
 
     // Initialize the ember side server logic
     InitDataModelHandler(&ctx.GetExchangeManager());
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0);
-
-    // Register our fake attribute access interface.
-    registerAttributeAccessOverride(&testServer);
+    DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage));
 
     app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::TestCluster::Id);
     app::ReadPrepareParams readParams(sessionHandle);
@@ -233,22 +396,15 @@ void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContex
 
         NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
 
-        //
-        // Service the IO + Engine till we get a ReportEnd callback on the client.
-        // Since bugs can happen, we don't want this test to never stop, so create a ceiling for how many
-        // times this can run without seeing expected results.
-        //
-        for (int j = 0; j < 10 && !readCallback.mOnReportEnd; j++)
-        {
-            ctx.DrainAndServiceIO();
-            chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
-            ctx.DrainAndServiceIO();
-        }
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
 
         //
-        // Always returns the same number of attributes read (5 + revision = 6).
+        // Always returns the same number of attributes read (5 + revision +
+        // AttributeList + AcceptedCommandList +
+        // GeneratedCommandList = 9).
         //
-        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 6);
+        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 9);
         readCallback.mAttributeCount = 0;
 
         NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -261,6 +417,8 @@ void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContex
             break;
         }
     }
+
+    emberAfClearDynamicEndpoint(0);
 }
 
 // Similar to the test above, but for the list chunking feature.
@@ -269,16 +427,13 @@ void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apCo
     TestContext & ctx                    = *static_cast<TestContext *>(apContext);
     auto sessionHandle                   = ctx.GetSessionBobToAlice();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
-    TestAttrAccess testServer;
 
     // Initialize the ember side server logic
     InitDataModelHandler(&ctx.GetExchangeManager());
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0);
-
-    // Register our fake attribute access interface.
-    registerAttributeAccessOverride(&testServer);
+    DataVersion dataVersionStorage[ArraySize(testEndpoint3Clusters)];
+    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0, Span<DataVersion>(dataVersionStorage));
 
     app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::TestCluster::Id, kTestListAttribute);
     app::ReadPrepareParams readParams(sessionHandle);
@@ -306,17 +461,8 @@ void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apCo
 
         NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
 
-        //
-        // Service the IO + Engine till we get a ReportEnd callback on the client.
-        // Since bugs can happen, we don't want this test to never stop, so create a ceiling for how many
-        // times this can run without seeing expected results.
-        //
-        for (int j = 0; j < 10 && !readCallback.mOnReportEnd; j++)
-        {
-            ctx.DrainAndServiceIO();
-            chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
-            ctx.DrainAndServiceIO();
-        }
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
 
         //
         // Always returns the same number of attributes read (merged by buffered read callback). The content is checked in
@@ -335,6 +481,8 @@ void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apCo
             break;
         }
     }
+
+    emberAfClearDynamicEndpoint(0);
 }
 
 // Read an attribute that can never fit into the buffer. Result in an empty report, server should shutdown the transaction.
@@ -343,16 +491,15 @@ void TestCommandInteraction::TestBadChunking(nlTestSuite * apSuite, void * apCon
     TestContext & ctx                    = *static_cast<TestContext *>(apContext);
     auto sessionHandle                   = ctx.GetSessionBobToAlice();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
-    TestAttrAccess testServer;
 
     // Initialize the ember side server logic
     InitDataModelHandler(&ctx.GetExchangeManager());
 
-    // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0);
+    app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(0);
 
-    // Register our fake attribute access interface.
-    registerAttributeAccessOverride(&testServer);
+    // Register our fake dynamic endpoint.
+    DataVersion dataVersionStorage[ArraySize(testEndpoint3Clusters)];
+    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0, Span<DataVersion>(dataVersionStorage));
 
     app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::TestCluster::Id, kTestBadAttribute);
     app::ReadPrepareParams readParams(sessionHandle);
@@ -368,27 +515,379 @@ void TestCommandInteraction::TestBadChunking(nlTestSuite * apSuite, void * apCon
 
         NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
 
-        //
-        // Service the IO + Engine till we get a ReportEnd callback on the client.
+        ctx.DrainAndServiceIO();
+
         // The server should return an empty list as attribute data for the first report (for list chunking), and encodes nothing
         // (then shuts down the read handler) for the second report.
         //
-        for (int j = 0; j < 2; j++)
-        {
-            ctx.DrainAndServiceIO();
-            chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
-            ctx.DrainAndServiceIO();
-        }
 
         // Nothing is actually encoded. buffered callback does not handle the message to us.
         NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 0);
+        NL_TEST_ASSERT(apSuite, !readCallback.mOnReportEnd);
 
         // The server should shutted down, while the client is still alive (pending for the attribute data.)
-        NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 1);
+        NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
     }
 
     // Sanity check
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+    emberAfClearDynamicEndpoint(0);
+}
+
+/*
+ * This test contains two parts, one is to enable a new endpoint on the fly, another is to disable it and re-enable it.
+ */
+void TestCommandInteraction::TestDynamicEndpoint(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx                    = *static_cast<TestContext *>(apContext);
+    auto sessionHandle                   = ctx.GetSessionBobToAlice();
+    app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
+
+    // Initialize the ember side server logic
+    InitDataModelHandler(&ctx.GetExchangeManager());
+
+    // Register our fake dynamic endpoint.
+    DataVersion dataVersionStorage[ArraySize(testEndpoint4Clusters)];
+
+    app::AttributePathParams attributePath;
+    app::ReadPrepareParams readParams(sessionHandle);
+
+    readParams.mpAttributePathParamsList    = &attributePath;
+    readParams.mAttributePathParamsListSize = 1;
+    readParams.mMaxIntervalCeilingSeconds   = 1;
+
+    TestReadCallback readCallback;
+
+    {
+
+        app::ReadClient readClient(engine, &ctx.GetExchangeManager(), readCallback.mBufferedCallback,
+                                   app::ReadClient::InteractionType::Subscribe);
+
+        NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+
+        // We should not receive any reports in initial reports, so check mOnSubscriptionEstablished instead.
+        NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablished);
+        readCallback.mAttributeCount = 0;
+
+        // Enable the new endpoint
+        emberAfSetDynamicEndpoint(0, kTestEndpointId4, &testEndpoint4, 0, 0, Span<DataVersion>(dataVersionStorage));
+
+        ctx.DrainAndServiceIO();
+
+        // Ensure we have received the report, we do not care about the initial report here.
+        // AcceptedCommandList / GeneratedCommandList / AttributeList attribute are not included in
+        // testClusterAttrsOnEndpoint4.
+        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == ArraySize(testClusterAttrsOnEndpoint4) + 3);
+
+        // We have received all report data.
+        NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
+
+        readCallback.mAttributeCount = 0;
+        readCallback.mOnReportEnd    = false;
+
+        // Disable the new endpoint
+        emberAfEndpointEnableDisable(kTestEndpointId4, false);
+
+        ctx.DrainAndServiceIO();
+
+        // We may receive some attribute reports for descriptor cluster, but we do not care about it for now.
+
+        // Enable the new endpoint
+
+        readCallback.mAttributeCount = 0;
+        readCallback.mOnReportEnd    = false;
+
+        emberAfEndpointEnableDisable(kTestEndpointId4, true);
+        ctx.DrainAndServiceIO();
+
+        // Ensure we have received the report, we do not care about the initial report here.
+        // AcceptedCommandList / GeneratedCommandList / AttributeList attribute are not include in
+        // testClusterAttrsOnEndpoint4.
+        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == ArraySize(testClusterAttrsOnEndpoint4) + 3);
+
+        // We have received all report data.
+        NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
+    }
+
+    chip::test_utils::SleepMillis(secondsToMilliseconds(2));
+
+    // Destroying the read client will terminate the subscription transaction.
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+    emberAfClearDynamicEndpoint(0);
+}
+
+/*
+ * The tests below are for testing deatiled bwhavior when the attributes are modified between two chunks. In this test, we only care
+ * above whether we will receive correct attribute values in reasonable messages with reduced reporting traffic.
+ */
+
+namespace TestSetDirtyBetweenChunksUtil {
+
+using AttributeIdWithEndpointId = std::pair<EndpointId, AttributeId>;
+
+template <AttributeId id>
+constexpr AttributeIdWithEndpointId AttrOnEp1 = AttributeIdWithEndpointId(kTestEndpointId, id);
+
+template <AttributeId id>
+constexpr AttributeIdWithEndpointId AttrOnEp5 = AttributeIdWithEndpointId(kTestEndpointId5, id);
+
+auto WriteAttrOp(AttributeIdWithEndpointId attr, uint8_t val)
+{
+    return [=]() { gMutableAttrAccess.SetVal(static_cast<uint8_t>(attr.second), val); };
+}
+
+auto TouchAttrOp(AttributeIdWithEndpointId attr)
+{
+    return [=]() {
+        app::AttributePathParams path;
+        path.mEndpointId  = attr.first;
+        path.mClusterId   = TestCluster::Id;
+        path.mAttributeId = attr.second;
+        gIterationCount++;
+        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+    };
+}
+
+enum AttrIds
+{
+    Attr1 = 1,
+    Attr2 = 2,
+    Attr3 = 3,
+};
+
+using AttributeWithValue = std::pair<AttributeIdWithEndpointId, uint8_t>;
+using AttributesList     = std::vector<AttributeIdWithEndpointId>;
+
+struct Instruction
+{
+    // The maximum number of attributes should be iterated in a single report chunk.
+    uint32_t chunksize;
+    // A list of functions that will be executed before driving the main loop.
+    std::vector<std::function<void()>> preworks;
+    // A list of pair for attributes and their expected values in the report.
+    std::vector<AttributeWithValue> expectedValues;
+    // A list of list of various attributes which should have the same data version in the report.
+    std::vector<AttributesList> attributesWithSameDataVersion;
+};
+
+void DriveIOUntilSubscriptionEstablished(TestMutableReadCallback * callback)
+{
+    callback->mOnReportEnd = false;
+    gCtx->GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return callback->mOnSubscriptionEstablished; });
+    NL_TEST_ASSERT(gSuite, callback->mOnReportEnd);
+    NL_TEST_ASSERT(gSuite, callback->mOnSubscriptionEstablished);
+    callback->mActionOn.clear();
+}
+
+void DriveIOUntilEndOfReport(TestMutableReadCallback * callback)
+{
+    callback->mOnReportEnd = false;
+    gCtx->GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return callback->mOnReportEnd; });
+    NL_TEST_ASSERT(gSuite, callback->mOnReportEnd);
+    callback->mActionOn.clear();
+}
+
+void CheckValues(TestMutableReadCallback * callback, std::vector<AttributeWithValue> expectedValues = {})
+{
+    for (const auto & vals : expectedValues)
+    {
+        NL_TEST_ASSERT(gSuite, callback->mValues[vals.first] == vals.second);
+    }
+}
+
+void ExpectSameDataVersions(TestMutableReadCallback * callback, AttributesList attrList)
+{
+    if (attrList.size() == 0)
+    {
+        return;
+    }
+    DataVersion expectedVersion = callback->mDataVersions[attrList[0]];
+    for (const auto & attr : attrList)
+    {
+        NL_TEST_ASSERT(gSuite, callback->mDataVersions[attr] == expectedVersion);
+    }
+}
+
+void DoTest(TestMutableReadCallback * callback, Instruction instruction)
+{
+    app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetMaxAttributesPerChunk(instruction.chunksize);
+
+    for (const auto & act : instruction.preworks)
+    {
+        act();
+    }
+
+    DriveIOUntilEndOfReport(callback);
+
+    CheckValues(callback, instruction.expectedValues);
+
+    for (const auto & attrList : instruction.attributesWithSameDataVersion)
+    {
+        ExpectSameDataVersions(callback, attrList);
+    }
+}
+
+}; // namespace TestSetDirtyBetweenChunksUtil
+
+void TestCommandInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void * apContext)
+{
+    using namespace TestSetDirtyBetweenChunksUtil;
+    TestContext & ctx                    = *static_cast<TestContext *>(apContext);
+    auto sessionHandle                   = ctx.GetSessionBobToAlice();
+    app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
+
+    gCtx   = &ctx;
+    gSuite = apSuite;
+
+    // Initialize the ember side server logic
+    InitDataModelHandler(&ctx.GetExchangeManager());
+
+    app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(0);
+    app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetMaxAttributesPerChunk(2);
+
+    DataVersion dataVersionStorage1[ArraySize(testEndpointClusters)];
+    DataVersion dataVersionStorage5[ArraySize(testEndpoint5Clusters)];
+
+    gMutableAttrAccess.Reset();
+
+    // Register our fake dynamic endpoint.
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage1));
+    emberAfSetDynamicEndpoint(1, kTestEndpointId5, &testEndpoint5, 0, 0, Span<DataVersion>(dataVersionStorage5));
+
+    {
+        app::AttributePathParams attributePath;
+        app::ReadPrepareParams readParams(sessionHandle);
+
+        readParams.mpAttributePathParamsList    = &attributePath;
+        readParams.mAttributePathParamsListSize = 1;
+        readParams.mMinIntervalFloorSeconds     = 0;
+        readParams.mMaxIntervalCeilingSeconds   = 2;
+
+        // TEST 1 -- Read using wildcard paths
+        ChipLogProgress(DataManagement, "Test 1: Read using wildcard paths.");
+        {
+            TestMutableReadCallback readCallback;
+
+            gIterationCount = 1;
+
+            app::ReadClient readClient(engine, &ctx.GetExchangeManager(), readCallback.mBufferedCallback,
+                                       app::ReadClient::InteractionType::Subscribe);
+
+            NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
+
+            // CASE 1 -- Touch an attribute during priming report, then verify it is included in first report after priming report.
+            {
+                // When the report engine starts to report attributes in endpoint 5, mark cluster 1 as dirty.
+                // The report engine should NOT include it in initial report to reduce traffic.
+                // We are expected to miss attributes on kTestEndpointId during initial reports.
+                ChipLogProgress(DataManagement, "Case 1-1: Set dirty during priming report.");
+                readCallback.mActionOn[AttrOnEp5<Attr1>] = TouchAttrOp(AttrOnEp1<Attr1>);
+                DriveIOUntilSubscriptionEstablished(&readCallback);
+                CheckValues(&readCallback, { { AttrOnEp1<Attr1>, 1 } });
+
+                ChipLogProgress(DataManagement, "Case 1-2: Check for attributes missed last report.");
+                DoTest(&readCallback, Instruction{ .chunksize = 2, .expectedValues = { { AttrOnEp1<Attr1>, 2 } } });
+            }
+
+            // CASE 2 -- Set dirty during chunked report, the attribute is already dirty.
+            {
+                ChipLogProgress(DataManagement, "Case 2: Set dirty during chunked report by wildcard path.");
+                readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOp(AttrOnEp5<Attr3>, 3);
+                DoTest(
+                    &readCallback,
+                    Instruction{ .chunksize      = 2,
+                                 .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 2), WriteAttrOp(AttrOnEp5<Attr2>, 2),
+                                               WriteAttrOp(AttrOnEp5<Attr3>, 2) },
+                                 .expectedValues = { { AttrOnEp5<Attr1>, 2 }, { AttrOnEp5<Attr2>, 2 }, { AttrOnEp5<Attr3>, 3 } },
+                                 .attributesWithSameDataVersion = { { AttrOnEp5<Attr1>, AttrOnEp5<Attr2>, AttrOnEp5<Attr3> } } });
+            }
+
+            // CASE 3 -- Set dirty during chunked report, the attribute is not dirty, and it may catch / missed the current report.
+            {
+                ChipLogProgress(DataManagement,
+                                "Case 3-1: Set dirty during chunked report by wildcard path -- new dirty attribute.");
+                readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOp(AttrOnEp5<Attr3>, 4);
+                DoTest(
+                    &readCallback,
+                    Instruction{ .chunksize      = 1,
+                                 .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 4), WriteAttrOp(AttrOnEp5<Attr2>, 4) },
+                                 .expectedValues = { { AttrOnEp5<Attr1>, 4 }, { AttrOnEp5<Attr2>, 4 }, { AttrOnEp5<Attr3>, 4 } },
+                                 .attributesWithSameDataVersion = { { AttrOnEp5<Attr1>, AttrOnEp5<Attr2>, AttrOnEp5<Attr3> } } });
+
+                ChipLogProgress(DataManagement,
+                                "Case 3-2: Set dirty during chunked report by wildcard path -- new dirty attribute.");
+                app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetMaxAttributesPerChunk(1);
+                readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOp(AttrOnEp5<Attr1>, 5);
+                DoTest(
+                    &readCallback,
+                    Instruction{ .chunksize      = 1,
+                                 .preworks       = { WriteAttrOp(AttrOnEp5<Attr2>, 5), WriteAttrOp(AttrOnEp5<Attr3>, 5) },
+                                 .expectedValues = { { AttrOnEp5<Attr1>, 5 }, { AttrOnEp5<Attr2>, 5 }, { AttrOnEp5<Attr3>, 5 } },
+                                 .attributesWithSameDataVersion = { { AttrOnEp5<Attr1>, AttrOnEp5<Attr2>, AttrOnEp5<Attr3> } } });
+            }
+        }
+    }
+    // The read client is destructed, server will shutdown the corresponding subscription later.
+
+    // TEST 2 -- Read using concrete paths.
+    ChipLogProgress(DataManagement, "Test 2: Read using concrete paths.");
+    {
+        app::AttributePathParams attributePath[3];
+        app::ReadPrepareParams readParams(sessionHandle);
+
+        attributePath[0] = app::AttributePathParams(kTestEndpointId5, TestCluster::Id, Attr1);
+        attributePath[1] = app::AttributePathParams(kTestEndpointId5, TestCluster::Id, Attr2);
+        attributePath[2] = app::AttributePathParams(kTestEndpointId5, TestCluster::Id, Attr3);
+
+        readParams.mpAttributePathParamsList    = attributePath;
+        readParams.mAttributePathParamsListSize = 3;
+        readParams.mMinIntervalFloorSeconds     = 0;
+        readParams.mMaxIntervalCeilingSeconds   = 2;
+        gMutableAttrAccess.Reset();
+
+        // CASE 1 -- Touch an attribute during priming report, then verify it is included in first report after priming report.
+        {
+            TestMutableReadCallback readCallback;
+
+            app::ReadClient readClient(engine, &ctx.GetExchangeManager(), readCallback.mBufferedCallback,
+                                       app::ReadClient::InteractionType::Subscribe);
+
+            NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
+
+            DriveIOUntilSubscriptionEstablished(&readCallback);
+
+            // Note, although the two attributes comes from the same cluster, they are generated by different interested paths.
+            // In this case, we won't reset the path iterator.
+            ChipLogProgress(DataManagement, "Case 1-1: Test set dirty during reports generated by concrete paths.");
+            readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOp(AttrOnEp5<Attr3>, 4);
+            DoTest(&readCallback,
+                   Instruction{ .chunksize      = 1,
+                                .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 3), WriteAttrOp(AttrOnEp5<Attr2>, 3),
+                                              WriteAttrOp(AttrOnEp5<Attr3>, 3) },
+                                .expectedValues = { { AttrOnEp5<Attr1>, 3 }, { AttrOnEp5<Attr2>, 3 }, { AttrOnEp5<Attr3>, 3 } } });
+
+            // The attribute failed to catch last report will be picked by this report.
+            ChipLogProgress(DataManagement, "Case 1-2: Check for attributes missed last report.");
+            DoTest(&readCallback, { .chunksize = 1, .expectedValues = { { AttrOnEp5<Attr3>, 4 } } });
+        }
+    }
+
+    chip::test_utils::SleepMillis(secondsToMilliseconds(3));
+
+    // Destroying the read client will terminate the subscription transaction.
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+    emberAfClearDynamicEndpoint(1);
+    emberAfClearDynamicEndpoint(0);
+    app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetMaxAttributesPerChunk(UINT32_MAX);
 }
 
 // clang-format off
@@ -397,6 +896,8 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestChunking", TestCommandInteraction::TestChunking),
     NL_TEST_DEF("TestListChunking", TestCommandInteraction::TestListChunking),
     NL_TEST_DEF("TestBadChunking", TestCommandInteraction::TestBadChunking),
+    NL_TEST_DEF("TestDynamicEndpoint", TestCommandInteraction::TestDynamicEndpoint),
+    NL_TEST_DEF("TestSetDirtyBetweenChunks", TestCommandInteraction::TestSetDirtyBetweenChunks),
     NL_TEST_SENTINEL()
 };
 

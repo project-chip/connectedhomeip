@@ -37,16 +37,21 @@
 
 #include <nlunit-test.h>
 
+namespace {
+
 using namespace chip;
+using chip::Inet::InterfaceId;
+using chip::Inet::IPAddress;
+using chip::Transport::PeerAddress;
 
 /**
  *  Test correct identification of IPv6 multicast addresses.
  */
 void TestPeerAddressMulticast(nlTestSuite * inSuite, void * inContext)
 {
-    constexpr chip::FabricId fabric   = 0xa1a2a4a8b1b2b4b8;
-    constexpr chip::GroupId group     = 0xe10f;
-    chip::Transport::PeerAddress addr = chip::Transport::PeerAddress::Multicast(fabric, group);
+    constexpr chip::FabricId fabric = 0xa1a2a4a8b1b2b4b8;
+    constexpr chip::GroupId group   = 0xe10f;
+    PeerAddress addr                = PeerAddress::Multicast(fabric, group);
     NL_TEST_ASSERT(inSuite, chip::Transport::Type::kUdp == addr.GetTransportType());
     NL_TEST_ASSERT(inSuite, addr.IsMulticast());
 
@@ -62,17 +67,59 @@ void TestPeerAddressMulticast(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !memcmp(expected, result, NL_INET_IPV6_ADDR_LEN_IN_BYTES));
 }
 
+void TestToString(nlTestSuite * inSuite, void * inContext)
+{
+    char buff[PeerAddress::kMaxToStringSize];
+    IPAddress ip;
+    {
+        IPAddress::FromString("::1", ip);
+        PeerAddress::UDP(ip, 1122).ToString(buff);
+
+        NL_TEST_ASSERT(inSuite, !strcmp(buff, "UDP:[::1]:1122"));
+    }
+
+    {
+        IPAddress::FromString("::1", ip);
+        PeerAddress::TCP(ip, 1122).ToString(buff);
+
+        NL_TEST_ASSERT(inSuite, !strcmp(buff, "TCP:[::1]:1122"));
+    }
+
+    {
+        PeerAddress::BLE().ToString(buff);
+        NL_TEST_ASSERT(inSuite, !strcmp(buff, "BLE"));
+    }
+
+    {
+        IPAddress::FromString("1223::3456:789a", ip);
+        PeerAddress::UDP(ip, 8080).ToString(buff);
+
+        NL_TEST_ASSERT(inSuite, !strcmp(buff, "UDP:[1223::3456:789a]:8080"));
+    }
+
+    {
+
+        PeerAddress udp = PeerAddress(Transport::Type::kUdp);
+        udp.SetPort(5840);
+        udp.ToString(buff);
+        NL_TEST_ASSERT(inSuite, !strcmp(buff, "UDP:[::]:5840"));
+    }
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
 
 // clang-format off
-static const nlTest sTests[] =
+const nlTest sTests[] =
 {
     NL_TEST_DEF("PeerAddress Multicast", TestPeerAddressMulticast),
+    NL_TEST_DEF("ToString", TestToString),
     NL_TEST_SENTINEL()
 };
 // clang-format on
+
+} // namespace
 
 int TestPeerAddress(void)
 {

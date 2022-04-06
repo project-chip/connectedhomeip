@@ -21,26 +21,31 @@ on:
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
-  
+
 jobs:
     # TODO ESP32 https://github.com/project-chip/connectedhomeip/issues/1510
     esp32:
         name: ESP32
-        timeout-minutes: 80
+        timeout-minutes: 90
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.5.52
+            image: connectedhomeip/chip-build-esp32:0.5.58
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
 
             - name: Set up environment for size reports
               if: ${{ !env.ACT }}
@@ -57,8 +62,8 @@ jobs:
               with:
                   name: bootstrap-logs
                   path: |
-                   .environment/gn_out/.ninja_log
-                   .environment/pigweed-venv/*.log
+                      .environment/gn_out/.ninja_log
+                      .environment/pigweed-venv/*.log
             - name: Build some M5Stack variations
               timeout-minutes: 30
               run: |
@@ -76,7 +81,7 @@ jobs:
                      out/esp32-m5stack-all-clusters/chip-all-clusters-app.elf \
                      /tmp/bloat_reports/
             - name: Build example All Clusters App C3
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: scripts/examples/esp_example.sh all-clusters-app sdkconfig_c3devkit.defaults
             - name: Copy aside build products
               run: |
@@ -88,13 +93,13 @@ jobs:
                      example_binaries/esp32-build/chip-all-clusters-app.elf \
                      /tmp/bloat_reports/
             - name: Build example Pigweed App
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: scripts/examples/esp_example.sh pigweed-app sdkconfig.defaults
             - name: Build example Lighting App
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: scripts/examples/esp_example.sh lighting-app sdkconfig.defaults
             - name: Build example Lock App
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: scripts/examples/esp_example.sh lock-app sdkconfig.defaults
 
             - name: Uploading Size Reports
@@ -106,21 +111,26 @@ jobs:
 
     esp32_1:
         name: ESP32_1
-        timeout-minutes: 70
+        timeout-minutes: 90
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.5.52
+            image: connectedhomeip/chip-build-esp32:0.5.58
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
 
             - name: Bootstrap
               timeout-minutes: 10
@@ -132,33 +142,33 @@ jobs:
               with:
                   name: bootstrap-logs
                   path: |
-                   .environment/gn_out/.ninja_log
-                   .environment/pigweed-venv/*.log
+                      .environment/gn_out/.ninja_log
+                      .environment/pigweed-venv/*.log
 
             - name: Build example Bridge App
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: scripts/examples/esp_example.sh bridge-app
 
             - name: Build example Persistent Storage App
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: scripts/examples/esp_example.sh persistent-storage sdkconfig.defaults
 
             - name: Build example Shell App
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: scripts/examples/esp_example.sh shell sdkconfig.defaults
 
             - name: Build example Temperature Measurement App
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: scripts/examples/esp_example.sh temperature-measurement-app sdkconfig.optimize.defaults
 
             - name: Build example IPv6 Only App
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: scripts/examples/esp_example.sh ipv6only-app sdkconfig.defaults
 
             - name: Build example OTA Requestor App
               run: scripts/examples/esp_example.sh ota-requestor-app sdkconfig.defaults
-              timeout-minutes: 10
+              timeout-minutes: 15
 
             - name: Build example OTA Provider App
               run: scripts/examples/esp_example.sh ota-provider-app sdkconfig.defaults
-              timeout-minutes: 10
+              timeout-minutes: 15

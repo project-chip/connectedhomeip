@@ -309,6 +309,7 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *  @param[in]  expr        A Boolean expression to be evaluated.
  *  @param[in]  code        A value to return if @a expr is false.
  */
+#if CHIP_CONFIG_ERROR_SOURCE
 #define VerifyOrReturnLogError(expr, code)                                                                                         \
     do                                                                                                                             \
     {                                                                                                                              \
@@ -318,6 +319,17 @@ constexpr inline const _T & max(const _T & a, const _T & b)
             return code;                                                                                                           \
         }                                                                                                                          \
     } while (false)
+#else // CHIP_CONFIG_ERROR_SOURCE
+#define VerifyOrReturnLogError(expr, code)                                                                                         \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!(expr))                                                                                                               \
+        {                                                                                                                          \
+            ChipLogError(NotSpecified, "%s:%d false: %" CHIP_ERROR_FORMAT, #expr, __LINE__, code.Format());                        \
+            return code;                                                                                                           \
+        }                                                                                                                          \
+    } while (false)
+#endif // CHIP_CONFIG_ERROR_SOURCE
 
 /**
  *  @def ReturnErrorCodeIf(expr, code)
@@ -329,7 +341,7 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *
  *  @code
  *    ReturnErrorCodeIf(state == kInitialized, CHIP_NO_ERROR);
- *    ReturnErrorCodeIf(state == kInitialized, CHIP_ERROR_INVALID_STATE);
+ *    ReturnErrorCodeIf(state == kInitialized, CHIP_ERROR_INCORRECT_STATE);
  *  @endcode
  *
  *  @param[in]  expr        A Boolean expression to be evaluated.
@@ -669,3 +681,34 @@ inline void chipDie(void)
  *       thing in C++ as well.
  */
 #define ArraySize(a) (sizeof(a) / sizeof((a)[0]))
+
+namespace chip {
+
+/**
+ * Utility for checking, at compile time if the array is constexpr, whether an
+ * array is sorted.  Can be used for static_asserts.
+ */
+
+template <typename T>
+constexpr bool ArrayIsSorted(const T * aArray, size_t aLength)
+{
+    if (aLength == 0 || aLength == 1)
+    {
+        return true;
+    }
+
+    if (aArray[0] > aArray[1])
+    {
+        return false;
+    }
+
+    return ArrayIsSorted(aArray + 1, aLength - 1);
+}
+
+template <typename T, size_t N>
+constexpr bool ArrayIsSorted(const T (&aArray)[N])
+{
+    return ArrayIsSorted(aArray, N);
+}
+
+} // namespace chip

@@ -15,6 +15,7 @@
 name: 48.1.1. [TC-ETHDIAG-1.1] Attributes with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Ethernet Network Diagnostics"
     endpoint: 1
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     #Disabled due to issue #11670 and #13648
     - label: "Read PHYRate attribute"

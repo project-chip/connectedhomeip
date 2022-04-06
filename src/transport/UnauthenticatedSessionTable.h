@@ -46,10 +46,17 @@ public:
 class UnauthenticatedSession : public Session, public ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>
 {
 public:
-    UnauthenticatedSession(const PeerAddress & address, const ReliableMessageProtocolConfig & config) :
-        mPeerAddress(address), mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
+    enum class SessionRole
+    {
+        kInitiator,
+        kResponder,
+    };
+
+    UnauthenticatedSession(SessionRole sessionRole, NodeId ephemeralInitiatorNodeID, const ReliableMessageProtocolConfig & config) :
+        mEphemeralInitiatorNodeId(ephemeralInitiatorNodeID), mSessionRole(sessionRole),
+        mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
     {}
-    ~UnauthenticatedSession() { NotifySessionReleased(); }
+    ~UnauthenticatedSession() override { NotifySessionReleased(); }
 
     UnauthenticatedSession(const UnauthenticatedSession &) = delete;
     UnauthenticatedSession & operator=(const UnauthenticatedSession &) = delete;
@@ -66,6 +73,8 @@ public:
 
     void Retain() override { ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>::Retain(); }
     void Release() override { ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>::Release(); }
+
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(kUndefinedNodeId, GetFabricIndex()); }
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
@@ -88,8 +97,20 @@ public:
         return System::Clock::Timeout();
     }
 
-    NodeId GetPeerNodeId() const { return kUndefinedNodeId; }
+    NodeId GetPeerNodeId() const
+    {
+        if (mSessionRole == SessionRole::kInitiator)
+        {
+            return kUndefinedNodeId;
+        }
+
+        return mEphemeralInitiatorNodeId;
+    }
+
+    SessionRole GetSessionRole() const { return mSessionRole; }
+    NodeId GetEphemeralInitiatorNodeID() const { return mEphemeralInitiatorNodeId; }
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
+    void SetPeerAddress(const PeerAddress & peerAddress) { mPeerAddress = peerAddress; }
 
     void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
 
@@ -98,7 +119,9 @@ public:
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
 
 private:
-    const PeerAddress mPeerAddress;
+    const NodeId mEphemeralInitiatorNodeId;
+    const SessionRole mSessionRole;
+    PeerAddress mPeerAddress;
     System::Clock::Timestamp mLastActivityTime;
     ReliableMessageProtocolConfig mMRPConfig;
     PeerMessageCounter mPeerMessageCounter;
@@ -118,26 +141,50 @@ public:
     ~UnauthenticatedSessionTable() { mEntries.ReleaseAll(); }
 
     /**
-     * Get a session given the peer address. If the session doesn't exist in the cache, allocate a new entry for it.
+     * Get a responder session with the given ephemeralInitiatorNodeID. If the session doesn't exist in the cache, allocate a new
+     * entry for it.
      *
-     * @return the session found or allocated, nullptr if not found and allocation failed.
+     * @return the session found or allocated, or Optional::Missing if not found and allocation failed.
      */
     CHECK_RETURN_VALUE
-    Optional<SessionHandle> FindOrAllocateEntry(const PeerAddress & address, const ReliableMessageProtocolConfig & config)
+    Optional<SessionHandle> FindOrAllocateResponder(NodeId ephemeralInitiatorNodeID, const ReliableMessageProtocolConfig & config)
     {
-        UnauthenticatedSession * result = FindEntry(address);
+        UnauthenticatedSession * result = FindEntry(UnauthenticatedSession::SessionRole::kResponder, ephemeralInitiatorNodeID);
         if (result != nullptr)
             return MakeOptional<SessionHandle>(*result);
 
-        CHIP_ERROR err = AllocEntry(address, config, result);
+        CHIP_ERROR err = AllocEntry(UnauthenticatedSession::SessionRole::kResponder, ephemeralInitiatorNodeID, config, result);
         if (err == CHIP_NO_ERROR)
         {
             return MakeOptional<SessionHandle>(*result);
         }
-        else
+
+        return Optional<SessionHandle>::Missing();
+    }
+
+    CHECK_RETURN_VALUE Optional<SessionHandle> FindInitiator(NodeId ephemeralInitiatorNodeID)
+    {
+        UnauthenticatedSession * result = FindEntry(UnauthenticatedSession::SessionRole::kInitiator, ephemeralInitiatorNodeID);
+        if (result != nullptr)
         {
-            return Optional<SessionHandle>::Missing();
+            return MakeOptional<SessionHandle>(*result);
         }
+
+        return Optional<SessionHandle>::Missing();
+    }
+
+    CHECK_RETURN_VALUE Optional<SessionHandle> AllocInitiator(NodeId ephemeralInitiatorNodeID, const PeerAddress & peerAddress,
+                                                              const ReliableMessageProtocolConfig & config)
+    {
+        UnauthenticatedSession * result = nullptr;
+        CHIP_ERROR err = AllocEntry(UnauthenticatedSession::SessionRole::kInitiator, ephemeralInitiatorNodeID, config, result);
+        if (err == CHIP_NO_ERROR)
+        {
+            result->SetPeerAddress(peerAddress);
+            return MakeOptional<SessionHandle>(*result);
+        }
+
+        return Optional<SessionHandle>::Missing();
     }
 
 private:
@@ -148,10 +195,10 @@ private:
      * CHIP_ERROR_NO_MEMORY).
      */
     CHECK_RETURN_VALUE
-    CHIP_ERROR AllocEntry(const PeerAddress & address, const ReliableMessageProtocolConfig & config,
-                          UnauthenticatedSession *& entry)
+    CHIP_ERROR AllocEntry(UnauthenticatedSession::SessionRole sessionRole, NodeId ephemeralInitiatorNodeID,
+                          const ReliableMessageProtocolConfig & config, UnauthenticatedSession *& entry)
     {
-        entry = mEntries.CreateObject(address, config);
+        entry = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config);
         if (entry != nullptr)
             return CHIP_NO_ERROR;
 
@@ -161,21 +208,16 @@ private:
             return CHIP_ERROR_NO_MEMORY;
         }
 
-        mEntries.ResetObject(entry, address, config);
+        mEntries.ResetObject(entry, sessionRole, ephemeralInitiatorNodeID, config);
         return CHIP_NO_ERROR;
     }
 
-    /**
-     * Get a session using given address
-     *
-     * @return the peer found, nullptr if not found
-     */
-    CHECK_RETURN_VALUE
-    UnauthenticatedSession * FindEntry(const PeerAddress & address)
+    CHECK_RETURN_VALUE UnauthenticatedSession * FindEntry(UnauthenticatedSession::SessionRole sessionRole,
+                                                          NodeId ephemeralInitiatorNodeID)
     {
         UnauthenticatedSession * result = nullptr;
         mEntries.ForEachActiveObject([&](UnauthenticatedSession * entry) {
-            if (MatchPeerAddress(entry->GetPeerAddress(), address))
+            if (entry->GetSessionRole() == sessionRole && entry->GetEphemeralInitiatorNodeID() == ephemeralInitiatorNodeID)
             {
                 result = entry;
                 return Loop::Break;
@@ -202,46 +244,7 @@ private:
         return result;
     }
 
-    // A temporary solution for #11120
-    // Enforce interface match if not null
-    static bool MatchInterface(Inet::InterfaceId i1, Inet::InterfaceId i2)
-    {
-        if (i1.IsPresent() && i2.IsPresent())
-        {
-            return i1 == i2;
-        }
-        else
-        {
-            // One of the interfaces is null.
-            return true;
-        }
-    }
-
-    static bool MatchPeerAddress(const PeerAddress & a1, const PeerAddress & a2)
-    {
-        if (a1.GetTransportType() != a2.GetTransportType())
-            return false;
-
-        switch (a1.GetTransportType())
-        {
-        case Transport::Type::kUndefined:
-            return false;
-        case Transport::Type::kUdp:
-        case Transport::Type::kTcp:
-            return a1.GetIPAddress() == a2.GetIPAddress() && a1.GetPort() == a2.GetPort() &&
-                // Enforce interface equal-ness if the address is link-local, otherwise ignore interface
-                // Use MatchInterface for a temporary solution for #11120
-                (a1.GetIPAddress().IsIPv6LinkLocal() ? a1.GetInterface() == a2.GetInterface()
-                                                     : MatchInterface(a1.GetInterface(), a2.GetInterface()));
-        case Transport::Type::kBle:
-            // TODO: complete BLE address comparation
-            return true;
-        }
-
-        return false;
-    }
-
-    BitMapObjectPool<UnauthenticatedSession, kMaxSessionCount> mEntries;
+    ObjectPool<UnauthenticatedSession, kMaxSessionCount> mEntries;
 };
 
 } // namespace Transport

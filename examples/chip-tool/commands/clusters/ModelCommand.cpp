@@ -25,6 +25,16 @@ using namespace ::chip;
 
 CHIP_ERROR ModelCommand::RunCommand()
 {
+
+    if (IsGroupId(mNodeId))
+    {
+        FabricIndex fabricIndex;
+        ReturnErrorOnFailure(CurrentCommissioner().GetFabricIndex(&fabricIndex));
+        ChipLogProgress(chipTool, "Sending command to group 0x%" PRIx16, GroupIdFromNodeId(mNodeId));
+
+        return SendGroupCommand(GroupIdFromNodeId(mNodeId), fabricIndex);
+    }
+
     ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
     return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
@@ -45,4 +55,11 @@ void ModelCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CH
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectionFailureFn: context is null"));
     command->SetCommandExitStatus(err);
+}
+
+void ModelCommand::Shutdown()
+{
+    ResetArguments();
+    mOnDeviceConnectedCallback.Cancel();
+    mOnDeviceConnectionFailureCallback.Cancel();
 }

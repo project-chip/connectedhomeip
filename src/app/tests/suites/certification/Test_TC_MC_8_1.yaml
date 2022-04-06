@@ -15,6 +15,7 @@
 name: 21.10.1. [TC-MC-8.1] Navigate Target Verification (DUT as Server)
 
 config:
+    nodeId: 0x12344321
     cluster: "Target Navigator"
     endpoint: 1
 
@@ -22,21 +23,24 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Precondition: one or more navigation targets available"
       disabled: true
 
     - label: "Reads the CurrentTarget attribute"
       command: "readAttribute"
-      attribute: "current navigator target"
+      attribute: "CurrentTarget"
       response:
-          saveAs: currentTarget
           constraints:
               type: uint8
 
     - label: "Reads the TargetList attribute"
       command: "readAttribute"
-      attribute: "target navigator list"
+      attribute: "TargetList"
       response:
           constraints:
               type: list

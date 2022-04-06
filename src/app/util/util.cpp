@@ -48,8 +48,8 @@
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/print-cluster.h>
 #include <app/util/af-event.h>
-#include <app/util/af-main.h>
 #include <app/util/af.h>
+#include <app/util/ember-compatibility-functions.h>
 #include <zap-generated/PluginApplicationCallbacks.h>
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
@@ -57,19 +57,6 @@
 #endif // EMBER_AF_PLUGIN_GROUPS_SERVER
 
 using namespace chip;
-
-// Function for Compatibility
-namespace chip {
-namespace app {
-namespace Compatibility {
-bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status);
-bool __attribute__((weak)) IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
-{
-    return false;
-}
-} // namespace Compatibility
-} // namespace app
-} // namespace chip
 
 //------------------------------------------------------------------------------
 // Forward Declarations
@@ -87,8 +74,8 @@ uint32_t afNumPktsSent;
 #endif
 
 const EmberAfClusterName zclClusterNames[] = {
-    CLUSTER_IDS_TO_NAMES                                            // defined in print-cluster.h
-    { ZCL_NULL_CLUSTER_ID, EMBER_AF_NULL_MANUFACTURER_CODE, NULL }, // terminator
+    CLUSTER_IDS_TO_NAMES                                               // defined in print-cluster.h
+    { ZCL_NULL_CLUSTER_ID, EMBER_AF_NULL_MANUFACTURER_CODE, nullptr }, // terminator
 };
 
 // A pointer to the current command being processed
@@ -112,12 +99,6 @@ static uint8_t /*enum EmberAfDisableDefaultResponse*/ emAfSavedDisableDefaultRes
 
 // Holds the response type
 uint8_t emberAfResponseType = ZCL_UTIL_RESP_NORMAL;
-
-static EmberAfInterpanHeader interpanResponseHeader;
-
-uint8_t emAfExtendedPanId[EXTENDED_PAN_ID_SIZE] = {
-    0, 0, 0, 0, 0, 0, 0, 0,
-};
 
 #ifdef EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
@@ -207,38 +188,6 @@ EmberAfDifferenceType emberAfGetDifference(uint8_t * pData, EmberAfDifferenceTyp
     return diff;
 }
 
-// --------------------------------------------------
-
-static void prepareForResponse(const EmberAfClusterCommand * cmd)
-{
-    emberAfResponseApsFrame.clusterId           = cmd->apsFrame->clusterId;
-    emberAfResponseApsFrame.sourceEndpoint      = cmd->apsFrame->destinationEndpoint;
-    emberAfResponseApsFrame.destinationEndpoint = cmd->apsFrame->sourceEndpoint;
-
-    // Use the default APS options for the response, but also use encryption and
-    // retries if the incoming message used them.  The rationale is that the
-    // sender of the request cares about some aspects of the delivery, so we as
-    // the receiver should make equal effort for the response.
-    emberAfResponseApsFrame.options = EMBER_AF_DEFAULT_APS_OPTIONS;
-    if ((cmd->apsFrame->options & EMBER_APS_OPTION_RETRY) != 0U)
-    {
-        emberAfResponseApsFrame.options |= EMBER_APS_OPTION_RETRY;
-    }
-
-    if (cmd->interPanHeader == NULL)
-    {
-        emberAfResponseDestination = cmd->source;
-        emberAfResponseType        = static_cast<uint8_t>(emberAfResponseType & ~ZCL_UTIL_RESP_INTERPAN);
-    }
-    else
-    {
-        emberAfResponseType |= ZCL_UTIL_RESP_INTERPAN;
-        memmove(&interpanResponseHeader, cmd->interPanHeader, sizeof(EmberAfInterpanHeader));
-        // Always send responses as unicast
-        interpanResponseHeader.messageType = EMBER_AF_INTER_PAN_UNICAST;
-    }
-}
-
 // ****************************************
 // Initialize Clusters
 // ****************************************
@@ -308,6 +257,7 @@ void MatterTimeSynchronizationPluginServerInitCallback() {}
 void MatterProxyValidPluginServerInitCallback() {}
 void MatterProxyDiscoveryPluginServerInitCallback() {}
 void MatterProxyConfigurationPluginServerInitCallback() {}
+void MatterFanControlPluginServerInitCallback() {}
 
 // ****************************************
 // This function is called by the application when the stack goes down,
@@ -363,14 +313,12 @@ void emberAfDecodeAndPrintCluster(ClusterId cluster)
 // for references to the standard library.
 uint16_t emberAfGetMfgCodeFromCurrentCommand(void)
 {
-    if (emberAfCurrentCommand() != NULL)
+    if (emberAfCurrentCommand() != nullptr)
     {
         return emberAfCurrentCommand()->mfgCode;
     }
-    else
-    {
-        return EMBER_AF_NULL_MANUFACTURER_CODE;
-    }
+
+    return EMBER_AF_NULL_MANUFACTURER_CODE;
 }
 
 uint8_t emberAfNextSequence(void)
@@ -412,11 +360,11 @@ EmberAfRetryOverride emberAfGetRetryOverride(void)
 
 void emAfApplyRetryOverride(EmberApsOption * options)
 {
-    if (options == NULL)
+    if (options == nullptr)
     {
         return;
     }
-    else if (emberAfApsRetryOverride == EMBER_AF_RETRY_OVERRIDE_SET)
+    if (emberAfApsRetryOverride == EMBER_AF_RETRY_OVERRIDE_SET)
     {
         *options |= EMBER_APS_OPTION_RETRY;
     }
@@ -446,11 +394,11 @@ EmberAfDisableDefaultResponse emberAfGetDisableDefaultResponse(void)
 
 void emAfApplyDisableDefaultResponse(uint8_t * frame_control)
 {
-    if (frame_control == NULL)
+    if (frame_control == nullptr)
     {
         return;
     }
-    else if (emAfDisableDefaultResponse == EMBER_AF_DISABLE_DEFAULT_RESPONSE_ONE_SHOT)
+    if (emAfDisableDefaultResponse == EMBER_AF_DISABLE_DEFAULT_RESPONSE_ONE_SHOT)
     {
         emAfDisableDefaultResponse = emAfSavedDisableDefaultResponseVale;
         *frame_control |= ZCL_DISABLE_DEFAULT_RESPONSE_MASK;
@@ -465,164 +413,26 @@ void emAfApplyDisableDefaultResponse(uint8_t * frame_control)
     }
 }
 
-static bool isBroadcastDestination(Messaging::ExchangeContext * responseDestination)
-{
-    // TODO: Will need to actually figure out how to test for this!
-    return false;
-}
-
-EmberStatus emberAfSendResponseWithCallback(EmberAfMessageSentFunction callback)
-{
-    EmberStatus status;
-    uint8_t label;
-
-    // If the no-response flag is set, don't send anything.
-    if ((emberAfResponseType & ZCL_UTIL_RESP_NONE) != 0U)
-    {
-        emberAfDebugPrintln("ZCL Util: no response at user request");
-        return EMBER_SUCCESS;
-    }
-
-    // Make sure we are respecting the request APS options
-    // there are seemingly some calls to emberAfSendResponse
-    //  that occur outside of the emberAfProcessMessage context,
-    //  which leads to a bad memory reference - AHilton
-    if (emberAfCurrentCommand() != NULL)
-    {
-        if ((emberAfCurrentCommand()->apsFrame->options & EMBER_APS_OPTION_RETRY) != 0U)
-        {
-            emberAfResponseApsFrame.options |= EMBER_APS_OPTION_RETRY;
-        }
-    }
-
-    // Fill commands may increase the sequence.  For responses, we want to make
-    // sure the sequence is reset to that of the request.
-    if ((appResponseData[0] & ZCL_MANUFACTURER_SPECIFIC_MASK) != 0U)
-    {
-        appResponseData[3] = emberAfIncomingZclSequenceNumber;
-    }
-    else
-    {
-        appResponseData[1] = emberAfIncomingZclSequenceNumber;
-    }
-
-    // The manner in which the message is sent depends on the response flags and
-    // the destination of the message.
-    if ((emberAfResponseType & ZCL_UTIL_RESP_INTERPAN) != 0U)
-    {
-        label               = 'I';
-        status              = emberAfInterpanSendMessageCallback(&interpanResponseHeader, appResponseLength, appResponseData);
-        emberAfResponseType = static_cast<uint8_t>(emberAfResponseType & ~ZCL_UTIL_RESP_INTERPAN);
-    }
-    else if (!isBroadcastDestination(emberAfResponseDestination))
-    {
-        label  = 'U';
-        status = emberAfSendUnicastWithCallback(MessageSendDestination::ViaExchange(emberAfResponseDestination),
-                                                &emberAfResponseApsFrame, appResponseLength, appResponseData, callback);
-    }
-    else
-    {
-        label = 'B';
-#if 0
-    status = emberAfSendBroadcastWithCallback(emberAfResponseDestination,
-                                              &emberAfResponseApsFrame,
-                                              appResponseLength,
-                                              appResponseData,
-                                              callback);
-#else
-        status = EMBER_SUCCESS;
-#endif
-    }
-    UNUSED_VAR(label);
-    emberAfDebugPrintln("T%4x:TX (%p) %ccast 0x%x%p", 0, "resp", label, status, "");
-    emberAfDebugPrint("TX buffer: [");
-    emberAfDebugFlush();
-    emberAfDebugPrintBuffer(appResponseData, appResponseLength, true);
-    emberAfDebugPrintln("]");
-    emberAfDebugFlush();
-
-#ifdef EMBER_AF_ENABLE_STATISTICS
-    if (status == EMBER_SUCCESS)
-    {
-        afNumPktsSent++;
-    }
-#endif
-
-    return status;
-}
-
-EmberStatus emberAfSendResponse(void)
-{
-    return emberAfSendResponseWithCallback(NULL);
-}
-
-EmberStatus emberAfSendImmediateDefaultResponseWithCallback(EmberAfStatus status, EmberAfMessageSentFunction callback)
-{
-    return emberAfSendDefaultResponseWithCallback(emberAfCurrentCommand(), status, callback);
-}
-
 EmberStatus emberAfSendImmediateDefaultResponse(EmberAfStatus status)
 {
-    return emberAfSendImmediateDefaultResponseWithCallback(status, NULL);
+    return emberAfSendDefaultResponse(emberAfCurrentCommand(), status);
 }
 
-EmberStatus emberAfSendDefaultResponseWithCallback(const EmberAfClusterCommand * cmd, EmberAfStatus status,
-                                                   EmberAfMessageSentFunction callback)
+EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberAfStatus status)
 {
-    uint8_t frameControl;
-
     // Default Response commands are only sent in response to unicast commands.
     if (cmd->type != EMBER_INCOMING_UNICAST && cmd->type != EMBER_INCOMING_UNICAST_REPLY)
     {
         return EMBER_SUCCESS;
     }
 
-    if (chip::app::Compatibility::IMEmberAfSendDefaultResponseWithCallback(status))
+    if (!chip::app::Compatibility::IMEmberAfSendDefaultResponseWithCallback(status))
     {
-        // If the compatibility can handle this response
-        return EMBER_SUCCESS;
+        // Caller is not responding to anything!
+        return EMBER_ERR_FATAL;
     }
 
-    // If the Disable Default Response sub-field is set, Default Response commands
-    // are only sent if there was an error.
-    if ((cmd->buffer[0] & ZCL_DISABLE_DEFAULT_RESPONSE_MASK) && status == EMBER_ZCL_STATUS_SUCCESS)
-    {
-        return EMBER_SUCCESS;
-    }
-
-    // Default Response commands are never sent in response to other Default
-    // Response commands.
-    if (!cmd->clusterSpecific && cmd->commandId == ZCL_DEFAULT_RESPONSE_COMMAND_ID)
-    {
-        return EMBER_SUCCESS;
-    }
-
-    appResponseLength = 0;
-    frameControl      = static_cast<uint8_t>(ZCL_GLOBAL_COMMAND |
-                                        (cmd->direction == ZCL_DIRECTION_CLIENT_TO_SERVER ? ZCL_FRAME_CONTROL_SERVER_TO_CLIENT
-                                                                                          : ZCL_FRAME_CONTROL_CLIENT_TO_SERVER));
-
-    if (!cmd->mfgSpecific)
-    {
-        emberAfPutInt8uInResp(frameControl & (uint8_t) ~ZCL_MANUFACTURER_SPECIFIC_MASK);
-    }
-    else
-    {
-        emberAfPutInt8uInResp(frameControl | ZCL_MANUFACTURER_SPECIFIC_MASK);
-        emberAfPutInt16uInResp(cmd->mfgCode);
-    }
-    emberAfPutInt8uInResp(cmd->seqNum);
-    emberAfPutInt32uInResp(ZCL_DEFAULT_RESPONSE_COMMAND_ID);
-    emberAfPutInt32uInResp(cmd->commandId);
-    emberAfPutStatusInResp(status);
-
-    prepareForResponse(cmd);
-    return emberAfSendResponseWithCallback(callback);
-}
-
-EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberAfStatus status)
-{
-    return emberAfSendDefaultResponseWithCallback(cmd, status, NULL);
+    return EMBER_SUCCESS;
 }
 
 void emberAfCopyInt16u(uint8_t * data, uint16_t index, uint16_t x)
@@ -648,7 +458,7 @@ void emberAfCopyInt32u(uint8_t * data, uint16_t index, uint32_t x)
 
 void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size)
 {
-    if (src == NULL)
+    if (src == nullptr)
     {
         dest[0] = 0; // Zero out the length of string
     }
@@ -671,7 +481,7 @@ void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size)
 
 void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size)
 {
-    if (src == NULL)
+    if (src == nullptr)
     {
         dest[0] = dest[1] = 0; // Zero out the length of string
     }
@@ -716,7 +526,7 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
 
             for (i = 0; i < len; i++)
             {
-                j = (val1 == NULL ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
+                j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
                 accum1 |= j << (8 * (len - 1 - i));
 
                 k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
@@ -740,7 +550,7 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
             {
                 return 1;
             }
-            else if (accum1 < accum2)
+            if (accum1 < accum2)
             {
                 return -1;
             }
@@ -758,14 +568,14 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
     { // regular unsigned number comparison
         for (i = 0; i < len; i++)
         {
-            j = (val1 == NULL ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
+            j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
             k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
 
             if (j > k)
             {
                 return 1;
             }
-            else if (k > j)
+            if (k > j)
             {
                 return -1;
             }
@@ -829,7 +639,7 @@ uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, co
     uint8_t curLen;
     uint8_t charsToWrite;
 
-    if ((zclString == NULL) || (zclStringMaxLen == 0) || (appendingChars == NULL) || (appendingCharsLen == 0))
+    if ((zclString == nullptr) || (zclStringMaxLen == 0) || (appendingChars == nullptr) || (appendingCharsLen == 0))
     {
         return 0;
     }
@@ -971,8 +781,8 @@ bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId cluster
 bool emberAfIsNonVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
                                    bool asServer)
 {
-    uint8_t mask                        = asServer ? CLUSTER_MASK_SERVER : CLUSTER_MASK_CLIENT;
-    EmberAfAttributeMetadata * metadata = emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId, mask);
+    uint8_t mask                              = asServer ? CLUSTER_MASK_SERVER : CLUSTER_MASK_CLIENT;
+    const EmberAfAttributeMetadata * metadata = emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId, mask);
 
     if (metadata == nullptr)
     {

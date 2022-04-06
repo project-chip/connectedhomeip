@@ -222,7 +222,6 @@ CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ConcreteAttributePat
     //
     mBufferedList.clear();
     mBufferedPath = ConcreteDataAttributePath();
-
     return CHIP_NO_ERROR;
 }
 

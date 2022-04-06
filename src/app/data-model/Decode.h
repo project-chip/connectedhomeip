@@ -24,6 +24,7 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
+#include <protocols/interaction_model/Constants.h>
 
 namespace chip {
 namespace app {
@@ -161,7 +162,7 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, Nullable<X> & x)
     ReturnErrorOnFailure(Decode(reader, x.SetNonNull()));
     if (!x.HasValidValue())
     {
-        return CHIP_ERROR_IM_CONSTRAINT_ERROR;
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
     return CHIP_NO_ERROR;
 }

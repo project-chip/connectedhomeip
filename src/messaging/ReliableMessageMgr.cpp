@@ -132,7 +132,7 @@ void ReliableMessageMgr::ExecuteActions()
         {
             ChipLogError(ExchangeManager,
                          "Failed to Send CHIP MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange
-                         " sendCount: %" PRIu8 " max retries: %d",
+                         " sendCount: %u max retries: %d",
                          messageCounter, ChipLogValueExchange(&entry->ec.Get()), sendCount, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
 
             // Do not StartTimer, we will schedule the timer at the end of the timer handler.
@@ -144,9 +144,10 @@ void ReliableMessageMgr::ExecuteActions()
                       "Retransmitting MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange
                       " Send Cnt %d",
                       messageCounter, ChipLogValueExchange(&entry->ec.Get()), entry->sendCount);
-        // TODO: Choose active/idle timeout corresponding to the activity of exchanges of the session.
-        entry->nextRetransTime =
-            System::SystemClock().GetMonotonicTimestamp() + entry->ec->GetSessionHandle()->GetMRPConfig().mActiveRetransTimeout;
+        // TODO(#15800): Choose active/idle timeout corresponding to the activity of exchanges of the session.
+        System::Clock::Timestamp backoff =
+            ReliableMessageMgr::GetBackoff(entry->ec->GetSessionHandle()->GetMRPConfig().mActiveRetransTimeout, entry->sendCount);
+        entry->nextRetransTime = System::SystemClock().GetMonotonicTimestamp() + backoff;
         SendFromRetransTable(entry);
         // For test not using async IO loop, the entry may have been removed after send, do not use entry below
 
@@ -187,11 +188,48 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
     return CHIP_NO_ERROR;
 }
 
+System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp backoffBase, uint8_t sendCount)
+{
+    static constexpr uint32_t MRP_BACKOFF_JITTER_BASE      = 1024;
+    static constexpr uint32_t MRP_BACKOFF_BASE_NUMERATOR   = 16;
+    static constexpr uint32_t MRP_BACKOFF_BASE_DENOMENATOR = 10;
+    static constexpr uint32_t MRP_BACKOFF_THRESHOLD        = 1;
+
+    System::Clock::Timestamp backoff = backoffBase;
+
+    // Implement `t = i⋅MRP_BACKOFF_BASE^max(0,n−MRP_BACKOFF_THRESHOLD)` from Section 4.11.2.1. Retransmissions
+
+    // Generate fixed point equivalent of `retryCount = max(0,n−MRP_BACKOFF_THRESHOLD)`
+    int retryCount = sendCount - MRP_BACKOFF_THRESHOLD;
+    if (retryCount < 0)
+        retryCount = 0; // Enforce floor
+    if (retryCount > 4)
+        retryCount = 4; // Enforce reasonable maximum after 5 tries
+
+    // Generate fixed point equivalent of `backoff = i⋅1.6^retryCount`
+    uint32_t backoffNum   = 1;
+    uint32_t backoffDenom = 1;
+    for (int i = 0; i < retryCount; i++)
+    {
+        backoffNum *= MRP_BACKOFF_BASE_NUMERATOR;
+        backoffDenom *= MRP_BACKOFF_BASE_DENOMENATOR;
+    }
+    backoff = backoff * backoffNum / backoffDenom;
+
+    // Implement jitter scaler: `t *= (1.0+random(0,1)⋅MRP_BACKOFF_JITTER)`
+    // where jitter is random multiplier from 1.000 to 1.250:
+    uint32_t jitter = MRP_BACKOFF_JITTER_BASE + Crypto::GetRandU8();
+    backoff         = backoff * jitter / MRP_BACKOFF_JITTER_BASE;
+
+    return backoff;
+}
+
 void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
 {
-    // TODO: Choose active/idle timeout corresponding to the activity of exchanges of the session.
-    entry->nextRetransTime =
-        System::SystemClock().GetMonotonicTimestamp() + entry->ec->GetSessionHandle()->GetMRPConfig().mIdleRetransTimeout;
+    // TODO(#15800): Choose active/idle timeout corresponding to the ActiveState of peer in session.
+    System::Clock::Timestamp backoff =
+        ReliableMessageMgr::GetBackoff(entry->ec->GetSessionHandle()->GetMRPConfig().mIdleRetransTimeout, entry->sendCount);
+    entry->nextRetransTime = System::SystemClock().GetMonotonicTimestamp() + backoff;
     StartTimer();
 }
 

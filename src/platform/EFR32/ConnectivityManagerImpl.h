@@ -31,7 +31,7 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-#include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
+#include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 #endif

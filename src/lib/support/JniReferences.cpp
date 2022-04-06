@@ -43,7 +43,9 @@ void JniReferences::SetJavaVm(JavaVM * jvm, const char * clsType)
     mClassLoader     = env->NewGlobalRef(env->CallObjectMethod(chipClass, getClassLoaderMethod));
     mFindClassMethod = env->GetMethodID(classLoaderClass, "findClass", "(Ljava/lang/String;)Ljava/lang/Class;");
 
+    chip::JniReferences::GetInstance().GetClassRef(env, "java/util/List", mListClass);
     chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", mArrayListClass);
+    chip::JniReferences::GetInstance().GetClassRef(env, "java/util/HashMap", mHashMapClass);
 }
 
 JNIEnv * JniReferences::GetEnvForCurrentThread()
@@ -306,12 +308,12 @@ CHIP_ERROR JniReferences::CreateArrayList(jobject & outList)
     return err;
 }
 
-CHIP_ERROR JniReferences::AddToArrayList(jobject list, jobject objectToAdd)
+CHIP_ERROR JniReferences::AddToList(jobject list, jobject objectToAdd)
 {
     JNIEnv * env   = GetEnvForCurrentThread();
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    jmethodID addMethod = env->GetMethodID(mArrayListClass, "add", "(Ljava/lang/Object;)Z");
+    jmethodID addMethod = env->GetMethodID(mListClass, "add", "(Ljava/lang/Object;)Z");
     VerifyOrReturnError(addMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
     env->CallBooleanMethod(list, addMethod, objectToAdd);
@@ -319,12 +321,38 @@ CHIP_ERROR JniReferences::AddToArrayList(jobject list, jobject objectToAdd)
     return err;
 }
 
-CHIP_ERROR JniReferences::GetArrayListSize(jobject list, jint & size)
+CHIP_ERROR JniReferences::CreateHashMap(jobject & outMap)
 {
     JNIEnv * env   = GetEnvForCurrentThread();
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    jmethodID sizeMethod = env->GetMethodID(mArrayListClass, "size", "()I");
+    jmethodID hashMapCtor = env->GetMethodID(mHashMapClass, "<init>", "()V");
+    VerifyOrReturnError(hashMapCtor != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+    outMap = env->NewObject(mHashMapClass, hashMapCtor);
+    VerifyOrReturnError(outMap != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
+
+    return err;
+}
+
+CHIP_ERROR JniReferences::PutInMap(jobject map, jobject key, jobject value)
+{
+    JNIEnv * env   = GetEnvForCurrentThread();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    jmethodID putMethod = env->GetMethodID(mHashMapClass, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+    VerifyOrReturnError(putMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+
+    env->CallObjectMethod(map, putMethod, key, value);
+    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
+    return err;
+}
+
+CHIP_ERROR JniReferences::GetListSize(jobject list, jint & size)
+{
+    JNIEnv * env   = GetEnvForCurrentThread();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    jmethodID sizeMethod = env->GetMethodID(mListClass, "size", "()I");
     VerifyOrReturnError(sizeMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
     size = env->CallIntMethod(list, sizeMethod);
@@ -332,12 +360,12 @@ CHIP_ERROR JniReferences::GetArrayListSize(jobject list, jint & size)
     return err;
 }
 
-CHIP_ERROR JniReferences::GetArrayListItem(jobject list, jint index, jobject & outItem)
+CHIP_ERROR JniReferences::GetListItem(jobject list, jint index, jobject & outItem)
 {
     JNIEnv * env   = GetEnvForCurrentThread();
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    jmethodID getMethod = env->GetMethodID(mArrayListClass, "get", "(I)Ljava/lang/Object;");
+    jmethodID getMethod = env->GetMethodID(mListClass, "get", "(I)Ljava/lang/Object;");
     VerifyOrReturnError(getMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
     outItem = env->CallObjectMethod(list, getMethod, index);

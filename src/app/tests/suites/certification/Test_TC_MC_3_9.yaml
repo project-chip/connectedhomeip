@@ -15,6 +15,7 @@
 name: 21.5.2. [TC-MC-3.9] Select Input Verification
 
 config:
+    nodeId: 0x12344321
     cluster: "Media Input"
     endpoint: 1
 
@@ -22,11 +23,15 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     # Remove disable flag when SDK supports command.
     - label: "Select Input Command"
       disabled: true
-      command: "SelectInputRequest"
+      command: "SelectInput"
       arguments:
           values:
               - name: "index"
@@ -35,6 +40,6 @@ tests:
     - label: "Read current input list"
       disabled: true
       command: "readAttribute"
-      attribute: "current media input"
+      attribute: "CurrentInput"
       response:
           value: 1

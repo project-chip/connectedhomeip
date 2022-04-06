@@ -76,6 +76,11 @@ void InitTestInetCommon()
     chip::Platform::MemoryInit();
 }
 
+void ShutdownTestInetCommon()
+{
+    chip::Platform::MemoryShutdown();
+}
+
 void InitSystemLayer()
 {
     gSystemLayer.Init();

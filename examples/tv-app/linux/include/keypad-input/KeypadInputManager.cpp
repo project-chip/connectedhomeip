@@ -21,10 +21,40 @@
 using namespace chip;
 using namespace chip::app::Clusters::KeypadInput;
 
-void KeypadInputManager::HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper, const CecKeyCode & keycCode)
+void KeypadInputManager::HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper, const CecKeyCodeType & keycCode)
 {
     // TODO: Insert code here
     Commands::SendKeyResponse::Type response;
-    response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+
+    switch (keycCode)
+    {
+    case CecKeyCodeType::kUp:
+        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kDown:
+        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kLeft:
+        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kRight:
+        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kSelect:
+        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kBackward:
+        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kExit:
+        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kRootMenu:
+        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        break;
+    default:
+        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kUnsupportedKey;
+    }
+
     helper.Success(response);
 }

@@ -33,8 +33,20 @@ namespace app {
 class DefaultAttributePersistenceProvider : public AttributePersistenceProvider
 {
 public:
-    // aStorage must outlive this object.
-    DefaultAttributePersistenceProvider(PersistentStorageDelegate & aStorage) : mStorage(aStorage) {}
+    DefaultAttributePersistenceProvider() {}
+
+    // Passed-in storage must outlive this object.
+    CHIP_ERROR Init(PersistentStorageDelegate * storage)
+    {
+        if (storage == nullptr)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        mStorage = storage;
+        return CHIP_NO_ERROR;
+    }
+
+    void Shutdown() {}
 
     // AttributePersistenceProvider implementation.
     CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const EmberAfAttributeMetadata * aMetadata,
@@ -42,8 +54,8 @@ public:
     CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, const EmberAfAttributeMetadata * aMetadata,
                          MutableByteSpan & aValue) override;
 
-private:
-    PersistentStorageDelegate & mStorage;
+protected:
+    PersistentStorageDelegate * mStorage;
 };
 
 } // namespace app

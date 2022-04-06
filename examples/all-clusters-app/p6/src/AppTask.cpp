@@ -40,6 +40,9 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/P6/NetworkCommissioningDriver.h>
+
 #define APP_EVENT_QUEUE_SIZE 10
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_WAIT_LOOP 1000
@@ -60,12 +63,34 @@ StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 } // namespace
 
+using namespace ::chip;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
-using namespace ::chip::app::Clusters;
+using namespace ::chip::System;
 
 AppTask AppTask::sAppTask;
+
+namespace {
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::P6WiFiDriver::GetInstance()));
+} // namespace
+
+void NetWorkCommissioningInstInit()
+{
+    sWiFiNetworkCommissioningInstance.Init();
+}
+
+static void InitServer(intptr_t context)
+{
+    // Init ZCL Data Model
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+}
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -98,15 +123,13 @@ CHIP_ERROR AppTask::Init()
             }
         },
         0);
-    // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 
     // Initialise WSTK buttons PB0 and PB1 (including debounce).
     ButtonHandler::Init();
 
+    NetWorkCommissioningInstInit();
     P6_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
     // Initialize LEDs
@@ -151,7 +174,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     sLightLED.Invert();
 
     /* Update OnOff Cluster state */
-    sAppTask.OnOffUpdateClusterState();
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(OnOffUpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 }
 
 void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
@@ -217,12 +240,14 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
-void AppTask::OnOffUpdateClusterState(void)
+void AppTask::OnOffUpdateClusterState(intptr_t context)
 {
-    uint8_t newValue = sLightLED.Get();
+    uint8_t onoff = sLightLED.Get();
 
     // write the new on/off value
-    EmberAfStatus status = OnOff::Attributes::OnOff::Set(2, newValue);
+    EmberAfStatus status =
+        emberAfWriteServerAttribute(2, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &onoff, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         P6_LOG("ERR: updating on/off %x", status);

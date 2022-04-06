@@ -326,7 +326,7 @@ to read more about flashing on the nRF52840 Dongle.
 Run the following command to start an interactive Python shell, where the Echo
 RPC commands can be invoked:
 
-        python -m pw_hdlc.rpc_console --device /dev/ttyACM0 -b 115200 $CHIP_ROOT/third_party/pigweed/repo/pw_rpc/echo.proto -o /tmp/pw_rpc.out
+        python -m pw_hdlc.rpc_console --device /dev/ttyACM0 -b 115200 --proto-globs $CHIP_ROOT/third_party/pigweed/repo/pw_rpc/echo.proto -o /tmp/pw_rpc.out
 
 To send an Echo RPC message, type the following command, where the actual
 message is the text in quotation marks after the `msg=` phrase:

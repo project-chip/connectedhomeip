@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/nrfconnect/args.gni")
 
 assert(chip_device_platform == "nrfconnect")
 
@@ -28,6 +29,7 @@ static_library("nrfconnect") {
     "../Zephyr/KeyValueStoreManagerImpl.cpp",
     "../Zephyr/Logging.cpp",
     "../Zephyr/PlatformManagerImpl.cpp",
+    "../Zephyr/SysHeapMalloc.h",
     "../Zephyr/SystemTimeSupport.cpp",
     "../Zephyr/ZephyrConfig.cpp",
     "../Zephyr/ZephyrConfig.h",
@@ -47,8 +49,6 @@ static_library("nrfconnect") {
     "SystemPlatformConfig.h",
   ]
 
-  deps = [ "${chip_root}/src/setup_payload:additional_data_payload" ]
-
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   if (chip_enable_openthread) {
@@ -60,7 +60,7 @@ static_library("nrfconnect") {
 
     if (chip_mdns == "platform") {
       sources += [ "../OpenThread/DnssdImpl.cpp" ]
-      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+      deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
   }
 
@@ -73,8 +73,14 @@ static_library("nrfconnect") {
 
   if (chip_enable_ota_requestor) {
     sources += [
+      "OTAImageContentHeader.cpp",
+      "OTAImageContentHeader.h",
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
     ]
+  }
+
+  if (chip_malloc_sys_heap) {
+    sources += [ "../Zephyr/SysHeapMalloc.cpp" ]
   }
 }

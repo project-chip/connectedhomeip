@@ -23,6 +23,15 @@ if (current_os == "mac") {
   import("${build_root}/config/mac/mac_sdk.gni")
 }
 
+if (current_os == "webos") {
+  import("${build_root}/config/webos/webos_sdk.gni")
+  target_defines += []
+  target_cflags += [ "--sysroot=" + sysroot_webos ]
+  target_cflags_cc += []
+  target_cflags_c += []
+  target_ldflags += [ "--sysroot=" + sysroot_webos ]
+}
+
 declare_args() {
   # Enable -Werror. This can be disabled if using a different compiler
   # with unfixed or unsupported wanings.
@@ -33,6 +42,8 @@ if (current_cpu == "arm" || current_cpu == "arm64") {
   import("${build_root}/config/arm.gni")
 } else if (current_cpu == "x86" || current_cpu == "x86_64") {
   import("${build_root}/config/x86.gni")
+} else if (current_cpu == "riscv") {
+  import("${build_root}/config/riscv.gni")
 }
 
 config("release") {
@@ -113,6 +124,26 @@ config("abi_default") {
         ]
       }
     }
+    if (current_cpu == "riscv") {
+      if (riscv_arch != "") {
+        cflags += [ "-march=${riscv_arch}" ]
+      }
+      if (riscv_cpu != "") {
+        cflags += [ "-mcpu=${riscv_cpu}" ]
+      }
+      if (riscv_tune != "") {
+        cflags += [ "-mtune=${riscv_tune}" ]
+      }
+      if (riscv_abi != "") {
+        cflags += [ "-mabi=${riscv_abi}" ]
+      }
+      if (riscv_fpu != "") {
+        cflags += [ "-mfpu=${riscv_fpu}" ]
+      }
+      if (riscv_float_abi != "") {
+        cflags += [ "-mfloat-abi=${riscv_float_abi}" ]
+      }
+    }
   }
 
   asmflags = cflags
@@ -191,7 +222,7 @@ config("warnings_common") {
   }
 
   if (current_os != "mac" && current_os != "ios" && current_os != "linux" &&
-      current_os != "win" && current_os != "tizen") {
+      current_os != "win" && current_os != "tizen" && current_os != "webos") {
     cflags += [ "-Wstack-usage=8192" ]
   }
 }
@@ -206,6 +237,13 @@ config("strict_warnings") {
     "-Wformat-nonliteral",
     "-Wformat-security",
   ]
+
+  if (current_os == "webos") {
+    cflags -= [
+      "-Wshadow",
+      "-Wvla",
+    ]
+  }
 
   cflags_cc = [ "-Wnon-virtual-dtor" ]
 
@@ -271,7 +309,7 @@ config("runtime_default") {
       "$dir_pw_toolchain/host_clang:xcode_sysroot",
     ]
   }
-  if (current_os == "linux" || current_os == "tizen") {
+  if (current_os == "linux" || current_os == "tizen" || current_os == "webos") {
     libs = [
       "dl",
       "pthread",

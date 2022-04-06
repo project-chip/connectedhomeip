@@ -127,9 +127,22 @@ public class NsdManagerServiceResolver implements ServiceResolver {
       String[] subTypes) {
     NsdServiceInfo serviceInfo = new NsdServiceInfo();
     serviceInfo.setServiceName(serviceName);
-    serviceInfo.setServiceType(type);
+
+    /**
+     * Note, subtypes registration is using an undocumented feature of android dns-sd
+     * service/mDNSResponder which MAY STOP WORKING in future Android versions. Here, set type =
+     * "${type},${subtypes1},${subtypes2},...", then subtypes1, subtypes2 etc are all registered to
+     * this dns-sd server, we can usd `dns-sd -B ${type},${subtypes}` or avahi-browse
+     * ${subtypes}._sub.${type} -r to browser it
+     */
+    StringBuilder sb = new StringBuilder(type);
+    for (String subType : subTypes) {
+      sb.append(",").append(subType);
+    }
+    serviceInfo.setServiceType(sb.toString());
+
     serviceInfo.setPort(port);
-    Log.i(TAG, "publish serviceName=" + serviceName + " type=" + type + " port=" + port);
+    Log.i(TAG, "publish serviceName=" + serviceName + " type=" + sb.toString() + " port=" + port);
     int cnt = Math.min(textEntriesDatas.length, textEntriesKeys.length);
     for (int i = 0; i < cnt; i++) {
       String value = new String(textEntriesDatas[i]);
@@ -155,23 +168,31 @@ public class NsdManagerServiceResolver implements ServiceResolver {
 
           @Override
           public void onServiceRegistered(NsdServiceInfo serviceInfo) {
-            Log.i(TAG, "service " + serviceInfo.getServiceName() + " onServiceRegistered");
+            Log.i(
+                TAG,
+                "service " + serviceInfo.getServiceName() + "(" + this + ") onServiceRegistered");
           }
 
           @Override
           public void onServiceUnregistered(NsdServiceInfo serviceInfo) {
-            Log.i(TAG, "service " + serviceInfo.getServiceName() + " onServiceRegistered");
+            Log.i(
+                TAG,
+                "service " + serviceInfo.getServiceName() + "(" + this + ") onServiceUnregistered");
           }
         };
     registrationListeners.add(registrationListener);
 
     nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, registrationListener);
+    Log.d(TAG, "publish " + registrationListener + " count = " + registrationListeners.size());
   }
 
   @Override
   public void removeServices() {
+    Log.d(TAG, "removeServices: ");
     for (NsdManager.RegistrationListener l : registrationListeners) {
+      Log.i(TAG, "Remove " + l);
       nsdManager.unregisterService(l);
     }
+    registrationListeners.clear();
   }
 }

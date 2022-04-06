@@ -32,6 +32,17 @@ public:
 protected:
     virtual void Exit(std::string message) = 0;
 
+    bool CheckDecodeValue(CHIP_ERROR error)
+    {
+        if (CHIP_NO_ERROR != error)
+        {
+            Exit(std::string("Can not decode data: ") + chip::ErrorStr(error));
+            return false;
+        }
+
+        return true;
+    }
+
     bool CheckValueAsString(const char * itemName, chip::ByteSpan current, chip::ByteSpan expected)
     {
         if (!current.data_equal(expected))
@@ -81,6 +92,26 @@ protected:
     bool CheckValue(const char * itemName, chip::BitFlags<T> current, U expected)
     {
         return CheckValue(itemName, current.Raw(), expected);
+    }
+
+    // Allow an expected value that is a nullable wrapped around the actual
+    // value (e.g. a SaveAs from reading a different attribute that has a value
+    // space that includes null).  In that case we check that:
+    // 1) The nullable is not in fact null.
+    //
+    // 2) The value in the nullable matches our test value.
+    template <typename T>
+    bool CheckValue(const char * itemName, T current, const chip::app::DataModel::Nullable<T> & expected)
+    {
+        auto nullableName = std::string(itemName);
+        nullableName += " expected value";
+        return CheckValueNonNull(nullableName.c_str(), expected) && CheckValue(itemName, current, expected.Value());
+    }
+
+    template <typename T>
+    bool CheckValue(const char * itemName, chip::BitFlags<T> current, chip::BitFlags<T> expected)
+    {
+        return CheckValue(itemName, current.Raw(), expected.Raw());
     }
 
     template <typename T>

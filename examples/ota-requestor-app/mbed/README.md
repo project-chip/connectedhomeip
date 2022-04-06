@@ -82,9 +82,21 @@ using the following command:
     $ git submodule update --init
 
 Building the example application requires the use of **ARM Mbed-OS** sources and
-the **arm-none-gnu-eabi** toolchain. The OpenOCD package is used for flashing
-purpose. <br> Some additional packages may be needed, depending on selected
-build target and its requirements.
+the **arm-none-gnu-eabi** toolchain.
+
+The Cypress OpenOCD package is required for flashing purpose. Install the
+Cypress OpenOCD and set env var `OPENOCD_PATH` before calling the flashing
+script.
+
+```
+cd ~
+wget https://github.com/Infineon/openocd/releases/download/release-v4.3.0/openocd-4.3.0.1746-linux.tar.gz
+tar xzvf openocd-4.3.0.1746-linux.tar.gz
+export OPENOCD_PATH=$HOME/openocd
+```
+
+Some additional packages may be needed, depending on selected build target and
+its requirements.
 
 > **The VSCode devcontainer has these components pre-installed. Using the VSCode
 > devcontainer is the recommended way to interact with Arm Mbed-OS port of the
@@ -214,8 +226,7 @@ After device reset these lines should be visible:
 
     [INFO][CHIP]: [-]Mbed ota-requestor-app example application start
     ...
-
-[INFO][chip]: [-]Mbed ota-requestor-app example application run
+    [INFO][chip]: [-]Mbed ota-requestor-app example application run
 
 The ota-requestor-app application launched correctly and you can follow traces
 in the terminal.
@@ -294,8 +305,16 @@ following states are possible:
     procedure. **LEDs 1-4** blink in unison when the factory reset procedure is
     initiated.
 
--   _Pressed for less than 3 s_ &mdash; Initiates the OTA software update
-    process. This feature is not currently supported.
+-   _Pressed for less than 3 s_ &mdash; Trigger confirm user response.
+
+**Button 1** can be used for the following purposes:
+
+-   _Pressed for 6 s_ &mdash; Initiates the commissioning reset of the device.
+    The fabric IDs are deleted and BLE advertising start. Releasing the button
+    within the 6-second window cancels the commissioning reset procedure. **LEDs
+    1-4** blink in unison when the commissioning reset procedure is initiated.
+
+-   _Pressed for less than 3 s_ &mdash; Trigger reject user response.
 
 **Button 1** &mdash; Pressing the button once delete all fabric IDs and start
 BLE advertising.

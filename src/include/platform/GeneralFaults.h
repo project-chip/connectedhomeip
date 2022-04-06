@@ -49,7 +49,6 @@ public:
         int mIndex = -1;
     };
 
-public:
     GeneralFaults() = default;
     ~GeneralFaults() { mSize = 0; }
 

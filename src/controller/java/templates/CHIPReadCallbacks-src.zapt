@@ -88,7 +88,7 @@ void CHIP{{chipCallback.name}}AttributeCallback::CallbackFn(void * context, {{ch
 {{! TODO: Add support for struct-typed attributes }}
 {{#unless (isStrEqual chipCallback.name "Unsupported")}}
 
-{{#if_in_global_responses}}
+{{#if_basic_global_response}}
 {{else}}
 CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
@@ -114,7 +114,7 @@ CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::
     }
     env->DeleteGlobalRef(javaCallbackRef);
 }
-{{/if_in_global_responses}}
+{{/if_basic_global_response}}
 
 {{#if isArray}}
 void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list)
@@ -142,7 +142,7 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 {{else}}
-  {{#if_in_global_responses}}
+  {{#if_basic_global_response}}
   {{else}}
     void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} value)
     {
@@ -166,7 +166,7 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
     }
-  {{/if_in_global_responses}}
+  {{/if_basic_global_response}}
 {{/if}}
 {{/unless}}
 {{/chip_server_cluster_attributes}}

@@ -63,3 +63,18 @@ application of OTA image.
 ```
 ./out/debug/chip-tool pairing onnetwork 12345 20202021
 ```
+
+## Generate OTA image
+
+User can generate the Matter OTA image by simply enabling
+`CONFIG_CHIP_OTA_IMAGE_BUILD` config option. OTA image is generated in `build`
+directory with name `<project name>-ota.bin`. This image then can be used with
+OTA Provider Application.
+
+Please make sure that version number is set to correct value. Use
+`CONFIG_DEVICE_SOFTWARE_VERSION` and `CONFIG_DEVICE_SOFTWARE_VERSION_NUMBER`
+config options for setting software version.
+
+Matter OTA image can also be generated using
+[ota_image_tool.py](https://github.com/project-chip/connectedhomeip/blob/master/src/app/ota_image_tool.py)
+script.

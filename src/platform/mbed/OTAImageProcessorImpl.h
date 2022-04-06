@@ -65,6 +65,10 @@ public:
      */
     CHIP_ERROR ProcessBlock(ByteSpan & block);
 
+    bool IsFirstImageRun() override { return false; }
+
+    CHIP_ERROR ConfirmCurrentImage() override { return CHIP_NO_ERROR; }
+
     /**
      * Check if memory for update image is works correctly.
      */

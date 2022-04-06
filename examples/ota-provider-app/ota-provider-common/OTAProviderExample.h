@@ -18,8 +18,11 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
+#include <app/clusters/ota-provider/OTAProviderUserConsentDelegate.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
+#include <lib/core/OTAImageHeader.h>
 #include <ota-provider-common/BdxOtaSender.h>
 #include <vector>
 
@@ -31,28 +34,13 @@ class OTAProviderExample : public chip::app::Clusters::OTAProviderDelegate
 public:
     OTAProviderExample();
 
-    void SetOTAFilePath(const char * path);
-    BdxOtaSender * GetBdxOtaSender() { return &mBdxOtaSender; }
+    using OTAQueryStatus       = chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus;
+    using OTAApplyUpdateAction = chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction;
 
-    // Inherited from OTAProviderDelegate
-    EmberAfStatus HandleQueryImage(
-        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData) override;
-    EmberAfStatus HandleApplyUpdateRequest(
-        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData) override;
-    EmberAfStatus HandleNotifyUpdateApplied(
-        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData) override;
-
-    enum QueryImageBehaviorType
-    {
-        kRespondWithUpdateAvailable,
-        kRespondWithBusy,
-        kRespondWithNotAvailable
-    };
-    static constexpr uint16_t SW_VER_STR_MAX_LEN = 32;
+    static constexpr uint16_t SW_VER_STR_MAX_LEN = 64;
     static constexpr uint16_t OTA_URL_MAX_LEN    = 512;
+    static constexpr size_t kFilepathBufLen      = 256;
+
     typedef struct DeviceSoftwareVersionModel
     {
         chip::VendorId vendorId;
@@ -65,18 +53,65 @@ public:
         uint32_t maxApplicableSoftwareVersion;
         char otaURL[OTA_URL_MAX_LEN];
     } DeviceSoftwareVersionModel;
+
+    //////////// OTAProviderDelegate Implementation ///////////////
+    void HandleQueryImage(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData) override;
+    void HandleApplyUpdateRequest(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData) override;
+    void HandleNotifyUpdateApplied(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData) override;
+
+    //////////// OTAProviderExample public APIs ///////////////
+    void SetOTAFilePath(const char * path);
+    BdxOtaSender * GetBdxOtaSender() { return &mBdxOtaSender; }
+
     void SetOTACandidates(std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates);
-    void SetQueryImageBehavior(QueryImageBehaviorType behavior) { mQueryImageBehavior = behavior; }
-    void SetDelayedActionTimeSec(uint32_t time) { mDelayedActionTimeSec = time; }
+    void SetIgnoreQueryImageCount(uint32_t count) { mIgnoreQueryImageCount = count; }
+    void SetIgnoreApplyUpdateCount(uint32_t count) { mIgnoreApplyUpdateCount = count; }
+    void SetQueryImageStatus(OTAQueryStatus status) { mQueryImageStatus = status; }
+    void SetApplyUpdateAction(chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction action)
+    {
+        mUpdateAction = action;
+    }
+    void SetDelayedQueryActionTimeSec(uint32_t time) { mDelayedQueryActionTimeSec = time; }
+    void SetDelayedApplyActionTimeSec(uint32_t time) { mDelayedApplyActionTimeSec = time; }
+    void SetUserConsentDelegate(chip::ota::OTAProviderUserConsentDelegate * delegate) { mUserConsentDelegate = delegate; }
+    void SetUserConsentNeeded(bool needed) { mUserConsentNeeded = needed; }
 
 private:
-    BdxOtaSender mBdxOtaSender;
-    std::vector<DeviceSoftwareVersionModel> mCandidates;
-    static constexpr size_t kFilepathBufLen = 256;
-    char mOTAFilePath[kFilepathBufLen]; // null-terminated
-    QueryImageBehaviorType mQueryImageBehavior;
-    uint32_t mDelayedActionTimeSec;
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
                             const uint32_t requestorSoftwareVersion,
                             OTAProviderExample::DeviceSoftwareVersionModel & finalCandidate);
+
+    chip::ota::UserConsentSubject
+    GetUserConsentSubject(const chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                          const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData,
+                          uint32_t targetVersion);
+
+    bool ParseOTAHeader(const char * otaFilePath, chip::OTAImageHeader & header);
+
+    /**
+     * Called to send the response for a QueryImage command. If an error is encountered, an error status will be sent.
+     */
+    void
+    SendQueryImageResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                           const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData);
+
+    BdxOtaSender mBdxOtaSender;
+    std::vector<DeviceSoftwareVersionModel> mCandidates;
+    char mOTAFilePath[kFilepathBufLen]; // null-terminated
+    OTAQueryStatus mQueryImageStatus;
+    OTAApplyUpdateAction mUpdateAction;
+    uint32_t mIgnoreQueryImageCount;
+    uint32_t mIgnoreApplyUpdateCount;
+    uint32_t mDelayedQueryActionTimeSec;
+    uint32_t mDelayedApplyActionTimeSec;
+    chip::ota::OTAProviderUserConsentDelegate * mUserConsentDelegate;
+    bool mUserConsentNeeded;
+    uint32_t mSoftwareVersion;
+    char mSoftwareVersionString[SW_VER_STR_MAX_LEN];
 };

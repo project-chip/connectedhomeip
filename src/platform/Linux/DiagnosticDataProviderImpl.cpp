@@ -218,6 +218,9 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
+#ifndef __GLIBC__
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#else
     struct mallinfo mallocInfo = mallinfo();
 
     // Get the current amount of heap memory, in bytes, that are not being utilized
@@ -225,10 +228,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeap
     currentHeapFree = mallocInfo.fordblks;
 
     return CHIP_NO_ERROR;
+#endif
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
+#ifndef __GLIBC__
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#else
     struct mallinfo mallocInfo = mallinfo();
 
     // Get the current amount of heap memory, in bytes, that are being used by
@@ -236,10 +243,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
     currentHeapUsed = mallocInfo.uordblks;
 
     return CHIP_NO_ERROR;
+#endif
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
+#ifndef __GLIBC__
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#else
     struct mallinfo mallocInfo = mallinfo();
 
     // The usecase of this function is embedded devices,on which we would need to intercept
@@ -252,6 +263,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
     currentHeapHighWatermark = mallocInfo.uordblks;
 
     return CHIP_NO_ERROR;
+#endif
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
@@ -269,7 +281,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
         struct dirent * entry;
 
         /* proc available, iterate through tasks... */
-        while ((entry = readdir(proc_dir)) != NULL)
+        while ((entry = readdir(proc_dir)) != nullptr)
         {
             if (entry->d_name[0] == '.')
                 continue;
@@ -356,7 +368,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
     return CHIP_ERROR_INVALID_TIME;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
 {
     uint32_t reason = 0;
 
@@ -365,7 +377,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
     if (err == CHIP_NO_ERROR)
     {
         VerifyOrReturnError(reason <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-        bootReason = static_cast<uint8_t>(reason);
+        bootReason = static_cast<BootReasonType>(reason);
     }
 
     return err;
@@ -432,11 +444,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 strncpy(ifp->Name, ifa->ifa_name, Inet::InterfaceId::kMaxIfNameLength);
                 ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
 
-                ifp->name                            = CharSpan::fromCharString(ifp->Name);
-                ifp->fabricConnected                 = ifa->ifa_flags & IFF_RUNNING;
-                ifp->type                            = ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name);
-                ifp->offPremiseServicesReachableIPv4 = false;
-                ifp->offPremiseServicesReachableIPv6 = false;
+                ifp->name          = CharSpan::fromCharString(ifp->Name);
+                ifp->isOperational = ifa->ifa_flags & IFF_RUNNING;
+                ifp->type          = ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name);
+                ifp->offPremiseServicesReachableIPv4.SetNull();
+                ifp->offPremiseServicesReachableIPv6.SetNull();
 
                 if (ConnectivityUtils::GetInterfaceHardwareAddrs(ifa->ifa_name, ifp->MacAddress, kMaxHardwareAddrSize) !=
                     CHIP_NO_ERROR)
@@ -473,7 +485,7 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
     }
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetEthPHYRate(uint8_t & pHYRate)
+CHIP_ERROR DiagnosticDataProviderImpl::GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateType & pHYRate)
 {
     if (ConnectivityMgrImpl().GetEthernetIfName() == nullptr)
     {

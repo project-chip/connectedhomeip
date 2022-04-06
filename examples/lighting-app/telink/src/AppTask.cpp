@@ -63,6 +63,7 @@ LEDWidget sStatusLED;
 Button sFactoryResetButton;
 Button sLightingButton;
 Button sThreadStartButton;
+Button sBleAdvStartButton;
 
 bool sIsThreadProvisioned = false;
 bool sIsThreadEnabled     = false;
@@ -97,7 +98,9 @@ CHIP_ERROR AppTask::Init()
     LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     // Init ZCL Data Model and start server
-    chip::Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -105,10 +108,10 @@ CHIP_ERROR AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
-    ret = chip::Server::GetInstance().AddTestCommissioning();
+    ret = ConnectivityMgr().SetBLEDeviceName("TelinkLight");
     if (ret != CHIP_NO_ERROR)
     {
-        LOG_ERR("Failed to add test pairing");
+        LOG_ERR("Fail to set BLE device name");
         return ret;
     }
 
@@ -215,7 +218,7 @@ void AppTask::FactoryResetButtonEventHandler(void)
 void AppTask::FactoryResetHandler(AppEvent * aEvent)
 {
     LOG_INF("Factory Reset triggered.");
-    ConfigurationMgr().InitiateFactoryReset();
+    chip::Server::GetInstance().ScheduleFactoryReset();
 }
 
 void AppTask::StartThreadButtonEventHandler(void)
@@ -230,6 +233,7 @@ void AppTask::StartThreadButtonEventHandler(void)
 
 void AppTask::StartThreadHandler(AppEvent * aEvent)
 {
+
     if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
         StartDefaultThreadNetwork();
@@ -238,6 +242,39 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
     else
     {
         LOG_INF("Device is commissioned to a Thread network.");
+    }
+}
+
+void AppTask::StartBleAdvButtonEventHandler(void)
+{
+    AppEvent event;
+
+    event.Type               = AppEvent::kEventType_Button;
+    event.ButtonEvent.Action = kButtonPushEvent;
+    event.Handler            = StartBleAdvHandler;
+    sAppTask.PostEvent(&event);
+}
+
+void AppTask::StartBleAdvHandler(AppEvent * aEvent)
+{
+    LOG_INF("BLE advertising start button pressed");
+
+    // Don't allow on starting Matter service BLE advertising after Thread provisioning.
+    if (ConnectivityMgr().IsThreadProvisioned())
+    {
+        LOG_INF("Matter service BLE advertising not started - device is commissioned to a Thread network.");
+        return;
+    }
+
+    if (ConnectivityMgr().IsBLEAdvertisingEnabled())
+    {
+        LOG_INF("BLE advertising is already enabled");
+        return;
+    }
+
+    if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
+    {
+        LOG_ERR("OpenBasicCommissioningWindow() failed");
     }
 }
 
@@ -335,8 +372,10 @@ void AppTask::InitButtons(void)
     sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
     sLightingButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, LightingActionButtonEventHandler);
     sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
+    sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, StartBleAdvButtonEventHandler);
 
     ButtonManagerInst().AddButton(sFactoryResetButton);
     ButtonManagerInst().AddButton(sLightingButton);
     ButtonManagerInst().AddButton(sThreadStartButton);
+    ButtonManagerInst().AddButton(sBleAdvStartButton);
 }

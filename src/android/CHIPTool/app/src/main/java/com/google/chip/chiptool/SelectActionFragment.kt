@@ -51,13 +51,14 @@ class SelectActionFragment : Fragment() {
         setOnClickListener { getCallback()?.onProvisionThreadCredentialsClicked() }
       }
       onOffClusterBtn.setOnClickListener { getCallback()?.handleOnOffClicked() }
-      sensorClustersBtn.setOnClickListener{ getCallback()?.handleSensorClicked() }
-      multiAdminClusterBtn.setOnClickListener{ getCallback()?.handleMultiAdminClicked() }
-      opCredClustersBtn.setOnClickListener{ getCallback()?.handleOpCredClicked() }
-      basicClusterBtn.setOnClickListener{ getCallback()?.handleBasicClicked() }
+      sensorClustersBtn.setOnClickListener { getCallback()?.handleSensorClicked() }
+      multiAdminClusterBtn.setOnClickListener { getCallback()?.handleMultiAdminClicked() }
+      opCredClustersBtn.setOnClickListener { getCallback()?.handleOpCredClicked() }
+      basicClusterBtn.setOnClickListener { getCallback()?.handleBasicClicked() }
       attestationTestBtn.setOnClickListener { getCallback()?.handleAttestationTestClicked() }
       clusterInteractionBtn.setOnClickListener { getCallback()?.handleClusterInteractionClicked() }
-      provisionCustomFlowBtn.setOnClickListener{ getCallback()?.handleCustomFlowClicked() }
+      provisionCustomFlowBtn.setOnClickListener{  getCallback()?.handleCustomFlowClicked() }
+      wildcardBtn.setOnClickListener { getCallback()?.handleWildcardClicked() }
     }
   }
 
@@ -122,10 +123,12 @@ class SelectActionFragment : Fragment() {
     fun handleBasicClicked()
     /** Notifies listener of attestation command button clicked. */
     fun handleAttestationTestClicked()
-    /** Notifies listener of a click to manually input the CHIP device address.. */
+    /** Notifies listener of a click to manually input the CHIP device address. */
     fun onShowDeviceAddressInput()
-    /** Notifies listener of cluster interaction button click.. */
+    /** Notifies listener of cluster interaction button click. */
     fun handleClusterInteractionClicked()
+    /** Notifies listener of wildcard button click. */
+    fun handleWildcardClicked()
     /** Notifies listener of provision-custom-flow button click. */
     fun handleCustomFlowClicked()
   }

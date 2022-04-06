@@ -106,7 +106,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadClientServerAttribute(EndpointId endpoint, 
 
         for (uint8_t clusterIndex = 0; clusterIndex < clusterCount; clusterIndex++)
         {
-            EmberAfCluster * cluster = emberAfGetNthCluster(endpoint, clusterIndex, server);
+            const EmberAfCluster * cluster = emberAfGetNthCluster(endpoint, clusterIndex, server);
             ReturnErrorOnFailure(encoder.Encode(cluster->clusterId));
         }
 

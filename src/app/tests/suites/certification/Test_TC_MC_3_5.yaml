@@ -15,6 +15,7 @@
 name: 21.4.1. [TC-MC-3.5] Catalog List Verification
 
 config:
+    nodeId: 0x12344321
     cluster: "Application Launcher"
     endpoint: 1
 
@@ -22,11 +23,15 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     # TODO: Need to enable when we can properly verify vendor id and uint16
     - label: "Read launch list attribute."
       disabled: true
       command: "readAttribute"
-      attribute: "application launcher list"
+      attribute: "CatalogList"
       response:
           value: []

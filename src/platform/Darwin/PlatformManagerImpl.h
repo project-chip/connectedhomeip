@@ -53,6 +53,8 @@ public:
         return mWorkQueue;
     }
 
+    System::Clock::Timestamp GetStartTime() { return mStartTime; }
+
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
     CHIP_ERROR _InitChipStack();
@@ -61,12 +63,6 @@ private:
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout delay) { return CHIP_ERROR_NOT_IMPLEMENTED; };
     CHIP_ERROR _StartEventLoopTask();
     CHIP_ERROR _StopEventLoopTask();
-
-    CHIP_ERROR _SetUserLabelList(EndpointId endpoint,
-                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
-    CHIP_ERROR _GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales);
-    CHIP_ERROR _GetSupportedCalendarTypes(
-        AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes);
 
     void _RunEventLoop();
     void _LockChipStack(){};
@@ -85,6 +81,8 @@ private:
     friend class Internal::BLEManagerImpl;
 
     static PlatformManagerImpl sInstance;
+
+    System::Clock::Timestamp mStartTime = System::Clock::kZero;
 
     dispatch_queue_t mWorkQueue = nullptr;
     // Semaphore used to implement blocking behavior in _RunEventLoop.

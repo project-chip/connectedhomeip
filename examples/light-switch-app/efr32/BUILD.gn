@@ -39,7 +39,7 @@ declare_args() {
   chip_print_memory_usage = false
 
   # PIN code for PASE session establishment.
-  setupPinCode = 73141520
+  setupPinCode = 20202021
   setupDiscriminator = 3840
 
   # Monitor & log memory usage at runtime.
@@ -48,31 +48,40 @@ declare_args() {
   # Enable Sleepy end device
   enable_sleepy_device = false
 
+  # OTA timeout in seconds
+  OTA_periodic_query_timeout = 86400
+
   # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
   use_wf200 = false
   use_rs911x = false
   use_rs911x_sockets = false
   sl_wfx_config_softap = false
-  sl_wfx_config_scan = false
+  sl_wfx_config_scan = true
+
+  # Enables LCD Qr Code on supported devices
+  show_qr_code = true
 }
 
-show_qr_code = true
+# Sanity check
+assert(!(chip_enable_wifi && chip_enable_openthread))
+assert(!(use_rs911x && chip_enable_openthread))
+assert(!(use_wf200 && chip_enable_openthread))
+if (chip_enable_wifi) {
+  assert(use_rs911x || use_wf200)
+}
 
 # BRD4166A --> ThunderBoard Sense 2 (No LCD)
 if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
   show_qr_code = false
 }
-if (use_rs911x || use_wf200) {
+
+# Enables LCD on supported devices
+lcd_on = show_qr_code
+
+# WiFi settings
+if (chip_enable_wifi) {
   wifi_sdk_dir = "${chip_root}/third_party/efr32_sdk/repo/matter/wifi"
-  if (use_rs911x) {
-    wiseconnect_sdk_root = "${chip_root}/third_party/wiseconnect-wifi-bt-sdk"
-    import("${wifi_sdk_dir}/rs911x/rs911x.gni")
-  } else {
-    import("${wifi_sdk_dir}/wf200/wf200.gni")
-  }
-}
-efr32_lwip_defs = [ "LWIP_NETIF_API=1" ]
-if (use_rs911x || use_wf200) {
+  efr32_lwip_defs = [ "LWIP_NETIF_API=1" ]
   efr32_lwip_defs += [
     "LWIP_IPV4=1",
     "LWIP_ARP=1",
@@ -81,6 +90,14 @@ if (use_rs911x || use_wf200) {
     "LWIP_IPV6_ND=1",
     "LWIP_IGMP=1",
   ]
+
+  if (use_rs911x) {
+    wiseconnect_sdk_root =
+        "${chip_root}/third_party/efr32_sdk/wiseconnect-wifi-bt-sdk"
+    import("${wifi_sdk_dir}/rs911x/rs911x.gni")
+  } else {
+    import("${wifi_sdk_dir}/wf200/wf200.gni")
+  }
 }
 
 efr32_sdk("sdk") {
@@ -100,6 +117,7 @@ efr32_sdk("sdk") {
     "BOARD_ID=${efr32_board}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
+    "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
   ]
 
   if (chip_enable_pw_rpc) {
@@ -108,29 +126,31 @@ efr32_sdk("sdk") {
       "PW_RPC_ENABLED",
     ]
   }
-  if (use_rs911x) {
-    defines += rs911x_defs
-    include_dirs += rs911x_plat_incs
-  } else if (use_wf200) {
-    defines += wf200_defs
-    include_dirs += wf200_plat_incs
-  } else {
-    defines += [ "SL_HEAP_SIZE=20480" ]
-  }
-  if (use_rs911x_sockets) {
-    include_dirs += [ "${examples_plat_dir}/wifi/rsi-sockets" ]
-    defines += rs911x_sock_defs
-  } else {
-    # Using LWIP instead of the native TCP/IP stack
-    # Thread also uses LWIP
-    #
-    defines += efr32_lwip_defs
-  }
-  if (sl_wfx_config_softap) {
-    defines += "SL_WFX_CONFIG_SOFTAP"
-  }
-  if (sl_wfx_config_scan) {
-    defines += "SL_WFX_CONFIG_SCAN"
+
+  # WiFi Settings
+  if (chip_enable_wifi) {
+    if (use_rs911x) {
+      defines += rs911x_defs
+      include_dirs += rs911x_plat_incs
+    } else if (use_wf200) {
+      defines += wf200_defs
+      include_dirs += wf200_plat_incs
+    }
+
+    if (use_rs911x_sockets) {
+      include_dirs += [ "${examples_plat_dir}/wifi/rsi-sockets" ]
+      defines += rs911x_sock_defs
+    } else {
+      # Using LWIP instead of the native TCP/IP stack
+      defines += efr32_lwip_defs
+    }
+
+    if (sl_wfx_config_softap) {
+      defines += [ "SL_WFX_CONFIG_SOFTAP" ]
+    }
+    if (sl_wfx_config_scan) {
+      defines += [ "SL_WFX_CONFIG_SCAN" ]
+    }
   }
 }
 
@@ -143,7 +163,6 @@ efr32_executable("light_switch_app") {
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/uart.cpp",
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
@@ -151,14 +170,19 @@ efr32_executable("light_switch_app") {
     "src/main.cpp",
   ]
 
+  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
+    sources += [ "${examples_plat_dir}/uart.cpp" ]
+  }
+
   deps = [
     ":sdk",
-    "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/light-switch-app/light-switch-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]
-  if (!use_rs911x && !use_wf200) {
+
+  # OpenThread Settings
+  if (chip_enable_openthread) {
     deps += [
       "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
       "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
@@ -176,35 +200,48 @@ efr32_executable("light_switch_app") {
       ]
     }
   }
-  if (use_rs911x) {
-    sources += rs911x_src_plat
 
-    # All the stuff from wiseconnect
-    sources += rs911x_src_sapi
-
-    # Apparently - the rsi library needs this (though we may not use use it)
-    sources += rs911x_src_sock
-    include_dirs += rs911x_inc_plat
-
-    if (use_rs911x_sockets) {
-      #
-      # Using native sockets inside RS911x
-      #
-      include_dirs += rs911x_sock_inc
-    } else {
-      #
-      # We use LWIP - not built-in sockets
-      #
-      sources += rs911x_src_lwip
-    }
-  } else if (use_wf200) {
-    sources += wf200_plat_src
-    include_dirs += wf200_plat_incs
+  if (chip_enable_ota_requestor) {
+    defines += [ "EFR32_OTA_ENABLED" ]
+    sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
   }
 
-  if (show_qr_code) {
+  # WiFi Settings
+  if (chip_enable_wifi) {
+    if (use_rs911x) {
+      sources += rs911x_src_plat
+
+      # All the stuff from wiseconnect
+      sources += rs911x_src_sapi
+
+      # Apparently - the rsi library needs this (though we may not use use it)
+      sources += rs911x_src_sock
+      include_dirs += rs911x_inc_plat
+
+      if (use_rs911x_sockets) {
+        #
+        # Using native sockets inside RS911x
+        #
+        include_dirs += rs911x_sock_inc
+      } else {
+        #
+        # We use LWIP - not built-in sockets
+        #
+        sources += rs911x_src_lwip
+      }
+    } else if (use_wf200) {
+      sources += wf200_plat_src
+      include_dirs += wf200_plat_incs
+    }
+  }
+
+  if (lcd_on) {
     sources += [ "${examples_plat_dir}/display/lcd.c" ]
     defines += [ "DISPLAY_ENABLED" ]
+    if (show_qr_code) {
+      defines += [ "QR_CODE_ENABLED" ]
+      deps += [ "${chip_root}/examples/common/QRCode" ]
+    }
   }
 
   if (chip_enable_pw_rpc) {
@@ -212,6 +249,7 @@ efr32_executable("light_switch_app") {
       "PW_RPC_ENABLED",
       "PW_RPC_ATTRIBUTE_SERVICE=1",
       "PW_RPC_BUTTON_SERVICE=1",
+      "PW_RPC_DESCRIPTOR_SERVICE=1",
       "PW_RPC_DEVICE_SERVICE=1",
       "PW_RPC_LIGHTING_SERVICE=1",
     ]
@@ -229,6 +267,7 @@ efr32_executable("light_switch_app") {
       "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
       "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
@@ -257,6 +296,14 @@ efr32_executable("light_switch_app") {
     ldflags += [
       "-Wl,--print-memory-usage",
       "-fstack-usage",
+    ]
+  }
+
+  # WiFi Settings
+  if (chip_enable_wifi) {
+    ldflags += [
+      "-Wl,--defsym",
+      "-Wl,SILABS_WIFI=1",
     ]
   }
 

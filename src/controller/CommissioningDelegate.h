@@ -19,25 +19,27 @@
 #pragma once
 #include <app/OperationalDeviceProxy.h>
 #include <controller/CommissioneeDeviceProxy.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/support/Variant.h>
 
 namespace chip {
 namespace Controller {
 
+class DeviceCommissioner;
+
 enum CommissioningStage : uint8_t
 {
     kError,
     kSecurePairing,
+    kReadCommissioningInfo,
     kArmFailsafe,
-    // kConfigTime,  // NOT YET IMPLEMENTED
-    // kConfigTimeZone,  // NOT YET IMPLEMENTED
-    // kConfigDST,  // NOT YET IMPLEMENTED
     kConfigRegulatory,
     kSendPAICertificateRequest,
     kSendDACCertificateRequest,
     kSendAttestationRequest,
     kAttestationVerification,
     kSendOpCertSigningRequest,
+    kValidateCSR,
     kGenerateNOCChain,
     kSendTrustedRootCert,
     kSendNOC,
@@ -48,13 +50,13 @@ enum CommissioningStage : uint8_t
     kFindOperational,
     kSendComplete,
     kCleanup,
-    kConfigACL,
 };
+
+const char * StageToString(CommissioningStage stage);
 
 struct WiFiCredentials
 {
     ByteSpan ssid;
-    // TODO(cecille): We should add a PII bytespan concept.
     ByteSpan credentials;
     WiFiCredentials(ByteSpan newSsid, ByteSpan newCreds) : ssid(newSsid), credentials(newCreds) {}
 };
@@ -64,38 +66,158 @@ struct NOCChainGenerationParameters
     ByteSpan nocsrElements;
     ByteSpan signature;
 };
-struct NOCerts
+
+struct CompletionStatus
 {
+    CompletionStatus() : err(CHIP_NO_ERROR), failedStage(NullOptional), attestationResult(NullOptional) {}
+    CHIP_ERROR err;
+    Optional<CommissioningStage> failedStage;
+    Optional<Credentials::AttestationVerificationResult> attestationResult;
 };
+
+constexpr uint16_t kDefaultFailsafeTimeout = 60;
 class CommissioningParameters
 {
 public:
     static constexpr size_t kMaxThreadDatasetLen = 254;
     static constexpr size_t kMaxSsidLen          = 32;
     static constexpr size_t kMaxCredentialsLen   = 64;
-    uint16_t GetFailsafeTimerSeconds() const { return mFailsafeTimerSeconds; }
+
+    // Value to use when setting the commissioning failsafe timer on the node being commissioned.
+    // If the failsafe timer value is passed in as part of the commissioning parameters, that value will be used. If not supplied,
+    // the AutoCommissioner will set this to the recommended value read from the node. If that is not set, it will fall back to the
+    // default kDefaultFailsafeTimeout.
+    // This value should be set before running PerformCommissioningStep for the kArmFailsafe step.
+    const Optional<uint16_t> GetFailsafeTimerSeconds() const { return mFailsafeTimerSeconds; }
+
+    // The location (indoor/outdoor) of the node being commissioned.
+    // The node regulartory location (indoor/outdoor) should be set by the commissioner explicitly as it may be different than the
+    // location of the commissioner. This location will be set on the node if the node supports configurable regulatory location
+    // (from GetLocationCapability - see below). If the regulatory location is not supplied, this will fall back to the location in
+    // GetDefaultRegulatoryLocation and then to Outdoor (most restrictive).
+    // This value should be set before calling PerformCommissioningStep for the kConfigRegulatory step.
+    const Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> GetDeviceRegulatoryLocation() const
+    {
+        return mDeviceRegulatoryLocation;
+    }
+
+    // Nonce sent to the node to use during the CSR request.
+    // When using the AutoCommissioner, this value will be ignored in favour of the value supplied by the
+    // OperationalCredentialsDelegate ObtainCsrNonce function. If the credential delegate is not supplied, the value supplied here
+    // will be used. If neither is supplied random value will be used as a fallback.
+    // This value must be set before calling PerformCommissioningStep for the kSendOpCertSigningRequest step.
     const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
+
+    // Nonce value sent to the node to use during the attestation request.
+    // When using the AutoCommissioner, this value will fall back to random if not supplied.
+    // If a non-random value is to be used, the value must be set before calling PerformCommissioningStep for the
+    // kSendAttestationRequest step.
     const Optional<ByteSpan> GetAttestationNonce() const { return mAttestationNonce; }
+
+    // WiFi SSID and credentials to use when adding/updating and enabling WiFi on the node.
+    // This value must be set before calling PerformCommissioningStep for the kWiFiNetworkSetup or kWiFiNetworkEnable steps.
     const Optional<WiFiCredentials> GetWiFiCredentials() const { return mWiFiCreds; }
+
+    // Thread operational dataset to use when adding/updating and enabling the thread network on the node.
+    // This value must be set before calling PerformCommissioningStep for the kThreadNetworkSetup or kThreadNetworkEnable steps.
     const Optional<ByteSpan> GetThreadOperationalDataset() const { return mThreadOperationalDataset; }
+
+    // The NOCSR parameters (elements and signature) returned from the node. In the AutoCommissioner, this is set using the data
+    // returned from the kSendOpCertSigningRequest stage.
+    // This value must be set before calling PerformCommissioningStep for the kGenerateNOCChain step.
     const Optional<NOCChainGenerationParameters> GetNOCChainGenerationParameters() const { return mNOCChainGenerationParameters; }
+
+    // The root certificate for the operational certificate chain. In the auto commissioner, this is set by by the kGenerateNOCChain
+    // stage through the OperationalCredentialsDelegate.
+    // This value must be set before calling PerformCommissioningStep for the kSendTrustedRootCert step.
     const Optional<ByteSpan> GetRootCert() const { return mRootCert; }
+
+    // The node operational certificate for the node being commissioned. In the AutoCommissioner, this is set by by the
+    // kGenerateNOCChain stage through the OperationalCredentialsDelegate.
+    // This value must be set before calling PerformCommissioningStep for the kSendNOC step.
+    // This value must also be set before calling PerformCommissioningStep for the kSendTrustedRootCert step, as it is used to set
+    // the node id in the DeviceProxy.
     const Optional<ByteSpan> GetNoc() const { return mNoc; }
+
+    // The intermediate certificate for the node being commissioned. In the AutoCommissioner, this is set by by the
+    // kGenerateNOCChain stage through the OperationalCredentialsDelegate.
+    // This value should be set before calling PerformCommissioningStep for the kSendNOC step.
     const Optional<ByteSpan> GetIcac() const { return mIcac; }
+
+    // Epoch key for the identity protection key for the node being commissioned. In the AutoCommissioner, this is set by by the
+    // kGenerateNOCChain stage through the OperationalCredentialsDelegate.
+    // This value must be set before calling PerformCommissioningStep for the kSendNOC step.
     const Optional<AesCcm128KeySpan> GetIpk() const
     {
         return mIpk.HasValue() ? Optional<AesCcm128KeySpan>(mIpk.Value().Span()) : Optional<AesCcm128KeySpan>();
     }
+
+    // Admin subject id used for the case access control entry created if the AddNOC command succeeds. In the AutoCommissioner, this
+    // is set by by the kGenerateNOCChain stage through the OperationalCredentialsDelegate.
+    // This must be set before calling PerformCommissioningStep for the kSendNOC step.
     const Optional<NodeId> GetAdminSubject() const { return mAdminSubject; }
+
+    // Attestation elements from the node. These are obtained from node in response to the AttestationRequest command. In the
+    // AutoCommissioner, this is automatically set from the report from the kSendAttestationRequest stage.
+    // This must be set before calling PerformCommissioningStep for the kAttestationVerification step.
     const Optional<ByteSpan> GetAttestationElements() const { return mAttestationElements; }
+
+    // Attestation signature from the node. This is obtained from node in response to the AttestationRequest command. In the
+    // AutoCommissioner, this is automatically set from the report from the kSendAttestationRequest stage.
+    // This must be set before calling PerformCommissioningStep for the kAttestationVerification step.
     const Optional<ByteSpan> GetAttestationSignature() const { return mAttestationSignature; }
+
+    // Product attestation intermediate certificate from the node. This is obtained from the node in response to the
+    // CertificateChainRequest command for the PAI. In the AutoCommissioner, this is automatically set from the report from the
+    // kSendPAICertificateRequest stage.
+    // This must be set before calling PerformCommissioningStep for the kAttestationVerificationstep.
     const Optional<ByteSpan> GetPAI() const { return mPAI; }
+
+    // Device attestation certificate from the node. This is obtained from the node in response to the CertificateChainRequest
+    // command for the DAC. In the AutoCommissioner, this is automatically set from the report from the kSendDACCertificateRequest
+    // stage.
+    // This must be set before calling PerformCommissioningStep for the kAttestationVerification step.
     const Optional<ByteSpan> GetDAC() const { return mDAC; }
-    CHIP_ERROR GetCompletionStatus() { return completionStatus; }
+
+    // Node vendor ID from the basic information cluster. In the AutoCommissioner, this is automatically set from report from the
+    // kReadCommissioningInfo stage.
+    // This must be set before calling PerformCommissioningStep for the kAttestationVerification step.
+    const Optional<VendorId> GetRemoteVendorId() const { return mRemoteVendorId; }
+
+    // Node product ID from the basic information cluster. In the AutoCommissioner, this is automatically set from report from the
+    // kReadCommissioningInfo stage.
+    // This must be set before calling PerformCommissioningStep for the kAttestationVerification step.
+    const Optional<uint16_t> GetRemoteProductId() const { return mRemoteProductId; }
+
+    // Default regulatory location set by the node, as read from the GeneralCommissioning cluster. In the AutoCommissioner, this is
+    // automatically set from report from the kReadCommissioningInfo stage.
+    // This should be set before calling PerformCommissioningStep for the kConfigRegulatory step.
+    const Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> GetDefaultRegulatoryLocation() const
+    {
+        return mDefaultRegulatoryLocation;
+    }
+
+    // Location capabilities of the node, as read from the GeneralCommissioning cluster. In the AutoCommissioner, this is
+    // automatically set from report from the kReadCommissioningInfo stage.
+    // This should be set before calling PerformCommissioningStep for the kConfigRegulatory step.
+    const Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> GetLocationCapability() const
+    {
+        return mLocationCapability;
+    }
+
+    // Status to send when calling CommissioningComplete on the PairingDelegate during the kCleanup step. The AutoCommissioner uses
+    // this to pass through any error messages received during commissioning.
+    const CompletionStatus & GetCompletionStatus() const { return completionStatus; }
 
     CommissioningParameters & SetFailsafeTimerSeconds(uint16_t seconds)
     {
-        mFailsafeTimerSeconds = seconds;
+        mFailsafeTimerSeconds.SetValue(seconds);
+        return *this;
+    }
+
+    CommissioningParameters & SetDeviceRegulatoryLocation(app::Clusters::GeneralCommissioning::RegulatoryLocationType location)
+    {
+        mDeviceRegulatoryLocation.SetValue(location);
         return *this;
     }
 
@@ -179,12 +301,34 @@ public:
         mDAC = MakeOptional(dac);
         return *this;
     }
-    void SetCompletionStatus(CHIP_ERROR err) { completionStatus = err; }
+    CommissioningParameters & SetRemoteVendorId(VendorId id)
+    {
+        mRemoteVendorId = MakeOptional(id);
+        return *this;
+    }
+    CommissioningParameters & SetRemoteProductId(uint16_t id)
+    {
+        mRemoteProductId = MakeOptional(id);
+        return *this;
+    }
+    CommissioningParameters & SetDefaultRegulatoryLocation(app::Clusters::GeneralCommissioning::RegulatoryLocationType location)
+    {
+        mDefaultRegulatoryLocation = MakeOptional(location);
+        return *this;
+    }
+    CommissioningParameters & SetLocationCapability(app::Clusters::GeneralCommissioning::RegulatoryLocationType capability)
+    {
+        mLocationCapability = MakeOptional(capability);
+        return *this;
+    }
+    void SetCompletionStatus(const CompletionStatus & status) { completionStatus = status; }
 
 private:
-    uint16_t mFailsafeTimerSeconds = 60;
-    Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
-    Optional<ByteSpan> mAttestationNonce; ///< Attestation Nonce passed by the commissioner
+    // Items that can be set by the commissioner
+    Optional<uint16_t> mFailsafeTimerSeconds;
+    Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> mDeviceRegulatoryLocation;
+    Optional<ByteSpan> mCSRNonce;
+    Optional<ByteSpan> mAttestationNonce;
     Optional<WiFiCredentials> mWiFiCreds;
     Optional<ByteSpan> mThreadOperationalDataset;
     Optional<NOCChainGenerationParameters> mNOCChainGenerationParameters;
@@ -193,11 +337,16 @@ private:
     Optional<ByteSpan> mIcac;
     Optional<AesCcm128Key> mIpk;
     Optional<NodeId> mAdminSubject;
+    // Items that come from the device in commissioning steps
     Optional<ByteSpan> mAttestationElements;
     Optional<ByteSpan> mAttestationSignature;
     Optional<ByteSpan> mPAI;
     Optional<ByteSpan> mDAC;
-    CHIP_ERROR completionStatus = CHIP_NO_ERROR;
+    Optional<VendorId> mRemoteVendorId;
+    Optional<uint16_t> mRemoteProductId;
+    Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> mDefaultRegulatoryLocation;
+    Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> mLocationCapability;
+    CompletionStatus completionStatus;
 };
 
 struct RequestedCertificate
@@ -212,6 +361,13 @@ struct AttestationResponse
         attestationElements(newAttestationElements), signature(newSignature)
     {}
     ByteSpan attestationElements;
+    ByteSpan signature;
+};
+
+struct CSRResponse
+{
+    CSRResponse(ByteSpan elements, ByteSpan newSignature) : nocsrElements(elements), signature(newSignature) {}
+    ByteSpan nocsrElements;
     ByteSpan signature;
 };
 
@@ -232,18 +388,81 @@ struct OperationalNodeFoundData
     OperationalNodeFoundData(OperationalDeviceProxy * proxy) : operationalProxy(proxy) {}
     OperationalDeviceProxy * operationalProxy;
 };
+
+struct NetworkClusterInfo
+{
+    EndpointId endpoint = kInvalidEndpointId;
+    app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableType minConnectionTime;
+};
+struct NetworkClusters
+{
+    NetworkClusterInfo wifi;
+    NetworkClusterInfo thread;
+    NetworkClusterInfo eth;
+};
+struct BasicClusterInfo
+{
+    VendorId vendorId  = VendorId::Common;
+    uint16_t productId = 0;
+};
+struct GeneralCommissioningInfo
+{
+    uint64_t breadcrumb          = 0;
+    uint16_t recommendedFailsafe = 0;
+    app::Clusters::GeneralCommissioning::RegulatoryLocationType currentRegulatoryLocation =
+        app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoorOutdoor;
+    app::Clusters::GeneralCommissioning::RegulatoryLocationType locationCapability =
+        app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoorOutdoor;
+    ;
+};
+
+struct ReadCommissioningInfo
+{
+    NetworkClusters network;
+    BasicClusterInfo basic;
+    GeneralCommissioningInfo general;
+};
+
+struct AdditionalErrorInfo
+{
+    AdditionalErrorInfo(Credentials::AttestationVerificationResult result) : attestationResult(result) {}
+    Credentials::AttestationVerificationResult attestationResult;
+};
+
 class CommissioningDelegate
 {
 public:
     virtual ~CommissioningDelegate(){};
-
-    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData>
+    /* CommissioningReport is returned after each commissioning step is completed. The reports for each step are:
+     * kReadCommissioningInfo - ReadCommissioningInfo
+     * kArmFailsafe: none
+     * kConfigRegulatory: none
+     * kSendPAICertificateRequest: RequestedCertificate
+     * kSendDACCertificateRequest: RequestedCertificate
+     * kSendAttestationRequest: AttestationResponse
+     * kAttestationVerification: AdditionalErrorInfo if there is an error
+     * kSendOpCertSigningRequest: CSRResponse
+     * kGenerateNOCChain: NocChain
+     * kSendTrustedRootCert: None
+     * kSendNOC: none
+     * kWiFiNetworkSetup: none
+     * kThreadNetworkSetup: none
+     * kWiFiNetworkEnable: none
+     * kThreadNetworkEnable: none
+     * kFindOperational: OperationalNodeFoundData
+     * kSendComplete: none
+     * kCleanup: none
+     */
+    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData,
+                                         ReadCommissioningInfo, AdditionalErrorInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;
-        // TODO: Add other things the delegate needs to know.
     };
-    virtual CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningReport report) = 0;
+    virtual CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params)                           = 0;
+    virtual void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) = 0;
+    virtual CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy)       = 0;
+    virtual CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningReport report)                        = 0;
 };
 
 } // namespace Controller

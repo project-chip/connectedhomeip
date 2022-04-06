@@ -46,7 +46,7 @@ CHIP_ERROR SetupPayloadParseCommand::Parse(std::string codeString, chip::SetupPa
 
 CHIP_ERROR SetupPayloadParseCommand::Print(chip::SetupPayload payload)
 {
-    ChipLogProgress(SetupPayload, "CommissioningFlow: %" PRIu8, to_underlying(payload.commissioningFlow));
+    ChipLogProgress(SetupPayload, "CommissioningFlow: %u", to_underlying(payload.commissioningFlow));
     ChipLogProgress(SetupPayload, "VendorID: %u", payload.vendorID);
     ChipLogProgress(SetupPayload, "Version: %u", payload.version);
     ChipLogProgress(SetupPayload, "ProductID: %u", payload.productID);

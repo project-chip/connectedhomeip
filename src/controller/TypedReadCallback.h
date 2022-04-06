@@ -20,9 +20,9 @@
 
 #include <app/BufferedReadCallback.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/data-model/Decode.h>
 #include <functional>
+#include <lib/support/CHIPMem.h>
 
 namespace chip {
 namespace Controller {
@@ -30,11 +30,12 @@ namespace Controller {
 /*
  * This provides an adapter class that implements ReadClient::Callback and provides three additional
  * features:
- *  1. The ability to pass in std::function closures to permit more flexible programming scenarios than are provided by the strict
- *     delegate interface stipulated by by InteractionModelDelegate.
+ *  1. The ability to pass in std::function closures to permit more flexible
+ *     programming scenarios than are provided by the strict delegate interface
+ *     stipulated by ReadClient::Callback.
  *
- *  2. Automatic decoding of attribute data provided in the TLVReader by InteractionModelDelegate::OnReportData into a decoded
- *     cluster object.
+ *  2. Automatic decoding of attribute data provided in the TLVReader by
+ *     ReadClient::Callback::OnAttributeData into a decoded cluster object.
  *
  *  3. Automatically representing all errors as a CHIP_ERROR (which might
  *     encapsulate a StatusIB).  This could be a path-specific error or it
@@ -48,10 +49,10 @@ class TypedReadAttributeCallback final : public app::ReadClient::Callback
 {
 public:
     using OnSuccessCallbackType =
-        std::function<void(const app::ConcreteAttributePath & aPath, const DecodableAttributeType & aData)>;
-    using OnErrorCallbackType                   = std::function<void(const app::ConcreteAttributePath * aPath, CHIP_ERROR aError)>;
-    using OnDoneCallbackType                    = std::function<void(TypedReadAttributeCallback * callback)>;
-    using OnSubscriptionEstablishedCallbackType = std::function<void()>;
+        std::function<void(const app::ConcreteDataAttributePath & aPath, const DecodableAttributeType & aData)>;
+    using OnErrorCallbackType = std::function<void(const app::ConcreteDataAttributePath * aPath, CHIP_ERROR aError)>;
+    using OnDoneCallbackType  = std::function<void(TypedReadAttributeCallback * callback)>;
+    using OnSubscriptionEstablishedCallbackType = std::function<void(const app::ReadClient & readClient)>;
 
     TypedReadAttributeCallback(ClusterId aClusterId, AttributeId aAttributeId, OnSuccessCallbackType aOnSuccess,
                                OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
@@ -82,8 +83,7 @@ private:
         VerifyOrExit(aPath.mClusterId == mClusterId && aPath.mAttributeId == mAttributeId, err = CHIP_ERROR_SCHEMA_MISMATCH);
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-        err = app::DataModel::Decode(*apData, value);
-        SuccessOrExit(err);
+        SuccessOrExit(err = app::DataModel::Decode(*apData, value));
 
         mOnSuccess(aPath, value);
 
@@ -102,8 +102,18 @@ private:
     {
         if (mOnSubscriptionEstablished)
         {
-            mOnSubscriptionEstablished();
+            mOnSubscriptionEstablished(*mReadClient.get());
         }
+    }
+
+    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
+    {
+        VerifyOrDie(aReadPrepareParams.mAttributePathParamsListSize == 1 &&
+                    aReadPrepareParams.mpAttributePathParamsList != nullptr);
+        chip::Platform::Delete<app::AttributePathParams>(aReadPrepareParams.mpAttributePathParamsList);
+
+        VerifyOrDie(aReadPrepareParams.mDataVersionFilterListSize == 1 && aReadPrepareParams.mpDataVersionFilterList != nullptr);
+        chip::Platform::Delete<app::DataVersionFilter>(aReadPrepareParams.mpDataVersionFilterList);
     }
 
     ClusterId mClusterId;
@@ -139,6 +149,10 @@ private:
         CHIP_ERROR err = CHIP_NO_ERROR;
         DecodableEventType value;
 
+        // Only one of the apData and apStatus can be non-null, so apStatus will always indicate a failure status when it is not
+        // nullptr.
+        VerifyOrExit(apStatus == nullptr, err = apStatus->ToChipError());
+
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         VerifyOrExit((aEventHeader.mPath.mEventId == value.GetEventId()) && (aEventHeader.mPath.mClusterId == value.GetClusterId()),
@@ -158,6 +172,12 @@ private:
     void OnError(CHIP_ERROR aError) override { mOnError(nullptr, aError); }
 
     void OnDone() override { mOnDone(this); }
+
+    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
+    {
+        VerifyOrDie(aReadPrepareParams.mEventPathParamsListSize == 1 && aReadPrepareParams.mpEventPathParamsList != nullptr);
+        chip::Platform::Delete<app::EventPathParams>(aReadPrepareParams.mpEventPathParamsList);
+    }
 
     void OnSubscriptionEstablished(uint64_t aSubscriptionId) override
     {

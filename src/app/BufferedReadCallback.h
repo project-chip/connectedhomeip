@@ -79,6 +79,11 @@ private:
     void OnDone() override { return mCallback.OnDone(); }
     void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mCallback.OnSubscriptionEstablished(aSubscriptionId); }
 
+    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
+    {
+        return mCallback.OnDeallocatePaths(std::move(aReadPrepareParams));
+    }
+
 private:
     /*
      * Given a reader positioned at a list element, allocate a packet buffer, copy the list item where
@@ -88,7 +93,6 @@ private:
      *
      */
     CHIP_ERROR BufferListItem(TLV::TLVReader & reader);
-
     ConcreteDataAttributePath mBufferedPath;
     std::vector<System::PacketBufferHandle> mBufferedList;
     Callback & mCallback;

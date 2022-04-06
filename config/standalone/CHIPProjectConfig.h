@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,9 +36,12 @@
 // Enable support functions for parsing command-line arguments
 #define CHIP_CONFIG_ENABLE_ARG_PARSER 1
 
-// Use a default pairing code if one hasn't been provisioned in flash.
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
+//  Enable use of test setup parameters for testing purposes only.
+//
+//    WARNING: This option makes it possible to circumvent basic chip security functionality.
+//    Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
+//
+#define CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS 1
 
 // Enable reading DRBG seed data from /dev/(u)random.
 // This is needed for test applications and the CHIP device manager to function
@@ -56,14 +59,7 @@
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
 #define CHIP_CONFIG_REQUIRE_AUTH 1
 
-// Increase session idle timeout in stand-alone builds for the convenience of developers.
-#define CHIP_CONFIG_DEFAULT_SECURITY_SESSION_IDLE_TIMEOUT 120000
-
 #define CHIP_CONFIG_ENABLE_UPDATE 1
-
-#define CHIP_CONFIG_LEGACY_CASE_AUTH_DELEGATE 0
-
-#define CHIP_CONFIG_LEGACY_KEY_EXPORT_DELEGATE 0
 
 #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 0
 
@@ -73,20 +69,21 @@
 #define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 4
 #endif
 
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 1
+#endif
+
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "1.0"
+#endif
+
 //
 // Default of 8 ECs is not sufficient for some of the unit tests
 // that try to validate multiple simultaneous interactions.
 //
-#define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS 16
+#define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS 24
 
-//
-// Set this to a value greater than the value for CHIP_IM_MAX_NUM_READ_HANDLER
-// to ensure some of the tests for validating resource exhaustion and heap allocation
-// pass correctly.
-//
-// TODO: Once we fix ReadClients to be heap allocated, we no longer need this override.
-//
-#define CHIP_IM_MAX_NUM_READ_CLIENT 6
+#define CHIP_IM_MAX_NUM_READ_HANDLER 8
 
 #define CONFIG_IM_BUILD_FOR_UNIT_TEST 1
 

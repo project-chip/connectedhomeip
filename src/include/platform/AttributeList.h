@@ -46,7 +46,6 @@ public:
         int mIndex = -1;
     };
 
-public:
     AttributeList() = default;
     ~AttributeList() { mSize = 0; }
 

@@ -34,14 +34,19 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.52
+            image: connectedhomeip/chip-build:0.5.58
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
 
             - name: Set up environment for size reports
               if: ${{ !env.ACT }}
@@ -58,33 +63,18 @@ jobs:
               with:
                   name: bootstrap-logs
                   path: |
-                   .environment/gn_out/.ninja_log
-                   .environment/pigweed-venv/*.log
-            - name: Build example QPG6105 Lock App
+                      .environment/gn_out/.ninja_log
+                      .environment/pigweed-venv/*.log
+            - name: Build QPG6105 example apps
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/lock-app/qpg out/lock_app_debug qpg_target_ic=\"qpg6105\"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    qpg qpg6105+debug lock-app \
-                    out/lock_app_debug/chip-qpg6105-lock-example.out \
-                    /tmp/bloat_reports/
-            - name: Build example QPG6105 Lighting App
-              timeout-minutes: 5
-              run: |
-                  scripts/examples/gn_build_example.sh examples/lighting-app/qpg out/lighting_app_debug qpg_target_ic=\"qpg6105\"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    qpg qpg6105+debug lighting-app \
-                    out/lighting_app_debug/chip-qpg6105-lighting-example.out \
-                    /tmp/bloat_reports/
-            - name: Build example QPG6105 persistent-storage
-              timeout-minutes: 5
-              run: |
-                  scripts/examples/gn_build_example.sh examples/persistent-storage/qpg out/persistent-storage_app_debug \
-                    qpg_target_ic=\"qpg6105\"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    qpg qpg6105+debug persistent-storage-app \
-                    out/persistent-storage_app_debug/chip-qpg6105-persistent_storage-example.out \
-                    /tmp/bloat_reports/
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --enable-flashbundle \
+                        --target-glob 'qpg6105-{lock,light,shell,persistent-storage}' \
+                        build \
+                        --copy-artifacts-to out/artifacts \
+                     "
             - name: Build Matter SDK library
               timeout-minutes: 5
               run: |

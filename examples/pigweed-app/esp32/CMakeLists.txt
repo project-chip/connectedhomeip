@@ -18,7 +18,7 @@
 # CMakeLists in this exact order for cmake to work correctly
 cmake_minimum_required(VERSION 3.5)
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/../../common/cmake/idf_flashing.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/cmake/idf_flashing.cmake)
 
 
 set(EXTRA_COMPONENT_DIRS
@@ -31,6 +31,12 @@ idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)
 # For the C3, project_include.cmake sets -Wno-format, but does not clear various
 # flags that depend on -Wformat
 idf_build_set_property(COMPILE_OPTIONS "-Wno-format-nonliteral;-Wno-format-security" APPEND)
+
+# -Wmaybe-uninitialized has too many false positives, including on std::optional
+# and chip::Optional.  Make it nonfatal.
+#
+# See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
+idf_build_set_property(COMPILE_OPTIONS "-Wno-error=maybe-uninitialized" APPEND)
 
 get_filename_component(CHIP_ROOT ./third_party/connectedhomeip REALPATH)
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
@@ -51,5 +57,4 @@ list(REMOVE_ITEM _target_cxx_flags $<$<COMPILE_LANGUAGE:CXX>:-std=c++17>)
 list(APPEND _target_cxx_flags $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++17>)
 set_target_properties(pw_build.cpp17 PROPERTIES INTERFACE_COMPILE_OPTIONS "${_target_cxx_flags}")
 
-idf_build_get_property(project_path PROJECT_DIR)
-flashing_script(DEPENDS "${project_path}/echo_test_config.yml" "${project_path}/../mobly_tests/echo_test.py")
+flashing_script(DEPENDS "${CMAKE_CURRENT_LIST_DIR}/echo_test_config.yml" "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/pigweed-app/mobly_tests/echo_test.py")

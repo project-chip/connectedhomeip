@@ -36,5 +36,37 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
     return sInstance;
 }
 
+CHIP_ERROR DiagnosticDataProviderImpl::GetUpTime(uint64_t & upTime)
+{
+    System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
+    System::Clock::Timestamp startTime   = PlatformMgrImpl().GetStartTime();
+
+    if (currentTime >= startTime)
+    {
+        upTime = std::chrono::duration_cast<System::Clock::Seconds64>(currentTime - startTime).count();
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_INVALID_TIME;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    uint64_t upTime = 0;
+
+    if (GetUpTime(upTime) == CHIP_NO_ERROR)
+    {
+        uint32_t totalHours = 0;
+        if (ConfigurationMgr().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(upTime / 3600 <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+            totalOperationalHours = totalHours + static_cast<uint32_t>(upTime / 3600);
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    return CHIP_ERROR_INVALID_TIME;
+}
+
 } // namespace DeviceLayer
 } // namespace chip

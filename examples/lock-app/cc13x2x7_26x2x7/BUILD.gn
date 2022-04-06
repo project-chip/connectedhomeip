@@ -43,7 +43,6 @@ ti_sysconfig("sysconfig") {
   sources = [ "${project_dir}/chip.syscfg" ]
 
   outputs = [
-    "ti_devices_config.c",
     "ti_radio_config.c",
     "ti_radio_config.h",
     "ti_drivers_config.c",
@@ -109,17 +108,6 @@ ti_simplelink_executable("lock_app") {
     "-Wno-implicit-fallthrough",
     "-Wno-sign-compare",
     "-Wconversion",
-  ]
-
-  ldscript = "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/cc13x2x7_cc26x2x7.lds"
-
-  inputs = [ ldscript ]
-
-  ldflags = [
-    "-L${ti_simplelink_sdk_root}/source",
-    rebase_path("${target_gen_dir}/sysconfig/ti_utils_build_linker.cmd.genlibs",
-                root_build_dir),
-    "-T" + rebase_path(ldscript, root_build_dir),
   ]
 
   output_dir = root_out_dir

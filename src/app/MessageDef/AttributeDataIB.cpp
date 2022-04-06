@@ -139,7 +139,7 @@ AttributeDataIB::Parser::ParseData(TLV::TLVReader & aReader, int aDepth) const
         {
             for (size_t i = 0; i < len; i++)
             {
-                PRETTY_PRINT_SAMELINE("0x%" PRIx8 ", ", value_b[i]);
+                PRETTY_PRINT_SAMELINE("0x%x, ", value_b[i]);
             }
         }
 

@@ -15,6 +15,7 @@
 name: 21.7.2. [TC-MC-5.2] Change Channel by Number Verification
 
 config:
+    nodeId: 0x12344321
     cluster: "Channel"
     endpoint: 1
 
@@ -22,12 +23,16 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     #Disabled due to issue- #13029
     - label: "Reads the ChannelList attribute"
       disabled: true
       command: "readAttribute"
-      attribute: "channel list"
+      attribute: "ChannelList"
       response:
           saveAs: ChanaelListValues
           constraints:
@@ -56,6 +61,6 @@ tests:
     - label: "Reads the CurrentChannel attribute"
       disabled: true
       command: "readAttribute"
-      attribute: "current channel"
+      attribute: "CurrentChannel"
       response:
           value: ChanaelListValues

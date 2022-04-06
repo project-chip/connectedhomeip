@@ -15,6 +15,7 @@
 name: Groups Cluster Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Groups"
     endpoint: 1
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "View Group 0 (invalid)"
       command: "ViewGroup"
@@ -101,7 +106,7 @@ tests:
       response:
           values:
               - name: "capacity"
-                value: 0xff
+                value: null
               - name: "groupList"
                 value: [0x01]
 
@@ -212,7 +217,7 @@ tests:
       response:
           values:
               - name: "capacity"
-                value: 0xff
+                value: null
               - name: "groupList"
                 value: [0x7fff]
 
@@ -328,7 +333,7 @@ tests:
       response:
           values:
               - name: "capacity"
-                value: 0xff
+                value: null
               - name: "groupList"
                 value: [0x01]
 
@@ -383,6 +388,6 @@ tests:
       response:
           values:
               - name: "capacity"
-                value: 0xff
+                value: null
               - name: "groupList"
                 value: []

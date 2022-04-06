@@ -95,11 +95,11 @@ limitations under the License.
         <!-- Conformance feature RFID - for now optional -->
         <attribute side="server" code="19" define="NUM_RFID_USERS_SUPPORTED" type="INT16U" default="0" writable="false" optional="true">NumberOfRFIDUsersSupported</attribute>
         <!-- Conformance feature SCH - for now optional -->
-        <attribute side="server" code="20" define="NUM_WEEKDAY_SCHEDULES_SUPPORTED_PER_USER" type="INT16U" default="0" writable="false" optional="true">NumberOfWeekDaySchedulesSupportedPerUser</attribute>
+        <attribute side="server" code="20" define="NUM_WEEKDAY_SCHEDULES_SUPPORTED_PER_USER" type="INT8U" default="0" writable="false" optional="true">NumberOfWeekDaySchedulesSupportedPerUser</attribute>
         <!-- Conformance feature SCH - for now optional -->
-        <attribute side="server" code="21" define="NUM_YEARDAY_SCHEDULES_SUPPORTED_PER_USER" type="INT16U" default="0" writable="false" optional="true">NumberOfYearDaySchedulesSupportedPerUser</attribute>
+        <attribute side="server" code="21" define="NUM_YEARDAY_SCHEDULES_SUPPORTED_PER_USER" type="INT8U" default="0" writable="false" optional="true">NumberOfYearDaySchedulesSupportedPerUser</attribute>
         <!-- Conformance feature SCH - for now optional -->
-        <attribute side="server" code="22" define="NUM_HOLIDAY_SCHEDULES_SUPPORTED" type="INT16U" default="0" writable="false" optional="true">NumberOfHolidaySchedulesSupported</attribute>
+        <attribute side="server" code="22" define="NUM_HOLIDAY_SCHEDULES_SUPPORTED" type="INT8U" default="0" writable="false" optional="true">NumberOfHolidaySchedulesSupported</attribute>
         <!-- Conformance feature PIN - for now optional -->
         <attribute side="server" code="23" define="MAX_PIN_LENGTH" type="INT8U" writable="false" optional="true">MaxPINCodeLength</attribute>
         <!-- Conformance feature PIN - for now optional -->
@@ -109,7 +109,7 @@ limitations under the License.
         <!-- Conformance feature RID - for now optional -->
         <attribute side="server" code="26" define="MIN_RFID_CODE_LENGTH" type="INT8U" writable="false" optional="true">MinRFIDCodeLength</attribute>
         <!-- Conformance feature USR - for now optional -->
-        <attribute side="server" code="27" define="CREDENTIAL_RULES_SUPPORT" type="BITMAP8" min="0x00" max="0x07" default="1" writable="false" optional="true">CredentialRulesSupport</attribute>
+        <attribute side="server" code="27" define="CREDENTIAL_RULES_SUPPORT" type="DlCredentialRuleMask" min="0x00" max="0xFF" default="1" writable="false" optional="true">CredentialRulesSupport</attribute>
         <!-- Conformance feature LOG - for now optional -->
         <attribute side="server" code="32" define="ENABLE_LOGGING" type="boolean" reportable="true" default="0" writable="true" optional="true">
             <description>EnableLogging</description>
@@ -141,8 +141,8 @@ limitations under the License.
             <access op="read" role="view" />
             <access op="write" role="manage" />
         </attribute>
-        <attribute side="server" code="38" define="SUPPORTED_OPERATING_MODES" type="BITMAP16" min="0x0000" max="0xFFFF" default="0xFFF6" writable="false">SupportedOperatingModes</attribute>
-        <attribute side="server" code="39" define="DEFAULT_CONFIGURATION_REGISTER" type="BITMAP16" min="0x0000" max="0xFFFF" reportable="true" default="0" writable="false" optional="true">DefaultConfigurationRegister</attribute>
+        <attribute side="server" code="38" define="SUPPORTED_OPERATING_MODES" type="DlSupportedOperatingModes" min="0x0000" max="0xFFFF" default="0xFFF6" writable="false">SupportedOperatingModes</attribute>
+        <attribute side="server" code="39" define="DEFAULT_CONFIGURATION_REGISTER" type="DlDefaultConfigurationRegister" min="0x0000" max="0xFFFF" reportable="true" default="0" writable="false" optional="true">DefaultConfigurationRegister</attribute>
         <attribute side="server" code="40" define="ENABLE_LOCAL_PROGRAMMING" type="boolean" reportable="true" default="1" writable="true" optional="true">
             <description>EnableLocalProgramming</description>
             <access op="read" role="view" />
@@ -163,7 +163,7 @@ limitations under the License.
             <access op="read" role="view" />
             <access op="write" role="manage" />
         </attribute>
-        <attribute side="server" code="44" define="LOCAL_PROGRAMMING_FEATURES" type="BITMAP8" min="0x0" max="0x0F" reportable="true" default="0" writable="true" optional="true">
+        <attribute side="server" code="44" define="LOCAL_PROGRAMMING_FEATURES" type="DlLocalProgrammingFeatures" min="0x0" max="0x0F" reportable="true" default="0" writable="true" optional="true">
             <description>LocalProgrammingFeatures</description>
             <access op="read" role="view" />
             <access op="write" role="administer" />
@@ -199,49 +199,49 @@ limitations under the License.
             <access op="read" role="view" />
             <access op="write" role="administer" />
         </attribute>
-        <attribute side="server" code="64" define="ALARM_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
+        <attribute side="server" code="64" define="ALARM_MASK" type="DlAlarmMask" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
             <description>AlarmMask</description>
             <access op="read" role="view" />
             <access op="write" role="administer" />
         </attribute>
         <!-- Conformance feature [NOT & PIN] - for now optional -->
-        <attribute side="server" code="65" define="KEYPAD_OPERATION_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
+        <attribute side="server" code="65" define="KEYPAD_OPERATION_EVENT_MASK" type="DlKeypadOperationEventMask" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
             <description>KeypadOperationEventMask</description>
             <access op="read" role="view" />
             <access op="write" role="administer" />
         </attribute>
         <!-- Conformance feature [NOT] - for now optional -->
-        <attribute side="server" code="66" define="REMOTE_OPERATION_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
+        <attribute side="server" code="66" define="REMOTE_OPERATION_EVENT_MASK" type="DlRemoteOperationEventMask" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
             <description>RemoteOperationEventMask</description>
             <access op="read" role="view" />
             <access op="write" role="administer" />
         </attribute>
         <!-- Conformance feature [NOT] - for now optional -->
-        <attribute side="server" code="67" define="MANUAL_OPERATION_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
+        <attribute side="server" code="67" define="MANUAL_OPERATION_EVENT_MASK" type="DlManualOperationEventMask" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
             <description>ManualOperationEventMask</description>
             <access op="read" role="view" />
             <access op="write" role="administer" />
         </attribute>
         <!-- Conformance feature [NOT & RID] - for now optional -->
-        <attribute side="server" code="68" define="RFID_OPERATION_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
+        <attribute side="server" code="68" define="RFID_OPERATION_EVENT_MASK" type="DlRFIDOperationEventMask" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
             <description>RFIDOperationEventMask</description>
             <access op="read" role="view" />
             <access op="write" role="administer" />
         </attribute>
         <!-- Conformance feature [NOT & PIN] - for now optional -->
-        <attribute side="server" code="69" define="KEYPAD_PROGRAMMING_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
+        <attribute side="server" code="69" define="KEYPAD_PROGRAMMING_EVENT_MASK" type="DlKeypadOperationEventMask" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
             <description>KeypadProgrammingEventMask</description>
             <access op="read" role="view" />
             <access op="write" role="administer" />
         </attribute>
         <!-- Conformance feature [NOT] - for now optional -->
-        <attribute side="server" code="70" define="REMOTE_PROGRAMMING_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
+        <attribute side="server" code="70" define="REMOTE_PROGRAMMING_EVENT_MASK" type="DlRemoteProgrammingEventMask" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
             <description>RemoteProgrammingEventMask</description>
             <access op="read" role="view" />
             <access op="write" role="administer" />
         </attribute>
         <!-- Conformance feature [NOT & RID] - for now optional -->
-        <attribute side="server" code="71" define="RFID_PROGRAMMING_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
+        <attribute side="server" code="71" define="RFID_PROGRAMMING_EVENT_MASK" type="DlRFIDProgrammingEventMask" min="0x0000" max="0xFFFF" reportable="true" default="0xFFFF" writable="true" optional="true">
             <description>RFIDProgrammingEventMask</description>
             <access op="read" role="view" />
             <access op="write" role="administer" />
@@ -249,18 +249,18 @@ limitations under the License.
 
 
         <!-- Commands -->
-        <command source="client" code="0" name="LockDoor">
+        <command source="client" code="0" name="LockDoor" mustUseTimedInvoke="true">
             <description>This command causes the lock device to lock the door.</description>
             <!-- Conformance feature [COTA & PIN] - for now optional -->
             <arg name="pinCode" type="OCTET_STRING" optional="true" />
         </command>
-        <command source="client" code="1" name="UnlockDoor">
+        <command source="client" code="1" name="UnlockDoor" mustUseTimedInvoke="true">
             <description>This command causes the lock device to unlock the door.</description>
             <!-- Conformance feature [COTA & PIN] - for now optional -->
             <arg name="pinCode" type="OCTET_STRING" optional="true" />
         </command>
         <!-- Command Toggle with ID 2 is deprecated/disallowed -->
-        <command source="client" code="3" name="UnlockWithTimeout" optional="true">
+        <command source="client" code="3" name="UnlockWithTimeout" mustUseTimedInvoke="true" optional="true">
             <description>This command causes the lock device to unlock the door with a timeout parameter.</description>
             <arg name="timeout" type="INT16U" />
             <!-- Conformance feature [COTA & PIN] - for now optional -->
@@ -285,7 +285,7 @@ limitations under the License.
             <arg name="pin" type="OCTET_STRING" />
         </command>
         <!-- Conformance feature !USR & PIN - for now optional -->
-        <command source="client" code="5" name="SetPINCode" optional="true">
+        <command source="client" code="5" name="SetPINCode" mustUseTimedInvoke="true" optional="true">
             <description>Set a PIN Code into the lock.</description>
             <access op="invoke" role="administer" />
             <arg name="userId" type="INT16U" />
@@ -309,13 +309,13 @@ limitations under the License.
             <arg name="pin" type="OCTET_STRING" isNullable="true" />
         </command>
         <!-- Conformance feature !USR & PIN - for now optional -->
-        <command source="client" code="7" name="ClearPINCode" optional="true">
+        <command source="client" code="7" name="ClearPINCode" mustUseTimedInvoke="true" optional="true">
             <description>Clear a PIN code or all PIN codes.</description>
             <access op="invoke" role="administer" />
             <arg name="pinSlotIndex" type="INT16U" />
         </command>
         <!-- Conformance feature !USR & PIN - for now optional -->
-        <command source="client" code="8" name="ClearAllPINCodes" optional="true">
+        <command source="client" code="8" name="ClearAllPINCodes" mustUseTimedInvoke="true" optional="true">
             <description>Clear out all PINs on the lock.</description>
             <access op="invoke" role="administer" />
         </command>
@@ -365,11 +365,11 @@ limitations under the License.
             <arg name="weekDayIndex" type="INT8U" />
             <arg name="userIndex" type="INT16U" />
             <arg name="status" type="DlStatus" />
-            <arg name="daysMask" type="DlDaysMaskMap" presentIf="status == 0" />
-            <arg name="startHour" type="INT8U" presentIf="status == 0" />
-            <arg name="startMinute" type="INT8U" presentIf="status == 0" />
-            <arg name="endHour" type="INT8U" presentIf="status == 0" />
-            <arg name="endMinute" type="INT8U" presentIf="status == 0" />
+            <arg name="daysMask" type="DlDaysMaskMap" optional="true" />
+            <arg name="startHour" type="INT8U" optional="true" />
+            <arg name="startMinute" type="INT8U" optional="true" />
+            <arg name="endHour" type="INT8U" optional="true" />
+            <arg name="endMinute" type="INT8U" optional="true" />
         </command>
         <!-- Conformance feature SCH - for now optional -->
         <command source="client" code="13" name="ClearWeekDaySchedule" optional="true">
@@ -401,8 +401,8 @@ limitations under the License.
             <arg name="yearDayIndex" type="INT8U" />
             <arg name="userIndex" type="INT16U" />
             <arg name="status" type="DlStatus" />
-            <arg name="localStartTime" type="epoch_s" presentIf="status == 0" />
-            <arg name="localEndTime" type="epoch_s" presentIf="status == 0" />
+            <arg name="localStartTime" type="epoch_s" optional="true" />
+            <arg name="localEndTime" type="epoch_s" optional="true" />
         </command>
         <!-- Conformance feature SCH - for now optional -->
         <command source="client" code="16" name="ClearYearDaySchedule" optional="true">
@@ -432,9 +432,9 @@ limitations under the License.
             <access op="invoke" role="administer" />
             <arg name="holidayIndex" type="INT8U" />
             <arg name="status" type="DlStatus" />
-            <arg name="localStartTime" type="epoch_s" presentIf="status == 0" />
-            <arg name="localEndTime" type="epoch_s" presentIf="status == 0" />
-            <arg name="operatingMode" type="DlOperatingMode" presentIf="status == 0" />
+            <arg name="localStartTime" type="epoch_s" optional="true" />
+            <arg name="localEndTime" type="epoch_s" optional="true" />
+            <arg name="operatingMode" type="DlOperatingMode" optional="true" />
         </command>
         <!-- Conformance feature SCH - for now optional -->
         <command source="client" code="19" name="ClearHolidaySchedule" optional="true">
@@ -463,7 +463,7 @@ limitations under the License.
             <arg name="userType" type="DlUserType" />
         </command>
         <!-- Conformance feature !USR & RID - for now optional -->
-        <command source="client" code="22" name="SetRFIDCode" optional="true">
+        <command source="client" code="22" name="SetRFIDCode" mustUseTimedInvoke="true" optional="true">
             <description>Set an ID for RFID access into the lock.</description>
             <access op="invoke" role="administer" />
             <arg name="userId" type="INT16U" />
@@ -487,18 +487,18 @@ limitations under the License.
             <arg name="rfidCode" type="OCTET_STRING" isNullable="true" />
         </command>
         <!-- Conformance feature !USR & RID - for now optional -->
-        <command source="client" code="24" name="ClearRFIDCode" optional="true">
+        <command source="client" code="24" name="ClearRFIDCode" mustUseTimedInvoke="true" optional="true">
             <description>Clear an RFID code or all RFID codes.</description>
             <access op="invoke" role="administer" />
             <arg name="rfidSlotIndex" type="INT16U" />
         </command>
         <!-- Conformance feature !USR & PIN - for now optional -->
-        <command source="client" code="25" name="ClearAllRFIDCodes" optional="true">
+        <command source="client" code="25" name="ClearAllRFIDCodes" mustUseTimedInvoke="true" optional="true">
             <description>Clear out all RFIDs on the lock.</description>
             <access op="invoke" role="administer" />
         </command>
         <!-- Conformance feature USR - for now optional -->
-        <command source="client" code="26" name="SetUser" optional="true">
+        <command source="client" code="26" name="SetUser" mustUseTimedInvoke="true" optional="true">
             <description>Set User into the lock.</description>
             <access op="invoke" role="administer" />
             <arg name="operationType" type="DlDataOperationType" />
@@ -531,7 +531,7 @@ limitations under the License.
             <arg name="nextUserIndex" type="INT16U" isNullable="true" />
         </command>
         <!-- Conformance feature USR - for now optional -->
-        <command source="client" code="29" name="ClearUser" optional="true">
+        <command source="client" code="29" name="ClearUser" mustUseTimedInvoke="true" optional="true">
             <description>Clears a User or all Users.</description>
             <access op="invoke" role="administer" />
             <arg name="userIndex" type="INT16U" />
@@ -559,7 +559,7 @@ limitations under the License.
             <arg name="data" type="CHAR_STRING" optional="true" />
         </command>
         <!-- Conformance feature USR - for now optional -->
-        <command source="client" code="34" name="SetCredential" response="SetCredentialResponse" optional="true">
+        <command source="client" code="34" name="SetCredential" response="SetCredentialResponse" mustUseTimedInvoke="true" optional="true">
             <description>Set a credential (e.g. PIN, RFID, Fingerprint, etc.) into the lock for a new user, existing user, or ProgrammingUser.</description>
             <access op="invoke" role="administer" />
             <arg name="operationType" type="DlDataOperationType" />
@@ -592,7 +592,7 @@ limitations under the License.
             <arg name="nextCredentialIndex" type="INT16U" isNullable="true" />
         </command>
         <!-- Conformance feature USR - for now optional -->
-        <command source="client" code="38" name="ClearCredential" optional="true">
+        <command source="client" code="38" name="ClearCredential" mustUseTimedInvoke="true" optional="true">
             <description>Clear one, one type, or all credentials except ProgrammingPIN credential.</description>
             <access op="invoke" role="administer" />
             <arg name="credential" type="DlCredential" isNullable="true"/>
@@ -662,6 +662,13 @@ limitations under the License.
         <item value="1" name="Double" />
         <item value="2" name="Tri" />
     </enum>
+
+    <bitmap name="DlCredentialRuleMask" type="BITMAP8">
+        <cluster code="0x0101" />
+        <field mask="0x01" name="Single" />
+        <field mask="0x02" name="Dual" />
+        <field mask="0x04" name="Tri" />
+    </bitmap> 
 
     <struct name="DlCredential">
         <cluster code="0x0101" />
@@ -882,7 +889,7 @@ limitations under the License.
         <field mask="0x40" name="UnlockInvalidSchedule" />
     </bitmap>
 
-    <!-- RemoteOperationEventMask attribute bit meaning set -->
+    <!-- ManualOperationEventMask attribute bit meaning set -->
     <bitmap name="DlManualOperationEventMask" type="BITMAP16">
         <cluster code="0x0101" />
         <field mask="0x001" name="Unknown" />
@@ -952,15 +959,15 @@ limitations under the License.
 
     <bitmap name="DoorLockFeature" type="BITMAP32">
         <cluster code="0x0101" />
-        <field name="PINCredentials" mask="0x01"/>
-        <field name="RFIDCredentials" mask="0x02"/>
-        <field name="FingerCredentials" mask="0x04"/>
-        <field name="Logging" mask="0x08"/>
-        <field name="AccessSchedules" mask="0x10"/>
-        <field name="DoorPositionSensor" mask="0x20"/>
-        <field name="FaceCredentials" mask="0x40"/>
-        <field name="CredentialsOTA" mask="0x80"/>
-        <field name="UsersManagement" mask="0x100"/>
-        <field name="Notifications" mask="0x200"/>
+        <field name="PINCredentials" mask="0x01" />
+        <field name="RFIDCredentials" mask="0x02" />
+        <field name="FingerCredentials" mask="0x04" />
+        <field name="Logging" mask="0x08" />
+        <field name="AccessSchedules" mask="0x10" />
+        <field name="DoorPositionSensor" mask="0x20" />
+        <field name="FaceCredentials" mask="0x40" />
+        <field name="CredentialsOTA" mask="0x80" />
+        <field name="UsersManagement" mask="0x100" />
+        <field name="Notifications" mask="0x200" />
     </bitmap>
 </configurator>

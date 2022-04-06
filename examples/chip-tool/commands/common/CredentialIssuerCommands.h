@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2021-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@
 
 #include <app/util/basic-types.h>
 #include <controller/CHIPDeviceControllerFactory.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 
@@ -46,10 +47,12 @@ public:
      *
      * @param[in] setupParams A reference to the Setup/Commissioning Parameters, to be initialized with custom Device Attestation
      *                        Verifier.
+     * @param[in] trustStore  A pointer to the PAA trust store to use to find valid PAA roots.
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    virtual CHIP_ERROR SetupDeviceAttestation(chip::Controller::SetupParams & setupParams) = 0;
+    virtual CHIP_ERROR SetupDeviceAttestation(chip::Controller::SetupParams & setupParams,
+                                              const chip::Credentials::AttestationTrustStore * trustStore) = 0;
 
     virtual chip::Controller::OperationalCredentialsDelegate * GetCredentialIssuer() = 0;
 
@@ -60,14 +63,15 @@ public:
      *
      * @param[in] nodeId   The desired NodeId for the generated NOC Chain - May be optional/unused in some implementations.
      * @param[in] fabricId The desired FabricId for the generated NOC Chain - May be optional/unused in some implementations.
+     * @param[in] cats     The desired CATs for the generated NOC Chain - May be optional/unused in some implementations.
      * @param[in] keypair  The desired Keypair for the generated NOC Chain - May be optional/unused in some implementations.
-     * @param[inout] rcac  Buffer to hold the Root Certificate of the generated NOC Chain.
-     * @param[inout] icac  Buffer to hold the Intermediate Certificate of the generated NOC Chain.
-     * @param[inout] noc   Buffer to hold the Leaf Certificate of the generated NOC Chain.
+     * @param[in,out] rcac  Buffer to hold the Root Certificate of the generated NOC Chain.
+     * @param[in,out] icac  Buffer to hold the Intermediate Certificate of the generated NOC Chain.
+     * @param[in,out] noc   Buffer to hold the Leaf Certificate of the generated NOC Chain.
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    virtual CHIP_ERROR GenerateControllerNOCChain(chip::NodeId nodeId, chip::FabricId fabricId, chip::Crypto::P256Keypair & keypair,
-                                                  chip::MutableByteSpan & rcac, chip::MutableByteSpan & icac,
-                                                  chip::MutableByteSpan & noc) = 0;
+    virtual CHIP_ERROR GenerateControllerNOCChain(chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
+                                                  chip::Crypto::P256Keypair & keypair, chip::MutableByteSpan & rcac,
+                                                  chip::MutableByteSpan & icac, chip::MutableByteSpan & noc) = 0;
 };

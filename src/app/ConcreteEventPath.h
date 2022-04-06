@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/ConcreteClusterPath.h>
 #include <app/util/basic-types.h>
 
 namespace chip {
@@ -26,25 +27,25 @@ namespace app {
 /**
  * A representation of a concrete event path.
  */
-struct ConcreteEventPath
+struct ConcreteEventPath : public ConcreteClusterPath
 {
     ConcreteEventPath(EndpointId aEndpointId, ClusterId aClusterId, EventId aEventId) :
-        mEndpointId(aEndpointId), mClusterId(aClusterId), mEventId(aEventId)
+        ConcreteClusterPath(aEndpointId, aClusterId), mEventId(aEventId)
     {}
 
     ConcreteEventPath() {}
 
-    ConcreteEventPath(const ConcreteEventPath & other) = default;
-    ConcreteEventPath & operator=(const ConcreteEventPath & other) = default;
+    ConcreteEventPath(const ConcreteEventPath & aOther) = default;
+    ConcreteEventPath & operator=(const ConcreteEventPath & aOther) = default;
 
-    bool operator==(const ConcreteEventPath & other) const
+    bool operator==(const ConcreteEventPath & aOther) const
     {
-        return mEndpointId == other.mEndpointId && mClusterId == other.mClusterId && mEventId == other.mEventId;
+        return ConcreteClusterPath::operator==(aOther) && (mEventId == aOther.mEventId);
     }
 
-    EndpointId mEndpointId = 0;
-    ClusterId mClusterId   = 0;
-    EventId mEventId       = 0;
+    bool operator!=(const ConcreteEventPath & aOther) const { return !(*this == aOther); }
+
+    EventId mEventId = 0;
 };
 } // namespace app
 } // namespace chip

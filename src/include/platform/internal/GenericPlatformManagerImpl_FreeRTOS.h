@@ -78,6 +78,10 @@ protected:
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);
     CHIP_ERROR _Shutdown(void);
 
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
+    bool _IsChipStackLockedByCurrentThread() const;
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
+
     // ===== Methods available to the implementation subclass.
 
     void PostEventFromISR(const ChipDeviceEvent * event, BaseType_t & yieldRequired);

@@ -51,6 +51,8 @@ AttributePathIBstruct = Struct(
     "EndpointId" / Int16ul,
     "ClusterId" / Int32ul,
     "AttributeId" / Int32ul,
+    "DataVersion" / Int32ul,
+    "HasDataVersion" / Int8ul,
 )
 
 # EventPath should not contain padding
@@ -58,6 +60,13 @@ EventPathIBstruct = Struct(
     "EndpointId" / Int16ul,
     "ClusterId" / Int32ul,
     "EventId" / Int32ul,
+    "Urgent" / Int8ul,
+)
+
+DataVersionFilterIBstruct = Struct(
+    "EndpointId" / Int16ul,
+    "ClusterId" / Int32ul,
+    "DataVersion" / Int32ul,
 )
 
 
@@ -75,6 +84,7 @@ class EventPath:
     endpointId: int
     clusterId: int
     eventId: int
+    urgent: int
 
 
 @dataclass

@@ -105,8 +105,14 @@ Attestation Certificates (DAC):
 ./chip-cert gen-att-cert --type d --subject-cn "Matter Development DAC 01" --subject-vid FFF1 --subject-pid 0123 --valid-from "2020-10-15 14:23:43" --lifetime 7305 --ca-key Chip-PAI-Key.pem --ca-cert Chip-PAI-Cert.pem --out-key Chip-DAC-Key.pem --out Chip-DAC-Cert.pem
 ```
 
-The standard openssl command line tool can be used to verify the attestation
-certificate chain that was just created:
+Now the 'chip-cert' tool can be used to validate generated Node certificate:
+
+```
+./chip-cert validate-att-cert --dac Chip-DAC-Cert.pem --pai Chip-PAI-Cert.pem --paa Chip-PAA-Cert.pem
+```
+
+The equivalent openssl command line tool can also be used to verify the
+attestation certificate chain that was just created:
 
 ```
 openssl verify -CAfile Chip-PAA-Cert.pem -untrusted Chip-PAI-Cert.pem Chip-DAC-Cert.pem

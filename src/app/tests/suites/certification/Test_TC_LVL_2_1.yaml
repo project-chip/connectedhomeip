@@ -15,6 +15,7 @@
 name: 24.2.1. [TC-LVL-2.1] Read cluster attributes (DUT as Server)
 
 config:
+    nodeId: 0x12344321
     cluster: "Level Control"
     endpoint: 1
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     # Temporary - see #13551
     - label: "Reset level to 254"

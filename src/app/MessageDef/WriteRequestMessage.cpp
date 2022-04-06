@@ -34,7 +34,7 @@ namespace app {
 CHIP_ERROR WriteRequestMessage::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
+    int tagPresenceMask = 0;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("WriteRequestMessage =");
@@ -51,8 +51,8 @@ CHIP_ERROR WriteRequestMessage::Parser::CheckSchemaValidity() const
         {
         case to_underlying(Tag::kSuppressResponse):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kSuppressResponse))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kSuppressResponse));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kSuppressResponse))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kSuppressResponse));
 #if CHIP_DETAIL_LOGGING
             {
                 bool suppressResponse;
@@ -64,8 +64,8 @@ CHIP_ERROR WriteRequestMessage::Parser::CheckSchemaValidity() const
 
         case to_underlying(Tag::kTimedRequest):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kTimedRequest))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kTimedRequest));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kTimedRequest))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kTimedRequest));
 #if CHIP_DETAIL_LOGGING
             {
                 bool timedRequest;
@@ -76,8 +76,8 @@ CHIP_ERROR WriteRequestMessage::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kWriteRequests):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kWriteRequests))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kWriteRequests));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kWriteRequests))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kWriteRequests));
             {
                 AttributeDataIBs::Parser writeRequests;
                 ReturnErrorOnFailure(writeRequests.Init(reader));
@@ -89,8 +89,8 @@ CHIP_ERROR WriteRequestMessage::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kMoreChunkedMessages):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kMoreChunkedMessages))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kMoreChunkedMessages));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kMoreChunkedMessages))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kMoreChunkedMessages));
 #if CHIP_DETAIL_LOGGING
             {
                 bool moreChunkedMessages;
@@ -99,17 +99,8 @@ CHIP_ERROR WriteRequestMessage::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case to_underlying(Tag::kIsFabricFiltered):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kIsFabricFiltered))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kIsFabricFiltered));
-#if CHIP_DETAIL_LOGGING
-            {
-                bool isFabricFiltered;
-                ReturnErrorOnFailure(reader.Get(isFabricFiltered));
-                PRETTY_PRINT("\tisFabricFiltered = %s, ", isFabricFiltered ? "true" : "false");
-            }
-#endif // CHIP_DETAIL_LOGGING
+        case kInteractionModelRevisionTag:
+            ReturnErrorOnFailure(MessageParser::CheckInteractionModelRevision(reader));
             break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
@@ -122,10 +113,9 @@ CHIP_ERROR WriteRequestMessage::Parser::CheckSchemaValidity() const
 
     if (CHIP_END_OF_TLV == err)
     {
-        const int RequiredFields = (1 << to_underlying(Tag::kIsFabricFiltered)) | (1 << to_underlying(Tag::kTimedRequest)) |
-            (1 << to_underlying(Tag::kWriteRequests));
+        const int RequiredFields = ((1 << to_underlying(Tag::kTimedRequest)) | (1 << to_underlying(Tag::kWriteRequests)));
 
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
+        if ((tagPresenceMask & RequiredFields) == RequiredFields)
         {
             err = CHIP_NO_ERROR;
         }
@@ -160,11 +150,6 @@ CHIP_ERROR WriteRequestMessage::Parser::GetWriteRequests(AttributeDataIBs::Parse
 CHIP_ERROR WriteRequestMessage::Parser::GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const
 {
     return GetSimpleValue(to_underlying(Tag::kMoreChunkedMessages), TLV::kTLVType_Boolean, apMoreChunkedMessages);
-}
-
-CHIP_ERROR WriteRequestMessage::Parser::GetIsFabricFiltered(bool * const apIsFabricFiltered) const
-{
-    return GetSimpleValue(to_underlying(Tag::kIsFabricFiltered), TLV::kTLVType_Boolean, apIsFabricFiltered);
 }
 
 WriteRequestMessage::Builder & WriteRequestMessage::Builder::SuppressResponse(const bool aSuppressResponse)
@@ -207,19 +192,16 @@ WriteRequestMessage::Builder & WriteRequestMessage::Builder::MoreChunkedMessages
     return *this;
 }
 
-WriteRequestMessage::Builder & WriteRequestMessage::Builder::IsFabricFiltered(const bool aIsFabricFiltered)
-{
-    // skip if error has already been set
-    if (mError == CHIP_NO_ERROR)
-    {
-        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kIsFabricFiltered)), aIsFabricFiltered);
-    }
-    return *this;
-}
-
 WriteRequestMessage::Builder & WriteRequestMessage::Builder::EndOfWriteRequestMessage()
 {
-    EndOfContainer();
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = MessageBuilder::EncodeInteractionModelRevision();
+    }
+    if (mError == CHIP_NO_ERROR)
+    {
+        EndOfContainer();
+    }
     return *this;
 }
 } // namespace app

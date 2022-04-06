@@ -18,9 +18,8 @@
 #pragma once
 
 #include "AttributeStatusIBs.h"
-#include "StructBuilder.h"
-
-#include "StructParser.h"
+#include "MessageBuilder.h"
+#include "MessageParser.h"
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -35,7 +34,7 @@ enum class Tag : uint8_t
     kWriteResponses = 0,
 };
 
-class Parser : public StructParser
+class Parser : public MessageParser
 {
 public:
     /**
@@ -62,7 +61,7 @@ public:
     CHIP_ERROR GetWriteResponses(AttributeStatusIBs::Parser * const apWriteResponses) const;
 };
 
-class Builder : public StructBuilder
+class Builder : public MessageBuilder
 {
 public:
     /**

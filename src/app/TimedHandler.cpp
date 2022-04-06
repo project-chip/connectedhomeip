@@ -17,7 +17,6 @@
  */
 
 #include "TimedHandler.h"
-#include <app/InteractionModelDelegate.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/TimedRequestMessage.h>
 #include <app/StatusResponse.h>
@@ -112,9 +111,6 @@ CHIP_ERROR TimedHandler::HandleTimedRequestAction(Messaging::ExchangeContext * a
 
     System::PacketBufferTLVReader reader;
     reader.Init(std::move(aPayload));
-
-    reader.Next();
-
     TimedRequestMessage::Parser parser;
     ReturnErrorOnFailure(parser.Init(reader));
 
@@ -124,6 +120,7 @@ CHIP_ERROR TimedHandler::HandleTimedRequestAction(Messaging::ExchangeContext * a
 
     uint16_t timeoutMs;
     ReturnErrorOnFailure(parser.GetTimeoutMs(&timeoutMs));
+    ReturnErrorOnFailure(parser.ExitContainer());
 
     ChipLogDetail(DataManagement, "Got Timed Request with timeout %" PRIu16 ": handler %p exchange " ChipLogFormatExchange,
                   timeoutMs, this, ChipLogValueExchange(aExchangeContext));

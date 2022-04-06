@@ -13,9 +13,8 @@
 # limitations under the License.
 
 import os
-
-from platform import uname
 from enum import Enum, auto
+from platform import uname
 
 from .gn import GnBuilder
 
@@ -26,10 +25,14 @@ class HostApp(Enum):
     THERMOSTAT = auto()
     RPC_CONSOLE = auto()
     MIN_MDNS = auto()
+    ADDRESS_RESOLVE = auto()
     TV_APP = auto()
     LOCK = auto()
     TESTS = auto()
     SHELL = auto()
+    CERT_TOOL = auto()
+    OTA_PROVIDER = auto()
+    OTA_REQUESTOR = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -42,6 +45,8 @@ class HostApp(Enum):
             return 'common/pigweed/rpc_console'
         elif self == HostApp.MIN_MDNS:
             return 'minimal-mdns'
+        elif self == HostApp.ADDRESS_RESOLVE:
+            return '../'
         elif self == HostApp.TV_APP:
             return 'tv-app/linux'
         elif self == HostApp.LOCK:
@@ -50,6 +55,12 @@ class HostApp(Enum):
             return '../'
         elif self == HostApp.SHELL:
             return 'shell/standalone'
+        elif self == HostApp.CERT_TOOL:
+            return '..'
+        elif self == HostApp.OTA_PROVIDER:
+            return 'ota-provider-app/linux'
+        elif self == HostApp.OTA_REQUESTOR:
+            return 'ota-requestor-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -72,6 +83,9 @@ class HostApp(Enum):
             yield 'minimal-mdns-client.map'
             yield 'minimal-mdns-server'
             yield 'minimal-mdns-server.map'
+        elif self == HostApp.ADDRESS_RESOLVE:
+            yield 'address-resolve-tool'
+            yield 'address-resolve-tool.map'
         elif self == HostApp.TV_APP:
             yield 'chip-tv-app'
             yield 'chip-tv-app.map'
@@ -83,6 +97,15 @@ class HostApp(Enum):
         elif self == HostApp.SHELL:
             yield 'chip-shell'
             yield 'chip-shell.map'
+        elif self == HostApp.CERT_TOOL:
+            yield 'chip-cert'
+            yield 'chip-cert.map'
+        elif self == HostApp.OTA_PROVIDER:
+            yield 'chip-ota-provider-app'
+            yield 'chip-ota-provider-app.map'
+        elif self == HostApp.OTA_REQUESTOR:
+            yield 'chip-ota-requestor-app'
+            yield 'chip-ota-requestor-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -106,7 +129,7 @@ class HostBoard(Enum):
                 arch = 'x64'
             elif arch == 'i386' or arch == 'i686':
                 arch = 'x86'
-            elif arch == 'aarch64' or arch == 'aarch64_be' or arch == 'armv8b' or arch == 'armv8l':
+            elif arch in ('aarch64', 'aarch64_be', 'armv8b', 'armv8l'):
                 arch = 'arm64'
 
             return arch
@@ -130,8 +153,9 @@ class HostBoard(Enum):
 class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=True,
-                 enable_ble=True, use_tsan=False,  use_asan=False, separate_event_loop=True,
-                 test_group=False, use_libfuzzer=False, use_clang=False):
+                 enable_ble=True, enable_wifi=True, use_tsan=False,  use_asan=False, separate_event_loop=True,
+                 test_group=False, use_libfuzzer=False, use_clang=False, interactive_mode=True,
+                 use_platform_mdns=False):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
@@ -146,6 +170,9 @@ class HostBuilder(GnBuilder):
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
 
+        if not enable_wifi:
+            self.extra_gn_options.append('chip_enable_wifi=false')
+
         if use_tsan:
             self.extra_gn_options.append('is_tsan=true')
 
@@ -154,6 +181,9 @@ class HostBuilder(GnBuilder):
 
         if not separate_event_loop:
             self.extra_gn_options.append('config_use_separate_eventloop=false')
+
+        if not interactive_mode:
+            self.extra_gn_options.append('config_use_interactive_mode=false')
 
         if test_group:
             self.extra_gn_options.append(
@@ -165,9 +195,25 @@ class HostBuilder(GnBuilder):
         if use_clang:
             self.extra_gn_options.append('is_clang=true')
 
+        if use_platform_mdns:
+            self.extra_gn_options.append('chip_mdns="platform"')
+
         if app == HostApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')
             self.build_command = 'check'
+
+        if app == HostApp.CERT_TOOL:
+            # Certification only built for openssl
+            if self.board == HostBoard.ARM64:
+                # OpenSSL and mbedTLS conflicts.
+                # We only cross compile with mbedTLS.
+                raise Exception(
+                    "Cannot cross compile CERT TOOL: ssl library conflict")
+            self.extra_gn_options.append('chip_crypto="openssl"')
+            self.build_command = 'src/tools/chip-cert'
+
+        if app == HostApp.ADDRESS_RESOLVE:
+            self.build_command = 'src/lib/address_resolve:address-resolve-tool'
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:
@@ -202,13 +248,15 @@ class HostBuilder(GnBuilder):
             return None
         elif self.board == HostBoard.ARM64:
             return {
-                'PKG_CONFIG_PATH': self.SysRootPath('SYSROOT_AARCH64') + '/lib/aarch64-linux-gnu/pkgconfig',
+                'PKG_CONFIG_PATH': os.path.join(
+                    self.SysRootPath('SYSROOT_AARCH64'),
+                    'lib/aarch64-linux-gnu/pkgconfig'),
             }
         else:
             raise Exception('Unknown host board type: %r' % self)
 
     def SysRootPath(self, name):
-        if not name in os.environ:
+        if name not in os.environ:
             raise Exception('Missing environment variable "%s"' % name)
         return os.environ[name]
 

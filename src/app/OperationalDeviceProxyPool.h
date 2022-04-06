@@ -37,6 +37,10 @@ public:
 
     virtual OperationalDeviceProxy * FindDevice(PeerId peerId) = 0;
 
+    virtual void ReleaseDevicesForFabric(CompressedFabricId compressedFabricId) = 0;
+
+    virtual void ReleaseAllDevices() = 0;
+
     virtual ~OperationalDeviceProxyPoolDelegate() {}
 };
 
@@ -44,7 +48,7 @@ template <size_t N>
 class OperationalDeviceProxyPool : public OperationalDeviceProxyPoolDelegate
 {
 public:
-    ~OperationalDeviceProxyPool() { mDevicePool.ReleaseAll(); }
+    ~OperationalDeviceProxyPool() override { mDevicePool.ReleaseAll(); }
 
     OperationalDeviceProxy * Allocate(DeviceProxyInitParams & params, PeerId peerId) override
     {
@@ -89,8 +93,27 @@ public:
         return foundDevice;
     }
 
+    void ReleaseDevicesForFabric(CompressedFabricId compressedFabricId) override
+    {
+        mDevicePool.ForEachActiveObject([&](auto * activeDevice) {
+            if (activeDevice->GetPeerId().GetCompressedFabricId() == compressedFabricId)
+            {
+                Release(activeDevice);
+            }
+            return Loop::Continue;
+        });
+    }
+
+    void ReleaseAllDevices() override
+    {
+        mDevicePool.ForEachActiveObject([&](auto * activeDevice) {
+            Release(activeDevice);
+            return Loop::Continue;
+        });
+    }
+
 private:
-    BitMapObjectPool<OperationalDeviceProxy, N> mDevicePool;
+    ObjectPool<OperationalDeviceProxy, N> mDevicePool;
 };
 
 }; // namespace chip

@@ -15,6 +15,7 @@
 name: 27.2.20. [TC-CC-9.1] ColorLoopSet Validation
 
 config:
+    nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Precondition : Turn on light for color control tests"
       cluster: "On/Off"
@@ -169,14 +174,21 @@ tests:
       response:
           value: 1
 
-    #Issue #10816 Disabled as value needs to be same as EnhancedCurrentHue
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
+      response:
+          saveAs: EnhancedCurrentHueValue1
+          constraints:
+              type: uint16
+
     - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
-      disabled: true
       command: "readAttribute"
       attribute: "color loop stored enhanced hue"
       PICS: A_COLORLOOPSTOREDENHANCEDHUE
       response:
-          value: 0
+          value: EnhancedCurrentHueValue1
 
     # Test is disabled because a sleep/wait is necessary to let the hue change over time
     # Once sleep/wait is available, test case will need to be adapted
@@ -225,14 +237,21 @@ tests:
       response:
           value: 0
 
-    #Issue #10816 Disabled as value needs to be same as EnhancedCurrentHue
+    - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
+      command: "readAttribute"
+      attribute: "color loop stored enhanced hue"
+      PICS: A_COLORLOOPSTOREDENHANCEDHUE
+      response:
+          saveAs: ColorLoopStoredEnhancedHueValue1
+          constraints:
+              type: uint16
+
     - label: "Read EnhancedCurrentHue attribute from DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
       PICS: A_ENHANCEDCURRENTHUE
       response:
-          value: 0
+          value: ColorLoopStoredEnhancedHueValue1
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
@@ -288,14 +307,21 @@ tests:
       response:
           value: 1
 
-    #Issue #10816 Disabled as value needs to be same as EnhancedCurrentHue
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
+      response:
+          saveAs: EnhancedCurrentHueValue2
+          constraints:
+              type: uint16
+
     - label: "Read ColorLoopStoredEnhancedHue attribute from DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "color loop stored enhanced hue"
       PICS: A_COLORLOOPSTOREDENHANCEDHUE
       response:
-          value: 0
+          value: EnhancedCurrentHueValue2
 
     # Test is disabled because a sleep/wait is necessary to let the hue change over time
     # Once sleep/wait is available, test case will need to be adapted
@@ -344,16 +370,23 @@ tests:
       response:
           value: 0
 
-    #Issue #10816 Disabled as value needs to be same as ColorLoopStoredEnhancedHue.
+    - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
+      command: "readAttribute"
+      attribute: "color loop stored enhanced hue"
+      PICS: A_COLORLOOPSTOREDENHANCEDHUE
+      response:
+          saveAs: ColorLoopStoredEnhancedHueValue2
+          constraints:
+              type: uint16
+
     - label: "Read EnhancedCurrentHue attribute from DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
       PICS: A_ENHANCEDCURRENTHUE
       response:
-          value: 0
+          value: ColorLoopStoredEnhancedHueValue2
 
-    - label: "Enhanced Move To Hue command 10"
+    - label: "Enhanced Move To Hue command"
       command: "EnhancedMoveToHue"
       PICS: CR_ENHANCEDMOVETOHUE
       arguments:
@@ -431,7 +464,6 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
-    #Issue #335 expected value is 2 but returned is 1
     - label: "Read ColorLoopActive attribute from DUT"
       command: "readAttribute"
       attribute: "color loop active"
@@ -439,14 +471,21 @@ tests:
       response:
           value: 1
 
-    #Issue# 10816 Disabled as value needs to be same as EnhancedCurrentHue.
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
+      response:
+          saveAs: EnhancedCurrentHueValue3
+          constraints:
+              type: uint16
+
     - label: "Read ColorLoopStoredEnhancedHue attribute from DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "color loop stored enhanced hue"
       PICS: A_COLORLOOPSTOREDENHANCEDHUE
       response:
-          value: 0
+          value: EnhancedCurrentHueValue3
 
     # Test is disabled because a sleep/wait is necessary to let the hue change over time
     # Once sleep/wait is available, test case will need to be adapted
@@ -495,14 +534,21 @@ tests:
       response:
           value: 0
 
-    #Issue #10816 Disabled as value needs to be same as ColorLoopStoredEnhancedHue.
+    - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
+      command: "readAttribute"
+      attribute: "color loop stored enhanced hue"
+      PICS: A_COLORLOOPSTOREDENHANCEDHUE
+      response:
+          saveAs: ColorLoopStoredEnhancedHueValue3
+          constraints:
+              type: uint16
+
     - label: "Read EnhancedCurrentHue attribute from DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
       PICS: A_ENHANCEDCURRENTHUE
       response:
-          value: 0
+          value: ColorLoopStoredEnhancedHueValue3
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
@@ -559,14 +605,21 @@ tests:
       response:
           value: 1
 
-    #Issue #10816 Disabled as value needs to be same as EnhancedCurrentHue.
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
+      response:
+          saveAs: EnhancedCurrentHueValue4
+          constraints:
+              type: uint16
+
     - label: "Read ColorLoopStoredEnhancedHue attribute from DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "color loop stored enhanced hue"
       PICS: A_COLORLOOPSTOREDENHANCEDHUE
       response:
-          value: 0
+          value: EnhancedCurrentHueValue4
 
     # Test is disabled because a sleep/wait is necessary to let the hue change over time
     # Once sleep/wait is available, test case will need to be adapted
@@ -615,15 +668,29 @@ tests:
       response:
           value: 0
 
-    #Issue #10816 Disabled as value needs to be same as ColorLoopStoredEnhancedHue..
+    - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
+      command: "readAttribute"
+      attribute: "color loop stored enhanced hue"
+      PICS: A_COLORLOOPSTOREDENHANCEDHUE
+      response:
+          saveAs: ColorLoopStoredEnhancedHue4
+          constraints:
+              type: uint16
+
     - label: "Read EnhancedCurrentHue attribute from DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
       PICS: A_ENHANCEDCURRENTHUE
       response:
-          value: 0
+          value: ColorLoopStoredEnhancedHue4
 
     - label: "Turn Off light for color control tests"
       cluster: "On/Off"
       command: "Off"
+
+    - label: "Check on/off attribute value is false after off command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0

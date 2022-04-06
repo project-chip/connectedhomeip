@@ -25,6 +25,23 @@
 
 #include <system/SystemPacketBuffer.h>
 
+#if CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
+
+#include <list>
+using QueryResponderPtrPool = std::list<mdns::Minimal::QueryResponderBase *>;
+#else
+
+#include <array>
+
+// Note: ptr storage is 2 + number of operational networks required, based on
+// the current implementation of Advertiser_ImplMinimalMdns.cpp:
+//    - 1 for commissionable advertising
+//    - 1 for commissioner responder
+//    - extra for every operational advertisement
+using QueryResponderPtrPool = std::array<mdns::Minimal::QueryResponderBase *, CHIP_CONFIG_MAX_FABRICS + 2>;
+
+#endif
+
 namespace mdns {
 namespace Minimal {
 
@@ -88,11 +105,11 @@ private:
 class ResponseSender : public ResponderDelegate
 {
 public:
-    // TODO(cecille): Template this and set appropriately. Please see issue #8000.
-    static constexpr size_t kMaxQueryResponders = 7;
     ResponseSender(ServerBase * server) : mServer(server) {}
 
     CHIP_ERROR AddQueryResponder(QueryResponderBase * queryResponder);
+    CHIP_ERROR RemoveQueryResponder(QueryResponderBase * queryResponder);
+    bool HasQueryResponders() const;
 
     /// Send back the response to a particular query
     CHIP_ERROR Respond(uint32_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource);
@@ -107,7 +124,7 @@ private:
     CHIP_ERROR PrepareNewReplyPacket();
 
     ServerBase * mServer;
-    QueryResponderBase * mResponder[kMaxQueryResponders] = {};
+    QueryResponderPtrPool mResponders = {};
 
     /// Current send state
     ResponseBuilder mResponseBuilder;          // packet being built

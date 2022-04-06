@@ -26,7 +26,7 @@
 
 #include <platform/ThreadStackManager.h>
 
-#include <platform/ESP32/ESPThreadConfig.h>
+#include <platform/ESP32/OpenthreadLauncher.h>
 #include <platform/ESP32/ThreadStackManagerImpl.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
 
@@ -52,6 +52,7 @@ ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
+    openthread_launch_task();
     return GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(esp_openthread_get_instance());
 }
 
@@ -90,12 +91,23 @@ void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStop()
     // Intentionally empty.
 }
 
-void ThreadStackManagerImpl::ESPThreadTask(void * arg)
+void ThreadStackManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
-    esp_openthread_launch_mainloop();
-    esp_openthread_netif_glue_deinit();
-    esp_vfs_eventfd_unregister();
-    vTaskDelete(NULL);
+    Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::_OnPlatformEvent(event);
+
+    if (event->Type == DeviceEventType::kThreadStateChange && event->ThreadStateChange.RoleChanged)
+    {
+        const bool isAttached = IsThreadAttached();
+        VerifyOrReturn(isAttached != mIsAttached);
+        ChipDeviceEvent attachEvent;
+        attachEvent.Type                            = DeviceEventType::kThreadConnectivityChange;
+        attachEvent.ThreadConnectivityChange.Result = isAttached ? kConnectivity_Established : kConnectivity_Lost;
+
+        CHIP_ERROR error = PlatformMgr().PostEvent(&attachEvent);
+        VerifyOrReturn(error == CHIP_NO_ERROR,
+                       ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, error.Format()));
+        mIsAttached = isAttached;
+    }
 }
 
 } // namespace DeviceLayer

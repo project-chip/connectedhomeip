@@ -118,6 +118,11 @@
             "path": "../../zap-templates/templates/app/cluster-objects-src.zapt",
             "name": "Cluster objects header for Interaction Model",
             "output": "cluster-objects.cpp"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-enums.zapt",
+            "name": "Enum and bitmap definitions for clusters",
+            "output": "cluster-enums.h"
         }
     ]
 }

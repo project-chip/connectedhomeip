@@ -15,6 +15,7 @@
 name: Log Commands Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Test Cluster"
     endpoint: 1
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Log a simple message"
       cluster: "LogCommands"
@@ -30,6 +35,28 @@ tests:
           values:
               - name: "message"
                 value: "This is a simple message"
+
+    - label: "Do a simple user prompt message. Expect 'y' to pass."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      disabled: true
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Do a simple user prompt message. Use enter to coninue."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      disabled: true
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter enter to continue"
+              - name: "expectedValue"
+                value: ""
 
     - label: "Do a simple user prompt message"
       cluster: "LogCommands"

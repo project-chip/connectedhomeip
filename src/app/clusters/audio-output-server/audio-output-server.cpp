@@ -30,9 +30,13 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
+#include <platform/CHIPDeviceConfig.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::AudioOutput;
+
+static constexpr size_t kAudioOutputDelegateTableSize =
+    EMBER_AF_AUDIO_OUTPUT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -41,7 +45,7 @@ using chip::app::Clusters::AudioOutput::Delegate;
 
 namespace {
 
-Delegate * gDelegateTable[EMBER_AF_AUDIO_OUTPUT_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
+Delegate * gDelegateTable[kAudioOutputDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
@@ -109,7 +113,7 @@ CHIP_ERROR AudioOutputAttrAccess::Read(const app::ConcreteReadAttributePath & aP
 
     switch (aPath.mAttributeId)
     {
-    case app::Clusters::AudioOutput::Attributes::AudioOutputList::Id: {
+    case app::Clusters::AudioOutput::Attributes::OutputList::Id: {
         if (isDelegateNull(delegate, endpoint))
         {
             return aEncoder.EncodeEmptyList();
@@ -117,7 +121,7 @@ CHIP_ERROR AudioOutputAttrAccess::Read(const app::ConcreteReadAttributePath & aP
 
         return ReadOutputListAttribute(aEncoder, delegate);
     }
-    case app::Clusters::AudioOutput::Attributes::CurrentAudioOutput::Id: {
+    case app::Clusters::AudioOutput::Attributes::CurrentOutput::Id: {
         if (isDelegateNull(delegate, endpoint))
         {
             return CHIP_NO_ERROR;
@@ -149,9 +153,8 @@ CHIP_ERROR AudioOutputAttrAccess::ReadCurrentOutputAttribute(app::AttributeValue
 // -----------------------------------------------------------------------------
 // Matter Framework Callbacks Implementation
 
-bool emberAfAudioOutputClusterRenameOutputRequestCallback(app::CommandHandler * command,
-                                                          const app::ConcreteCommandPath & commandPath,
-                                                          const Commands::RenameOutputRequest::DecodableType & commandData)
+bool emberAfAudioOutputClusterRenameOutputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                   const Commands::RenameOutput::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -164,7 +167,7 @@ bool emberAfAudioOutputClusterRenameOutputRequestCallback(app::CommandHandler * 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfAudioOutputClusterRenameOutputRequestCallback error: %s", err.AsString());
+        ChipLogError(Zcl, "emberAfAudioOutputClusterRenameOutputCallback error: %s", err.AsString());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
@@ -174,9 +177,8 @@ exit:
     return true;
 }
 
-bool emberAfAudioOutputClusterSelectOutputRequestCallback(app::CommandHandler * command,
-                                                          const app::ConcreteCommandPath & commandPath,
-                                                          const Commands::SelectOutputRequest::DecodableType & commandData)
+bool emberAfAudioOutputClusterSelectOutputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                   const Commands::SelectOutput::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -188,7 +190,7 @@ bool emberAfAudioOutputClusterSelectOutputRequestCallback(app::CommandHandler * 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfAudioOutputClusterSelectOutputRequestCallback error: %s", err.AsString());
+        ChipLogError(Zcl, "emberAfAudioOutputClusterSelectOutputCallback error: %s", err.AsString());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 

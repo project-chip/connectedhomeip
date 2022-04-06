@@ -53,16 +53,16 @@
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
- * 0x235A: Chip's Vendor Id.
+ * 0xFFF1: Test vendor.
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x235A
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0x4B4C: K32W lighting-app
+ * 0x8006: example lock-app
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x4B4C
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8006
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
@@ -86,7 +86,7 @@
  * {MAJOR_VERSION}.0d{MINOR_VERSION}
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "04-2020-te2"
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "03-2022-te8"
 #endif
 
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
@@ -100,13 +100,6 @@
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME "NXP Demo App"
 #endif
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
- *
- * Enable support for CHIP-over-BLE (CHIPOBLE).
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
@@ -161,14 +154,14 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_NFC 1
 
 /**
- *  @def CHIP_CONFIG_MAX_DEVICE_ADMINS
+ *  @def CHIP_CONFIG_MAX_FABRICS
  *
  *  @brief
- *    Maximum number of administrators that can provision the device. Each admin
- *    can provision the device with their unique operational credentials and manage
- *    their access control lists.
+ *    Maximum number of fabrics the device can participate in.  Each fabric can
+ *    provision the device with its unique operational credentials and manage
+ *    its own access control lists.
  */
-#define CHIP_CONFIG_MAX_DEVICE_ADMINS 4 // 3 fabrics + 1 for rotation slack
+#define CHIP_CONFIG_MAX_FABRICS 4 // 3 fabrics + 1 for rotation slack
 
 #define CHIP_DEVICE_CONFIG_ENABLE_SED 1
 #define CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL 1000_ms32

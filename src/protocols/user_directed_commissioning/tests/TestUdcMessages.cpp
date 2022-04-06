@@ -142,7 +142,7 @@ void TestUDCServerInstanceNameResolver(nlTestSuite * inSuite, void * inContext)
     // encode our client message
     char nameBuffer[Dnssd::Commission::kInstanceNameMaxLength + 1] = "Chris";
     System::PacketBufferHandle payloadBuf = MessagePacketBuffer::NewWithData(nameBuffer, strlen(nameBuffer));
-    udcClient.EncodeUDCMessage(std::move(payloadBuf));
+    udcClient.EncodeUDCMessage(payloadBuf);
 
     // prepare peerAddress for handleMessage
     Inet::IPAddress commissioner;
@@ -165,8 +165,10 @@ void TestUDCServerInstanceNameResolver(nlTestSuite * inSuite, void * inContext)
     // same instance name is received, there is no callback
     testCallback.mFindCommissionableNodeCalled = false;
 
+    payloadBuf = MessagePacketBuffer::NewWithData(nameBuffer, strlen(nameBuffer));
+
     // reset the UDC message
-    udcClient.EncodeUDCMessage(std::move(payloadBuf));
+    udcClient.EncodeUDCMessage(payloadBuf);
 
     // test OnMessageReceived again
     mUdcTransportMgr->HandleMessageReceived(peerAddress, std::move(payloadBuf));
@@ -177,8 +179,10 @@ void TestUDCServerInstanceNameResolver(nlTestSuite * inSuite, void * inContext)
     // next, reset the cache state and confirm the callback
     udcServer.ResetUDCClientProcessingStates();
 
+    payloadBuf = MessagePacketBuffer::NewWithData(nameBuffer, strlen(nameBuffer));
+
     // reset the UDC message
-    udcClient.EncodeUDCMessage(std::move(payloadBuf));
+    udcClient.EncodeUDCMessage(payloadBuf);
 
     // test OnMessageReceived again
     mUdcTransportMgr->HandleMessageReceived(peerAddress, std::move(payloadBuf));
@@ -194,7 +198,7 @@ void TestUserDirectedCommissioningClientMessage(nlTestSuite * inSuite, void * in
     UserDirectedCommissioningClient udcClient;
 
     // obtain the UDC message
-    CHIP_ERROR err = udcClient.EncodeUDCMessage(std::move(payloadBuf));
+    CHIP_ERROR err = udcClient.EncodeUDCMessage(payloadBuf);
 
     // check the packet header fields
     PacketHeader packetHeader;

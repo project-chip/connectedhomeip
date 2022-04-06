@@ -37,7 +37,7 @@ class DLL_EXPORT CommissionableNodeController : public AbstractDnssdDiscoveryCon
 {
 public:
     CommissionableNodeController(chip::Dnssd::Resolver * resolver = nullptr) : mResolver(resolver) {}
-    virtual ~CommissionableNodeController() {}
+    ~CommissionableNodeController() override {}
 
     CHIP_ERROR DiscoverCommissioners(Dnssd::DiscoveryFilter discoveryFilter = Dnssd::DiscoveryFilter());
 
@@ -49,16 +49,6 @@ public:
      *   See Resolver.h IsValid()
      */
     const Dnssd::DiscoveredNodeData * GetDiscoveredCommissioner(int idx);
-
-    void OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override
-    {
-        ChipLogError(Controller, "Unsupported operation CommissionableNodeController::OnNodeIdResolved");
-    }
-
-    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override
-    {
-        ChipLogError(Controller, "Unsupported operation CommissionableNodeController::OnNodeIdResolutionFailed");
-    }
 
 protected:
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mDiscoveredCommissioners); }

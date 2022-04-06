@@ -57,7 +57,7 @@ limitations under the License.
     <attribute side="server" code="0x4000" define="SW_BUILD_ID" type="CHAR_STRING" length="16" writable="false" default="" optional="true" introducedIn="zll-1.0-11-0037-10">sw build id</attribute>
   </clusterExtension>
   <clusterExtension code="0x0005">
-    <command source="client" code="0x40" name="EnhancedAddScene" optional="true" introducedIn="zll-1.0-11-0037-10" cli="zcl scenes eadd">
+    <command source="client" code="0x40" name="EnhancedAddScene" response="EnhancedAddSceneResponse" optional="true" introducedIn="zll-1.0-11-0037-10" cli="zcl scenes eadd">
       <description>
         Command description for EnhancedAddScene
       </description>
@@ -67,14 +67,14 @@ limitations under the License.
       <arg name="sceneName" type="CHAR_STRING"/>
       <arg name="extensionFieldSets" type="SceneExtensionFieldSet" array="true"/>
     </command>
-    <command source="client" code="0x41" name="EnhancedViewScene" optional="true" noDefaultImplementation="true" introducedIn="zll-1.0-11-0037-10" cli="zcl scenes eview">
+    <command source="client" code="0x41" name="EnhancedViewScene" response="EnhancedViewSceneResponse" optional="true" noDefaultImplementation="true" introducedIn="zll-1.0-11-0037-10" cli="zcl scenes eview">
       <description>
         Command description for EnhancedViewScene
       </description>
       <arg name="groupId" type="INT16U"/>
       <arg name="sceneId" type="INT8U"/>
     </command>
-    <command source="client" code="0x42" name="CopyScene" optional="true" introducedIn="zll-1.0-11-0037-10" cli="zcl scenes copy">
+    <command source="client" code="0x42" name="CopyScene" response="CopySceneResponse" optional="true" introducedIn="zll-1.0-11-0037-10" cli="zcl scenes copy">
       <description>
         Command description for CopyScene
       </description>

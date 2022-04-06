@@ -28,6 +28,7 @@
 #include <lib/support/SafeInt.h>
 #include <new>
 #include <platform/internal/BLEManager.h>
+#include <platform/CommissionableDataProvider.h>
 
 #include <cassert>
 #include <type_traits>
@@ -175,7 +176,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
     else
     {
         uint16_t discriminator;
-        SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
+        SuccessOrExit(err = GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
         snprintf(mDeviceName, sizeof(mDeviceName), "%s%04u", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, discriminator);
         mDeviceName[kMaxDeviceNameLength] = 0;
         mFlags.Clear(Flags::kUseCustomDeviceName);

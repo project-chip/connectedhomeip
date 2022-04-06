@@ -15,7 +15,6 @@
 import logging
 import os
 import shlex
-
 from enum import Enum, auto
 
 from .builder import Builder
@@ -96,7 +95,7 @@ class Esp32App(Enum):
 def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
     if app == Esp32App.TESTS:
         return 'sdkconfig_qemu.defaults'
-    elif app != Esp32App.ALL_CLUSTERS:
+    elif app != Esp32App.ALL_CLUSTERS and app != Esp32App.TEMPERATURE_MEASUREMENT:
         return 'sdkconfig.defaults'
 
     rpc = "_rpc" if enable_rpcs else ""

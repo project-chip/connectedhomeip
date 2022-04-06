@@ -25,7 +25,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include <platform/ConfigurationManager.h>
 #include <platform/KeyValueStoreManager.h>
@@ -45,8 +45,14 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    bool failSafeArmed;
     uint32_t rebootCount;
+
+    // Save out software version on first boot
+    if (!P6Config::ConfigValueExists(P6Config::kConfigKey_SoftwareVersion))
+    {
+        err = StoreSoftwareVersion(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+        SuccessOrExit(err);
+    }
 
     if (P6Config::ConfigValueExists(P6Config::kCounterKey_RebootCount))
     {
@@ -73,13 +79,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     err = Internal::GenericConfigurationManagerImpl<P6Config>::Init();
     VerifyOrReturnError(CHIP_NO_ERROR == err, err);
 
-    // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
-    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
-    {
-        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
-        InitiateFactoryReset();
-    }
-
 exit:
     return err;
 }
@@ -92,6 +91,16 @@ CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
 CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
 {
     return WriteConfigValue(P6Config::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint32_t & softwareVer)
+{
+    return ReadConfigValue(P6Config::kConfigKey_SoftwareVersion, softwareVer);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareVersion(uint32_t softwareVer)
+{
+    return WriteConfigValue(P6Config::kConfigKey_SoftwareVersion, softwareVer);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)

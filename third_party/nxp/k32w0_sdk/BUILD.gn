@@ -42,7 +42,6 @@ config("mbedtls_k32w0_config") {
     "MBEDTLS_X509_CREATE_C",
     "MBEDTLS_PEM_WRITE_C",
     "MBEDTLS_HKDF_C",
-    "MBEDTLS_ERROR_C",
     "MBEDTLS_PKCS5_C",
   ]
 

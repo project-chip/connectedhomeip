@@ -21,6 +21,7 @@
 
 #include "AppEvent.h"
 #include "BoltLockManager.h"
+#include <DFUManager.h>
 
 class AppTask
 {

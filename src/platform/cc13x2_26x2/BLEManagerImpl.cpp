@@ -838,14 +838,16 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
                 // Enable legacy advertising for set #1
                 status = (bStatus_t) GapAdv_enable(sInstance.advHandleLegacy, GAP_ADV_ENABLE_OPTIONS_USE_MAX, 0);
 
-                assert(status == SUCCESS);
+                // If adverisement fails, keep flags set
+                if (status == SUCCESS)
+                {
 
-                // Start advertisement timeout timer
-                Util_startClock(&sInstance.clkAdvTimeout);
+                    // Start advertisement timeout timer
+                    Util_startClock(&sInstance.clkAdvTimeout);
 
-                sInstance.mFlags.Set(Flags::kAdvertising);
+                    sInstance.mFlags.Set(Flags::kAdvertising);
+                }
             }
-
             // Advertising should be disabled
             if ((!sInstance.mFlags.Has(Flags::kAdvertisingEnabled)) && sInstance.mFlags.Has(Flags::kAdvertising))
             {

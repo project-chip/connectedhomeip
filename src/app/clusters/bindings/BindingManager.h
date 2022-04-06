@@ -18,8 +18,11 @@
 #pragma once
 
 #include <app/CASESessionManager.h>
+#include <app/clusters/bindings/PendingNotificationMap.h>
 #include <app/server/Server.h>
 #include <app/util/binding-table.h>
+#include <credentials/FabricTable.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
 
@@ -35,7 +38,14 @@ namespace chip {
  * E.g. The application will send on/off commands to peer for the OnOff cluster.
  *
  */
-using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry * binding, DeviceProxy * peer_device, void * context);
+using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry & binding, DeviceProxy * peer_device, void * context);
+
+struct BindingManagerInitParams
+{
+    FabricTable * mFabricTable               = nullptr;
+    CASESessionManager * mCASESessionManager = nullptr;
+    PersistentStorageDelegate * mStorage     = nullptr;
+};
 
 /**
  *
@@ -60,19 +70,25 @@ public:
 
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
 
-    void SetAppServer(Server * appServer) { mAppServer = appServer; }
+    CHIP_ERROR Init(const BindingManagerInitParams & params);
 
     /*
      * Notifies the BindingManager that a new unicast binding is created.
      *
      */
-    CHIP_ERROR UnicastBindingCreated(FabricIndex fabric, NodeId node) { return EstablishConnection(fabric, node); }
+    CHIP_ERROR UnicastBindingCreated(uint8_t fabricIndex, NodeId nodeId);
 
     /*
-     * Notfies the BindingManager that the **last** unicast binding to a device has been removed.
+     * Notifies the BindingManager that a unicast binding is about to be removed from the given index.
      *
      */
-    CHIP_ERROR LastUnicastBindingRemoved(FabricIndex fabric, NodeId node);
+    CHIP_ERROR UnicastBindingRemoved(uint8_t bindingEntryId);
+
+    /*
+     * Notifies the BindingManager that a fabric is removed from the device
+     *
+     */
+    void FabricRemoved(CompressedFabricId compressedId, FabricIndex fabricIndex);
 
     /*
      * Notify a cluster change to **all** bound devices associated with the (endpoint, cluster) tuple.
@@ -91,85 +107,6 @@ public:
 private:
     static BindingManager sBindingManager;
 
-    static constexpr uint8_t kMaxPendingNotifications = 3;
-
-    struct ClusterPath
-    {
-        void * context;
-        ClusterId cluster;
-        EndpointId endpoint;
-    };
-
-    // A pending notification to be sent to a binding waiting for the CASE session to be established.
-    class PendingNotificationEntry
-    {
-    public:
-        PendingNotificationEntry(PeerId peerId) : mPeerId(peerId) {}
-
-        PeerId GetPeerId() { return mPeerId; }
-
-        System::Clock::Timestamp GetLastUpdateTime() { return mLastUpdateTime; }
-        void Touch() { mLastUpdateTime = System::SystemClock().GetMonotonicTimestamp(); }
-
-        ClusterPath * begin() { return &mPendingNotifications[0]; }
-        ClusterPath * end() { return &mPendingNotifications[mNumPendingNotifications]; }
-
-        void AddPendingNotification(EndpointId endpoint, ClusterId cluster, void * context)
-        {
-            for (ClusterPath & path : *this)
-            {
-                // New notifications for the same (endpoint, cluster) shall
-                // simply overrride the old ones
-                if (path.cluster == cluster && path.endpoint == endpoint)
-                {
-                    path.context = context;
-                    return;
-                }
-            }
-            if (mNumPendingNotifications < kMaxPendingNotifications)
-            {
-                mPendingNotifications[mNumPendingNotifications++] = { context, cluster, endpoint };
-            }
-            else
-            {
-                mPendingNotifications[mNextToOverride] = { context, cluster, endpoint };
-                mNextToOverride++;
-                mNextToOverride %= kMaxPendingNotifications;
-            }
-        }
-
-    private:
-        PeerId mPeerId;
-        System::Clock::Timestamp mLastUpdateTime;
-        // TODO: Make the pending notifications list of binding table indecies and list of contexts
-        ClusterPath mPendingNotifications[kMaxPendingNotifications];
-
-        uint8_t mNumPendingNotifications = 0;
-        uint8_t mNextToOverride          = 0;
-    };
-
-    // The pool for all the pending comands.
-    class PendingNotificationMap
-    {
-    public:
-        PendingNotificationEntry * FindLRUEntry();
-
-        PendingNotificationEntry * FindEntry(PeerId peerId);
-
-        CHIP_ERROR AddPendingNotification(PeerId peer, EndpointId endpoint, ClusterId cluster, void * context);
-
-        void RemoveEntry(PendingNotificationEntry * entry) { mPendingNotificationMap.ReleaseObject(entry); }
-
-        template <typename Function>
-        Loop ForEachActiveObject(Function && function)
-        {
-            return mPendingNotificationMap.ForEachActiveObject(std::forward<Function>(function));
-        }
-
-    private:
-        BitMapObjectPool<PendingNotificationEntry, EMBER_BINDING_TABLE_SIZE> mPendingNotificationMap;
-    };
-
     static void HandleDeviceConnected(void * context, OperationalDeviceProxy * device);
     void HandleDeviceConnected(OperationalDeviceProxy * device);
 
@@ -178,15 +115,9 @@ private:
 
     CHIP_ERROR EstablishConnection(FabricIndex fabric, NodeId node);
 
-    // Called when CASE session is established to a peer device. Will send all the pending commands to the peer.
-    void SyncPendingNotificationsToPeer(OperationalDeviceProxy * device, PendingNotificationEntry * pendingClusters);
-
-    // Called when CASE session is not established to a peer device. Will enqueue the command and initialize connection.
-    CHIP_ERROR EnqueueUnicastNotification(FabricIndex fabric, NodeId node, EndpointId endpoint, ClusterId cluster, void * context);
-
     PendingNotificationMap mPendingNotificationMap;
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;
-    Server * mAppServer = nullptr;
+    BindingManagerInitParams mInitParams;
 
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;

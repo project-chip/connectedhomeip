@@ -356,7 +356,7 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
                 return chip::Loop::Continue;
             }
 
-            CHIP_ERROR err;
+            CHIP_ERROR err = CHIP_NO_ERROR;
 
             /// The same packet needs to be sent over potentially multiple interfaces.
             /// LWIP does not like having a pbuf sent over serparate interfaces, hence we create a copy
@@ -386,8 +386,14 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
             }
             else
             {
-                ChipLogError(Discovery, "Attempt to mDNS broadcast failed:  %s", chip::ErrorStr(err));
                 lastError = err;
+#if CHIP_DETAIL_LOGGING
+                char ifaceName[chip::Inet::InterfaceId::kMaxIfNameLength];
+                err = info->mInterfaceId.GetInterfaceName(ifaceName, sizeof(ifaceName));
+                if (err != CHIP_NO_ERROR)
+                    strcpy(ifaceName, "???");
+                ChipLogDetail(Discovery, "Warning: Attempt to mDNS broadcast failed on %s:  %s", ifaceName, lastError.AsString());
+#endif
             }
             return chip::Loop::Continue;
         }))

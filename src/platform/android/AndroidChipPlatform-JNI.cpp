@@ -21,6 +21,7 @@
  *      Implementation of JNI bridge for CHIP Device Controller for Android apps
  *
  */
+#include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CHIPMem.h>
@@ -35,6 +36,8 @@
 
 #include "AndroidChipPlatform-JNI.h"
 #include "BLEManagerImpl.h"
+#include "CommissionableDataProviderImpl.h"
+#include "DiagnosticDataProviderImpl.h"
 #include "DnssdImpl.h"
 
 using namespace chip;
@@ -98,6 +101,7 @@ void AndroidChipPlatformJNI_OnUnload(JavaVM * jvm, void * reserved)
 
 JNI_METHOD(void, initChipStack)(JNIEnv * env, jobject self)
 {
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Error initializing CHIP stack: %s", ErrorStr(err)));
 }
@@ -213,12 +217,14 @@ JNI_METHOD(void, setKeyValueStoreManager)(JNIEnv * env, jclass self, jobject man
 JNI_METHOD(void, setConfigurationManager)(JNIEnv * env, jclass self, jobject manager)
 {
     chip::DeviceLayer::StackLock lock;
-    chip::DeviceLayer::ConfigurationManagerImpl * configurationManagerImpl =
-        reinterpret_cast<chip::DeviceLayer::ConfigurationManagerImpl *>(&chip::DeviceLayer::ConfigurationMgr());
-    if (configurationManagerImpl != nullptr)
-    {
-        configurationManagerImpl->InitializeWithObject(manager);
-    }
+    chip::DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance().InitializeWithObject(manager);
+}
+
+// for DiagnosticDataProviderManager
+JNI_METHOD(void, setDiagnosticDataProviderManager)(JNIEnv * env, jclass self, jobject manager)
+{
+    chip::DeviceLayer::StackLock lock;
+    chip::DeviceLayer::DiagnosticDataProviderImpl::GetDefaultInstance().InitializeWithObject(manager);
 }
 
 // for ServiceResolver
@@ -251,3 +257,20 @@ exit:
     return result;
 }
 #endif
+
+// for CommissionableDataProvider
+JNI_METHOD(jboolean, updateCommissionableDataProviderData)
+(JNIEnv * env, jclass self, jstring spake2pVerifierBase64, jstring Spake2pSaltBase64, jint spake2pIterationCount,
+ jlong setupPasscode, jint discriminator)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CommissionableDataProviderMgrImpl().Update(env, spake2pVerifierBase64, Spake2pSaltBase64,
+                                                                spake2pIterationCount, setupPasscode, discriminator);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to update commissionable data provider data: %s", ErrorStr(err));
+        return false;
+    }
+
+    return true;
+}

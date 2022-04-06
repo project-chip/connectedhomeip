@@ -22,7 +22,7 @@ concurrency:
     # Don't cancel an already-running bloat check just because it took more
     # than 5 minutes to run and our cron job is trying to schedule a new one.
     cancel-in-progress: false
-  
+
 jobs:
     pull_request_update:
         name: Report on pull requests
@@ -30,11 +30,18 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.5.52
+            image: connectedhomeip/chip-build:0.5.58
 
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
+              with:
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
 
             - name: Report
               run: |

@@ -48,6 +48,7 @@
 #include <app/clusters/channel-server/channel-server.h>
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
+#include <platform/CHIPDeviceConfig.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -56,6 +57,9 @@ using namespace chip::app::Clusters::Channel;
 using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
+static constexpr size_t kChannelDelegateTableSize =
+    EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
 // -----------------------------------------------------------------------------
 // Delegate Implementation
 
@@ -63,7 +67,7 @@ using chip::app::Clusters::Channel::Delegate;
 
 namespace {
 
-Delegate * gDelegateTable[EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
+Delegate * gDelegateTable[kChannelDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
@@ -150,7 +154,7 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
 
         return ReadChannelListAttribute(aEncoder, delegate);
     }
-    case app::Clusters::Channel::Attributes::ChannelLineup::Id: {
+    case app::Clusters::Channel::Attributes::Lineup::Id: {
         if (isDelegateNull(delegate, endpoint))
         {
             return CHIP_NO_ERROR;
@@ -194,8 +198,8 @@ CHIP_ERROR ChannelAttrAccess::ReadCurrentChannelAttribute(app::AttributeValueEnc
 // -----------------------------------------------------------------------------
 // Matter Framework Callbacks Implementation
 
-bool emberAfChannelClusterChangeChannelRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                       const Commands::ChangeChannelRequest::DecodableType & commandData)
+bool emberAfChannelClusterChangeChannelCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                const Commands::ChangeChannel::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -213,7 +217,7 @@ bool emberAfChannelClusterChangeChannelRequestCallback(app::CommandHandler * com
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfChannelClusterChangeChannelRequestCallback error: %s", err.AsString());
+        ChipLogError(Zcl, "emberAfChannelClusterChangeChannelCallback error: %s", err.AsString());
     }
 
     // If isDelegateNull, no one will call responder, so HasSentResponse will be false
@@ -225,9 +229,8 @@ exit:
     return true;
 }
 
-bool emberAfChannelClusterChangeChannelByNumberRequestCallback(
-    app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-    const Commands::ChangeChannelByNumberRequest::DecodableType & commandData)
+bool emberAfChannelClusterChangeChannelByNumberCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                        const Commands::ChangeChannelByNumber::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -241,7 +244,7 @@ bool emberAfChannelClusterChangeChannelByNumberRequestCallback(
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfChannelClusterChangeChannelByNumberRequestCallback error: %s", err.AsString());
+        ChipLogError(Zcl, "emberAfChannelClusterChangeChannelByNumberCallback error: %s", err.AsString());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
@@ -251,8 +254,8 @@ exit:
     return true;
 }
 
-bool emberAfChannelClusterSkipChannelRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                     const Commands::SkipChannelRequest::DecodableType & commandData)
+bool emberAfChannelClusterSkipChannelCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                              const Commands::SkipChannel::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -264,7 +267,7 @@ bool emberAfChannelClusterSkipChannelRequestCallback(app::CommandHandler * comma
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfChannelClusterSkipChannelRequestCallback error: %s", err.AsString());
+        ChipLogError(Zcl, "emberAfChannelClusterSkipChannelCallback error: %s", err.AsString());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 

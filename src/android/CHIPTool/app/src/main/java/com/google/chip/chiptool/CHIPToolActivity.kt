@@ -39,6 +39,7 @@ import com.google.chip.chiptool.clusterclient.OpCredClientFragment
 import com.google.chip.chiptool.clusterclient.BasicClientFragment
 import com.google.chip.chiptool.clusterclient.OnOffClientFragment
 import com.google.chip.chiptool.clusterclient.SensorClientFragment
+import com.google.chip.chiptool.clusterclient.WildcardFragment
 import com.google.chip.chiptool.provisioning.AddressCommissioningFragment
 import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
 import com.google.chip.chiptool.provisioning.EnterNetworkFragment
@@ -138,6 +139,10 @@ class CHIPToolActivity :
 
   override fun handleClusterInteractionClicked() {
     showFragment(ClusterInteractionFragment.newInstance())
+  }
+
+  override fun handleWildcardClicked() {
+    showFragment(WildcardFragment.newInstance())
   }
 
   override fun handleOnOffClicked() {

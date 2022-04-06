@@ -15,41 +15,48 @@
 name: 45.1.4. [TC-SWDIAG-3.1] Command received functionality with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Software Diagnostics"
-    endpoint: 1
+    endpoint: 0
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-    #issue #11578 ResetWatermarks command is Failing
     - label: "Sends ResetWatermarks to DUT"
-      disabled: true
       command: "ResetWatermarks"
       PICS: CR_RESETWATERMARKS
 
-    #Disabled due to issue  #13441
     - label: "Reads a list of ThreadMetrics struct attribute from DUT."
       disabled: true
       command: "readAttribute"
       attribute: "ThreadMetrics"
       PICS: A_THREADMETRICS
       response:
-          value: 0
+          # TODO: Say something about the values?
+          value: {}
 
+    #issue #830
     - label: "Reads CurrentHeapUsed attribute value from DUT"
       optional: true
       command: "readAttribute"
       attribute: "CurrentHeapUsed"
       PICS: A_CURRENTHEAPUSED
       response:
-          value: 0
+          constraints:
+              type: uint64
 
+    #issue #830
     - label: "Reads CurrentHeapHighWaterMark attribute value from DUT"
       optional: true
       command: "readAttribute"
       attribute: "CurrentHeapHighWatermark"
       PICS: A_CURRENTHEAPHIGHWATERMARK
       response:
-          value: 0
+          constraints:
+              type: uint64

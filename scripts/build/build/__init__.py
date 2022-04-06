@@ -1,11 +1,10 @@
 import logging
 import os
 import shutil
-
 from enum import Enum, auto
 from typing import Sequence
 
-from .targets import Target, ALL
+from .targets import ALL, Target
 
 ALL_TARGETS = ALL
 
@@ -27,19 +26,27 @@ class Context:
         self.output_prefix = output_prefix
         self.completed_steps = set()
 
-    def SetupBuilders(self, targets: Sequence[Target], enable_flashbundle: bool):
-        """Configures internal builders for the given platform/board/app combination. """
+    def SetupBuilders(self, targets: Sequence[Target],
+                      enable_flashbundle: bool):
+        """
+        Configures internal builders for the given platform/board/app
+        combination.
+        """
 
         self.builders = []
         for target in targets:
             self.builders.append(target.Create(
-                self.runner, self.repository_path, self.output_prefix, enable_flashbundle))
+                self.runner, self.repository_path, self.output_prefix,
+                enable_flashbundle))
 
         # whenever builders change, assume generation is required again
         self.completed_steps.discard(BuildSteps.GENERATED)
 
     def Generate(self):
-        """Performs a build generation IFF code generation has not yet been performed."""
+        """
+        Performs a build generation IF code generation has not yet been
+        performed.
+        """
         if BuildSteps.GENERATED in self.completed_steps:
             return
 

@@ -44,15 +44,14 @@ namespace {
 
 AvahiProtocol ToAvahiProtocol(chip::Inet::IPAddressType addressType)
 {
+#if INET_CONFIG_ENABLE_IPV4
     AvahiProtocol protocol;
 
     switch (addressType)
     {
-#if INET_CONFIG_ENABLE_IPV4
     case chip::Inet::IPAddressType::kIPv4:
         protocol = AVAHI_PROTO_INET;
         break;
-#endif
     case chip::Inet::IPAddressType::kIPv6:
         protocol = AVAHI_PROTO_INET6;
         break;
@@ -62,6 +61,11 @@ AvahiProtocol ToAvahiProtocol(chip::Inet::IPAddressType addressType)
     }
 
     return protocol;
+#else
+    // We only support IPV6, never tell AVAHI about INET4 or UNSPEC because
+    // UNSPEC may actually return IPv4 data.
+    return AVAHI_PROTO_INET6;
+#endif
 }
 
 chip::Inet::IPAddressType ToAddressType(AvahiProtocol protocol)
@@ -453,7 +457,7 @@ void MdnsAvahi::HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState s
     }
 }
 
-CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service)
+CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishCallback callback, void * context)
 {
     std::ostringstream keyBuilder;
     std::string key;
@@ -505,9 +509,18 @@ exit:
     {
         avahi_string_list_free(text);
     }
-    if (error != CHIP_NO_ERROR)
+
+    // Ideally the callback would be called from `HandleGroupState` when the `AVAHI_ENTRY_GROUP_ESTABLISHED` state
+    // is received. But the current code use the `userdata` field to pass a pointer to the current MdnsAvahi instance
+    // and this is all comes from MdnsAvahi::Init that does not have any clue about the `type` that *will* be published.
+    // The code needs to be updated to support that callback properly.
+    if (CHIP_NO_ERROR == error)
     {
-        ChipLogError(DeviceLayer, "Avahi publish service failed: %" CHIP_ERROR_FORMAT, error.Format());
+        callback(context, type.c_str(), CHIP_NO_ERROR);
+    }
+    else
+    {
+        callback(context, nullptr, error);
     }
 
     return error;
@@ -556,7 +569,7 @@ DnssdServiceProtocol GetProtocolInType(const char * type)
 {
     const char * deliminator = strrchr(type, '.');
 
-    if (deliminator == NULL)
+    if (deliminator == nullptr)
     {
         ChipLogError(Discovery, "Failed to find protocol in type: %s", type);
         return DnssdServiceProtocol::kDnssdProtocolUnknown;
@@ -705,17 +718,16 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
             if (resolver == nullptr)
             {
                 ChipLogError(DeviceLayer, "Avahi resolve failed on retry");
-                context->mCallback(context->mContext, nullptr, CHIP_ERROR_INTERNAL);
+                context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
                 chip::Platform::Delete(context);
             }
             return;
         }
         ChipLogError(DeviceLayer, "Avahi resolve failed");
-        context->mCallback(context->mContext, nullptr, CHIP_ERROR_INTERNAL);
+        context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
         break;
     case AVAHI_RESOLVER_FOUND:
-        DnssdService result   = {};
-        CHIP_ERROR result_err = CHIP_NO_ERROR;
+        DnssdService result = {};
 
         result.mAddress.SetValue(chip::Inet::IPAddress());
         ChipLogError(DeviceLayer, "Avahi resolve found");
@@ -740,6 +752,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
             *dot = '\0';
         }
 
+        CHIP_ERROR result_err = CHIP_ERROR_INVALID_ADDRESS;
         if (address)
         {
             switch (address->proto)
@@ -750,8 +763,8 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
 
                 memcpy(&addr4, &(address->data.ipv4), sizeof(addr4));
                 result.mAddress.SetValue(chip::Inet::IPAddress(addr4));
+                result_err = CHIP_NO_ERROR;
 #else
-                result_err = CHIP_ERROR_INVALID_ADDRESS;
                 ChipLogError(Discovery, "Ignoring IPv4 mDNS address.");
 #endif
                 break;
@@ -760,6 +773,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
 
                 memcpy(&addr6, &(address->data.ipv6), sizeof(addr6));
                 result.mAddress.SetValue(chip::Inet::IPAddress(addr6));
+                result_err = CHIP_NO_ERROR;
                 break;
             default:
                 break;
@@ -788,11 +802,11 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
 
         if (result_err == CHIP_NO_ERROR)
         {
-            context->mCallback(context->mContext, &result, CHIP_NO_ERROR);
+            context->mCallback(context->mContext, &result, Span<Inet::IPAddress>(), CHIP_NO_ERROR);
         }
         else
         {
-            context->mCallback(context->mContext, nullptr, result_err);
+            context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), result_err);
         }
         break;
     }
@@ -811,13 +825,16 @@ CHIP_ERROR ChipDnssdShutdown()
     return MdnsAvahi::GetInstance().Shutdown();
 }
 
-CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
+CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
+    VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     if (strcmp(service->mHostName, "") != 0)
     {
         ReturnErrorOnFailure(MdnsAvahi::GetInstance().SetHostname(service->mHostName));
     }
-    return MdnsAvahi::GetInstance().PublishService(*service);
+
+    return MdnsAvahi::GetInstance().PublishService(*service, callback, context);
 }
 
 CHIP_ERROR ChipDnssdRemoveServices()

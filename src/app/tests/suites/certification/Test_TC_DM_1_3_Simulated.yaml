@@ -15,6 +15,7 @@
 name: 10.1.3. [TC-DM-1.3] Basic Cluster Server Attributes [DUT - Controller]
 
 config:
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
@@ -31,9 +32,9 @@ tests:
               - name: "message"
                 value: "*** Basic Cluster Tests Ready"
 
-    - label: "Query Interaction Model Version"
+    - label: "Query Data Model Revision"
       wait: "readAttribute"
-      attribute: "InteractionModelVersion"
+      attribute: "DataModelRevision"
 
     - label: "Query Vendor Name"
       wait: "readAttribute"

@@ -22,17 +22,39 @@
 #include <app-common/zap-generated/callbacks/PluginCallbacks.h>
 
 #define MATTER_PLUGINS_INIT                                                                                                        \
+    MatterApplicationBasicPluginClientInitCallback();                                                                              \
+    MatterApplicationBasicPluginServerInitCallback();                                                                              \
     MatterBasicPluginServerInitCallback();                                                                                         \
     MatterColorControlPluginServerInitCallback();                                                                                  \
+    MatterContentLauncherPluginClientInitCallback();                                                                               \
+    MatterContentLauncherPluginServerInitCallback();                                                                               \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
+    MatterGeneralCommissioningPluginClientInitCallback();                                                                          \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
+    MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
     MatterGroupsPluginServerInitCallback();                                                                                        \
     MatterIdentifyPluginServerInitCallback();                                                                                      \
+    MatterKeypadInputPluginClientInitCallback();                                                                                   \
+    MatterKeypadInputPluginServerInitCallback();                                                                                   \
     MatterLevelControlPluginServerInitCallback();                                                                                  \
+    MatterModeSelectPluginClientInitCallback();                                                                                    \
+    MatterModeSelectPluginServerInitCallback();                                                                                    \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
+    MatterOnOffPluginClientInitCallback();                                                                                         \
     MatterOnOffPluginServerInitCallback();                                                                                         \
     MatterOperationalCredentialsPluginClientInitCallback();                                                                        \
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
+    MatterPumpConfigurationAndControlPluginServerInitCallback();                                                                   \
+    MatterRelativeHumidityMeasurementPluginClientInitCallback();                                                                   \
+    MatterRelativeHumidityMeasurementPluginServerInitCallback();                                                                   \
     MatterScenesPluginServerInitCallback();                                                                                        \
+    MatterSwitchPluginClientInitCallback();                                                                                        \
+    MatterSwitchPluginServerInitCallback();                                                                                        \
+    MatterTargetNavigatorPluginClientInitCallback();                                                                               \
+    MatterTargetNavigatorPluginServerInitCallback();                                                                               \
     MatterTemperatureMeasurementPluginClientInitCallback();                                                                        \
-    MatterTemperatureMeasurementPluginServerInitCallback();
+    MatterTemperatureMeasurementPluginServerInitCallback();                                                                        \
+    MatterThermostatPluginServerInitCallback();                                                                                    \
+    MatterThermostatUserInterfaceConfigurationPluginClientInitCallback();                                                          \
+    MatterThermostatUserInterfaceConfigurationPluginServerInitCallback();                                                          \
+    MatterWindowCoveringPluginServerInitCallback();

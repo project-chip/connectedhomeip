@@ -22,11 +22,10 @@
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 namespace {
 constexpr uint8_t kMaxWiFiNetworks                  = 1;
 constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
-constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
+constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 30;
 } // namespace
 
 class ESPScanResponseIterator : public Iterator<WiFiScanResponse>
@@ -41,7 +40,7 @@ public:
             return false;
         }
 
-        item.security = mpScanResults[mIternum].authmode;
+        item.security.SetRaw(mpScanResults[mIternum].authmode);
         item.ssidLen =
             strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
         item.channel  = mpScanResults[mIternum].primary;
@@ -88,7 +87,7 @@ public:
 
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
-    CHIP_ERROR Init() override;
+    CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) override;
     CHIP_ERROR Shutdown() override;
 
     // WirelessDriver
@@ -99,17 +98,23 @@ public:
     CHIP_ERROR CommitConfiguration() override;
     CHIP_ERROR RevertConfiguration() override;
 
-    Status RemoveNetwork(ByteSpan networkId) override;
-    Status ReorderNetwork(ByteSpan networkId, uint8_t index) override;
+    Status RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) override;
+    Status ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText) override;
     void ConnectNetwork(ByteSpan networkId, ConnectCallback * callback) override;
 
     // WiFiDriver
-    Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials) override;
+    Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
+                              uint8_t & outNetworkIndex) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
 
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
     void OnConnectWiFiNetwork();
     void OnScanWiFiNetworkDone();
+    void OnNetworkStatusChange();
+
+    CHIP_ERROR SetLastDisconnectReason(const ChipDeviceEvent * event);
+    int32_t GetLastDisconnectReason();
+
     static ESPWiFiDriver & GetInstance()
     {
         static ESPWiFiDriver instance;
@@ -125,12 +130,10 @@ private:
     WiFiNetwork mStagingNetwork;
     ScanCallback * mpScanCallback;
     ConnectCallback * mpConnectCallback;
+    NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
+    int32_t mLastDisconnectedReason;
 };
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-// TODO: Add Thread Driver for ESP32H2 platform
-#endif
 } // namespace NetworkCommissioning
 } // namespace DeviceLayer
 } // namespace chip

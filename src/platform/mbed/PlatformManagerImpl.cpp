@@ -5,8 +5,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 #include <platform/ScopedLock.h>
-#include <platform/internal/GenericPlatformManagerImpl.cpp>
+#include <platform/internal/GenericPlatformManagerImpl.ipp>
 #include <platform/mbed/DiagnosticDataProviderImpl.h>
+#include <platform/mbed/SystemTimeSupport.h>
 #include <rtos/ThisThread.h>
 
 #include "MbedEventTimeout.h"
@@ -94,8 +95,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
+    auto err = System::Clock::InitClock_RealTime();
+    SuccessOrExit(err);
+
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
-    auto err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
+    err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
     SuccessOrExit(err);
     mInitialized = true;
 

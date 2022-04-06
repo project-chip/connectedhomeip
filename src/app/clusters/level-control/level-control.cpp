@@ -51,6 +51,7 @@
 #include <app/util/util.h>
 
 #include <app/reporting/reporting.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #ifdef EMBER_AF_PLUGIN_SCENES
 #include <app/clusters/scenes/scenes.h>
@@ -88,6 +89,9 @@ static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoin
 #define STARTUP_CURRENT_LEVEL_USE_DEVICE_MINIMUM 0x00
 #define STARTUP_CURRENT_LEVEL_USE_PREVIOUS_LEVEL 0xFF
 
+static constexpr size_t kLevelControlStateTableSize =
+    EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
 typedef struct
 {
     CommandId commandId;
@@ -103,12 +107,12 @@ typedef struct
     uint32_t elapsedTimeMs;
 } EmberAfLevelControlState;
 
-static EmberAfLevelControlState stateTable[EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+static EmberAfLevelControlState stateTable[kLevelControlStateTableSize];
 
 static EmberAfLevelControlState * getState(EndpointId endpoint);
 
-static void moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level, uint16_t transitionTimeDs,
-                               uint8_t optionMask, uint8_t optionOverride, uint16_t storedLevel);
+static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level, uint16_t transitionTimeDs,
+                                        uint8_t optionMask, uint8_t optionOverride, uint16_t storedLevel);
 static void moveHandler(CommandId commandId, uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride);
 static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTimeDs, uint8_t optionMask,
                         uint8_t optionOverride);
@@ -408,8 +412,12 @@ bool emberAfLevelControlClusterMoveToLevelCallback(app::CommandHandler * command
 
     emberAfLevelControlClusterPrintln("%pMOVE_TO_LEVEL %x %2x %x %x", "RX level-control:", level, transitionTime, optionMask,
                                       optionOverride);
-    moveToLevelHandler(commandPath.mEndpointId, Commands::MoveToLevel::Id, level, transitionTime, optionMask, optionOverride,
-                       INVALID_STORED_LEVEL); // Don't revert to the stored level
+    EmberAfStatus status =
+        moveToLevelHandler(commandPath.mEndpointId, Commands::MoveToLevel::Id, level, transitionTime, optionMask, optionOverride,
+                           INVALID_STORED_LEVEL); // Don't revert to the stored level
+
+    emberAfSendImmediateDefaultResponse(status);
+
     return true;
 }
 
@@ -421,8 +429,12 @@ bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(app::CommandHandler 
     auto & transitionTime = commandData.transitionTime;
 
     emberAfLevelControlClusterPrintln("%pMOVE_TO_LEVEL_WITH_ON_OFF %x %2x", "RX level-control:", level, transitionTime);
-    moveToLevelHandler(commandPath.mEndpointId, Commands::MoveToLevelWithOnOff::Id, level, transitionTime, 0xFF, 0xFF,
-                       INVALID_STORED_LEVEL); // Don't revert to the stored level
+    EmberAfStatus status =
+        moveToLevelHandler(commandPath.mEndpointId, Commands::MoveToLevelWithOnOff::Id, level, transitionTime, 0xFF, 0xFF,
+                           INVALID_STORED_LEVEL); // Don't revert to the stored level
+
+    emberAfSendImmediateDefaultResponse(status);
+
     return true;
 }
 
@@ -495,8 +507,8 @@ bool emberAfLevelControlClusterStopWithOnOffCallback(app::CommandHandler * comma
     return true;
 }
 
-static void moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level, uint16_t transitionTimeDs,
-                               uint8_t optionMask, uint8_t optionOverride, uint16_t storedLevel)
+static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level, uint16_t transitionTimeDs,
+                                        uint8_t optionMask, uint8_t optionOverride, uint16_t storedLevel)
 {
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
@@ -505,14 +517,12 @@ static void moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t
 
     if (state == NULL)
     {
-        status = EMBER_ZCL_STATUS_FAILURE;
-        goto send_default_response;
+        return EMBER_ZCL_STATUS_FAILURE;
     }
 
     if (!shouldExecuteIfOff(endpoint, commandId, optionMask, optionOverride))
     {
-        status = EMBER_ZCL_STATUS_SUCCESS;
-        goto send_default_response;
+        return EMBER_ZCL_STATUS_SUCCESS;
     }
 
     // Cancel any currently active command before fiddling with the state.
@@ -522,7 +532,7 @@ static void moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
-        goto send_default_response;
+        return status;
     }
 
     state->commandId = commandId;
@@ -554,8 +564,7 @@ static void moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t
         }
         if (currentLevel == state->moveToLevel)
         {
-            status = EMBER_ZCL_STATUS_SUCCESS;
-            goto send_default_response;
+            return EMBER_ZCL_STATUS_SUCCESS;
         }
         state->increasing = true;
         actualStepSize    = static_cast<uint8_t>(state->moveToLevel - currentLevel);
@@ -580,7 +589,7 @@ static void moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t
             if (status != EMBER_ZCL_STATUS_SUCCESS)
             {
                 emberAfLevelControlClusterPrintln("ERR: reading on/off transition time %x", status);
-                goto send_default_response;
+                return status;
             }
 
             // Transition time comes in (or is stored, in the case of On/Off Transition
@@ -629,11 +638,7 @@ static void moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t
         }
     }
 
-send_default_response:
-    if (emberAfCurrentCommand()->apsFrame->clusterId == LevelControl::Id)
-    {
-        emberAfSendImmediateDefaultResponse(status);
-    }
+    return status;
 }
 
 static void moveHandler(CommandId commandId, uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride)

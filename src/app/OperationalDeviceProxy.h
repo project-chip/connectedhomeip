@@ -31,40 +31,39 @@
 #include <app/DeviceProxy.h>
 #include <app/util/attribute-filter.h>
 #include <app/util/basic-types.h>
+#include <credentials/GroupDataProvider.h>
+#include <lib/address_resolve/AddressResolve.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/secure_channel/CASESession.h>
-#include <protocols/secure_channel/SessionIDAllocator.h>
 #include <system/SystemLayer.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
 
-#include <lib/dnssd/ResolverProxy.h>
-
 namespace chip {
 
 struct DeviceProxyInitParams
 {
-    SessionManager * sessionManager          = nullptr;
-    Messaging::ExchangeManager * exchangeMgr = nullptr;
-    SessionIDAllocator * idAllocator         = nullptr;
-    FabricTable * fabricTable                = nullptr;
-    CASEClientPoolDelegate * clientPool      = nullptr;
-
-    Controller::DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
+    SessionManager * sessionManager                     = nullptr;
+    SessionResumptionStorage * sessionResumptionStorage = nullptr;
+    Messaging::ExchangeManager * exchangeMgr            = nullptr;
+    FabricTable * fabricTable                           = nullptr;
+    CASEClientPoolDelegate * clientPool                 = nullptr;
+    Credentials::GroupDataProvider * groupDataProvider  = nullptr;
 
     Optional<ReliableMessageProtocolConfig> mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Missing();
 
     CHIP_ERROR Validate() const
     {
         ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        // sessionResumptionStorage can be nullptr when resumption is disabled
         ReturnErrorCodeIf(exchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(idAllocator == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(groupDataProvider == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(clientPool == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         return CHIP_NO_ERROR;
@@ -76,25 +75,42 @@ class OperationalDeviceProxy;
 typedef void (*OnDeviceConnected)(void * context, OperationalDeviceProxy * device);
 typedef void (*OnDeviceConnectionFailure)(void * context, PeerId peerId, CHIP_ERROR error);
 
-class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy, SessionReleaseDelegate, public SessionEstablishmentDelegate
+/**
+ * Represents a connection path to a device that is in an operational state.
+ *
+ * Handles the lifetime of communicating with such a device:
+ *    - Discover the device using DNSSD (find out what IP address to use and what
+ *      communication parameters are appropriate for it)
+ *    - Establish a secure channel to it via CASE
+ *    - Expose to consumers the secure session for talking to the device.
+ */
+class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy,
+                                          SessionReleaseDelegate,
+                                          public SessionEstablishmentDelegate,
+                                          public AddressResolve::NodeListener
 {
 public:
-    virtual ~OperationalDeviceProxy();
+    ~OperationalDeviceProxy() override;
     OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId) : mSecureSession(*this)
     {
-        VerifyOrReturn(params.Validate() == CHIP_NO_ERROR);
+        mInitParams = params;
+        if (params.Validate() != CHIP_NO_ERROR)
+        {
+            mState = State::Uninitialized;
+            return;
+        }
 
         mSystemLayer = params.exchangeMgr->GetSessionManager()->SystemLayer();
-        mInitParams  = params;
         mPeerId      = peerId;
         mFabricInfo  = params.fabricTable->FindFabricWithCompressedId(peerId.GetCompressedFabricId());
-
-        mState = State::NeedsAddress;
+        mState       = State::NeedsAddress;
+        mAddressLookupHandle.SetListener(this);
     }
 
     OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId, const Dnssd::ResolvedNodeData & nodeResolutionData) :
         OperationalDeviceProxy(params, peerId)
     {
+        mAddressLookupHandle.SetListener(this);
         OnNodeIdResolved(nodeResolutionData);
     }
 
@@ -114,7 +130,7 @@ public:
      * returned.
      */
     CHIP_ERROR Connect(Callback::Callback<OnDeviceConnected> * onConnection,
-                       Callback::Callback<OnDeviceConnectionFailure> * onFailure, Dnssd::ResolverProxy * resolver);
+                       Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
     bool IsConnected() const { return mState == State::SecureConnected; }
 
@@ -170,8 +186,6 @@ public:
 
     CHIP_ERROR ShutdownSubscriptions() override;
 
-    Controller::DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() override { return mInitParams.imDelegate; }
-
     Messaging::ExchangeManager * GetExchangeManager() const override { return mInitParams.exchangeMgr; }
 
     chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.ToOptional(); }
@@ -197,6 +211,27 @@ public:
         return Transport::PeerAddress::UDP(nodeData.mAddress[0], nodeData.mPort, interfaceId);
     }
 
+    /**
+     * @brief Get the raw Fabric ID assigned to the device.
+     */
+    FabricIndex GetFabricIndex() const
+    {
+        if (mFabricInfo != nullptr)
+        {
+            return mFabricInfo->GetFabricIndex();
+        }
+        return kUndefinedFabricIndex;
+    }
+
+    /**
+     * Triggers a DNSSD lookup to find a usable peer address for this operational device.
+     */
+    CHIP_ERROR LookupPeerAddress();
+
+    // AddressResolve::NodeListener - notifications when dnssd finds a node IP address
+    void OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result) override;
+    void OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason) override;
+
 private:
     enum class State
     {
@@ -217,6 +252,8 @@ private:
 
     Transport::PeerAddress mDeviceAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
+    void MoveToState(State aTargetState);
+
     State mState = State::Uninitialized;
 
     SessionHolderWithDelegate mSecureSession;
@@ -225,6 +262,9 @@ private:
 
     Callback::CallbackDeque mConnectionSuccess;
     Callback::CallbackDeque mConnectionFailure;
+
+    /// This is used when a node address is required.
+    chip::AddressResolve::NodeLookupHandle mAddressLookupHandle;
 
     CHIP_ERROR EstablishConnection();
 

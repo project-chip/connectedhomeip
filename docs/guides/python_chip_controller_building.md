@@ -202,8 +202,8 @@ terminal of the device (for example, UART). For example:
 ```
 I: 254 [DL]Device Configuration:
 I: 257 [DL] Serial Number: TEST_SN
-I: 260 [DL] Vendor Id: 9050 (0x235A)
-I: 263 [DL] Product Id: 20043 (0x4E4B)
+I: 260 [DL] Vendor Id: 65521 (0xFFF1)
+I: 263 [DL] Product Id: 32768 (0x8000)
 I: 267 [DL] Hardware Version: 1
 I: 270 [DL] Setup Pin Code: 20202021
 I: 273 [DL] Setup Discriminator: 3840 (0xF00)
@@ -505,7 +505,7 @@ List available commands in cluster. For example, for _Basic_ cluster:
 
 ```
 chip-device-ctrl > zcl ? Basic
-InteractionModelVersion
+DataModelRevision
 VendorName
 VendorID
 ProductName

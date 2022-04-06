@@ -34,7 +34,6 @@
     MatterBindingPluginServerInitCallback();                                                                                       \
     MatterBooleanStatePluginServerInitCallback();                                                                                  \
     MatterBridgedActionsPluginServerInitCallback();                                                                                \
-    MatterBridgedDeviceBasicPluginServerInitCallback();                                                                            \
     MatterChannelPluginServerInitCallback();                                                                                       \
     MatterColorControlPluginServerInitCallback();                                                                                  \
     MatterContentLauncherPluginServerInitCallback();                                                                               \
@@ -43,6 +42,7 @@
     MatterDoorLockPluginServerInitCallback();                                                                                      \
     MatterElectricalMeasurementPluginServerInitCallback();                                                                         \
     MatterEthernetNetworkDiagnosticsPluginServerInitCallback();                                                                    \
+    MatterFanControlPluginServerInitCallback();                                                                                    \
     MatterFixedLabelPluginServerInitCallback();                                                                                    \
     MatterFlowMeasurementPluginServerInitCallback();                                                                               \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \

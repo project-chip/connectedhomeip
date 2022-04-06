@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/Optional.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
@@ -67,8 +68,10 @@ constexpr size_t kMAX_CSR_Length = 255;
 
 constexpr size_t CHIP_CRYPTO_HASH_LEN_BYTES = kSHA256_Hash_Length;
 
-constexpr size_t kMin_Salt_Length = 16;
-constexpr size_t kMax_Salt_Length = 32;
+constexpr size_t kSpake2p_Min_PBKDF_Salt_Length  = 16;
+constexpr size_t kSpake2p_Max_PBKDF_Salt_Length  = 32;
+constexpr uint32_t kSpake2p_Min_PBKDF_Iterations = 1000;
+constexpr uint32_t kSpake2p_Max_PBKDF_Iterations = 100000;
 
 constexpr size_t kP256_PrivateKey_Length = CHIP_CRYPTO_GROUP_SIZE_BYTES;
 constexpr size_t kP256_PublicKey_Length  = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
@@ -91,6 +94,14 @@ constexpr size_t kEmitDerIntegerWithoutTagOverhead = 1; // 1 sign stuffer
 constexpr size_t kEmitDerIntegerOverhead           = 3; // Tag + Length byte + 1 sign stuffer
 
 constexpr size_t kMAX_Hash_SHA256_Context_Size = CHIP_CONFIG_SHA256_CONTEXT_SIZE;
+
+constexpr size_t kSpake2p_WS_Length                 = kP256_FE_Length + 8;
+constexpr size_t kSpake2p_VerifierSerialized_Length = kP256_FE_Length + kP256_Point_Length;
+
+constexpr char kVIDPrefixForCNEncoding[]    = "Mvid:";
+constexpr char kPIDPrefixForCNEncoding[]    = "Mpid:";
+constexpr size_t kVIDandPIDHexLength        = sizeof(uint16_t) * 2;
+constexpr size_t kMax_CommonNameAttr_Length = 64;
 
 /*
  * Overhead to encode a raw ECDSA signature in X9.62 format in ASN.1 DER
@@ -193,6 +204,18 @@ public:
     {
         // Sanitize after use
         ClearSecretData(&bytes[0], Cap);
+    }
+
+    CapacityBoundBuffer & operator=(const CapacityBoundBuffer & other)
+    {
+        // Guard self assignment
+        if (this == &other)
+            return *this;
+
+        ClearSecretData(&bytes[0], Cap);
+        SetLength(other.Length());
+        ::memcpy(Bytes(), other.Bytes(), other.Length());
+        return *this;
     }
 
     /** @brief Set current length of the buffer that's being used
@@ -357,7 +380,7 @@ class P256Keypair : public P256KeypairBase
 {
 public:
     P256Keypair() {}
-    virtual ~P256Keypair();
+    ~P256Keypair() override;
 
     /**
      * @brief Initialize the keypair.
@@ -547,15 +570,15 @@ CHIP_ERROR ConvertIntegerRawToDerWithoutTag(const ByteSpan & raw_integer, Mutabl
  * @param aad_length Length of additional authentication data
  * @param key Encryption key
  * @param key_length Length of encryption key (in bytes)
- * @param iv Initial vector
- * @param iv_length Length of initial vector
+ * @param nonce Encryption nonce
+ * @param nonce_length Length of encryption nonce
  * @param ciphertext Buffer to write ciphertext into. Caller must ensure this is large enough to hold the ciphertext
  * @param tag Buffer to write tag into. Caller must ensure this is large enough to hold the tag
  * @param tag_length Expected length of tag
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  * */
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
-                           const uint8_t * key, size_t key_length, const uint8_t * iv, size_t iv_length, uint8_t * ciphertext,
+                           const uint8_t * key, size_t key_length, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
                            uint8_t * tag, size_t tag_length);
 
 /**
@@ -574,15 +597,15 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
  * @param tag_length Length of tag
  * @param key Decryption key
  * @param key_length Length of Decryption key (in bytes)
- * @param iv Initial vector
- * @param iv_length Length of initial vector
+ * @param nonce Encryption nonce
+ * @param nonce_length Length of encryption nonce
  * @param plaintext Buffer to write plaintext into
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 
 CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length, const uint8_t * aad, size_t aad_length,
-                           const uint8_t * tag, size_t tag_length, const uint8_t * key, size_t key_length, const uint8_t * iv,
-                           size_t iv_length, uint8_t * plaintext);
+                           const uint8_t * tag, size_t tag_length, const uint8_t * key, size_t key_length, const uint8_t * nonce,
+                           size_t nonce_length, uint8_t * plaintext);
 
 /**
  * @brief Verify the Certificate Signing Request (CSR). If successfully verified, it outputs the public key from the CSR.
@@ -849,7 +872,7 @@ public:
      * @param my_identity_len   The verifier identity length.
      * @param peer_identity     The peer identity. May be NULL if identities are not established.
      * @param peer_identity_len The peer identity length.
-     * @param w0in              The input w0 (an output from the PBKDF).
+     * @param w0in              The input w0 (a parameter baked into the device or computed with ComputeW0).
      * @param w0in_len          The input w0 length.
      * @param Lin               The input L (a parameter baked into the device or computed with ComputeL).
      * @param Lin_len           The input L length.
@@ -1046,6 +1069,18 @@ public:
     virtual CHIP_ERROR PointIsValid(void * R) = 0;
 
     /*
+     *   @synopsis Compute w0sin mod p
+     *
+     *   @param w0out       Output field element (modulo p)
+     *   @param w0_len      Output field element length
+     *   @param w1sin       Input field element
+     *   @param w1sin_len   Input field element length
+     *
+     *   @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR ComputeW0(uint8_t * w0out, size_t * w0_len, const uint8_t * w0sin, size_t w0sin_len) = 0;
+
+    /*
      *   @synopsis Compute w1in*G
      *
      *   @param Lout        Output point in 0x04 || X || Y format.
@@ -1112,24 +1147,25 @@ protected:
     /**
      * @brief Return the hash.
      *
-     * @param out    Output buffer. The size is implicit and is determined by the hash used.
+     * @param out_span Output buffer. The size available must be >= the hash size. It gets resized
+     *                 to hash size on success.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR HashFinalize(uint8_t * out) = 0;
+    virtual CHIP_ERROR HashFinalize(MutableByteSpan & out_span) = 0;
 
     /**
      * @brief Generate a message authentication code.
      *
-     * @param key     The MAC key buffer.
-     * @param key_len The size of the MAC key in bytes.
-     * @param in      The input buffer.
-     * @param in_len  The size of the input data to MAC in bytes.
-     * @param out     The output MAC buffer. Size is implicit and is determined by the hash used.
+     * @param key      The MAC key buffer.
+     * @param key_len  The size of the MAC key in bytes.
+     * @param in       The input buffer.
+     * @param in_len   The size of the input data to MAC in bytes.
+     * @param out_span The output MAC buffer span. Size must be >= the hash_size. Output size is updated to fit on success.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out) = 0;
+    virtual CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, MutableByteSpan & out_span) = 0;
 
     /**
      * @brief Verify a message authentication code.
@@ -1192,7 +1228,7 @@ public:
     ~Spake2p_P256_SHA256_HKDF_HMAC() override { Spake2p_P256_SHA256_HKDF_HMAC::Clear(); }
 
     void Clear() override;
-    CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out) override;
+    CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, MutableByteSpan & out_span) override;
     CHIP_ERROR MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len, const uint8_t * in,
                          size_t in_len) override;
     CHIP_ERROR FELoad(const uint8_t * in, size_t in_len, void * fe) override;
@@ -1207,12 +1243,14 @@ public:
     CHIP_ERROR PointInvert(void * R) override;
     CHIP_ERROR PointCofactorMul(void * R) override;
     CHIP_ERROR PointIsValid(void * R) override;
+
+    CHIP_ERROR ComputeW0(uint8_t * w0out, size_t * w0_len, const uint8_t * w0sin, size_t w0sin_len) override;
     CHIP_ERROR ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len) override;
 
 protected:
     CHIP_ERROR InitImpl() override;
     CHIP_ERROR Hash(const uint8_t * in, size_t in_len) override;
-    CHIP_ERROR HashFinalize(uint8_t * out) override;
+    CHIP_ERROR HashFinalize(MutableByteSpan & out_span) override;
     CHIP_ERROR KDF(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length, const uint8_t * info,
                    size_t info_length, uint8_t * out, size_t out_length) override;
 
@@ -1222,6 +1260,55 @@ private:
 
     Spake2pOpaqueContext mSpake2pContext;
 };
+
+/**
+ * @brief Class used for verifying PASE secure sessions.
+ **/
+class Spake2pVerifier
+{
+public:
+    uint8_t mW0[kP256_FE_Length];
+    uint8_t mL[kP256_Point_Length];
+
+    CHIP_ERROR Serialize(MutableByteSpan & outSerialized) const;
+    CHIP_ERROR Deserialize(const ByteSpan & inSerialized);
+
+    /**
+     * @brief Generate the Spake2+ verifier.
+     *
+     * @param pbkdf2IterCount Iteration count for PBKDF2 function
+     * @param salt            Salt to be used for Spake2+ operation
+     * @param setupPin        Provided setup PIN (passcode)
+     *
+     * @return CHIP_ERROR     The result of Spake2+ verifier generation
+     */
+    CHIP_ERROR Generate(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t & setupPin);
+
+    /**
+     * @brief Compute the initiator values (w0, w1) used for PAKE input.
+     *
+     * @param pbkdf2IterCount Iteration count for PBKDF2 function
+     * @param salt            Salt to be used for Spake2+ operation
+     * @param setupPin        Provided setup PIN (passcode)
+     * @param ws              The output pair (w0, w1) stored sequentially
+     * @param ws_len          The output length
+     *
+     * @return CHIP_ERROR     The result from running PBKDF2
+     */
+    static CHIP_ERROR ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t & setupPin, uint8_t * ws,
+                                uint32_t ws_len);
+};
+
+/**
+ * @brief Serialized format of the Spake2+ Verifier components.
+ *
+ *  This is used when the Verifier should be presented in a serialized form.
+ *  For example, when it is generated using PBKDF function, when stored in the
+ *  memory or when sent over the wire.
+ *  The serialized format is concatentation of 'W0' and 'L' verifier components:
+ *      { Spake2pVerifier.mW0[kP256_FE_Length], Spake2pVerifier.mL[kP256_Point_Length] }
+ **/
+typedef uint8_t Spake2pVerifierSerialized[kSpake2p_VerifierSerialized_Length];
 
 /**
  * @brief Compute the compressed fabric identifier used for operational discovery service
@@ -1246,8 +1333,8 @@ CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_
  *        records from a Node's root public key and Fabric ID.  This is a conveniance
  *        overload that writes to a uint64_t (CompressedFabricId) type.
  *
- * @param[in] root_public_key The root public key associated with the node's fabric
- * @param[in] fabric_id The fabric ID associated with the node's fabric
+ * @param[in] rootPublicKey The root public key associated with the node's fabric
+ * @param[in] fabricId The fabric ID associated with the node's fabric
  * @param[out] compressedFabricId output location for compressed fabric ID
  * @returns a CHIP_ERROR on failure or CHIP_NO_ERROR otherwise.
  */
@@ -1328,19 +1415,50 @@ CHIP_ERROR ExtractSKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
  **/
 CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid);
 
-enum class MatterOid
+/**
+ * Defines DN attribute types that can include endocing of VID/PID parameters.
+ */
+enum class DNAttrType
 {
-    kVendorId,
-    kProductId,
+    kUnspecified = 0,
+    kCommonName  = 1,
+    kMatterVID   = 2,
+    kMatterPID   = 3,
 };
 
 /**
- * @brief Extracts one of the IDs listed in MatterOid enum from an X509 Certificate.
- **/
-CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & certificate, uint16_t & id);
+ *  @struct AttestationCertVidPid
+ *
+ *  @brief
+ *    A data structure representing Attestation Certificate VID and PID attributes.
+ */
+struct AttestationCertVidPid
+{
+    Optional<VendorId> mVendorId;
+    Optional<uint16_t> mProductId;
+
+    bool Initialized() const { return (mVendorId.HasValue() || mProductId.HasValue()); }
+};
 
 /**
- * @brief Opaque context used to protect the symmetric key. The key operations must
+ * @brief Extracts VID and PID attributes from the DN Attribute string.
+ *        If attribute is not present the corresponding output value stays uninitialized.
+ *
+ * @return CHIP_ERROR_INVALID_ARGUMENT if wrong input is provided.
+ *         CHIP_ERROR_WRONG_CERT_DN if encoding of kMatterVID and kMatterPID attributes is wrong.
+ *         CHIP_NO_ERROR otherwise.
+ **/
+CHIP_ERROR ExtractVIDPIDFromAttributeString(DNAttrType attrType, const ByteSpan & attr,
+                                            AttestationCertVidPid & vidpidFromMatterAttr, AttestationCertVidPid & vidpidFromCNAttr);
+
+/**
+ * @brief Extracts VID and PID attributes from the Subject DN of an X509 Certificate.
+ *        If attribute is not present the corresponding output value stays uninitialized.
+ **/
+CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & x509Cert, AttestationCertVidPid & vidpid);
+
+/**
+ * @brief Opaque context used to protect a symmetric key. The key operations must
  *        be performed without exposing the protected key value.
  */
 class SymmetricKeyContext
@@ -1348,6 +1466,9 @@ class SymmetricKeyContext
 public:
     /**
      * @brief Returns the symmetric key hash
+     *
+     * TODO: Replace GetKeyHash() with DeriveGroupSessionId(SymmetricKeyContext &, uint16_t & session_id)
+     *
      * @return Group Key Hash
      */
     virtual uint16_t GetKeyHash() = 0;
@@ -1355,31 +1476,35 @@ public:
     virtual ~SymmetricKeyContext() = default;
     /**
      * @brief Perform the message encryption as described in 4.7.2. (Security Processing of Outgoing Messages)
-     * @param[inout] plaintext     Outgoing message payload.
+     * @param[in] plaintext     Outgoing message payload.
      * @param[in] aad           Additional data (message header contents)
      * @param[in] nonce         Nonce (Security Flags | Message Counter | Source Node ID)
-     * @param[out] out_mic      Outgoing Message Integrity Check
+     * @param[out] mic          Outgoing Message Integrity Check
+     * @param[out] ciphertext   Outgoing encrypted payload. Must be at least as big as plaintext. The same buffer may be used both
+     * for ciphertext, and plaintext.
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR EncryptMessage(MutableByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
-                                      MutableByteSpan & out_mic) const = 0;
+    virtual CHIP_ERROR EncryptMessage(const ByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
+                                      MutableByteSpan & mic, MutableByteSpan & ciphertext) const = 0;
     /**
      * @brief Perform the message decryption as described in 4.7.3.(Security Processing of Incoming Messages)
-     * @param ciphertext[inout] Incoming encrypted payload
-     * @param aad[in]   Additional data (message header contents)
-     * @param nonce[in] Nonce (Security Flags | Message Counter | Source Node ID)
-     * @param mic[in]   Incoming Message Integrity Check
+     * @param[in] ciphertext    Incoming encrypted payload
+     * @param[in] aad           Additional data (message header contents)
+     * @param[in] nonce         Nonce (Security Flags | Message Counter | Source Node ID)
+     * @param[in] mic           Incoming Message Integrity Check
+     * @param[out] plaintext     Incoming message payload. Must be at least as big as ciphertext. The same buffer may be used both
+     * for plaintext, and ciphertext.
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR DecryptMessage(MutableByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
-                                      const ByteSpan & mic) const = 0;
+    virtual CHIP_ERROR DecryptMessage(const ByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
+                                      const ByteSpan & mic, MutableByteSpan & plaintext) const = 0;
 
     /**
      * @brief Perform privacy encoding as described in 4.8.2. (Privacy Processing of Outgoing Messages)
-     * @param header[in/out]    Message header to encrypt
-     * @param session_id[in]    Outgoing SessionID
-     * @param payload[in]       Encrypted payload
-     * @param mic[in]       Outgoing Message Integrity Check
+     * @param[in,out] header    Message header to encrypt
+     * @param[in] session_id    Outgoing SessionID
+     * @param[in] payload       Encrypted payload
+     * @param[in] mic       Outgoing Message Integrity Check
      * @return CHIP_ERROR
      */
     virtual CHIP_ERROR EncryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,
@@ -1387,17 +1512,17 @@ public:
 
     /**
      * @brief Perform privacy decoding as described in 4.8.3. (Privacy Processing of Incoming Messages)
-     * @param header[in/out]    Message header to decrypt
-     * @param session_id[in]    Incoming SessionID
-     * @param payload[in]       Encrypted payload
-     * @param mic[in]           Outgoing Message Integrity Check
+     * @param[in,out] header    Message header to decrypt
+     * @param[in] session_id    Incoming SessionID
+     * @param[in] payload       Encrypted payload
+     * @param[in] mic           Outgoing Message Integrity Check
      * @return CHIP_ERROR
      */
     virtual CHIP_ERROR DecryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,
                                       const ByteSpan & mic) const = 0;
 
     /**
-     * @brief Release the dynamic memory used to allocate this instance of the SymmetricKeyContext
+     * @brief Release resources such as dynamic memory used to allocate this instance of the SymmetricKeyContext
      */
     virtual void Release() = 0;
 };
@@ -1409,7 +1534,7 @@ public:
  The buffer size must be at least CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
  * @return Returns a CHIP_NO_ERROR on succcess, or CHIP_ERROR_INTERNAL if the provided key is invalid.
  **/
-CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, MutableByteSpan & out_key);
+CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, const ByteSpan & compressed_fabric_id, MutableByteSpan & out_key);
 
 /**
  *  @brief Derives the Group Session ID from a given operational group key using

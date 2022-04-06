@@ -27,12 +27,6 @@
 namespace chip {
 namespace DeviceLayer {
 
-void HandleArmFailSafe(System::Layer * layer, void * aAppState)
-{
-    DeviceControlServer * server = reinterpret_cast<DeviceControlServer *>(aAppState);
-    server->CommissioningFailedTimerComplete();
-}
-
 DeviceControlServer DeviceControlServer::sInstance;
 
 DeviceControlServer & DeviceControlServer::DeviceControlSvr()
@@ -40,36 +34,16 @@ DeviceControlServer & DeviceControlServer::DeviceControlSvr()
     return sInstance;
 }
 
-void DeviceControlServer::CommissioningFailedTimerComplete()
+CHIP_ERROR DeviceControlServer::CommissioningComplete(NodeId peerNodeId, FabricIndex accessingFabricIndex)
 {
+    VerifyOrReturnError(CHIP_NO_ERROR == mFailSafeContext.DisarmFailSafe(), CHIP_ERROR_INTERNAL);
+
     ChipDeviceEvent event;
-    event.Type                         = DeviceEventType::kCommissioningComplete;
-    event.CommissioningComplete.status = CHIP_ERROR_TIMEOUT;
-    CHIP_ERROR status                  = PlatformMgr().PostEvent(&event);
-    if (status != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to post commissioning complete: %" CHIP_ERROR_FORMAT, status.Format());
-    }
-}
 
-CHIP_ERROR DeviceControlServer::ArmFailSafe(System::Clock::Timeout expiryLength)
-{
-    DeviceLayer::SystemLayer().StartTimer(expiryLength, HandleArmFailSafe, this);
-    return CHIP_NO_ERROR;
-}
+    event.Type                                  = DeviceEventType::kCommissioningComplete;
+    event.CommissioningComplete.PeerNodeId      = peerNodeId;
+    event.CommissioningComplete.PeerFabricIndex = accessingFabricIndex;
 
-CHIP_ERROR DeviceControlServer::DisarmFailSafe()
-{
-    DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafe, this);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceControlServer::CommissioningComplete()
-{
-    VerifyOrReturnError(CHIP_NO_ERROR == DisarmFailSafe(), CHIP_ERROR_INTERNAL);
-    ChipDeviceEvent event;
-    event.Type                         = DeviceEventType::kCommissioningComplete;
-    event.CommissioningComplete.status = CHIP_NO_ERROR;
     return PlatformMgr().PostEvent(&event);
 }
 
@@ -92,9 +66,7 @@ exit:
         ChipLogError(DeviceLayer, "SetRegulatoryConfig failed with error: %s", ErrorStr(err));
     }
 
-    // TODO(cecille): This command fails on ESP32, but it's blocking IP cluster-based commissioning so for now just return a success
-    // status.
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR DeviceControlServer::ConnectNetworkForOperational(ByteSpan networkID)

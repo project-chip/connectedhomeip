@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2020 Project CHIP Authors
+#    Copyright (c) 2022 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,8 +51,6 @@ menu "Demo"
       help
           Specifies the Rendezvous mode of the peripheral.
 
-      config RENDEZVOUS_MODE_BYPASS
-          bool "Bypass"
       config RENDEZVOUS_MODE_SOFTAP
           bool "Soft-AP"
       config RENDEZVOUS_MODE_BLE
@@ -87,7 +85,6 @@ menu "Demo"
     config RENDEZVOUS_MODE
        int
        range 0 8
-       default 0 if RENDEZVOUS_MODE_BYPASS
        default 1 if RENDEZVOUS_MODE_SOFTAP
        default 2 if RENDEZVOUS_MODE_BLE
        default 4 if RENDEZVOUS_MODE_ON_NETWORK
@@ -101,6 +98,21 @@ menu "Demo"
         help
             To reduce wear and heat the M5Stack's Display is automatically switched off after a few seconds
 
+    config STATUS_LED_GPIO_NUM
+        int 
+        range 0 40
+        default 2 if DEVICE_TYPE_ESP32_DEVKITC         #Use LED1 (blue LED) as status LED on DevKitC      
+        default 8 if DEVICE_TYPE_ESP32_C3_DEVKITM
+        default 26 if DEVICE_TYPE_ESP32_WROVER_KIT     
+        default 40 if DEVICE_TYPE_M5STACK
+        help
+            Each board has a status led, define its pin number.
+
+    config DEINIT_BLE_ON_COMMISSIONING_COMPLETE
+	bool "Disable and DeInit BLE on commissioning complete"
+	default y
+	help 
+             Disable and deinit BLE and reclaim all its memory, once the commissioning is successful and Commissioning complete event is received in the application.	
 endmenu
 
 menu "PW RPC Debug channel"

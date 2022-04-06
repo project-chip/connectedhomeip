@@ -48,7 +48,10 @@ static_library("Ameba") {
     "SystemTimeSupport.h",
   ]
 
-  deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
+  deps = [
+    "${chip_root}/src/lib/dnssd:platform_header",
+    "${chip_root}/src/setup_payload",
+  ]
 
   public_deps = [
     "${chip_root}/src/crypto",

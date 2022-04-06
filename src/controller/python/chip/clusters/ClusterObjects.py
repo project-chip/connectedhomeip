@@ -219,10 +219,30 @@ class ClusterCommand(ClusterObject):
 
 
 class Cluster(ClusterObject):
-    ''' This class does nothing, but a convenient class that generated clusters can inherit from.
-    This gives the ability that the users can use issubclass(X, Cluster) to determine if the class represnents a Cluster.
     '''
-    pass
+    When send read requests with returnClusterObject=True, we will set the data_version property of the object.
+    Otherwise the [endpoint][cluster][Clusters.DataVersion] will be set to the DataVersion of the cluster.
+
+    For data_version, we do not make it a real property so we can distinguish it with real attributes internally,
+    especially the TLV decoding logic. Also ThreadNetworkDiagnostics has an attribute with the same name so we
+    picked data_version as its name.
+    '''
+    @property
+    def data_version(self) -> int:
+        return self._data_version
+
+    def __rich_repr__(self):
+        '''
+        Override the default behavior of rich.pretty.pprint for adding the cluster data version.
+        '''
+        if self._data_version is not None:
+            yield "(data version)", self.data_version
+        for k in self.__dataclass_fields__.keys():
+            if k in self.__dict__:
+                yield k, self.__dict__[k]
+
+    def SetDataVersion(self, version: int) -> None:
+        self._data_version = version
 
 
 class ClusterAttributeDescriptor:

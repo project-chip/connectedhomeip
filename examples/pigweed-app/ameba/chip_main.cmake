@@ -72,13 +72,14 @@ link_directories(
 list(
     APPEND chip_main_flags
 
-    -DINET_CONFIG_ENABLE_IPV4=1
+    -DINET_CONFIG_ENABLE_IPV4=0
     -DCHIP_PROJECT=1
     -DCHIP_DEVICE_LAYER_TARGET=Ameba
     -DUSE_ZAP_CONFIG
     -DCHIP_HAVE_CONFIG_H
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
     -DCONFIG_ENABLE_PW_RPC=1
+    -DMATTER_PIGWEED_APP=1
 )
 
 list(

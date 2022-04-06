@@ -71,9 +71,8 @@ private:
     {
         kFunction_NoneSelected   = 0,
         kFunction_SoftwareUpdate = 1,
-        kFunction_Joiner         = 2,
-        kFunction_FactoryReset   = 3,
-        kFunction_StartBleAdv    = 4,
+        kFunction_FactoryReset   = 2,
+        kFunction_StartBleAdv    = 3,
 
         kFunction_Invalid
     } Function;
@@ -81,7 +80,6 @@ private:
     Function_t mFunction;
     bool mFunctionTimerActive;
     bool mSyncClusterToButtonAction;
-    chip::Ble::BLEEndPoint * mBLEEndPoint;
 
     static AppTask sAppTask;
 };

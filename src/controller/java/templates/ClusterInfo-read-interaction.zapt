@@ -22,11 +22,11 @@ public class ClusterReadMapping {
         InteractionInfo read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}AttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster).read{{asUpperCamelCase name}}Attribute(
-              ({{#if_in_global_responses}}
+              ({{#if_basic_global_response}}
                 ChipClusters.{{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback
               {{else}}
                 ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}AttributeCallback
-              {{/if_in_global_responses}}) callback
+              {{/if_basic_global_response}}) callback
             );
           },
           {{#if isArray}}

@@ -106,12 +106,13 @@ void InteractionModelEngine::Shutdown()
 
     for (auto & writeHandler : mWriteHandlers)
     {
-        VerifyOrDie(writeHandler.IsFree());
+        writeHandler.Abort();
     }
 
     mReportingEngine.Shutdown();
-    mClusterInfoPool.ReleaseAll();
-
+    mAttributePathPool.ReleaseAll();
+    mEventPathPool.ReleaseAll();
+    mDataVersionFilterPool.ReleaseAll();
     mpExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id);
 }
 
@@ -175,6 +176,24 @@ uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
     return numActive;
 }
 
+void InteractionModelEngine::CloseTransactionsFromFabricIndex(FabricIndex aFabricIndex)
+{
+    //
+    // Walk through all existing subscriptions and shut down those whose subscriber matches
+    // that which just came in.
+    //
+    mReadHandlers.ForEachActiveObject([this, aFabricIndex](ReadHandler * handler) {
+        if (handler->GetAccessingFabricIndex() == aFabricIndex)
+        {
+            ChipLogProgress(InteractionModel, "Deleting expired ReadHandler for NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
+                            ChipLogValueX64(handler->GetInitiatorNodeId()), aFabricIndex);
+            mReadHandlers.ReleaseObject(handler);
+        }
+
+        return Loop::Continue;
+    });
+}
+
 CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId)
 {
     for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
@@ -210,14 +229,14 @@ void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
 
 void InteractionModelEngine::OnDone(ReadHandler & apReadObj)
 {
-    mReadHandlers.ReleaseObject(&apReadObj);
-
     //
     // Deleting an item can shift down the contents of the underlying pool storage,
-    // rendering any tracker using positional indexes invalid. Let's reset it and
-    // have it start from index 0.
+    // rendering any tracker using positional indexes invalid. Let's reset it,
+    // based on which readHandler we are getting rid of.
     //
-    mReportingEngine.ResetReadHandlerTracker();
+    mReportingEngine.ResetReadHandlerTracker(&apReadObj);
+
+    mReadHandlers.ReleaseObject(&apReadObj);
 }
 
 CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
@@ -257,7 +276,6 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
         bool keepExistingSubscriptions = true;
 
         reader.Init(aPayload.Retain());
-        ReturnErrorOnFailure(reader.Next());
 
         SubscribeRequestMessage::Parser subscribeRequestParser;
         ReturnErrorOnFailure(subscribeRequestParser.Init(reader));
@@ -274,9 +292,9 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
                 if (handler->IsFromSubscriber(*apExchangeContext))
                 {
                     ChipLogProgress(InteractionModel,
-                                    "Deleting previous subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %" PRIu8,
+                                    "Deleting previous subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
                                     ChipLogValueX64(apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId()),
-                                    apExchangeContext->GetSessionHandle()->AsSecureSession()->GetFabricIndex());
+                                    apExchangeContext->GetSessionHandle()->GetFabricIndex());
                     mReadHandlers.ReleaseObject(handler);
                 }
 
@@ -298,7 +316,7 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
     if (aInteractionType == ReadHandler::InteractionType::Subscribe && ((handlerPoolCapacity - GetNumActiveReadHandlers()) == 1) &&
         !HasActiveRead())
     {
-        ChipLogProgress(InteractionModel, "Reserve the last ReadHandler for IM read Interaction");
+        ChipLogDetail(InteractionModel, "Reserve the last ReadHandler for IM read Interaction");
         aStatus = Protocols::InteractionModel::Status::ResourceExhausted;
         return CHIP_NO_ERROR;
     }
@@ -371,13 +389,13 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeCo
 {
     System::PacketBufferTLVReader reader;
     reader.Init(aPayload.Retain());
-    ReturnLogErrorOnFailure(reader.Next());
 
     ReportDataMessage::Parser report;
-    ReturnLogErrorOnFailure(report.Init(reader));
+    ReturnErrorOnFailure(report.Init(reader));
 
     uint64_t subscriptionId = 0;
-    ReturnLogErrorOnFailure(report.GetSubscriptionId(&subscriptionId));
+    ReturnErrorOnFailure(report.GetSubscriptionId(&subscriptionId));
+    ReturnErrorOnFailure(report.ExitContainer());
 
     for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
     {
@@ -404,6 +422,15 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
 
     CHIP_ERROR err                             = CHIP_NO_ERROR;
     Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Failure;
+
+    // Group Message can only be an InvokeCommandRequest or WriteRequest
+    if (apExchangeContext->IsGroupExchangeContext() &&
+        !aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest) &&
+        !aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
+    {
+        ChipLogProgress(InteractionModel, "Msg type %d not supported for group message", aPayloadHeader.GetMessageType());
+        return err;
+    }
 
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest))
     {
@@ -448,8 +475,8 @@ exit:
 
 void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
-    ChipLogProgress(InteractionModel, "Time out! Failed to receive IM response from Exchange: " ChipLogFormatExchange,
-                    ChipLogValueExchange(ec));
+    ChipLogError(InteractionModel, "Time out! Failed to receive IM response from Exchange: " ChipLogFormatExchange,
+                 ChipLogValueExchange(ec));
 }
 
 void InteractionModelEngine::AddReadClient(ReadClient * apReadClient)
@@ -517,44 +544,109 @@ bool InteractionModelEngine::InActiveReadClientList(ReadClient * apReadClient)
     return false;
 }
 
-void InteractionModelEngine::ReleaseClusterInfoList(ClusterInfo *& aClusterInfo)
+bool InteractionModelEngine::HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath)
 {
-    ClusterInfo * current = aClusterInfo;
+    for (auto & writeHandler : mWriteHandlers)
+    {
+        if (writeHandler.IsFree() || &writeHandler == apWriteHandler)
+        {
+            continue;
+        }
+        if (writeHandler.IsCurrentlyProcessingWritePath(aPath))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void InteractionModelEngine::ReleaseAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList)
+{
+    ReleasePool(aAttributePathList, mAttributePathPool);
+}
+
+CHIP_ERROR InteractionModelEngine::PushFrontAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList,
+                                                              AttributePathParams & aAttributePath)
+{
+    CHIP_ERROR err = PushFront(aAttributePathList, aAttributePath, mAttributePathPool);
+    if (err == CHIP_ERROR_NO_MEMORY)
+    {
+        ChipLogError(InteractionModel, "AttributePath pool full, cannot handle more entries!");
+    }
+    return err;
+}
+
+void InteractionModelEngine::ReleaseEventPathList(ObjectList<EventPathParams> *& aEventPathList)
+{
+    ReleasePool(aEventPathList, mEventPathPool);
+}
+
+CHIP_ERROR InteractionModelEngine::PushFrontEventPathParamsList(ObjectList<EventPathParams> *& aEventPathList,
+                                                                EventPathParams & aEventPath)
+{
+    CHIP_ERROR err = PushFront(aEventPathList, aEventPath, mEventPathPool);
+    if (err == CHIP_ERROR_NO_MEMORY)
+    {
+        ChipLogError(InteractionModel, "EventPath pool full, cannot handle more entries!");
+    }
+    return err;
+}
+
+void InteractionModelEngine::ReleaseDataVersionFilterList(ObjectList<DataVersionFilter> *& aDataVersionFilterList)
+{
+    ReleasePool(aDataVersionFilterList, mDataVersionFilterPool);
+}
+
+CHIP_ERROR InteractionModelEngine::PushFrontDataVersionFilterList(ObjectList<DataVersionFilter> *& aDataVersionFilterList,
+                                                                  DataVersionFilter & aDataVersionFilter)
+{
+    CHIP_ERROR err = PushFront(aDataVersionFilterList, aDataVersionFilter, mDataVersionFilterPool);
+    if (err == CHIP_ERROR_NO_MEMORY)
+    {
+        ChipLogError(InteractionModel, "DataVersionFilter pool full, cannot handle more entries, reset this error and continue!");
+        err = CHIP_NO_ERROR;
+    }
+    return err;
+}
+
+template <typename T, size_t N>
+void InteractionModelEngine::ReleasePool(ObjectList<T> *& aObjectList, ObjectPool<ObjectList<T>, N> & aObjectPool)
+{
+    ObjectList<T> * current = aObjectList;
     while (current != nullptr)
     {
-        ClusterInfo * next = current->mpNext;
-        mClusterInfoPool.ReleaseObject(current);
+        ObjectList<T> * next = current->mpNext;
+        aObjectPool.ReleaseObject(current);
         current = next;
     }
 
-    aClusterInfo = nullptr;
+    aObjectList = nullptr;
 }
 
-CHIP_ERROR InteractionModelEngine::PushFront(ClusterInfo *& aClusterInfoList, ClusterInfo & aClusterInfo)
+template <typename T, size_t N>
+CHIP_ERROR InteractionModelEngine::PushFront(ObjectList<T> *& aObjectList, T & aData, ObjectPool<ObjectList<T>, N> & aObjectPool)
 {
-    ClusterInfo * clusterInfo = mClusterInfoPool.CreateObject();
-    if (clusterInfo == nullptr)
+    ObjectList<T> * object = aObjectPool.CreateObject();
+    if (object == nullptr)
     {
-        ChipLogError(InteractionModel, "ClusterInfo pool full, cannot handle more entries!");
         return CHIP_ERROR_NO_MEMORY;
     }
-    *clusterInfo        = aClusterInfo;
-    clusterInfo->mpNext = aClusterInfoList;
-    aClusterInfoList    = clusterInfo;
+    object->mValue = aData;
+    object->mpNext = aObjectList;
+    aObjectList    = object;
     return CHIP_NO_ERROR;
 }
 
-bool InteractionModelEngine::IsOverlappedAttributePath(ClusterInfo & aAttributePath)
+bool InteractionModelEngine::IsOverlappedAttributePath(AttributePathParams & aAttributePath)
 {
     return (mReadHandlers.ForEachActiveObject([&aAttributePath](ReadHandler * handler) {
         if (handler->IsType(ReadHandler::InteractionType::Subscribe) &&
             (handler->IsGeneratingReports() || handler->IsAwaitingReportResponse()))
         {
-            for (auto clusterInfo = handler->GetAttributeClusterInfolist(); clusterInfo != nullptr;
-                 clusterInfo      = clusterInfo->mpNext)
+            for (auto object = handler->GetAttributePathList(); object != nullptr; object = object->mpNext)
             {
-                if (clusterInfo->IsAttributePathSupersetOf(aAttributePath) ||
-                    aAttributePath.IsAttributePathSupersetOf(*clusterInfo))
+                if (object->mValue.IsAttributePathSupersetOf(aAttributePath) ||
+                    aAttributePath.IsAttributePathSupersetOf(object->mValue))
                 {
                     return Loop::Break;
                 }
@@ -572,9 +664,6 @@ void InteractionModelEngine::DispatchCommand(CommandHandler & apCommandObj, cons
 
     if (handler)
     {
-        // TODO: Figure out who is responsible for handling checking
-        // apCommandObj->IsTimedInvoke() for commands that require a timed
-        // invoke and have a CommandHandlerInterface handling them.
         CommandHandlerInterface::HandlerContext context(apCommandObj, aCommandPath, apPayload);
         handler->InvokeCommand(context);
 
@@ -590,7 +679,7 @@ void InteractionModelEngine::DispatchCommand(CommandHandler & apCommandObj, cons
     DispatchSingleClusterCommand(aCommandPath, apPayload, &apCommandObj);
 }
 
-bool InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)
+Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)
 {
     return ServerClusterCommandExists(aCommandPath);
 }

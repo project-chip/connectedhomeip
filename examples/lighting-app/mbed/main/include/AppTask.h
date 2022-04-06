@@ -21,6 +21,7 @@
 
 #include "AppEvent.h"
 #include "LightingManager.h"
+#include <DFUManager.h>
 
 class AppTask
 {

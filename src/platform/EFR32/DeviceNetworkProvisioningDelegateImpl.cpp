@@ -16,7 +16,7 @@
  */
 
 #include "DeviceNetworkProvisioningDelegateImpl.h"
-#include "ServiceProvisioning.h"
+#include "NetworkCommissioningWiFiDriver.h"
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -49,7 +49,8 @@ CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const ch
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(NetworkProvisioning, "EFR Wifi provision: SSID: %s", ssid);
-    err = SetWiFiStationProvisioning(ssid, key);
+    err = NetworkCommissioning::SlWiFiDriver::GetInstance().ConnectWiFiNetwork(ssid, strlen(ssid), key, strlen(key));
+
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NetworkProvisioning, "ERR:WiFi:Provision network: %s", chip::ErrorStr(err));

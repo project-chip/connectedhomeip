@@ -46,10 +46,14 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         err = Unpair(remoteId);
         break;
     case PairingMode::QRCode:
-        err = PairWithQRCode(remoteId);
+        err = PairWithCode(remoteId);
         break;
     case PairingMode::ManualCode:
-        err = PairWithManualCode(remoteId);
+        err = PairWithCode(remoteId);
+        break;
+    case PairingMode::QRCodePaseOnly:
+    case PairingMode::ManualCodePaseOnly:
+        err = PaseWithCode(remoteId);
         break;
     case PairingMode::Ble:
         err = Pair(remoteId, PeerAddress::BLE());
@@ -58,10 +62,10 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         err = PairWithMdns(remoteId);
         break;
     case PairingMode::SoftAP:
-        err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
+        err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort, mRemoteAddr.interfaceId));
         break;
     case PairingMode::Ethernet:
-        err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
+        err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort, mRemoteAddr.interfaceId));
         break;
     }
 
@@ -83,14 +87,15 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
     return CommissioningParameters();
 }
 
-CHIP_ERROR PairingCommand::PairWithQRCode(NodeId remoteId)
+CHIP_ERROR PairingCommand::PaseWithCode(NodeId remoteId)
 {
-    return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload);
+    return CurrentCommissioner().EstablishPASEConnection(remoteId, mOnboardingPayload);
 }
 
-CHIP_ERROR PairingCommand::PairWithManualCode(NodeId remoteId)
+CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
 {
-    return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload);
+    CommissioningParameters commissioningParams = GetCommissioningParameters();
+    return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams);
 }
 
 CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
@@ -155,6 +160,10 @@ void PairingCommand::OnPairingComplete(CHIP_ERROR err)
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(chipTool, "Pairing Success");
+        if (mPairingMode == PairingMode::QRCodePaseOnly || mPairingMode == PairingMode::ManualCodePaseOnly)
+        {
+            SetCommandExitStatus(err);
+        }
     }
     else
     {
@@ -197,6 +206,9 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 
 void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
 {
+    // Ignore nodes with closed comissioning window
+    VerifyOrReturn(nodeData.commissioningMode != 0);
+
     const uint16_t port = nodeData.port;
     char buf[chip::Inet::IPAddress::kMaxStringLength];
     nodeData.ipAddress[0].ToString(buf);
@@ -205,7 +217,7 @@ void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & 
     // Stop Mdns discovery. Is it the right method ?
     CurrentCommissioner().RegisterDeviceDiscoveryDelegate(nullptr);
 
-    Inet::InterfaceId interfaceId = nodeData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.interfaceId[0] : Inet::InterfaceId::Null();
+    Inet::InterfaceId interfaceId = nodeData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.interfaceId : Inet::InterfaceId::Null();
     PeerAddress peerAddress       = PeerAddress::UDP(nodeData.ipAddress[0], port, interfaceId);
     CHIP_ERROR err                = Pair(mNodeId, peerAddress);
     if (CHIP_NO_ERROR != err)

@@ -68,7 +68,7 @@ private:
     static void LightActionEventHandler(AppEvent * aEvent);
     static void TimerEventHandler(TimerHandle_t xTimer);
 
-    static void UpdateClusterState(void);
+    static void UpdateClusterState(intptr_t context);
 
     void StartTimer(uint32_t aTimeoutMs);
 

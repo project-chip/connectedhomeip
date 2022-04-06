@@ -155,6 +155,7 @@ CHIP_ERROR EstablishSecureSession()
     chip::Optional<chip::Transport::PeerAddress> peerAddr;
     chip::SecurePairingUsingTestSecret * testSecurePairingSecret = chip::Platform::New<chip::SecurePairingUsingTestSecret>();
     VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    testSecurePairingSecret->Init(gSessionManager);
 
     if (gUseTCP)
     {
@@ -231,6 +232,9 @@ int main(int argc, char * argv[])
 
     InitializeChip();
 
+    err = gFabricTable.Init(&gStorage);
+    SuccessOrExit(err);
+
     if (gUseTCP)
     {
         err = gTCPManager.Init(chip::Transport::TcpListenParameters(chip::DeviceLayer::TCPEndPointManager())
@@ -238,7 +242,8 @@ int main(int argc, char * argv[])
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager);
+        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager, &gStorage,
+                                   &gFabricTable);
         SuccessOrExit(err);
     }
     else
@@ -248,7 +253,8 @@ int main(int argc, char * argv[])
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager);
+        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager, &gStorage,
+                                   &gFabricTable);
         SuccessOrExit(err);
     }
 

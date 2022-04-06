@@ -21,8 +21,8 @@
 #include "DataVersionFilterIBs.h"
 #include "EventFilterIBs.h"
 #include "EventPathIBs.h"
-#include "StructBuilder.h"
-#include "StructParser.h"
+#include "MessageBuilder.h"
+#include "MessageParser.h"
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -46,7 +46,7 @@ enum class Tag : uint8_t
     kIsFabricFiltered          = 8,
 };
 
-class Parser : public StructParser
+class Parser : public MessageParser
 {
 public:
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -136,7 +136,7 @@ public:
     CHIP_ERROR GetIsFabricFiltered(bool * const apIsFabricFiltered) const;
 };
 
-class Builder : public StructBuilder
+class Builder : public MessageBuilder
 {
 public:
     /**

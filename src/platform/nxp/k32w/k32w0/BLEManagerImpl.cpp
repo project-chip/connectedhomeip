@@ -26,6 +26,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <platform/CommissionableDataProvider.h>
+
 #include <crypto/CHIPCryptoPAL.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -38,8 +40,6 @@
 #include "gatt_db_handles.h"
 #include "stdio.h"
 #include "timers.h"
-
-#include "RNG_Interface.h"
 
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
 #include "PWR_Configuration.h"
@@ -98,7 +98,7 @@ namespace {
 #define CONTROLLER_TASK_STACK_SIZE (gControllerTaskStackSize_c / sizeof(StackType_t))
 
 /* host task configuration */
-#define HOST_TASK_PRIORITY (3U)
+#define HOST_TASK_PRIORITY (4U)
 #define HOST_TASK_STACK_SIZE (gHost_TaskStackSize_c / sizeof(StackType_t))
 
 /* ble app task configuration */
@@ -157,9 +157,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     // Initialize the Chip BleLayer.
     err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
-
-    (void) RNG_Init();
-    RNG_SetPseudoRandomNoSeed(NULL);
 
     /* Initialization of message wait events -
      * used for receiving BLE Stack events */
@@ -799,7 +796,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     ChipBLEDeviceIdentificationInfo mDeviceIdInfo = { 0 };
     uint8_t mDeviceIdInfoLength                   = 0;
 
-    chipErr = ConfigurationMgr().GetSetupDiscriminator(discriminator);
+    chipErr = GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator);
     if (chipErr != CHIP_NO_ERROR)
     {
         return chipErr;

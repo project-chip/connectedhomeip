@@ -127,6 +127,36 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPDoorLockClusterGetWeekDayScheduleResponseCallback
+    : public Callback::Callback<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>
+{
+public:
+    CHIPDoorLockClusterGetWeekDayScheduleResponseCallback(jobject javaCallback);
+
+    ~CHIPDoorLockClusterGetWeekDayScheduleResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPDoorLockClusterGetYearDayScheduleResponseCallback
+    : public Callback::Callback<CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType>
+{
+public:
+    CHIPDoorLockClusterGetYearDayScheduleResponseCallback(jobject javaCallback);
+
+    ~CHIPDoorLockClusterGetYearDayScheduleResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPDoorLockClusterSetCredentialResponseCallback
     : public Callback::Callback<CHIPDoorLockClusterSetCredentialResponseCallbackType>
 {
@@ -409,6 +439,21 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPOperationalCredentialsClusterCSRResponseCallback
+    : public Callback::Callback<CHIPOperationalCredentialsClusterCSRResponseCallbackType>
+{
+public:
+    CHIPOperationalCredentialsClusterCSRResponseCallback(jobject javaCallback);
+
+    ~CHIPOperationalCredentialsClusterCSRResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPOperationalCredentialsClusterCertificateChainResponseCallback
     : public Callback::Callback<CHIPOperationalCredentialsClusterCertificateChainResponseCallbackType>
 {
@@ -435,21 +480,6 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPOperationalCredentialsClusterOpCSRResponseCallback
-    : public Callback::Callback<CHIPOperationalCredentialsClusterOpCSRResponseCallbackType>
-{
-public:
-    CHIPOperationalCredentialsClusterOpCSRResponseCallback(jobject javaCallback);
-
-    ~CHIPOperationalCredentialsClusterOpCSRResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

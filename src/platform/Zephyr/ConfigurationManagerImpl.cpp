@@ -24,19 +24,17 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConfigurationManager.h>
-#include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/Zephyr/ZephyrConfig.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-#include <platform/internal/FactoryProvisioning.cpp>
+#include <platform/internal/FactoryProvisioning.ipp>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-
-#include <power/reboot.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -53,7 +51,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     uint32_t rebootCount;
-    bool failSafeArmed;
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<ZephyrConfig>::Init();
@@ -86,13 +83,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         // The first boot after factory reset of the Node.
         err = StoreRebootCount(1);
         SuccessOrExit(err);
-    }
-
-    // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
-    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
-    {
-        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
-        InitiateFactoryReset();
     }
 
     err = CHIP_NO_ERROR;
@@ -204,9 +194,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     ThreadStackMgr().ErasePersistentInfo();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-#if CONFIG_REBOOT
-    sys_reboot(SYS_REBOOT_WARM);
-#endif
+    PlatformMgr().Shutdown();
 }
 
 } // namespace DeviceLayer

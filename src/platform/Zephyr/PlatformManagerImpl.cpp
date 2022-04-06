@@ -30,7 +30,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <platform/Zephyr/DiagnosticDataProviderImpl.h>
-#include <platform/internal/GenericPlatformManagerImpl_Zephyr.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_Zephyr.ipp>
 
 #include <drivers/entropy.h>
 #include <malloc.h>
@@ -125,20 +125,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     k_timer_start(&sOperationalHoursSavingTimer, K_HOURS(CONFIG_CHIP_OPERATIONAL_TIME_SAVE_INTERVAL),
                   K_HOURS(CONFIG_CHIP_OPERATIONAL_TIME_SAVE_INTERVAL));
 
-    ScheduleWork(OnDeviceBoot, 0);
-
 exit:
     return err;
-}
-
-void PlatformManagerImpl::OnDeviceBoot(intptr_t arg)
-{
-    GeneralDiagnosticsDelegate * generalDiagnosticsDelegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
-
-    if (generalDiagnosticsDelegate)
-    {
-        generalDiagnosticsDelegate->OnDeviceRebooted();
-    }
 }
 
 } // namespace DeviceLayer

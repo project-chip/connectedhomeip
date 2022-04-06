@@ -29,10 +29,14 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
+#include <platform/CHIPDeviceConfig.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::MediaInput;
+
+static constexpr size_t kMediaInputDelegateTableSize =
+    EMBER_AF_MEDIA_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -41,7 +45,7 @@ using chip::app::Clusters::MediaInput::Delegate;
 
 namespace {
 
-Delegate * gDelegateTable[EMBER_AF_MEDIA_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
+Delegate * gDelegateTable[kMediaInputDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
@@ -108,7 +112,7 @@ CHIP_ERROR MediaInputAttrAccess::Read(const app::ConcreteReadAttributePath & aPa
 
     switch (aPath.mAttributeId)
     {
-    case app::Clusters::MediaInput::Attributes::MediaInputList::Id: {
+    case app::Clusters::MediaInput::Attributes::InputList::Id: {
         if (isDelegateNull(delegate, endpoint))
         {
             return aEncoder.EncodeEmptyList();
@@ -116,7 +120,7 @@ CHIP_ERROR MediaInputAttrAccess::Read(const app::ConcreteReadAttributePath & aPa
 
         return ReadInputListAttribute(aEncoder, delegate);
     }
-    case app::Clusters::MediaInput::Attributes::CurrentMediaInput::Id: {
+    case app::Clusters::MediaInput::Attributes::CurrentInput::Id: {
         if (isDelegateNull(delegate, endpoint))
         {
             return CHIP_NO_ERROR;
@@ -148,8 +152,8 @@ CHIP_ERROR MediaInputAttrAccess::ReadCurrentInputAttribute(app::AttributeValueEn
 // -----------------------------------------------------------------------------
 // Matter Framework Callbacks Implementation
 
-bool emberAfMediaInputClusterSelectInputRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                        const Commands::SelectInputRequest::DecodableType & commandData)
+bool emberAfMediaInputClusterSelectInputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                 const Commands::SelectInput::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -162,7 +166,7 @@ bool emberAfMediaInputClusterSelectInputRequestCallback(app::CommandHandler * co
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfMediaInputClusterSelectInputRequestCallback error: %s", err.AsString());
+        ChipLogError(Zcl, "emberAfMediaInputClusterSelectInputCallback error: %s", err.AsString());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
@@ -172,9 +176,8 @@ exit:
     return true;
 }
 
-bool emberAfMediaInputClusterShowInputStatusRequestCallback(app::CommandHandler * command,
-                                                            const app::ConcreteCommandPath & commandPath,
-                                                            const Commands::ShowInputStatusRequest::DecodableType & commandData)
+bool emberAfMediaInputClusterShowInputStatusCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                     const Commands::ShowInputStatus::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -185,7 +188,7 @@ bool emberAfMediaInputClusterShowInputStatusRequestCallback(app::CommandHandler 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfMediaInputClusterShowInputStatusRequestCallback error: %s", err.AsString());
+        ChipLogError(Zcl, "emberAfMediaInputClusterShowInputStatusCallback error: %s", err.AsString());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
@@ -195,9 +198,8 @@ exit:
     return true;
 }
 
-bool emberAfMediaInputClusterHideInputStatusRequestCallback(app::CommandHandler * command,
-                                                            const app::ConcreteCommandPath & commandPath,
-                                                            const Commands::HideInputStatusRequest::DecodableType & commandData)
+bool emberAfMediaInputClusterHideInputStatusCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                     const Commands::HideInputStatus::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -208,7 +210,7 @@ bool emberAfMediaInputClusterHideInputStatusRequestCallback(app::CommandHandler 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfMediaInputClusterHideInputStatusRequestCallback error: %s", err.AsString());
+        ChipLogError(Zcl, "emberAfMediaInputClusterHideInputStatusCallback error: %s", err.AsString());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
@@ -218,8 +220,8 @@ exit:
     return true;
 }
 
-bool emberAfMediaInputClusterRenameInputRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                        const Commands::RenameInputRequest::DecodableType & commandData)
+bool emberAfMediaInputClusterRenameInputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                 const Commands::RenameInput::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -232,7 +234,7 @@ bool emberAfMediaInputClusterRenameInputRequestCallback(app::CommandHandler * co
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfMediaInputClusterRenameInputRequestCallback error: %s", err.AsString());
+        ChipLogError(Zcl, "emberAfMediaInputClusterRenameInputCallback error: %s", err.AsString());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 

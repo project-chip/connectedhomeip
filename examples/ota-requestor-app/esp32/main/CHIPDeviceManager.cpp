@@ -51,13 +51,13 @@ void CHIPDeviceManager::CommonDeviceEventHandler(const ChipDeviceEvent * event, 
 
 CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 {
-    CHIP_ERROR err;
     mCB                              = cb;
     RendezvousInformationFlags flags = RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE);
 
+    ReturnErrorOnFailure(Platform::MemoryInit());
+
     // Initialize the CHIP stack.
-    err = PlatformMgr().InitChipStack();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(PlatformMgr().InitChipStack());
 
     if (flags.Has(RendezvousInformationFlag::kBLE))
     {
@@ -69,26 +69,13 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
         ConnectivityMgr().SetBLEAdvertisingEnabled(false);
         ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Enabled);
     }
-    else
-    {
-        // If rendezvous is bypassed, enable SoftAP so that the device can still
-        // be communicated with via its SoftAP as needed.
-        ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Enabled);
-    }
-
-    err = Platform::MemoryInit();
-    SuccessOrExit(err);
 
     // Register a function to receive events from the CHIP device layer.  Note that calls to
     // this function will happen on the CHIP event loop thread, not the app_main thread.
     PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
 
     // Start a task to run the CHIP Device event loop.
-    err = PlatformMgr().StartEventLoopTask();
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return PlatformMgr().StartEventLoopTask();
 }
 } // namespace DeviceManager
 } // namespace chip

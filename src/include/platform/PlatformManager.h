@@ -37,9 +37,6 @@ class DiscoveryImplPlatform;
 
 namespace DeviceLayer {
 
-static constexpr size_t kMaxFixedLabels   = 10;
-static constexpr size_t kMaxUserLabels    = 10;
-static constexpr size_t kMaxLanguageTags  = 254; // Maximum number of entry type 'ARRAY' supports
 static constexpr size_t kMaxCalendarTypes = 12;
 
 class PlatformManagerImpl;
@@ -118,6 +115,18 @@ public:
     PlatformManagerDelegate * GetDelegate() const { return mDelegate; }
 
     /**
+     * Should be called after initializing all layers of the Matter stack to
+     * run all needed post-startup actions.
+     */
+    void HandleServerStarted();
+
+    /**
+     * Should be called before shutting down the Matter stack or restarting the
+     * application to run all needed pre-shutdown actions.
+     */
+    void HandleServerShuttingDown();
+
+    /**
      * ScheduleWork can be called after InitChipStack has been called.  Calls
      * that happen before either StartEventLoopTask or RunEventLoop will queue
      * the work up but that work will NOT run until one of those functions is
@@ -183,15 +192,14 @@ public:
     bool IsChipStackLockedByCurrentThread() const;
 #endif
 
-    CHIP_ERROR GetFixedLabelList(EndpointId endpoint,
-                                 AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList);
-    CHIP_ERROR SetUserLabelList(EndpointId endpoint,
-                                AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
-    CHIP_ERROR GetUserLabelList(EndpointId endpoint,
-                                AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
-    CHIP_ERROR GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales);
-    CHIP_ERROR GetSupportedCalendarTypes(
-        AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes);
+    /*
+     * PostEvent can be called safely on any thread without locking the stack.
+     * When called from a thread that is not doing the stack work item
+     * processing, the event might get dispatched (on the work item processing
+     * thread) before PostEvent returns.
+     */
+    [[nodiscard]] CHIP_ERROR PostEvent(const ChipDeviceEvent * event);
+    void PostEventOrDie(const ChipDeviceEvent * event);
 
 private:
     bool mInitialized                   = false;
@@ -204,6 +212,7 @@ private:
     friend class ConfigurationManagerImpl;
     friend class DeviceControlServer;
     friend class Dnssd::DiscoveryImplPlatform;
+    friend class FailSafeContext;
     friend class TraitManager;
     friend class ThreadStackManagerImpl;
     friend class TimeSyncManager;
@@ -226,14 +235,6 @@ private:
     friend class Internal::GenericConfigurationManagerImpl;
     friend class System::PlatformEventing;
 
-    /*
-     * PostEvent can be called safely on any thread without locking the stack.
-     * When called from a thread that is not doing the stack work item
-     * processing, the event might get dispatched (on the work item processing
-     * thread) before PostEvent returns.
-     */
-    [[nodiscard]] CHIP_ERROR PostEvent(const ChipDeviceEvent * event);
-    void PostEventOrDie(const ChipDeviceEvent * event);
     void DispatchEvent(const ChipDeviceEvent * event);
     CHIP_ERROR StartChipTimer(System::Clock::Timeout duration);
 
@@ -341,6 +342,16 @@ inline void PlatformManager::RemoveEventHandler(EventHandlerFunct handler, intpt
     static_cast<ImplClass *>(this)->_RemoveEventHandler(handler, arg);
 }
 
+inline void PlatformManager::HandleServerStarted()
+{
+    static_cast<ImplClass *>(this)->_HandleServerStarted();
+}
+
+inline void PlatformManager::HandleServerShuttingDown()
+{
+    static_cast<ImplClass *>(this)->_HandleServerShuttingDown();
+}
+
 inline void PlatformManager::ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg)
 {
     static_cast<ImplClass *>(this)->_ScheduleWork(workFunct, arg);
@@ -431,37 +442,6 @@ inline void PlatformManager::DispatchEvent(const ChipDeviceEvent * event)
 inline CHIP_ERROR PlatformManager::StartChipTimer(System::Clock::Timeout duration)
 {
     return static_cast<ImplClass *>(this)->_StartChipTimer(duration);
-}
-
-inline CHIP_ERROR PlatformManager::GetFixedLabelList(
-    EndpointId endpoint, AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
-{
-    return static_cast<ImplClass *>(this)->_GetFixedLabelList(endpoint, labelList);
-}
-
-inline CHIP_ERROR
-PlatformManager::SetUserLabelList(EndpointId endpoint,
-                                  AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
-{
-    return static_cast<ImplClass *>(this)->_SetUserLabelList(endpoint, labelList);
-}
-
-inline CHIP_ERROR
-PlatformManager::GetUserLabelList(EndpointId endpoint,
-                                  AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
-{
-    return static_cast<ImplClass *>(this)->_GetUserLabelList(endpoint, labelList);
-}
-
-inline CHIP_ERROR PlatformManager::GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
-{
-    return static_cast<ImplClass *>(this)->_GetSupportedLocales(supportedLocales);
-}
-
-inline CHIP_ERROR PlatformManager::GetSupportedCalendarTypes(
-    AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes)
-{
-    return static_cast<ImplClass *>(this)->_GetSupportedCalendarTypes(supportedCalendarTypes);
 }
 
 } // namespace DeviceLayer

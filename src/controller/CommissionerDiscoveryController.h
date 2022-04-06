@@ -28,13 +28,18 @@
 
 #pragma once
 
+#include <app/OperationalDeviceProxy.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/NodeId.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/PlatformManager.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
+using chip::NodeId;
+using chip::OperationalDeviceProxy;
 using chip::Protocols::UserDirectedCommissioning::UDCClientState;
 using chip::Protocols::UserDirectedCommissioning::UserConfirmationProvider;
 using chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer;
@@ -73,6 +78,26 @@ public:
      */
     virtual void PromptForCommissionPincode(uint16_t vendorId, uint16_t productId, const char * commissioneeName) = 0;
 
+    /**
+     * @brief
+     *   Called to prompt the user that commissioning and post-commissioning steps have completed successfully."
+     *
+     *  @param[in]    vendorId           The vendorid from the DAC of the new node.
+     *  @param[in]    productId          The productid from the DAC of the new node.
+     *  @param[in]    commissioneeName   The commissioneeName in the DNS-SD advertisement of the requesting commissionee.
+     *
+     */
+    virtual void PromptCommissioningSucceeded(uint16_t vendorId, uint16_t productId, const char * commissioneeName) = 0;
+
+    /**
+     * @brief
+     *   Called to prompt the user that commissioning and post-commissioning steps have failed."
+     *
+     *  @param[in]    commissioneeName   The commissioneeName in the DNS-SD advertisement of the requesting commissionee.
+     *
+     */
+    virtual void PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error) = 0;
+
     virtual ~UserPrompter() = default;
 };
 
@@ -97,6 +122,25 @@ public:
     virtual ~PincodeService() = default;
 };
 
+class DLL_EXPORT PostCommissioningListener
+{
+public:
+    /**
+     * @brief
+     *   Called to when commissioning completed to allow the listener to perform additional
+     * steps such as binding and ACL creation.
+     *
+     *  @param[in]    vendorId           The vendorid from the DAC of the new node.
+     *  @param[in]    productId          The productid from the DAC of the new node.
+     *  @param[in]    nodeId             The node id for the newly commissioned node.
+     *  @param[in]    device             The device proxy for use in cluster communication.
+     *
+     */
+    virtual void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, OperationalDeviceProxy * device) = 0;
+
+    virtual ~PostCommissioningListener() = default;
+};
+
 class DLL_EXPORT CommissionerCallback
 {
 public:
@@ -119,13 +163,27 @@ class CommissionerDiscoveryController : public chip::Protocols::UserDirectedComm
 {
 public:
     /**
+     * This controller can only handle one outstanding UDC session at a time and will
+     * reject attempts to start a second when one is outstanding.
+     *
+     * A session ends when post-commissioning completes:
+     * - PostCommissioningSucceeded()
+     * or when one of the following failure methods is called:
+     * - PostCommissioningFailed()
+     * - CommissioningFailed()
+     *
+     * Reset the state of this controller so that a new sessions will be accepted.
+     */
+    void ResetState();
+
+    /**
      * UserConfirmationProvider callback.
      *
      * Notification that a UDC protocol message was received.
      *
      * This code will call the registered UserPrompter's PromptForCommissionOKPermission
      */
-    void OnUserDirectedCommissioningRequest(UDCClientState state);
+    void OnUserDirectedCommissioningRequest(UDCClientState state) override;
 
     /**
      * This method should be called after the user has given consent for commissioning of the client
@@ -144,6 +202,36 @@ public:
      * indicated in the UserPrompter's PromptForCommissionPincode callback
      */
     void CommissionWithPincode(uint32_t pincode);
+
+    /**
+     * This method should be called by the commissioner to indicate that commissioning succeeded.
+     * The PostCommissioningCallback will then be invoked to complete setup
+     *
+     *  @param[in]    vendorId           The vendorid from the DAC of the new node.
+     *  @param[in]    productId          The productid from the DAC of the new node.
+     *  @param[in]    nodeId             The node id for the newly commissioned node.
+     *  @param[in]    device             The device proxy for use in cluster communication.
+     *
+     */
+    void CommissioningSucceeded(uint16_t vendorId, uint16_t productId, NodeId nodeId, OperationalDeviceProxy * device);
+
+    /**
+     * This method should be called by the commissioner to indicate that commissioning failed.
+     * The UserPrompter will then be invoked to notify the user of the failure.
+     */
+    void CommissioningFailed(CHIP_ERROR error);
+
+    /**
+     * This method should be called by the PostCommissioningListener to indicate that post-commissioning steps completed.
+     * The PromptCommissioningSucceeded will then be invoked to notify the user of success.
+     */
+    void PostCommissioningSucceeded();
+
+    /**
+     * This method should be called by the PostCommissioningListener to indicate that post-commissioning steps failed.
+     * The PromptCommissioningFailed will then be invoked to notify the user of failure.
+     */
+    void PostCommissioningFailed(CHIP_ERROR error);
 
     /**
      * Assign a DeviceCommissioner
@@ -172,13 +260,37 @@ public:
         mCommissionerCallback = commissionerCallback;
     }
 
+    /**
+     * Assign a PostCommissioning Listener to perform post-commissioning operations
+     */
+    inline void SetPostCommissioningListener(PostCommissioningListener * postCommissioningListener)
+    {
+        mPostCommissioningListener = postCommissioningListener;
+    }
+
+    /**
+     * Get the commissioneeName in the DNS-SD advertisement of the requesting commissionee.
+     */
+    const char * GetCommissioneeName();
+
+    /**
+     * Get the UDCClientState of the requesting commissionee.
+     */
+    UDCClientState * GetUDCClientState();
+
 protected:
+    bool mReady          = true; // ready to start commissioning
     bool mPendingConsent = false;
     char mCurrentInstance[chip::Dnssd::Commission::kInstanceNameMaxLength + 1];
-    UserDirectedCommissioningServer * mUdcServer = nullptr;
-    UserPrompter * mUserPrompter                 = nullptr;
-    PincodeService * mPincodeService             = nullptr;
-    CommissionerCallback * mCommissionerCallback = nullptr;
+    uint16_t mVendorId  = 0;
+    uint16_t mProductId = 0;
+    NodeId mNodeId      = 0;
+
+    UserDirectedCommissioningServer * mUdcServer           = nullptr;
+    UserPrompter * mUserPrompter                           = nullptr;
+    PincodeService * mPincodeService                       = nullptr;
+    CommissionerCallback * mCommissionerCallback           = nullptr;
+    PostCommissioningListener * mPostCommissioningListener = nullptr;
 };
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY

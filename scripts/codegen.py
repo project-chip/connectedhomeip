@@ -31,6 +31,11 @@ from idl.generators.java import JavaGenerator
 
 
 class CodeGeneratorTypes(enum.Enum):
+    """
+    Represents every generator type supported by codegen and maps
+    the simple enum value (user friendly and can be a command line input)
+    into underlying generators.
+    """
     JAVA = enum.auto()
 
     def CreateGenerator(self, *args, **kargs):
@@ -42,7 +47,7 @@ class CodeGeneratorTypes(enum.Enum):
 
 class ListGeneratedFilesStorage(GeneratorStorage):
     """
-    Output a list of files to be generated
+    A storage that prints out file names that would have content in them.
     """
 
     def get_existing_data(self, relative_path: str):

@@ -56,7 +56,6 @@ private:
 
     static void OperationalHoursSavingTimerEventHandler(k_timer * timer);
     static void UpdateOperationalHours(intptr_t arg);
-    static void OnDeviceBoot(intptr_t arg);
 
     // ===== Members for internal use by the following friends.
 
@@ -67,7 +66,7 @@ private:
     System::Clock::Timestamp mStartTime      = System::Clock::kZero;
     uint32_t mSavedOperationalHoursSinceBoot = 0;
 
-    explicit PlatformManagerImpl(ThreadStack & stack) : Internal::GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>(stack) {}
+    explicit PlatformManagerImpl(ThreadStack stack) : Internal::GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>(stack) {}
 
     static PlatformManagerImpl sInstance;
 };

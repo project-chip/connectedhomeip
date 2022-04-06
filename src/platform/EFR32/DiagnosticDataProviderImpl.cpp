@@ -98,7 +98,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
     return err;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
 {
     uint32_t reason = 0;
     CHIP_ERROR err  = ConfigurationMgr().GetBootReason(reason);
@@ -106,7 +106,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
     if (err == CHIP_NO_ERROR)
     {
         VerifyOrReturnError(reason <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-        bootReason = static_cast<uint8_t>(reason);
+        bootReason = static_cast<BootReasonType>(reason);
     }
 
     return err;
@@ -182,12 +182,12 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     NetworkInterface * ifp = new NetworkInterface();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    const char * threadNetworkName       = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
-    ifp->name                            = Span<const char>(threadNetworkName, strlen(threadNetworkName));
-    ifp->fabricConnected                 = true;
-    ifp->offPremiseServicesReachableIPv4 = false;
-    ifp->offPremiseServicesReachableIPv6 = false;
-    ifp->type                            = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_THREAD;
+    const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
+    ifp->name                      = Span<const char>(threadNetworkName, strlen(threadNetworkName));
+    ifp->isOperational             = true;
+    ifp->offPremiseServicesReachableIPv4.SetNull();
+    ifp->offPremiseServicesReachableIPv6.SetNull();
+    ifp->type = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_THREAD;
 #else
     /* TODO */
 #endif

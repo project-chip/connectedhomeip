@@ -34,7 +34,7 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Linux/PosixConfig.h>
-#include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 namespace chip {
 namespace DeviceLayer {
@@ -51,7 +51,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     uint32_t rebootCount;
-    bool failSafeArmed;
 
     // Force initialization of NVS namespaces if they doesn't already exist.
     err = PosixConfig::EnsureNamespace(PosixConfig::kConfigNamespace_ChipFactory);
@@ -88,7 +87,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_BootReason))
     {
-        err = StoreBootReason(DiagnosticDataProvider::BootReasonType::Unspecified);
+        err = StoreBootReason(to_underlying(BootReasonType::kUnspecified));
         SuccessOrExit(err);
     }
 
@@ -106,13 +105,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
-    // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
-    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
-    {
-        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
-        InitiateFactoryReset();
-    }
-
     err = CHIP_NO_ERROR;
 
 exit:
@@ -121,12 +113,12 @@ exit:
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
-    struct ifaddrs * addresses = NULL;
+    struct ifaddrs * addresses = nullptr;
     CHIP_ERROR error           = CHIP_NO_ERROR;
     bool found                 = false;
 
     VerifyOrExit(getifaddrs(&addresses) == 0, error = CHIP_ERROR_INTERNAL);
-    for (auto addr = addresses; addr != NULL; addr = addr->ifa_next)
+    for (auto addr = addresses; addr != nullptr; addr = addr->ifa_next)
     {
         if ((addr->ifa_addr) && (addr->ifa_addr->sa_family == AF_PACKET) && strncmp(addr->ifa_name, "lo", IFNAMSIZ) != 0)
         {

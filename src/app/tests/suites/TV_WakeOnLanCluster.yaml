@@ -15,6 +15,7 @@
 name: Wake on LAN Cluster Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Wake on LAN"
     endpoint: 1
 
@@ -22,9 +23,13 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Read mac address"
       command: "readAttribute"
-      attribute: "wake on lan mac address"
+      attribute: "MACAddress"
       response:
           value: "00:00:00:00:00"

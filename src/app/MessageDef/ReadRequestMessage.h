@@ -21,7 +21,8 @@
 #include "DataVersionFilterIBs.h"
 #include "EventFilterIBs.h"
 #include "EventPathIBs.h"
-
+#include "MessageBuilder.h"
+#include "MessageParser.h"
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -41,7 +42,7 @@ enum class Tag : uint8_t
     kIsFabricFiltered   = 4,
 };
 
-class Parser : public StructParser
+class Parser : public MessageParser
 {
 public:
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -60,7 +61,6 @@ public:
      */
     CHIP_ERROR CheckSchemaValidity() const;
 #endif
-
     /**
      *  @brief Get a TLVReader for the AttributePathIBs. Next() must be called before accessing them.
      *
@@ -82,7 +82,7 @@ public:
     /**
      *  @brief Get a TLVReader for the EventRequests. Next() must be called before accessing them.
      *
-     *  @param [in] apEventPaths    A pointer to apEventPaths
+     *  @param [in] apEventRequests    A pointer to apEventRequests
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
@@ -108,7 +108,7 @@ public:
     CHIP_ERROR GetIsFabricFiltered(bool * const apIsFabricFiltered) const;
 };
 
-class Builder : public StructBuilder
+class Builder : public MessageBuilder
 {
 public:
     /**

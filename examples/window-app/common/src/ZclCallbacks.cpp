@@ -24,6 +24,7 @@
 #include <WindowApp.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -39,83 +40,19 @@ using namespace ::chip::app::Clusters::WindowCovering;
 void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
-    if (attributePath.mClusterId == app::Clusters::Identify::Id)
+    switch (attributePath.mClusterId)
     {
-        ChipLogProgress(Zcl, "Identify cluster ID: " ChipLogFormatMEI " Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16,
+    case app::Clusters::Identify::Id:
+        ChipLogProgress(Zcl, "Identify cluster ID: " ChipLogFormatMEI " Type: %u Value: %" PRIu16 ", length %" PRIu16,
                         ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
-    }
-    else if (attributePath.mClusterId == Id)
-    {
-        ChipLogProgress(Zcl, "Window  cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mClusterId));
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mClusterId));
-    }
-
-    WindowApp & app     = WindowApp::Instance();
-    EndpointId endpoint = attributePath.mEndpointId;
-
-    chip::app::DataModel::Nullable<chip::Percent100ths> current;
-    chip::app::DataModel::Nullable<chip::Percent100ths> target;
-    OperationalState opState;
-
-    switch (attributePath.mAttributeId)
-    {
-    case Attributes::Type::Id:
-        app.PostEvent(WindowApp::Event(WindowApp::EventId::CoverTypeChange, endpoint));
         break;
-
-    case Attributes::CurrentPositionLiftPercent100ths::Id:
-        app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftChanged, endpoint));
-        break;
-
-    case Attributes::CurrentPositionTiltPercent100ths::Id:
-        app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltChanged, endpoint));
-        break;
-
-    case Attributes::TargetPositionLiftPercent100ths::Id:
-        Attributes::TargetPositionLiftPercent100ths::Get(endpoint, target);
-        Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, current);
-        opState = ComputeOperationalState(target, current);
-        if (OperationalState::MovingDownOrClose == opState)
-        {
-            app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftDown, endpoint));
-        }
-        else if (OperationalState::MovingUpOrOpen == opState)
-        {
-            app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftUp, endpoint));
-        }
-        break;
-
-    case Attributes::TargetPositionTiltPercent100ths::Id:
-        Attributes::TargetPositionTiltPercent100ths::Get(endpoint, target);
-        Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, current);
-        opState = ComputeOperationalState(target, current);
-        if (OperationalState::MovingDownOrClose == opState)
-        {
-            app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltDown, endpoint));
-        }
-        else if (OperationalState::MovingUpOrOpen == opState)
-        {
-            app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltUp, endpoint));
-        }
-        break;
-
     default:
         break;
     }
 }
 
-/**
- * @brief  Cluster StopMotion Command callback (from client)
- */
-bool emberAfWindowCoveringClusterStopMotionCallback(chip::app::CommandHandler * commandObj,
-                                                    const chip::app::ConcreteCommandPath & commandPath,
-                                                    const Commands::StopMotion::DecodableType & commandData)
+/* Forwards all attributes changes */
+void MatterWindowCoveringClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
-    ChipLogProgress(Zcl, "StopMotion command received");
-    WindowApp::Instance().PostEvent(WindowApp::Event(WindowApp::EventId::StopMotion, commandPath.mEndpointId));
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-    return true;
+    WindowApp::Instance().PostAttributeChange(attributePath.mEndpointId, attributePath.mAttributeId);
 }

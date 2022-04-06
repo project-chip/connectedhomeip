@@ -47,23 +47,13 @@ namespace chip {
 
 extern const char * kSpake2pI2RSessionInfo;
 extern const char * kSpake2pR2ISessionInfo;
-extern const char * kSpake2pKeyExchangeSalt;
 
 constexpr uint16_t kPBKDFParamRandomNumberSize = 32;
-constexpr uint32_t kSpake2p_Iteration_Count    = 100;
 
-// Specifications section 3.9. Password-Based Key Derivation Function
-constexpr uint32_t kPBKDFMinimumIterations = 1000;
-constexpr uint32_t kPBKDFMaximumIterations = 100000;
-constexpr uint32_t kPBKDFMinimumSaltLen    = 16;
-constexpr uint32_t kPBKDFMaximumSaltLen    = 32;
-
-// Specifications section 5.1.1.6
-constexpr uint32_t kSetupPINCodeMaximumValue = 99999998;
+constexpr uint32_t kSetupPINCodeMaximumValue   = 99999998;
+constexpr uint32_t kSetupPINCodeUndefinedValue = 0;
 
 using namespace Crypto;
-
-constexpr size_t kSpake2p_WS_Length = kP256_FE_Length + 8;
 
 struct PASESessionSerialized;
 
@@ -76,12 +66,6 @@ struct PASESessionSerializable
     uint16_t mPeerSessionId;
 };
 
-struct PASEVerifier
-{
-    uint8_t mW0[kSpake2p_WS_Length];
-    uint8_t mL[kSpake2p_WS_Length];
-};
-
 class DLL_EXPORT PASESession : public Messaging::ExchangeDelegate, public PairingSession
 {
 public:
@@ -89,7 +73,7 @@ public:
     PASESession(PASESession &&)      = default;
     PASESession(const PASESession &) = delete;
 
-    virtual ~PASESession();
+    ~PASESession() override;
 
     // TODO: The SetPeerNodeId method should not be exposed; PASE sessions
     // should not need to be told their peer node ID
@@ -97,52 +81,36 @@ public:
 
     /**
      * @brief
-     *   Initialize using setup PIN code and wait for pairing requests.
-     *
-     * @param mySetUpPINCode  Setup PIN code of the local device
-     * @param pbkdf2IterCount Iteration count for PBKDF2 function
-     * @param salt            Salt to be used for SPAKE2P operation
-     * @param mySessionId     Session ID to be assigned to the secure session on the peer node
-     * @param delegate        Callback object
-     *
-     * @return CHIP_ERROR     The result of initialization
-     */
-    CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const ByteSpan & salt, uint16_t mySessionId,
-                              Optional<ReliableMessageProtocolConfig> mrpConfig, SessionEstablishmentDelegate * delegate);
-
-    /**
-     * @brief
      *   Initialize using PASE verifier and wait for pairing requests.
      *
-     * @param verifier        PASE verifier to be used for SPAKE2P pairing
-     * @param pbkdf2IterCount Iteration count for PBKDF2 function
-     * @param salt            Salt to be used for SPAKE2P operation
-     * @param passcodeID      Passcode ID assigned by the administrator to this PASE verifier
-     * @param mySessionId     Session ID to be assigned to the secure session on the peer node
-     * @param delegate        Callback object
+     * @param sessionManager      session manager from which to allocate a secure session object
+     * @param verifier            PASE verifier to be used for SPAKE2P pairing
+     * @param pbkdf2IterCount     Iteration count for PBKDF2 function
+     * @param salt                Salt to be used for SPAKE2P operation
+     * @param delegate            Callback object
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForPairing(const PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt, uint16_t passcodeID,
-                              uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
+    CHIP_ERROR WaitForPairing(SessionManager & sessionManager, const Spake2pVerifier & verifier, uint32_t pbkdf2IterCount,
+                              const ByteSpan & salt, Optional<ReliableMessageProtocolConfig> mrpConfig,
                               SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
      *   Create a pairing request using peer's setup PIN code.
      *
-     * @param peerAddress      Address of peer to pair
-     * @param peerSetUpPINCode Setup PIN code of the peer device
-     * @param mySessionId      Session ID to be assigned to the secure session on the peer node
-     * @param exchangeCtxt     The exchange context to send and receive messages with the peer
-     *                         Note: It's expected that the caller of this API hands over the
-     *                         ownership of the exchangeCtxt to PASESession object. PASESession
-     *                         will close the exchange on (successful/failed) handshake completion.
-     * @param delegate         Callback object
+     * @param sessionManager      session manager from which to allocate a secure session object
+     * @param peerAddress         Address of peer to pair
+     * @param peerSetUpPINCode    Setup PIN code of the peer device
+     * @param exchangeCtxt        The exchange context to send and receive messages with the peer
+     *                            Note: It's expected that the caller of this API hands over the
+     *                            ownership of the exchangeCtxt to PASESession object. PASESession
+     *                            will close the exchange on (successful/failed) handshake completion.
+     * @param delegate            Callback object
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t mySessionId,
+    CHIP_ERROR Pair(SessionManager & sessionManager, const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode,
                     Optional<ReliableMessageProtocolConfig> mrpConfig, Messaging::ExchangeContext * exchangeCtxt,
                     SessionEstablishmentDelegate * delegate);
 
@@ -158,7 +126,7 @@ public:
      *
      * @return CHIP_ERROR      The result of PASE verifier generation
      */
-    static CHIP_ERROR GeneratePASEVerifier(PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
+    static CHIP_ERROR GeneratePASEVerifier(Spake2pVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
                                            bool useRandomPIN, uint32_t & setupPIN);
 
     /**
@@ -172,30 +140,6 @@ public:
      * @return CHIP_ERROR The result of session derivation
      */
     CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override;
-
-    /** @brief Serialize the Pairing Session to a string.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR Serialize(PASESessionSerialized & output);
-
-    /** @brief Deserialize the Pairing Session from the string.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR Deserialize(PASESessionSerialized & input);
-
-    /** @brief Serialize the PASESession to the given serializable data structure for secure pairing
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR ToSerializable(PASESessionSerializable & output);
-
-    /** @brief Reconstruct secure pairing class from the serializable data structure.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR FromSerializable(const PASESessionSerializable & output);
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     /** @brief This function zeroes out and resets the memory used by the object.
@@ -237,15 +181,12 @@ private:
         kUnexpected             = 0xff,
     };
 
-    CHIP_ERROR Init(uint16_t mySessionId, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(SessionManager & sessionManager, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
-                                       System::PacketBufferHandle && msg);
+                                       const System::PacketBufferHandle & msg);
 
-    static CHIP_ERROR ComputePASEVerifier(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const ByteSpan & salt,
-                                          PASEVerifier & verifier);
-
-    CHIP_ERROR SetupSpake2p(uint32_t pbkdf2IterCount, const ByteSpan & salt);
+    CHIP_ERROR SetupSpake2p();
 
     CHIP_ERROR SendPBKDFParamRequest();
     CHIP_ERROR HandlePBKDFParamRequest(System::PacketBufferHandle && msg);
@@ -279,16 +220,10 @@ private:
 #else
     Spake2p_P256_SHA256_HKDF_HMAC mSpake2p;
 #endif
-    uint8_t mPoint[kMAX_Point_Length];
 
-    /* w0s and w1s */
-    PASEVerifier mPASEVerifier;
-
-    uint16_t mPasscodeID = 0;
+    Spake2pVerifier mPASEVerifier;
 
     uint32_t mSetupPINCode;
-
-    bool mComputeVerifier = true;
 
     bool mHavePBKDFParameters = false;
 
@@ -335,16 +270,22 @@ class SecurePairingUsingTestSecret : public PairingSession
 public:
     SecurePairingUsingTestSecret() : PairingSession(Transport::SecureSession::Type::kPASE)
     {
-        // Do not set to 0 to prevent unwanted unsecured session
+        // Do not set to 0 to prevent an unwanted unsecured session
         // since the session type is unknown.
-        SetLocalSessionId(1);
         SetPeerSessionId(1);
     }
 
-    SecurePairingUsingTestSecret(uint16_t peerSessionId, uint16_t localSessionId) :
-        PairingSession(Transport::SecureSession::Type::kPASE)
+    void Init(SessionManager & sessionManager)
     {
-        SetLocalSessionId(localSessionId);
+        // Do not set to 0 to prevent an unwanted unsecured session
+        // since the session type is unknown.
+        AllocateSecureSession(sessionManager, mLocalSessionId);
+    }
+
+    SecurePairingUsingTestSecret(uint16_t peerSessionId, uint16_t localSessionId, SessionManager & sessionManager) :
+        PairingSession(Transport::SecureSession::Type::kPASE), mLocalSessionId(localSessionId)
+    {
+        AllocateSecureSession(sessionManager, localSessionId);
         SetPeerSessionId(peerSessionId);
     }
 
@@ -355,28 +296,11 @@ public:
                                       CryptoContext::SessionInfoType::kSessionEstablishment, role);
     }
 
-    CHIP_ERROR ToSerializable(PASESessionSerializable & serializable)
-    {
-        size_t secretLen = strlen(kTestSecret);
-
-        memset(&serializable, 0, sizeof(serializable));
-        serializable.mKeLen           = static_cast<uint16_t>(secretLen);
-        serializable.mPairingComplete = 1;
-        serializable.mLocalSessionId  = GetLocalSessionId();
-        serializable.mPeerSessionId   = GetPeerSessionId();
-
-        memcpy(serializable.mKe, kTestSecret, secretLen);
-        return CHIP_NO_ERROR;
-    }
-
 private:
+    // Do not set to 0 to prevent an unwanted unsecured session
+    // since the session type is unknown.
+    uint16_t mLocalSessionId = 1;
     const char * kTestSecret = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
 };
-
-typedef struct PASESessionSerialized
-{
-    // Extra uint64_t to account for padding bytes (NULL termination, and some decoding overheads)
-    uint8_t inner[BASE64_ENCODED_LEN(sizeof(PASESessionSerializable) + sizeof(uint64_t))];
-} PASESessionSerialized;
 
 } // namespace chip

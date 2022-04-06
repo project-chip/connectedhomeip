@@ -30,14 +30,14 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * Concrete implementation of the PlatformManager singleton object for Linux platforms.
+ * Concrete implementation of the DiagnosticDataProvider singleton object for Linux platforms.
  */
 class DiagnosticDataProviderImpl : public DiagnosticDataProvider
 {
 public:
     static DiagnosticDataProviderImpl & GetDefaultInstance();
 
-    // ===== Methods that implement the PlatformManager abstract interface.
+    // ===== Methods that implement the DiagnosticDataProvider abstract interface.
 
     CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree) override;
     CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) override;
@@ -48,7 +48,7 @@ public:
     CHIP_ERROR GetRebootCount(uint16_t & rebootCount) override;
     CHIP_ERROR GetUpTime(uint64_t & upTime) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
-    CHIP_ERROR GetBootReason(uint8_t & bootReason) override;
+    CHIP_ERROR GetBootReason(BootReasonType & bootReason) override;
 
     CHIP_ERROR GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults) override;
     CHIP_ERROR GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults) override;
@@ -57,7 +57,7 @@ public:
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
     void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
 
-    CHIP_ERROR GetEthPHYRate(uint8_t & pHYRate) override;
+    CHIP_ERROR GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateType & pHYRate) override;
     CHIP_ERROR GetEthFullDuplex(bool & fullDuplex) override;
     CHIP_ERROR GetEthTimeSinceReset(uint64_t & timeSinceReset) override;
     CHIP_ERROR GetEthPacketRxCount(uint64_t & packetRxCount) override;

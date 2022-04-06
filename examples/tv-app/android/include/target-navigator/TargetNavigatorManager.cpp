@@ -47,7 +47,7 @@ void TargetNavigatorManager::HandleNavigateTarget(CommandResponseHelper<Navigate
 {
     // TODO: Insert code here
     Commands::NavigateTargetResponse::Type response;
-    response.data   = chip::CharSpan::fromCharString("data response");
+    response.data   = chip::Optional<CharSpan>(chip::CharSpan::fromCharString("data response"));
     response.status = chip::app::Clusters::TargetNavigator::StatusEnum::kSuccess;
     helper.Success(response);
 }

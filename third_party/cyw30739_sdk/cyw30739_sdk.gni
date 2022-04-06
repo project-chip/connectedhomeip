@@ -13,7 +13,10 @@
 # limitations under the License.
 
 import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
 import("//build_overrides/cyw30739_sdk.gni")
+
+import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
   # Location of the CYW30739 SDK.
@@ -32,7 +35,7 @@ cyw30739_sdk_patch_dir =
     "${cyw30739_sdk_baselib_dir}/internal/30739A0/patches_CYW930739M2EVB_01"
 cyw30739_sdk_platform_dir = "${cyw30739_sdk_baselib_dir}/platforms"
 cyw30739_sdk_scripts_dir = "${cyw30739_sdk_baselib_dir}/make/scripts"
-cyw30739_sdk_btp_file = "${cyw30739_sdk_platform_dir}/flash.btp"
+cyw30739_sdk_btp_file = "${cyw30739_sdk_build_root}/flash.btp"
 cyw30739_sdk_patch_sym_file = "${cyw30739_sdk_patch_dir}/patch.sym"
 
 cyw30739_sdk_tools_dir = "${cyw30739_sdk_root}/btsdk-tools/"
@@ -43,6 +46,15 @@ if (host_os == "linux") {
 } else if (host_os == "win") {
   cyw30739_sdk_tools_dir += "Windows"
 }
+
+btp_reader_args =
+    [ "--btp=" + rebase_path(cyw30739_sdk_btp_file, root_build_dir) ]
+if (chip_enable_ota_requestor) {
+  btp_reader_args += [ "--enable_ota" ]
+}
+btp = exec_script("${cyw30739_sdk_build_root}/btp_reader.py",
+                  btp_reader_args,
+                  "json")
 
 template("cyw30739_sdk_script") {
   action(target_name) {
@@ -88,16 +100,16 @@ template("cyw30739_sdk") {
 
   assert(cyw30739_sdk_root != "", "cyw30739_sdk_root must be specified")
 
+  if (is_debug) {
+    enable_debug = 1
+  } else {
+    enable_debug = 0
+  }
+
   config("${target_name}_config") {
     include_dirs = []
     defines = []
     libs = []
-
-    if (is_debug) {
-      enable_debug = 1
-    } else {
-      enable_debug = 0
-    }
 
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
@@ -117,14 +129,6 @@ template("cyw30739_sdk") {
       "${cyw30739_sdk_board_dir}",
       "${cyw30739_sdk_build_root}/include",
       "${cyw30739_sdk_include_dir}",
-    ]
-
-    defines += [
-      "CHIP_HAVE_CONFIG_H=1",
-      "CY_PLATFORM_SWDCK=WICED_P05",
-      "CY_PLATFORM_SWDIO=WICED_P03",
-      "ENABLE_DEBUG=${enable_debug}",
-      "SPAR_CRT_SETUP=spar_crt_setup",
     ]
 
     cflags = [ "--specs=nano.specs" ]
@@ -174,13 +178,38 @@ template("cyw30739_sdk") {
       "${cyw30739_sdk_bsp_design_modus_dir}/cycfg_pins.c",
       "${cyw30739_sdk_bsp_design_modus_dir}/cycfg_pins.h",
       "${cyw30739_sdk_bsp_design_modus_dir}/cycfg_routing.h",
+      "${cyw30739_sdk_build_root}/include/auto_flags.h",
+      "${cyw30739_sdk_build_root}/include/wiced_button_manager.h",
+      "${cyw30739_sdk_build_root}/include/wiced_led_manager.h",
       "${cyw30739_sdk_build_root}/src/platform_retarget_lock.c",
+      "${cyw30739_sdk_build_root}/src/wiced_button_manager.c",
+      "${cyw30739_sdk_build_root}/src/wiced_led_manager.c",
     ]
+
+    if (chip_enable_ota_requestor) {
+      sources += [
+        "${cyw30739_sdk_build_root}/include/ota_fw_upgrade.h",
+        "${cyw30739_sdk_build_root}/src/ota_fw_upgrade.c",
+      ]
+    }
 
     sources += get_target_outputs(":${target_name}_gen_lib_installer")
 
     if (defined(invoker.sources)) {
       sources += invoker.sources
+    }
+
+    defines = [
+      "CHIP_HAVE_CONFIG_H=1",
+      "CY_PLATFORM_SWDCK=WICED_P05",
+      "CY_PLATFORM_SWDIO=WICED_P03",
+      "ENABLE_DEBUG=${enable_debug}",
+      "SPAR_CRT_SETUP=spar_crt_setup",
+      "XS_LOCATION_ACTIVE=" + btp.XS_LOCATION_ACTIVE,
+      "XS_LOCATION_UPGRADE=" + btp.XS_LOCATION_UPGRADE,
+    ]
+    if (chip_enable_ota_requestor) {
+      defines += [ "BLE_OTA_FW_UPGRADE=1" ]
     }
 
     public_configs = [ ":${target_name}_config" ]
@@ -192,10 +221,6 @@ template("cyw30739_sdk") {
 template("cyw30739_sdk_pre_build") {
   cyw30739_sdk_script(target_name) {
     script_file_name = "bt_pre_build.bash"
-
-    btp = exec_script("${cyw30739_sdk_build_root}/btp_reader.py",
-                      [ rebase_path(cyw30739_sdk_btp_file, root_build_dir) ],
-                      "json")
 
     linker_defines = [
       "FLASH0_BEGIN_ADDR=" + btp.DLConfigSSLocation,
@@ -276,6 +301,28 @@ template("cyw30739_sdk_post_build") {
     deps = [
       ":${target_name}_static_config",
       invoker.executable_target,
+    ]
+  }
+}
+
+template("cyw30739_sdk_ota_image") {
+  action(target_name) {
+    forward_variables_from(invoker, [ "deps" ])
+
+    script = "${cyw30739_sdk_build_root}/gen_ota_image.py"
+
+    binary = "${root_out_dir}/${invoker.output_base_name}_download.ota.bin"
+    hex = "${root_out_dir}/${invoker.output_base_name}_download.hex"
+
+    outputs = [ binary ]
+
+    inputs = [ hex ]
+
+    args = [
+      "--binary=" + rebase_path(binary, root_build_dir),
+      "--hex=" + rebase_path(hex, root_build_dir),
+      "--lzss_tool=" +
+          rebase_path(cyw30739_sdk_tools_dir + "/lzss/lzss", root_build_dir),
     ]
   }
 }

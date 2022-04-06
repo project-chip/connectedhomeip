@@ -13,23 +13,24 @@
 # limitations under the License.
 
 import os
-
-from typing import Any, List
 from itertools import combinations
+from typing import List
 
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
-from builders.android import AndroidBoard, AndroidApp, AndroidBuilder
-from builders.cyw30739 import Cyw30739Builder, Cyw30739App, Cyw30739Board
-from builders.efr32 import Efr32Builder, Efr32App, Efr32Board
-from builders.esp32 import Esp32Builder, Esp32Board, Esp32App
-from builders.host import HostBuilder, HostApp, HostBoard
-from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
+from builders.android import AndroidApp, AndroidBoard, AndroidBuilder
+from builders.cc13x2x7_26x2x7 import cc13x2x7_26x2x7App, cc13x2x7_26x2x7Builder
+from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
+from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
+from builders.esp32 import Esp32App, Esp32Board, Esp32Builder
+from builders.host import HostApp, HostBoard, HostBuilder
+from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
 from builders.k32w import K32WApp, K32WBuilder
-from builders.mbed import MbedApp, MbedBoard, MbedProfile, MbedBuilder
+from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
-from builders.qpg import QpgBuilder
+from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
+from builders.bl602 import Bl602App, Bl602Board, Bl602Builder
 
 
 class Target:
@@ -66,7 +67,8 @@ class Target:
         clone.create_kw_args.update(kargs)
         return clone
 
-    def Create(self, runner, repository_path: str, output_prefix: str, enable_flashbundle: bool):
+    def Create(self, runner, repository_path: str, output_prefix: str,
+               enable_flashbundle: bool):
         builder = self.builder_class(
             repository_path, runner=runner, **self.create_kw_args)
 
@@ -112,39 +114,125 @@ class AcceptNameWithSubstrings:
         return False
 
 
-class HostBuildVariant:
-    def __init__(self, name: str, validator=AcceptAnyName(), conflicts: List[str] = [], **buildargs):
+class BuildVariant:
+    def __init__(self, name: str, validator=AcceptAnyName(),
+                 conflicts: List[str] = [], requires: List[str] = [],
+                 **buildargs):
         self.name = name
         self.validator = validator
         self.conflicts = conflicts
         self.buildargs = buildargs
+        self.requires = requires
 
 
-def HasConflicts(items: List[HostBuildVariant]) -> bool:
+def HasConflicts(items: List[BuildVariant]) -> bool:
     for a, b in combinations(items, 2):
         if (a.name in b.conflicts) or (b.name in a.conflicts):
             return True
     return False
 
 
+def AllRequirementsMet(items: List[BuildVariant]) -> bool:
+    """
+    Check that item.requires is satisfied for all items in the given list
+    """
+    available = set([item.name for item in items])
+
+    for item in items:
+        for requirement in item.requires:
+            if requirement not in available:
+                return False
+
+    return True
+
+
+class VariantBuilder:
+    """Handles creating multiple build variants based on a starting target.
+    """
+
+    def __init__(self, targets: List[Target] = []):
+        # note the clone in case the default arg is used
+        self.targets = targets[:]
+        self.variants = []
+        self.glob_whitelist = []
+
+    def WhitelistVariantNameForGlob(self, name):
+        """
+        Whitelist the specified variant to be allowed for globbing.
+
+        By default we do not want a 'build all' to select all variants, so
+        variants are generally glob-blacklisted.
+        """
+        self.glob_whitelist.append(name)
+
+    def AppendVariant(self, **args):
+        """
+        Add another variant to accepted variants. Arguments are construction
+        variants to BuildVariant.
+
+        Example usage:
+
+        builder.AppendVariant(name="ipv6only", enable_ipv4=False)
+        """
+        self.variants.append(BuildVariant(**args))
+
+    def AllVariants(self):
+        """
+        Yields a list of acceptable variants for the given targets.
+
+        Handles conflict resolution between build variants and globbing
+        whitelist targets.
+        """
+        for target in self.targets:
+            yield target
+
+            # skip variants that do not work for  this target
+            ok_variants = [
+                v for v in self.variants if v.validator.Accept(target.name)]
+
+            # Build every possible variant
+            for variant_count in range(1, len(ok_variants) + 1):
+                for subgroup in combinations(ok_variants, variant_count):
+                    if HasConflicts(subgroup):
+                        continue
+
+                    if not AllRequirementsMet(subgroup):
+                        continue
+
+                    # Target ready to be created - no conflicts
+                    variant_target = target.Clone()
+                    for option in subgroup:
+                        variant_target = variant_target.Extend(
+                            option.name, **option.buildargs)
+
+                    # Only a few are whitelisted for globs
+                    name = '-'.join([o.name for o in subgroup])
+                    if name not in self.glob_whitelist:
+                        if not variant_target.IsGlobBlacklisted:
+                            variant_target = variant_target.GlobBlacklist(
+                                'Reduce default build variants')
+
+                    yield variant_target
+
+
 def HostTargets():
     target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
-    targets = [
-        target.Extend(HostBoard.NATIVE.BoardName(), board=HostBoard.NATIVE)
-    ]
+    target_native = target.Extend(HostBoard.NATIVE.BoardName(), board=HostBoard.NATIVE)
+
+    targets = [target_native]
 
     # x64 linux  supports cross compile
-    if (HostBoard.NATIVE.PlatformName() == 'linux') and (
-            HostBoard.NATIVE.BoardName() != HostBoard.ARM64.BoardName()):
+    cross_compile = (HostBoard.NATIVE.PlatformName() == 'linux') and (HostBoard.NATIVE.BoardName() != HostBoard.ARM64.BoardName())
+    if cross_compile:
         targets.append(target.Extend('arm64', board=HostBoard.ARM64))
 
     app_targets = []
 
     # Don't cross  compile some builds
     app_targets.append(
-        targets[0].Extend('rpc-console', app=HostApp.RPC_CONSOLE))
+        target_native.Extend('rpc-console', app=HostApp.RPC_CONSOLE))
     app_targets.append(
-        targets[0].Extend('tv-app', app=HostApp.TV_APP))
+        target_native.Extend('tv-app', app=HostApp.TV_APP))
 
     for target in targets:
         app_targets.append(target.Extend(
@@ -154,51 +242,57 @@ def HostTargets():
         app_targets.append(target.Extend('minmdns', app=HostApp.MIN_MDNS))
         app_targets.append(target.Extend('door-lock', app=HostApp.LOCK))
         app_targets.append(target.Extend('shell', app=HostApp.SHELL))
+        app_targets.append(target.Extend(
+            'ota-provider', app=HostApp.OTA_PROVIDER, enable_ble=False))
+        app_targets.append(target.Extend(
+            'ota-requestor', app=HostApp.OTA_REQUESTOR, enable_ble=False))
+
+    builder = VariantBuilder()
 
     # Possible build variants. Note that number of potential
     # builds is exponential here
-    variants = [
-        HostBuildVariant(name="ipv6only", enable_ipv4=False),
-        HostBuildVariant(name="no-ble", enable_ble=False),
-        HostBuildVariant(name="tsan", conflicts=['asan'], use_tsan=True),
-        HostBuildVariant(name="asan", conflicts=['tsan'], use_asan=True),
-        HostBuildVariant(name="libfuzzer", use_libfuzzer=True, use_clang=True),
-        HostBuildVariant(name="test-group",
-                         validator=AcceptNameWithSubstrings(['-all-clusters', '-chip-tool']), test_group=True),
-        HostBuildVariant(name="same-event-loop",
-                         validator=AcceptNameWithSubstrings(['-chip-tool']), separate_event_loop=False),
-    ]
+    builder.AppendVariant(name="test-group", validator=AcceptNameWithSubstrings(
+        ['-all-clusters', '-chip-tool']), test_group=True),
+    builder.AppendVariant(name="same-event-loop", validator=AcceptNameWithSubstrings(
+        ['-chip-tool']), separate_event_loop=False),
+    builder.AppendVariant(name="no-interactive", validator=AcceptNameWithSubstrings(
+        ['-chip-tool']), interactive_mode=False),
+    builder.AppendVariant(name="ipv6only", enable_ipv4=False),
+    builder.AppendVariant(name="no-ble", enable_ble=False),
+    builder.AppendVariant(name="no-wifi", enable_wifi=False),
+    builder.AppendVariant(name="tsan", conflicts=['asan'], use_tsan=True),
+    builder.AppendVariant(name="asan", conflicts=['tsan'], use_asan=True),
+    builder.AppendVariant(name="libfuzzer", requires=[
+                          "clang"], use_libfuzzer=True),
+    builder.AppendVariant(name="clang", use_clang=True),
 
-    glob_whitelist = set(['ipv6only'])
+    builder.WhitelistVariantNameForGlob('no-interactive')
+    builder.WhitelistVariantNameForGlob('ipv6only')
 
     for target in app_targets:
-        yield target
-
         if 'rpc-console' in target.name:
             # rpc console  has only one build variant right now
-            continue
+            yield target
+        else:
+            builder.targets.append(target)
 
-        # skip variants that do not work for  this target
-        ok_variants = [v for v in variants if v.validator.Accept(target.name)]
+    for target in builder.AllVariants():
+        if cross_compile and 'chip-tool' in target.name and 'arm64' in target.name and '-no-interactive' not in target.name:
+            # Interactive builds will not compile by default on arm cross compiles
+            # because libreadline is not part of the default sysroot
+            yield target.GlobBlacklist('Arm crosscompile does not support libreadline-dev')
+        else:
+            yield target
 
-        # Build every possible variant
-        for variant_count in range(1, len(ok_variants) + 1):
-            for subgroup in combinations(ok_variants, variant_count):
-                if HasConflicts(subgroup):
-                    continue
-
-                # Target ready to be created - no conflicts
-                variant_target = target.Clone()
-                for option in subgroup:
-                    variant_target = variant_target.Extend(
-                        option.name, **option.buildargs)
-
-                # Only a few are whitelisted for globs
-                if '-'.join([o.name for o in subgroup]) not in glob_whitelist:
-                    variant_target = variant_target.GlobBlacklist(
-                        'Reduce default build variants')
-
-                yield variant_target
+    # Without extra build variants
+    yield target_native.Extend('chip-cert', app=HostApp.CERT_TOOL)
+    yield target_native.Extend('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE)
+    yield target_native.Extend('address-resolve-tool-clang', app=HostApp.ADDRESS_RESOLVE,
+                               use_clang=True).GlobBlacklist("Reduce default build variants")
+    yield target_native.Extend('address-resolve-tool-platform-mdns', app=HostApp.ADDRESS_RESOLVE,
+                               use_platform_mdns=True).GlobBlacklist("Reduce default build variants")
+    yield target_native.Extend('address-resolve-tool-platform-mdns-ipv6only', app=HostApp.ADDRESS_RESOLVE,
+                               use_platform_mdns=True, enable_ipv4=False).GlobBlacklist("Reduce default build variants")
 
     test_target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
     for board in [HostBoard.NATIVE, HostBoard.FAKE]:
@@ -209,9 +303,12 @@ def Esp32Targets():
     esp32_target = Target('esp32', Esp32Builder)
 
     yield esp32_target.Extend('m5stack-all-clusters', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS)
-    yield esp32_target.Extend('m5stack-all-clusters-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_ipv4=False)
-    yield esp32_target.Extend('m5stack-all-clusters-rpc', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_rpcs=True)
-    yield esp32_target.Extend('m5stack-all-clusters-rpc-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_rpcs=True, enable_ipv4=False)
+    yield esp32_target.Extend('m5stack-all-clusters-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS,
+                              enable_ipv4=False)
+    yield esp32_target.Extend('m5stack-all-clusters-rpc', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS,
+                              enable_rpcs=True)
+    yield esp32_target.Extend('m5stack-all-clusters-rpc-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS,
+                              enable_rpcs=True, enable_ipv4=False)
 
     yield esp32_target.Extend('c3devkit-all-clusters', board=Esp32Board.C3DevKit, app=Esp32App.ALL_CLUSTERS)
 
@@ -224,6 +321,7 @@ def Esp32Targets():
     yield devkitc.Extend('lock', app=Esp32App.LOCK)
     yield devkitc.Extend('bridge', app=Esp32App.BRIDGE)
     yield devkitc.Extend('temperature-measurement', app=Esp32App.TEMPERATURE_MEASUREMENT)
+    yield devkitc.Extend('temperature-measurement-rpc', app=Esp32App.TEMPERATURE_MEASUREMENT, enable_rpcs=True)
 
     yield esp32_target.Extend('qemu-tests', board=Esp32Board.QEMU, app=Esp32App.TESTS)
 
@@ -249,18 +347,29 @@ def Efr32Targets():
             'only user requested')
     ]
 
+    builder = VariantBuilder()
+
     for board_target in board_targets:
-        yield board_target.Extend('window-covering', app=Efr32App.WINDOW_COVERING)
-        yield board_target.Extend('unit-test', app=Efr32App.UNIT_TEST)
+        builder.targets.append(board_target.Extend(
+            'window-covering', app=Efr32App.WINDOW_COVERING))
+        builder.targets.append(board_target.Extend(
+            'switch', app=Efr32App.SWITCH))
+        builder.targets.append(board_target.Extend(
+            'unit-test', app=Efr32App.UNIT_TEST))
+        builder.targets.append(
+            board_target.Extend('light', app=Efr32App.LIGHT))
+        builder.targets.append(board_target.Extend('lock', app=Efr32App.LOCK))
 
-        rpc_aware_targets = [
-            board_target.Extend('light', app=Efr32App.LIGHT),
-            board_target.Extend('lock', app=Efr32App.LOCK)
-        ]
+    # Possible build variants. Note that number of potential
+    # builds is exponential here
+    builder.AppendVariant(name="rpc", validator=AcceptNameWithSubstrings(
+        ['-light', '-lock']), enable_rpcs=True)
+    builder.AppendVariant(name="with-ota-requestor", enable_ota_requestor=True)
 
-        for target in rpc_aware_targets:
-            yield target
-            yield target.Extend('rpc', enable_rpcs=True)
+    builder.WhitelistVariantNameForGlob('rpc')
+
+    for target in builder.AllVariants():
+        yield target
 
 
 def NrfTargets():
@@ -287,7 +396,8 @@ def NrfTargets():
 
         if '-nrf5340dk-' in rpc.name:
             rpc = rpc.GlobBlacklist(
-                'Compile failure due to pw_build args not forwarded to proto compiler. https://pigweed-review.googlesource.com/c/pigweed/pigweed/+/66760')
+                'Compile failure due to pw_build args not forwarded to proto compiler. '
+                'https://pigweed-review.googlesource.com/c/pigweed/pigweed/+/66760')
 
         yield rpc
 
@@ -329,8 +439,12 @@ def MbedTargets():
 
     for target in app_targets:
         yield target.Extend('release', profile=MbedProfile.RELEASE)
-        yield target.Extend('develop', profile=MbedProfile.DEVELOP).GlobBlacklist('Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html')
-        yield target.Extend('debug', profile=MbedProfile.DEBUG).GlobBlacklist('Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html')
+        yield target.Extend('develop', profile=MbedProfile.DEVELOP).GlobBlacklist(
+            'Compile only for debugging purpose - '
+            'https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html')
+        yield target.Extend('debug', profile=MbedProfile.DEBUG).GlobBlacklist(
+            'Compile only for debugging purpose - '
+            'https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html')
 
 
 def InfineonTargets():
@@ -352,21 +466,65 @@ def AmebaTargets():
 def K32WTargets():
     target = Target('k32w', K32WBuilder)
 
-    # This is for testing only  in case debug builds are to be fixed
-    # Error is LWIP_DEBUG being redefined between 0 and 1 in debug builds in:
-    #    third_party/connectedhomeip/src/lwip/k32w0/lwipopts.h
-    #    gen/include/lwip/lwip_buildconfig.h
-    yield target.Extend('light', app=K32WApp.LIGHT).GlobBlacklist("Debug builds broken due to LWIP_DEBUG redefition")
-
-    yield target.Extend('light-release', app=K32WApp.LIGHT, release=True)
+    yield target.Extend('light-ota-se', app=K32WApp.LIGHT, release=True, disable_ble=True, se05x=True).GlobBlacklist("Only on demand build")
+    yield target.Extend('light-release-no-ota', app=K32WApp.LIGHT, tokenizer=True, disable_ota=True, release=True)
     yield target.Extend('shell-release', app=K32WApp.SHELL, release=True)
     yield target.Extend('lock-release', app=K32WApp.LOCK, release=True)
-    yield target.Extend('lock-low-power-release', app=K32WApp.LOCK, low_power=True, release=True).GlobBlacklist("Only on demand build")
+    yield target.Extend('lock-low-power-release', app=K32WApp.LOCK,
+                        low_power=True, release=True).GlobBlacklist("Only on demand build")
+
+
+def cc13x2x7_26x2x7Targets():
+    target = Target('cc13x2x7_26x2x7', cc13x2x7_26x2x7Builder)
+
+    yield target.Extend('lock-ftd', app=cc13x2x7_26x2x7App.LOCK, openthread_ftd=True)
+    yield target.Extend('lock-mtd', app=cc13x2x7_26x2x7App.LOCK, openthread_ftd=False)
+    yield target.Extend('pump', app=cc13x2x7_26x2x7App.PUMP)
+    yield target.Extend('pump-controller', app=cc13x2x7_26x2x7App.PUMP_CONTROLLER)
 
 
 def Cyw30739Targets():
-    yield Target('cyw30739-cyw930739m2evb_01-light', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.LIGHT)
-    yield Target('cyw30739-cyw930739m2evb_01-lock', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.LOCK)
+    yield Target('cyw30739-cyw930739m2evb_01-light', Cyw30739Builder,
+                 board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.LIGHT)
+    yield Target('cyw30739-cyw930739m2evb_01-lock', Cyw30739Builder,
+                 board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.LOCK)
+    yield Target('cyw30739-cyw930739m2evb_01-ota-requestor', Cyw30739Builder,
+                 board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.OTA_REQUESTOR).GlobBlacklist(
+                     "Running out of XIP flash space")
+    yield Target('cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging', Cyw30739Builder,
+                 board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.OTA_REQUESTOR, progress_logging=False)
+
+
+def QorvoTargets():
+    target = Target('qpg', QpgBuilder)
+
+    yield target.Extend('lock', board=QpgBoard.QPG6105, app=QpgApp.LOCK)
+    yield target.Extend('light', board=QpgBoard.QPG6105, app=QpgApp.LIGHT)
+    yield target.Extend('shell', board=QpgBoard.QPG6105, app=QpgApp.SHELL)
+    yield target.Extend('persistent-storage', board=QpgBoard.QPG6105, app=QpgApp.PERSISTENT_STORAGE)
+
+
+def TizenTargets():
+
+    # Possible build variants.
+    # NOTE: The number of potential builds is exponential here.
+    builder = VariantBuilder()
+    builder.AppendVariant(name="no-ble", enable_ble=False)
+    builder.AppendVariant(name="no-wifi", enable_wifi=False)
+    builder.AppendVariant(name="asan", use_asan=True)
+
+    target = Target('tizen-arm', TizenBuilder, board=TizenBoard.ARM)
+
+    builder.targets.append(target.Extend('light', app=TizenApp.LIGHT))
+
+    for target in builder.AllVariants():
+        yield target
+
+
+def Bl602Targets():
+    target = Target('bl602', Bl602Builder)
+
+    yield target.Extend('light', board=Bl602Board.BL602BOARD, app=Bl602App.LIGHT)
 
 
 ALL = []
@@ -381,7 +539,11 @@ target_generators = [
     InfineonTargets(),
     AmebaTargets(),
     K32WTargets(),
+    cc13x2x7_26x2x7Targets(),
     Cyw30739Targets(),
+    QorvoTargets(),
+    TizenTargets(),
+    Bl602Targets(),
 ]
 
 for generator in target_generators:
@@ -389,11 +551,8 @@ for generator in target_generators:
         ALL.append(target)
 
 # Simple targets added one by one
-ALL.append(Target('qpg-qpg6100-lock', QpgBuilder))
 ALL.append(Target('telink-tlsr9518adk80d-light', TelinkBuilder,
                   board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.LIGHT))
-ALL.append(Target('tizen-arm-light', TizenBuilder,
-                  board=TizenBoard.ARM, app=TizenApp.LIGHT))
 
 # have a consistent order overall
 ALL.sort(key=lambda t: t.name)

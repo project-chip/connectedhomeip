@@ -62,7 +62,7 @@ public:
         size_t Count() override;
         bool Next(Network & item) override;
         void Release() override { delete this; }
-        ~WiFiNetworkIterator() = default;
+        ~WiFiNetworkIterator() override = default;
 
     private:
         LinuxWiFiDriver * driver;
@@ -79,8 +79,8 @@ public:
 
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
-    CHIP_ERROR Init() override;
-    CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; } // Nothing to do on linux for shutdown.
+    CHIP_ERROR Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback) override;
+    CHIP_ERROR Shutdown() override;
 
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return 1; }
@@ -90,12 +90,13 @@ public:
     CHIP_ERROR CommitConfiguration() override;
     CHIP_ERROR RevertConfiguration() override;
 
-    Status RemoveNetwork(ByteSpan networkId) override;
-    Status ReorderNetwork(ByteSpan networkId, uint8_t index) override;
+    Status RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) override;
+    Status ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText) override;
     void ConnectNetwork(ByteSpan networkId, ConnectCallback * callback) override;
 
     // WiFiDriver
-    Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials) override;
+    Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
+                              uint8_t & outNetworkIndex) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
 
 private:
@@ -104,6 +105,7 @@ private:
     WiFiNetworkIterator mWiFiIterator = WiFiNetworkIterator(this);
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
+    Optional<Status> mScanStatus;
 };
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
@@ -118,7 +120,7 @@ public:
         size_t Count() override;
         bool Next(Network & item) override;
         void Release() override { delete this; }
-        ~ThreadNetworkIterator() = default;
+        ~ThreadNetworkIterator() override = default;
 
     private:
         LinuxThreadDriver * driver;
@@ -127,8 +129,8 @@ public:
 
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new ThreadNetworkIterator(this); }
-    CHIP_ERROR Init() override;
-    CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; } // Nothing to do on linux for shutdown.
+    CHIP_ERROR Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback) override;
+    CHIP_ERROR Shutdown() override;
 
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return 1; }
@@ -138,13 +140,13 @@ public:
     CHIP_ERROR CommitConfiguration() override;
     CHIP_ERROR RevertConfiguration() override;
 
-    Status RemoveNetwork(ByteSpan networkId) override;
-    Status ReorderNetwork(ByteSpan networkId, uint8_t index) override;
+    Status RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) override;
+    Status ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText) override;
     void ConnectNetwork(ByteSpan networkId, ConnectCallback * callback) override;
 
     // ThreadDriver
-    Status AddOrUpdateNetwork(ByteSpan operationalDataset) override;
-    void ScanNetworks(ScanCallback * callback) override;
+    Status AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) override;
+    void ScanNetworks(ThreadDriver::ScanCallback * callback) override;
 
 private:
     ThreadNetworkIterator mThreadIterator = ThreadNetworkIterator(this);

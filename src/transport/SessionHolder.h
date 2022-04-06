@@ -32,7 +32,7 @@ class SessionHolder : public SessionReleaseDelegate, public IntrusiveListNodeBas
 {
 public:
     SessionHolder() {}
-    ~SessionHolder();
+    ~SessionHolder() override;
 
     SessionHolder(const SessionHolder &);
     SessionHolder(SessionHolder && that);
@@ -68,6 +68,10 @@ class SessionHolderWithDelegate : public SessionHolder
 {
 public:
     SessionHolderWithDelegate(SessionReleaseDelegate & delegate) : mDelegate(delegate) {}
+    SessionHolderWithDelegate(const SessionHandle & handle, SessionReleaseDelegate & delegate) : mDelegate(delegate)
+    {
+        Grab(handle);
+    }
     operator bool() const { return SessionHolder::operator bool(); }
 
     void OnSessionReleased() override

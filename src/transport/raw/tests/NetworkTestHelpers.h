@@ -79,6 +79,15 @@ public:
         mAsyncMessageDispatch = true;
     }
 
+    /*
+     * Reset the dispatch back to a model that synchronously dispatches received messages up the stack.
+     *
+     * NOTE: This results in highly atypical/complex call stacks that are not representative of what happens on real
+     * devices and can cause subtle and complex bugs to either appear or get masked in the system. Where possible, please
+     * use this sparingly!
+     */
+    void DisableAsyncDispatch() { mAsyncMessageDispatch = false; }
+
     bool HasPendingMessages() { return !mPendingMessageQueue.empty(); }
 
     static void OnMessageReceived(System::Layer * aSystemLayer, void * aAppState)

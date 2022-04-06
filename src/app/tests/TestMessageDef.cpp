@@ -985,6 +985,7 @@ void ParseInvokeRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & aRe
     err = invokeRequestMessageParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
+    NL_TEST_ASSERT(apSuite, invokeRequestMessageParser.ExitContainer() == CHIP_NO_ERROR);
 }
 
 void BuildInvokeResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
@@ -1017,6 +1018,7 @@ void ParseInvokeResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & aR
     err = invokeResponseMessageParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
+    NL_TEST_ASSERT(apSuite, invokeResponseMessageParser.ExitContainer() == CHIP_NO_ERROR);
 }
 
 void BuildReportDataMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
@@ -1075,6 +1077,7 @@ void ParseReportDataMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & aReade
 
     err = reportDataParser.GetMoreChunkedMessages(&moreChunkedMessages);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && moreChunkedMessages);
+    NL_TEST_ASSERT(apSuite, reportDataParser.ExitContainer() == CHIP_NO_ERROR);
 }
 
 void BuildReadRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
@@ -1140,6 +1143,7 @@ void ParseReadRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & aRead
 
     err = readRequestParser.GetIsFabricFiltered(&isFabricFiltered);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && isFabricFiltered);
+    NL_TEST_ASSERT(apSuite, readRequestParser.ExitContainer() == CHIP_NO_ERROR);
 }
 
 void BuildWriteRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
@@ -1163,9 +1167,6 @@ void BuildWriteRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWri
     writeRequestBuilder.MoreChunkedMessages(true);
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
-    writeRequestBuilder.IsFabricFiltered(true);
-    NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
-
     writeRequestBuilder.EndOfWriteRequestMessage();
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
 }
@@ -1179,7 +1180,6 @@ void ParseWriteRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & aRea
     bool timeRequest      = false;
     AttributeDataIBs::Parser writeRequests;
     bool moreChunkedMessages = false;
-    bool isFabricFiltered    = false;
 
     err = writeRequestParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1198,9 +1198,6 @@ void ParseWriteRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & aRea
 
     err = writeRequestParser.GetMoreChunkedMessages(&moreChunkedMessages);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && moreChunkedMessages);
-
-    err = writeRequestParser.GetIsFabricFiltered(&isFabricFiltered);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && isFabricFiltered);
 }
 
 void BuildWriteResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
@@ -1233,6 +1230,7 @@ void ParseWriteResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & aRe
 #endif
     err = writeResponseParser.GetWriteResponses(&attributeStatusesParser);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, writeResponseParser.ExitContainer() == CHIP_NO_ERROR);
 }
 
 void BuildSubscribeRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
@@ -1326,6 +1324,7 @@ void ParseSubscribeRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & 
 
     err = subscribeRequestParser.GetIsFabricFiltered(&isFabricFiltered);
     NL_TEST_ASSERT(apSuite, isFabricFiltered && err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, subscribeRequestParser.ExitContainer() == CHIP_NO_ERROR);
 }
 
 void BuildSubscribeResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
@@ -1371,6 +1370,8 @@ void ParseSubscribeResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVReader &
 
     err = subscribeResponseParser.GetMaxIntervalCeilingSeconds(&maxIntervalCeilingSeconds);
     NL_TEST_ASSERT(apSuite, maxIntervalCeilingSeconds == 2 && err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(apSuite, subscribeResponseParser.ExitContainer() == CHIP_NO_ERROR);
 }
 
 void BuildTimedRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
@@ -1389,17 +1390,19 @@ void ParseTimedRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & aRea
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    TimedRequestMessage::Parser TimedRequestMessagearser;
+    TimedRequestMessage::Parser timedRequestMessageParser;
     uint16_t timeout = 0;
 
-    err = TimedRequestMessagearser.Init(aReader);
+    err = timedRequestMessageParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    err = TimedRequestMessagearser.CheckSchemaValidity();
+    err = timedRequestMessageParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
-    err = TimedRequestMessagearser.GetTimeoutMs(&timeout);
+    err = timedRequestMessageParser.GetTimeoutMs(&timeout);
     NL_TEST_ASSERT(apSuite, timeout == 1 && err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(apSuite, timedRequestMessageParser.ExitContainer() == CHIP_NO_ERROR);
 }
 
 void DataVersionFilterIBTest(nlTestSuite * apSuite, void * apContext)
@@ -2065,8 +2068,6 @@ void InvokeInvokeRequestMessageTest(nlTestSuite * apSuite, void * apContext)
     DebugPrettyPrint(buf);
 
     reader.Init(std::move(buf));
-    err = reader.Next();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ParseInvokeRequestMessage(apSuite, reader);
 }
 
@@ -2084,8 +2085,6 @@ void InvokeInvokeResponseMessageTest(nlTestSuite * apSuite, void * apContext)
     DebugPrettyPrint(buf);
 
     reader.Init(std::move(buf));
-    err = reader.Next();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ParseInvokeResponseMessage(apSuite, reader);
 }
 
@@ -2103,8 +2102,6 @@ void ReportDataMessageTest(nlTestSuite * apSuite, void * apContext)
     DebugPrettyPrint(buf);
 
     reader.Init(std::move(buf));
-    err = reader.Next();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ParseReportDataMessage(apSuite, reader);
 }
 
@@ -2122,8 +2119,6 @@ void ReadRequestMessageTest(nlTestSuite * apSuite, void * apContext)
     DebugPrettyPrint(buf);
 
     reader.Init(std::move(buf));
-    err = reader.Next();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ParseReadRequestMessage(apSuite, reader);
 }
 
@@ -2141,8 +2136,6 @@ void WriteRequestMessageTest(nlTestSuite * apSuite, void * apContext)
     DebugPrettyPrint(buf);
 
     reader.Init(std::move(buf));
-    err = reader.Next();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ParseWriteRequestMessage(apSuite, reader);
 }
 
@@ -2160,8 +2153,6 @@ void WriteResponseMessageTest(nlTestSuite * apSuite, void * apContext)
     DebugPrettyPrint(buf);
 
     reader.Init(std::move(buf));
-    err = reader.Next();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ParseWriteResponseMessage(apSuite, reader);
 }
 
@@ -2179,8 +2170,6 @@ void SubscribeRequestMessageTest(nlTestSuite * apSuite, void * apContext)
     DebugPrettyPrint(buf);
 
     reader.Init(std::move(buf));
-    err = reader.Next();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ParseSubscribeRequestMessage(apSuite, reader);
 }
 
@@ -2198,8 +2187,6 @@ void SubscribeResponseMessageTest(nlTestSuite * apSuite, void * apContext)
     DebugPrettyPrint(buf);
 
     reader.Init(std::move(buf));
-    err = reader.Next();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ParseSubscribeResponseMessage(apSuite, reader);
 }
 
@@ -2217,8 +2204,6 @@ void TimedRequestMessageTest(nlTestSuite * apSuite, void * apContext)
     DebugPrettyPrint(buf);
 
     reader.Init(std::move(buf));
-    err = reader.Next();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ParseTimedRequestMessage(apSuite, reader);
 }
 

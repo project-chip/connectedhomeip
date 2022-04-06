@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2018 Nest Labs, Inc.
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,59 +19,99 @@
 /**
  * @file Button.cpp
  *
- * Implements a Button tied to a GPIO and provides debouncing and polling
+ * Implements a Button tied to a GPIO and provides debouncing
  *
  **/
 
 #include "driver/gpio.h"
+#include "esp_check.h"
 #include "esp_log.h"
 #include "esp_system.h"
 
+#include "AppTask.h"
 #include "Button.h"
+#include "Globals.h"
+#include "ScreenManager.h"
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <vector>
 
-extern const char * TAG;
+static const char * TAG = "Button.cpp";
 
-esp_err_t Button::Init(gpio_num_t gpioNum, uint16_t debouncePeriod)
+extern Button gButtons[BUTTON_NUMBER];
+
+Button::Button() {}
+
+Button::Button(gpio_num_t gpioNum)
 {
-    mGPIONum         = gpioNum;
-    mDebouncePeriod  = debouncePeriod / portTICK_PERIOD_MS;
-    mState           = false;
-    mLastPolledState = false;
-
-    esp_err_t err = gpio_set_direction(gpioNum, GPIO_MODE_INPUT);
-    if (err == ESP_OK)
-    {
-        Poll();
-    }
-    return err;
+    mGPIONum = gpioNum;
 }
 
-bool Button::Poll()
+int32_t Find_Button_Via_Pin(gpio_num_t gpioNum)
 {
-    uint32_t now = xTaskGetTickCount();
-
-    bool newState = gpio_get_level(mGPIONum) == 0;
-
-    if (newState != mLastPolledState)
+    for (int i = 0; i < BUTTON_NUMBER; i++)
     {
-        mLastPolledState = newState;
-        mLastReadTime    = now;
+        if (gButtons[i].GetGPIONum() == gpioNum)
+        {
+            return i;
+        }
     }
-
-    else if (newState != mState && (now - mLastReadTime) >= mDebouncePeriod)
-    {
-        mState          = newState;
-        mPrevStateDur   = now - mStateStartTime;
-        mStateStartTime = now;
-        return true;
-    }
-
-    return false;
+    return -1;
 }
 
-uint32_t Button::GetStateDuration()
+void IRAM_ATTR button_isr_handler(void * arg)
 {
-    return (xTaskGetTickCount() - mStateStartTime) * portTICK_PERIOD_MS;
+    uint32_t gpio_num = (uint32_t) arg;
+    int32_t idx       = Find_Button_Via_Pin((gpio_num_t) gpio_num);
+    if (idx == -1)
+    {
+        return;
+    }
+    BaseType_t taskWoken = pdFALSE;
+    xTimerStartFromISR(gButtons[idx].mbuttonTimer,
+                       &taskWoken); // If the timer had already been started ,restart it will reset its expiry time
+}
+
+esp_err_t Button::Init()
+{
+    return Init(mGPIONum);
+}
+
+esp_err_t Button::Init(gpio_num_t gpioNum)
+{
+    esp_err_t ret = ESP_OK;
+
+    mGPIONum = gpioNum;
+    //  zero-initialize the config structure.
+    gpio_config_t io_conf = {};
+    // interrupt of falling edge
+    io_conf.intr_type = GPIO_INTR_NEGEDGE;
+    // bit mask of the pins, use GPIO4/5 here
+    io_conf.pin_bit_mask = 1ULL << gpioNum;
+    // set as input mode
+    io_conf.mode = GPIO_MODE_INPUT;
+    // enable pull-up mode
+    io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
+
+    gpio_config(&io_conf);
+
+    // hook isr handler for specific gpio pin
+    ret = gpio_isr_handler_add(gpioNum, button_isr_handler, (void *) gpioNum);
+    ESP_RETURN_ON_ERROR(ret, TAG, "gpio_isr_handler_add failed: %s", esp_err_to_name(ret));
+
+    mbuttonTimer = xTimerCreate("BtnTmr",               // Just a text name, not used by the RTOS kernel
+                                pdMS_TO_TICKS(50),      // timer period
+                                false,                  // no timer reload (==one-shot)
+                                (void *) (int) gpioNum, // init timer id = gpioNum index
+                                TimerCallback           // timer callback handler (all buttons use
+                                                        // the same timer cn function)
+    );
+
+    return ESP_OK;
+}
+void Button::TimerCallback(TimerHandle_t xTimer)
+{
+    // Get the button index of the expired timer and call button event Handler.
+    uint32_t gpio_num = (uint32_t) pvTimerGetTimerID(xTimer);
+    GetAppTask().ButtonEventHandler(gpio_num, APP_BUTTON_PRESSED);
 }

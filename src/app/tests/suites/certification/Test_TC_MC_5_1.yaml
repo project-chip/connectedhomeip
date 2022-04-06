@@ -15,6 +15,7 @@
 name: 21.7.1. [TC-MC-5.1] List TV Channels Verification
 
 config:
+    nodeId: 0x12344321
     cluster: "Channel"
     endpoint: 1
 
@@ -22,12 +23,16 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     #issue 13412 TODO: Enable test and update response value when SDK supports.
     - label: "Read attribute Channel list"
       disabled: true
       command: "readAttribute"
-      attribute: "Channel list"
+      attribute: "ChannelList"
       response:
           value:
               [
@@ -49,7 +54,7 @@ tests:
 
     - label: "Reads the ChannelList attribute from the DUT"
       command: "readAttribute"
-      attribute: "channel list"
+      attribute: "ChannelList"
       response:
           constraints:
               type: list

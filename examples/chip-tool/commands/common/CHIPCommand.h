@@ -22,6 +22,7 @@
 #include "Command.h"
 #include <commands/common/CredentialIssuerCommands.h>
 #include <commands/example/ExampleCredentialIssuerCommands.h>
+#include <credentials/GroupDataProviderImpl.h>
 
 #pragma once
 
@@ -52,18 +53,19 @@ public:
     using PeerId                 = ::chip::PeerId;
     using PeerAddress            = ::chip::Transport::PeerAddress;
 
-    CHIPCommand(const char * commandName) : Command(commandName)
+    static constexpr uint16_t kMaxGroupsPerFabric    = 5;
+    static constexpr uint16_t kMaxGroupKeysPerFabric = 8;
+
+    CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds) :
+        Command(commandName), mCredIssuerCmds(credIssuerCmds)
     {
+        AddArgument("paa-trust-store-path", &mPaaTrustStorePath);
         AddArgument("commissioner-name", &mCommissionerName);
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace_file", &mTraceFile);
         AddArgument("trace_log", 0, 1, &mTraceLog);
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
-    }
-
-    CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds) : CHIPCommand(commandName)
-    {
-        mCredIssuerCmds = credIssuerCmds;
+        AddArgument("ble-adapter", 0, UINT64_MAX, &mBleAdapterId);
     }
 
     /////////// Command Interface /////////
@@ -93,9 +95,8 @@ protected:
 
     PersistentStorage mDefaultStorage;
     PersistentStorage mCommissionerStorage;
-    chip::SimpleFabricStorage mFabricStorage;
-    ExampleCredentialIssuerCommands mExampleCredentialIssuerCmds;
-    CredentialIssuerCommands * mCredIssuerCmds = &mExampleCredentialIssuerCmds;
+    chip::Credentials::GroupDataProviderImpl mGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
+    CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();
     void SetIdentity(const char * name);
@@ -106,11 +107,17 @@ protected:
     ChipDeviceCommissioner & CurrentCommissioner();
 
 private:
-    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId);
+    CHIP_ERROR MaybeSetUpStack();
+    CHIP_ERROR MaybeTearDownStack();
+
+    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId,
+                                      const chip::Credentials::AttestationTrustStore * trustStore);
     CHIP_ERROR ShutdownCommissioner(std::string key);
     chip::FabricId CurrentCommissionerId();
-    std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
+    static std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
     chip::Optional<char *> mCommissionerName;
+    chip::Optional<uint16_t> mBleAdapterId;
+    chip::Optional<char *> mPaaTrustStorePath;
 
     static void RunQueuedCommand(intptr_t commandArg);
 

@@ -40,7 +40,7 @@ public:
     }
 
     ApplicationExchangeDispatch() {}
-    virtual ~ApplicationExchangeDispatch() {}
+    ~ApplicationExchangeDispatch() override {}
 
 protected:
     bool MessagePermitted(uint16_t protocol, uint8_t type) override;

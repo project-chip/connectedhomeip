@@ -34,7 +34,8 @@ CHIP_ERROR DelayedActionTimeHandler(int argc, char ** argv)
     VerifyOrReturnError(exampleOTAProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     const uint32_t delay = strtoul(argv[0], nullptr, 10);
-    exampleOTAProvider->SetDelayedActionTimeSec(delay);
+    exampleOTAProvider->SetDelayedQueryActionTimeSec(delay);
+    exampleOTAProvider->SetDelayedApplyActionTimeSec(delay);
     return CHIP_NO_ERROR;
 }
 

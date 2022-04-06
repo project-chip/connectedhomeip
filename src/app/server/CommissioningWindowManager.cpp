@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,17 +21,16 @@
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/CommissionableDataProvider.h>
+#include <platform/DeviceControlServer.h>
+
+using namespace chip::app::Clusters;
+using namespace chip::System::Clock;
 
 namespace {
 
 // As per specifications (Section 13.3), Nodes SHALL exit commissioning mode after 20 failed commission attempts.
 constexpr uint8_t kMaxFailedCommissioningAttempts = 20;
-
-void HandleCommissioningWindowTimeout(chip::System::Layer * aSystemLayer, void * aAppState)
-{
-    chip::CommissioningWindowManager * commissionMgr = static_cast<chip::CommissioningWindowManager *>(aAppState);
-    commissionMgr->CloseCommissioningWindow();
-}
 
 void HandleSessionEstablishmentTimeout(chip::System::Layer * aSystemLayer, void * aAppState)
 {
@@ -52,17 +51,16 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
 {
     if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
-        if (event->CommissioningComplete.status == CHIP_NO_ERROR)
-        {
-            ChipLogProgress(AppServer, "Commissioning completed successfully");
-            Cleanup();
-        }
-        else
-        {
-            ChipLogError(AppServer, "Commissioning failed with error %" CHIP_ERROR_FORMAT,
-                         event->CommissioningComplete.status.Format());
-            OnSessionEstablishmentError(event->CommissioningComplete.status);
-        }
+        ChipLogProgress(AppServer, "Commissioning completed successfully");
+        DeviceLayer::SystemLayer().CancelTimer(HandleCommissioningWindowTimeout, this);
+        mCommissioningTimeoutTimerArmed = false;
+        Cleanup();
+        mServer->GetSecureSessionManager().ExpireAllPASEPairings();
+    }
+    else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
+    {
+        ChipLogError(AppServer, "Failsafe timer expired");
+        HandleFailedAttempt(CHIP_ERROR_TIMEOUT);
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
@@ -83,17 +81,25 @@ void CommissioningWindowManager::ResetState()
     mUseECM = false;
 
     mECMDiscriminator = 0;
-    mECMPasscodeID    = 0;
     mECMIterations    = 0;
     mECMSaltLength    = 0;
+    mWindowStatus     = app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen;
 
     memset(&mECMPASEVerifier, 0, sizeof(mECMPASEVerifier));
     memset(mECMSalt, 0, sizeof(mECMSalt));
+
+    DeviceLayer::SystemLayer().CancelTimer(HandleCommissioningWindowTimeout, this);
+    mCommissioningTimeoutTimerArmed = false;
 }
 
 void CommissioningWindowManager::Cleanup()
 {
     StopAdvertisement(/* aShuttingDown = */ false);
+    DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    if (failSafeContext.IsFailSafeArmed())
+    {
+        failSafeContext.ForceFailSafeTimerExpiry();
+    }
 
     ResetState();
 }
@@ -101,27 +107,32 @@ void CommissioningWindowManager::Cleanup()
 void CommissioningWindowManager::OnSessionEstablishmentError(CHIP_ERROR err)
 {
     DeviceLayer::SystemLayer().CancelTimer(HandleSessionEstablishmentTimeout, this);
+    HandleFailedAttempt(err);
+}
+
+void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
+{
     mFailedCommissioningAttempts++;
     ChipLogError(AppServer, "Commissioning failed (attempt %d): %s", mFailedCommissioningAttempts, ErrorStr(err));
-
 #if CONFIG_NETWORK_LAYER_BLE
-    mServer->getBleLayerObject()->mBleEndPoint->ReleaseBleConnection();
+    mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
     if (mFailedCommissioningAttempts < kMaxFailedCommissioningAttempts)
     {
-        // If the number of commissioning attempts have not exceeded maximum retries, let's reopen
-        // the pairing window.
-        err = OpenCommissioningWindow();
+        // If the number of commissioning attempts has not exceeded maximum
+        // retries, let's start listening for commissioning connections again.
+        err = AdvertiseAndListenForPASE();
     }
 
-    // If the commissioning attempts limit exceeded, or reopening the commissioning window failed.
     if (err != CHIP_NO_ERROR)
     {
+        // The commissioning attempts limit was exceeded, or listening for
+        // commmissioning connections failed.
         Cleanup();
 
         if (mAppDelegate != nullptr)
         {
-            mAppDelegate->OnRendezvousStopped();
+            mAppDelegate->OnCommissioningSessionStopped();
         }
     }
 }
@@ -150,47 +161,86 @@ void CommissioningWindowManager::OnSessionEstablished()
     ChipLogProgress(AppServer, "Commissioning completed session establishment step");
     if (mAppDelegate != nullptr)
     {
-        mAppDelegate->OnRendezvousStarted();
+        mAppDelegate->OnCommissioningSessionStarted();
     }
 
     DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
 
-    StopAdvertisement(/* aShuttingDown = */ true);
+    StopAdvertisement(/* aShuttingDown = */ false);
+
+    DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    // This should never be armed because we don't allow CASE sessions to arm the failsafe when the commissioning window is open and
+    // we check that the failsafe is not armed before opening the commissioning window. None the less, it is good to double-check.
+    if (failSafeContext.IsFailSafeArmed())
+    {
+        ChipLogError(AppServer, "Error - arm failsafe is already armed on PASE session establishment completion");
+    }
+    else
+    {
+        err = failSafeContext.ArmFailSafe(kUndefinedFabricId, System::Clock::Seconds16(60));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Error arming failsafe on PASE session establishment completion");
+        }
+    }
+
     ChipLogProgress(AppServer, "Device completed Rendezvous process");
 }
 
-CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
+CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds16 commissioningTimeout)
 {
-    uint16_t keyID = 0;
-    ReturnErrorOnFailure(mIDAllocator->Allocate(keyID));
+    VerifyOrReturnError(commissioningTimeout <= MaxCommissioningTimeout() &&
+                            commissioningTimeout >= mMinCommissioningTimeoutOverride.ValueOr(MinCommissioningTimeout()),
+                        CHIP_ERROR_INVALID_ARGUMENT);
+    DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    VerifyOrReturnError(!failSafeContext.IsFailSafeArmed(), CHIP_ERROR_INCORRECT_STATE);
+
+    ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(commissioningTimeout, HandleCommissioningWindowTimeout, this));
+
+    mCommissioningTimeoutTimerArmed = true;
+
+    return AdvertiseAndListenForPASE();
+}
+
+CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
+{
+    VerifyOrReturnError(mCommissioningTimeoutTimerArmed, CHIP_ERROR_INCORRECT_STATE);
 
     mPairingSession.Clear();
 
-    if (mCommissioningTimeoutSeconds != kNoCommissioningTimeout)
-    {
-        ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(mCommissioningTimeoutSeconds),
-                                                                   HandleCommissioningWindowTimeout, this));
-    }
-
     ReturnErrorOnFailure(mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
         Protocols::SecureChannel::MsgType::PBKDFParamRequest, &mPairingSession));
+    mListeningForPASE = true;
 
     if (mUseECM)
     {
         ReturnErrorOnFailure(SetTemporaryDiscriminator(mECMDiscriminator));
-        ReturnErrorOnFailure(
-            mPairingSession.WaitForPairing(mECMPASEVerifier, mECMIterations, ByteSpan(mECMSalt, mECMSaltLength), mECMPasscodeID,
-                                           keyID, Optional<ReliableMessageProtocolConfig>::Value(gDefaultMRPConfig), this));
+        ReturnErrorOnFailure(mPairingSession.WaitForPairing(
+            mServer->GetSecureSessionManager(), mECMPASEVerifier, mECMIterations, ByteSpan(mECMSalt, mECMSaltLength),
+            Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), this));
     }
     else
     {
-        uint32_t pinCode;
-        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSetupPinCode(pinCode));
+        uint32_t iterationCount                      = 0;
+        uint8_t salt[kSpake2p_Max_PBKDF_Salt_Length] = { 0 };
+        Spake2pVerifierSerialized serializedVerifier = { 0 };
+        size_t serializedVerifierLen                 = 0;
+        Spake2pVerifier verifier;
+        MutableByteSpan saltSpan{ salt };
+        MutableByteSpan verifierSpan{ serializedVerifier };
 
-        ReturnErrorOnFailure(mPairingSession.WaitForPairing(
-            pinCode, kSpake2p_Iteration_Count,
-            ByteSpan(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt)), keyID,
-            Optional<ReliableMessageProtocolConfig>::Value(gDefaultMRPConfig), this));
+        auto * commissionableDataProvider = DeviceLayer::GetCommissionableDataProvider();
+        ReturnErrorOnFailure(commissionableDataProvider->GetSpake2pIterationCount(iterationCount));
+        ReturnErrorOnFailure(commissionableDataProvider->GetSpake2pSalt(saltSpan));
+        ReturnErrorOnFailure(commissionableDataProvider->GetSpake2pVerifier(verifierSpan, serializedVerifierLen));
+        VerifyOrReturnError(Crypto::kSpake2p_VerifierSerialized_Length == serializedVerifierLen, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(verifierSpan.size() == serializedVerifierLen, CHIP_ERROR_INTERNAL);
+
+        ReturnErrorOnFailure(verifier.Deserialize(ByteSpan(serializedVerifier)));
+
+        ReturnErrorOnFailure(mPairingSession.WaitForPairing(mServer->GetSecureSessionManager(), verifier, iterationCount, saltSpan,
+                                                            Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()),
+                                                            this));
     }
 
     ReturnErrorOnFailure(StartAdvertisement());
@@ -198,7 +248,7 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(uint16_t commissioningTimeoutSeconds,
+CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(Seconds16 commissioningTimeout,
                                                                     CommissioningWindowAdvertisement advertisementMode)
 {
     RestoreDiscriminator();
@@ -212,11 +262,10 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(uint16_t com
 #endif // CONFIG_NETWORK_LAYER_BLE
 
     mFailedCommissioningAttempts = 0;
-    mCommissioningTimeoutSeconds = commissioningTimeoutSeconds;
 
     mUseECM = false;
 
-    CHIP_ERROR err = OpenCommissioningWindow();
+    CHIP_ERROR err = OpenCommissioningWindow(commissioningTimeout);
     if (err != CHIP_NO_ERROR)
     {
         Cleanup();
@@ -225,9 +274,9 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(uint16_t com
     return err;
 }
 
-CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
-                                                                       PASEVerifier & verifier, uint32_t iterations, ByteSpan salt,
-                                                                       uint16_t passcodeID)
+CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(Seconds16 commissioningTimeout, uint16_t discriminator,
+                                                                       Spake2pVerifier & verifier, uint32_t iterations,
+                                                                       ByteSpan salt)
 {
     // Once a device is operational, it shall be commissioned into subsequent fabrics using
     // the operational network only.
@@ -239,17 +288,15 @@ CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(uint16_t 
     mECMSaltLength = static_cast<uint32_t>(salt.size());
 
     mFailedCommissioningAttempts = 0;
-    mCommissioningTimeoutSeconds = commissioningTimeoutSeconds;
 
     mECMDiscriminator = discriminator;
-    mECMPasscodeID    = passcodeID;
     mECMIterations    = iterations;
 
-    memcpy(&mECMPASEVerifier, &verifier, sizeof(PASEVerifier));
+    memcpy(&mECMPASEVerifier, &verifier, sizeof(Spake2pVerifier));
 
     mUseECM = true;
 
-    CHIP_ERROR err = OpenCommissioningWindow();
+    CHIP_ERROR err = OpenCommissioningWindow(commissioningTimeout);
     if (err != CHIP_NO_ERROR)
     {
         Cleanup();
@@ -259,10 +306,31 @@ CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(uint16_t 
 
 void CommissioningWindowManager::CloseCommissioningWindow()
 {
-    if (mWindowStatus != app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen)
+    if (mWindowStatus != AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen)
     {
         ChipLogProgress(AppServer, "Closing pairing window");
         Cleanup();
+    }
+}
+
+Dnssd::CommissioningMode CommissioningWindowManager::GetCommissioningMode() const
+{
+    if (!mListeningForPASE)
+    {
+        // We should not be advertising ourselves as in commissioning mode.
+        // We need to check this before mWindowStatus, because we might have an
+        // open window even while we are not listening for PASE.
+        return Dnssd::CommissioningMode::kDisabled;
+    }
+
+    switch (mWindowStatus)
+    {
+    case AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen:
+        return Dnssd::CommissioningMode::kEnabledEnhanced;
+    case AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen:
+        return Dnssd::CommissioningMode::kEnabledBasic;
+    default:
+        return Dnssd::CommissioningMode::kDisabled;
     }
 }
 
@@ -273,33 +341,34 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
     DeviceLayer::ConfigurationMgr().NotifyOfAdvertisementStart();
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    if (!mIsBLE && mWindowStatus == AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen)
+    {
+        DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(true);
+    }
+#endif
+
     if (mIsBLE)
     {
         ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
     }
+
     if (mAppDelegate != nullptr)
     {
-        mAppDelegate->OnPairingWindowOpened();
+        mAppDelegate->OnCommissioningWindowOpened();
     }
 
-    Dnssd::CommissioningMode commissioningMode;
     if (mUseECM)
     {
-        mWindowStatus     = app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen;
-        commissioningMode = Dnssd::CommissioningMode::kEnabledEnhanced;
+        mWindowStatus = AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen;
     }
     else
     {
-        mWindowStatus     = app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen;
-        commissioningMode = Dnssd::CommissioningMode::kEnabledBasic;
+        mWindowStatus = AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen;
     }
 
-    // reset all advertising, indicating we are in commissioningMode
-    app::DnssdServer::Instance().StartServer(commissioningMode);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(true);
-#endif
+    // reset all advertising, switching to our new commissioning mode.
+    app::DnssdServer::Instance().StartServer();
 
     return CHIP_NO_ERROR;
 }
@@ -309,12 +378,14 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
     RestoreDiscriminator();
 
     mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
+    mListeningForPASE = false;
     mPairingSession.Clear();
 
-    mWindowStatus = app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen;
-
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(false);
+    if (!mIsBLE && mWindowStatus != AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen)
+    {
+        DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(false);
+    }
 #endif
 
     // If aShuttingDown, don't try to change our DNS-SD advertisements.
@@ -322,8 +393,8 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
     {
         // Stop advertising commissioning mode, since we're not accepting PASE
         // connections right now.  If we start accepting them again (via
-        // OpenCommissioningWindow) that will call StartAdvertisement as needed.
-        app::DnssdServer::Instance().StartServer(Dnssd::CommissioningMode::kDisabled);
+        // AdvertiseAndListenForPASE) that will call StartAdvertisement as needed.
+        app::DnssdServer::Instance().StartServer();
     }
 
     if (mIsBLE)
@@ -333,7 +404,7 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
 
     if (mAppDelegate != nullptr)
     {
-        mAppDelegate->OnPairingWindowClosed();
+        mAppDelegate->OnCommissioningWindowClosed();
     }
 
     return CHIP_NO_ERROR;
@@ -341,26 +412,19 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
 
 CHIP_ERROR CommissioningWindowManager::SetTemporaryDiscriminator(uint16_t discriminator)
 {
-    if (!mOriginalDiscriminatorCached)
-    {
-        // Cache the original discriminator
-        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(mOriginalDiscriminator));
-        mOriginalDiscriminatorCached = true;
-    }
-
-    return DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(discriminator);
+    return app::DnssdServer::Instance().SetEphemeralDiscriminator(MakeOptional(discriminator));
 }
 
 CHIP_ERROR CommissioningWindowManager::RestoreDiscriminator()
 {
-    if (mOriginalDiscriminatorCached)
-    {
-        // Restore the original discriminator
-        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(mOriginalDiscriminator));
-        mOriginalDiscriminatorCached = false;
-    }
+    return app::DnssdServer::Instance().SetEphemeralDiscriminator(NullOptional);
+}
 
-    return CHIP_NO_ERROR;
+void CommissioningWindowManager::HandleCommissioningWindowTimeout(chip::System::Layer * aSystemLayer, void * aAppState)
+{
+    auto * commissionMgr                           = static_cast<CommissioningWindowManager *>(aAppState);
+    commissionMgr->mCommissioningTimeoutTimerArmed = false;
+    commissionMgr->CloseCommissioningWindow();
 }
 
 } // namespace chip

@@ -15,11 +15,12 @@
 name: 45.1.3. [TC-SWDIAG-2.1] Event functionality with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Software Diagnostics"
-    endpoint: 1
+    endpoint: 0
 
 tests:
-    #issue #11725 Reading the List is not implemented in YAML framework
+    #Disabled due to issue #11343
     - label: "Reads a list of SoftwareFault struct from DUT"
       disabled: true
       command: "readAttribute"
@@ -27,4 +28,4 @@ tests:
       PICS: E_SOFTWAREFAULT
       response:
           constraints:
-              value: 0
+              type: list

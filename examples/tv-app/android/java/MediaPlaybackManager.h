@@ -77,9 +77,9 @@ public:
                             const uint64_t & deltaPositionMilliseconds) override;
     void HandleSkipForward(CommandResponseHelper<PlaybackResponseType> & helper,
                            const uint64_t & deltaPositionMilliseconds) override;
-    void HandleSeekRequest(CommandResponseHelper<PlaybackResponseType> & helper, const uint64_t & positionMilliseconds) override;
+    void HandleSeek(CommandResponseHelper<PlaybackResponseType> & helper, const uint64_t & positionMilliseconds) override;
     void HandleNext(CommandResponseHelper<PlaybackResponseType> & helper) override;
-    void HandleStartOverRequest(CommandResponseHelper<PlaybackResponseType> & helper) override;
+    void HandleStartOver(CommandResponseHelper<PlaybackResponseType> & helper) override;
 
 private:
     jobject mMediaPlaybackManagerObject = nullptr;

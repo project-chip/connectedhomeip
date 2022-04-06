@@ -309,12 +309,13 @@ CHIP_ERROR TLVWriter::VPutStringF(Tag tag, const char * fmt, va_list ap)
     va_copy(aq, ap);
 
     dataLen = static_cast<size_t>(vsnprintf(nullptr, 0, fmt, aq));
+
+    va_end(aq);
+
     if (!CanCastTo<uint32_t>(dataLen))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-
-    va_end(aq);
 
     if (dataLen <= UINT8_MAX)
         lenFieldSize = kTLVFieldSize_1Byte;

@@ -40,12 +40,16 @@
 #ifdef HEAP_MONITORING
 #include "MemMonitoring.h"
 #endif
+#define MAIN_TASK_STACK_SIZE (4096)
+#define MAIN_TASK_PRIORITY 2
 
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 
 volatile int apperror_cnt;
+static void main_task(void * pvParameters);
+
 // ================================================================================
 // App Error
 //=================================================================================
@@ -70,24 +74,17 @@ extern "C" void vApplicationIdleHook(void)
     // FreeRTOS Idle callback
 }
 
-// ================================================================================
-// Main Code
-// ================================================================================
-int main(void)
+extern "C" void vApplicationDaemonTaskStartupHook()
 {
-    init_p6Platform();
-
-#ifdef HEAP_MONITORING
-    MemMonitoring::startHeapMonitoring();
-#endif
-
-    P6_LOG("==================================================\r\n");
-    P6_LOG("chip-p6-lighting-example starting\r\n");
-    P6_LOG("==================================================\r\n");
-
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
 
+    /* Create the Main task. */
+    xTaskCreate(main_task, "Main task", MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, NULL);
+}
+
+static void main_task(void * pvParameters)
+{
     CHIP_ERROR ret = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
     if (ret != CHIP_NO_ERROR)
     {
@@ -115,6 +112,26 @@ int main(void)
         P6_LOG("GetAppTask().Init() failed");
         appError(ret);
     }
+
+    /* Delete task */
+    vTaskDelete(NULL);
+}
+
+// ================================================================================
+// Main Code
+// ================================================================================
+int main(void)
+{
+    init_p6Platform();
+
+#ifdef HEAP_MONITORING
+    MemMonitoring::startHeapMonitoring();
+#endif
+
+    P6_LOG("==================================================\r\n");
+    P6_LOG("chip-p6-lighting-example starting\r\n");
+    P6_LOG("==================================================\r\n");
+
     /* Start the FreeRTOS scheduler */
     vTaskStartScheduler();
 
@@ -124,5 +141,4 @@ int main(void)
 
     // Should never get here.
     P6_LOG("vTaskStartScheduler() failed");
-    appError(ret);
 }

@@ -23,7 +23,7 @@ limitations under the License.
     <item name="Kelvin" value="0x02"/>
   </enum>
   <cluster>
-    <domain>General</domain>
+    <domain>CHIP</domain>
     <name>Unit Localization</name>
     <code>0x002d</code>
     <define>UNIT_LOCALIZATION_CLUSTER</define>

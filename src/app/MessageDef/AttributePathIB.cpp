@@ -198,6 +198,33 @@ CHIP_ERROR AttributePathIB::Parser::GetListIndex(DataModel::Nullable<ListIndex> 
     return GetNullableUnsignedInteger(to_underlying(Tag::kListIndex), apListIndex);
 }
 
+CHIP_ERROR AttributePathIB::Parser::GetListIndex(ConcreteDataAttributePath & aAttributePath) const
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    DataModel::Nullable<ListIndex> listIndex;
+    err = GetListIndex(&(listIndex));
+    if (err == CHIP_NO_ERROR)
+    {
+        if (listIndex.IsNull())
+        {
+            aAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
+        }
+        else
+        {
+            // TODO: Add ListOperation::ReplaceItem support. (Attribute path with valid list index)
+            err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+        }
+    }
+    else if (CHIP_END_OF_TLV == err)
+    {
+        // We do not have the context for the actual data type here. We always set the list operation to not list and the users
+        // should interpret it as ReplaceAll when the attribute type is a list.
+        aAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::NotList;
+        err                    = CHIP_NO_ERROR;
+    }
+    return err;
+}
+
 AttributePathIB::Builder & AttributePathIB::Builder::EnableTagCompression(const bool aEnableTagCompression)
 {
     // skip if error has already been set
@@ -294,6 +321,30 @@ CHIP_ERROR AttributePathIB::Builder::Encode(const AttributePathParams & aAttribu
     if (!(aAttributePathParams.HasWildcardListIndex()))
     {
         ListIndex(aAttributePathParams.mListIndex);
+    }
+
+    EndOfAttributePathIB();
+    return GetError();
+}
+
+CHIP_ERROR AttributePathIB::Builder::Encode(const ConcreteDataAttributePath & aAttributePath)
+{
+    Endpoint(aAttributePath.mEndpointId);
+    Cluster(aAttributePath.mClusterId);
+    Attribute(aAttributePath.mAttributeId);
+
+    if (!aAttributePath.IsListOperation() || aAttributePath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+    {
+        /* noop */
+    }
+    else if (aAttributePath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    {
+        ListIndex(DataModel::NullNullable);
+    }
+    else
+    {
+        // TODO: Add ListOperation::ReplaceItem support. (Attribute path with valid list index)
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     EndOfAttributePathIB();

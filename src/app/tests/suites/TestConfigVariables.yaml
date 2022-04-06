@@ -15,6 +15,7 @@
 name: Test Cluster Config Variables Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Test Cluster"
     endpoint: 1
     arg1:
@@ -28,6 +29,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Send Test Add Arguments Command"
       command: "testAddArguments"

@@ -38,9 +38,14 @@ struct AppEvent
     {
         struct
         {
-            int Pin;
-            uint8_t Action;
+            uint8_t button;
+            uint8_t action;
         } ButtonEvent;
+
+        struct
+        {
+            uint8_t index;
+        } TimerEvent;
     };
 
     EventHandler Handler;

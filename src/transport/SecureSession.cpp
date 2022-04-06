@@ -20,6 +20,11 @@
 namespace chip {
 namespace Transport {
 
+ScopedNodeId SecureSession::GetPeer() const
+{
+    return ScopedNodeId(mPeerNodeId, GetFabricIndex());
+}
+
 Access::SubjectDescriptor SecureSession::GetSubjectDescriptor() const
 {
     Access::SubjectDescriptor subjectDescriptor;
@@ -28,13 +33,13 @@ Access::SubjectDescriptor SecureSession::GetSubjectDescriptor() const
         subjectDescriptor.authMode    = Access::AuthMode::kCase;
         subjectDescriptor.subject     = mPeerNodeId;
         subjectDescriptor.cats        = mPeerCATs;
-        subjectDescriptor.fabricIndex = mFabric;
+        subjectDescriptor.fabricIndex = GetFabricIndex();
     }
     else if (IsPAKEKeyId(mPeerNodeId))
     {
         subjectDescriptor.authMode    = Access::AuthMode::kPase;
         subjectDescriptor.subject     = mPeerNodeId;
-        subjectDescriptor.fabricIndex = mFabric;
+        subjectDescriptor.fabricIndex = GetFabricIndex();
     }
     else
     {

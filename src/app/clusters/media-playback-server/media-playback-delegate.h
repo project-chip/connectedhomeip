@@ -44,20 +44,20 @@ public:
     virtual uint64_t HandleGetSeekRangeStart()                                         = 0;
     virtual uint64_t HandleGetSeekRangeEnd()                                           = 0;
 
-    virtual void HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)             = 0;
-    virtual void HandlePause(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)            = 0;
-    virtual void HandleStop(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)             = 0;
-    virtual void HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)      = 0;
-    virtual void HandlePrevious(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)         = 0;
-    virtual void HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)           = 0;
+    virtual void HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)        = 0;
+    virtual void HandlePause(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)       = 0;
+    virtual void HandleStop(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)        = 0;
+    virtual void HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper) = 0;
+    virtual void HandlePrevious(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)    = 0;
+    virtual void HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)      = 0;
     virtual void HandleSkipBackward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
-                                    const uint64_t & deltaPositionMilliseconds)                           = 0;
+                                    const uint64_t & deltaPositionMilliseconds)                      = 0;
     virtual void HandleSkipForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
-                                   const uint64_t & deltaPositionMilliseconds)                            = 0;
-    virtual void HandleSeekRequest(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
-                                   const uint64_t & positionMilliseconds)                                 = 0;
-    virtual void HandleNext(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)             = 0;
-    virtual void HandleStartOverRequest(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper) = 0;
+                                   const uint64_t & deltaPositionMilliseconds)                       = 0;
+    virtual void HandleSeek(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+                            const uint64_t & positionMilliseconds)                                   = 0;
+    virtual void HandleNext(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)        = 0;
+    virtual void HandleStartOver(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)   = 0;
 
     virtual ~Delegate() = default;
 };

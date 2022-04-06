@@ -30,31 +30,74 @@
 namespace chip {
 namespace Controller {
 
+class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
+{
+public:
+    ApplicationBasicCluster() : ClusterBase(app::Clusters::ApplicationBasic::Id) {}
+    ~ApplicationBasicCluster() {}
+};
+
+class DLL_EXPORT ContentLauncherCluster : public ClusterBase
+{
+public:
+    ContentLauncherCluster() : ClusterBase(app::Clusters::ContentLauncher::Id) {}
+    ~ContentLauncherCluster() {}
+};
+
+class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
+{
+public:
+    GeneralCommissioningCluster() : ClusterBase(app::Clusters::GeneralCommissioning::Id) {}
+    ~GeneralCommissioningCluster() {}
+};
+
+class DLL_EXPORT KeypadInputCluster : public ClusterBase
+{
+public:
+    KeypadInputCluster() : ClusterBase(app::Clusters::KeypadInput::Id) {}
+    ~KeypadInputCluster() {}
+};
+
+class DLL_EXPORT ModeSelectCluster : public ClusterBase
+{
+public:
+    ModeSelectCluster() : ClusterBase(app::Clusters::ModeSelect::Id) {}
+    ~ModeSelectCluster() {}
+};
+
+class DLL_EXPORT OnOffCluster : public ClusterBase
+{
+public:
+    OnOffCluster() : ClusterBase(app::Clusters::OnOff::Id) {}
+    ~OnOffCluster() {}
+};
+
 class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
 {
 public:
     OperationalCredentialsCluster() : ClusterBase(app::Clusters::OperationalCredentials::Id) {}
     ~OperationalCredentialsCluster() {}
+};
 
-    // Cluster Commands
-    CHIP_ERROR AddNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan NOCValue,
-                      chip::ByteSpan ICACValue, chip::ByteSpan IPKValue, chip::NodeId caseAdminNode, uint16_t adminVendorId);
-    CHIP_ERROR AddTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                         chip::ByteSpan rootCertificate);
-    CHIP_ERROR AttestationRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  chip::ByteSpan attestationNonce);
-    CHIP_ERROR CertificateChainRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                       uint8_t certificateType);
-    CHIP_ERROR OpCSRRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                            chip::ByteSpan CSRNonce);
-    CHIP_ERROR RemoveFabric(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                            uint8_t fabricIndex);
-    CHIP_ERROR RemoveTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            chip::ByteSpan trustedRootIdentifier);
-    CHIP_ERROR UpdateFabricLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                 chip::CharSpan label);
-    CHIP_ERROR UpdateNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                         chip::ByteSpan NOCValue, chip::ByteSpan ICACValue);
+class DLL_EXPORT RelativeHumidityMeasurementCluster : public ClusterBase
+{
+public:
+    RelativeHumidityMeasurementCluster() : ClusterBase(app::Clusters::RelativeHumidityMeasurement::Id) {}
+    ~RelativeHumidityMeasurementCluster() {}
+};
+
+class DLL_EXPORT SwitchCluster : public ClusterBase
+{
+public:
+    SwitchCluster() : ClusterBase(app::Clusters::Switch::Id) {}
+    ~SwitchCluster() {}
+};
+
+class DLL_EXPORT TargetNavigatorCluster : public ClusterBase
+{
+public:
+    TargetNavigatorCluster() : ClusterBase(app::Clusters::TargetNavigator::Id) {}
+    ~TargetNavigatorCluster() {}
 };
 
 class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
@@ -62,6 +105,13 @@ class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
 public:
     TemperatureMeasurementCluster() : ClusterBase(app::Clusters::TemperatureMeasurement::Id) {}
     ~TemperatureMeasurementCluster() {}
+};
+
+class DLL_EXPORT ThermostatUserInterfaceConfigurationCluster : public ClusterBase
+{
+public:
+    ThermostatUserInterfaceConfigurationCluster() : ClusterBase(app::Clusters::ThermostatUserInterfaceConfiguration::Id) {}
+    ~ThermostatUserInterfaceConfigurationCluster() {}
 };
 
 } // namespace Controller

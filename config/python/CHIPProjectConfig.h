@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -53,14 +53,7 @@
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
 #define CHIP_CONFIG_REQUIRE_AUTH 1
 
-// Increase session idle timeout in stand-alone builds for the convenience of developers.
-#define CHIP_CONFIG_DEFAULT_SECURITY_SESSION_IDLE_TIMEOUT 120000
-
 #define CHIP_CONFIG_ENABLE_UPDATE 1
-
-#define CHIP_CONFIG_LEGACY_CASE_AUTH_DELEGATE 0
-
-#define CHIP_CONFIG_LEGACY_KEY_EXPORT_DELEGATE 0
 
 #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 0
 

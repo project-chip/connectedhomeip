@@ -96,7 +96,7 @@ typedef struct
     /**
      * Pointer to attribute metadata array for this cluster.
      */
-    EmberAfAttributeMetadata * attributes;
+    const EmberAfAttributeMetadata * attributes;
     /**
      * Total number of attributes
      */
@@ -117,6 +117,18 @@ typedef struct
      * if this cluster has no functions.
      */
     const EmberAfGenericClusterFunction * functions;
+
+    /**
+     * A list of client generated commands. A client generated command
+     * is a client to server command. Can be nullptr or terminated by 0xFFFF_FFFF.
+     */
+    const chip::CommandId * acceptedCommandList;
+
+    /**
+     * A list of server generated commands. A server generated command
+     * is a response to client command request. Can be nullptr or terminated by 0xFFFF_FFFF.
+     */
+    const chip::CommandId * generatedCommandList;
 } EmberAfCluster;
 
 /**
@@ -328,7 +340,7 @@ typedef struct
      * Pointer to the cluster structs, describing clusters on this
      * endpoint type.
      */
-    EmberAfCluster * cluster;
+    const EmberAfCluster * cluster;
     /**
      * Number of clusters in this endpoint type.
      */
@@ -383,17 +395,18 @@ typedef struct
      */
     uint8_t deviceVersion;
     /**
-     * Endpoint type for this endpoint.
-     */
-    EmberAfEndpointType * endpointType;
-    /**
-     * Network index for this endpoint.
-     */
-    uint8_t networkIndex;
-    /**
      * Meta-data about the endpoint
      */
     EmberAfEndpointBitmask bitmask;
+    /**
+     * Endpoint type for this endpoint.
+     */
+    const EmberAfEndpointType * endpointType;
+    /**
+     * Pointer to the DataVersion storage for the server clusters on this
+     * endpoint
+     */
+    chip::DataVersion * dataVersions;
 } EmberAfDefinedEndpoint;
 
 // Cluster specific types

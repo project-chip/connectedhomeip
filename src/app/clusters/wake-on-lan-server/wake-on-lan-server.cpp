@@ -30,10 +30,14 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
+#include <platform/CHIPDeviceConfig.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WakeOnLan;
+
+static constexpr size_t kWakeOnLanDelegateTableSize =
+    EMBER_AF_WAKE_ON_LAN_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -42,7 +46,7 @@ using chip::app::Clusters::WakeOnLan::Delegate;
 
 namespace {
 
-Delegate * gDelegateTable[EMBER_AF_WAKE_ON_LAN_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
+Delegate * gDelegateTable[kWakeOnLanDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
@@ -113,7 +117,7 @@ CHIP_ERROR WakeOnLanAttrAccess::Read(const app::ConcreteReadAttributePath & aPat
 
     switch (aPath.mAttributeId)
     {
-    case app::Clusters::WakeOnLan::Attributes::WakeOnLanMacAddress::Id: {
+    case app::Clusters::WakeOnLan::Attributes::MACAddress::Id: {
         return ReadMacAddressAttribute(aEncoder, delegate);
     }
     default: {

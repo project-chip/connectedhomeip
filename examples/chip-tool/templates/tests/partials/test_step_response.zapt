@@ -1,0 +1,42 @@
+{{~#*inline "maybeCheckClusterError"}}
+{{#if response.clusterError}}
+    VerifyOrReturn(CheckValue("clusterStatus", status.mClusterStatus.HasValue(), true));
+    VerifyOrReturn(CheckValue("clusterStatus", status.mClusterStatus.Value(), {{response.clusterError}}));
+{{/if}}
+{{/inline~}}
+
+{{~#*inline "maybeContinueWithoutWaitingOnDone"}}
+    {{~#if isWaitForReport}}shouldContinue = true;{{/if~}}
+    {{~#if (isTestOnlyCluster cluster)}}shouldContinue = true;{{/if~}}
+{{/inline~}}
+
+{{~#*inline "maybeReturnOnUnsupported"}}
+{{~#if optional}}
+    if (IsUnsupported(status.mStatus))
+    {
+        {{>maybeContinueWithoutWaitingOnDone}}
+        return;
+    }
+{{/if~}}
+{{/inline~}}
+
+{{! --- Test Step Response Content --}}
+{{#if response.error}}
+    VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), {{response.error}}));
+    {{>maybeCheckClusterError}}
+{{else}}
+    {{>maybeReturnOnUnsupported}}
+    VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), {{response.error}}));
+    {{#if hasSpecificResponse}}
+    {
+        {{asDecodableType}} value;
+        VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+        {{#chip_tests_item_response_parameters}}
+            {{>maybeCheckExpectedValue}}
+            {{>maybeCheckExpectedConstraints}}
+            {{>maybeSaveAs}}
+        {{/chip_tests_item_response_parameters}}
+    }
+    {{/if}}
+{{/if}}
+{{>maybeContinueWithoutWaitingOnDone}}

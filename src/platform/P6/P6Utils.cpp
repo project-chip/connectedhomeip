@@ -210,9 +210,9 @@ CHIP_ERROR P6Utils::GetWiFiSSID(char * buf, size_t bufSize)
     return P6Config::ReadConfigValueStr(P6Config::kConfigKey_WiFiSSID, buf, bufSize, num);
 }
 
-CHIP_ERROR P6Utils::StoreWiFiSSID(char * buf)
+CHIP_ERROR P6Utils::StoreWiFiSSID(char * buf, size_t size)
 {
-    return P6Config::WriteConfigValueStr(P6Config::kConfigKey_WiFiSSID, buf);
+    return P6Config::WriteConfigValueStr(P6Config::kConfigKey_WiFiSSID, buf, size);
 }
 
 CHIP_ERROR P6Utils::GetWiFiPassword(char * buf, size_t bufSize)
@@ -221,9 +221,9 @@ CHIP_ERROR P6Utils::GetWiFiPassword(char * buf, size_t bufSize)
     return P6Config::ReadConfigValueStr(P6Config::kConfigKey_WiFiPassword, buf, bufSize, num);
 }
 
-CHIP_ERROR P6Utils::StoreWiFiPassword(char * buf)
+CHIP_ERROR P6Utils::StoreWiFiPassword(char * buf, size_t size)
 {
-    return P6Config::WriteConfigValueStr(P6Config::kConfigKey_WiFiPassword, buf);
+    return P6Config::WriteConfigValueStr(P6Config::kConfigKey_WiFiPassword, buf, size);
 }
 
 CHIP_ERROR P6Utils::GetWiFiSecurityCode(uint32_t & security)
@@ -252,10 +252,10 @@ CHIP_ERROR P6Utils::p6_wifi_set_config(wifi_interface_t interface, wifi_config_t
     if (interface == WIFI_IF_STA)
     {
         /* Store Wi-Fi Configurations in Storage */
-        err = StoreWiFiSSID((char *) conf->sta.ssid);
+        err = StoreWiFiSSID((char *) conf->sta.ssid, strlen((char *) conf->sta.ssid));
         SuccessOrExit(err);
 
-        err = StoreWiFiPassword((char *) conf->sta.password);
+        err = StoreWiFiPassword((char *) conf->sta.password, strlen((char *) conf->sta.password));
         SuccessOrExit(err);
 
         err = StoreWiFiSecurityCode(conf->sta.security);
@@ -759,7 +759,7 @@ static int xtlv_size_for_data(int dlen, uint16_t opts, const uint8_t ** data)
 {
     int hsz;
     hsz = xtlv_hdr_size(opts, data);
-    return ((opts & XTLV_OPTION_ALIGN32) ? ALIGN_SIZE(dlen + hsz, 4) : (dlen + hsz));
+    return ((opts & XTLV_OPTION_ALIGN32) ? P6_ALIGN_SIZE(dlen + hsz, 4) : (dlen + hsz));
 }
 
 static int xtlv_len(const xtlv_t * elt, uint16_t opts)

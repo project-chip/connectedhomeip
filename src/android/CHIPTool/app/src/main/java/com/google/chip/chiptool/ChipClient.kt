@@ -24,6 +24,7 @@ import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCal
 import chip.platform.AndroidBleManager
 import chip.platform.AndroidChipPlatform
 import chip.platform.ChipMdnsCallbackImpl
+import chip.platform.DiagnosticDataProviderImpl
 import chip.platform.NsdManagerServiceResolver
 import chip.platform.PreferencesConfigurationManager
 import chip.platform.PreferencesKeyValueStoreManager
@@ -50,7 +51,7 @@ object ChipClient {
     if (!this::androidPlatform.isInitialized && context != null) {
       //force ChipDeviceController load jni
       ChipDeviceController.loadJni()
-      androidPlatform = AndroidChipPlatform(AndroidBleManager(), PreferencesKeyValueStoreManager(context), PreferencesConfigurationManager(context), NsdManagerServiceResolver(context), ChipMdnsCallbackImpl())
+      androidPlatform = AndroidChipPlatform(AndroidBleManager(), PreferencesKeyValueStoreManager(context), PreferencesConfigurationManager(context), NsdManagerServiceResolver(context), ChipMdnsCallbackImpl(), DiagnosticDataProviderImpl(context))
     }
     return androidPlatform
   }

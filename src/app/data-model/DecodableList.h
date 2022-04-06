@@ -20,6 +20,7 @@
 
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/FabricScoped.h>
 #include <lib/core/CHIPTLV.h>
 
 namespace chip {
@@ -39,6 +40,8 @@ class DecodableList
 public:
     DecodableList() { ClearReader(); }
 
+    static constexpr bool kIsFabricScoped = DataModel::IsFabricScoped<T>::value;
+
     /*
      * @brief
      *
@@ -56,6 +59,12 @@ public:
      */
     void ClearReader() { mReader.Init(nullptr, 0); }
 
+    template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
+    void SetFabricIndex(FabricIndex fabricIndex)
+    {
+        mFabricIndex.SetValue(fabricIndex);
+    }
+
     class Iterator
     {
     public:
@@ -67,7 +76,7 @@ public:
          * have a `kTLVType_NotSpecified` container type if there is
          * no list.
          */
-        Iterator(const TLV::TLVReader & reader)
+        Iterator(const TLV::TLVReader & reader, Optional<FabricIndex> fabricIndex) : mFabricIndex(fabricIndex)
         {
             mStatus = CHIP_NO_ERROR;
             mReader.Init(reader);
@@ -88,24 +97,23 @@ public:
          * this shall return false as well. The caller is expected to invoke GetStatus()
          * to retrieve the status of the operation.
          */
+        template <typename T0 = T, std::enable_if_t<!DataModel::IsFabricScoped<T0>::value, bool> = true>
         bool Next()
         {
-            if (mReader.GetContainerType() == TLV::kTLVType_NotSpecified)
+            return DoNext();
+        }
+
+        template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
+        bool Next()
+        {
+            bool hasNext = DoNext();
+
+            if (hasNext && mFabricIndex.HasValue())
             {
-                return false;
+                mValue.SetFabricIndex(mFabricIndex.Value());
             }
 
-            if (mStatus == CHIP_NO_ERROR)
-            {
-                mStatus = mReader.Next();
-            }
-
-            if (mStatus == CHIP_NO_ERROR)
-            {
-                mStatus = Decode(mReader, mValue);
-            }
-
-            return (mStatus == CHIP_NO_ERROR);
+            return hasNext;
         }
 
         /*
@@ -126,19 +134,49 @@ public:
             {
                 return CHIP_NO_ERROR;
             }
-            else
-            {
-                return mStatus;
-            }
+
+            return mStatus;
         }
 
     private:
+        bool DoNext()
+        {
+            if (mReader.GetContainerType() == TLV::kTLVType_NotSpecified)
+            {
+                return false;
+            }
+
+            if (mStatus == CHIP_NO_ERROR)
+            {
+                mStatus = mReader.Next();
+            }
+
+            if (mStatus == CHIP_NO_ERROR)
+            {
+                //
+                // Re-construct mValue to reset its state back to cluster object defaults.
+                // This is especially important when decoding successive list elements
+                // that do not contain all of the fields for a given struct because
+                // they are marked optional/fabric-sensitive. Without this re-construction,
+                // data from previous decode attempts will continue to linger and give
+                // an incorrect view of the state as seen from a client.
+                //
+                mValue  = T();
+                mStatus = DataModel::Decode(mReader, mValue);
+            }
+
+            return (mStatus == CHIP_NO_ERROR);
+        }
+
         T mValue;
         CHIP_ERROR mStatus;
         TLV::TLVReader mReader;
+        // TODO: Consider some setup where this field does not exist when T
+        // is not a fabric scoped struct.
+        const Optional<FabricIndex> mFabricIndex;
     };
 
-    Iterator begin() const { return Iterator(mReader); }
+    Iterator begin() const { return Iterator(mReader, mFabricIndex); }
 
     /*
      * Compute the size of the list. This can fail if the TLV is malformed. If
@@ -154,26 +192,24 @@ public:
             *size = 0;
             return CHIP_NO_ERROR;
         }
-        else
-        {
-            return mReader.CountRemainingInContainer(size);
-        }
+
+        return mReader.CountRemainingInContainer(size);
+    }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader)
+    {
+        VerifyOrReturnError(reader.GetType() == TLV::kTLVType_Array, CHIP_ERROR_SCHEMA_MISMATCH);
+        TLV::TLVType type;
+        ReturnErrorOnFailure(reader.EnterContainer(type));
+        SetReader(reader);
+        ReturnErrorOnFailure(reader.ExitContainer(type));
+        return CHIP_NO_ERROR;
     }
 
 private:
     TLV::TLVReader mReader;
+    chip::Optional<FabricIndex> mFabricIndex;
 };
-
-template <typename X>
-CHIP_ERROR Decode(TLV::TLVReader & reader, DecodableList<X> & x)
-{
-    VerifyOrReturnError(reader.GetType() == TLV::kTLVType_Array, CHIP_ERROR_SCHEMA_MISMATCH);
-    TLV::TLVType type;
-    ReturnErrorOnFailure(reader.EnterContainer(type));
-    x.SetReader(reader);
-    ReturnErrorOnFailure(reader.ExitContainer(type));
-    return CHIP_NO_ERROR;
-}
 
 } // namespace DataModel
 } // namespace app

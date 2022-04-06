@@ -34,11 +34,6 @@
 #include <app/clusters/media-playback-server/media-playback-delegate.h>
 #include <app/clusters/target-navigator-server/target-navigator-delegate.h>
 #include <app/util/attribute-storage.h>
-#include <functional>
-#include <list>
-#include <stdbool.h>
-#include <stdint.h>
-#include <string>
 
 namespace chip {
 namespace AppPlatform {

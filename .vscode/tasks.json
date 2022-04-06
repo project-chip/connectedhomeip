@@ -135,6 +135,16 @@
             }
         },
         {
+            "label": "Build i.MX Linux examples",
+            "type": "shell",
+            "command": "./scripts/examples/imxlinux_example.sh ${input:imxExampleTarget} out/aarch64",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": ["relative", "${workspaceFolder}/out/aarch64/"]
+            }
+        },
+        {
             "label": "Run Mbed Application",
             "type": "shell",
             "command": "scripts/examples/mbed_example.sh",
@@ -234,6 +244,17 @@
         },
         {
             "type": "pickString",
+            "id": "imxExampleTarget",
+            "description": "What example application type do you want to build?",
+            "options": [
+                "examples/chip-tool",
+                "examples/lighting-app/linux",
+                "examples/thermostat/linux"
+            ],
+            "default": "examples/chip-tool"
+        },
+        {
+            "type": "pickString",
             "id": "exampleTarget",
             "description": "What target to build",
             "options": [
@@ -280,6 +301,14 @@
                 "efr32-brd4186a-unit-test",
                 "efr32-brd4187a-unit-test",
                 "efr32-brd4304a-unit-test",
+                "efr32-brd4161a-switch",
+                "efr32-brd4163a-switch",
+                "efr32-brd4164a-switch",
+                "efr32-brd4166a-switch",
+                "efr32-brd4170a-switch",
+                "efr32-brd4186a-switch",
+                "efr32-brd4187a-switch",
+                "efr32-brd4304a-switch",
                 "efr32-brd4161a-window-covering",
                 "efr32-brd4163a-window-covering",
                 "efr32-brd4164a-window-covering",

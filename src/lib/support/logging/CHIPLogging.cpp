@@ -36,6 +36,28 @@
 
 #include <atomic>
 
+#if CHIP_PW_TOKENIZER_LOGGING
+
+extern "C" void pw_tokenizer_HandleEncodedMessageWithPayload(uintptr_t levels, const uint8_t encoded_message[], size_t size_bytes)
+{
+    uint8_t log_category = levels >> 8 & 0xFF;
+    uint8_t log_module   = levels & 0xFF;
+    char * buffer        = (char *) malloc(2 * size_bytes + 1);
+
+    if (buffer)
+    {
+        for (int i = 0; i < size_bytes; i++)
+        {
+            sprintf(buffer + 2 * i, "%02x", encoded_message[i]);
+        }
+        buffer[2 * size_bytes] = '\0';
+        chip::Logging::Log(log_module, log_category, "%s", buffer);
+        free(buffer);
+    }
+}
+
+#endif
+
 namespace chip {
 namespace Logging {
 
@@ -44,8 +66,6 @@ namespace Logging {
 namespace {
 
 std::atomic<LogRedirectCallback_t> sLogRedirectCallback{ nullptr };
-
-}
 
 /*
  * Array of strings containing the names for each of the chip log
@@ -57,56 +77,64 @@ std::atomic<LogRedirectCallback_t> sLogRedirectCallback{ nullptr };
  *       necessary.
  *
  */
-static const char ModuleNames[] = "-\0\0" // None
-                                  "IN\0"  // Inet
-                                  "BLE"   // BLE
-                                  "ML\0"  // MessageLayer
-                                  "SM\0"  // SecurityManager
-                                  "EM\0"  // ExchangeManager
-                                  "TLV"   // TLV
-                                  "ASN"   // ASN1
-                                  "CR\0"  // Crypto
-                                  "CTL"   // Controller
-                                  "AL\0"  // Alarm
-                                  "SC\0"  // SecureChannel
-                                  "BDX"   // BulkDataTransfer
-                                  "DMG"   // DataManagement
-                                  "DC\0"  // DeviceControl
-                                  "DD\0"  // DeviceDescription
-                                  "ECH"   // Echo
-                                  "FP\0"  // FabricProvisioning
-                                  "NP\0"  // NetworkProvisioning
-                                  "SD\0"  // ServiceDirectory
-                                  "SP\0"  // ServiceProvisioning
-                                  "SWU"   // SoftwareUpdate
-                                  "TP\0"  // TokenPairing
-                                  "TS\0"  // TimeServices
-                                  "HB\0"  // Heartbeat
-                                  "CSL"   // chipSystemLayer
-                                  "EVL"   // Event Logging
-                                  "SPT"   // Support
-                                  "TOO"   // chipTool
-                                  "ZCL"   // Zcl
-                                  "SH\0"  // Shell
-                                  "DL\0"  // DeviceLayer
-                                  "SPL"   // SetupPayload
-                                  "SVR"   // AppServer
-                                  "DIS"   // Discovery
-                                  "IM\0"  // InteractionModel
-                                  "TST"   // Test
-                                  "ODP"   // OperationalDeviceProxy
-                                  "ATM"   // Automation
+const char ModuleNames[] = "-\0\0" // None
+                           "IN\0"  // Inet
+                           "BLE"   // BLE
+                           "ML\0"  // MessageLayer
+                           "SM\0"  // SecurityManager
+                           "EM\0"  // ExchangeManager
+                           "TLV"   // TLV
+                           "ASN"   // ASN1
+                           "CR\0"  // Crypto
+                           "CTL"   // Controller
+                           "AL\0"  // Alarm
+                           "SC\0"  // SecureChannel
+                           "BDX"   // BulkDataTransfer
+                           "DMG"   // DataManagement
+                           "DC\0"  // DeviceControl
+                           "DD\0"  // DeviceDescription
+                           "ECH"   // Echo
+                           "FP\0"  // FabricProvisioning
+                           "NP\0"  // NetworkProvisioning
+                           "SD\0"  // ServiceDirectory
+                           "SP\0"  // ServiceProvisioning
+                           "SWU"   // SoftwareUpdate
+                           "TP\0"  // TokenPairing
+                           "TS\0"  // TimeServices
+                           "HB\0"  // Heartbeat
+                           "CSL"   // chipSystemLayer
+                           "EVL"   // Event Logging
+                           "SPT"   // Support
+                           "TOO"   // chipTool
+                           "ZCL"   // Zcl
+                           "SH\0"  // Shell
+                           "DL\0"  // DeviceLayer
+                           "SPL"   // SetupPayload
+                           "SVR"   // AppServer
+                           "DIS"   // Discovery
+                           "IM\0"  // InteractionModel
+                           "TST"   // Test
+                           "ODP"   // OperationalDeviceProxy
+                           "ATM"   // Automation
+                           "CSM"   // CASESessionManager
     ;
 
 #define ModuleNamesCount ((sizeof(ModuleNames) - 1) / chip::Logging::kMaxModuleNameLen)
 
-void GetModuleName(char * buf, uint8_t bufSize, uint8_t module)
+void GetModuleName(char (&buf)[chip::Logging::kMaxModuleNameLen + 1], uint8_t module)
 {
-    const char * moduleNamePtr = ModuleNames + ((module < ModuleNamesCount) ? module * chip::Logging::kMaxModuleNameLen : 0);
 
-    snprintf(buf, bufSize, "%s", moduleNamePtr);
-    buf[chip::Logging::kMaxModuleNameLen] = 0;
+    const char * module_name = ModuleNames;
+    if (module < ModuleNamesCount)
+    {
+        module_name += module * chip::Logging::kMaxModuleNameLen;
+    }
+
+    memcpy(buf, module_name, chip::Logging::kMaxModuleNameLen);
+    buf[chip::Logging::kMaxModuleNameLen] = 0; // ensure null termination
 }
+
+} // namespace
 
 void SetLogRedirectCallback(LogRedirectCallback_t callback)
 {
@@ -183,7 +211,7 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list args)
     }
 
     char moduleName[chip::Logging::kMaxModuleNameLen + 1];
-    GetModuleName(moduleName, sizeof(moduleName), module);
+    GetModuleName(moduleName, module);
 
     LogRedirectCallback_t redirect = sLogRedirectCallback.load();
 

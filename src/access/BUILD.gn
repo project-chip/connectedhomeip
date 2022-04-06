@@ -26,6 +26,8 @@ static_library("access") {
     "SubjectDescriptor.h",
     "examples/ExampleAccessControlDelegate.cpp",
     "examples/ExampleAccessControlDelegate.h",
+    "examples/PermissiveAccessControlDelegate.cpp",
+    "examples/PermissiveAccessControlDelegate.h",
   ]
 
   cflags = [ "-Wconversion" ]

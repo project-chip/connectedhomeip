@@ -165,30 +165,30 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
     return CHIP_ERROR_INVALID_TIME;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
 {
-    bootReason = BootReasonType::Unspecified;
+    bootReason = BootReasonType::kUnspecified;
     uint8_t reason;
     reason = static_cast<uint8_t>(esp_reset_reason());
     if (reason == ESP_RST_UNKNOWN)
     {
-        bootReason = BootReasonType::Unspecified;
+        bootReason = BootReasonType::kUnspecified;
     }
     else if (reason == ESP_RST_POWERON)
     {
-        bootReason = BootReasonType::PowerOnReboot;
+        bootReason = BootReasonType::kPowerOnReboot;
     }
     else if (reason == ESP_RST_BROWNOUT)
     {
-        bootReason = BootReasonType::BrownOutReset;
+        bootReason = BootReasonType::kBrownOutReset;
     }
     else if (reason == ESP_RST_SW)
     {
-        bootReason = BootReasonType::SoftwareReset;
+        bootReason = BootReasonType::kSoftwareReset;
     }
     else if (reason == ESP_RST_INT_WDT)
     {
-        bootReason = BootReasonType::SoftwareWatchdogReset;
+        bootReason = BootReasonType::kSoftwareWatchdogReset;
         /* Reboot can be due to hardware or software watchdog*/
     }
     return CHIP_NO_ERROR;
@@ -210,10 +210,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             strncpy(ifp->Name, esp_netif_get_ifkey(ifa), Inet::InterfaceId::kMaxIfNameLength);
             ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
             ifp->name                                          = CharSpan::fromCharString(ifp->Name);
-            ifp->fabricConnected                               = true;
+            ifp->isOperational                                 = true;
             ifp->type                                          = GetInterfaceType(esp_netif_get_desc(ifa));
-            ifp->offPremiseServicesReachableIPv4               = false;
-            ifp->offPremiseServicesReachableIPv6               = false;
+            ifp->offPremiseServicesReachableIPv4.SetNull();
+            ifp->offPremiseServicesReachableIPv6.SetNull();
             if (esp_netif_get_mac(ifa, ifp->MacAddress) != ESP_OK)
             {
                 ChipLogError(DeviceLayer, "Failed to get network hardware address");

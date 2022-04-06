@@ -26,8 +26,9 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <openthread-system.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include <platform/nxp/k32w/k32w0/DiagnosticDataProviderImpl.h>
 
 #include <lwip/tcpip.h>
@@ -35,11 +36,47 @@
 #include <openthread/platform/entropy.h>
 
 #include "K32W061.h"
+#include "MemManager.h"
+#include "RNG_Interface.h"
+#include "TimersManager.h"
+#include "fsl_sha.h"
+#include "k32w0-chip-mbedtls-config.h"
 
 namespace chip {
 namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
+
+CHIP_ERROR PlatformManagerImpl::InitBoardFwk(void)
+{
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    char initString[] = "app";
+    char * argv[1]    = { 0 };
+    argv[0]           = &initString[0];
+
+    SHA_ClkInit(SHA_INSTANCE);
+
+    if (MEM_Init() != MEM_SUCCESS_c)
+    {
+        err = CHIP_ERROR_NO_MEMORY;
+        goto exit;
+    }
+
+    if (RNG_Init() != gRngSuccess_d)
+    {
+        err = CHIP_ERROR_RANDOM_DATA_UNAVAILABLE;
+        goto exit;
+    }
+    RNG_SetPseudoRandomNoSeed(NULL);
+
+    TMR_Init();
+
+    /* Used for OT initializations */
+    otSysInit(1, argv);
+
+exit:
+    return err;
+}
 
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
@@ -56,13 +93,15 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
-    CHIP_ERROR err;
+    uint32_t chipType;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Initialize the configuration system.
     err = Internal::K32WConfig::Init();
     SuccessOrExit(err);
 
-    if (Chip_GetType() != CHIP_K32W061)
+    chipType = Chip_GetType();
+    if ((chipType != CHIP_K32W061) && (chipType != CHIP_K32W041) && (chipType != CHIP_K32W041A) && (chipType != CHIP_K32W041AM))
     {
         err = CHIP_ERROR_INTERNAL;
         ChipLogError(DeviceLayer, "Invalid chip type, expected K32W061");

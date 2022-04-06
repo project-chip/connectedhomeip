@@ -28,10 +28,8 @@
 
 #include <app/CommandSender.h>
 #include <app/DeviceProxy.h>
-#include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/attribute-filter.h>
 #include <app/util/basic-types.h>
-#include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <lib/core/CHIPCallback.h>
@@ -41,7 +39,6 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <protocols/secure_channel/SessionIDAllocator.h>
 #include <transport/SessionHolder.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
@@ -71,19 +68,16 @@ struct ControllerDeviceInitParams
     Messaging::ExchangeManager * exchangeMgr                      = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
     PersistentStorageDelegate * storageDelegate                   = nullptr;
-    SessionIDAllocator * idAllocator                              = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
     FabricTable * fabricsTable = nullptr;
-
-    Controller::DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
 };
 
 class CommissioneeDeviceProxy : public DeviceProxy, public SessionReleaseDelegate
 {
 public:
-    ~CommissioneeDeviceProxy();
+    ~CommissioneeDeviceProxy() override;
     CommissioneeDeviceProxy() : mSecureSession(*this) {}
     CommissioneeDeviceProxy(const CommissioneeDeviceProxy &) = delete;
 
@@ -124,8 +118,6 @@ public:
         mExchangeMgr        = params.exchangeMgr;
         mUDPEndPointManager = params.udpEndPointManager;
         mFabricIndex        = fabric;
-        mIDAllocator        = params.idAllocator;
-        mpIMDelegate        = params.imDelegate;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -161,8 +153,6 @@ public:
      *   Called when the associated session is released
      *
      *   The receiver should release all resources associated with the connection.
-     *
-     * @param session A handle to the secure session
      */
     void OnSessionReleased() override;
 
@@ -213,6 +203,7 @@ public:
     NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
     PeerId GetPeerId() const { return mPeerId; }
     CHIP_ERROR SetPeerId(ByteSpan rcac, ByteSpan noc) override;
+    const Transport::PeerAddress & GetPeerAddress() const { return mDeviceAddress; }
 
     bool MatchesSession(const SessionHandle & session) const { return mSecureSession.Contains(session); }
 
@@ -233,7 +224,7 @@ public:
         return LoadSecureSessionParametersIfNeeded(loadedSecureSession);
     };
 
-    Controller::DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() override { return mpIMDelegate; };
+    Transport::Type GetDeviceTransportType() const { return mDeviceAddress.GetTransportType(); }
 
 private:
     enum class ConnectionState
@@ -273,8 +264,6 @@ private:
 
     SessionHolderWithDelegate mSecureSession;
 
-    Controller::DeviceControllerInteractionModelDelegate * mpIMDelegate = nullptr;
-
     uint8_t mSequenceNumber = 0;
 
     /**
@@ -296,8 +285,6 @@ private:
     CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
 
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
-
-    SessionIDAllocator * mIDAllocator = nullptr;
 };
 
 } // namespace chip

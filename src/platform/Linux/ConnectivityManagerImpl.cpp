@@ -18,6 +18,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <platform/CommissionableDataProvider.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Linux/ConnectivityUtils.h>
@@ -42,15 +43,15 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include <platform/internal/GenericConnectivityManagerImpl_BLE.cpp>
+#include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <platform/internal/GenericConnectivityManagerImpl_Thread.cpp>
+#include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-#include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
+#include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 #endif
 
 #ifndef CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD
@@ -282,7 +283,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
         ChipLogProgress(DeviceLayer, "WiFi AP mode change: %s -> %s", WiFiAPModeToStr(mWiFiAPMode), WiFiAPModeToStr(val));
         mWiFiAPMode = val;
 
-        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
+        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, nullptr);
     }
 
 exit:
@@ -295,7 +296,7 @@ void ConnectivityManagerImpl::_DemandStartWiFiAP()
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand start WiFi AP");
         mLastAPDemandTime = System::SystemClock().GetMonotonicTimestamp();
-        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
+        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, nullptr);
     }
     else
     {
@@ -309,7 +310,7 @@ void ConnectivityManagerImpl::_StopOnDemandWiFiAP()
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand stop WiFi AP");
         mLastAPDemandTime = System::Clock::kZero;
-        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
+        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, nullptr);
     }
     else
     {
@@ -331,7 +332,33 @@ void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP()
 void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
 {
     mWiFiAPIdleTimeout = val;
-    DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
+    DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, nullptr);
+}
+
+void ConnectivityManagerImpl::UpdateNetworkStatus()
+{
+    Network configuredNetwork;
+
+    VerifyOrReturn(IsWiFiStationEnabled() && mpStatusChangeCallback != nullptr);
+
+    CHIP_ERROR err = GetConfiguredNetwork(configuredNetwork);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to get configured network when updating network status: %s", err.AsString());
+        return;
+    }
+
+    // If we have already connected to the WiFi AP, then return null to indicate a success state.
+    if (IsWiFiStationConnected())
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(
+            Status::kSuccess, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)), NullOptional);
+        return;
+    }
+
+    mpStatusChangeCallback->OnNetworkingStatusChange(
+        Status::kUnknownError, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)),
+        MakeOptional(GetDisconnectReason()));
 }
 
 void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * changed_properties,
@@ -399,6 +426,8 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
                         delegate->OnAssociationFailureDetected(associationFailureCause, status);
                     }
 
+                    DeviceLayer::SystemLayer().ScheduleLambda([]() { ConnectivityMgrImpl().UpdateNetworkStatus(); });
+
                     mAssociattionStarted = false;
                 }
                 else if (g_strcmp0(value_str, "\'associated\'") == 0)
@@ -407,6 +436,8 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
                     {
                         delegate->OnConnectionStatusChanged(static_cast<uint8_t>(WiFiConnectionStatus::kNotConnected));
                     }
+
+                    DeviceLayer::SystemLayer().ScheduleLambda([]() { ConnectivityMgrImpl().UpdateNetworkStatus(); });
                 }
             }
 
@@ -447,6 +478,15 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object,
 
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_NOT_CONNECTED;
     }
+
+    // We need to stop auto scan or it will block our network scan.
+    DeviceLayer::SystemLayer().ScheduleLambda([]() {
+        CHIP_ERROR errInner = StopAutoScan();
+        if (errInner != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "wpa_supplicant: Failed to stop auto scan: %s", ErrorStr(errInner));
+        }
+    });
 
     if (err != nullptr)
         g_error_free(err);
@@ -644,17 +684,6 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncRe
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_NOT_CONNECTED;
     }
 
-    // We need to stop auto scan or it will block our network scan.
-    DeviceLayer::SystemLayer().ScheduleLambda([]() {
-        std::lock_guard<std::mutex> innerLock(mWpaSupplicantMutex);
-        ChipLogDetail(DeviceLayer, "Disabling auto scan");
-        CHIP_ERROR errInner = StopAutoScan();
-        if (errInner != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "Failed to stop auto scan");
-        }
-    });
-
     if (err != nullptr)
         g_error_free(err);
 }
@@ -729,7 +758,7 @@ void ConnectivityManagerImpl::DriveAPState()
                 // Compute the amount of idle time before the AP should be deactivated and
                 // arm a timer to fire at that time.
                 System::Clock::Timeout apTimeout = (mLastAPDemandTime + mWiFiAPIdleTimeout) - now;
-                err                              = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, NULL);
+                err                              = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, nullptr);
                 SuccessOrExit(err);
                 ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " s",
                                 std::chrono::duration_cast<System::Clock::Seconds32>(apTimeout).count());
@@ -807,7 +836,7 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
 
     channel = ConnectivityUtils::MapChannelToFrequency(kWiFi_BAND_2_4_GHZ, CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL);
 
-    if (ConfigurationMgr().GetSetupDiscriminator(discriminator) != CHIP_NO_ERROR)
+    if (GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator) != CHIP_NO_ERROR)
         discriminator = 0;
 
     snprintf(ssid, 32, "%s%04u", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX, discriminator);
@@ -985,7 +1014,7 @@ void ConnectivityManagerImpl::_ConnectWiFiNetworkAsyncCallback(GObject * source_
             DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
                 if (mpConnectCallback != nullptr)
                 {
-                    // TODO: Replace this with actual thread attach result.
+                    // TODO(#14175): Replace this with actual thread attach result.
                     this_->mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), 0);
                     this_->mpConnectCallback = nullptr;
                 }
@@ -997,7 +1026,7 @@ void ConnectivityManagerImpl::_ConnectWiFiNetworkAsyncCallback(GObject * source_
             DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
                 if (this_->mpConnectCallback != nullptr)
                 {
-                    // TODO: Replace this with actual thread attach result.
+                    // TODO(#14175): Replace this with actual thread attach result.
                     this_->mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
                     this_->mpConnectCallback = nullptr;
                 }
@@ -1278,12 +1307,29 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(uint8_t & wiFiVersion)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::GetConnectedNetwork(NetworkCommissioning::Network & network)
+int32_t ConnectivityManagerImpl::GetDisconnectReason()
+{
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+    std::unique_ptr<GError, GErrorDeleter> err;
+
+    gint errorValue = wpa_fi_w1_wpa_supplicant1_interface_get_disconnect_reason(mWpaSupplicant.iface);
+    // wpa_supplicant DBus API: DisconnectReason: The most recent IEEE 802.11 reason code for disconnect. Negative value
+    // indicates locally generated disconnection.
+    return errorValue;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::GetConfiguredNetwork(NetworkCommissioning::Network & network)
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     std::unique_ptr<GError, GErrorDeleter> err;
 
     const gchar * networkPath = wpa_fi_w1_wpa_supplicant1_interface_get_current_network(mWpaSupplicant.iface);
+
+    // wpa_supplicant DBus API: if network path of current network is "/", means no networks is currently selected.
+    if (strcmp(networkPath, "/") == 0)
+    {
+        return CHIP_ERROR_KEY_NOT_FOUND;
+    }
 
     std::unique_ptr<WpaFiW1Wpa_supplicant1Network, GObjectDeleter> networkInfo(
         wpa_fi_w1_wpa_supplicant1_network_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE,
@@ -1312,9 +1358,14 @@ CHIP_ERROR ConnectivityManagerImpl::GetConnectedNetwork(NetworkCommissioning::Ne
 
 CHIP_ERROR ConnectivityManagerImpl::StopAutoScan()
 {
-    std::unique_ptr<GError, GErrorDeleter> err;
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+    VerifyOrReturnError(mWpaSupplicant.iface != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+    std::unique_ptr<GError, GErrorDeleter> err;
     gboolean result;
+
+    ChipLogDetail(DeviceLayer, "wpa_supplicant: disabling auto scan");
+
     result = wpa_fi_w1_wpa_supplicant1_interface_call_auto_scan_sync(
         mWpaSupplicant.iface, "" /* empty string means disabling auto scan */, nullptr, &MakeUniquePointerReceiver(err).Get());
     if (!result)
@@ -1590,7 +1641,7 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
     auto bandInfo   = GetBandAndChannelFromFrequency(frequency);
     result.wiFiBand = bandInfo.first;
     result.channel  = bandInfo.second;
-    result.security = GetNetworkSecurityType(bssProxy);
+    result.security.SetRaw(GetNetworkSecurityType(bssProxy));
 
     return true;
 }

@@ -29,7 +29,7 @@ namespace app {
 CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
+    int tagPresenceMask = 0;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("ReadRequestMessage =");
@@ -46,8 +46,8 @@ CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
         {
         case to_underlying(Tag::kAttributeRequests):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kAttributeRequests))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kAttributeRequests));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kAttributeRequests))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kAttributeRequests));
             {
                 AttributePathIBs::Parser attributeRequests;
                 ReturnErrorOnFailure(attributeRequests.Init(reader));
@@ -59,8 +59,8 @@ CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kDataVersionFilters):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEventFilters))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kDataVersionFilters));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kDataVersionFilters))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kDataVersionFilters));
             {
                 DataVersionFilterIBs::Parser dataVersionFilters;
                 ReturnErrorOnFailure(dataVersionFilters.Init(reader));
@@ -72,8 +72,8 @@ CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kEventRequests):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEventRequests))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kEventRequests));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kEventRequests))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kEventRequests));
             {
                 EventPathIBs::Parser eventRequests;
                 ReturnErrorOnFailure(eventRequests.Init(reader));
@@ -85,8 +85,8 @@ CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kEventFilters):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEventFilters))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kEventFilters));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kEventFilters))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kEventFilters));
             {
                 EventFilterIBs::Parser eventFilters;
                 ReturnErrorOnFailure(eventFilters.Init(reader));
@@ -98,8 +98,8 @@ CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kIsFabricFiltered):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kIsFabricFiltered))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kIsFabricFiltered));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kIsFabricFiltered))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kIsFabricFiltered));
 #if CHIP_DETAIL_LOGGING
             {
                 bool isFabricFiltered;
@@ -107,6 +107,9 @@ CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
                 PRETTY_PRINT("\tisFabricFiltered = %s, ", isFabricFiltered ? "true" : "false");
             }
 #endif // CHIP_DETAIL_LOGGING
+            break;
+        case kInteractionModelRevisionTag:
+            ReturnErrorOnFailure(MessageParser::CheckInteractionModelRevision(reader));
             break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
@@ -121,7 +124,7 @@ CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
     {
         const int RequiredFields = (1 << to_underlying(Tag::kIsFabricFiltered));
 
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
+        if ((tagPresenceMask & RequiredFields) == RequiredFields)
         {
             err = CHIP_NO_ERROR;
         }
@@ -221,7 +224,14 @@ ReadRequestMessage::Builder & ReadRequestMessage::Builder::IsFabricFiltered(cons
 
 ReadRequestMessage::Builder & ReadRequestMessage::Builder::EndOfReadRequestMessage()
 {
-    EndOfContainer();
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = MessageBuilder::EncodeInteractionModelRevision();
+    }
+    if (mError == CHIP_NO_ERROR)
+    {
+        EndOfContainer();
+    }
     return *this;
 }
 } // namespace app

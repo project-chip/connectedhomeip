@@ -33,10 +33,10 @@ using namespace Messaging;
 CHIP_ERROR TimedRequest::Send(ExchangeContext * aExchangeContext, uint16_t aTimeoutMs)
 {
     // The payload is an anonymous struct (2 bytes) containing a single
-    // 16-bit integer with a context tag (1 control byte, 1 byte tag, at
-    // most 2 bytes for the integer).  Use MessagePacketBuffer::New to
-    // account for other message-global overheads (MIC, etc).
-    System::PacketBufferHandle payload = MessagePacketBuffer::New(6);
+    // 16-bit integer with two context tag (1 control byte, 1 byte tag, at
+    // most 2 bytes for the timeout integer and 1 control byte, 1 byte tag, one byte for InteractionModelRevision).  Use
+    // MessagePacketBuffer::New to account for other message-global overheads (MIC, etc).
+    System::PacketBufferHandle payload = MessagePacketBuffer::New(9);
     VerifyOrReturnError(!payload.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     System::PacketBufferTLVWriter writer;

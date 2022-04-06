@@ -103,7 +103,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
     return CHIP_ERROR_INVALID_TIME;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
 {
     uint32_t reason = 0;
 
@@ -112,7 +112,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
     if (err == CHIP_NO_ERROR)
     {
         VerifyOrReturnError(reason <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-        bootReason = static_cast<uint8_t>(reason);
+        bootReason = static_cast<BootReasonType>(reason);
     }
 
     return err;
@@ -137,14 +137,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             strncpy(ifp->Name, ifa->name, Inet::InterfaceId::kMaxIfNameLength);
             ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
 
-            ifp->name            = CharSpan::fromCharString(ifp->Name);
-            ifp->fabricConnected = true;
+            ifp->name          = CharSpan::fromCharString(ifp->Name);
+            ifp->isOperational = true;
             if ((ifa->flags) & NETIF_FLAG_ETHERNET)
                 ifp->type = EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
             else
                 ifp->type = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
-            ifp->offPremiseServicesReachableIPv4 = false;
-            ifp->offPremiseServicesReachableIPv6 = false;
+            ifp->offPremiseServicesReachableIPv4.SetNull();
+            ifp->offPremiseServicesReachableIPv6.SetNull();
 
             memcpy(ifp->MacAddress, ifa->hwaddr, sizeof(ifa->hwaddr));
 
@@ -156,6 +156,20 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             {
                 // Set 48-bit IEEE MAC Address
                 ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
+            }
+
+            if (ifa->ip_addr.u_addr.ip4.addr != 0)
+            {
+                memcpy(ifp->Ipv4AddressesBuffer[0], &(ifa->ip_addr.u_addr.ip4.addr), kMaxIPv4AddrSize);
+                ifp->Ipv4AddressSpans[0] = ByteSpan(ifp->Ipv4AddressesBuffer[0], kMaxIPv4AddrSize);
+                ifp->IPv4Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, 1);
+            }
+
+            if (ifa->ip6_addr->u_addr.ip6.addr != 0)
+            {
+                memcpy(ifp->Ipv6AddressesBuffer[0], &(ifa->ip6_addr->u_addr.ip6.addr), kMaxIPv6AddrSize);
+                ifp->Ipv6AddressSpans[0] = ByteSpan(ifp->Ipv6AddressesBuffer[0], kMaxIPv6AddrSize);
+                ifp->IPv6Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, 1);
             }
 
             ifp->Next = head;
@@ -338,6 +352,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & pa
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCount)
 {
     overrunCount = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
+{
     return CHIP_NO_ERROR;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI

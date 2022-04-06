@@ -17,10 +17,10 @@ name: Docker CHIP images
 on:
     push:
         paths:
-            - 'integrations/docker/images/**'
+            - "integrations/docker/images/**"
     pull_request:
         paths:
-            - 'integrations/docker/images/**'
+            - "integrations/docker/images/**"
     workflow_dispatch:
 
 jobs:
@@ -47,13 +47,20 @@ jobs:
                     - "-mbed-os"
                     - "-nrf-platform"
                     - "-telink"
+                    - "-ti"
                     - "-tizen"
                     # NOTE: vscode image consumes ~52 GB disk space but GitHub-hosted runners provide ~10 GB free disk space(https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources)
                     #- "-vscode"
                     - "-zap"
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
+              with:
+                  action: actions/checkout@v3
+                  with: |
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
             - name: Build All images using project bash script
               run: |
                   cd integrations/docker/images/chip-build${{ matrix.img }}
@@ -64,4 +71,3 @@ jobs:
                   # NOTE: This task validates the images built previously with latest tag
                   image: connectedhomeip/chip-build${{ matrix.img }}:latest
                   annotations: true
-

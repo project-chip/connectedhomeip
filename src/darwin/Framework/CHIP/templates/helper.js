@@ -25,50 +25,6 @@ const ChipTypesHelper = require('../../../../../src/app/zap-templates/common/Chi
 const StringHelper    = require('../../../../../src/app/zap-templates/common/StringHelper.js');
 const appHelper       = require('../../../../../src/app/zap-templates/templates/app/helper.js');
 
-// Ideally those clusters clusters endpoints should be retrieved from the
-// descriptor cluster.
-function asExpectedEndpointForCluster(clusterName)
-{
-  switch (clusterName) {
-  case 'AccessControl':
-  case 'AdministratorCommissioning':
-  case 'Basic':
-  case 'Descriptor':
-  case 'DiagnosticLogs':
-  case 'GeneralCommissioning':
-  case 'GeneralDiagnostics':
-  case 'LocalizationConfiguration':
-  case 'SoftwareDiagnostics':
-  case 'ThreadNetworkDiagnostics':
-  case 'EthernetNetworkDiagnostics':
-  case 'WiFiNetworkDiagnostics':
-  case 'GroupKeyManagement':
-  case 'NetworkCommissioning':
-  case 'OperationalCredentials':
-  case 'TimeFormatLocalization':
-  case 'TrustedRootCertificates':
-  case 'OtaSoftwareUpdateProvider':
-  case 'OtaSoftwareUpdateRequestor':
-  case 'PowerSourceConfiguration':
-  case 'UnitLocalization':
-    return 0;
-  }
-  return 1;
-}
-
-function asTestValue()
-{
-  if (StringHelper.isOctetString(this.type)) {
-    return `[@"${"Test".substring(0, this.maxLength)}" dataUsingEncoding:NSUTF8StringEncoding]`;
-  } else if (StringHelper.isCharString(this.type)) {
-    return `@"${"Test".substring(0, this.maxLength)}"`;
-  } else if (this.isArray) {
-    return '[NSArray array]';
-  } else {
-    return `@(${this.min || this.max || 0})`;
-  }
-}
-
 function asObjectiveCBasicType(type, options)
 {
   if (StringHelper.isOctetString(type)) {
@@ -121,11 +77,6 @@ function asObjectiveCNumberType(label, type, asLowerCased)
 
   const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
   return templateUtil.templatePromise(this.global, promise)
-}
-
-function asTestIndex(index)
-{
-  return index.toString().padStart(6, 0);
 }
 
 async function asObjectiveCClass(type, cluster, options)
@@ -194,16 +145,65 @@ function commandHasRequiredField(command)
   return command.arguments.some(arg => !arg.isOptional);
 }
 
+/**
+ * Produce a reasonable name for an Objective C enum for the given cluster name
+ * and enum label.  Because a lot of our enum labels already have the cluster
+ * name prefixed (e.g. NetworkCommissioning*, or the IdentifyIdentifyType that
+ * has it prefixed _twice_) just concatenating the two gives overly verbose
+ * names in a few cases (e.g. "IdentifyIdentifyIdentifyType").
+ *
+ * This function strips out the redundant cluster names, and strips off trailing
+ * "Enum" bits on the enum names while we're here.
+ */
+function objCEnumName(clusterName, enumLabel)
+{
+  clusterName = appHelper.asUpperCamelCase(clusterName);
+  enumLabel   = appHelper.asUpperCamelCase(enumLabel);
+  // Some enum names have one or more copies of the cluster name at the
+  // beginning.
+  while (enumLabel.startsWith(clusterName)) {
+    enumLabel = enumLabel.substring(clusterName.length);
+  }
+
+  if (enumLabel.endsWith("Enum")) {
+    // Strip that off; it'll clearly be an enum anyway.
+    enumLabel = enumLabel.substring(0, enumLabel.length - "Enum".length);
+  }
+
+  return "CHIP" + clusterName + enumLabel;
+}
+
+function objCEnumItemLabel(itemLabel)
+{
+  // Check for the case when we're:
+  // 1. A single word (that's the regexp at the beginning, which matches the
+  //    word-splitting regexp in string.toCamelCase).
+  // 2. All upper-case.
+  //
+  // This will get converted to lowercase except the first letter by
+  // asUpperCamelCase, which is not really what we want.
+  if (!/ |_|-|\//.test(itemLabel) && itemLabel.toUpperCase() == itemLabel) {
+    return itemLabel.replace(/[\.:]/g, '');
+  }
+
+  return appHelper.asUpperCamelCase(itemLabel);
+}
+
+function hasArguments()
+{
+  return !!this.arguments.length
+}
+
 //
 // Module exports
 //
-exports.asObjectiveCBasicType        = asObjectiveCBasicType;
-exports.asObjectiveCNumberType       = asObjectiveCNumberType;
-exports.asExpectedEndpointForCluster = asExpectedEndpointForCluster;
-exports.asTestIndex                  = asTestIndex;
-exports.asTestValue                  = asTestValue;
-exports.asObjectiveCClass            = asObjectiveCClass;
-exports.asObjectiveCType             = asObjectiveCType;
-exports.asStructPropertyName         = asStructPropertyName;
-exports.asGetterName                 = asGetterName;
-exports.commandHasRequiredField      = commandHasRequiredField;
+exports.asObjectiveCBasicType   = asObjectiveCBasicType;
+exports.asObjectiveCNumberType  = asObjectiveCNumberType;
+exports.asObjectiveCClass       = asObjectiveCClass;
+exports.asObjectiveCType        = asObjectiveCType;
+exports.asStructPropertyName    = asStructPropertyName;
+exports.asGetterName            = asGetterName;
+exports.commandHasRequiredField = commandHasRequiredField;
+exports.objCEnumName            = objCEnumName;
+exports.objCEnumItemLabel       = objCEnumItemLabel;
+exports.hasArguments            = hasArguments;

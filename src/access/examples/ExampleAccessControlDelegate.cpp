@@ -40,6 +40,8 @@ using chip::kUndefinedNodeId;
 using chip::Access::AccessControl;
 using chip::Access::AuthMode;
 using chip::Access::Privilege;
+using chip::Access::RequestPath;
+using chip::Access::SubjectDescriptor;
 
 using Entry         = chip::Access::AccessControl::Entry;
 using EntryIterator = chip::Access::AccessControl::EntryIterator;
@@ -129,7 +131,7 @@ public:
     }
 
 public:
-    CHIP_ERROR Serialize(chip::TLV::TLVWriter & writer) { return writer.Put(chip::TLV::AnonymousTag(), mNode); }
+    CHIP_ERROR Serialize(chip::TLV::TLVWriter & writer) const { return writer.Put(chip::TLV::AnonymousTag(), mNode); }
 
     CHIP_ERROR Deserialize(chip::TLV::TLVReader & reader)
     {
@@ -193,7 +195,7 @@ public:
     }
 
 public:
-    CHIP_ERROR Serialize(chip::TLV::TLVWriter & writer)
+    CHIP_ERROR Serialize(chip::TLV::TLVWriter & writer) const
     {
         ReturnErrorOnFailure(writer.Put(chip::TLV::AnonymousTag(), mCluster));
         return writer.Put(chip::TLV::AnonymousTag(), mDeviceType);
@@ -353,7 +355,7 @@ class EntryStorage
 {
 public:
     // ACL support
-    static constexpr size_t kNumberOfFabrics  = CHIP_CONFIG_MAX_DEVICE_ADMINS;
+    static constexpr size_t kNumberOfFabrics  = CHIP_CONFIG_MAX_FABRICS;
     static constexpr size_t kEntriesPerFabric = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC;
     static EntryStorage acl[kNumberOfFabrics * kEntriesPerFabric];
 
@@ -517,8 +519,6 @@ public:
     static constexpr uint8_t kTagPrivilege   = 4;
     static constexpr uint8_t kTagSubjects    = 5;
     static constexpr uint8_t kTagTargets     = 6;
-    // This value was chosen to be large enough to contain the data, but has not been fine-tuned.
-    static const size_t kStorageBufferSize = 192;
 
     CHIP_ERROR Serialize(chip::PersistentStorageDelegate * storage, const char * key)
     {
@@ -601,6 +601,13 @@ public:
 public:
     static constexpr size_t kMaxSubjects = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY;
     static constexpr size_t kMaxTargets  = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY;
+
+    static constexpr uint8_t kApproxSizeSubject = 9;
+    static constexpr uint8_t kApproxSizeTarget  = 8;
+    static constexpr uint8_t kApproxSizeEntry   = 4;
+    // This value was chosen to be large enough to contain the data, but has not been fine-tuned.
+    static const size_t kStorageBufferSize =
+        kEntriesPerFabric * (kApproxSizeEntry + kApproxSizeSubject * kMaxSubjects + kApproxSizeTarget * kMaxTargets);
 
     bool mInUse;
     FabricIndex mFabricIndex;
@@ -870,7 +877,7 @@ public:
         {
             return CHIP_NO_ERROR;
         }
-        else if (auto * storage = EntryStorage::Find(nullptr))
+        if (auto * storage = EntryStorage::Find(nullptr))
         {
             *storage = *mStorage;
             mStorage = storage;
@@ -1065,21 +1072,22 @@ class AccessControlDelegate : public AccessControl::Delegate
 public:
     CHIP_ERROR Init() override
     {
-        ChipLogDetail(DataManagement, "Examples::AccessControlDelegate::Init");
+        ChipLogProgress(DataManagement, "Examples::AccessControlDelegate::Init");
         CHIP_ERROR err = LoadFromFlash();
         if (err != CHIP_NO_ERROR)
         {
+            ChipLogProgress(DataManagement, "AccessControl: unable to load stored ACL entries; using empty list instead");
             for (auto & storage : EntryStorage::acl)
             {
                 storage.Clear();
             }
         }
-        return err;
+        return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR Finish() override
     {
-        ChipLogDetail(DataManagement, "Examples::AccessControlDelegate::Finish");
+        ChipLogProgress(DataManagement, "Examples::AccessControlDelegate::Finish");
         return SaveToFlash();
     }
 
@@ -1139,7 +1147,7 @@ public:
                 CHIP_ERROR saveError = SaveToFlash();
                 if (saveError != CHIP_NO_ERROR && saveError != CHIP_ERROR_INCORRECT_STATE)
                 {
-                    ChipLogDetail(DataManagement, "CreateEntry failed to save to flash");
+                    ChipLogProgress(DataManagement, "CreateEntry failed to save to flash");
                 }
             }
             return err;
@@ -1171,7 +1179,7 @@ public:
                 CHIP_ERROR saveError = SaveToFlash();
                 if (saveError != CHIP_NO_ERROR && saveError != CHIP_ERROR_INCORRECT_STATE)
                 {
-                    ChipLogDetail(DataManagement, "UpdateEntry failed to save to flash");
+                    ChipLogProgress(DataManagement, "UpdateEntry failed to save to flash");
                 }
             }
             return err;
@@ -1214,7 +1222,7 @@ public:
             CHIP_ERROR saveError = SaveToFlash();
             if (saveError != CHIP_NO_ERROR && saveError != CHIP_ERROR_INCORRECT_STATE)
             {
-                ChipLogDetail(DataManagement, "DeleteEntry failed to save to flash");
+                ChipLogProgress(DataManagement, "DeleteEntry failed to save to flash");
             }
             return CHIP_NO_ERROR;
         }
@@ -1229,6 +1237,12 @@ public:
             return CHIP_NO_ERROR;
         }
         return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
+                     Privilege requestPrivilege) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
 public:
@@ -1309,17 +1323,11 @@ namespace chip {
 namespace Access {
 namespace Examples {
 
-AccessControl::Delegate & GetAccessControlDelegate()
+AccessControl::Delegate * GetAccessControlDelegate(PersistentStorageDelegate * storageDelegate)
 {
     static AccessControlDelegate accessControlDelegate;
-    return accessControlDelegate;
-}
-
-void SetAccessControlDelegateStorage(chip::PersistentStorageDelegate * storageDelegate)
-{
-    ChipLogDetail(DataManagement, "Examples::SetAccessControlDelegateStorage");
-    AccessControlDelegate & accessControlDelegate = static_cast<AccessControlDelegate &>(GetAccessControlDelegate());
     accessControlDelegate.SetStorageDelegate(storageDelegate);
+    return &accessControlDelegate;
 }
 
 } // namespace Examples

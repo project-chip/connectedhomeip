@@ -48,6 +48,10 @@
 #define LOCALSTATEDIR "/tmp"
 #endif
 
+#ifndef DEVICEINFODIR
+#define DEVICEINFODIR "/tmp"
+#endif
+
 #define CHIP_DEFAULT_FACTORY_PATH                                                                                                  \
     FATCONFDIR "/"                                                                                                                 \
                "chip_factory.ini"
@@ -57,6 +61,9 @@
 #define CHIP_DEFAULT_DATA_PATH                                                                                                     \
     LOCALSTATEDIR "/"                                                                                                              \
                   "chip_counters.ini"
+#define CHIP_DEVICE_INFO_PATH                                                                                                      \
+    DEVICEINFODIR "/"                                                                                                              \
+                  "chip_device_info.ini"
 
 namespace chip {
 namespace DeviceLayer {
@@ -88,6 +95,7 @@ private:
     std::mutex mLock;
     bool mDirty;
     std::string mConfigPath;
+    bool mInitialized = false;
 };
 
 } // namespace Internal

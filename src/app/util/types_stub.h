@@ -46,6 +46,7 @@
 #include <app/chip-zcl-zpro-codec.h> // For EmberApsFrame
 
 #include <app/util/basic-types.h>
+#include <lib/core/Optional.h>
 
 #include <transport/raw/MessageHeader.h>
 static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");
@@ -498,7 +499,7 @@ struct EmberBindingTableEntry
     EmberBindingTableEntry() = default;
 
     static EmberBindingTableEntry ForNode(chip::FabricIndex fabric, chip::NodeId node, chip::EndpointId localEndpoint,
-                                          chip::EndpointId remoteEndpoint, chip::ClusterId cluster)
+                                          chip::EndpointId remoteEndpoint, chip::Optional<chip::ClusterId> cluster)
     {
         EmberBindingTableEntry entry = {
             .type        = EMBER_UNICAST_BINDING,
@@ -512,7 +513,7 @@ struct EmberBindingTableEntry
     }
 
     static EmberBindingTableEntry ForGroup(chip::FabricIndex fabric, chip::GroupId group, chip::EndpointId localEndpoint,
-                                           chip::ClusterId cluster)
+                                           chip::Optional<chip::ClusterId> cluster)
     {
         EmberBindingTableEntry entry = {
             .type        = EMBER_MULTICAST_BINDING,
@@ -526,7 +527,7 @@ struct EmberBindingTableEntry
     }
 
     /** The type of binding. */
-    EmberBindingType type;
+    EmberBindingType type = EMBER_UNUSED_BINDING;
 
     chip::FabricIndex fabricIndex;
     /** The endpoint on the local node. */
@@ -538,7 +539,7 @@ struct EmberBindingTableEntry
      * that a binding can be used to to send messages with any cluster ID, not
      * just that listed in the binding.
      */
-    chip::ClusterId clusterId;
+    chip::Optional<chip::ClusterId> clusterId;
     /** The endpoint on the remote node (specified by \c identifier). */
     chip::EndpointId remote;
     /** A 64-bit destination identifier.  This is either:
@@ -564,12 +565,12 @@ struct EmberBindingTableEntry
             return false;
         }
 
-        if (type == EMBER_UNICAST_BINDING && nodeId != other.nodeId)
+        if (type == EMBER_UNICAST_BINDING && (nodeId != other.nodeId || remote != other.remote))
         {
             return false;
         }
 
-        return fabricIndex == other.fabricIndex && local == other.local && clusterId == other.clusterId && remote == other.remote;
+        return fabricIndex == other.fabricIndex && local == other.local && clusterId == other.clusterId;
     }
 };
 

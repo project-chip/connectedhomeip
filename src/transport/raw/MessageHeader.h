@@ -50,7 +50,7 @@ typedef int PacketHeaderFlags;
 
 namespace Header {
 
-enum class SessionType
+enum class SessionType : uint8_t
 {
     kUnicastSession = 0,
     kGroupSession   = 1,
@@ -70,6 +70,9 @@ enum class ExFlagValues : uint8_t
 
     /// Set when current message is requesting an acknowledgment from the recipient.
     kExchangeFlag_NeedsAck = 0x04,
+
+    /// Secured Extension block is present.
+    kExchangeFlag_SecuredExtension = 0x08,
 
     /// Set when a vendor id is prepended to the Message Protocol Id field.
     kExchangeFlag_VendorIdPresent = 0x10,
@@ -288,7 +291,9 @@ public:
 
     PacketHeader & SetSessionType(Header::SessionType type)
     {
-        mSessionType = type;
+        mSessionType     = type;
+        uint8_t typeMask = to_underlying(Header::kSessionTypeMask);
+        mSecFlags.SetRaw(static_cast<uint8_t>((mSecFlags.Raw() & ~typeMask) | (to_underlying(type) & typeMask)));
         return *this;
     }
 

@@ -28,9 +28,13 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <platform/CHIPDeviceConfig.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::LowPower;
+
+static constexpr size_t kLowPowerDelegateTableSize =
+    EMBER_AF_LOW_POWER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -39,7 +43,7 @@ using chip::app::Clusters::LowPower::Delegate;
 
 namespace {
 
-Delegate * gDelegateTable[EMBER_AF_LOW_POWER_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
+Delegate * gDelegateTable[kLowPowerDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {

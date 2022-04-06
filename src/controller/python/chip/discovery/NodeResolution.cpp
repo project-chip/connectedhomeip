@@ -33,10 +33,10 @@ namespace {
 using DiscoverSuccessCallback = void (*)(uint64_t fabricId, uint64_t nodeId, uint32_t interfaceId, const char * ip, uint16_t port);
 using DiscoverFailureCallback = void (*)(uint64_t fabricId, uint64_t nodeId, ChipError::StorageType error_code);
 
-class PythonResolverDelegate : public ResolverDelegate
+class PythonResolverDelegate : public OperationalResolveDelegate
 {
 public:
-    void OnNodeIdResolved(const ResolvedNodeData & nodeData) override
+    void OnOperationalNodeResolved(const ResolvedNodeData & nodeData) override
     {
         if (mSuccessCallback != nullptr)
         {
@@ -58,7 +58,7 @@ public:
         }
     }
 
-    void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override
+    void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override
     {
         if (mFailureCallback != nullptr)
         {
@@ -69,8 +69,6 @@ public:
             ChipLogError(Controller, "Discovery failure without any python callback set.");
         }
     }
-
-    void OnNodeDiscoveryComplete(const DiscoveredNodeData & nodeData) override {}
 
     void SetSuccessCallback(DiscoverSuccessCallback cb) { mSuccessCallback = cb; }
     void SetFailureCallback(DiscoverFailureCallback cb) { mFailureCallback = cb; }
@@ -97,7 +95,7 @@ extern "C" ChipError::StorageType pychip_discovery_resolve(uint64_t fabricId, ui
     chip::python::ChipMainThreadScheduleAndWait([&] {
         result = Resolver::Instance().Init(chip::DeviceLayer::UDPEndPointManager());
         ReturnOnFailure(result);
-        Resolver::Instance().SetResolverDelegate(&gPythonResolverDelegate);
+        Resolver::Instance().SetOperationalDelegate(&gPythonResolverDelegate);
 
         result = Resolver::Instance().ResolveNodeId(chip::PeerId().SetCompressedFabricId(fabricId).SetNodeId(nodeId),
                                                     chip::Inet::IPAddressType::kAny);

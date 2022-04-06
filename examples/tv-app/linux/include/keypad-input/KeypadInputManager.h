@@ -23,10 +23,10 @@
 using chip::app::CommandResponseHelper;
 using KeypadInputDelegate = chip::app::Clusters::KeypadInput::Delegate;
 using SendKeyResponseType = chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::Type;
+using CecKeyCodeType      = chip::app::Clusters::KeypadInput::CecKeyCode;
 
 class KeypadInputManager : public KeypadInputDelegate
 {
 public:
-    void HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper,
-                       const chip::app::Clusters::KeypadInput::CecKeyCode & keyCode) override;
+    void HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper, const CecKeyCodeType & keyCode) override;
 };

@@ -89,16 +89,17 @@ class MultiAdminClientFragment : Fragment() {
 
   private suspend fun sendEnhancedCommissioningCommandClick() {
     val testDuration = 100
-    val testIteration = 800
+    val testIteration = 1000
     val devicePointer =
       ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
     deviceController.openPairingWindowWithPIN(
-      devicePointer, testDuration, testIteration,
+      devicePointer, testDuration, testIteration.toLong(),
       discriminatorEd.text.toString().toInt(), setupPinCodeEd.text.toString().toULong().toLong()
     )
   }
 
   private suspend fun sendRevokeCommandClick() {
+    val timedInvokeTimeout = 10000
     getAdministratorCommissioningClusterForDevice().revokeCommissioning(object : ChipClusters.DefaultClusterCallback {
       override fun onSuccess() {
         showMessage("Revoke Commissioning success")
@@ -108,7 +109,7 @@ class MultiAdminClientFragment : Fragment() {
         showMessage("Revoke Commissioning  failure $ex")
         Log.e(TAG, "Revoke Commissioning  failure", ex)
       }
-    })
+    }, timedInvokeTimeout)
   }
 
   private suspend fun getAdministratorCommissioningClusterForDevice(): ChipClusters.AdministratorCommissioningCluster {

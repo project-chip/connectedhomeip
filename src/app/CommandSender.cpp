@@ -174,7 +174,6 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
     bool suppressResponse = false;
 
     reader.Init(std::move(payload));
-    ReturnErrorOnFailure(reader.Next());
     ReturnErrorOnFailure(invokeResponseMessage.Init(reader));
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -198,7 +197,8 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
     {
         err = CHIP_NO_ERROR;
     }
-    return err;
+    ReturnErrorOnFailure(err);
+    return invokeResponseMessage.ExitContainer();
 }
 
 void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
@@ -296,7 +296,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             {
                 ChipLogProgress(DataManagement,
                                 "Received Command Response Status for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
-                                " Command=" ChipLogFormatMEI " Status=0x%" PRIx8,
+                                " Command=" ChipLogFormatMEI " Status=0x%x",
                                 endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId),
                                 to_underlying(statusIB.mStatus));
             }
@@ -321,7 +321,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
 
 CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct)
 {
-    ReturnLogErrorOnFailure(AllocateBuffer());
+    ReturnErrorOnFailure(AllocateBuffer());
 
     //
     // We must not be in the middle of preparing a command, or having prepared or sent one.
@@ -336,8 +336,8 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
 
     if (aStartDataStruct)
     {
-        ReturnLogErrorOnFailure(invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)),
-                                                                          TLV::kTLVType_Structure, mDataElementContainerType));
+        ReturnErrorOnFailure(invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)),
+                                                                       TLV::kTLVType_Structure, mDataElementContainerType));
     }
 
     MoveToState(State::AddingCommand);
@@ -372,10 +372,8 @@ TLV::TLVWriter * CommandSender::GetCommandDataIBTLVWriter()
     {
         return nullptr;
     }
-    else
-    {
-        return mInvokeRequestBuilder.GetInvokeRequests().GetCommandData().GetWriter();
-    }
+
+    return mInvokeRequestBuilder.GetInvokeRequests().GetCommandData().GetWriter();
 }
 
 CHIP_ERROR CommandSender::HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)

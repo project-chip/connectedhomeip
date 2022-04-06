@@ -21,13 +21,13 @@ The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
 
 -   Clone the Espressif ESP-IDF and checkout
-    [v4.4-beta1 pre-release](https://github.com/espressif/esp-idf/releases/tag/v4.4-beta1)
+    [v4.4 release](https://github.com/espressif/esp-idf/releases/tag/v4.4)
 
           $ mkdir ${HOME}/tools
           $ cd ${HOME}/tools
           $ git clone https://github.com/espressif/esp-idf.git
           $ cd esp-idf
-          $ git checkout v4.4-beta1
+          $ git checkout v4.4
           $ git submodule update --init
           $ ./install.sh
 
@@ -96,7 +96,7 @@ Build or install the [rpc console](../../common/pigweed/rpc_console/README.md)
 
 Start the console:
 
-    $ python -m chip_rpc.console --device /dev/ttyUSB0 -b 115200
+    $ chip-console --device /dev/ttyUSB0 -b 115200
 
 An example flow of performing a scan, connecting, and getting the IPv6 address:
 

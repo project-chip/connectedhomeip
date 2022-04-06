@@ -41,7 +41,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * aData, size_t aSize)
         VerifyOrDie(PlatformMgr().InitChipStack() == CHIP_NO_ERROR);
 
         // ChipLinuxAppMainLoop blocks, and we don't want that here.
-        VerifyOrDie(Server::GetInstance().Init() == CHIP_NO_ERROR);
+        static chip::CommonCaseDeviceServerInitParams initParams;
+        (void) initParams.InitializeStaticResourcesBeforeServerInit();
+        VerifyOrDie(Server::GetInstance().Init(initParams) == CHIP_NO_ERROR);
 
         ApplicationInit();
 

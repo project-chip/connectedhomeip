@@ -18,44 +18,21 @@
 
 #pragma once
 
+#include <LockEndpoint.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
-#include <stdbool.h>
-#include <stdint.h>
-
-#include <functional>
+#include <cstdint>
 
 #include <app/util/af.h>
-
-struct LockUserInfo
-{
-    char userName[DOOR_LOCK_USER_NAME_BUFFER_SIZE];
-    DlCredential credentials[DOOR_LOCK_MAX_CREDENTIALS_PER_USER];
-    size_t totalCredentials;
-    uint32_t userUniqueId;
-    DlUserStatus userStatus;
-    DlUserType userType;
-    DlCredentialRule credentialRule;
-    chip::FabricIndex createdBy;
-    chip::FabricIndex lastModifiedBy;
-};
-
-static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE = 20;
-
-struct LockCredentialInfo
-{
-    DlCredentialStatus status;
-    DlCredentialType credentialType;
-    uint8_t credentialData[DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE];
-    size_t credentialDataSize;
-};
 
 class LockManager
 {
 public:
-    LockManager() : mLocked(DlLockState::kLocked) {}
+    LockManager() {}
 
-    bool Lock(chip::Optional<chip::ByteSpan> pin);
-    bool Unlock(chip::Optional<chip::ByteSpan> pin);
+    bool InitEndpoint(chip::EndpointId endpointId);
+
+    bool Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
+    bool Unlock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
 
     bool GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user);
     bool SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
@@ -68,17 +45,21 @@ public:
     bool SetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
                        DlCredentialType credentialType, const chip::ByteSpan & credentialData);
 
+    DlStatus GetSchedule(chip::EndpointId endpointId, uint8_t weekDayIndex, uint16_t userIndex,
+                         EmberAfPluginDoorLockWeekDaySchedule & schedule);
+    DlStatus GetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
+                         EmberAfPluginDoorLockYearDaySchedule & schedule);
+    DlStatus SetSchedule(chip::EndpointId endpointId, uint8_t weekDayIndex, uint16_t userIndex, DlScheduleStatus status,
+                         DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
+    DlStatus SetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status,
+                         uint32_t localStartTime, uint32_t localEndTime);
+
     static LockManager & Instance();
 
 private:
-    bool setLockState(DlLockState lockState, chip::Optional<chip::ByteSpan> & pin);
-    const char * lockStateToString(DlLockState lockState);
+    LockEndpoint * getEndpoint(chip::EndpointId endpointId);
 
-    DlLockState mLocked;
+    std::vector<LockEndpoint> mEndpoints;
 
-    // TODO: Support multiple endpoints in the app.
-    std::array<LockUserInfo, 10> mLockUsers;
-    // Also include programming User PIN as a zero index
-    std::array<LockCredentialInfo, 11> mLockCredentials;
     static LockManager instance;
 };

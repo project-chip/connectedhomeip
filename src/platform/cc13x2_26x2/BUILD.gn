@@ -55,11 +55,23 @@ static_library("cc13x2_26x2") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]
+  public_configs =
+      [ "${chip_root}/src/lib/address_resolve:default_address_resolve_config" ]
 
   if (chip_enable_ble) {
     sources += [
       "BLEManagerImpl.cpp",
       "BLEManagerImpl.h",
+    ]
+  }
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      # this needs to be in the final link to place the data correctly
+      # see ${chip_root}/third_party/ti_simplelink_sdk/ti_simplelink_executable.gni
+      #"oad_image_header.c",
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
     ]
   }
 

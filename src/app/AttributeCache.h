@@ -24,6 +24,7 @@
 #include <app/AttributePathParams.h>
 #include <app/BufferedReadCallback.h>
 #include <app/ReadClient.h>
+#include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
 #include <lib/support/Variant.h>
 #include <list>
@@ -279,6 +280,7 @@ public:
                 }
             }
         }
+        return CHIP_NO_ERROR;
     }
 
     /*
@@ -305,6 +307,7 @@ public:
                 ReturnErrorOnFailure(func(clusterIter.first));
             }
         }
+        return CHIP_NO_ERROR;
     }
 
 private:
@@ -351,6 +354,11 @@ private:
 
     void OnDone() override { return mCallback.OnDone(); }
     void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mCallback.OnSubscriptionEstablished(aSubscriptionId); }
+
+    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
+    {
+        return mCallback.OnDeallocatePaths(std::move(aReadPrepareParams));
+    }
 
 private:
     Callback & mCallback;

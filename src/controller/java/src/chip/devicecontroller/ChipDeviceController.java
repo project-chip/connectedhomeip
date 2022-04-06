@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020-2021 Project CHIP Authors
+ *   Copyright (c) 2020-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,8 @@ import android.bluetooth.BluetoothGatt;
 import android.util.Log;
 import androidx.annotation.Nullable;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
+import chip.devicecontroller.model.ChipAttributePath;
+import java.util.List;
 
 /** Controller to interact with the CHIP device. */
 public class ChipDeviceController {
@@ -174,6 +176,9 @@ public class ChipDeviceController {
   /**
    * Through GetConnectedDeviceCallback, returns a pointer to a connected device or an error.
    *
+   * <p>The native code invoked by this method creates a strong reference to the provided callback,
+   * which is released only when GetConnectedDeviceCallback has returned success or failure.
+   *
    * <p>TODO(#8443): This method could benefit from a ChipDevice abstraction to hide the pointer
    * passing.
    */
@@ -273,6 +278,16 @@ public class ChipDeviceController {
     return getCompressedFabricId(deviceControllerPtr);
   }
 
+  /**
+   * Returns the compressed fabric ID based on the given root certificate and node operational
+   * credentials.
+   *
+   * @param rcac the root certificate (in Matter cert form)
+   * @param noc the NOC (in Matter cert form)
+   * @see #convertX509CertToMatterCert(byte[])
+   */
+  public native long generateCompressedFabricId(byte[] rcac, byte[] noc);
+
   public void updateDevice(long fabricId, long deviceId) {
     updateDevice(deviceControllerPtr, fabricId, deviceId);
   }
@@ -282,7 +297,7 @@ public class ChipDeviceController {
   }
 
   public boolean openPairingWindowWithPIN(
-      long devicePtr, int duration, int iteration, int discriminator, long setupPinCode) {
+      long devicePtr, int duration, long iteration, int discriminator, long setupPinCode) {
     return openPairingWindowWithPIN(
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode);
   }
@@ -297,7 +312,52 @@ public class ChipDeviceController {
   }
 
   /**
-   * Generates a new PASE verifier and passcode ID for the given setup PIN code.
+   * Returns an attestation challenge for the given device, for which there must be an existing
+   * secure session.
+   *
+   * @param devicePtr a pointer to the device from which to retrieve the challenge
+   * @throws ChipDeviceControllerException if there is no secure session for the given device
+   */
+  public byte[] getAttestationChallenge(long devicePtr) {
+    return getAttestationChallenge(deviceControllerPtr, devicePtr);
+  }
+
+  /** Subscribe to the given attribute path. */
+  public void subscribeToPath(
+      SubscriptionEstablishedCallback subscriptionEstablishedCallback,
+      ReportCallback reportCallback,
+      long devicePtr,
+      List<ChipAttributePath> attributePaths,
+      int minInterval,
+      int maxInterval) {
+    ReportCallbackJni jniCallback =
+        new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback);
+    subscribeToPath(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        attributePaths,
+        minInterval,
+        maxInterval);
+  }
+
+  /** Read the given attribute path. */
+  public void readPath(
+      ReportCallback callback, long devicePtr, List<ChipAttributePath> attributePaths) {
+    ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback);
+    readPath(deviceControllerPtr, jniCallback.getCallbackHandle(), devicePtr, attributePaths);
+  }
+
+  /**
+   * Converts a given X.509v3 certificate into a Matter certificate.
+   *
+   * @throws ChipDeviceControllerException if there was an issue during encoding (e.g. out of
+   *     memory, invalid certificate format)
+   */
+  public native byte[] convertX509CertToMatterCert(byte[] x509Cert);
+
+  /**
+   * Generates a new PASE verifier for the given setup PIN code.
    *
    * @param devicePtr a pointer to the device object for which to generate the PASE verifier
    * @param setupPincode the PIN code to use
@@ -305,12 +365,26 @@ public class ChipDeviceController {
    * @param salt the 16-byte salt
    */
   public PaseVerifierParams computePaseVerifier(
-      long devicePtr, long setupPincode, int iterations, byte[] salt) {
+      long devicePtr, long setupPincode, long iterations, byte[] salt) {
     return computePaseVerifier(deviceControllerPtr, devicePtr, setupPincode, iterations, salt);
   }
 
   private native PaseVerifierParams computePaseVerifier(
-      long deviceControllerPtr, long devicePtr, long setupPincode, int iterations, byte[] salt);
+      long deviceControllerPtr, long devicePtr, long setupPincode, long iterations, byte[] salt);
+
+  private native void subscribeToPath(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      List<ChipAttributePath> attributePaths,
+      int minInterval,
+      int maxInterval);
+
+  public native void readPath(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      List<ChipAttributePath> attributePaths);
 
   private native long newDeviceController();
 
@@ -368,11 +442,13 @@ public class ChipDeviceController {
       long deviceControllerPtr,
       long devicePtr,
       int duration,
-      int iteration,
+      long iteration,
       int discriminator,
       long setupPinCode);
 
   private native boolean isActive(long deviceControllerPtr, long deviceId);
+
+  private native byte[] getAttestationChallenge(long deviceControllerPtr, long devicePtr);
 
   private native void shutdownSubscriptions(long deviceControllerPtr, long devicePtr);
 

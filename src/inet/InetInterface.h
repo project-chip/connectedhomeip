@@ -180,7 +180,7 @@ public:
      *                                              any address configured.
      *  @retval    #CHIP_NO_ERROR                   On success.
      */
-    CHIP_ERROR GetLinkLocalAddr(IPAddress * llAddr);
+    CHIP_ERROR GetLinkLocalAddr(IPAddress * llAddr) const;
 
 private:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

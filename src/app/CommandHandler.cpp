@@ -28,9 +28,11 @@
 #include "messaging/ExchangeContext.h"
 
 #include <access/AccessControl.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/RequiredPrivilege.h>
 #include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
+#include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/TypeTraits.h>
 #include <protocols/secure_channel/Constants.h>
 
@@ -92,7 +94,6 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     InvokeRequestMessage::Parser invokeRequestMessage;
     InvokeRequests::Parser invokeRequests;
     reader.Init(std::move(payload));
-    ReturnErrorOnFailure(reader.Next());
     ReturnErrorOnFailure(invokeRequestMessage.Init(reader));
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     ReturnErrorOnFailure(invokeRequestMessage.CheckSchemaValidity());
@@ -125,6 +126,15 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     }
 
     invokeRequests.GetReader(&invokeRequestsReader);
+
+    {
+        // We don't support handling multiple commands but the protocol is ready to support it in the future, reject all of them and
+        // IM Engine will send a status response.
+        size_t commandCount = 0;
+        TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */);
+        VerifyOrReturnError(commandCount == 1, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    }
+
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
     {
         VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
@@ -146,7 +156,8 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     {
         err = CHIP_NO_ERROR;
     }
-    return err;
+    ReturnErrorOnFailure(err);
+    return invokeRequestMessage.ExitContainer();
 }
 
 void CommandHandler::Close()
@@ -253,24 +264,41 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     err = commandPath.GetEndpointId(&concretePath.mEndpointId);
     SuccessOrExit(err);
 
-    VerifyOrExit(mpCallback->CommandExists(concretePath), err = CHIP_ERROR_INVALID_PROFILE_ID);
+    using Protocols::InteractionModel::Status;
+    {
+        Status commandExists = mpCallback->CommandExists(concretePath);
+        if (commandExists != Status::Success)
+        {
+            ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%" PRIx16,
+                          ChipLogValueMEI(concretePath.mCommandId), ChipLogValueMEI(concretePath.mClusterId),
+                          concretePath.mEndpointId);
+            return AddStatus(concretePath, commandExists);
+        }
+    }
+
     VerifyOrExit(mpExchangeCtx != nullptr && mpExchangeCtx->HasSessionHandle(), err = CHIP_ERROR_INCORRECT_STATE);
 
     {
-        Access::SubjectDescriptor subjectDescriptor = mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
+        Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
         Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
         err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
-        err                                = CHIP_NO_ERROR; // TODO: remove override
         if (err != CHIP_NO_ERROR)
         {
             if (err != CHIP_ERROR_ACCESS_DENIED)
             {
-                return AddStatus(concretePath, Protocols::InteractionModel::Status::Failure);
+                return AddStatus(concretePath, Status::Failure);
             }
-            // TODO: when wildcard/group invokes are supported, handle them to discard rather than fail with status
-            return AddStatus(concretePath, Protocols::InteractionModel::Status::UnsupportedAccess);
+            // TODO: when wildcard invokes are supported, handle them to discard rather than fail with status
+            return AddStatus(concretePath, Status::UnsupportedAccess);
         }
+    }
+
+    if (CommandNeedsTimedInvoke(concretePath.mClusterId, concretePath.mCommandId) && !IsTimedInvoke())
+    {
+        // TODO: when wildcard invokes are supported, discard a
+        // wildcard-expanded path instead of returning a status.
+        return AddStatus(concretePath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
     }
 
     err = aCommandElement.GetData(&commandDataReader);
@@ -295,18 +323,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        // The Path is the path in the request if there are any error occurred before we dispatch the command to clusters.
-        // Currently, it could be failed to decode Path or failed to find cluster / command on desired endpoint.
-        // TODO: The behavior when receiving a malformed message is not clear in the Spec. (Spec#3259)
-        // TODO: The error code should be updated after #7072 added error codes required by IM.
-        if (err == CHIP_ERROR_INVALID_PROFILE_ID)
-        {
-            ChipLogDetail(DataManagement, "No Cluster " ChipLogFormatMEI " on Endpoint 0x%" PRIx16,
-                          ChipLogValueMEI(concretePath.mClusterId), concretePath.mEndpointId);
-        }
-
-        // TODO:in particular different reasons for ServerClusterCommandExists to test false should result in different errors here
-        AddStatus(concretePath, Protocols::InteractionModel::Status::InvalidCommand);
+        return AddStatus(concretePath, Status::InvalidCommand);
     }
 
     // We have handled the error status above and put the error status in response, now return success status so we can process
@@ -337,7 +354,7 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
     err = commandPath.GetCommandId(&commandId);
     SuccessOrExit(err);
 
-    groupId = mpExchangeCtx->GetSessionHandle()->AsGroupSession()->GetGroupId();
+    groupId = mpExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
     fabric  = GetAccessingFabricIndex();
 
     ChipLogDetail(DataManagement,
@@ -353,6 +370,17 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
         err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
+
+    // Per spec, we do the "is this a timed command?" check for every path, but
+    // since all paths that fail it just get silently discarded we can do it
+    // once up front and discard all the paths at once.  Ordering with respect
+    // to ACL and command presence checks does not matter, because the behavior
+    // is the same for all of them: ignore the path.
+    if (CommandNeedsTimedInvoke(clusterId, commandId))
+    {
+        // Group commands are never timed.
+        ExitNow();
+    }
 
     iterator = groupDataProvider->IterateEndpoints(fabric);
     VerifyOrExit(iterator != nullptr, err = CHIP_ERROR_NO_MEMORY);
@@ -370,22 +398,22 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
 
         const ConcreteCommandPath concretePath(mapping.endpoint_id, clusterId, commandId);
 
-        if (!mpCallback->CommandExists(concretePath))
+        if (mpCallback->CommandExists(concretePath) != Protocols::InteractionModel::Status::Success)
         {
-            ChipLogError(DataManagement, "No Cluster " ChipLogFormatMEI " on Endpoint 0x%" PRIx16, ChipLogValueMEI(clusterId),
-                         mapping.endpoint_id);
+            ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%" PRIx16,
+                          ChipLogValueMEI(mapping.endpoint_id), ChipLogValueMEI(clusterId), mapping.endpoint_id);
 
             continue;
         }
 
         {
-            Access::SubjectDescriptor subjectDescriptor = mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
+            Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
             Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
-            Access::Privilege requestPrivilege = Access::Privilege::kOperate; // TODO: get actual request privilege
+            Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
             err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
-            err                                = CHIP_NO_ERROR; // TODO: remove override
             if (err != CHIP_NO_ERROR)
             {
+                // TODO: handle errors that aren't CHIP_ERROR_ACCESS_DENIED, etc.
                 continue;
             }
         }
@@ -416,7 +444,7 @@ CHIP_ERROR CommandHandler::AddStatusInternal(const ConcreteCommandPath & aComman
                                              const Optional<ClusterStatus> & aClusterStatus)
 {
     StatusIB statusIB;
-    ReturnLogErrorOnFailure(PrepareStatus(aCommandPath));
+    ReturnErrorOnFailure(PrepareStatus(aCommandPath));
     CommandStatusIB::Builder & commandStatus = mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetStatus();
     StatusIB::Builder & statusIBBuilder      = commandStatus.CreateErrorStatus();
     ReturnErrorOnFailure(commandStatus.GetError());
@@ -453,10 +481,13 @@ CHIP_ERROR CommandHandler::AddClusterSpecificFailure(const ConcreteCommandPath &
 CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aCommandPath, bool aStartDataStruct)
 {
     ReturnErrorOnFailure(AllocateBuffer());
+
+    mInvokeResponseBuilder.Checkpoint(mBackupWriter);
     //
     // We must not be in the middle of preparing a command, or having prepared or sent one.
     //
     VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
+    MoveToState(State::Preparing);
     InvokeResponseIBs::Builder & invokeResponses = mInvokeResponseBuilder.GetInvokeResponses();
     InvokeResponseIB::Builder & invokeResponse   = invokeResponses.CreateInvokeResponse();
     ReturnErrorOnFailure(invokeResponses.GetError());
@@ -498,6 +529,7 @@ CHIP_ERROR CommandHandler::PrepareStatus(const ConcreteCommandPath & aCommandPat
     // We must not be in the middle of preparing a command, or having prepared or sent one.
     //
     VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
+    MoveToState(State::Preparing);
     InvokeResponseIBs::Builder & invokeResponses = mInvokeResponseBuilder.GetInvokeResponses();
     InvokeResponseIB::Builder & invokeResponse   = invokeResponses.CreateInvokeResponse();
     ReturnErrorOnFailure(invokeResponses.GetError());
@@ -522,31 +554,30 @@ CHIP_ERROR CommandHandler::FinishStatus()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR CommandHandler::RollbackResponse()
+{
+    VerifyOrReturnError(mState == State::Preparing || mState == State::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
+    mInvokeResponseBuilder.Rollback(mBackupWriter);
+    mInvokeResponseBuilder.ResetError();
+    // Note: We only support one command per request, so we reset the state to Idle here, need to review the states when adding
+    // supports of having multiple requests in the same transaction.
+    MoveToState(State::Idle);
+    return CHIP_NO_ERROR;
+}
+
 TLV::TLVWriter * CommandHandler::GetCommandDataIBTLVWriter()
 {
     if (mState != State::AddingCommand)
     {
         return nullptr;
     }
-    else
-    {
-        return mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetCommand().GetWriter();
-    }
+
+    return mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetCommand().GetWriter();
 }
 
 FabricIndex CommandHandler::GetAccessingFabricIndex() const
 {
-    FabricIndex fabric = kUndefinedFabricIndex;
-    if (mpExchangeCtx->GetSessionHandle()->IsGroupSession())
-    {
-        fabric = mpExchangeCtx->GetSessionHandle()->AsGroupSession()->GetFabricIndex();
-    }
-    else
-    {
-        fabric = mpExchangeCtx->GetSessionHandle()->AsSecureSession()->GetFabricIndex();
-    }
-
-    return fabric;
+    return mpExchangeCtx->GetSessionHandle()->GetFabricIndex();
 }
 
 CommandHandler * CommandHandler::Handle::Get()
@@ -590,6 +621,9 @@ const char * CommandHandler::GetStateStr() const
     {
     case State::Idle:
         return "Idle";
+
+    case State::Preparing:
+        return "Preparing";
 
     case State::AddingCommand:
         return "AddingCommand";

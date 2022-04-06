@@ -20,8 +20,9 @@ devices:
 
 -   [ESP32-DevKitC](https://www.espressif.com/en/products/hardware/esp32-devkitc/overview)
 -   [ESP32-WROVER-KIT_V4.1](https://www.espressif.com/en/products/hardware/esp-wrover-kit/overview)
--   [ESP32C3-DevKitM](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html).
--   [ESP32S3-DevKitM](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/hw-reference/esp32s3/user-guide-devkitm-1.html).
+-   [ESP32C3-DevKitM](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html)
+-   [ESP32S3-DevKitM](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/hw-reference/esp32s3/user-guide-devkitm-1.html)
+-   [ESP32-H2](https://www.espressif.com/en/news/ESP32_H2).
 
 ## Building the Example Application
 
@@ -32,13 +33,21 @@ The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
 
 -   Clone the Espressif ESP-IDF and checkout
-    [v4.4-beta1 pre-release](https://github.com/espressif/esp-idf/releases/tag/v4.4-beta1)
+    [v4.4 release](https://github.com/espressif/esp-idf/releases/tag/v4.4)
 
         $ mkdir ${HOME}/tools
         $ cd ${HOME}/tools
         $ git clone https://github.com/espressif/esp-idf.git
         $ cd esp-idf
-        $ git checkout v4.4-beta1
+        $ git checkout v4.4
+        $ git submodule update --init
+        $ ./install.sh
+
+-   For ESP32H2, you can checkout commit id
+    [10f3aba770](https://github.com/espressif/esp-idf/tree/10f3aba770)
+
+        $ cd esp-idf
+        $ git checkout 10f3aba770
         $ git submodule update --init
         $ ./install.sh
 
@@ -72,6 +81,8 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
         $ idf.py set-target esp32c3
         or
         $ idf.py set-target esp32s3
+        or
+        $ idf.py --preview set-target esp32h2
 
 -   To build the demo application.
 
@@ -103,9 +114,21 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 ## Commissioning over BLE using chip-tool
 
 -   Please build the standalone chip-tool as described [here](../../chip-tool)
--   Commissioning the Lighting device
+-   Commissioning the WiFi Lighting devices(ESP32, ESP32C3, ESP32S3)
 
         $ ./out/debug/chip-tool pairing ble-wifi 12345 <ssid> <passphrase> 20202021 3840
+
+-   For ESP32-H2, firstly start OpenThread Border Router, you can either use
+    [Raspberry Pi OpenThread Border Router](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/openthread_border_router_pi.md)
+    OR
+    [ESP32 OpenThread Border Router](https://github.com/espressif/esp-idf/tree/master/examples/openthread/ot_br)
+-   Get the active operational dataset.
+
+        $ ot-ctl> dataset active -x
+
+-   Commissioning the Thread Lighting device(ESP32H2)
+
+         $ ./out/debug/chip-tool pairing ble-thread 12345 hex:<operational-dataset> 20202021 3840
 
 ## Cluster Control
 

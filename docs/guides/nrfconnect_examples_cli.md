@@ -170,8 +170,8 @@ information. You can use this command without any subcommand to print all
 available configuration data or to add a specific subcommand.
 
 ```shell
-VendorId:        9050 (0x235A)
-ProductId:       20043 (0x4E4B)
+VendorId:        65521 (0xFFF1)
+ProductId:       32768 (0x8000)
 HardwareVersion: 1 (0x1)
 FabricId:
 PinCode:         020202021
@@ -205,7 +205,7 @@ Prints the vendor ID of the device. Takes no arguments.
 
 ```shell
 uart:~$ matter config vendorid
-9050 (0x235A)
+65521 (0xFFFF1)
 ```
 
 #### productid
@@ -214,7 +214,7 @@ Prints the product ID of the device. Takes no arguments.
 
 ```shell
 uart:~$ matter config productid
-20043 (0x4E4B)
+32768 (0x8000)
 ```
 
 #### hardwarever

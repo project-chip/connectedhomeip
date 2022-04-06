@@ -104,11 +104,6 @@ function asTypeMaxValue(type)
   return templateUtil.templatePromise(this.global, promise);
 }
 
-function utf8StringLength(str)
-{
-  return new TextEncoder().encode(str).length
-}
-
 async function structs_with_cluster_name(options)
 {
   const packageId = await templateUtil.ensureZclPackageId(this);
@@ -140,5 +135,4 @@ async function structs_with_cluster_name(options)
 exports.asDelimitedCommand        = asDelimitedCommand;
 exports.asTypeMinValue            = asTypeMinValue;
 exports.asTypeMaxValue            = asTypeMaxValue;
-exports.utf8StringLength          = utf8StringLength;
 exports.structs_with_cluster_name = structs_with_cluster_name;

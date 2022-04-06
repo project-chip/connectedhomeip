@@ -31,7 +31,7 @@ COPY --from=mbedos /opt/openocd/ /opt/openocd/
 COPY --from=p6 /opt/ModusToolbox /opt/ModusToolbox
 
 COPY --from=telink /opt/telink/zephyrproject /opt/telink/zephyrproject
-COPY --from=telink /opt/telink/zephyr-sdk-0.13.0 /opt/telink/zephyr-sdk-0.13.0
+COPY --from=telink /opt/telink/zephyr-sdk-0.13.2 /opt/telink/zephyr-sdk-0.13.2
 
 COPY --from=tizen /opt/tizen_sdk /opt/tizen_sdk
 
@@ -65,8 +65,8 @@ ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r21b
 ENV OPENOCD_PATH=/opt/openocd/
 ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
-ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.13.0
-ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.3"
+ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.13.2
+ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.4"
 ENV TIZEN_HOME /opt/tizen_sdk
 ENV SYSROOT_AARCH64=/opt/ubuntu-21.04-aarch64-sysroot
 ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA

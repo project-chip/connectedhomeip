@@ -15,6 +15,7 @@
 name: Test Cluster Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Test Cluster"
     endpoint: 1
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Send Test Command"
       command: "test"
@@ -606,13 +611,13 @@ tests:
       command: "writeAttribute"
       attribute: "float_double"
       arguments:
-          value: 1.7e200
+          value: "1.7e+200"
 
     - label: "Read attribute DOUBLE large Value"
       command: "readAttribute"
       attribute: "float_double"
       response:
-          value: 1.7e200
+          value: "1.7e+200"
 
     - label: "Write attribute DOUBLE small Value"
       command: "writeAttribute"
@@ -858,12 +863,38 @@ tests:
       arguments:
           value: ""
 
-    - label: "Read attribute LIST_LONG_OCTET_STRING"
+    - label: "Read attribute LIST_LONG_OCTET_STRING (for chunked read)"
       command: "readAttribute"
       attribute: "list_long_octet_string"
       response:
           value:
               [
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+              ]
+
+    - label: "Write attribute LIST_LONG_OCTET_STRING (for chunked write)"
+      command: "writeAttribute"
+      attribute: "list_long_octet_string"
+      arguments:
+          value:
+              [
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+              ]
+
+    - label: "Read attribute LIST_LONG_OCTET_STRING (for chunked read)"
+      command: "readAttribute"
+      attribute: "list_long_octet_string"
+      response:
+          value:
+              [
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
                   "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
                   "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
                   "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
@@ -954,17 +985,13 @@ tests:
       command: "test"
       endpoint: 200
       response:
-          # No such endpoint, so expect an error.
-          # SDK returning wrong error code here so far.
-          errorWrongValue: UNSUPPORTED_ENDPOINT
+          error: UNSUPPORTED_ENDPOINT
 
     - label: "Send Test Command to unsupported cluster"
       command: "test"
       endpoint: 0
       response:
-          # No TestCluster on that, so expect an error.
-          # SDK returning wrong error code here so far.
-          errorWrongValue: UNSUPPORTED_CLUSTER
+          error: UNSUPPORTED_CLUSTER
 
     # Tests for vendor id
 
@@ -2838,16 +2865,14 @@ tests:
       command: "readAttribute"
       attribute: "list_int8u"
       response:
-          # SDK returning wrong error code here so far.
-          errorWrongValue: UNSUPPORTED_ENDPOINT
+          error: UNSUPPORTED_ENDPOINT
 
     - label: "Read attribute from nonexistent cluster."
       endpoint: 0
       command: "readAttribute"
       attribute: "list_int8u"
       response:
-          # SDK returning wrong error code here so far.
-          errorWrongValue: UNSUPPORTED_CLUSTER
+          error: UNSUPPORTED_CLUSTER
 
     # Tests for command with optional arguments
     - label:
@@ -2869,7 +2894,7 @@ tests:
       command: "subscribeAttribute"
       attribute: "list_int8u"
       minInterval: 2
-      maxInterval: 10
+      maxInterval: 5
       response:
           value: [1, 2, 3, 4]
 
@@ -3741,3 +3766,49 @@ tests:
           # TODO: We don't have a way to represent cluster-specific status
           # here yet.
           error: FAILURE
+
+    - label: "read AcceptedCommandList attribute"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value:
+              [0, 1, 2, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19, 20, 21]
+
+    - label: "read GeneratedCommandList attribute"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: [0, 1, 4, 5, 6, 9, 10, 11]
+
+    # Struct-typed attribute
+    - label: "Write struct-typed attribute"
+      command: "writeAttribute"
+      attribute: "struct_attr"
+      arguments:
+          value:
+              {
+                  a: 5,
+                  b: true,
+                  c: 2,
+                  d: "abc",
+                  e: "",
+                  f: 17,
+                  g: 1.5,
+                  h: 3.14159265358979,
+              }
+
+    - label: "Read struct-typed attribute"
+      command: "readAttribute"
+      attribute: "struct_attr"
+      response:
+          value:
+              {
+                  a: 5,
+                  b: true,
+                  c: 2,
+                  d: "abc",
+                  e: "",
+                  f: 17,
+                  g: 1.5,
+                  h: 3.14159265358979,
+              }

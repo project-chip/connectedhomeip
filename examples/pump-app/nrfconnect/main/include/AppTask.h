@@ -34,7 +34,7 @@ struct k_timer;
 class AppTask
 {
 public:
-    int StartApp();
+    CHIP_ERROR StartApp();
 
     void PostStartActionRequest(int32_t aActor, PumpManager::Action_t aAction);
     void PostEvent(AppEvent * event);
@@ -43,7 +43,7 @@ public:
 private:
     friend AppTask & GetAppTask(void);
 
-    int Init();
+    CHIP_ERROR Init();
 
     static void ActionInitiated(PumpManager::Action_t aAction, int32_t aActor);
     static void ActionCompleted(PumpManager::Action_t aAction, int32_t aActor);

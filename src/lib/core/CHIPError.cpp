@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -350,8 +350,8 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_INVALID_ACCESS_TOKEN.AsInteger():
         desc = "Invalid access token";
         break;
-    case CHIP_ERROR_WRONG_CERT_SUBJECT.AsInteger():
-        desc = "Wrong certificate subject";
+    case CHIP_ERROR_WRONG_CERT_DN.AsInteger():
+        desc = "Wrong certificate distinguished name";
         break;
     case CHIP_ERROR_INVALID_PROVISIONING_BUNDLE.AsInteger():
         desc = "Invalid provisioning bundle";
@@ -410,29 +410,8 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_DRBG_ENTROPY_SOURCE_FAILED.AsInteger():
         desc = "DRBG entropy source failed to generate entropy data";
         break;
-    case CHIP_ERROR_NO_TAKE_AUTH_DELEGATE.AsInteger():
-        desc = "No TAKE auth delegate set";
-        break;
-    case CHIP_ERROR_TAKE_RECONFIGURE_REQUIRED.AsInteger():
-        desc = "TAKE requires a reconfigure";
-        break;
-    case CHIP_ERROR_TAKE_REAUTH_POSSIBLE.AsInteger():
-        desc = "TAKE can do a reauthentication";
-        break;
-    case CHIP_ERROR_INVALID_TAKE_PARAMETER.AsInteger():
-        desc = "TAKE received an invalid parameter";
-        break;
-    case CHIP_ERROR_UNSUPPORTED_TAKE_CONFIGURATION.AsInteger():
-        desc = "TAKE Unsupported configuration";
-        break;
-    case CHIP_ERROR_TAKE_TOKEN_IDENTIFICATION_FAILED.AsInteger():
-        desc = "TAKE token identification failed";
-        break;
-    case CHIP_ERROR_INVALID_TOKENPAIRINGBUNDLE.AsInteger():
-        desc = "Invalid Token Pairing Bundle";
-        break;
-    case CHIP_ERROR_UNSUPPORTED_TOKENPAIRINGBUNDLE_VERSION.AsInteger():
-        desc = "Unsupported Token Pairing Bundle version";
+    case CHIP_ERROR_FABRIC_EXISTS.AsInteger():
+        desc = "Trying to add a NOC for a fabric that already exists";
         break;
     case CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER.AsInteger():
         desc = "Key not found error code received from peer";
@@ -544,9 +523,6 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         break;
     case CHIP_ERROR_INCOMPATIBLE_SCHEMA_VERSION.AsInteger():
         desc = "Incompatible data schema version";
-        break;
-    case CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION.AsInteger():
-        desc = "Update Required Version mismatch";
         break;
     case CHIP_ERROR_ACCESS_DENIED.AsInteger():
         desc = "The CHIP message is not granted access";
@@ -691,6 +667,15 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         break;
     case CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB.AsInteger():
         desc = "Malformed Interaction Model Data Version Filter IB";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Status Response Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Timed Request Message";
+        break;
+    case CHIP_ERROR_BUSY.AsInteger():
+        desc = "The Resource is busy and cannot process the request";
         break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR

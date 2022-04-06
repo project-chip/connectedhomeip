@@ -14,7 +14,8 @@ using chip::Dnssd::DnssdService;
 using chip::Dnssd::DnssdServiceProtocol;
 using chip::Dnssd::TextEntry;
 
-static void HandleResolve(void * context, DnssdService * result, CHIP_ERROR error)
+static void HandleResolve(void * context, DnssdService * result, const chip::Span<chip::Inet::IPAddress> & extraIPs,
+                          CHIP_ERROR error)
 {
     char addrBuf[100];
     nlTestSuite * suite = static_cast<nlTestSuite *>(context);
@@ -46,6 +47,8 @@ static void HandleBrowse(void * context, DnssdService * services, size_t service
     }
 }
 
+static void HandlePublish(void * context, const char * type, CHIP_ERROR error) {}
+
 static void InitCallback(void * context, CHIP_ERROR error)
 {
     DnssdService service;
@@ -70,7 +73,7 @@ static void InitCallback(void * context, CHIP_ERROR error)
     service.mSubTypes      = nullptr;
     service.mSubTypeSize   = 0;
 
-    NL_TEST_ASSERT(suite, ChipDnssdPublishService(&service) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(suite, ChipDnssdPublishService(&service, HandlePublish) == CHIP_NO_ERROR);
     ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::IPAddressType::kAny,
                     chip::Inet::InterfaceId::Null(), HandleBrowse, suite);
 }

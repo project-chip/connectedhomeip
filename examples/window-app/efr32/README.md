@@ -5,6 +5,7 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
 <hr>
 
 -   [CHIP EFR32 Window Covering Example](#chip-efr32-window-covering-example)
+
     -   [Introduction](#introduction)
     -   [Building](#building)
         -   [Note](#note)
@@ -13,6 +14,7 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
     -   [Running Pigweed RPC console](#running-pigweed-rpc-console)
+    -   [OTA Software Update](#ota-software-update)
 
 <hr>
 
@@ -289,21 +291,23 @@ combination with JLinkRTTClient as follows:
     through CLI commands on your OT BR
 
     The
-    [Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/README.md)
+    [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
     can now be used to send ZCL commands to the window covering device. For
     instance, to set the window covering lift by percentage:
 
-        $ sudo chip-device-ctrl
+    ```
+    chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
 
-        chip-device-ctrl > set-pairing-thread-credential 16 0x1234 00112233445566778899aabbccddeeff
+    chip-tool onoff on 1 1
 
-        chip-device-ctrl > connect -ble 3840 12345678 12344321
-
-        chip-device-ctrl > zcl WindowCovering WindowCoveringGoToLiftPercentage 12344321 1 1 percentageLiftValue=50
+    chip-tool windowcovering go-to-tilt-percentage 50 0 1 1
+    ```
 
     To see the supported window covering cluster commands, use:
 
-        chip-device-ctrl > zcl ? WindowCovering
+    ```
+    chip-tool windowcovering
+    ```
 
 ### Notes
 
@@ -322,3 +326,42 @@ combination with JLinkRTTClient as follows:
           $ sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2
 
 <a name="running-pigweed-rpc-console"></a>
+
+## OTA Software Update
+
+For the description of Software Update process with EFR32 example applications
+see
+[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
+
+## Building options
+
+All of Silabs's examples within the Matter repo have all the features enabled by
+default, as to provide the best end user experience. However some of those
+features can easily be toggled on or off. Here is a short list of options :
+
+### Disabling logging
+
+chip_progress_logging, chip_detail_logging, chip_automation_logging
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
+
+### Debug build / release build
+
+is_debug
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "is_debug=false"
+
+### Disabling LCD
+
+show_qr_code
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "show_qr_code=false"
+
+### KVS maximum entry count
+
+kvs_max_entries
+
+    Set the maximum Kvs entries that can be stored in NVM (Default 75)
+    Thresholds: 30 <= kvs_max_entries <= 255
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A kvs_max_entries=50

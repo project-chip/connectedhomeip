@@ -54,6 +54,9 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     CHIP_ERROR err;
     mCB = cb;
 
+    err = Platform::MemoryInit();
+    SuccessOrExit(err);
+
     // Initialize the CHIP stack.
     err = PlatformMgr().InitChipStack();
     SuccessOrExit(err);
@@ -62,9 +65,6 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
     }
-
-    err = Platform::MemoryInit();
-    SuccessOrExit(err);
 
     // Register a function to receive events from the CHIP device layer.  Note that calls to
     // this function will happen on the CHIP event loop thread, not the app_main thread.

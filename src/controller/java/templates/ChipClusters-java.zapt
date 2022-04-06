@@ -20,6 +20,7 @@ public class ChipClusters {
     /** Indicates a successful read for a CHAR_STRING attribute. */
     void onSuccess(String value);
     void onError(Exception error);
+    {{! TODO: use SubscriptionEstablishedCallback instead, here and below. }}
     default void onSubscriptionEstablished() {}
   }
 
@@ -123,7 +124,7 @@ public class ChipClusters {
 
   {{#chip_server_cluster_attributes}}
   {{#unless (isStrEqual chipCallback.name "Unsupported")}}
-  {{#if_in_global_responses}}
+  {{#if_basic_global_response}}
   {{else}}
     {{! NOTE: asJavaType ends up sniffing for isArray on the context. Since we want the type of our _entry_, force isArray to
           false. }}
@@ -141,7 +142,7 @@ public class ChipClusters {
         default void onSubscriptionEstablished() {}
       }
     {{/if}}
-  {{/if_in_global_responses}}
+  {{/if_basic_global_response}}
   {{/unless}}
   {{/chip_server_cluster_attributes}}
   {{#chip_server_cluster_attributes}}
@@ -149,11 +150,11 @@ public class ChipClusters {
   {{#unless (isStrEqual chipCallback.name "Unsupported")}}
 
     public void read{{asUpperCamelCase name}}Attribute(
-    {{#if_in_global_responses}}
+    {{#if_basic_global_response}}
       {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
     {{else}}
       {{asUpperCamelCase name}}AttributeCallback callback
-    {{/if_in_global_responses}}
+    {{/if_basic_global_response}}
     ) {
       read{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback);
     }
@@ -170,11 +171,11 @@ public class ChipClusters {
   {{/if}}
   {{#if isReportableAttribute}}
     public void subscribe{{asCamelCased name false}}Attribute(
-      {{#if_in_global_responses}}
+      {{#if_basic_global_response}}
         {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
       {{else}}
         {{asUpperCamelCase name}}AttributeCallback callback
-      {{/if_in_global_responses}},
+      {{/if_basic_global_response}},
       int minInterval, int maxInterval) {
       subscribe{{asCamelCased name false}}Attribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
@@ -186,11 +187,11 @@ public class ChipClusters {
   {{#unless (isStrEqual chipCallback.name "Unsupported")}}
 
     private native void read{{asUpperCamelCase name}}Attribute(long chipClusterPtr,
-      {{#if_in_global_responses}}
+      {{#if_basic_global_response}}
         {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
       {{else}}
         {{asUpperCamelCase name}}AttributeCallback callback
-      {{/if_in_global_responses}}
+      {{/if_basic_global_response}}
     );
   {{#if isWritableAttribute}}
 
@@ -198,11 +199,11 @@ public class ChipClusters {
   {{/if}}
   {{#if isReportableAttribute}}
     private native void subscribe{{asCamelCased name false}}Attribute(long chipClusterPtr,
-      {{#if_in_global_responses}}
+      {{#if_basic_global_response}}
         {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
       {{else}}
         {{asUpperCamelCase name}}AttributeCallback callback
-      {{/if_in_global_responses}}, int minInterval, int maxInterval);
+      {{/if_basic_global_response}}, int minInterval, int maxInterval);
   {{/if}}
   {{/unless}}
   {{/chip_server_cluster_attributes}}

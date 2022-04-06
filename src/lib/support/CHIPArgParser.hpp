@@ -149,9 +149,9 @@ public:
     HelpOptions(const char * appName, const char * appUsage, const char * appVersion);
     HelpOptions(const char * appName, const char * appUsage, const char * appVersion, const char * appDesc);
 
-    void PrintBriefUsage(FILE * s);
-    void PrintLongUsage(OptionSet * optSets[], FILE * s);
-    void PrintVersion(FILE * s);
+    void PrintBriefUsage(FILE * s) const;
+    void PrintLongUsage(OptionSet * optSets[], FILE * s) const;
+    void PrintVersion(FILE * s) const;
 
     bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg) override;
 };

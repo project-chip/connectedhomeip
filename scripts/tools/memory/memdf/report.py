@@ -69,7 +69,7 @@ REPORT_CONFIG: ConfigDescription = {
 }
 
 
-def postprocess_report_by(config: Config, key: str) -> None:
+def postprocess_report_by(config: Config, key: str, info: Mapping) -> None:
     """For --report-by=region, select all sections."""
     assert key == 'report.by'
     if config.get(key) == 'region':
@@ -147,7 +147,8 @@ OUTPUT_FILE_CONFIG: ConfigDescription = {
 }
 
 
-def postprocess_output_metadata(config: Config, key: str) -> None:
+def postprocess_output_metadata(config: Config, key: str,
+                                info: Mapping) -> None:
     """For --output-metadata=KEY:VALUE list, convert to dictionary."""
     assert key == 'output.metadata'
     metadata = {}
@@ -466,7 +467,7 @@ OUTPUT_FORMAT_CONFIG: ConfigDescription = {
         'title': 'output options',
     },
     'output.format': {
-        'help': 'Output format',
+        'help': f'Output format: one of {", ".join(WRITERS)}.',
         'metavar': 'FORMAT',
         'default': 'simple',
         'choices': list(WRITERS.keys()),

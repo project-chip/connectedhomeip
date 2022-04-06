@@ -22,9 +22,13 @@
 #include "AppEvent.h"
 #include "LEDWidget.h"
 #include "binding-handler.h"
+#include "sl_simple_led_instances.h"
+
+#ifdef DISPLAY_ENABLED
 #include "lcd.h"
 #include "qrcodegen.h"
-#include "sl_simple_led_instances.h"
+#endif // DISPLAY_ENABLED
+
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
@@ -53,6 +57,8 @@
 #endif
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/EFR32/NetworkCommissioningWiFiDriver.h>
 #endif /* SL_WIFI */
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
@@ -67,6 +73,9 @@
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 #define APP_LIGHT_SWITCH &sl_button_btn1
 
+using namespace chip;
+using namespace ::chip::DeviceLayer;
+
 namespace {
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
@@ -79,6 +88,9 @@ LEDWidget sStatusLED;
 bool sIsWiFiProvisioned = false;
 bool sIsWiFiEnabled     = false;
 bool sIsWiFiAttached    = false;
+
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
 #endif /* SL_WIFI */
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -178,12 +190,14 @@ CHIP_ERROR AppTask::Init()
     }
     EFR32_LOG("APP: Done WiFi Init");
     /* We will init server when we get IP */
-#endif
-    // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
 
+    sWiFiNetworkCommissioningInstance.Init();
+#endif
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
@@ -337,7 +351,11 @@ void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
 {
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        SwitchToggleOnOff();
+        BindingCommandData * data = Platform::New<BindingCommandData>();
+        data->commandId           = chip::app::Clusters::OnOff::Commands::Toggle::Id;
+        data->clusterId           = chip::app::Clusters::OnOff::Id;
+
+        DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     }
 }
 
@@ -401,7 +419,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = kFunction_NoneSelected;
-        ConfigurationMgr().InitiateFactoryReset();
+        chip::Server::GetInstance().ScheduleFactoryReset();
     }
 }
 

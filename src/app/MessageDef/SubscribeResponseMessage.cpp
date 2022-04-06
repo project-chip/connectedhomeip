@@ -22,9 +22,9 @@ namespace app {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    uint16_t TagPresenceMask = 0;
-    chip::TLV::TLVReader reader;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    int tagPresenceMask = 0;
+    TLV::TLVReader reader;
     PRETTY_PRINT("SubscribeResponseMessage =");
     PRETTY_PRINT("{");
 
@@ -33,12 +33,13 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrReturnError(chip::TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (chip::TLV::TagNumFromTag(reader.GetTag()))
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
+        switch (tagNum)
         {
-        case kCsTag_SubscriptionId:
-            VerifyOrReturnError(!(TagPresenceMask & (1 << kCsTag_SubscriptionId)), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_SubscriptionId);
+        case to_underlying(Tag::kSubscriptionId):
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kSubscriptionId))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kSubscriptionId));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
@@ -48,10 +49,11 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case kCsTag_MinIntervalFloorSeconds:
-            VerifyOrReturnError(!(TagPresenceMask & (1 << kCsTag_MinIntervalFloorSeconds)), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_MinIntervalFloorSeconds);
-            VerifyOrReturnError(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+        case to_underlying(Tag::kMinIntervalFloorSeconds):
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kMinIntervalFloorSeconds))),
+                                CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kMinIntervalFloorSeconds));
+            VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
                 uint16_t minIntervalFloorSeconds;
@@ -60,10 +62,11 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case kCsTag_MaxIntervalCeilingSeconds:
-            VerifyOrReturnError(!(TagPresenceMask & (1 << kCsTag_MaxIntervalCeilingSeconds)), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_MaxIntervalCeilingSeconds);
-            VerifyOrReturnError(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+        case to_underlying(Tag::kMaxIntervalCeilingSeconds):
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kMaxIntervalCeilingSeconds))),
+                                CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kMaxIntervalCeilingSeconds));
+            VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
                 uint16_t maxIntervalCeilingSeconds;
@@ -72,8 +75,12 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
+        case kInteractionModelRevisionTag:
+            ReturnErrorOnFailure(MessageParser::CheckInteractionModelRevision(reader));
+            break;
         default:
-            ReturnErrorOnFailure(CHIP_ERROR_INVALID_TLV_TAG);
+            PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
+            break;
         }
     }
     PRETTY_PRINT("}");
@@ -81,10 +88,10 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
 
     if (CHIP_END_OF_TLV == err)
     {
-        const uint16_t RequiredFields =
-            (1 << kCsTag_SubscriptionId) | (1 << kCsTag_MinIntervalFloorSeconds) | (1 << kCsTag_MaxIntervalCeilingSeconds);
+        const uint16_t RequiredFields = (1 << to_underlying(Tag::kSubscriptionId)) |
+            (1 << to_underlying(Tag::kMinIntervalFloorSeconds)) | (1 << to_underlying(Tag::kMaxIntervalCeilingSeconds));
 
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
+        if ((tagPresenceMask & RequiredFields) == RequiredFields)
         {
             err = CHIP_NO_ERROR;
         }
@@ -100,24 +107,24 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
 
 CHIP_ERROR SubscribeResponseMessage::Parser::GetSubscriptionId(uint64_t * const apSubscribeId) const
 {
-    return GetUnsignedInteger(kCsTag_SubscriptionId, apSubscribeId);
+    return GetUnsignedInteger(to_underlying(Tag::kSubscriptionId), apSubscribeId);
 }
 
 CHIP_ERROR SubscribeResponseMessage::Parser::GetMinIntervalFloorSeconds(uint16_t * const apMinIntervalFloorSeconds) const
 {
-    return GetUnsignedInteger(kCsTag_MinIntervalFloorSeconds, apMinIntervalFloorSeconds);
+    return GetUnsignedInteger(to_underlying(Tag::kMinIntervalFloorSeconds), apMinIntervalFloorSeconds);
 }
 
 CHIP_ERROR SubscribeResponseMessage::Parser::GetMaxIntervalCeilingSeconds(uint16_t * const apMaxIntervalCeilingSeconds) const
 {
-    return GetUnsignedInteger(kCsTag_MaxIntervalCeilingSeconds, apMaxIntervalCeilingSeconds);
+    return GetUnsignedInteger(to_underlying(Tag::kMaxIntervalCeilingSeconds), apMaxIntervalCeilingSeconds);
 }
 
 SubscribeResponseMessage::Builder & SubscribeResponseMessage::Builder::SubscriptionId(const uint64_t aSubscribeId)
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_SubscriptionId), aSubscribeId);
+        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kSubscriptionId)), aSubscribeId);
     }
     return *this;
 }
@@ -127,7 +134,7 @@ SubscribeResponseMessage::Builder::MinIntervalFloorSeconds(const uint16_t aMinIn
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_MinIntervalFloorSeconds), aMinIntervalFloorSeconds);
+        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kMinIntervalFloorSeconds)), aMinIntervalFloorSeconds);
     }
     return *this;
 }
@@ -137,14 +144,21 @@ SubscribeResponseMessage::Builder::MaxIntervalCeilingSeconds(const uint16_t aMax
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_MaxIntervalCeilingSeconds), aMaxIntervalCeilingSeconds);
+        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kMaxIntervalCeilingSeconds)), aMaxIntervalCeilingSeconds);
     }
     return *this;
 }
 
 SubscribeResponseMessage::Builder & SubscribeResponseMessage::Builder::EndOfSubscribeResponseMessage()
 {
-    EndOfContainer();
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = MessageBuilder::EncodeInteractionModelRevision();
+    }
+    if (mError == CHIP_NO_ERROR)
+    {
+        EndOfContainer();
+    }
     return *this;
 }
 } // namespace app

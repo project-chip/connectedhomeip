@@ -94,6 +94,8 @@ void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorde
             if (key == nullptr || value == nullptr)
                 continue;
             // ownership of key and value is still holding by the iter
+            DeviceLayer::SystemLayer().ScheduleLambda([me]() { me->_UpdateNetworkStatus(); });
+
             if (strcmp(key, kPropertyDeviceRole) == 0)
             {
                 const gchar * value_str = g_variant_get_string(value, nullptr);
@@ -233,27 +235,51 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(ByteSpan netInfo)
     return PlatformMgr().PostEvent(&event);
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(ByteSpan & netInfo)
+CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(Thread::OperationalDataset & dataset)
 {
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
 
     {
-        // TODO: The following code does not works actually, since otbr-posix does not emit signals for properties changes. Which is
-        // required for gdbus to caching properties.
-        std::unique_ptr<GVariant, GVariantDeleter> value(
-            openthread_io_openthread_border_router_dup_active_dataset_tlvs(mProxy.get()));
-        if (value == nullptr)
+        std::unique_ptr<GError, GErrorDeleter> err;
+
+        std::unique_ptr<GVariant, GVariantDeleter> response(
+            g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
+                                   g_variant_new("(ss)", "io.openthread.BorderRouter", "ActiveDatasetTlvs"), G_DBUS_CALL_FLAGS_NONE,
+                                   -1, nullptr, &MakeUniquePointerReceiver(err).Get()));
+
+        if (err)
         {
-            netInfo = ByteSpan();
+            ChipLogError(DeviceLayer, "openthread: failed to read ActiveDatasetTlvs property: %s", err->message);
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        // Note: The actual value is wrapped by a GVariant container, wrapped in another GVariant with tuple type.
+
+        if (response == nullptr)
+        {
             return CHIP_ERROR_KEY_NOT_FOUND;
         }
-        GBytes * bytes = g_variant_get_data_as_bytes(value.get());
+
+        std::unique_ptr<GVariant, GVariantDeleter> tupleContent(g_variant_get_child_value(response.get(), 0));
+
+        if (tupleContent == nullptr)
+        {
+            return CHIP_ERROR_KEY_NOT_FOUND;
+        }
+
+        std::unique_ptr<GVariant, GVariantDeleter> value(g_variant_get_variant(tupleContent.get()));
+
+        if (value == nullptr)
+        {
+            return CHIP_ERROR_KEY_NOT_FOUND;
+        }
+
         gsize size;
-        const uint8_t * data = reinterpret_cast<const uint8_t *>(g_bytes_get_data(bytes, &size));
+        const uint8_t * data = reinterpret_cast<const uint8_t *>(g_variant_get_fixed_array(value.get(), &size, sizeof(guchar)));
         ReturnErrorOnFailure(mDataset.Init(ByteSpan(data, size)));
     }
 
-    netInfo = mDataset.AsByteSpan();
+    dataset.Init(mDataset.AsByteSpan());
 
     return CHIP_NO_ERROR;
 }
@@ -270,16 +296,51 @@ void ThreadStackManagerImpl::_ErasePersistentInfo()
 
 bool ThreadStackManagerImpl::_IsThreadEnabled()
 {
-    if (!mProxy)
+    VerifyOrReturnError(mProxy, false);
+
+    std::unique_ptr<GError, GErrorDeleter> err;
+
+    std::unique_ptr<GVariant, GVariantDeleter> response(
+        g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
+                               g_variant_new("(ss)", "io.openthread.BorderRouter", "DeviceRole"), G_DBUS_CALL_FLAGS_NONE, -1,
+                               nullptr, &MakeUniquePointerReceiver(err).Get()));
+
+    if (err)
+    {
+        ChipLogError(DeviceLayer, "openthread: failed to read DeviceRole property: %s", err->message);
+        return false;
+    }
+
+    if (response == nullptr)
     {
         return false;
     }
 
-    std::unique_ptr<gchar, GFree> role(openthread_io_openthread_border_router_dup_device_role(mProxy.get()));
-    return (strcmp(role.get(), kOpenthreadDeviceRoleDisabled) != 0);
+    std::unique_ptr<GVariant, GVariantDeleter> tupleContent(g_variant_get_child_value(response.get(), 0));
+
+    if (tupleContent == nullptr)
+    {
+        return false;
+    }
+
+    std::unique_ptr<GVariant, GVariantDeleter> value(g_variant_get_variant(tupleContent.get()));
+
+    if (value == nullptr)
+    {
+        return false;
+    }
+
+    const gchar * role = g_variant_get_string(value.get(), nullptr);
+
+    if (role == nullptr)
+    {
+        return false;
+    }
+
+    return (strcmp(role, kOpenthreadDeviceRoleDisabled) != 0);
 }
 
-bool ThreadStackManagerImpl::_IsThreadAttached()
+bool ThreadStackManagerImpl::_IsThreadAttached() const
 {
     return mAttached;
 }
@@ -289,7 +350,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
     if (val)
     {
-        openthread_io_openthread_border_router_call_attach(mProxy.get(), nullptr, _OnThreadAttachFinished, this);
+        openthread_io_openthread_border_router_call_attach(mProxy.get(), nullptr, _OnThreadBrAttachFinished, this);
     }
     else
     {
@@ -311,7 +372,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     return CHIP_NO_ERROR;
 }
 
-void ThreadStackManagerImpl::_OnThreadAttachFinished(GObject * source_object, GAsyncResult * res, gpointer user_data)
+void ThreadStackManagerImpl::_OnThreadBrAttachFinished(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
     ThreadStackManagerImpl * this_ = reinterpret_cast<ThreadStackManagerImpl *>(user_data);
     std::unique_ptr<GVariant, GVariantDeleter> attachRes;
@@ -362,7 +423,7 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
     {
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
     }
-    else if (strcmp(role.get(), kOpenthreadDeviceRoleChild) == 0)
+    if (strcmp(role.get(), kOpenthreadDeviceRoleChild) == 0)
     {
         std::unique_ptr<GVariant, GVariantDeleter> linkMode(openthread_io_openthread_border_router_dup_link_mode(mProxy.get()));
         if (!linkMode)
@@ -382,15 +443,13 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
         }
         return type;
     }
-    else if (strcmp(role.get(), kOpenthreadDeviceRoleLeader) == 0 || strcmp(role.get(), kOpenthreadDeviceRoleRouter) == 0)
+    if (strcmp(role.get(), kOpenthreadDeviceRoleLeader) == 0 || strcmp(role.get(), kOpenthreadDeviceRoleRouter) == 0)
     {
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_Router;
     }
-    else
-    {
-        ChipLogError(DeviceLayer, "Unknown Thread role: %s", role.get());
-        return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
-    }
+
+    ChipLogError(DeviceLayer, "Unknown Thread role: %s", role.get());
+    return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType)
@@ -507,7 +566,7 @@ CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::StartThreadScan(ThreadDriver::ScanCallback * callback)
+CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(ThreadDriver::ScanCallback * callback)
 {
     // There is another ongoing scan request, reject the new one.
     VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -571,8 +630,8 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
                                    &joiner_udp_port, &channel, &rssi, &lqi, &version, &is_native, &is_joinable))
         {
             ChipLogProgress(DeviceLayer,
-                            "Thread Network: %s (%016" PRIx64 ") ExtPanId(%016" PRIx64 ") RSSI %" PRIu16 " LQI %" PRIu8
-                            " Version %" PRIu8,
+                            "Thread Network: %s (%016" PRIx64 ") ExtPanId(%016" PRIx64 ") RSSI %" PRIu16 " LQI %u"
+                            " Version %u",
                             network_name, ext_address, ext_panid, rssi, lqi, version);
             NetworkCommissioning::ThreadScanResponse networkScanned;
             networkScanned.panId         = panid;
@@ -637,8 +696,8 @@ CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(A
 }
 
 CHIP_ERROR
-ThreadStackManagerImpl::AttachToThreadNetwork(ByteSpan netInfo,
-                                              NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
+ThreadStackManagerImpl::_AttachToThreadNetwork(ByteSpan netInfo,
+                                               NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
 {
     // There is another ongoing connect request, reject the new one.
     VerifyOrReturnError(mpConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -647,6 +706,37 @@ ThreadStackManagerImpl::AttachToThreadNetwork(ByteSpan netInfo,
     ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(true));
     mpConnectCallback = callback;
     return CHIP_NO_ERROR;
+}
+
+void ThreadStackManagerImpl::_UpdateNetworkStatus()
+{
+    // Thread is not enabled, then we are not trying to connect to the network.
+    VerifyOrReturn(IsThreadEnabled() && mpStatusChangeCallback != nullptr);
+
+    Thread::OperationalDataset dataset;
+    uint8_t extpanid[Thread::kSizeExtendedPanId];
+
+    // If we have not provisioned any Thread network, return the status from last network scan,
+    // If we have provisioned a network, we assume the ot-br-posix is activitely connecting to that network.
+    CHIP_ERROR err = ThreadStackMgrImpl().GetThreadProvision(dataset);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to get configured network when updating network status: %s", err.AsString());
+        return;
+    }
+
+    // The Thread network is not enabled, but has a different extended pan id.
+    VerifyOrReturn(dataset.GetExtendedPanId(extpanid) == CHIP_NO_ERROR);
+
+    // We have already connected to the network, thus return success.
+    if (ThreadStackMgrImpl().IsThreadAttached())
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(ByteSpan(extpanid)), NullOptional);
+    }
+    else
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kNetworkNotFound, MakeOptional(ByteSpan(extpanid)), NullOptional);
+    }
 }
 
 ThreadStackManager & ThreadStackMgr()

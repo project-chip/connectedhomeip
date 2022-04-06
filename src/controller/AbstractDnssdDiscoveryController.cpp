@@ -25,7 +25,7 @@
 namespace chip {
 namespace Controller {
 
-void AbstractDnssdDiscoveryController::OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData)
+void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData)
 {
     auto discoveredNodes = GetDiscoveredNodes();
     for (auto & discoveredNode : discoveredNodes)
