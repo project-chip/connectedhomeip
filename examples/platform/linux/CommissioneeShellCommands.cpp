@@ -134,9 +134,9 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
         }
         return PrintAllCommands();
             }
-    
+
             return CHIP_ERROR_INVALID_ARGUMENT;
-           
+
     return error;
 }
 

@@ -37,7 +37,7 @@
     } if (value.Has(chip::RendezvousInformationFlag::kOnNetwork))         {
         return kRendezvousInformationOnNetwork;
     }                 return kRendezvousInformationNone;
-   
+
 }
 
 - (CHIPCommissioningFlow)convertCommissioningFlow:(chip::CommissioningFlow)value
@@ -50,7 +50,7 @@
     } if (value == chip::CommissioningFlow::kCustom) {
                 return kCommissioningFlowCustom;
     }         return kCommissioningFlowInvalid;
-           
+
 }
 
 - (id)initWithSetupPayload:(chip::SetupPayload)setupPayload

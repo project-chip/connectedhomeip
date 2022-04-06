@@ -144,9 +144,9 @@ struct Transitions
         {
                     return mFactory.CreateState2();
         }
-        
+
                             return {};
-       
+
     }
 };
 
