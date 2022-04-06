@@ -323,7 +323,7 @@ public:
 
         chip::DeviceProxyInitParams initParams = {
             .sessionManager           = &(server->GetSecureSessionManager()),
-            .sessionResumptionStorage = &(server->GetSessionResumptionStorage()),
+            .sessionResumptionStorage = server->GetSessionResumptionStorage(),
             .exchangeMgr              = &(server->GetExchangeManager()),
             .fabricTable              = &(server->GetFabricTable()),
             .clientPool               = &gCASEClientPool,
