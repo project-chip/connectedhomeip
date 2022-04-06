@@ -1321,18 +1321,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_MDNS_CACHE_SIZE
- *
- * @brief
- *      Define the size of the MDNS cache
- *
- *      If CHIP_CONFIG_MDNS_CACHE_SIZE is 0, the builtin cache is not used.
- *
- */
-#ifndef CHIP_CONFIG_MDNS_CACHE_SIZE
-#define CHIP_CONFIG_MDNS_CACHE_SIZE 0
-#endif
-/**
  *  @name Interaction Model object pool configuration.
  *
  *  @brief
