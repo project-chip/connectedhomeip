@@ -63,11 +63,10 @@ const char PAYLOAD[] = "Hello!";
 
 auto & gLoopback = sContext.GetLoopback();
 
-class MockAppDelegate : public ExchangeAcceptor, public ExchangeDelegate
+class MockAppDelegate : public UnsolicitedMessageHandler, public ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle & payload,
-                                            ExchangeDelegate *& newDelegate) override
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
     {
         // Handle messages by myself
         newDelegate = this;
@@ -147,11 +146,10 @@ public:
     bool mRequireEncryption = false;
 };
 
-class MockSessionEstablishmentDelegate : public ExchangeAcceptor, public ExchangeDelegate
+class MockSessionEstablishmentDelegate : public UnsolicitedMessageHandler, public ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle & payload,
-                                            ExchangeDelegate *& newDelegate) override
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
     {
         // Handle messages by myself
         newDelegate = this;

@@ -69,7 +69,7 @@ namespace app {
  * handlers
  *
  */
-class InteractionModelEngine : public Messaging::ExchangeAcceptor,
+class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
                                public CommandHandler::Callback,
                                public ReadHandler::ManagementCallback
@@ -268,8 +268,7 @@ private:
 
     ReadHandler::ApplicationCallback * GetAppCallback() override { return mpReadHandlerApplicationCallback; }
 
-    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle & payload,
-                                            ExchangeDelegate *& newDelegate) override;
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
 
     /**
      * Called when Interaction Model receives a Command Request message.  Errors processing

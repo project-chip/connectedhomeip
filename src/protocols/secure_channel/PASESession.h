@@ -66,7 +66,9 @@ struct PASESessionSerializable
     uint16_t mPeerSessionId;
 };
 
-class DLL_EXPORT PASESession : public Messaging::ExchangeAcceptor, public Messaging::ExchangeDelegate, public PairingSession
+class DLL_EXPORT PASESession : public Messaging::UnsolicitedMessageHandler,
+                               public Messaging::ExchangeDelegate,
+                               public PairingSession
 {
 public:
     PASESession();
@@ -79,8 +81,7 @@ public:
     // should not need to be told their peer node ID
     using PairingSession::SetPeerNodeId;
 
-    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle & payload,
-                                            ExchangeDelegate *& newDelegate) override;
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
 
     /**
      * @brief
