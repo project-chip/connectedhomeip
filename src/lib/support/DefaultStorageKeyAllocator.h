@@ -76,6 +76,10 @@ public:
     const char * GroupDataCounter() { return Format("g/gdc"); }
     const char * GroupControlCounter() { return Format("g/gcc"); }
 
+    // Device Information Provider
+    const char * UserLabelLengthKey(EndpointId endpoint) { return Format("g/userlbl/%x", endpoint); }
+    const char * UserLabelIndexKey(EndpointId endpoint, uint32_t index) { return Format("g/userlbl/%x/%" PRIx32, endpoint, index); }
+
     // Group Data Provider
 
     // List of fabric indices that have endpoint-to-group associations defined.

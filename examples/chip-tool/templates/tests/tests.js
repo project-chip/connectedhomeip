@@ -547,6 +547,7 @@ function getTests()
     'TestModeSelectCluster',
     'TestSystemCommands',
     'TestBinding',
+    'TestUserLabelCluster',
   ];
 
   const MultiAdmin = [
