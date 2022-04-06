@@ -44,6 +44,7 @@ public:
                                              Ble::BleLayer * bleLayer,
 #endif
                                              SessionManager * sessionManager, FabricTable * fabrics,
+                                             SessionResumptionStorage * sessionResumptionStorage,
                                              Credentials::GroupDataProvider * responderGroupDataProvider);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
@@ -59,7 +60,8 @@ public:
     virtual CASESession & GetSession() { return mPairingSession; }
 
 private:
-    Messaging::ExchangeManager * mExchangeManager = nullptr;
+    Messaging::ExchangeManager * mExchangeManager        = nullptr;
+    SessionResumptionStorage * mSessionResumptionStorage = nullptr;
 
     CASESession mPairingSession;
     SessionManager * mSessionManager = nullptr;

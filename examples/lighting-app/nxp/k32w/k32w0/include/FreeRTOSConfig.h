@@ -44,7 +44,8 @@
 #define configCPU_CLOCK_HZ (SystemCoreClock)
 #define configTICK_RATE_HZ ((TickType_t) 100)
 #define configMAX_PRIORITIES (8)
-#define configMINIMAL_STACK_SIZE ((unsigned short) 90)
+// idle task stack size needs to be increased for OTA EEPROM processing
+#define configMINIMAL_STACK_SIZE ((unsigned short) 450)
 #define configMAX_TASK_NAME_LEN 20
 #define configUSE_16_BIT_TICKS 0
 #define configIDLE_SHOULD_YIELD 1
@@ -74,7 +75,7 @@
 
 /* Hook function related definitions. */
 #ifndef configUSE_IDLE_HOOK
-#define configUSE_IDLE_HOOK 0
+#define configUSE_IDLE_HOOK 1
 #endif
 #define configUSE_TICK_HOOK 0
 #define configCHECK_FOR_STACK_OVERFLOW 0
@@ -99,7 +100,7 @@
 #define configUSE_TIMERS 1
 #define configTIMER_TASK_PRIORITY (configMAX_PRIORITIES - 1)
 #define configTIMER_QUEUE_LENGTH 10
-#define configTIMER_TASK_STACK_DEPTH (configMINIMAL_STACK_SIZE * 4)
+#define configTIMER_TASK_STACK_DEPTH (360)
 
 /* Define to trap errors during development. */
 #define configASSERT(x)                                                                                                            \

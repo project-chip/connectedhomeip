@@ -297,7 +297,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _version = @(0);
 
-        _extendedAddress = @(0);
+        _extendedAddress = [NSData data];
 
         _rssi = @(0);
 

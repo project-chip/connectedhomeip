@@ -237,10 +237,10 @@ void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
     {
         NetworkCommissioning::WiFiScanResponse scanResponse = { 0 };
 
-        scanResponse.security = GetInstance().ConvertSecuritytype(aScanResult->security);
-        scanResponse.channel  = aScanResult->chan;
-        scanResponse.rssi     = aScanResult->rssi;
-        scanResponse.ssidLen  = strnlen(aScanResult->ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
+        scanResponse.security.SetRaw(GetInstance().ConvertSecuritytype(aScanResult->security));
+        scanResponse.channel = aScanResult->chan;
+        scanResponse.rssi    = aScanResult->rssi;
+        scanResponse.ssidLen = strnlen(aScanResult->ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
         memcpy(scanResponse.ssid, aScanResult->ssid, scanResponse.ssidLen);
         memcpy(scanResponse.bssid, aScanResult->bssid, sizeof(scanResponse.bssid));
 

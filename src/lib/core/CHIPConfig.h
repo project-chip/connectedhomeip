@@ -1679,7 +1679,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *   Maximum number of CASE sessions that a device caches, that can be resumed
  */
 #ifndef CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE
-#define CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE 4
+#define CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE 64
 #endif
 
 /**
@@ -1822,6 +1822,18 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
 #define CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT 0
 #endif // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+
+/**
+ *  @def CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS
+ *
+ *  @brief
+ *    This is the default timeout for the discovery of devices by
+ *    the setup code pairer.
+ *
+ */
+#ifndef CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS
+#define CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS 30
+#endif // CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS
 
 /**
  * @}

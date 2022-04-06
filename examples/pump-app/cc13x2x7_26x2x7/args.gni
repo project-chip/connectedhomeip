@@ -35,6 +35,9 @@ chip_enable_ota_requestor = true
 # BLE options
 chip_config_network_layer_ble = true
 
+# Disable session resumption due to lack of code space
+chip_enable_session_resumption = false
+
 # Disable lock tracking, since our FreeRTOS configuration does not set
 # INCLUDE_xSemaphoreGetMutexHolder
 chip_stack_lock_tracking = "none"

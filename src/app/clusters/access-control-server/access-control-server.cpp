@@ -705,9 +705,27 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
 
 AccessControlAttribute gAttribute;
 
+class : public FabricTableDelegate
+{
+public:
+    void OnFabricDeletedFromStorage(CompressedFabricId compressedId, FabricIndex fabricIndex) override
+    {
+        auto & storage = Server::GetInstance().GetPersistentStorage();
+        DefaultStorageKeyAllocator key;
+        storage.SyncDeleteKeyValue(key.AccessControlExtensionEntry(fabricIndex));
+    }
+    void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) override {}
+    void OnFabricPersistedToStorage(FabricInfo * fabricInfo) override {}
+
+} fabricTableDelegate;
+
 } // namespace
 
 void MatterAccessControlPluginServerInitCallback()
 {
+    ChipLogProgress(DataManagement, "AccessControlCluster: initializing");
+
     registerAttributeAccessOverride(&gAttribute);
+
+    Server::GetInstance().GetFabricTable().AddFabricDelegate(&fabricTableDelegate);
 }

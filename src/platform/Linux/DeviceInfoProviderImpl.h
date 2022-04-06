@@ -31,6 +31,7 @@ public:
     FixedLabelIterator * IterateFixedLabel(EndpointId endpoint) override;
     UserLabelIterator * IterateUserLabel(EndpointId endpoint) override;
     SupportedLocalesIterator * IterateSupportedLocales() override;
+    SupportedCalendarTypesIterator * IterateSupportedCalendarTypes() override;
 
     static DeviceInfoProviderImpl & GetDefaultInstance();
 
@@ -78,6 +79,18 @@ protected:
     private:
         size_t mIndex = 0;
         char mActiveLocaleBuf[kMaxActiveLocaleLength + 1];
+    };
+
+    class SupportedCalendarTypesIteratorImpl : public SupportedCalendarTypesIterator
+    {
+    public:
+        SupportedCalendarTypesIteratorImpl() = default;
+        size_t Count() override;
+        bool Next(CalendarType & output) override;
+        void Release() override { delete this; }
+
+    private:
+        size_t mIndex = 0;
     };
 
     CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) override;

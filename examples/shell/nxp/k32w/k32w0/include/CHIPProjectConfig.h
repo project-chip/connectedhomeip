@@ -102,13 +102,6 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
- *
- * Enable support for CHIP-over-BLE (CHIPOBLE).
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
-
-/**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
  *
  * Enables synchronizing the device's real time clock with a remote CHIP Time service

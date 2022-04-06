@@ -24,6 +24,7 @@ declare_args() {
       is_debug && (current_os == "linux" || current_os == "mac")
 
   chip_im_force_fabric_quota_check = false
+  chip_enable_session_resumption = true
 }
 
 buildconfig_header("app_buildconfig") {
@@ -33,6 +34,7 @@ buildconfig_header("app_buildconfig") {
   defines = [
     "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=${chip_enable_schema_check}",
     "CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK=${chip_im_force_fabric_quota_check}",
+    "CHIP_CONFIG_ENABLE_SESSION_RESUMPTION=${chip_enable_session_resumption}",
   ]
 }
 

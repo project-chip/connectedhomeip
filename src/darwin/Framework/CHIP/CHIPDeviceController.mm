@@ -16,6 +16,7 @@
  */
 #import "CHIPDeviceController.h"
 
+#import "CHIPAttestationTrustStoreBridge.h"
 #import "CHIPCommissioningParameters.h"
 #import "CHIPControllerAccessControl.h"
 #import "CHIPDevicePairingDelegateBridge.h"
@@ -58,6 +59,7 @@ static NSString * const kErrorIPKInit = @"Init failure while initializing IPK";
 static NSString * const kErrorOperationalCredentialsInit = @"Init failure while creating operational credentials delegate";
 static NSString * const kErrorPairingInit = @"Init failure while creating a pairing delegate";
 static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
+static NSString * const kErrorAttestationTrustStoreInit = @"Init failure while creating the attestation trust store";
 static NSString * const kErrorPairDevice = @"Failure while pairing the device";
 static NSString * const kErrorUnpairDevice = @"Failure while unpairing the device";
 static NSString * const kErrorStopPairing = @"Failure while trying to stop the pairing process";
@@ -79,6 +81,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 @property (readonly) chip::Credentials::GroupDataProviderImpl * groupDataProvider;
 @property (readonly) CHIPDevicePairingDelegateBridge * pairingDelegateBridge;
 @property (readonly) CHIPPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
+@property (readonly) CHIPAttestationTrustStoreBridge * attestationTrustStoreBridge;
 @property (readonly) CHIPOperationalCredentialsDelegate * operationalCredentialsDelegate;
 @property (readonly) CHIPP256KeypairBridge keypairBridge;
 @property (readonly) chip::NodeId localDeviceId;
@@ -120,6 +123,11 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 
         _persistentStorageDelegateBridge = new CHIPPersistentStorageDelegateBridge();
         if ([self checkForInitError:(_persistentStorageDelegateBridge != nullptr) logMsg:kErrorPersistentStorageInit]) {
+            return nil;
+        }
+
+        _attestationTrustStoreBridge = new CHIPAttestationTrustStoreBridge();
+        if ([self checkForInitError:(_attestationTrustStoreBridge != nullptr) logMsg:kErrorAttestationTrustStoreInit]) {
             return nil;
         }
 
@@ -183,12 +191,13 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
        vendorId:(uint16_t)vendorId
       nocSigner:(id<CHIPKeypair>)nocSigner
 {
-    return [self startup:storageDelegate vendorId:vendorId nocSigner:nocSigner ipk:nil];
+    return [self startup:storageDelegate vendorId:vendorId nocSigner:nocSigner ipk:nil paaCerts:nil];
 }
 - (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
        vendorId:(uint16_t)vendorId
       nocSigner:(id<CHIPKeypair>)nocSigner
             ipk:(NSData * _Nullable)ipk
+       paaCerts:(NSArray<NSData *> * _Nullable)paaCerts
 {
     if (vendorId == chip::VendorId::Common) {
         // Shouldn't be using the "standard" vendor ID for actual devices.
@@ -243,9 +252,14 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         params.enableServerInteractions = true;
 
         // Initialize device attestation verifier
-        // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
-        const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-        chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
+        if (paaCerts) {
+            _attestationTrustStoreBridge->Init(paaCerts);
+            chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(_attestationTrustStoreBridge));
+        } else {
+            // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+            const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+            chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
+        }
 
         params.groupDataProvider = _groupDataProvider;
         params.fabricIndependentStorage = _persistentStorageDelegateBridge;
@@ -673,6 +687,11 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     if (_persistentStorageDelegateBridge) {
         delete _persistentStorageDelegateBridge;
         _persistentStorageDelegateBridge = NULL;
+    }
+
+    if (_attestationTrustStoreBridge) {
+        delete _attestationTrustStoreBridge;
+        _attestationTrustStoreBridge = NULL;
     }
 
     if (_groupDataProvider) {

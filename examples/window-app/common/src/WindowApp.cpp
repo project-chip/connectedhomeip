@@ -380,9 +380,9 @@ void WindowApp::HandleLongPress()
     else if (mDownPressed)
     {
         // Long press button down: Cycle between covering types
-        mDownSuppressed          = true;
-        EmberAfWcType cover_type = GetCover().CycleType();
-        mTiltMode                = mTiltMode && (EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT == cover_type);
+        mDownSuppressed = true;
+        Type type       = GetCover().CycleType();
+        mTiltMode       = mTiltMode && (Type::kTiltBlindLiftAndTilt == type);
     }
 }
 
@@ -412,7 +412,7 @@ void WindowApp::Cover::Init(chip::EndpointId endpoint)
     // Note: All Current Positions are preset via Zap config and kept accross reboot via NVM: no need to init them
 
     // Attribute: Id  0 Type
-    TypeSet(endpoint, EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT);
+    TypeSet(endpoint, Type::kTiltBlindLiftAndTilt);
 
     // Attribute: Id  7 ConfigStatus
     ConfigStatus configStatus = { .operational             = 1,
@@ -427,7 +427,7 @@ void WindowApp::Cover::Init(chip::EndpointId endpoint)
     OperationalStatusSetWithGlobalUpdated(endpoint, mOperationalStatus);
 
     // Attribute: Id 13 EndProductType
-    EndProductTypeSet(endpoint, EMBER_ZCL_WC_END_PRODUCT_TYPE_INTERIOR_BLIND);
+    EndProductTypeSet(endpoint, EndProductType::kInteriorBlind);
 
     // Attribute: Id 24 Mode
     Mode mode = { .motorDirReversed = 0, .calibrationMode = 1, .maintenanceMode = 1, .ledDisplay = 1 };
@@ -588,27 +588,27 @@ void WindowApp::Cover::StepToward(OperationalState direction, bool isTilt)
     }
 }
 
-EmberAfWcType WindowApp::Cover::CycleType()
+Type WindowApp::Cover::CycleType()
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    EmberAfWcType type = TypeGet(mEndpoint);
+    Type type = TypeGet(mEndpoint);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     switch (type)
     {
-    case EMBER_ZCL_WC_TYPE_ROLLERSHADE:
-        type = EMBER_ZCL_WC_TYPE_DRAPERY;
+    case Type::kRollerShade:
+        type = Type::kDrapery;
         // tilt = false;
         break;
-    case EMBER_ZCL_WC_TYPE_DRAPERY:
-        type = EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT;
+    case Type::kDrapery:
+        type = Type::kTiltBlindLiftAndTilt;
         break;
-    case EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT:
-        type = EMBER_ZCL_WC_TYPE_ROLLERSHADE;
+    case Type::kTiltBlindLiftAndTilt:
+        type = Type::kRollerShade;
         // tilt = false;
         break;
     default:
-        type = EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT;
+        type = Type::kTiltBlindLiftAndTilt;
     }
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();

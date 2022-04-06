@@ -13,9 +13,8 @@
 # limitations under the License.
 
 import os
-
-from platform import uname
 from enum import Enum, auto
+from platform import uname
 
 from .gn import GnBuilder
 
@@ -130,7 +129,7 @@ class HostBoard(Enum):
                 arch = 'x64'
             elif arch == 'i386' or arch == 'i686':
                 arch = 'x86'
-            elif arch == 'aarch64' or arch == 'aarch64_be' or arch == 'armv8b' or arch == 'armv8l':
+            elif arch in ('aarch64', 'aarch64_be', 'armv8b', 'armv8l'):
                 arch = 'arm64'
 
             return arch
@@ -211,7 +210,8 @@ class HostBuilder(GnBuilder):
         if app == HostApp.CERT_TOOL:
             # Certification only built for openssl
             if self.board == HostBoard.ARM64:
-                # OpenSSL and MBEDTLS conflict. We only cross compile with mbedtls
+                # OpenSSL and mbedTLS conflicts.
+                # We only cross compile with mbedTLS.
                 raise Exception(
                     "Cannot cross compile CERT TOOL: ssl library conflict")
             self.extra_gn_options.append('chip_crypto="openssl"')
@@ -253,13 +253,15 @@ class HostBuilder(GnBuilder):
             return None
         elif self.board == HostBoard.ARM64:
             return {
-                'PKG_CONFIG_PATH': self.SysRootPath('SYSROOT_AARCH64') + '/lib/aarch64-linux-gnu/pkgconfig',
+                'PKG_CONFIG_PATH': os.path.join(
+                    self.SysRootPath('SYSROOT_AARCH64'),
+                    'lib/aarch64-linux-gnu/pkgconfig'),
             }
         else:
             raise Exception('Unknown host board type: %r' % self)
 
     def SysRootPath(self, name):
-        if not name in os.environ:
+        if name not in os.environ:
             raise Exception('Missing environment variable "%s"' % name)
         return os.environ[name]
 

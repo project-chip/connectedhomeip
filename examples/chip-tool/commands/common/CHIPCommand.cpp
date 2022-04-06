@@ -38,6 +38,7 @@ constexpr chip::FabricId kIdentityNullFabricId  = chip::kUndefinedFabricId;
 constexpr chip::FabricId kIdentityAlphaFabricId = 1;
 constexpr chip::FabricId kIdentityBetaFabricId  = 2;
 constexpr chip::FabricId kIdentityGammaFabricId = 3;
+constexpr chip::FabricId kIdentityOtherFabricId = 4;
 
 namespace {
 const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStore(const char * paaTrustStorePath)
@@ -113,6 +114,13 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityBeta, kIdentityBetaFabricId, trustStore));
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityGamma, kIdentityGammaFabricId, trustStore));
 
+    std::string name        = GetIdentity();
+    chip::FabricId fabricId = strtoull(name.c_str(), nullptr, 0);
+    if (fabricId >= kIdentityOtherFabricId)
+    {
+        ReturnLogErrorOnFailure(InitializeCommissioner(name.c_str(), fabricId, trustStore));
+    }
+
     // Initialize Group Data, including IPK
     for (auto it = mCommissioners.begin(); it != mCommissioners.end(); it++)
     {
@@ -155,6 +163,13 @@ CHIP_ERROR CHIPCommand::MaybeTearDownStack()
     ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityAlpha));
     ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityBeta));
     ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityGamma));
+
+    std::string name        = GetIdentity();
+    chip::FabricId fabricId = strtoull(name.c_str(), nullptr, 0);
+    if (fabricId >= kIdentityOtherFabricId)
+    {
+        ReturnLogErrorOnFailure(ShutdownCommissioner(name.c_str()));
+    }
 
     StopTracing();
 
@@ -201,10 +216,10 @@ void CHIPCommand::SetIdentity(const char * identity)
 {
     std::string name = std::string(identity);
     if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0 &&
-        name.compare(kIdentityNull) != 0)
+        name.compare(kIdentityNull) != 0 && strtoull(name.c_str(), nullptr, 0) < kIdentityOtherFabricId)
     {
-        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(), kIdentityAlpha,
-                     kIdentityBeta, kIdentityGamma);
+        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s, 4, 5...]", name.c_str(),
+                     kIdentityAlpha, kIdentityBeta, kIdentityGamma);
         chipDie();
     }
 
@@ -217,9 +232,22 @@ std::string CHIPCommand::GetIdentity()
     if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0 &&
         name.compare(kIdentityNull) != 0)
     {
-        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(), kIdentityAlpha,
-                     kIdentityBeta, kIdentityGamma);
-        chipDie();
+        chip::FabricId fabricId = strtoull(name.c_str(), nullptr, 0);
+        if (fabricId >= kIdentityOtherFabricId)
+        {
+            // normalize name since it is used in persistent storage
+
+            char s[24];
+            sprintf(s, "%" PRIu64, fabricId);
+
+            name = s;
+        }
+        else
+        {
+            ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s, 4, 5...]", name.c_str(),
+                         kIdentityAlpha, kIdentityBeta, kIdentityGamma);
+            chipDie();
+        }
     }
 
     return name;
@@ -246,10 +274,10 @@ chip::FabricId CHIPCommand::CurrentCommissionerId()
     {
         id = kIdentityNullFabricId;
     }
-    else
+    else if ((id = strtoull(name.c_str(), nullptr, 0)) < kIdentityOtherFabricId)
     {
-        VerifyOrDieWithMsg(false, chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(),
-                           kIdentityAlpha, kIdentityBeta, kIdentityGamma);
+        VerifyOrDieWithMsg(false, chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s, 4, 5...]",
+                           name.c_str(), kIdentityAlpha, kIdentityBeta, kIdentityGamma);
     }
 
     return id;
