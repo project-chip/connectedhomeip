@@ -5,7 +5,7 @@
 
 #include <lib/core/CHIPConfig.h>
 
-{{#endpoint_config}}
+{{#endpoint_config allowUnknownStorageOption="false"}}
 
 // Default values for the attributes longer than a pointer,
 // in a form of a binary blob
