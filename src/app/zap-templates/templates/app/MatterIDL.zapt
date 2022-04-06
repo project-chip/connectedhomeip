@@ -41,9 +41,7 @@
   {{#chip_server_cluster_attributes}}
   {{! ensure indent }}{{#unless isWritableAttribute~}}
     readonly {{!marker to place a space even with whitespace removal~}}
-  {{~/unless~}}{{#if isGlobalAttribute~}}
-    global {{!marker to place a space even with whitespace removal~}}
-  {{~/if~}}
+  {{~/unless~}}
   {{~!TODO: write only attributes should also be supported~}}
   {{~#unless isReportableAttribute~}}
     nosubscribe {{!marker to place a space even with whitespace removal~}}
