@@ -142,11 +142,10 @@ struct Transitions
         }
         if (state.Is<State3>() && event.Is<Event5>())
         {
-                    return mFactory.CreateState2();
+            return mFactory.CreateState2();
         }
-        
-                            return {};
-       
+
+        return {};
     }
 };
 
