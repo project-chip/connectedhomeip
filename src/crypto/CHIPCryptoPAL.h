@@ -206,6 +206,18 @@ public:
         ClearSecretData(&bytes[0], Cap);
     }
 
+    CapacityBoundBuffer & operator=(const CapacityBoundBuffer & other)
+    {
+        // Guard self assignment
+        if (this == &other)
+            return *this;
+
+        ClearSecretData(&bytes[0], Cap);
+        SetLength(other.Length());
+        ::memcpy(Bytes(), other.Bytes(), other.Length());
+        return *this;
+    }
+
     /** @brief Set current length of the buffer that's being used
      * @return Returns error if new length is > capacity
      **/

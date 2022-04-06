@@ -1669,7 +1669,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *   Maximum number of CASE sessions that a device caches, that can be resumed
  */
 #ifndef CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE
-#define CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE 4
+#define CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE 64
 #endif
 
 /**

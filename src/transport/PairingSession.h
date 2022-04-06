@@ -124,7 +124,6 @@ protected:
     CHIP_ERROR AllocateSecureSession(SessionManager & sessionManager, uint16_t sessionId);
 
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
-    void SetPeerCATs(CATValues peerCATs) { mPeerCATs = peerCATs; }
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
     void SetPeerAddress(const Transport::PeerAddress & address) { mPeerAddress = address; }
     virtual void OnSuccessStatusReport() {}
@@ -203,9 +202,12 @@ protected:
 
 private:
     const Transport::SecureSession::Type mSecureSessionType;
+
+protected:
     NodeId mPeerNodeId = kUndefinedNodeId;
     CATValues mPeerCATs;
 
+private:
     SessionHolder mSecureSessionHolder;
 
     // TODO: decouple peer address into transport, such that pairing session do not need to handle peer address
