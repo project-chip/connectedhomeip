@@ -323,7 +323,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         }
         if ((iterCount < chip::Crypto::kSpake2p_Min_PBKDF_Iterations) || (iterCount > chip::Crypto::kSpake2p_Max_PBKDF_Iterations))
         {
-            PrintArgError("%s: ERROR: argument %s not in range         [%zu, %zu]\n", aProgram, aName,
+            PrintArgError("%s: ERROR: argument %s not in range [%zu, %zu]\n", aProgram, aName,
                           chip::Crypto::kSpake2p_Min_PBKDF_Iterations, chip::Crypto::kSpake2p_Max_PBKDF_Iterations);
             retval = false;
             break;

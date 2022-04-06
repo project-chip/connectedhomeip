@@ -301,7 +301,7 @@ CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t inte
 
     sdCtx = chip::Platform::New<RegisterContext>(type, callback, context);
     err   = DNSServiceRegister(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDot, NULL, ntohs(port), recordLen,
-                             recordBytesPtr, OnRegister, sdCtx);
+                               recordBytesPtr, OnRegister, sdCtx);
     TXTRecordDeallocate(recordRef);
 
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err), CHIP_ERROR_INTERNAL);
@@ -508,8 +508,8 @@ static CHIP_ERROR GetAddrInfo(void * context, DnssdResolveCallback callback, uin
     sockaddr.sin6_family = AF_INET6;
     sockaddr.sin6_addr   = in6addr_loopback;
     sockaddr.sin6_port   = htons((unsigned short) port);
-    uint32_t ttl         = 120; // default TTL for records with         hostnames is 120 seconds
-    uint32_t interface   = 0;   // Set interface         to ANY (0) - network stack can decide how to route this.
+    uint32_t ttl         = 120; // default TTL for records with hostnames is 120 seconds
+    uint32_t interface   = 0;   // Set interface to ANY (0) - network stack can decide how to route this.
     OnGetAddrInfo(nullptr, 0 /* flags */, interface, kDNSServiceErr_NoError, hostname,
                   reinterpret_cast<struct sockaddr *>(&sockaddr), ttl, sdCtx);
 

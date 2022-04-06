@@ -678,8 +678,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             return CHIP_NO_ERROR;
         }
 
-        // Something has gone strange. Delete the old         device, try again.
-        ChipLogError(Controller, "Found unconnected         device, removing");
+        // Something has gone strange. Delete the old device, try again.
+        ChipLogError(Controller, "Found unconnected device, removing");
         ReleaseCommissioneeDevice(current);
     }
 
