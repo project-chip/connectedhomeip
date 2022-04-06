@@ -60,6 +60,15 @@ ColorControlServer & ColorControlServer::Instance()
     return instance;
 }
 
+bool ColorControlServer::HasFeature(chip::EndpointId endpoint, ColorControlFeature feature)
+{
+    bool success;
+    uint32_t featureMap;
+    success = (Attributes::FeatureMap::Get(endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+
+    return success ? ((featureMap & to_underlying(feature)) != 0) : false;
+}
+
 EmberAfStatus ColorControlServer::stopAllColorTransitions(EndpointId endpoint)
 {
     EmberEventControl * event = getEventControl(endpoint);

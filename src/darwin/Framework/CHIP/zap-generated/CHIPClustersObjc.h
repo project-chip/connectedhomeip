@@ -15943,6 +15943,14 @@ typedef NS_OPTIONS(uint16_t, CHIPColorControlColorCapabilities) {
     CHIPColorControlColorCapabilitiesColorTemperatureSupported = 0x10,
 };
 
+typedef NS_OPTIONS(uint32_t, CHIPColorControlFeature) {
+    CHIPColorControlFeatureHueAndSaturation = 0x1,
+    CHIPColorControlFeatureEnhancedHue = 0x2,
+    CHIPColorControlFeatureColorLoop = 0x4,
+    CHIPColorControlFeatureXY = 0x8,
+    CHIPColorControlFeatureColorTemperature = 0x10,
+};
+
 typedef NS_OPTIONS(uint8_t, CHIPColorControlColorLoopUpdateFlags) {
     CHIPColorControlColorLoopUpdateFlagsUpdateAction = 0x1,
     CHIPColorControlColorLoopUpdateFlagsUpdateDirection = 0x2,

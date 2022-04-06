@@ -27,13 +27,11 @@
 // Separate block is generated for big-endian and little-endian cases.
 #if BIGENDIAN_CPU
 #define GENERATED_DEFAULTS                                                                                                         \
-    {                                                                                                                              \
-    }
+    {}
 
 #else // !BIGENDIAN_CPU
 #define GENERATED_DEFAULTS                                                                                                         \
-    {                                                                                                                              \
-    }
+    {}
 
 #endif // BIGENDIAN_CPU
 
@@ -60,15 +58,13 @@
 // This is an array of EmberAfAttributeMinMaxValue structures.
 #define GENERATED_MIN_MAX_DEFAULT_COUNT 0
 #define GENERATED_MIN_MAX_DEFAULTS                                                                                                 \
-    {                                                                                                                              \
-    }
+    {}
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
 #define GENERATED_ATTRIBUTE_COUNT 0
 #define GENERATED_ATTRIBUTES                                                                                                       \
-    {                                                                                                                              \
-    }
+    {}
 
 // This is an array of EmberAfCluster structures.
 #define ZAP_ATTRIBUTE_INDEX(index) (&generatedAttributes[index])

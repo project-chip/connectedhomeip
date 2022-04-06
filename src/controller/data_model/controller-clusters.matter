@@ -659,6 +659,14 @@ client cluster ColorControl = 768 {
     kColorTemperatureSupported = 0x10;
   }
 
+  bitmap ColorControlFeature : BITMAP32 {
+    kHueAndSaturation = 0x1;
+    kEnhancedHue = 0x2;
+    kColorLoop = 0x4;
+    kXy = 0x8;
+    kColorTemperature = 0x10;
+  }
+
   bitmap ColorLoopUpdateFlags : BITMAP8 {
     kUpdateAction = 0x1;
     kUpdateDirection = 0x2;

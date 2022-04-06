@@ -565,7 +565,10 @@
         /* Endpoint: 0, Cluster: Time Format Localization (server) */                                                              \
         { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1 }, /* HourFormat */                                                       \
                                                                                                                                    \
-        /* Endpoint: 1, Cluster: On/Off (server) */ { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x2 } /* StartUpOnOff */          \
+        /* Endpoint: 1, Cluster: On/Off (server) */                                                                                \
+        {                                                                                                                          \
+            (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x2                                                                         \
+        } /* StartUpOnOff */                                                                                                       \
     }
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
