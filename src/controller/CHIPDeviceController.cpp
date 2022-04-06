@@ -807,10 +807,10 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestationFailure(DevicePro
                                                                        Credentials::AttestationVerificationResult attestationResult)
 {
     MATTER_TRACE_EVENT_SCOPE("continueCommissioningDevice", "DeviceCommissioner");
-    if (device == nullptr || device != mDeviceBeingCommissioned) 
+    if (device == nullptr || device != mDeviceBeingCommissioned)
     {
         ChipLogError(Controller, "Invalid device for commissioning %p", device);
-        return CHIP_ERROR_INCORRECT_STATE;    
+        return CHIP_ERROR_INCORRECT_STATE;
     }
     CommissioneeDeviceProxy * commissioneeDevice = FindCommissioneeDevice(device->GetDeviceId());
     if (commissioneeDevice == nullptr || !commissioneeDevice->IsSecureConnected() || commissioneeDevice != mDeviceBeingCommissioned)
