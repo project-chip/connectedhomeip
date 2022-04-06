@@ -48,6 +48,10 @@ public:
 
         if (deviceTypeList.size())
         {
+            //
+            // TODO: Need to update the Pigweed proto definition to actually represent this
+            //       as a list of device types.
+            //
             chip_rpc_DeviceType out{ .device_type = deviceTypeList.data()[0].deviceId };
             writer.Write(out);
         }

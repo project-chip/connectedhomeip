@@ -169,8 +169,13 @@ void emberAfEndpointConfigure(void)
 #if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
     if (MAX_ENDPOINT_COUNT > FIXED_ENDPOINT_COUNT)
     {
-        // This is assuming that EMBER_AF_ENDPOINT_DISABLED is 0
-        static_assert(EMBER_AF_ENDPOINT_DISABLED == 0, "We are creating enabled dynamic endpoints!");
+        //
+        // Reset instances tracking dynamic endpoints to safe defaults.
+        //
+        for (ep = FIXED_ENDPOINT_COUNT; ep < MAX_ENDPOINT_COUNT; ep++)
+        {
+            emAfEndpoints[ep] = EmberAfDefinedEndpoint();
+        }
     }
 #endif
 }

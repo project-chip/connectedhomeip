@@ -405,7 +405,7 @@ struct EmberAfDefinedEndpoint
     /**
      * Meta-data about the endpoint
      */
-    EmberAfEndpointBitmask bitmask = 0;
+    EmberAfEndpointBitmask bitmask = EMBER_AF_ENDPOINT_DISABLED;
     /**
      * Endpoint type for this endpoint.
      */
