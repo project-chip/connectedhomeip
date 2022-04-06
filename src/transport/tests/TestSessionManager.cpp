@@ -168,12 +168,12 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
 
     SessionHolder aliceToBobSession;
-    SecurePairingUsingTestSecret aliceToBobPairing(1, 2, sessionManager);
+    SecurePairingUsingTestSecret aliceToBobPairing(&sessionManager, 1, 2);
     err = sessionManager.NewPairing(aliceToBobSession, peer, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
                                     &aliceToBobPairing, CryptoContext::SessionRole::kInitiator, aliceFabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret bobToAlicePairing(2, 1, sessionManager);
+    SecurePairingUsingTestSecret bobToAlicePairing(&sessionManager, 2, 1);
     SessionHolder bobToAliceSession;
     err = sessionManager.NewPairing(bobToAliceSession, peer, fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
                                     &bobToAlicePairing, CryptoContext::SessionRole::kResponder, bobFabricIndex);
@@ -283,12 +283,12 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
 
     SessionHolder aliceToBobSession;
-    SecurePairingUsingTestSecret aliceToBobPairing(1, 2, sessionManager);
+    SecurePairingUsingTestSecret aliceToBobPairing(&sessionManager, 1, 2);
     err = sessionManager.NewPairing(aliceToBobSession, peer, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
                                     &aliceToBobPairing, CryptoContext::SessionRole::kInitiator, aliceFabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret bobToAlicePairing(2, 1, sessionManager);
+    SecurePairingUsingTestSecret bobToAlicePairing(&sessionManager, 2, 1);
     SessionHolder bobToAliceSession;
     err = sessionManager.NewPairing(bobToAliceSession, peer, fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
                                     &bobToAlicePairing, CryptoContext::SessionRole::kResponder, bobFabricIndex);
@@ -384,12 +384,12 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
 
     SessionHolder aliceToBobSession;
-    SecurePairingUsingTestSecret aliceToBobPairing(1, 2, sessionManager);
+    SecurePairingUsingTestSecret aliceToBobPairing(&sessionManager, 1, 2);
     err = sessionManager.NewPairing(aliceToBobSession, peer, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
                                     &aliceToBobPairing, CryptoContext::SessionRole::kInitiator, aliceFabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret bobToAlicePairing(2, 1, sessionManager);
+    SecurePairingUsingTestSecret bobToAlicePairing(&sessionManager, 2, 1);
     SessionHolder bobToAliceSession;
     err = sessionManager.NewPairing(bobToAliceSession, peer, fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
                                     &bobToAlicePairing, CryptoContext::SessionRole::kResponder, bobFabricIndex);
@@ -498,35 +498,35 @@ void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
 
     // First pairing
     callback.mOldConnectionDropped = false;
-    SecurePairingUsingTestSecret pairing1(1, 1, sessionManager);
+    SecurePairingUsingTestSecret pairing1(&sessionManager, 1, 1);
     err = sessionManager.NewPairing(session1, peer, kSourceNodeId, &pairing1, CryptoContext::SessionRole::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with different peer node ID and different local key ID (same peer key ID)
     callback.mOldConnectionDropped = false;
-    SecurePairingUsingTestSecret pairing2(1, 2, sessionManager);
+    SecurePairingUsingTestSecret pairing2(&sessionManager, 1, 2);
     err = sessionManager.NewPairing(session2, peer, kSourceNodeId, &pairing2, CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with undefined node ID and different local key ID (same peer key ID)
     callback.mOldConnectionDropped = false;
-    SecurePairingUsingTestSecret pairing3(1, 3, sessionManager);
+    SecurePairingUsingTestSecret pairing3(&sessionManager, 1, 3);
     err = sessionManager.NewPairing(session3, peer, kUndefinedNodeId, &pairing3, CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with same local key ID, and a given node ID
     callback.mOldConnectionDropped = false;
-    SecurePairingUsingTestSecret pairing4(1, 2, sessionManager);
+    SecurePairingUsingTestSecret pairing4(&sessionManager, 1, 2);
     err = sessionManager.NewPairing(session4, peer, kSourceNodeId, &pairing4, CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, callback.mOldConnectionDropped);
 
     // New pairing with same local key ID, and undefined node ID
     callback.mOldConnectionDropped = false;
-    SecurePairingUsingTestSecret pairing5(1, 1, sessionManager);
+    SecurePairingUsingTestSecret pairing5(&sessionManager, 1, 1);
     err = sessionManager.NewPairing(session5, peer, kUndefinedNodeId, &pairing5, CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, callback.mOldConnectionDropped);
@@ -590,12 +590,12 @@ void SendPacketWithOldCounterTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
 
     SessionHolder aliceToBobSession;
-    SecurePairingUsingTestSecret aliceToBobPairing(1, 2, sessionManager);
+    SecurePairingUsingTestSecret aliceToBobPairing(&sessionManager, 1, 2);
     err = sessionManager.NewPairing(aliceToBobSession, peer, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
                                     &aliceToBobPairing, CryptoContext::SessionRole::kInitiator, aliceFabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret bobToAlicePairing(2, 1, sessionManager);
+    SecurePairingUsingTestSecret bobToAlicePairing(&sessionManager, 2, 1);
     SessionHolder bobToAliceSession;
     err = sessionManager.NewPairing(bobToAliceSession, peer, fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
                                     &bobToAlicePairing, CryptoContext::SessionRole::kResponder, bobFabricIndex);
@@ -704,12 +704,12 @@ void SendPacketWithTooOldCounterTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
 
     SessionHolder aliceToBobSession;
-    SecurePairingUsingTestSecret aliceToBobPairing(1, 2, sessionManager);
+    SecurePairingUsingTestSecret aliceToBobPairing(&sessionManager, 1, 2);
     err = sessionManager.NewPairing(aliceToBobSession, peer, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
                                     &aliceToBobPairing, CryptoContext::SessionRole::kInitiator, aliceFabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret bobToAlicePairing(2, 1, sessionManager);
+    SecurePairingUsingTestSecret bobToAlicePairing(&sessionManager, 2, 1);
     SessionHolder bobToAliceSession;
     err = sessionManager.NewPairing(bobToAliceSession, peer, fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
                                     &bobToAlicePairing, CryptoContext::SessionRole::kResponder, bobFabricIndex);

@@ -47,6 +47,17 @@ void OnPlatformEventWrapper(const chip::DeviceLayer::ChipDeviceEvent * event, in
 
 namespace chip {
 
+CHIP_ERROR CommissioningWindowManager::Init(Server * server)
+{
+    if (server == nullptr)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    mServer = server;
+    mPairingSession.Init(&server->GetSecureSessionManager());
+    return CHIP_NO_ERROR;
+}
+
 void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 {
     if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
@@ -215,9 +226,9 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
     if (mUseECM)
     {
         ReturnErrorOnFailure(SetTemporaryDiscriminator(mECMDiscriminator));
-        ReturnErrorOnFailure(mPairingSession.WaitForPairing(
-            mServer->GetSecureSessionManager(), mECMPASEVerifier, mECMIterations, ByteSpan(mECMSalt, mECMSaltLength),
-            Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), this));
+        ReturnErrorOnFailure(mPairingSession.WaitForPairing(mECMPASEVerifier, mECMIterations, ByteSpan(mECMSalt, mECMSaltLength),
+                                                            Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()),
+                                                            this));
     }
     else
     {
@@ -238,9 +249,8 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
 
         ReturnErrorOnFailure(verifier.Deserialize(ByteSpan(serializedVerifier)));
 
-        ReturnErrorOnFailure(mPairingSession.WaitForPairing(mServer->GetSecureSessionManager(), verifier, iterationCount, saltSpan,
-                                                            Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()),
-                                                            this));
+        ReturnErrorOnFailure(mPairingSession.WaitForPairing(
+            verifier, iterationCount, saltSpan, Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), this));
     }
 
     ReturnErrorOnFailure(StartAdvertisement());

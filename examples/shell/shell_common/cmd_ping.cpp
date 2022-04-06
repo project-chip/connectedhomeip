@@ -243,7 +243,7 @@ CHIP_ERROR EstablishSecureSession(streamer_t * stream, const Transport::PeerAddr
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     Optional<Transport::PeerAddress> peerAddr;
-    SecurePairingUsingTestSecret * testSecurePairingSecret = chip::Platform::New<SecurePairingUsingTestSecret>();
+    SecurePairingUsingTestSecret * testSecurePairingSecret = chip::Platform::New<SecurePairingUsingTestSecret>(&gSessionManager);
     VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     peerAddr = Optional<Transport::PeerAddress>::Value(peerAddress);

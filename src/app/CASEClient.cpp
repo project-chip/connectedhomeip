@@ -19,7 +19,10 @@
 
 namespace chip {
 
-CASEClient::CASEClient(const CASEClientInitParams & params) : mInitParams(params) {}
+CASEClient::CASEClient(const CASEClientInitParams & params) : mInitParams(params)
+{
+    mCASESession.Init(params.sessionManager);
+}
 
 void CASEClient::SetMRPIntervals(const ReliableMessageProtocolConfig & mrpConfig)
 {
@@ -45,9 +48,8 @@ CHIP_ERROR CASEClient::EstablishSession(PeerId peer, const Transport::PeerAddres
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
 
     mCASESession.SetGroupDataProvider(mInitParams.groupDataProvider);
-    ReturnErrorOnFailure(mCASESession.EstablishSession(*mInitParams.sessionManager, peerAddress, mInitParams.fabricInfo,
-                                                       peer.GetNodeId(), exchange, mInitParams.sessionResumptionStorage, this,
-                                                       mInitParams.mrpLocalConfig));
+    ReturnErrorOnFailure(mCASESession.EstablishSession(peerAddress, mInitParams.fabricInfo, peer.GetNodeId(), exchange,
+                                                       mInitParams.sessionResumptionStorage, this, mInitParams.mrpLocalConfig));
     mConnectionSuccessCallback = onConnection;
     mConnectionFailureCallback = onFailure;
     mConectionContext          = context;

@@ -121,6 +121,7 @@ public:
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
+        mPairing.Init(mSessionManager);
     }
 
     /**

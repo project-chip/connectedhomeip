@@ -40,15 +40,7 @@ class CommissioningWindowManager : public SessionEstablishmentDelegate, public a
 public:
     CommissioningWindowManager() {}
 
-    CHIP_ERROR Init(Server * server)
-    {
-        if (server == nullptr)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        mServer = server;
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR Init(Server * server);
 
     static constexpr System::Clock::Seconds16 MaxCommissioningTimeout()
     {

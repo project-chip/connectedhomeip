@@ -41,6 +41,8 @@ public:
     PairingSession(Transport::SecureSession::Type secureSessionType) : mSecureSessionType(secureSessionType) {}
     virtual ~PairingSession() {}
 
+    void Init(SessionManager * sessionManager) { mSessionManager = sessionManager; }
+
     Transport::SecureSession::Type GetSecureSessionType() const { return mSecureSessionType; }
 
     // TODO: the session should know which peer we are trying to connect to at start
@@ -108,7 +110,7 @@ protected:
      * @param sessionManager session manager from which to allocate a secure session object
      * @return CHIP_ERROR The outcome of the allocation attempt
      */
-    CHIP_ERROR AllocateSecureSession(SessionManager & sessionManager);
+    CHIP_ERROR AllocateSecureSession();
 
     /**
      * Allocate a secure session object from the passed session manager with the
@@ -121,7 +123,7 @@ protected:
      * @param sessionId caller-requested session ID
      * @return CHIP_ERROR The outcome of the allocation attempt
      */
-    CHIP_ERROR AllocateSecureSession(SessionManager & sessionManager, uint16_t sessionId);
+    CHIP_ERROR AllocateSecureSession(uint16_t sessionId);
 
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
@@ -199,6 +201,9 @@ protected:
         mPeerSessionId.ClearValue();
         mSecureSessionHolder.Release();
     }
+
+protected:
+    SessionManager * mSessionManager;
 
 private:
     const Transport::SecureSession::Type mSecureSessionType;

@@ -57,31 +57,25 @@ class DLL_EXPORT CASESession : public Messaging::ExchangeDelegate, public Pairin
 {
 public:
     CASESession();
-    CASESession(CASESession &&)      = default;
-    CASESession(const CASESession &) = default;
-
     ~CASESession() override;
 
     /**
      * @brief
      *   Initialize using configured fabrics and wait for session establishment requests.
      *
-     * @param sessionManager                session manager from which to allocate a secure session object
      * @param fabrics                       Table of fabrics that are currently configured on the device
      * @param delegate                      Callback object
      *
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR ListenForSessionEstablishment(
-        SessionManager & sessionManager, FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage,
-        SessionEstablishmentDelegate * delegate,
+        FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage, SessionEstablishmentDelegate * delegate,
         Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
      * @brief
      *   Create and send session establishment request using device's operational credentials.
      *
-     * @param sessionManager                session manager from which to allocate a secure session object
      * @param peerAddress                   Address of peer with which to establish a session.
      * @param fabric                        The fabric that should be used for connecting with the peer
      * @param peerNodeId                    Node id of the peer node
@@ -91,9 +85,9 @@ public:
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR
-    EstablishSession(SessionManager & sessionManager, const Transport::PeerAddress peerAddress, FabricInfo * fabric,
-                     NodeId peerNodeId, Messaging::ExchangeContext * exchangeCtxt,
-                     SessionResumptionStorage * sessionResumptionStorage, SessionEstablishmentDelegate * delegate,
+    EstablishSession(const Transport::PeerAddress peerAddress, FabricInfo * fabric, NodeId peerNodeId,
+                     Messaging::ExchangeContext * exchangeCtxt, SessionResumptionStorage * sessionResumptionStorage,
+                     SessionEstablishmentDelegate * delegate,
                      Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
@@ -165,7 +159,7 @@ private:
         kSentSigma2Resume = 5,
     };
 
-    CHIP_ERROR Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR InitCASE(SessionEstablishmentDelegate * delegate);
 
     // On success, sets mIpk to the correct value for outgoing Sigma1 based on internal state
     CHIP_ERROR RecoverInitiatorIpk();

@@ -83,7 +83,6 @@ public:
      * @brief
      *   Initialize using PASE verifier and wait for pairing requests.
      *
-     * @param sessionManager      session manager from which to allocate a secure session object
      * @param verifier            PASE verifier to be used for SPAKE2P pairing
      * @param pbkdf2IterCount     Iteration count for PBKDF2 function
      * @param salt                Salt to be used for SPAKE2P operation
@@ -91,15 +90,13 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForPairing(SessionManager & sessionManager, const Spake2pVerifier & verifier, uint32_t pbkdf2IterCount,
-                              const ByteSpan & salt, Optional<ReliableMessageProtocolConfig> mrpConfig,
-                              SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR WaitForPairing(const Spake2pVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
+                              Optional<ReliableMessageProtocolConfig> mrpConfig, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
      *   Create a pairing request using peer's setup PIN code.
      *
-     * @param sessionManager      session manager from which to allocate a secure session object
      * @param peerAddress         Address of peer to pair
      * @param peerSetUpPINCode    Setup PIN code of the peer device
      * @param exchangeCtxt        The exchange context to send and receive messages with the peer
@@ -110,7 +107,7 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR Pair(SessionManager & sessionManager, const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode,
+    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode,
                     Optional<ReliableMessageProtocolConfig> mrpConfig, Messaging::ExchangeContext * exchangeCtxt,
                     SessionEstablishmentDelegate * delegate);
 
@@ -181,7 +178,7 @@ private:
         kUnexpected             = 0xff,
     };
 
-    CHIP_ERROR Init(SessionManager & sessionManager, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR InitPASE(uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
                                        const System::PacketBufferHandle & msg);
@@ -268,24 +265,19 @@ constexpr chip::NodeId kTestDeviceNodeId     = 12344321;
 class SecurePairingUsingTestSecret : public PairingSession
 {
 public:
-    SecurePairingUsingTestSecret() : PairingSession(Transport::SecureSession::Type::kPASE)
+    SecurePairingUsingTestSecret(SessionManager * sessionManager) : PairingSession(Transport::SecureSession::Type::kPASE)
     {
-        // Do not set to 0 to prevent an unwanted unsecured session
-        // since the session type is unknown.
+        PairingSession::Init(sessionManager);
+        // Do not set to 0 to prevent an unwanted unsecured session since the session type is unknown.
+        AllocateSecureSession(1);
         SetPeerSessionId(1);
     }
 
-    void Init(SessionManager & sessionManager)
+    SecurePairingUsingTestSecret(SessionManager * sessionManager, uint16_t peerSessionId, uint16_t localSessionId) :
+        PairingSession(Transport::SecureSession::Type::kPASE)
     {
-        // Do not set to 0 to prevent an unwanted unsecured session
-        // since the session type is unknown.
-        AllocateSecureSession(sessionManager, mLocalSessionId);
-    }
-
-    SecurePairingUsingTestSecret(uint16_t peerSessionId, uint16_t localSessionId, SessionManager & sessionManager) :
-        PairingSession(Transport::SecureSession::Type::kPASE), mLocalSessionId(localSessionId)
-    {
-        AllocateSecureSession(sessionManager, localSessionId);
+        PairingSession::Init(sessionManager);
+        AllocateSecureSession(localSessionId);
         SetPeerSessionId(peerSessionId);
     }
 
@@ -297,9 +289,6 @@ public:
     }
 
 private:
-    // Do not set to 0 to prevent an unwanted unsecured session
-    // since the session type is unknown.
-    uint16_t mLocalSessionId = 1;
     const char * kTestSecret = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
 };
 
