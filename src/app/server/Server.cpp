@@ -115,7 +115,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mCommissioningWindowManager.SetAppDelegate(initParams.appDelegate);
 
     // Initialize PersistentStorageDelegate-based storage
-    mDeviceStorage = initParams.persistentStorageDelegate;
+    mDeviceStorage            = initParams.persistentStorageDelegate;
     mSessionResumptionStorage = initParams.sessionResumptionStorage;
 
     // Set up attribute persistence before we try to bring up the data model
