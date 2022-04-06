@@ -48,7 +48,19 @@
     /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
+    /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
+    49, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
+    49, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
+    /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: view */ \
+    49, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
+    49, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
+    49, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
+    /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     62, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
+    /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: system mode, Privilege: view */ \
+    /* Cluster: User Label, Attribute: label list, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
 
@@ -73,7 +85,19 @@
     /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
+    /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
+    0, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
+    1, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
+    /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: view */ \
+    5, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
+    6, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
+    7, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
+    /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     0, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
+    /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: system mode, Privilege: view */ \
+    /* Cluster: User Label, Attribute: label list, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
 
@@ -98,7 +122,19 @@
     /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
+    /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
+    /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: view */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
+    /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
+    /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: system mode, Privilege: view */ \
+    /* Cluster: User Label, Attribute: label list, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
 
@@ -125,6 +161,13 @@
     257, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
     257, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
     48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
+    63, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
+    49, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
+    6, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: system mode, Privilege: manage */ \
+    65, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
     258, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
 
@@ -149,6 +192,13 @@
     49, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
     51, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
     0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
+    0, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
+    4, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
+    16387, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
+    25, /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: manage */ \
+    27, /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: manage */ \
+    28, /* Cluster: Thermostat, Attribute: system mode, Privilege: manage */ \
+    0, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
     23, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
 
@@ -173,6 +223,13 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
+    kMatterAccessPrivilegeManage, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: system mode, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
 
@@ -192,6 +249,19 @@
     48, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     48, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     48, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
+    63, /* Cluster: Group Key Management, Command: KeySetWrite, Privilege: administer */ \
+    63, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
+    63, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
+    63, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
+    3, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
+    3, /* Cluster: Identify, Command: IdentifyQuery, Privilege: manage */ \
+    3, /* Cluster: Identify, Command: TriggerEffect, Privilege: manage */ \
+    49, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
+    49, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
+    49, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
+    49, /* Cluster: Network Commissioning, Command: RemoveNetwork, Privilege: administer */ \
+    49, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
+    49, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
@@ -217,6 +287,19 @@
     0, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     2, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     4, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
+    0, /* Cluster: Group Key Management, Command: KeySetWrite, Privilege: administer */ \
+    1, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
+    3, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
+    4, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
+    0, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
+    1, /* Cluster: Identify, Command: IdentifyQuery, Privilege: manage */ \
+    64, /* Cluster: Identify, Command: TriggerEffect, Privilege: manage */ \
+    0, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
+    2, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
+    3, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
+    4, /* Cluster: Network Commissioning, Command: RemoveNetwork, Privilege: administer */ \
+    6, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
+    8, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     0, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
     2, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
     4, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
@@ -242,6 +325,19 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Group Key Management, Command: KeySetWrite, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Identify, Command: IdentifyQuery, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Identify, Command: TriggerEffect, Privilege: manage */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: RemoveNetwork, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
