@@ -27,10 +27,9 @@
 #include <platform_nvram.h>
 #include <string.h>
 
-namespace
-{
+namespace {
 constexpr size_t kMaxPersistedValueLengthSupported = 2048;
-}  // namespace
+} // namespace
 
 namespace chip {
 namespace DeviceLayer {

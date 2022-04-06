@@ -233,7 +233,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     CASESessionManagerConfig sessionManagerConfig = {
         .sessionInitParams = deviceInitParams,
-        .devicePool = stateParams.operationalDevicePool,
+        .devicePool        = stateParams.operationalDevicePool,
     };
 
     // TODO: Need to be able to create a CASESessionManagerConfig here!

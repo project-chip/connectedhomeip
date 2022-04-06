@@ -47,14 +47,13 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/PersistedStorage.h>
 
-namespace
-{
+namespace {
 
 constexpr size_t kMaxPersistedValueLengthSupported = 256;
 
 std::map<std::string, std::string> sPersistentStore;
 
-FILE *sPersistentStoreFile = nullptr;
+FILE * sPersistentStoreFile = nullptr;
 
 } // namespace
 
