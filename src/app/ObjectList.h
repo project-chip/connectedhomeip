@@ -27,7 +27,7 @@ struct ObjectList
     T mValue;
     ObjectList * mpNext = nullptr;
 
-    size_t size()
+    size_t count() const
     {
         size_t ret = 0;
         for (auto p = this; p != nullptr; p = p->mpNext)

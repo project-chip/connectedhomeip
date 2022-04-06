@@ -711,8 +711,11 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     }
     ReturnErrorOnFailure(err);
 
-    VerifyOrReturnError(InteractionModelEngine::GetInstance()->CanEstablishSubscribeTransaction(this),
-                        CHIP_IM_GLOBAL_STATUS(PathsExhausted));
+    if (!InteractionModelEngine::GetInstance()->CanEstablishSubscribeTransaction(this))
+    {
+        ChipLogProgress(DataManagement, "Cannot establish more subscriptions on this fabric");
+        return CHIP_IM_GLOBAL_STATUS(PathsExhausted);
+    }
 
     ReturnErrorOnFailure(subscribeRequestParser.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
     ReturnErrorOnFailure(subscribeRequestParser.GetMaxIntervalCeilingSeconds(&mMaxIntervalCeilingSeconds));

@@ -493,8 +493,9 @@ class ClusterObjectTests:
                         f"Established {len(subscriptionsEstablished[i])} subscriptions on fabric {fabricId}")
                 except chip.exceptions.ChipStackError as ex:
                     # Note: 1417 is 0x589 IM error 0x89 - ResourceExhausted
+                    # 1480 is 0x5c8 - PathsExhausted
                     # TODO: We should convert this error to im error here.
-                    if ex.err != 1417:
+                    if ex.err != 1417 and ex.err != 1480:
                         logger.info(f"Unexpected status code {ex} received.")
                         success = False
                     else:
@@ -529,6 +530,7 @@ class ClusterObjectTests:
             raise AssertionError(
                 "Failed to test parallel subscriptions, see logs above.")
 
+    @classmethod
     async def TestMixedReadAttributeAndEvents(cls, devCtrl):
         def attributePathPossibilities():
             yield ('Ex Cx Ax', [

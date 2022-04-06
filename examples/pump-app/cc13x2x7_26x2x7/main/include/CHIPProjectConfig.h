@@ -98,7 +98,7 @@
  * Enables synchronizing the device's real time clock with a remote CHIP Time service
  * using the CHIP Time Sync protocol.
  */
-//#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
+// #define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
 
 /**
  * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
@@ -126,5 +126,25 @@
 #else
 #define CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE chip::Profiles::DataManagement::Debug
 #endif // BUILD_RELEASE
+
+/**
+ * @def CHIP_IM_MAX_NUM_COMMAND_HANDLER
+ *
+ * @brief Defines the maximum number of CommandHandler, limits the number of active commands transactions on server.
+ *
+ * TODO: (#17080) 1 should be OK since almost all commands are synchronous, should be some larger number after we resolved the issue
+ * of the large memory footprint of ReadHandler.
+ */
+#define CHIP_IM_MAX_NUM_COMMAND_HANDLER 1
+
+/**
+ * @def CHIP_IM_MAX_NUM_WRITE_HANDLER
+ *
+ * @brief Defines the maximum number of WriteHandler, limits the number of active write transactions on server.
+ *
+ * TODO: (#17080) 1 should be OK since most write requests can be synchronous (not chunked), should be some larger number after we
+ * resolved the issue of the large memory footprint of ReadHandler.
+ */
+#define CHIP_IM_MAX_NUM_WRITE_HANDLER 1
 
 #endif // CHIP_PROJECT_CONFIG_H

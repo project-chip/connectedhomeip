@@ -266,9 +266,9 @@ private:
     uint32_t GetLastWrittenEventsBytes() const { return mLastWrittenEventsBytes; }
 
     // Returns the number of interested paths, including wildcard and corcrete paths.
-    size_t GetAttributePathCount() const { return mpAttributePathList == nullptr ? 0 : mpAttributePathList->size(); };
-    size_t GetEventPathCount() const { return mpEventPathList == nullptr ? 0 : mpEventPathList->size(); };
-    size_t GetDataVersionFilterCount() const { return mpDataVersionFilterList == nullptr ? 0 : mpDataVersionFilterList->size(); };
+    size_t GetAttributePathCount() const { return mpAttributePathList == nullptr ? 0 : mpAttributePathList->count(); };
+    size_t GetEventPathCount() const { return mpEventPathList == nullptr ? 0 : mpEventPathList->count(); };
+    size_t GetDataVersionFilterCount() const { return mpDataVersionFilterList == nullptr ? 0 : mpDataVersionFilterList->count(); };
 
     CHIP_ERROR SendStatusReport(Protocols::InteractionModel::Status aStatus);
 

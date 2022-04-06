@@ -465,11 +465,16 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
     {
         NL_TEST_ASSERT(apSuite,
                        Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-                           &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
+                           &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 20,
                            onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
     }
 
-    ctx.DrainAndServiceIO();
+    // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
+    // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
+    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(60), [&]() {
+        return numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1) &&
+            numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1);
+    });
 
     NL_TEST_ASSERT(apSuite, numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
     NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
