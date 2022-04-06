@@ -76,9 +76,10 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: 
                                    nodeid=device_nodeid),
               "Failed to finish key exchange")
 
-    asyncio.run(test.TestMultiFabric(ip=address,
+    ok = asyncio.run(test.TestMultiFabric(ip=address,
                                      setuppin=20202021,
                                      nodeid=1))
+    FailIfNot(ok, "Failed to commission multi-fabric")
     #
     # The server will crash if we are aborting / closing it too fast.
     # Issue: #15987
