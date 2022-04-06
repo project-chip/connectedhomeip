@@ -233,9 +233,6 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     CASESessionManagerConfig sessionManagerConfig = {
         .sessionInitParams = deviceInitParams,
-#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-        .dnsCache = NoSuchThingWeWouldNeedToAddIt,
-#endif
         .devicePool = stateParams.operationalDevicePool,
     };
 

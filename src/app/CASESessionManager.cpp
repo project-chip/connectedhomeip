@@ -33,12 +33,7 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::C
 {
     Dnssd::ResolvedNodeData resolutionData;
 
-    bool nodeIDWasResolved =
-#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-        (mConfig.dnsCache != nullptr && mConfig.dnsCache->Lookup(peerId, resolutionData) == CHIP_NO_ERROR);
-#else
-        false;
-#endif
+    bool nodeIDWasResolved = false;
 
     ChipLogDetail(CASESessionManager,
                   "FindOrEstablishSession: PeerId = " ChipLogFormatX64 ":" ChipLogFormatX64 ", NodeIdWasResolved = %d",
@@ -97,20 +92,6 @@ void CASESessionManager::ReleaseAllSessions()
 
 CHIP_ERROR CASESessionManager::GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr)
 {
-#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-    if (mConfig.dnsCache != nullptr)
-    {
-        Dnssd::ResolvedNodeData resolutionData;
-        // TODO(andy31415): DNS caching is generally not populated, need to move
-        // caching into a the address resolve layer and not have a global one anymore.
-        if (mConfig.dnsCache->Lookup(peerId, resolutionData) == CHIP_NO_ERROR)
-        {
-            addr = OperationalDeviceProxy::ToPeerAddress(resolutionData);
-            return CHIP_NO_ERROR;
-        }
-    }
-#endif
-
     OperationalDeviceProxy * session = FindExistingSession(peerId);
     VerifyOrReturnError(session != nullptr, CHIP_ERROR_NOT_CONNECTED);
     addr = session->GetPeerAddress();
