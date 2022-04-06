@@ -31,6 +31,7 @@ from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 from builders.bl602 import Bl602App, Bl602Board, Bl602Builder
+from builders.imx import IMXApp, IMXBuilder
 
 
 class Target:
@@ -526,6 +527,11 @@ def Bl602Targets():
 
     yield target.Extend('light', board=Bl602Board.BL602BOARD, app=Bl602App.LIGHT)
 
+def IMXTargets():
+    target = Target('imx', IMXBuilder)
+
+    yield target.Extend('chip-tool', app=IMXApp.CHIP_TOOL)
+    yield target.Extend('lighting-app', app=IMXApp.LIGHT)
 
 ALL = []
 
@@ -544,6 +550,7 @@ target_generators = [
     QorvoTargets(),
     TizenTargets(),
     Bl602Targets(),
+    IMXTargets(),
 ]
 
 for generator in target_generators:
