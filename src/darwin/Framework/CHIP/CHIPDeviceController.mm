@@ -500,7 +500,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     return success;
 }
 
-- (BOOL)continueCommissioningDevice:(uint64_t)deviceId
+- (BOOL)continueCommissioningDevice:(void *)device
            ignoreAttestationFailure:(BOOL)ignoreAttestationFailure
                               error:(NSError * __autoreleasing *)error
 {
@@ -516,7 +516,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
                 ? _deviceAttestationDelegateBridge->attestationVerificationResult()
                 : chip::Credentials::AttestationVerificationResult::kSuccess;
 
-            errorCode = self.cppCommissioner->ContinueCommissioningAfterDeviceAttestationFailure(deviceId,
+            chip::DeviceProxy * deviceProxy = static_cast<chip::DeviceProxy *>(device);
+            errorCode = self.cppCommissioner->ContinueCommissioningAfterDeviceAttestationFailure(deviceProxy,
                 ignoreAttestationFailure ? chip::Credentials::AttestationVerificationResult::kSuccess : lastAttestationResult);
         }
         success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];

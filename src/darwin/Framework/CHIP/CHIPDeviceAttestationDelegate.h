@@ -30,8 +30,11 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Notify the delegate when device attestation fails
  *
+ * @param controller Controller corresponding to the commissioning process
+ * @param device Handle of device being commissioned
+ * @param error NSError representing the error code for the failure
  */
-- (void)deviceAttestation:(CHIPDeviceController *)controller deviceId:(uint64_t)deviceId failedWithError:(NSError * _Nonnull)error;
+- (void)deviceAttestation:(CHIPDeviceController *)controller failedForDevice:(void *)device error:(NSError * _Nonnull)error;
 
 @end
 

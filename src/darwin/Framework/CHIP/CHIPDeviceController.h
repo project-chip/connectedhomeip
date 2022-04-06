@@ -54,7 +54,7 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
      commissioningParams:(CHIPCommissioningParameters *)commissioningParams
                    error:(NSError * __autoreleasing *)error;
 
-- (BOOL)continueCommissioningDevice:(uint64_t)deviceId
+- (BOOL)continueCommissioningDevice:(void *)device
            ignoreAttestationFailure:(BOOL)ignoreAttestationFailure
                               error:(NSError * __autoreleasing *)error;
 
