@@ -113,8 +113,8 @@ limitations under the License.
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0043" define="AC_COMPRESSOR" type="ENUM8" min="0x00" max="0x03" writable="true" default="0x00" optional="true">
-      <description>ac compressor</description>
+    <attribute side="server" code="0x0043" define="AC_COMPRESSOR_TYPE" type="ENUM8" min="0x00" max="0x03" writable="true" default="0x00" optional="true">
+      <description>ac compressor type</description>
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>

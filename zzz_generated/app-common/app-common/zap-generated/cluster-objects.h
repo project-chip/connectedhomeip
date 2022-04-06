@@ -22649,7 +22649,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcRefrigerantType
-namespace AcCompressor {
+namespace AcCompressorType {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -22657,10 +22657,10 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcCompressor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcCompressorType::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace AcCompressor
+} // namespace AcCompressorType
 namespace AcErrorCode {
 struct TypeInfo
 {
@@ -22819,7 +22819,7 @@ struct TypeInfo
         Attributes::AcType::TypeInfo::DecodableType acType                                               = static_cast<uint8_t>(0);
         Attributes::AcCapacity::TypeInfo::DecodableType acCapacity                                       = static_cast<uint16_t>(0);
         Attributes::AcRefrigerantType::TypeInfo::DecodableType acRefrigerantType                         = static_cast<uint8_t>(0);
-        Attributes::AcCompressor::TypeInfo::DecodableType acCompressor                                   = static_cast<uint8_t>(0);
+        Attributes::AcCompressorType::TypeInfo::DecodableType acCompressorType                           = static_cast<uint8_t>(0);
         Attributes::AcErrorCode::TypeInfo::DecodableType acErrorCode                                     = static_cast<uint32_t>(0);
         Attributes::AcLouverPosition::TypeInfo::DecodableType acLouverPosition                           = static_cast<uint8_t>(0);
         Attributes::AcCoilTemperature::TypeInfo::DecodableType acCoilTemperature                         = static_cast<int16_t>(0);
