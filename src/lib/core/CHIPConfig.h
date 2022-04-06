@@ -718,7 +718,7 @@
  * includes development/testing features that should never be used in production contexts.
  */
 #ifndef CHIP_NON_PRODUCTION_MARKER
-#if (CHIP_CONFIG_SECURITY_TEST_MODE || (!CHIP_CONFIG_REQUIRE_AUTH) || CHIP_FUZZING_ENABLED)
+#if (CHIP_CONFIG_SECURITY_TEST_MODE || CHIP_FUZZING_ENABLED)
 #define CHIP_NON_PRODUCTION_MARKER WARNING__DO_NOT_SHIP__CONTAINS_NON_PRODUCTION_CHIP_CODE
 #endif
 #endif
