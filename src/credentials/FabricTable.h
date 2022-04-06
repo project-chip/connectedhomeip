@@ -39,10 +39,6 @@
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Span.h>
 
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-#define CASE_OPS_KEY 0xCA5EECC0
-#endif
-
 namespace chip {
 
 static constexpr FabricIndex kMinValidFabricIndex = 1;
@@ -119,14 +115,10 @@ public:
         {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
             mOperationalKey = chip::Platform::New<Crypto::P256KeypairHSM>();
-            mOperationalKey->SetKeyId(CASE_OPS_KEY);
+            mOperationalKey->CreateOperationalKey(mFabricIndex);
 #else
             mOperationalKey = chip::Platform::New<Crypto::P256Keypair>();
-#endif
             mOperationalKey->Initialize();
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-            // Set provisioned_key = true , so that key is not deleted from HSM.
-            mOperationalKey->provisioned_key = true;
 #endif
         }
         return mOperationalKey;

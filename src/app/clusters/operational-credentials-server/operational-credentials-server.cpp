@@ -72,16 +72,8 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err);
 constexpr uint8_t kDACCertificate = 1;
 constexpr uint8_t kPAICertificate = 2;
 
-#ifdef ENABLE_HSM_EC_KEY
-class OpCred_P256Keypair : public Crypto::P256KeypairHSM
-{
-public:
-    OpCred_P256Keypair()
-    {
-        SetKeyId(CASE_OPS_KEY);
-        provisioned_key = true;
-    }
-};
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+using OpCred_P256Keypair = Crypto::P256KeypairHSM;
 #else
 using OpCred_P256Keypair = Crypto::P256Keypair;
 #endif
@@ -916,7 +908,11 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
             gFabricBeingCommissioned.GetOperationalKey()->Clear();
         }
 
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+        keypair.CreateOperationalKey(gFabricBeingCommissioned.GetFabricIndex());
+#else
         keypair.Initialize();
+#endif
         SuccessOrExit(err = gFabricBeingCommissioned.SetOperationalKeypair(&keypair));
 
         // Generate the actual CSR from the ephemeral key

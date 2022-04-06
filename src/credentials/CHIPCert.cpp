@@ -59,7 +59,7 @@ using namespace chip::Crypto;
 extern CHIP_ERROR DecodeConvertTBSCert(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData);
 extern CHIP_ERROR DecodeECDSASignature(TLVReader & reader, ChipCertificateData & certData);
 
-#ifdef ENABLE_HSM_EC_KEY
+#ifdef ENABLE_HSM_ECDSA_VERIFY
 using chipCert_P256PublicKey = P256PublicKeyHSM;
 #else
 using chipCert_P256PublicKey = P256PublicKey;
