@@ -116,13 +116,21 @@ async function structs_with_cluster_name(options)
       continue;
     }
 
-    if (s.struct_cluster_count == 1) {
+    s.items.forEach(i => {
+      if (i.type.toLowerCase() == "fabric_idx") {
+        s.struct_fabric_idx_field = i.label;
+      }
+    })
+
+    if (s.struct_cluster_count == 1)
+    {
       const clusters = await zclQuery.selectStructClusters(this.global.db, s.id);
-      blocks.push({ id : s.id, name : s.name, clusterName : clusters[0].name });
+      blocks.push(
+          { id : s.id, name : s.name, struct_fabric_idx_field : s.struct_fabric_idx_field, clusterName : clusters[0].name });
     }
 
     if (s.struct_cluster_count > 1) {
-      blocks.push({ id : s.id, name : s.name, clusterName : "detail" });
+      blocks.push({ id : s.id, name : s.name, struct_fabric_idx_field : s.struct_fabric_idx_field, clusterName : "detail" });
     }
   }
 

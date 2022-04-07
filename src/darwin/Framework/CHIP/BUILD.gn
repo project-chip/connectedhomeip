@@ -36,6 +36,8 @@ static_library("framework") {
     "CHIPControllerAccessControl.mm",
     "CHIPDevice.h",
     "CHIPDevice.mm",
+    "CHIPDeviceAttestationDelegateBridge.h",
+    "CHIPDeviceAttestationDelegateBridge.mm",
     "CHIPDeviceConnectionBridge.mm",
     "CHIPDeviceController.h",
     "CHIPDeviceController.mm",

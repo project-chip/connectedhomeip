@@ -1658,7 +1658,7 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
 
         // Compute the first round and send it to the verifier
         X_len = sizeof(X);
-        error = Prover.ComputeRoundOne(NULL, 0, X, &X_len);
+        error = Prover.ComputeRoundOne(nullptr, 0, X, &X_len);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, X_len == vector->X_len);
         NL_TEST_ASSERT(inSuite, memcmp(X, vector->X, vector->X_len) == 0);

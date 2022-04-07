@@ -150,7 +150,7 @@ Transport::PeerAddress GetEchoPeerAddress()
 
 void Shutdown()
 {
-    chip::DeviceLayer::SystemLayer().CancelTimer(EchoTimerHandler, NULL);
+    chip::DeviceLayer::SystemLayer().CancelTimer(EchoTimerHandler, nullptr);
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gPingArguments.IsUsingTCP())
     {
@@ -212,7 +212,7 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
 
     gPingArguments.SetLastEchoTime(System::SystemClock().GetMonotonicTimestamp());
     SuccessOrExit(chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(gPingArguments.GetEchoInterval()),
-                                                              EchoTimerHandler, NULL));
+                                                              EchoTimerHandler, nullptr));
 
     streamer_printf(stream, "\nSend echo request message with payload size: %d bytes to Node: %" PRIu64 "\n", payloadSize,
                     kTestDeviceNodeId);
@@ -226,7 +226,7 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
     }
     else
     {
-        chip::DeviceLayer::SystemLayer().CancelTimer(EchoTimerHandler, NULL);
+        chip::DeviceLayer::SystemLayer().CancelTimer(EchoTimerHandler, nullptr);
     }
 
 exit:

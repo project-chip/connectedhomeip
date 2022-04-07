@@ -27,7 +27,6 @@
 #include <lib/core/NodeId.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
@@ -221,6 +220,21 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
                          options.payload.discriminator);
 }
 
+CHIP_ERROR InitConfigurationManager(ConfigurationManagerImpl & configManager, LinuxDeviceOptions & options)
+{
+    if (options.payload.vendorID != 0)
+    {
+        configManager.StoreVendorId(options.payload.vendorID);
+    }
+
+    if (options.payload.productID != 0)
+    {
+        configManager.StoreProductId(options.payload.productID);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 void Cleanup()
 {
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
@@ -293,6 +307,10 @@ int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
     err = InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
     SuccessOrExit(err);
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
+
+    err = InitConfigurationManager(reinterpret_cast<ConfigurationManagerImpl &>(ConfigurationMgr()),
+                                   LinuxDeviceOptions::GetInstance());
+    SuccessOrExit(err);
 
     err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
     SuccessOrExit(err);
@@ -691,7 +709,7 @@ CommissionerDiscoveryController * GetCommissionerDiscoveryController()
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
-void ChipLinuxAppMainLoop()
+void ChipLinuxAppMainLoop(DeviceAttestationCredentialsProvider * dacProvider)
 {
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
@@ -724,7 +742,7 @@ void ChipLinuxAppMainLoop()
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
 
     // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    SetDeviceAttestationCredentialsProvider(dacProvider == nullptr ? Examples::GetExampleDACProvider() : dacProvider);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     ChipLogProgress(AppServer, "Starting commissioner");

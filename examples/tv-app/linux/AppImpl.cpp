@@ -228,6 +228,8 @@ namespace {
 
 DataVersion gDataVersions[APP_LIBRARY_SIZE][ArraySize(contentAppClusters)];
 
+EmberAfDeviceType gContentAppDeviceType[] = { { DEVICE_TYPE_CONTENT_APP, 1 } };
+
 } // anonymous namespace
 
 ContentAppFactoryImpl::ContentAppFactoryImpl() {}
@@ -275,8 +277,8 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
         ChipLogProgress(DeviceLayer, " Looking next=%s ", app.GetApplicationBasicDelegate()->GetCatalogVendorApp()->applicationId);
         if (app.GetApplicationBasicDelegate()->GetCatalogVendorApp()->Matches(vendorApp))
         {
-            ContentAppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP,
-                                                            Span<DataVersion>(gDataVersions[i]));
+            ContentAppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, Span<DataVersion>(gDataVersions[i]),
+                                                            Span<const EmberAfDeviceType>(gContentAppDeviceType));
             return &app;
         }
     }
