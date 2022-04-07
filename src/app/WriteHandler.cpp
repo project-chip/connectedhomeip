@@ -451,8 +451,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
 
         bool shouldReportListWriteEnd =
             ShouldReportListWriteEnd(mProcessingAttributePath, mProcessingAttributeIsList, dataAttributePath);
-        bool shouldReportListWriteBegin =
-            ShouldReportListWriteBegin(mProcessingAttributePath, mProcessingAttributeIsList, dataAttributePath);
+        bool shouldReportListWriteBegin = false; // This will be set below.
+
         const EmberAfAttributeMetadata * attributeMetadata = nullptr;
 
         while (iterator->Next(mapping))
@@ -522,8 +522,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(DataManagement,
-                             "Error when calling WriteSingleClusterData for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
-                             " Attribute =" ChipLogFormatMEI " : %" CHIP_ERROR_FORMAT,
+                             "WriteSingleClusterData Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Attribute =" ChipLogFormatMEI
+                             " failed: %" CHIP_ERROR_FORMAT,
                              mapping.endpoint_id, ChipLogValueMEI(dataAttributePath.mClusterId),
                              ChipLogValueMEI(dataAttributePath.mAttributeId), err.Format());
             }
