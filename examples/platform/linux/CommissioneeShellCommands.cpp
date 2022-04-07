@@ -79,8 +79,6 @@ static CHIP_ERROR PrintAllCommands()
 
 static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
     if (argc == 0 || strcmp(argv[0], "help") == 0)
     {
         return PrintAllCommands();
@@ -92,7 +90,7 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
         chip::Inet::IPAddress commissioner;
         chip::Inet::IPAddress::FromString(argv[1], commissioner);
         uint16_t port = (uint16_t) strtol(argv[2], &eptr, 10);
-        return error  = SendUDC(true, chip::Transport::PeerAddress::UDP(commissioner, port));
+        return SendUDC(true, chip::Transport::PeerAddress::UDP(commissioner, port));
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     if (strcmp(argv[0], "setdiscoverytimeout") == 0)
@@ -136,8 +134,6 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
     }
 
     return CHIP_ERROR_INVALID_ARGUMENT;
-
-    return error;
 }
 
 void RegisterCommissioneeCommands()
