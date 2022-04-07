@@ -443,7 +443,7 @@ void MdnsQueryDone(intptr_t context)
     }
     mdns_search_once_t * searchHandle = reinterpret_cast<mdns_search_once_t *>(context);
     GenericContext * ctx              = FindMdnsQuery(searchHandle);
-    if (mdns_query_async_get_results(searchHandle, 0, &(ctx->mResult)))
+    if (mdns_query_async_get_results(searchHandle, kTimeoutMilli, &(ctx->mResult)))
     {
         if (ctx->mContextType == ContextType::Browse)
         {
