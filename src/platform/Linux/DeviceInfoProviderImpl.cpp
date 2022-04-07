@@ -118,7 +118,9 @@ CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelLength(EndpointId endpoint, size_
 {
     DefaultStorageKeyAllocator keyAlloc;
 
-    return mStorage.WriteValue(keyAlloc.UserLabelLengthKey(endpoint), val);
+    ReturnErrorOnFailure(mStorage.WriteValue(keyAlloc.UserLabelLengthKey(endpoint), val));
+
+    return mStorage.Commit();
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::GetUserLabelLength(EndpointId endpoint, size_t & val)

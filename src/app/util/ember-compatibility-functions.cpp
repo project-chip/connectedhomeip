@@ -323,7 +323,6 @@ void IncreaseClusterDataVersion(const ConcreteClusterPath & aConcreteClusterPath
         ChipLogDetail(DataManagement, "Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI " update version to %" PRIx32,
                       aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId), *(version));
     }
-    return;
 }
 
 CHIP_ERROR SendSuccessStatus(AttributeReportIB::Builder & aAttributeReport, AttributeDataIB::Builder & aAttributeDataIBBuilder)
@@ -1056,8 +1055,22 @@ bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath,
 
 bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
 {
-    uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    return index != 0xFFFF && emberAfDeviceIdFromIndex(index) == deviceType;
+    CHIP_ERROR err;
+    auto deviceTypeList = emberAfDeviceTypeListFromEndpoint(endpoint, err);
+    if (err != CHIP_NO_ERROR)
+    {
+        return false;
+    }
+
+    for (auto & device : deviceTypeList)
+    {
+        if (device.deviceId == deviceType)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 } // namespace app

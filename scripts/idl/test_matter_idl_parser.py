@@ -94,8 +94,6 @@ class TestParser(unittest.TestCase):
             server cluster MyCluster = 0x321 {
                 readonly attribute int8u roAttr = 1;
                 attribute int32u rwAttr[] = 123;
-                global attribute int32u grwAttr[] = 124;
-                readonly global attribute int32u groAttr[] = 125;
                 readonly nosubscribe attribute int8s nosub[] = 0xaa;
                 readonly attribute nullable int8s isNullable = 0xab;
             }
@@ -110,10 +108,6 @@ class TestParser(unittest.TestCase):
                             data_type=DataType(name="int8u"), code=1, name="roAttr")),
                         Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
                             data_type=DataType(name="int32u"), code=123, name="rwAttr", is_list=True)),
-                        Attribute(tags=set([AttributeTag.GLOBAL, AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
-                            data_type=DataType(name="int32u"), code=124, name="grwAttr", is_list=True)),
-                        Attribute(tags=set([AttributeTag.GLOBAL, AttributeTag.READABLE]), definition=Field(
-                            data_type=DataType(name="int32u"), code=125, name="groAttr", is_list=True)),
                         Attribute(tags=set([AttributeTag.NOSUBSCRIBE, AttributeTag.READABLE]), definition=Field(
                             data_type=DataType(name="int8s"), code=0xAA, name="nosub", is_list=True)),
                         Attribute(tags=set([AttributeTag.READABLE]), definition=Field(

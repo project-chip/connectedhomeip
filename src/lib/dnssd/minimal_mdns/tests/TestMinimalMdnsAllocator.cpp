@@ -36,7 +36,7 @@ constexpr size_t kMaxRecords = 10;
 class TestAllocator : public QueryResponderAllocator<kMaxRecords>
 {
 public:
-    TestAllocator() : QueryResponderAllocator<kMaxRecords>()
+    TestAllocator()
     {
 #if CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
         // void dmalloc_track(const dmalloc_track_t track_func)

@@ -102,13 +102,15 @@ constexpr const chip::CommandId generatedCommands[] = GENERATED_COMMANDS;
 constexpr const EmberAfAttributeMetadata generatedAttributes[]      = GENERATED_ATTRIBUTES;
 constexpr const EmberAfCluster generatedClusters[]                  = GENERATED_CLUSTERS;
 constexpr const EmberAfEndpointType generatedEmberAfEndpointTypes[] = GENERATED_ENDPOINT_TYPES;
+constexpr const EmberAfDeviceType fixedDeviceTypeList[]             = FIXED_DEVICE_TYPES;
+
 // Not const, because these need to mutate.
 DataVersion fixedEndpointDataVersions[ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT];
 
 #if !defined(EMBER_SCRIPTED_TEST)
 #define endpointNumber(x) fixedEndpoints[x]
-#define endpointDeviceId(x) fixedDeviceIds[x]
-#define endpointDeviceVersion(x) fixedDeviceVersions[x]
+#define endpointDeviceTypeList(x)                                                                                                  \
+    Span<const EmberAfDeviceType>(&fixedDeviceTypeList[fixedDeviceTypeListOffsets[x]], fixedDeviceTypeListLengths[x])
 // Added 'Macro' to silence MISRA warning about conflict with synonymous vars.
 #define endpointTypeMacro(x) (&(generatedEmberAfEndpointTypes[fixedEmberAfEndpointTypes[x]]))
 #endif
@@ -130,10 +132,10 @@ void emberAfEndpointConfigure(void)
     uint8_t ep;
 
 #if !defined(EMBER_SCRIPTED_TEST)
-    uint16_t fixedEndpoints[]           = FIXED_ENDPOINT_ARRAY;
-    uint16_t fixedDeviceIds[]           = FIXED_DEVICE_IDS;
-    uint8_t fixedDeviceVersions[]       = FIXED_DEVICE_VERSIONS;
-    uint8_t fixedEmberAfEndpointTypes[] = FIXED_ENDPOINT_TYPES;
+    uint16_t fixedEndpoints[]             = FIXED_ENDPOINT_ARRAY;
+    uint16_t fixedDeviceTypeListLengths[] = FIXED_DEVICE_TYPE_LENGTHS;
+    uint16_t fixedDeviceTypeListOffsets[] = FIXED_DEVICE_TYPE_OFFSETS;
+    uint8_t fixedEmberAfEndpointTypes[]   = FIXED_ENDPOINT_TYPES;
 #endif
 
 #if ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT > 0
@@ -153,12 +155,11 @@ void emberAfEndpointConfigure(void)
     DataVersion * currentDataVersions = fixedEndpointDataVersions;
     for (ep = 0; ep < FIXED_ENDPOINT_COUNT; ep++)
     {
-        emAfEndpoints[ep].endpoint      = endpointNumber(ep);
-        emAfEndpoints[ep].deviceId      = endpointDeviceId(ep);
-        emAfEndpoints[ep].deviceVersion = endpointDeviceVersion(ep);
-        emAfEndpoints[ep].endpointType  = endpointTypeMacro(ep);
-        emAfEndpoints[ep].dataVersions  = currentDataVersions;
-        emAfEndpoints[ep].bitmask       = EMBER_AF_ENDPOINT_ENABLED;
+        emAfEndpoints[ep].endpoint       = endpointNumber(ep);
+        emAfEndpoints[ep].deviceTypeList = endpointDeviceTypeList(ep);
+        emAfEndpoints[ep].endpointType   = endpointTypeMacro(ep);
+        emAfEndpoints[ep].dataVersions   = currentDataVersions;
+        emAfEndpoints[ep].bitmask        = EMBER_AF_ENDPOINT_ENABLED;
 
         // Increment currentDataVersions by 1 (slot) for every server cluster
         // this endpoint has.
@@ -168,13 +169,12 @@ void emberAfEndpointConfigure(void)
 #if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
     if (MAX_ENDPOINT_COUNT > FIXED_ENDPOINT_COUNT)
     {
-        // This is assuming that EMBER_AF_ENDPOINT_DISABLED is 0
-        static_assert(EMBER_AF_ENDPOINT_DISABLED == 0, "We are creating enabled dynamic endpoints!");
-        memset(&emAfEndpoints[FIXED_ENDPOINT_COUNT], 0,
-               sizeof(EmberAfDefinedEndpoint) * (MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT));
+        //
+        // Reset instances tracking dynamic endpoints to safe defaults.
+        //
         for (ep = FIXED_ENDPOINT_COUNT; ep < MAX_ENDPOINT_COUNT; ep++)
         {
-            emAfEndpoints[ep].endpoint = kInvalidEndpointId;
+            emAfEndpoints[ep] = EmberAfDefinedEndpoint();
         }
     }
 #endif
@@ -198,8 +198,9 @@ uint16_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
     return kEmberInvalidEndpointIndex;
 }
 
-EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberAfEndpointType * ep, uint16_t deviceId,
-                                        uint8_t deviceVersion, const Span<DataVersion> & dataVersionStorage)
+EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
+                                        const chip::Span<chip::DataVersion> & dataVersionStorage,
+                                        chip::Span<const EmberAfDeviceType> deviceTypeList)
 {
     auto realIndex = index + FIXED_ENDPOINT_COUNT;
 
@@ -227,11 +228,10 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const Emb
         }
     }
 
-    emAfEndpoints[index].endpoint      = id;
-    emAfEndpoints[index].deviceId      = deviceId;
-    emAfEndpoints[index].deviceVersion = deviceVersion;
-    emAfEndpoints[index].endpointType  = ep;
-    emAfEndpoints[index].dataVersions  = dataVersionStorage.data();
+    emAfEndpoints[index].endpoint       = id;
+    emAfEndpoints[index].deviceTypeList = deviceTypeList;
+    emAfEndpoints[index].endpointType   = ep;
+    emAfEndpoints[index].dataVersions   = dataVersionStorage.data();
     // Start the endpoint off as disabled.
     emAfEndpoints[index].bitmask = EMBER_AF_ENDPOINT_DISABLED;
 
@@ -1063,14 +1063,31 @@ const EmberAfCluster * emberAfGetClusterByIndex(EndpointId endpoint, uint8_t clu
     return &(definedEndpoint->endpointType->cluster[clusterIndex]);
 }
 
-uint16_t emberAfGetDeviceIdForEndpoint(EndpointId endpoint)
+const chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::EndpointId endpoint, CHIP_ERROR & err)
 {
     uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
-    if (endpointIndex == kEmberInvalidEndpointIndex)
+    chip::Span<const EmberAfDeviceType> ret;
+
+    if (endpointIndex == 0xFFFF)
     {
-        return kEmberInvalidEndpointIndex;
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+        return ret;
     }
-    return emAfEndpoints[endpointIndex].deviceId;
+
+    err = CHIP_NO_ERROR;
+    return emAfEndpoints[endpointIndex].deviceTypeList;
+}
+
+CHIP_ERROR emberAfSetDeviceTypeList(EndpointId endpoint, Span<const EmberAfDeviceType> deviceTypeList)
+{
+    uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
+    if (endpointIndex == 0xFFFF)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    emAfEndpoints[endpointIndex].deviceTypeList = deviceTypeList;
+    return CHIP_NO_ERROR;
 }
 
 // Returns the cluster of Nth server or client cluster,

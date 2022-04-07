@@ -218,12 +218,6 @@ public:
 
     uint8_t GetNextSequenceNumber() override { return mSequenceNumber++; };
 
-    CHIP_ERROR LoadSecureSessionParametersIfNeeded()
-    {
-        bool loadedSecureSession = false;
-        return LoadSecureSessionParametersIfNeeded(loadedSecureSession);
-    };
-
     Transport::Type GetDeviceTransportType() const { return mDeviceAddress.GetTransportType(); }
 
 private:
@@ -265,24 +259,6 @@ private:
     SessionHolderWithDelegate mSecureSession;
 
     uint8_t mSequenceNumber = 0;
-
-    /**
-     * @brief
-     *   This function loads the secure session object from the serialized operational
-     *   credentials corresponding to the device. This is typically done when the device
-     *   does not have an active secure channel.
-     */
-    CHIP_ERROR LoadSecureSessionParameters();
-
-    /**
-     * @brief
-     *   This function loads the secure session object from the serialized operational
-     *   credentials corresponding if needed, based on the current state of the device and
-     *   underlying transport object.
-     *
-     * @param[out] didLoad   Were the secure session params loaded by the call to this function.
-     */
-    CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
 
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
 };

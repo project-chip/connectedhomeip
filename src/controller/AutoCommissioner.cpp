@@ -101,6 +101,11 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     return CHIP_NO_ERROR;
 }
 
+const CommissioningParameters & AutoCommissioner::GetCommissioningParameters() const
+{
+    return mParams;
+}
+
 CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr)
 {
     auto nextStage = GetNextCommissioningStageInternal(currentStage, lastErr);

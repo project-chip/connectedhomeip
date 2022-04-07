@@ -799,7 +799,6 @@ void FabricTable::UpdateNextAvailableFabricIndex()
     }
 
     mNextAvailableFabricIndex.ClearValue();
-    return;
 }
 
 CHIP_ERROR FabricTable::StoreFabricIndexInfo() const

@@ -62,6 +62,9 @@
 		5ACDDD7D27CD16D200EFD68A /* CHIPAttributeCacheContainer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5ACDDD7C27CD16D200EFD68A /* CHIPAttributeCacheContainer.mm */; };
 		5ACDDD7E27CD3F3A00EFD68A /* CHIPAttributeCacheContainer_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 5ACDDD7B27CD14AF00EFD68A /* CHIPAttributeCacheContainer_Internal.h */; };
 		5AE6D4E427A99041001F2493 /* CHIPDeviceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE6D4E327A99041001F2493 /* CHIPDeviceTests.m */; };
+		88EBF8CE27FABDD500686BC1 /* CHIPDeviceAttestationDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 88EBF8CB27FABDD500686BC1 /* CHIPDeviceAttestationDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		88EBF8CF27FABDD500686BC1 /* CHIPDeviceAttestationDelegateBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88EBF8CC27FABDD500686BC1 /* CHIPDeviceAttestationDelegateBridge.mm */; };
+		88EBF8D027FABDD500686BC1 /* CHIPDeviceAttestationDelegateBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 88EBF8CD27FABDD500686BC1 /* CHIPDeviceAttestationDelegateBridge.h */; };
 		991DC0842475F45400C13860 /* CHIPDeviceController.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC0822475F45400C13860 /* CHIPDeviceController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		991DC0892475F47D00C13860 /* CHIPDeviceController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 991DC0872475F47D00C13860 /* CHIPDeviceController.mm */; };
 		991DC08B247704DC00C13860 /* CHIPLogging.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC08A247704DC00C13860 /* CHIPLogging.h */; };
@@ -157,6 +160,9 @@
 		5ACDDD7B27CD14AF00EFD68A /* CHIPAttributeCacheContainer_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPAttributeCacheContainer_Internal.h; sourceTree = "<group>"; };
 		5ACDDD7C27CD16D200EFD68A /* CHIPAttributeCacheContainer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPAttributeCacheContainer.mm; sourceTree = "<group>"; };
 		5AE6D4E327A99041001F2493 /* CHIPDeviceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CHIPDeviceTests.m; sourceTree = "<group>"; };
+		88EBF8CB27FABDD500686BC1 /* CHIPDeviceAttestationDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceAttestationDelegate.h; sourceTree = "<group>"; };
+		88EBF8CC27FABDD500686BC1 /* CHIPDeviceAttestationDelegateBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPDeviceAttestationDelegateBridge.mm; sourceTree = "<group>"; };
+		88EBF8CD27FABDD500686BC1 /* CHIPDeviceAttestationDelegateBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceAttestationDelegateBridge.h; sourceTree = "<group>"; };
 		991DC0822475F45400C13860 /* CHIPDeviceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceController.h; sourceTree = "<group>"; };
 		991DC0872475F47D00C13860 /* CHIPDeviceController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPDeviceController.mm; sourceTree = "<group>"; };
 		991DC08A247704DC00C13860 /* CHIPLogging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPLogging.h; sourceTree = "<group>"; };
@@ -265,6 +271,9 @@
 			children = (
 				27A53C1527FBC6920053F131 /* CHIPAttestationTrustStoreBridge.h */,
 				27A53C1627FBC6920053F131 /* CHIPAttestationTrustStoreBridge.mm */,
+				88EBF8CB27FABDD500686BC1 /* CHIPDeviceAttestationDelegate.h */,
+				88EBF8CD27FABDD500686BC1 /* CHIPDeviceAttestationDelegateBridge.h */,
+				88EBF8CC27FABDD500686BC1 /* CHIPDeviceAttestationDelegateBridge.mm */,
 				513DDB852761F69300DAA01A /* CHIPAttributeTLVValueDecoder_Internal.h */,
 				1ED276E326C5832500547A89 /* CHIPCluster.h */,
 				1ED276E126C5812A00547A89 /* CHIPCluster.mm */,
@@ -370,6 +379,7 @@
 				B289D4212639C0D300D4E314 /* CHIPOnboardingPayloadParser.h in Headers */,
 				513DDB862761F69300DAA01A /* CHIPAttributeTLVValueDecoder_Internal.h in Headers */,
 				2CB7163F252F731E0026E2BB /* CHIPDevicePairingDelegate.h in Headers */,
+				88EBF8CE27FABDD500686BC1 /* CHIPDeviceAttestationDelegate.h in Headers */,
 				2C222AD0255C620600E446B9 /* CHIPDevice.h in Headers */,
 				991DC0842475F45400C13860 /* CHIPDeviceController.h in Headers */,
 				B2E0D7B2245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.h in Headers */,
@@ -379,6 +389,7 @@
 				9956064426420367000C28DE /* CHIPSetupPayload_Internal.h in Headers */,
 				27A53C1727FBC6920053F131 /* CHIPAttestationTrustStoreBridge.h in Headers */,
 				5A830D6C27CFCF590053B85D /* CHIPDeviceControllerOverXPC_Internal.h in Headers */,
+				88EBF8D027FABDD500686BC1 /* CHIPDeviceAttestationDelegateBridge.h in Headers */,
 				5A60370827EA1FF60020DB79 /* CHIPAttributeCacheContainer+XPC.h in Headers */,
 				5ACDDD7E27CD3F3A00EFD68A /* CHIPAttributeCacheContainer_Internal.h in Headers */,
 				998F286D26D55E10001846C6 /* CHIPKeypair.h in Headers */,
@@ -549,6 +560,7 @@
 				2C1B027A2641DB4E00780EF1 /* CHIPOperationalCredentialsDelegate.mm in Sources */,
 				B2E0D7B9245B0B5C003C5B48 /* CHIPSetupPayload.mm in Sources */,
 				B2E0D7B6245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.mm in Sources */,
+				88EBF8CF27FABDD500686BC1 /* CHIPDeviceAttestationDelegateBridge.mm in Sources */,
 				5A6FEC9827B5C6AF00F25F42 /* CHIPDeviceOverXPC.m in Sources */,
 				51431AF927D2973E008A7943 /* CHIPIMDispatch.mm in Sources */,
 				51431AFB27D29CA4008A7943 /* ota-provider.cpp in Sources */,

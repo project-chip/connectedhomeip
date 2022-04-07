@@ -31,6 +31,7 @@ public:
     AutoCommissioner();
     ~AutoCommissioner() override;
     CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params) override;
+    const CommissioningParameters & GetCommissioningParameters() const override;
     void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) override;
 
     CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy) override;

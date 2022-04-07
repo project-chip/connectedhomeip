@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,9 +16,22 @@
  *    limitations under the License.
  */
 
-#include <map>
-#include <string>
+/**
+ *    @file
+ *          Example project configuration file for CHIP.
+ *
+ *          This is a place to put application or project-specific overrides
+ *          to the default configuration values for general CHIP features.
+ *
+ */
 
-extern std::map<std::string, std::string> sPersistentStore;
+#pragma once
 
-extern FILE * sPersistentStoreFile;
+// Use a default pairing code if one hasn't been provisioned in flash.
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
+
+// Enable support functions for parsing command-line arguments
+#define CHIP_CONFIG_ENABLE_ARG_PARSER 1
+
+#define CHIP_DEVICE_CONFIG_DISABLE_SHELL_PING 1
