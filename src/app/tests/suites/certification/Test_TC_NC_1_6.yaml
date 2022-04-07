@@ -25,18 +25,18 @@ tests:
   - label: 'TH1 sends the AddOrUpdateThreadNetwork command to the DUT with the following argument: OperationalDataset
         argument value as ''Userth_op'' Breadcrumb argument value as 0'
     verification: |
-        Can't verify the test case as it need to be executed before the commissioning. 
+        Can't verify the test case as it need to be executed before the commissioning.
         Which is not possiable with the CHIP tool step
     disabled: true
   - label: 'TH1 sends RemoveNetwork command to the DUT with NetworkID argument value as ''Userth_op''
         and Breadcrumb argument value as 0'
     verification: |
-        Can't verify the test case as it need to be executed before the commissioning. 
+        Can't verify the test case as it need to be executed before the commissioning.
         Which is not possiable with the CHIP tool step
     disabled: true
   - label: 'TH1 sends ConnectNetwork command to the DUT with NetworkID argument value as ''Userth_op''
         and Breadcrumb argument value as 0'
     verification: |
-        Can't verify the test case as it need to be executed before the commissioning. 
+        Can't verify the test case as it need to be executed before the commissioning.
         Which is not possiable with the CHIP tool step
     disabled: true

@@ -44,7 +44,7 @@ tests:
         [1646286638.378089][11651:11651] CHIP:SVR: Long manual pairing code: [749701123365521327694]
 
 
-         
+
 
          ./chip-tool payload parse-setup-payload MT:-24J042C00KA0648G00
         [1646287790.029238][8190:8190] CHIP:SPL: Parsing base38Representation: MT:-24J042C00KA0648G00
