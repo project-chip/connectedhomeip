@@ -101,6 +101,7 @@ jobs:
             - name: Run OTA example
               timeout-minutes: 30
               run: |
+                  mkdir -p /tmp/ota/
                   bash scripts/tests/ota_test.sh
             - name: Uploading OTA logs
               if: always()
@@ -209,6 +210,7 @@ jobs:
               timeout-minutes: 30
               run: |
                   brew install openssl pkg-config coreutils
+                  mkdir -p /tmp/ota/
                   bash scripts/tests/ota_test.sh
             - name: Uploading OTA logs
               if: always()
