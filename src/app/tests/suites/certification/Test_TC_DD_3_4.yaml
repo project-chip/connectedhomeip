@@ -539,38 +539,38 @@ tests:
 
 
 
-          AUDIT: ===== RANDOM NUMBER GENERATOR AUDIT START ====                                                                                                                              
-          AUDIT: * Validate buf1 and buf2 are <<<different every run/boot!>>>                                                                                                                
-          AUDIT: * Validate r1 and r2 are <<<different every run/boot!>>>                                                                                                                    
-          AUDIT: * buf1: 8643126A627C1C289E7CBD1C0B59485B                                                                                                                                    
-          AUDIT: * buf2: E9A8AB9589D71155E7B161FC3DBB66CE                                                                                                                                    
-          AUDIT: * r1: 0x3A338FB7 r2: 0xCC480665                                                                                                                                             
-          AUDIT: ===== RANDOM NUMBER GENERATOR AUDIT END ====                                                                                                                                
-          writing settings to file (/tmp/chip_counters.ini-oR46os)                                                                                                                           
-          renamed tmp file to file (/tmp/chip_counters.ini)                                                                                                                                  
-          NVS set: chip-counters/reboot-count = 12 (0xC)                                                                                                                                     
-          Got Ethernet interface: eth0                                                                                                                                                       
-          Found the primary Ethernet interface:eth0                                                                                                                                          
-          Got WiFi interface: wlan0                                                                                                                                                          
-          Failed to reset WiFi statistic counts                                                                                                                                              
+          AUDIT: ===== RANDOM NUMBER GENERATOR AUDIT START ====
+          AUDIT: * Validate buf1 and buf2 are <<<different every run/boot!>>>
+          AUDIT: * Validate r1 and r2 are <<<different every run/boot!>>>
+          AUDIT: * buf1: 8643126A627C1C289E7CBD1C0B59485B
+          AUDIT: * buf2: E9A8AB9589D71155E7B161FC3DBB66CE
+          AUDIT: * r1: 0x3A338FB7 r2: 0xCC480665
+          AUDIT: ===== RANDOM NUMBER GENERATOR AUDIT END ====
+          writing settings to file (/tmp/chip_counters.ini-oR46os)
+          renamed tmp file to file (/tmp/chip_counters.ini)
+          NVS set: chip-counters/reboot-count = 12 (0xC)
+          Got Ethernet interface: eth0
+          Found the primary Ethernet interface:eth0
+          Got WiFi interface: wlan0
+          Failed to reset WiFi statistic counts
           MDNS failed to join multicast group on veth5731933 for address type IPv4: ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:387: Inet Error 0x00000110: Address not found
           MDNS failed to join multicast group on vethbf7bfa6 for address type IPv4: ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:387: Inet Error 0x00000110: Address not found
           MDNS failed to join multicast group on vethcf434e5 for address type IPv4: ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:387: Inet Error 0x00000110: Address not found
-           Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:687: OS Error 0x02000065: Network is unreachable                                   
-           Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:687: OS Error 0x02000065: Network is unreachable                                   
-           Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:687: OS Error 0x02000065: Network is unreachable                                   
-           Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:687: OS Error 0x02000065: Network is unreachable                                   
-           Discovered Commissioner #1                                                                                                                                                        
-                Device Name: Test TV                                                                                                                                                         
-                Vendor ID: 9050                                                                                                                                                              
-                Product ID: 65279                                                                                                                                                            
-                Device Type: 35                                                                                                                                                              
-                Hostname: EEAABADABAD0DDCA                                                                                                                                                   
-                IP Address #1: 2402:e280:2108:181:dea6:32ff:fef9:f0a1                                                                                                                        
-                IP Address #2: fe80::dea6:32ff:fef9:f0a1                                                                                                                                     
-                IP Address #3: 192.168.1.12                                                                                                                                                  
-                Port: 5550                                                                                                                                                                   
-                Commissioning Mode: 0                                                                                                                                                        
+           Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:687: OS Error 0x02000065: Network is unreachable
+           Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:687: OS Error 0x02000065: Network is unreachable
+           Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:687: OS Error 0x02000065: Network is unreachable
+           Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:687: OS Error 0x02000065: Network is unreachable
+           Discovered Commissioner #1
+                Device Name: Test TV
+                Vendor ID: 9050
+                Product ID: 65279
+                Device Type: 35
+                Hostname: EEAABADABAD0DDCA
+                IP Address #1: 2402:e280:2108:181:dea6:32ff:fef9:f0a1
+                IP Address #2: fe80::dea6:32ff:fef9:f0a1
+                IP Address #3: 192.168.1.12
+                Port: 5550
+                Commissioning Mode: 0
            1 commissioner(s) discovered. Select one (by number# above) to request commissioning from:
       disabled: true
 
@@ -585,15 +585,15 @@ tests:
       verification: |
           On DUT.
 
-           CHIP:SVR: UserDirectedCommissioningServer::OnMessageReceived                                                             
-           CHIP:SVR: UDC instance=420604DE2A8F19A2                                                                                  
-           CHIP:SVR: UserDirectedCommissioningServer::OnMessageReceived                                                             
-           CHIP:SVR: UDC instance=420604DE2A8F19A2                                                                                  
-           CHIP:SVR: UserDirectedCommissioningServer::OnMessageReceived                                                             
-           CHIP:SVR: UDC instance=420604DE2A8F19A2                                                                                  
-           CHIP:SVR: UserDirectedCommissioningServer::OnMessageReceived                                                             
-           CHIP:SVR: UDC instance=420604DE2A8F19A2                                                                                  
-           CHIP:SVR: OnCommissionableNodeFound instance: name=420604DE2A8F19A2 old_state=1 new_state=3                              
+           CHIP:SVR: UserDirectedCommissioningServer::OnMessageReceived
+           CHIP:SVR: UDC instance=420604DE2A8F19A2
+           CHIP:SVR: UserDirectedCommissioningServer::OnMessageReceived
+           CHIP:SVR: UDC instance=420604DE2A8F19A2
+           CHIP:SVR: UserDirectedCommissioningServer::OnMessageReceived
+           CHIP:SVR: UDC instance=420604DE2A8F19A2
+           CHIP:SVR: UserDirectedCommissioningServer::OnMessageReceived
+           CHIP:SVR: UDC instance=420604DE2A8F19A2
+           CHIP:SVR: OnCommissionableNodeFound instance: name=420604DE2A8F19A2 old_state=1 new_state=3
            CHIP:CTL: ------PROMPT USER!! OnUserDirectedCommissioningRequest instance=420604DE2A8F19A2 deviceName=Test TV casting app
            CHIP:SVR: UDC Client[0] instance=420604DE2A8F19A2 deviceName=Test TV casting app address=UDP:192.168.1.11:5540, disc=3840
       disabled: true

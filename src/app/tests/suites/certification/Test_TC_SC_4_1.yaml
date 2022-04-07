@@ -76,7 +76,7 @@ tests:
           "DUT is instructed to enter in commissioning mode using Open
           Commissioning Window command"
       verification: |
-          run chip tool command to open 
+          run chip tool command to open
           ./chip-tool pairing open-commissioning-window 1 1 20 2000 3840
       disabled: true
 
