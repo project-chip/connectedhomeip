@@ -72,20 +72,29 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
     case DeviceEventType::kCommissioningComplete: {
         ESP_LOGI(TAG, "Commissioning complete");
 #if CONFIG_BT_NIMBLE_ENABLED && CONFIG_DEINIT_BLE_ON_COMMISSIONING_COMPLETE
-        int ret = nimble_port_stop();
-        if (ret == 0)
+
+        // ble_hs_is_enabled() returns 1 if ble host is enabled
+        if (ble_hs_is_enabled())
         {
-            nimble_port_deinit();
-            esp_err_t err = esp_nimble_hci_and_controller_deinit();
-            err += esp_bt_mem_release(ESP_BT_MODE_BLE);
-            if (err == ESP_OK)
+            int ret = nimble_port_stop();
+            if (ret == 0)
             {
-                ESP_LOGI(TAG, "BLE deinit successful and memory reclaimed");
+                nimble_port_deinit();
+                esp_err_t err = esp_nimble_hci_and_controller_deinit();
+                err += esp_bt_mem_release(ESP_BT_MODE_BLE);
+                if (err == ESP_OK)
+                {
+                    ESP_LOGI(TAG, "BLE deinit successful and memory reclaimed");
+                }
+            }
+            else
+            {
+                ESP_LOGW(TAG, "nimble_port_stop() failed");
             }
         }
         else
         {
-            ESP_LOGW(TAG, "nimble_port_stop() failed");
+            ESP_LOGI(TAG, "BLE already deinited");
         }
 #endif
     }
