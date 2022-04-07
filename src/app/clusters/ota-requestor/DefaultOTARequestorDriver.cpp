@@ -132,9 +132,6 @@ void DefaultOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR
         // Retry with next provider in the list
         ScheduleQueryRetry(false);
         break;
-    case UpdateFailureState::kIdle:
-        // Ignore - We shouldn't be hitting this case.
-        break;
     case UpdateFailureState::kQuerying:
         if (error != CHIP_ERROR_BUFFER_TOO_SMALL)
         {
@@ -151,11 +148,10 @@ void DefaultOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR
         ScheduleQueryRetry(true);
         break;
     case UpdateFailureState::kNotifying:
-        // Ignore error and transition to Idle
-        break;
+        // No need for retry.  Just wait for the next Query.
         break;
     case UpdateFailureState::kDelayedOnUserConsent:
-        // Ignore error and transition to Idle
+        // No need for retry.  Just wait for the next Query.
         break;
     }
 }
@@ -504,8 +500,6 @@ bool DefaultOTARequestorDriver::GetNextProviderLocation(ProviderLocationType & p
 
 CHIP_ERROR DefaultOTARequestorDriver::ScheduleQueryRetry(bool trySameProvider)
 {
-
-    ProviderLocationType providerLocation;
     CHIP_ERROR status        = CHIP_NO_ERROR;
     bool willTryAnotherQuery = true;
 
@@ -513,6 +507,7 @@ CHIP_ERROR DefaultOTARequestorDriver::ScheduleQueryRetry(bool trySameProvider)
     {
         VerifyOrDie(mRequestor != nullptr);
 
+        ProviderLocationType providerLocation;
         bool listExhausted = false;
         if ((GetNextProviderLocation(providerLocation, listExhausted) != true) || (listExhausted == true))
         {
