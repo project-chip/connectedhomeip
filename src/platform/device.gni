@@ -55,10 +55,10 @@ declare_args() {
 
   # Enable wifi support.
   chip_enable_wifi =
-      chip_device_platform == "linux" || chip_device_platform == "mbed" ||
-      chip_device_platform == "tizen" || chip_device_platform == "android" ||
-      chip_device_platform == "ameba" || chip_device_platform == "webos" ||
-      chip_device_platform == "bl602"
+      chip_device_platform == "linux" || chip_device_platform == "esp32" ||
+      chip_device_platform == "mbed" || chip_device_platform == "tizen" ||
+      chip_device_platform == "android" || chip_device_platform == "ameba" ||
+      chip_device_platform == "webos" || chip_device_platform == "bl602"
 
   # Enable ble support.
   if (chip_device_platform == "fake") {
