@@ -95,6 +95,7 @@ android_library("java") {
     "src/chip/devicecontroller/SubscriptionEstablishedCallback.java",
     "src/chip/devicecontroller/model/AttributeState.java",
     "src/chip/devicecontroller/model/ChipAttributePath.java",
+    "src/chip/devicecontroller/model/ChipEventPath.java",
     "src/chip/devicecontroller/model/ChipPathId.java",
     "src/chip/devicecontroller/model/ClusterState.java",
     "src/chip/devicecontroller/model/EndpointState.java",

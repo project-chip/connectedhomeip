@@ -22,6 +22,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
 import chip.devicecontroller.model.ChipAttributePath;
+import chip.devicecontroller.model.ChipEventPath;
 import java.util.List;
 
 /** Controller to interact with the CHIP device. */
@@ -356,6 +357,31 @@ public class ChipDeviceController {
     readPath(deviceControllerPtr, jniCallback.getCallbackHandle(), devicePtr, attributePaths);
   }
 
+  /** Subscribe to the given event path. */
+  public void subscribeToEventPath(
+      SubscriptionEstablishedCallback subscriptionEstablishedCallback,
+      ReportCallback reportCallback,
+      long devicePtr,
+      List<ChipEventPath> eventPaths,
+      int minInterval,
+      int maxInterval) {
+    ReportCallbackJni jniCallback =
+        new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback);
+    subscribeToEventPath(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        eventPaths,
+        minInterval,
+        maxInterval);
+  }
+
+  /** Read the given event path. */
+  public void readEventPath(ReportCallback callback, long devicePtr, List<ChipEventPath> eventPaths) {
+    ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback);
+    readEventPath(deviceControllerPtr, jniCallback.getCallbackHandle(), devicePtr, eventPaths);
+  }
+
   /**
    * Converts a given X.509v3 certificate into a Matter certificate.
    *
@@ -397,6 +423,20 @@ public class ChipDeviceController {
       long callbackHandle,
       long devicePtr,
       List<ChipAttributePath> attributePaths);
+
+  private native void subscribeToEventPath(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      List<ChipEventPath> eventPaths,
+      int minInterval,
+      int maxInterval);
+
+  public native void readEventPath(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      List<ChipEventPath> eventPaths);
 
   private native long newDeviceController();
 
