@@ -2376,7 +2376,7 @@ using CHIP_ERROR = ::chip::ChipError;
  * @def CHIP_ERROR_MAX_RETRY_EXCEEDED
  *
  * @brief
- *   The Resource has exceeded the maximum rety limit.
+ *   The maximum retry limit has been exceeded.
  */
 #define CHIP_ERROR_MAX_RETRY_EXCEEDED   CHIP_CORE_ERROR(0xdc)
 

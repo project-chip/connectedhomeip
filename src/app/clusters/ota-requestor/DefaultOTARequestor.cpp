@@ -227,7 +227,6 @@ void DefaultOTARequestor::OnQueryImageResponse(void * context, const QueryImageR
             UpdateNotFoundReason::kBusy, System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         if (status == CHIP_ERROR_MAX_RETRY_EXCEEDED)
         {
-            // Go back to idle to start Periodic Query timer
             requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
         }
         else

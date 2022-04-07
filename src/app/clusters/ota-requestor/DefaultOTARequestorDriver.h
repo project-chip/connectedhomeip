@@ -93,7 +93,8 @@ protected:
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
     void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState);
     bool ProviderLocationsEqual(const ProviderLocationType & a, const ProviderLocationType & b);
-    CHIP_ERROR ScheduleRetry(bool trySameProvider);
+    // Return value of CHIP_NO_ERROR indicates a query retry has been successfully scheduled.
+    CHIP_ERROR ScheduleQueryRetry(bool trySameProvider);
 
     OTARequestorInterface * mRequestor           = nullptr;
     OTAImageProcessorInterface * mImageProcessor = nullptr;
