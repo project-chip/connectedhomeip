@@ -41,6 +41,23 @@
 #include "pigweed/rpc_services/Locking.h"
 #endif // defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
 
+#if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
+#include "pw_trace/trace.h"
+#include "pw_trace_tokenized/trace_rpc_service_nanopb.h"
+
+// Define trace time for pw_trace
+PW_TRACE_TIME_TYPE pw_trace_GetTraceTime()
+{
+    return (PW_TRACE_TIME_TYPE) chip::System::SystemClock().GetMonotonicMicroseconds64().count();
+}
+// Microsecond time source
+size_t pw_trace_GetTraceTimeTicksPerSecond()
+{
+    return 1000000;
+}
+
+#endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
+
 namespace chip {
 namespace rpc {
 namespace {
@@ -61,6 +78,10 @@ Device device_service;
 Lighting lighting_service;
 #endif // defined(PW_RPC_LIGHTING_SERVICE) && PW_RPC_LIGHTING_SERVICE
 
+#if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
+pw::trace::TraceService trace_service;
+#endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
+
 void RegisterServices(pw::rpc::Server & server)
 {
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
@@ -78,6 +99,10 @@ void RegisterServices(pw::rpc::Server & server)
 #if defined(PW_RPC_LIGHTING_SERVICE) && PW_RPC_LIGHTING_SERVICE
     server.RegisterService(lighting_service);
 #endif // defined(PW_RPC_LIGHTING_SERVICE) && PW_RPC_LIGHTING_SERVICE
+
+#if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
+    server.RegisterService(trace_service);
+#endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
 }
 
 } // namespace

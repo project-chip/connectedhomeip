@@ -46,7 +46,7 @@ namespace DeviceLayer {
         {
             bool found = false;
 
-            if (NULL == svcId || NULL == charId) {
+            if (nullptr == svcId || nullptr == charId) {
                 return found;
             }
 
@@ -73,7 +73,7 @@ namespace DeviceLayer {
             BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId)
         {
             bool found = false;
-            if (NULL == svcId || NULL == charId) {
+            if (nullptr == svcId || nullptr == charId) {
                 return found;
             }
 
@@ -130,7 +130,7 @@ namespace DeviceLayer {
             BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId, PacketBufferHandle pBuf)
         {
             bool found = false;
-            if (NULL == svcId || NULL == charId || pBuf.IsNull()) {
+            if (nullptr == svcId || nullptr == charId || pBuf.IsNull()) {
                 return found;
             }
 

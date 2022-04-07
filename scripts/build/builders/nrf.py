@@ -15,7 +15,6 @@
 import logging
 import os
 import shlex
-
 from enum import Enum, auto
 
 from .builder import Builder
@@ -79,7 +78,10 @@ class NrfApp(Enum):
             raise Exception('Unknown app type: %r' % self)
 
     def FlashBundleName(self):
-        '''Nrf build script will generate a file naming <project_name>.flashbundle.txt, go through the output dir to find the file and return it.'''
+        '''
+        Nrf build script will generate a file naming <project_name>.flashbundle.txt,
+        go through the output dir to find the file and return it.
+        '''
         return self._FlashBundlePrefix() + '.flashbundle.txt'
 
 
@@ -135,7 +137,7 @@ class NrfConnectBuilder(Builder):
                 try:
                     self._Execute(
                         ['python3', 'scripts/setup/nrfconnect/update_ncs.py', '--check'])
-                except Exception as e:
+                except Exception:
                     logging.exception('Failed to validate ZEPHYR_BASE status')
                     logging.error(
                         'To update $ZEPHYR_BASE run: python3 scripts/setup/nrfconnect/update_ncs.py --update --shallow')
@@ -144,7 +146,7 @@ class NrfConnectBuilder(Builder):
 
             overlays = []
             if self.enable_rpcs:
-                overlays.append("-DOVERLAY_CONFIG=rpc.overlay")
+                overlays.append("-DOVERLAY_CONFIG=../../rpc.overlay")
 
             cmd = '''
 source "$ZEPHYR_BASE/zephyr-env.sh";

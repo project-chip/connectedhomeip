@@ -19,7 +19,13 @@
 
 #if defined(PW_TRACE_BACKEND_SET) && PW_TRACE_BACKEND_SET
 
+/* ignore GCC Wconversion warnings for pigweed */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+
 #include <pw_trace/trace.h>
+
+#pragma GCC diagnostic pop
 
 #define MATTER_TRACE_EVENT_INSTANT(...) PW_TRACE_INSTANT(__VA_ARGS__)
 #define MATTER_TRACE_EVENT_INSTANT_FLAG(...) PW_TRACE_INSTANT_FLAG(__VA_ARGS__)

@@ -23,11 +23,6 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/BLEManager.h>
 
-#include <lwip/dns.h>
-#include <lwip/ip_addr.h>
-#include <lwip/nd6.h>
-#include <lwip/netif.h>
-
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
 #endif

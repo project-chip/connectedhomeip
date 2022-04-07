@@ -83,25 +83,31 @@ class {{filename}}Suite: public TestCommand
 
     {{>setupSaveAs}}
 
-    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & value) override
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
-      bool isExpectedDnssdResult = false;
-      {{#chip_tests_items}}
-      {{#if (isStrEqual cluster "DiscoveryCommands")}}
-      if ((mTestIndex - 1) == {{index}})
-      {
-          isExpectedDnssdResult = true;
-          {{#chip_tests_item_response_parameters}}
-          {{>maybeCheckExpectedValue}}
-          {{>maybeCheckExpectedConstraints}}
-          {{>maybeSaveAs}}
-          {{/chip_tests_item_response_parameters}}
-      }
-      {{/if}}
-      {{/chip_tests_items}}
+        bool shouldContinue = false;
 
-      VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
-      NextTest();
+        switch (mTestIndex - 1)
+        {
+        {{#chip_tests_items}}
+        {{!
+            This check can be removed once the cluster APIs have been converted from Invoke to
+            ReadClient/WriteClient/CommandSender
+        }}
+        {{~#if (isTestOnlyCluster cluster)~}}
+        case {{index}}:
+            {{>test_step_response}}
+            break;
+        {{/if~}}
+        {{/chip_tests_items}}
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
     }
 
     {{! Helper around zapTypeToDecodableClusterObjectType that lets us set the
@@ -203,8 +209,7 @@ class {{filename}}Suite: public TestCommand
           {{~else if (isString type)}}"{{definedValue}}"
           {{else}}{{definedValue}}
           {{~/if~}}
-          {{/chip_tests_item_parameters}}
-          {{additionalArguments}});
+          {{/chip_tests_item_parameters}});
     }
     {{else if isWait}}
     CHIP_ERROR {{>testCommand}}()

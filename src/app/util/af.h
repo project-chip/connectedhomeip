@@ -312,16 +312,6 @@ uint16_t emberAfFindClusterClientEndpointIndex(chip::EndpointId endpoint, chip::
 uint16_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 /**
- * @brief Macro that takes index of endpoint, and returns device Id for it
- */
-#define emberAfDeviceIdFromIndex(index) (emAfEndpoints[(index)].deviceId)
-
-/**
- * @brief Macro that takes index of endpoint, and returns device version for it
- */
-#define emberAfDeviceVersionFromIndex(index) (emAfEndpoints[(index)].deviceVersion)
-
-/**
  * @brief Macro that returns the primary endpoint.
  */
 #define emberAfPrimaryEndpoint() (emAfEndpoints[0].endpoint)

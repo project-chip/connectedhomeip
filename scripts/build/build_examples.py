@@ -14,15 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from glob_matcher import GlobMatcher
-from runner import PrintOnlyRunner, ShellRunner
-
-import build
-import coloredlogs
-import click
 import logging
 import os
 import sys
+
+import click
+import coloredlogs
+
+import build
+from glob_matcher import GlobMatcher
+from runner import PrintOnlyRunner, ShellRunner
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
@@ -42,7 +43,9 @@ def CommaSeparate(items) -> str:
 
 
 def ValidateRepoPath(context, parameter, value):
-    """Validates that the given path looks like a valid chip repository checkout."""
+    """
+    Validates that the given path looks like a valid chip repository checkout.
+    """
     if value.startswith('/TEST/'):
         # Hackish command to allow for unit testing
         return value
@@ -51,8 +54,8 @@ def ValidateRepoPath(context, parameter, value):
         expected_file = os.path.join(value, name)
         if not os.path.exists(expected_file):
             raise click.BadParameter(
-                "'%s' does not look like a valid repository path: %s not found." %
-                (value, expected_file))
+                ("'%s' does not look like a valid repository path: "
+                 "%s not found.") % (value, expected_file))
     return value
 
 
@@ -117,15 +120,16 @@ def ValidateRepoPath(context, parameter, value):
     is_flag=True,
     help='Skip timestaps in log output')
 @click.pass_context
-def main(context, log_level, target, target_glob, skip_target_glob, repo, out_prefix, clean,
-         dry_run, dry_run_output, enable_flashbundle, no_log_timestamps):
+def main(context, log_level, target, target_glob, skip_target_glob, repo,
+         out_prefix, clean, dry_run, dry_run_output, enable_flashbundle,
+         no_log_timestamps):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
     if no_log_timestamps:
         log_fmt = '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
-    if not 'PW_PROJECT_ROOT' in os.environ:
+    if 'PW_PROJECT_ROOT' not in os.environ:
         raise click.UsageError("""
 PW_PROJECT_ROOT not set in the current environment.
 
@@ -139,13 +143,15 @@ before running this script.
         runner = ShellRunner(root=repo)
 
     if 'all' in target:
-        # NOTE: ALL includes things that are glob blacklisted (so that 'targets' works and
-        # displays all)
+        # NOTE: The "all" target includes things that are glob blacklisted
+        #       (so that 'targets' works and displays all)
         targets = build.ALL_TARGETS
     else:
         requested_targets = set([t.lower for t in target])
         targets = [
-            target for target in build.ALL_TARGETS if target.name.lower in requested_targets]
+            target for target in build.ALL_TARGETS
+            if target.name.lower in requested_targets
+        ]
 
         actual_targes = set([t.name.lower for t in targets])
         if requested_targets != actual_targes:
@@ -183,9 +189,11 @@ def cmd_generate(context):
 
 
 @main.command(
-    'targets', help='List the targets that would be generated/built given the input arguments')
+    'targets',
+    help=('List the targets that would be generated/built given '
+          'the input arguments'))
 @click.pass_context
-def cmd_generate(context):
+def cmd_targets(context):
     for builder in context.obj.builders:
         if builder.target.IsGlobBlacklisted:
             print("%s (NOGLOB: %s)" %

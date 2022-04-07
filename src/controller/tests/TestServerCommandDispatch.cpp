@@ -259,7 +259,7 @@ void TestCommandInteraction::TestDataResponseHelper(nlTestSuite * apSuite, void 
     // All our endpoints have the same number of clusters, so just pick one.
     //
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters1)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, aEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage));
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, aEndpoint, Span<DataVersion>(dataVersionStorage));
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
