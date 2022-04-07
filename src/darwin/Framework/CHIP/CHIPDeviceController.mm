@@ -32,6 +32,7 @@
 #import <setup_payload/SetupPayload.h>
 #import <zap-generated/CHIPClustersObjc.h>
 
+#include "CHIPDeviceAttestationDelegateBridge.h"
 #import "CHIPDeviceConnectionBridge.h"
 
 #include <platform/CHIPDeviceBuildConfig.h>
@@ -84,6 +85,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 @property (readonly) CHIPAttestationTrustStoreBridge * attestationTrustStoreBridge;
 @property (readonly) CHIPOperationalCredentialsDelegate * operationalCredentialsDelegate;
 @property (readonly) CHIPP256KeypairBridge keypairBridge;
+@property (readonly) CHIPDeviceAttestationDelegateBridge * deviceAttestationDelegateBridge;
 @property (readonly) chip::NodeId localDeviceId;
 @property (readonly) uint16_t listenPort;
 @property (readonly) const char * kvsPath;
@@ -477,9 +479,46 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
                 chip::Controller::WiFiCredentials wifiCreds(ssid, credentials);
                 params.SetWiFiCredentials(wifiCreds);
             }
+            if (commissioningParams.deviceAttestationDelegate) {
+                [self clearDeviceAttestationDelegateBridge];
+
+                chip::Optional<uint16_t> timeoutSecs;
+                if (commissioningParams.failSafeExpiryTimeoutSecs) {
+                    timeoutSecs = chip::MakeOptional(
+                        static_cast<uint16_t>([commissioningParams.failSafeExpiryTimeoutSecs unsignedIntValue]));
+                }
+                _deviceAttestationDelegateBridge = new CHIPDeviceAttestationDelegateBridge(
+                    self, commissioningParams.deviceAttestationDelegate, _chipWorkQueue, timeoutSecs);
+                params.SetDeviceAttestationDelegate(_deviceAttestationDelegateBridge);
+            }
 
             _operationalCredentialsDelegate->SetDeviceID(deviceId);
             errorCode = self.cppCommissioner->Commission(deviceId, params);
+        }
+        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
+    });
+    return success;
+}
+
+- (BOOL)continueCommissioningDevice:(void *)device
+           ignoreAttestationFailure:(BOOL)ignoreAttestationFailure
+                              error:(NSError * __autoreleasing *)error
+{
+    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+    __block BOOL success = NO;
+    if (![self isRunning]) {
+        success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
+        return success;
+    }
+    dispatch_sync(_chipWorkQueue, ^{
+        if ([self isRunning]) {
+            auto lastAttestationResult = _deviceAttestationDelegateBridge
+                ? _deviceAttestationDelegateBridge->attestationVerificationResult()
+                : chip::Credentials::AttestationVerificationResult::kSuccess;
+
+            chip::DeviceProxy * deviceProxy = static_cast<chip::DeviceProxy *>(device);
+            errorCode = self.cppCommissioner->ContinueCommissioningAfterDeviceAttestationFailure(deviceProxy,
+                ignoreAttestationFailure ? chip::Credentials::AttestationVerificationResult::kSuccess : lastAttestationResult);
         }
         success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });
@@ -705,7 +744,17 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         _groupStorageDelegate = nullptr;
     }
 
+    [self clearDeviceAttestationDelegateBridge];
+
     return YES;
+}
+
+- (void)clearDeviceAttestationDelegateBridge
+{
+    if (_deviceAttestationDelegateBridge) {
+        delete _deviceAttestationDelegateBridge;
+        _deviceAttestationDelegateBridge = nullptr;
+    }
 }
 
 - (BOOL)checkForStartError:(BOOL)condition logMsg:(NSString *)logMsg
