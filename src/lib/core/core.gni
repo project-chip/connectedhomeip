@@ -25,13 +25,13 @@ declare_args() {
   chip_error_logging = chip_logging
 
   # Enable progress logging.
-  chip_progress_logging = chip_logging
+  chip_progress_logging = false
 
   # Enable detail logging.
-  chip_detail_logging = chip_logging
+  chip_detail_logging = false
 
   # Enable automation logging.
-  chip_automation_logging = chip_logging
+  chip_automation_logging = false
 
   # Enable pigweed tokenizer logging.
   chip_pw_tokenizer_logging = false
