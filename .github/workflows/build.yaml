@@ -26,7 +26,7 @@ concurrency:
 jobs:
     build_linux_gcc_debug:
         name: Build on Linux (gcc_debug)
-        timeout-minutes: 65
+        timeout-minutes: 85
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
