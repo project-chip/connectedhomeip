@@ -106,6 +106,9 @@ public:
     static CHIP_ERROR ClearNamespace(const char * ns);
 
     static void RunConfigUnitTest(void);
+
+private:
+    static const char * GetPartitionLabelByNamespace(const char * ns);
 };
 
 struct ESP32Config::Key
