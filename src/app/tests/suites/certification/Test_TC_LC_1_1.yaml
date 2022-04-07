@@ -33,7 +33,7 @@ tests:
 
     - label: "TH1 reads LabelList from the DUT"
       verification: |
-          '' ./chip-tool fixedlabel read label-list 1 0 
+          '' ./chip-tool fixedlabel read label-list 1 0
 
           [1641391188.532065][6515:6521] CHIP:TOO: FixedLabel.LabelList response: 4 entries
           [1641391188.532179][6515:6521] CHIP:TOO:   [1]: {
