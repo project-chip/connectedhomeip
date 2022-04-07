@@ -52,7 +52,7 @@ class IMXBuilder(HostBuilder):
 
     def GnBuildEnv(self):
         return {
-            'PKG_CONFIG_PATH': self.SysRootPath('SDKTARGETSYSROOT') + '/lib/aarch64-linux-gnu/pkgconfig',
+            'PKG_CONFIG_PATH': self.SysRootPath('IMX_SDK_ROOT') + '/sysroots/cortexa53-crypto-poky-linux/lib/aarch64-linux-gnu/pkgconfig',
         }
 
     def GnBuildArgs(self):
@@ -62,11 +62,11 @@ class IMXBuilder(HostBuilder):
             'arm_arch="armv8-a"',
             'import(\"//build_overrides/build.gni\")',
             'custom_toolchain=\"${build_root}/toolchain/custom\"',
-            'sysroot="%s"' % self.SysRootPath('SDKTARGETSYSROOT'),
+            'sysroot="%s/sysroots/cortexa53-crypto-poky-linux"' % self.SysRootPath('IMX_SDK_ROOT'),
             'target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\\"mlan0\\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\\"udhcpc -b -i %s \\"" ]',
-            'target_cc="%s/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc"' % self.SysRootPath('OECORE_NATIVE_SYSROOT'),
-            'target_cxx="%s/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++"' % self.SysRootPath('OECORE_NATIVE_SYSROOT'),
-            'target_ar="%s/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar"' % self.SysRootPath('OECORE_NATIVE_SYSROOT'),
+            'target_cc="%s/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc"' % self.SysRootPath('IMX_SDK_ROOT'),
+            'target_cxx="%s/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++"' % self.SysRootPath('IMX_SDK_ROOT'),
+            'target_ar="%s/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar"' % self.SysRootPath('IMX_SDK_ROOT'),
         ]
 
         if self.release:
