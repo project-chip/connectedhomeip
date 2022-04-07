@@ -523,7 +523,7 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
 #define PUBLISH_RECORDS(Type)                                                                                                      \
     ReturnErrorOnFailure(PublishService(k##Type##ServiceName, textEntries, textEntrySize, subTypes, subTypeSize, params));         \
     m##Type##NodeAdvertisingParams = params;                                                                                       \
-    mIs##Type##NodePublishing      = true;                                                                                         \
+    mIs##Type##NodePublishing      = true;
 
 CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParameters & params)
 {
