@@ -87,8 +87,6 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
     ReturnErrorCodeIf(error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
     ReturnErrorOnFailure(error);
 
-    KeyValueStoreMgr().Delete(DefaultStorageKeyAllocator::FailSafeNetworkConfig());
-
     // Not all KVS implementations support zero-length values, so handle a special value representing an empty dataset.
     ByteSpan dataset(datasetBytes, datasetLength);
 
@@ -98,8 +96,9 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
     }
 
     ReturnErrorOnFailure(mStagingNetwork.Init(dataset));
+    ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork, /* callback */ nullptr));
 
-    return DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork, /* callback */ nullptr);
+    return KeyValueStoreMgr().Delete(DefaultStorageKeyAllocator::FailSafeNetworkConfig());
 }
 
 Status GenericThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan & outDebugText,
