@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 10.2.3. [TC-DM-2.3] Operational Credential Commands [DUT - Commissioner]
+name:
+    107.7. [TC-DL-1.7] Verification for the following Commands - Set User
+    Status, Get User Status , Get User Status Response [DUT-Server]
 
 config:
     nodeId: 0x12344321
@@ -20,37 +22,29 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission TH to DUT"
+    - label: "Verify that DUT sends a SUCCESS response"
+      verification: |
+          https://github.com/project-chip/connectedhomeip/issues/15776
+      disabled: true
+
+    - label: "TH send Get User Status command to DUT with User ID as 3"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends Attestation Request to TH"
+    - label:
+          "TH send Set User Status command to DUT for setting the User Status as
+          3 for User ID as 3"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends Attestation Certificate Chain Request to TH"
+    - label: "TH sends Get User Status command to DUT"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends CSR Request to TH"
-      verification: |
-
-      disabled: true
-
-    - label: "DUT Sends Add Trusted Root Certificate Request to TH"
-      verification: |
-
-      disabled: true
-
-    - label: "DUT Sends Add Op Cert Request to TH"
-      verification: |
-
-      disabled: true
-
-    - label: "Verify DUT and TH are on the same Fabric"
+    - label: "TH sends Get User Status command to DUT with the User ID as '3f4'"
       verification: |
 
       disabled: true

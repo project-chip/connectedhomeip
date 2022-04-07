@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 10.2.3. [TC-DM-2.3] Operational Credential Commands [DUT - Commissioner]
+name:
+    3.13. [TC-NC-1.13] Verificatrion for ConnectNetwork Command for Ethernet
+    interface [DUT-Commissionee]
 
 config:
     nodeId: 0x12344321
@@ -20,37 +22,34 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission TH to DUT"
+    - label: "TH1 sends ArmFailSafe command to the DUT"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends Attestation Request to TH"
+    - label: "TH1 saves the timestamp as CT1"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends Attestation Certificate Chain Request to TH"
+    - label:
+          "TH1 sends ConnectNetwork command to the DUT with NetworkID argument
+          value as 'Ethnet_id' and Breadcrumb argument value as 0"
+      verification: |
+          https://github.com/project-chip/connectedhomeip/issues/15782
+      disabled: true
+
+    - label: "TH1 saves the timestamp as CT2"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends CSR Request to TH"
+    - label: "TH1 reads Networks attribute from the DUT"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends Add Trusted Root Certificate Request to TH"
-      verification: |
-
-      disabled: true
-
-    - label: "DUT Sends Add Op Cert Request to TH"
-      verification: |
-
-      disabled: true
-
-    - label: "Verify DUT and TH are on the same Fabric"
+    - label: "TH1 sends CommissioningComplete Command from the DUT"
       verification: |
 
       disabled: true
