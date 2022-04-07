@@ -37,16 +37,25 @@ public:
     virtual void DeviceTypeList(const ::chip_rpc_Endpoint & request, ServerWriter<::chip_rpc_DeviceType> & writer)
     {
         DeviceLayer::StackLock lock;
-        constexpr uint16_t kInvalidEndpointIndex = 0xFFFF;
-        uint16_t index                           = emberAfIndexFromEndpoint(request.endpoint);
-        if (index == kInvalidEndpointIndex)
+        CHIP_ERROR err;
+
+        auto deviceTypeList = emberAfDeviceTypeListFromEndpoint(request.endpoint, err);
+        if (err != CHIP_NO_ERROR)
         {
             writer.Finish(pw::Status::InvalidArgument());
             return;
         }
 
-        chip_rpc_DeviceType out{ .device_type = emberAfDeviceIdFromIndex(index) };
-        writer.Write(out);
+        if (deviceTypeList.size())
+        {
+            //
+            // TODO: Need to update the Pigweed proto definition to actually represent this
+            //       as a list of device types.
+            //
+            chip_rpc_DeviceType out{ .device_type = deviceTypeList.data()[0].deviceId };
+            writer.Write(out);
+        }
+
         writer.Finish();
     }
 
