@@ -178,6 +178,15 @@ enum class SupportedECPKeyTypes : uint8_t
  **/
 void ClearSecretData(uint8_t * buf, size_t len);
 
+/**
+ * Helper for clearing a C array which auto-deduces the size.
+ */
+template <size_t N>
+void ClearSecretData(uint8_t (&buf)[N])
+{
+    ClearSecretData(buf, N);
+}
+
 template <typename Sig>
 class ECPKey
 {
