@@ -73,7 +73,6 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         ESP_LOGI(TAG, "Commissioning complete");
 #if CONFIG_BT_NIMBLE_ENABLED && CONFIG_DEINIT_BLE_ON_COMMISSIONING_COMPLETE
 
-        // ble_hs_is_enabled() returns 1 if ble host is enabled
         if (ble_hs_is_enabled())
         {
             int ret = nimble_port_stop();
