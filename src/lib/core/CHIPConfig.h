@@ -94,8 +94,7 @@
  *
  *  @brief
  *    Enable (1) or disable (0) support for platform-specific
- *    implementation of chip Security Manager memory-management
- *    functions.
+ *    implementation of Matter memory-management functions.
  *
  *  @note This configuration is mutual exclusive with
  *        #CHIP_CONFIG_MEMORY_MGMT_MALLOC.
@@ -110,7 +109,7 @@
  *
  *  @brief
  *    Enable (1) or disable (0) support for a chip-provided
- *    implementation of chip Security Manager memory-management
+ *    implementation of Matter memory-management
  *    functions based on the C Standard Library malloc / free
  *    functions.
  *
@@ -165,62 +164,6 @@
 #endif // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 
 /**
- *  @name chip Security Manager Time-Consuming Crypto Alerts.
- *
- *  @brief
- *    The following definitions enable one of two potential chip
- *    Security Manager time-consuming crypto alerts implementations:
- *
- *      * #CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_DUMMY
- *      * #CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_PLATFORM
- *
- *    Note that these options are mutually exclusive and only one
- *    of these options should be set.
- *
- *  @{
- */
-
-/**
- *  @def CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_DUMMY
- *
- *  @brief
- *    Enable (1) or disable (0) support for chip-provided dummy
- *    implementation of chip security manager time-consuming
- *    crypto alerts functions.
- *
- *  @note This configuration is mutual exclusive with
- *        #CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_PLATFORM.
- *
- */
-#ifndef CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_DUMMY
-#define CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_DUMMY 1
-#endif // CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_DUMMY
-
-/**
- *  @def CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_PLATFORM
- *
- *  @brief
- *    Enable (1) or disable (0) support for a platform-specific
- *    implementation of chip security manager time-consuming
- *    crypto alerts functions.
- *
- *  @note This configuration is mutual exclusive with
- *        #CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_DUMMY.
- *
- */
-#ifndef CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_PLATFORM
-#define CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_PLATFORM 0
-#endif // CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_PLATFORM
-
-/**
- *  @}
- */
-
-#if ((CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_DUMMY + CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_PLATFORM) != 1)
-#error "Please assert exactly one of CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_DUMMY or CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_PLATFORM."
-#endif // ((CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_DUMMY + CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_PLATFORM) != 1)
-
-/**
  *  @def CHIP_CONFIG_SHA256_CONTEXT_SIZE
  *
  *  @brief
@@ -241,83 +184,6 @@
 #ifndef CHIP_CONFIG_SHA256_CONTEXT_SIZE
 #define CHIP_CONFIG_SHA256_CONTEXT_SIZE ((sizeof(unsigned int) * (8 + 2 + 16 + 2)) + sizeof(uint64_t))
 #endif // CHIP_CONFIG_SHA256_CONTEXT_SIZE
-
-/**
- *  @def CHIP_CONFIG_MAX_PEER_NODES
- *
- *  @brief
- *    Maximum number of peer nodes that the local node can communicate
- *    with.
- *
- */
-#ifndef CHIP_CONFIG_MAX_PEER_NODES
-#define CHIP_CONFIG_MAX_PEER_NODES 128
-#endif // CHIP_CONFIG_MAX_PEER_NODES
-
-/**
- *  @def CHIP_CONFIG_MAX_CONNECTIONS
- *
- *  @brief
- *    Maximum number of simultaneously active connections.
- *
- */
-#ifndef CHIP_CONFIG_MAX_CONNECTIONS
-#define CHIP_CONFIG_MAX_CONNECTIONS INET_CONFIG_NUM_TCP_ENDPOINTS
-#endif // CHIP_CONFIG_MAX_CONNECTIONS
-
-/**
- *  @def CHIP_CONFIG_MAX_INCOMING_TCP_CONNECTIONS
- *
- *  @brief
- *    Maximum number of simultaneously active inbound TCP connections.
- *
- *    Regardless of what #CHIP_CONFIG_MAX_INCOMING_TCP_CONNECTIONS
- *    is set to, the total number of inbound connections cannot exceed
- *    #CHIP_CONFIG_MAX_CONNECTIONS, which is the overall limit for
- *    inbound and outbound connections.
- */
-#ifndef CHIP_CONFIG_MAX_INCOMING_TCP_CONNECTIONS
-#define CHIP_CONFIG_MAX_INCOMING_TCP_CONNECTIONS (CHIP_CONFIG_MAX_CONNECTIONS * 4 / 5)
-#endif // CHIP_CONFIG_MAX_INCOMING_TCP_CONNECTIONS
-
-/**
- *  @def CHIP_CONFIG_MAX_INCOMING_TCP_CON_FROM_SINGLE_IP
- *
- *  @brief
- *    Maximum number of simultaneously active inbound TCP connections
- *    from the single IP address.
- *
- *    Regardless of what #CHIP_CONFIG_MAX_INCOMING_TCP_CON_FROM_SINGLE_IP
- *    is set to, the total number of inbound connections from a single IP
- *    address cannot exceed #CHIP_CONFIG_MAX_CONNECTIONS or
- *    #CHIP_CONFIG_MAX_INCOMING_TCP_CONNECTIONS.
- */
-#ifndef CHIP_CONFIG_MAX_INCOMING_TCP_CON_FROM_SINGLE_IP
-#define CHIP_CONFIG_MAX_INCOMING_TCP_CON_FROM_SINGLE_IP 2
-#endif // CHIP_CONFIG_MAX_INCOMING_TCP_CON_FROM_SINGLE_IP
-
-/**
- *  @def CHIP_CONFIG_MAX_SESSION_KEYS
- *
- *  @brief
- *    Maximum number of simultaneously active session keys.
- *
- */
-#ifndef CHIP_CONFIG_MAX_SESSION_KEYS
-#define CHIP_CONFIG_MAX_SESSION_KEYS CHIP_CONFIG_MAX_CONNECTIONS
-#endif // CHIP_CONFIG_MAX_SESSION_KEYS
-
-/**
- *  @def CHIP_CONFIG_NUM_MESSAGE_BUFS
- *
- *  @brief
- *    Total number of message buffers. Only used for the BSD sockets
- *    configuration.
- *
- */
-#ifndef CHIP_CONFIG_NUM_MESSAGE_BUFS
-#define CHIP_CONFIG_NUM_MESSAGE_BUFS 16
-#endif // CHIP_CONFIG_NUM_MESSAGE_BUFS
 
 /**
  *  @def CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
@@ -343,37 +209,6 @@
 #endif // CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS
 
 /**
- *  @def CHIP_CONFIG_MAX_ACTIVE_CHANNELS
- *
- *  @brief
- *    Maximum number of simultaneously active channels
- */
-#ifndef CHIP_CONFIG_MAX_ACTIVE_CHANNELS
-#define CHIP_CONFIG_MAX_ACTIVE_CHANNELS 16
-#endif // CHIP_CONFIG_MAX_ACTIVE_CHANNELS
-
-/**
- *  @def CHIP_CONFIG_MAX_CHANNEL_HANDLES
- *
- *  @brief
- *    Maximum number of channel handles
- */
-#ifndef CHIP_CONFIG_MAX_CHANNEL_HANDLES
-#define CHIP_CONFIG_MAX_CHANNEL_HANDLES 32
-#endif // CHIP_CONFIG_MAX_CHANNEL_HANDLES
-
-/**
- *  @def CHIP_CONFIG_NODE_ADDRESS_RESOLVE_TIMEOUT_MSECS
- *
- *  @brief
- *    This is the default timeout for node addres resolve over mDNS
- *
- */
-#ifndef CHIP_CONFIG_NODE_ADDRESS_RESOLVE_TIMEOUT_MSECS
-#define CHIP_CONFIG_NODE_ADDRESS_RESOLVE_TIMEOUT_MSECS (5000)
-#endif // CHIP_CONFIG_NODE_ADDRESS_RESOLVE_TIMEOUT_MSECS
-
-/**
  *  @def CHIP_CONFIG_MCSP_RECEIVE_TABLE_SIZE
  *
  *  @brief
@@ -396,18 +231,6 @@
 #endif // CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE
 
 /**
- *  @def CHIP_CONFIG_CONNECT_IP_ADDRS
- *
- *  @brief
- *    Maximum number of IP addresses tried when connecting to a
- *    hostname.
- *
- */
-#ifndef CHIP_CONFIG_CONNECT_IP_ADDRS
-#define CHIP_CONFIG_CONNECT_IP_ADDRS 4
-#endif // CHIP_CONFIG_CONNECT_IP_ADDRS
-
-/**
  *  @def CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE
  *
  *  @brief
@@ -421,51 +244,6 @@
 #ifndef CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE
 #define CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE 1280
 #endif // CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE
-
-/**
- *  @def CHIP_HEADER_RESERVE_SIZE
- *
- *  @brief
- *    The number of bytes to reserve in a network packet buffer to contain the
- *    chip message and exchange headers.
- *
- *    This number was calculated as follows:
- *
- *      chip Message Header:
- *
- *          2 -- Frame Length
- *          2 -- Message Header
- *          4 -- Message Id
- *          8 -- Source Node Id
- *          8 -- Destination Node Id
- *          2 -- Key Id
- *
- *      chip Exchange Header:
- *
- *          1 -- Application Version
- *          1 -- Message Type
- *          2 -- Exchange Id
- *          4 -- Profile Id
- *          4 -- Acknowledged Message Id
- *
- *    @note A number of these fields are optional or not presently used.
- *          So most headers will be considerably smaller than this.
- *
- */
-#ifndef CHIP_HEADER_RESERVE_SIZE
-#define CHIP_HEADER_RESERVE_SIZE 38
-#endif // CHIP_HEADER_RESERVE_SIZE
-
-/**
- *  @def CHIP_TRAILER_RESERVE_SIZE
- *
- *  @brief
- *    TODO
- *
- */
-#ifndef CHIP_TRAILER_RESERVE_SIZE
-#define CHIP_TRAILER_RESERVE_SIZE 20
-#endif // CHIP_TRAILER_RESERVE_SIZE
 
 /**
  *  @def CHIP_PORT
@@ -488,27 +266,6 @@
 #ifndef CHIP_UDC_PORT
 #define CHIP_UDC_PORT CHIP_PORT + 10
 #endif // CHIP_UDC_PORT
-
-/**
- *  @def CHIP_UNSECURED_PORT
- *
- *  @brief
- *    chip TCP/UDP port for unsecured chip traffic.
- *
- */
-#ifndef CHIP_UNSECURED_PORT
-#define CHIP_UNSECURED_PORT 11096
-#endif // CHIP_UNSECURED_PORT
-
-/**
- *  @def CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
- *
- *  @brief
- *    Enable use of an ephemeral UDP source port for locally initiated chip exchanges.
- */
-#ifndef CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
-#define CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT 0
-#endif // CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
 
 /**
  *  @def CHIP_CONFIG_SECURITY_TEST_MODE
@@ -544,49 +301,6 @@
 #endif // CHIP_CONFIG_TEST_SHARED_SECRET_VALUE
 
 /**
- *  @def CHIP_CONFIG_RESOLVE_IPADDR_LITERAL
- *
- *  @brief
- *    Enable support for resolving hostnames as literal IP addresses without a DNS resolver.
- *
- *    For historical reasons, the default is \c TRUE where \c CHIP_SYSTEM_CONFIG_USE_SOCKETS=1,
- *    and \c FALSE otherwise. The exception in the LwIP-only case was originally made to facilitate
- *    integration and change management with existing development lines. The default may
- *    change in the future to \c TRUE in all cases.
- */
-#ifndef CHIP_CONFIG_RESOLVE_IPADDR_LITERAL
-#define CHIP_CONFIG_RESOLVE_IPADDR_LITERAL (CHIP_SYSTEM_CONFIG_USE_SOCKETS)
-#endif // CHIP_CONFIG_RESOLVE_IPADDR_LITERAL
-
-/**
- *  @def CHIP_CONFIG_ENABLE_TARGETED_LISTEN
- *
- *  @brief
- *    Enable support for listening on particular addresses/interfaces.
- *
- *    This allows testing multiple instances of the chip stack
- *    running on a single host.
- *
- */
-#ifndef CHIP_CONFIG_ENABLE_TARGETED_LISTEN
-#define CHIP_CONFIG_ENABLE_TARGETED_LISTEN (!CHIP_SYSTEM_CONFIG_USE_LWIP)
-#endif // CHIP_CONFIG_ENABLE_TARGETED_LISTEN
-
-/**
- *  @def CHIP_CONFIG_ENABLE_UNSECURED_TCP_LISTEN
- *
- *  @brief
- *    Enable support for receiving TCP connections over an unsecured
- *    network layer (for example, from a device that is provisionally joined
- *    to a 6LowPAN network but does not possess the 802.15.4 network
- *    keys).
- *
- */
-#ifndef CHIP_CONFIG_ENABLE_UNSECURED_TCP_LISTEN
-#define CHIP_CONFIG_ENABLE_UNSECURED_TCP_LISTEN 0
-#endif // CHIP_CONFIG_ENABLE_UNSECURED_TCP_LISTEN
-
-/**
  *  @def CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES
  *
  *  @brief
@@ -601,100 +315,6 @@
 #ifndef CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER
 #define CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER "GlobalMCTR"
 #endif // CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER
-
-/**
- *  @def CHIP_CONFIG_REQUIRE_AUTH
- *
- *  @brief
- *    Enable (1) or disable (0) support for client requests via an
- *    authenticated session.
- *
- *    This broadly controls whether or not a number of chip servers
- *    require client requests to be sent via an authenticated session
- *    and provides a default configuration value to these related
- *    definitions:
- *
- *      * #CHIP_CONFIG_REQUIRE_AUTH_DEVICE_CONTROL
- *      * #CHIP_CONFIG_REQUIRE_AUTH_FABRIC_PROV
- *      * #CHIP_CONFIG_REQUIRE_AUTH_NETWORK_PROV
- *      * #CHIP_CONFIG_REQUIRE_AUTH_SERVICE_PROV
- *
- *    @note These configurations shall be deasserted for development
- *          and testing purposes only. No chip-enabled device shall
- *          be certified without these asserted.
- *
- */
-#ifndef CHIP_CONFIG_REQUIRE_AUTH
-#define CHIP_CONFIG_REQUIRE_AUTH 1
-#endif // CHIP_CONFIG_REQUIRE_AUTH
-
-/**
- *  @def CHIP_CONFIG_REQUIRE_AUTH_DEVICE_CONTROL
- *
- *  @brief
- *    Enable (1) or disable (0) support for client requests to the
- *    chip Device Control server via an authenticated session. See
- *    also #CHIP_CONFIG_REQUIRE_AUTH.
- *
- *    @note This configuration shall be deasserted for development
- *          and testing purposes only. No chip-enabled device shall
- *          be certified without this asserted.
- *
- */
-#ifndef CHIP_CONFIG_REQUIRE_AUTH_DEVICE_CONTROL
-#define CHIP_CONFIG_REQUIRE_AUTH_DEVICE_CONTROL CHIP_CONFIG_REQUIRE_AUTH
-#endif // CHIP_CONFIG_REQUIRE_AUTH_DEVICE_CONTROL
-
-/**
- *  @def CHIP_CONFIG_REQUIRE_AUTH_FABRIC_PROV
- *
- *  @brief
- *    Enable (1) or disable (0) support for client requests to the
- *    chip Fabric Provisioning server via an authenticated
- *    session. See also #CHIP_CONFIG_REQUIRE_AUTH.
- *
- *    @note This configuration shall be deasserted for development
- *          and testing purposes only. No chip-enabled device shall
- *          be certified without this asserted.
- *
- */
-#ifndef CHIP_CONFIG_REQUIRE_AUTH_FABRIC_PROV
-#define CHIP_CONFIG_REQUIRE_AUTH_FABRIC_PROV CHIP_CONFIG_REQUIRE_AUTH
-#endif // CHIP_CONFIG_REQUIRE_AUTH_FABRIC_PROV
-
-/**
- *  @def CHIP_CONFIG_REQUIRE_AUTH_NETWORK_PROV
- *
- *  @brief
- *    Enable (1) or disable (0) support for client requests to the
- *    chip Network Provisioning server via an authenticated
- *    session. See also #CHIP_CONFIG_REQUIRE_AUTH.
- *
- *    @note This configuration shall be deasserted for development
- *          and testing purposes only. No chip-enabled device shall
- *          be certified without this asserted.
- *
- */
-#ifndef CHIP_CONFIG_REQUIRE_AUTH_NETWORK_PROV
-#define CHIP_CONFIG_REQUIRE_AUTH_NETWORK_PROV CHIP_CONFIG_REQUIRE_AUTH
-#endif // CHIP_CONFIG_REQUIRE_AUTH_NETWORK_PROV
-
-/**
- *  @def CHIP_CONFIG_REQUIRE_AUTH_SERVICE_PROV
- *
- *  @brief
- *    Enable (1) or disable (0) support for client requests to the
- *    chip Service Provisioning server via an authenticated
- *    session. See also #CHIP_CONFIG_REQUIRE_AUTH.
- *
- *    @note This configuration shall be deasserted for development
- *          and testing purposes only. No chip-enabled device shall
- *          be certified without this asserted.
- *
- */
-#ifndef CHIP_CONFIG_REQUIRE_AUTH_SERVICE_PROV
-#define CHIP_CONFIG_REQUIRE_AUTH_SERVICE_PROV CHIP_CONFIG_REQUIRE_AUTH
-#endif // CHIP_CONFIG_REQUIRE_AUTH_SERVICE_PROV
 
 /**
  *  @def CHIP_ERROR_LOGGING
@@ -763,50 +383,6 @@
 #ifndef CHIP_CONFIG_ENABLE_CONDITION_LOGGING
 #define CHIP_CONFIG_ENABLE_CONDITION_LOGGING 0
 #endif // CHIP_CONFIG_ENABLE_CONDITION_LOGGING
-
-/**
- *  @def CHIP_CONFIG_SERVICE_DIR_CONNECT_TIMEOUT_MSECS
- *
- *  @brief
- *    This is the default timeout for the connect call to the
- *    directory server to wait for success or being notified
- *    of an error.
- *
- */
-#ifndef CHIP_CONFIG_SERVICE_DIR_CONNECT_TIMEOUT_MSECS
-#define CHIP_CONFIG_SERVICE_DIR_CONNECT_TIMEOUT_MSECS (10000)
-#endif // CHIP_CONFIG_SERVICE_DIR_CONNECT_TIMEOUT_MSECS
-
-/**
- *  @def CHIP_CONFIG_DEFAULT_INCOMING_CONNECTION_IDLE_TIMEOUT
- *
- *  @brief
- *    The maximum amount of time, in milliseconds, that an idle inbound
- *    chip connection will be allowed to exist before being closed.
- *
- *    This is a default value that can be overridden at runtime by the
- *    application.
- *
- *    A value of 0 disables automatic closing of idle connections.
- *
- */
-#ifndef CHIP_CONFIG_DEFAULT_INCOMING_CONNECTION_IDLE_TIMEOUT
-#define CHIP_CONFIG_DEFAULT_INCOMING_CONNECTION_IDLE_TIMEOUT 15000
-#endif // CHIP_CONFIG_DEFAULT_INCOMING_CONNECTION_IDLE_TIMEOUT
-
-/**
- *  @def CHIP_CONFIG_MSG_COUNTER_SYNC_RESP_TIMEOUT
- *
- *  @brief
- *    The amount of time (in milliseconds) which a peer is given
- *    to respond to a message counter synchronization request.
- *    Depending on when the request is sent, peers may
- *    actually have up to twice this time.
- *
- */
-#ifndef CHIP_CONFIG_MSG_COUNTER_SYNC_RESP_TIMEOUT
-#define CHIP_CONFIG_MSG_COUNTER_SYNC_RESP_TIMEOUT 2000
-#endif // CHIP_CONFIG_MSG_COUNTER_SYNC_RESP_TIMEOUT
 
 /**
  *  @def CHIP_CONFIG_TEST
@@ -936,18 +512,6 @@
 #endif // CHIP_CONFIG_BLE_PKT_RESERVED_SIZE
 
 /**
- *  @def CHIP_CONFIG_ENABLE_SECURITY_DEBUG_FUNCS
- *
- *  @brief
- *    Enable (1) or disable (0) support for utility functions for
- *    decoding and outputing information related to chip security.
- *
- */
-#ifndef CHIP_CONFIG_ENABLE_SECURITY_DEBUG_FUNCS
-#define CHIP_CONFIG_ENABLE_SECURITY_DEBUG_FUNCS 1
-#endif // CHIP_CONFIG_ENABLE_SECURITY_DEBUG_FUNCS
-
-/**
  *  @def CHIP_CONFIG_IsPlatformErrorNonCritical(CODE)
  *
  *  This macro checks if a platform generated error is critical and
@@ -990,54 +554,6 @@
 #endif // CHIP_CONFIG_IsPlatformErrorNonCritical
 
 /**
- *  @def CHIP_CONFIG_WILL_OVERRIDE_PLATFORM_MATH_FUNCS
- *
- *  @brief
- *    Enable (1) or disable (0) replacing math functions
- *    which may not be available in the standard/intrinsic library,
- *    and hence require special support from the platform.
- *
- */
-#ifndef CHIP_CONFIG_WILL_OVERRIDE_PLATFORM_MATH_FUNCS
-#define CHIP_CONFIG_WILL_OVERRIDE_PLATFORM_MATH_FUNCS 0
-#endif // CHIP_CONFIG_WILL_OVERRIDE_PLATFORM_MATH_FUNCS
-
-/**
- * @def CHIP_CONFIG_SERIALIZATION_USE_MALLOC
- *
- * @brief If turned on, then schema event serialization and
- *   deserialization will use the stdlib implementations of malloc,
- *   free, and realloc by default (if no other implementations have
- *   been provided).  We will fail at compile time if the stdlib
- *   implementations are not present.
- */
-#ifndef CHIP_CONFIG_SERIALIZATION_USE_MALLOC
-#define CHIP_CONFIG_SERIALIZATION_USE_MALLOC 0
-#endif
-
-/**
- * @def CHIP_CONFIG_SERIALIZATION_DEBUG_LOGGING
- *
- * @brief Enable debug logging for the serialization/deserialization APIs.
- */
-#ifndef CHIP_CONFIG_SERIALIZATION_DEBUG_LOGGING
-#define CHIP_CONFIG_SERIALIZATION_DEBUG_LOGGING 0
-#endif
-
-/**
- * @def CHIP_CONFIG_SERIALIZATION_LOG_FLOATS
- *
- * @brief Enable debug logging of floats and doubles for the
- *   serialization/deserialization APIs.  Not all platforms
- *   support these types, and may not compile if there are
- *   any references to them.  Only matters if
- *   CHIP_CONFIG_SERIALIZATION_DEBUG_LOGGING is enabled.
- */
-#ifndef CHIP_CONFIG_SERIALIZATION_LOG_FLOATS
-#define CHIP_CONFIG_SERIALIZATION_LOG_FLOATS 1
-#endif
-
-/**
  * @def CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE
  *
  * @brief
@@ -1070,17 +586,6 @@
 #endif // CHIP_CONFIG_PERSISTED_STORAGE_ENC_MSG_CNTR_ID
 
 /**
- *  @def CHIP_CONFIG_PERSISTED_STORAGE_ENC_MSG_CNTR_EPOCH
- *
- *  @brief
- *    The group key message counter persisted storage epoch.
- *
- */
-#ifndef CHIP_CONFIG_PERSISTED_STORAGE_ENC_MSG_CNTR_EPOCH
-#define CHIP_CONFIG_PERSISTED_STORAGE_ENC_MSG_CNTR_EPOCH 0x1000
-#endif // CHIP_CONFIG_PERSISTED_STORAGE_ENC_MSG_CNTR_EPOCH
-
-/**
  * @def CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH
  *
  * @brief The maximum length of the key in a key/value pair
@@ -1088,16 +593,6 @@
  */
 #ifndef CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH
 #define CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH 16
-#endif
-
-/**
- * @def CHIP_CONFIG_PERSISTED_STORAGE_MAX_VALUE_LENGTH
- *
- * @brief The maximum length of the value in a key/value pair
- *   stored in the platform's persistent storage.
- */
-#ifndef CHIP_CONFIG_PERSISTED_STORAGE_MAX_VALUE_LENGTH
-#define CHIP_CONFIG_PERSISTED_STORAGE_MAX_VALUE_LENGTH 256
 #endif
 
 /**
@@ -1130,73 +625,21 @@
 #endif
 
 /**
- * @def CHIP_CONFIG_ENABLE_ARG_PARSER_SANTIY_CHECK
+ * @def CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
  *
- * @brief Enable santiy checking of command-line argument definitions.
+ * @brief Enable validity checking of command-line argument definitions.
+ *
+ * // TODO: Determine why we wouldn't need this
  */
-#ifndef CHIP_CONFIG_ENABLE_ARG_PARSER_SANTIY_CHECK
-#define CHIP_CONFIG_ENABLE_ARG_PARSER_SANTIY_CHECK 1
+#ifndef CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
+#define CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS 1
 #endif
-
-/**
- * @def CHIP_CONFIG_SERVICE_PROV_RESPONSE_TIMEOUT
- *
- * @brief
- *    The amount of time (in milliseconds) which the service is given
- *    to respond to a pair device to account request.
- */
-#ifndef CHIP_CONFIG_SERVICE_PROV_RESPONSE_TIMEOUT
-#define CHIP_CONFIG_SERVICE_PROV_RESPONSE_TIMEOUT 60000
-#endif
-
-/**
- *  @def CHIP_CONFIG_SUPPORT_LEGACY_ADD_NETWORK_MESSAGE
- *
- *  @brief
- *    Enable (1) or disable (0) support for the depricated
- *    version of AddNetwork() message in the Network Provisioning
- *    profile.
- *    This option should be enabled to support pairing with CHIP
- *    legacy devices that don't have latest SW.
- *
- */
-#ifndef CHIP_CONFIG_SUPPORT_LEGACY_ADD_NETWORK_MESSAGE
-#define CHIP_CONFIG_SUPPORT_LEGACY_ADD_NETWORK_MESSAGE 1
-#endif // CHIP_CONFIG_SUPPORT_LEGACY_ADD_NETWORK_MESSAGE
-
-/**
- *  @def CHIP_CONFIG_ALWAYS_USE_LEGACY_ADD_NETWORK_MESSAGE
- *
- *  @brief
- *    Enable (1) or disable (0) the exclusive use of the depricated
- *    version of AddNetwork() message in the Network Provisioning
- *    profile.
- *    This option should be enabled when exclusively pairing with CHIP
- *    legacy devices that don't have latest SW.
- *    This option requires that
- *    CHIP_CONFIG_SUPPORT_LEGACY_ADD_NETWORK_MESSAGE is enabled.
- *
- */
-#ifndef CHIP_CONFIG_ALWAYS_USE_LEGACY_ADD_NETWORK_MESSAGE
-#define CHIP_CONFIG_ALWAYS_USE_LEGACY_ADD_NETWORK_MESSAGE 0
-#endif // CHIP_CONFIG_ALWAYS_USE_LEGACY_ADD_NETWORK_MESSAGE
-
-/**
- * @def CHIP_CONFIG_ENABLE_IFJ_SERVICE_FABRIC_JOIN
- *
- * @brief Enable the Service Provisioning profile message
- * for notification of successful in-field joining of the
- * chip fabric.
- */
-#ifndef CHIP_CONFIG_ENABLE_IFJ_SERVICE_FABRIC_JOIN
-#define CHIP_CONFIG_ENABLE_IFJ_SERVICE_FABRIC_JOIN 0
-#endif // CHIP_CONFIG_ENABLE_IFJ_SERVICE_FABRIC_JOIN
 
 /**
  * @def CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
  *
- * @brief Define the size of the pool used for tracking CHIP unauthenticated
- * states. The entries in the pool are automatically rotated by LRU. The size
+ * @brief Define the size of the pool used for tracking Matter unauthenticated
+ * message states. The entries in the pool are automatically rotated by LRU. The size
  * of the pool limits how many PASE and CASE pairing sessions can be processed
  * simultaneously.
  */
@@ -1235,21 +678,6 @@
 #endif // CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS
 
 /**
- *  @def CHIP_CONFIG_MAX_BINDINGS
- *
- *  @brief
- *    Maximum number of simultaneously active bindings per WeaveExchangeManager
- *    The new single source TimeSync client takes one binding.
- *    Every WDM one-way subscription takes one binding. Mutual subscription counts as two one-way subscriptions.
- *    A reserved slot is needed to take an incoming subscription request.
- *    For a device with 2 mutual subscriptions, and one single source time sync client, it needs 2 x 2 + 1 = 5 bindings at least.
- *    At least six is needed if it still wants to take new WDM subscriptions under this load.
- */
-#ifndef CHIP_CONFIG_MAX_BINDINGS
-#define CHIP_CONFIG_MAX_BINDINGS 6
-#endif // CHIP_CONFIG_MAX_BINDINGS
-
-/**
  *  @def CHIP_CONFIG_MAX_FABRICS
  *
  *  @brief
@@ -1267,6 +695,7 @@
  *  @brief
  *    Maximum number of Peer within a fabric that can send group data message to a device.
  *
+ *  // TODO: Determine a better value for this
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_DATA_PEERS
 #define CHIP_CONFIG_MAX_GROUP_DATA_PEERS 15
@@ -1289,7 +718,7 @@
  * includes development/testing features that should never be used in production contexts.
  */
 #ifndef CHIP_NON_PRODUCTION_MARKER
-#if (CHIP_CONFIG_SECURITY_TEST_MODE || (!CHIP_CONFIG_REQUIRE_AUTH) || CHIP_FUZZING_ENABLED)
+#if (CHIP_CONFIG_SECURITY_TEST_MODE || CHIP_FUZZING_ENABLED)
 #define CHIP_NON_PRODUCTION_MARKER WARNING__DO_NOT_SHIP__CONTAINS_NON_PRODUCTION_CHIP_CODE
 #endif
 #endif
@@ -1479,7 +908,12 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 /**
  * @def CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES
  *
- * @brief Number of devices an end device can be simultaneously connected to
+ * @brief Number of devices to which the `Server` implementers will be able to
+ *        concurrently connect over CASE and interact with. Relates to OTA
+ *        requestor queries and bindings that can be operated. This is *global*,
+ *        not *per fabric*.
+ *
+ * TODO: Determine how to better explain this.
  */
 #ifndef CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES
 #define CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES 4
@@ -1633,18 +1067,11 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES
- *
- * @brief Defines the max number of SessionReleaseDelegate
- */
-#ifndef CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES
-#define CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES 4
-#endif
-
-/**
  * @def CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
  *
  * @brief Defines the max number of SessionRecoveryDelegate
+ *
+ * // TODO: Explain what this is for.
  */
 #ifndef CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
 #define CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES 4
@@ -1657,7 +1084,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *   Maximum number of CASE sessions that a device caches, that can be resumed
  */
 #ifndef CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE
-#define CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE 64
+#define CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE (3 * CHIP_CONFIG_MAX_FABRICS)
 #endif
 
 /**
