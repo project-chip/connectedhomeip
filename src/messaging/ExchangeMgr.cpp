@@ -299,7 +299,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         {
             if (matchingUMH != nullptr && delegate != nullptr)
             {
-                matchingUMH->Handler->ReleaseDelegate(delegate);
+                matchingUMH->Handler->OnExchangeCreationFailed(delegate);
             }
 
             // Using same error message for all errors to reduce code size.
