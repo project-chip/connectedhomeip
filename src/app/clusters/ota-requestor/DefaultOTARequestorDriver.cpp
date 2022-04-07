@@ -153,8 +153,6 @@ void DefaultOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR
     case UpdateFailureState::kNotifying:
         // Ignore error and transition to Idle
         break;
-    case UpdateFailureState::kAwaitingNextAction:
-        // Ignore error and transition to Idle
         break;
     case UpdateFailureState::kDelayedOnUserConsent:
         // Ignore error and transition to Idle

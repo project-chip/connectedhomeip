@@ -139,7 +139,6 @@ CHIP_ERROR DefaultOTARequestor::Init(Server & server, OTARequestorStorage & stor
 
 void DefaultOTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse::DecodableType & response)
 {
-    CHIP_ERROR status;
     LogQueryImageResponse(response);
 
     DefaultOTARequestor * requestorCore = static_cast<DefaultOTARequestor *>(context);
@@ -222,8 +221,8 @@ void DefaultOTARequestor::OnQueryImageResponse(void * context, const QueryImageR
 
         break;
     }
-    case OTAQueryStatus::kBusy:
-        status = requestorCore->mOtaRequestorDriver->UpdateNotFound(
+    case OTAQueryStatus::kBusy: {
+        CHIP_ERROR status = requestorCore->mOtaRequestorDriver->UpdateNotFound(
             UpdateNotFoundReason::kBusy, System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         if (status == CHIP_ERROR_MAX_RETRY_EXCEEDED)
         {
@@ -235,14 +234,13 @@ void DefaultOTARequestor::OnQueryImageResponse(void * context, const QueryImageR
         }
 
         break;
-    case OTAQueryStatus::kNotAvailable:
-        status = requestorCore->mOtaRequestorDriver->UpdateNotFound(
-            UpdateNotFoundReason::kNotAvailable, System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
-        if (status == CHIP_ERROR_MAX_RETRY_EXCEEDED)
-        {
-            requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
-        }
+    }
+    case OTAQueryStatus::kNotAvailable: {
+        requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kNotAvailable,
+                                                           System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
         break;
+    }
     default:
         requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, CHIP_ERROR_BAD_REQUEST);
         break;

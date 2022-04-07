@@ -50,7 +50,6 @@ enum class UpdateFailureState
     kDownloading,
     kApplying,
     kNotifying,
-    kAwaitingNextAction,
     kDelayedOnUserConsent,
 };
 
