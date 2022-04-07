@@ -26,7 +26,7 @@ concurrency:
 jobs:
     cirque:
         name: Cirque
-        timeout-minutes: 60
+        timeout-minutes: 70
 
         env:
             DOCKER_RUN_VERSION: 0.5.56
