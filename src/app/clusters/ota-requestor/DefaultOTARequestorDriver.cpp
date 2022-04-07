@@ -360,7 +360,7 @@ void DefaultOTARequestorDriver::ProcessAnnounceOTAProviders(
 
 void DefaultOTARequestorDriver::SendQueryImage()
 {
-    OTAUpdateStateEnum state;
+    OTAUpdateStateEnum currentUpdateState;
     Optional<ProviderLocationType> lastUsedProvider;
     mRequestor->GetProviderLocation(lastUsedProvider);
     if (!lastUsedProvider.HasValue())
@@ -378,8 +378,8 @@ void DefaultOTARequestorDriver::SendQueryImage()
         }
     }
 
-    state = mRequestor->GetCurrentUpdateState();
-    if ((state == OTAUpdateStateEnum::kIdle) || (state == OTAUpdateStateEnum::kDelayedOnQuery))
+    currentUpdateState = mRequestor->GetCurrentUpdateState();
+    if ((currentUpdateState == OTAUpdateStateEnum::kIdle) || (currentUpdateState == OTAUpdateStateEnum::kDelayedOnQuery))
     {
         mProviderRetryCount++;
         DeviceLayer::SystemLayer().ScheduleLambda([this] { mRequestor->TriggerImmediateQueryInternal(); });
