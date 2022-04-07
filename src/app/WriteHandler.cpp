@@ -265,18 +265,22 @@ CHIP_ERROR WriteHandler::DeliverFinalListWriteEndForGroupWrite(bool writeWasSucc
 }
 namespace {
 
+// To reduce the various use of previousProcessed.HasValue() && previousProcessed.Value() == nextAttribute to save code size.
+bool IsSameAttribute(const Optional<ConcreteAttributePath> & previousProcessed, const ConcreteDataAttributePath & nextAttribute)
+{
+    return previousProcessed.HasValue() && previousProcessed.Value() == nextAttribute;
+}
+
 bool ShouldReportListWriteEnd(const Optional<ConcreteAttributePath> & previousProcessed, bool previousProcessedAttributeIsList,
                               const ConcreteDataAttributePath & nextAttribute)
 {
-    return previousProcessed.HasValue() && previousProcessedAttributeIsList &&
-        (previousProcessed.Value() != nextAttribute || !nextAttribute.IsListOperation());
+    return previousProcessedAttributeIsList && !IsSameAttribute(previousProcessed, nextAttribute) && previousProcessed.HasValue();
 }
 
 bool ShouldReportListWriteBegin(const Optional<ConcreteAttributePath> & previousProcessed, bool previousProcessedAttributeIsList,
                                 const ConcreteDataAttributePath & nextAttribute)
 {
-    return nextAttribute.IsListOperation() &&
-        (!previousProcessed.HasValue() || previousProcessed.Value() != nextAttribute || !previousProcessedAttributeIsList);
+    return !IsSameAttribute(previousProcessed, nextAttribute) && nextAttribute.IsListOperation();
 }
 
 } // namespace
@@ -331,8 +335,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         if (InteractionModelEngine::GetInstance()->HasConflictWriteRequests(this, dataAttributePath) ||
             // Per chunking protocol, we are processing the list entries, but the initial empty list is not processed, so we reject
             // it with Busy status code.
-            (dataAttributePath.IsListItemOperation() &&
-             (!mProcessingAttributePath.HasValue() || mProcessingAttributePath.Value() != dataAttributePath)))
+            (dataAttributePath.IsListItemOperation() && !IsSameAttribute(mProcessingAttributePath, dataAttributePath)))
         {
             err = AddStatus(dataAttributePath, StatusIB(Protocols::InteractionModel::Status::Busy));
             continue;
