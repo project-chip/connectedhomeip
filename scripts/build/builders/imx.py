@@ -64,9 +64,12 @@ class IMXBuilder(HostBuilder):
             'custom_toolchain=\"${build_root}/toolchain/custom\"',
             'sysroot="%s/sysroots/cortexa53-crypto-poky-linux"' % self.SysRootPath('IMX_SDK_ROOT'),
             'target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\\"mlan0\\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\\"udhcpc -b -i %s \\"" ]',
-            'target_cc="%s/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc"' % self.SysRootPath('IMX_SDK_ROOT'),
-            'target_cxx="%s/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++"' % self.SysRootPath('IMX_SDK_ROOT'),
-            'target_ar="%s/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar"' % self.SysRootPath('IMX_SDK_ROOT'),
+            'target_cc="%s/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc"' % self.SysRootPath(
+                'IMX_SDK_ROOT'),
+            'target_cxx="%s/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++"' % self.SysRootPath(
+                'IMX_SDK_ROOT'),
+            'target_ar="%s/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar"' % self.SysRootPath(
+                'IMX_SDK_ROOT'),
         ]
 
         if self.release:
