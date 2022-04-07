@@ -1,0 +1,129 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 3.4.5. [TC-WNCV-4.5] Positions Storage Verification with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Check GoToLiftPercentage NVM effects"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "If (PA_LF & LF) TH sends GoToLiftPercentage command with 90% to DUT"
+      verification: |
+          ./chip-tool windowcovering go-to-lift-percentage 90  9000 1 1
+      disabled: true
+
+    - label: "TH waits for 100-1000 ms"
+      verification: |
+          wait between 100ms-1second
+      disabled: true
+
+    - label: "TH sends StopMotion command to DUT"
+      verification: |
+          ./chip-tool windowcovering stop-motion 1 1
+      disabled: true
+
+    - label: "TH waits for 100-1000 ms"
+      verification: |
+          wait between 100ms-1second
+      disabled: true
+
+    - label: "Check GoToTiltPercentage NVM effects"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "If (PA_TL & TL) TH sends GoToTiltPercentage command with 90% to DUT"
+      verification: |
+          ./chip-tool windowcovering go-to-tilt-percentage 90  9000 1 1
+      disabled: true
+
+    - label: "TH waits for 100-1000 ms"
+      verification: |
+          wait between 100ms-1second
+      disabled: true
+
+    - label: "TH sends StopMotion command to DUT"
+      verification: |
+          ./chip-tool windowcovering stop-motion 1 1
+      disabled: true
+
+    - label: "TH waits for 100-1000 ms"
+      verification: |
+          wait between 100ms-1second
+      disabled: true
+
+    - label: "Store positions and reboot"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "If (PA_LF & LF) TH reads _CurrentPositionLiftPercent100ths attribute_
+          from DUT"
+      verification: |
+          ./chip-tool  windowcovering read current-position-lift-percent100ths 1 1
+
+          CHIP:TOO:   CurrentPositionLiftPercent100ths: currentLiftValA
+      disabled: true
+
+    - label:
+          "If (PA_TL & TL) TH reads _CurrentPositionTiltPercent100ths attribute_
+          from DUT"
+      verification: |
+          ./chip-tool  windowcovering read current-position-tilt-percent100ths 1 1
+
+          CHIP:TOO:   CurrentPositionTiltPercent100ths: currentTiltValA
+      disabled: true
+
+    - label: "TH reboot/restart the DUT"
+      verification: |
+          reboot the DUT
+      disabled: true
+
+    - label: "TH waits for 1-5 s"
+      verification: |
+          wait the necessary time for rebooting
+      disabled: true
+
+    - label:
+          "If (PA_LF & LF) TH reads _CurrentPositionLiftPercent100ths attribute_
+          from DUT"
+      verification: |
+          ./chip-tool  windowcovering read current-position-lift-percent100ths 1 1
+
+          CHIP:TOO:   CurrentPositionLiftPercent100ths: currentLiftValB
+
+
+          currentLiftValB == currentLiftValA
+      disabled: true
+
+    - label:
+          "If (PA_TL & TL) TH reads _CurrentPositionTiltPercent100ths attribute_
+          from DUT"
+      verification: |
+          ./chip-tool  windowcovering read current-position-tilt-percent100ths 1 1
+
+          CHIP:TOO:   CurrentPositionTiltPercent100ths: currentTiltValB
+
+          currentTiltValB == currentTitlValA
+      disabled: true
