@@ -45,7 +45,7 @@ tests:
           [1645774062.824650][4020:4025] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
           [1645774062.824775][4020:4025] CHIP:TOO:   NetworkConfigResponse: {
           [1645774062.824838][4020:4025] CHIP:TOO:     networkingStatus: 2
-          [1645774062.824891][4020:4025] CHIP:TOO:     debugText: 
+          [1645774062.824891][4020:4025] CHIP:TOO:     debugText:
           [1645774062.824945][4020:4025] CHIP:TOO:    }
           [1645774062.825030][4020:4025] CHIP:DMG: ICR moving to [AwaitingDe]
 

@@ -49,7 +49,7 @@ tests:
           [1645774700.721204][4113:4118] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
           [1645774700.721335][4113:4118] CHIP:TOO:   ConnectNetworkResponse: {
           [1645774700.721398][4113:4118] CHIP:TOO:     networkingStatus: 5
-          [1645774700.721453][4113:4118] CHIP:TOO:     debugText: 
+          [1645774700.721453][4113:4118] CHIP:TOO:     debugText:
           [1645774700.721505][4113:4118] CHIP:TOO:     errorValue: 0
           [1645774700.721559][4113:4118] CHIP:TOO:    }
       disabled: true
