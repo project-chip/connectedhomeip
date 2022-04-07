@@ -24,6 +24,7 @@ limitations under the License.
     <define>PUMP_CONFIG_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
     <attribute side="server" code="0x0000" define="MAX_PRESSURE" type="INT16S" isNullable="true" min="0x8001" max="0x7FFF" writable="false" optional="false">MaxPressure</attribute>
     <attribute side="server" code="0x0001" define="MAX_SPEED" type="INT16U" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="false">MaxSpeed</attribute>
     <attribute side="server" code="0x0002" define="MAX_FLOW" type="INT16U" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="false">MaxFlow</attribute>
