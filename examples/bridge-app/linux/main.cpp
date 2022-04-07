@@ -206,7 +206,7 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, uint16_t deviceTyp
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
-        if (NULL == gDevices[index])
+        if (nullptr == gDevices[index])
         {
             gDevices[index] = dev;
             EmberAfStatus ret;
@@ -246,7 +246,7 @@ int RemoveDeviceEndpoint(Device * dev)
         if (gDevices[index] == dev)
         {
             EndpointId ep   = emberAfClearDynamicEndpoint(index);
-            gDevices[index] = NULL;
+            gDevices[index] = nullptr;
             ChipLogProgress(DeviceLayer, "Removed device %s from dynamic endpoint %d (index=%d)", dev->GetName(), ep, index);
             // Silence complaints about unused ep when progress logging
             // disabled.
@@ -482,7 +482,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
 
     EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
 
-    if ((endpointIndex < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT) && (gDevices[endpointIndex] != NULL))
+    if ((endpointIndex < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT) && (gDevices[endpointIndex] != nullptr))
     {
         Device * dev = gDevices[endpointIndex];
 

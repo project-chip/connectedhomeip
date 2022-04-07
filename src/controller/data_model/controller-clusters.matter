@@ -1513,6 +1513,21 @@ client cluster DoorLock = 257 {
     INT16U userIndex = 1;
   }
 
+  request struct SetHolidayScheduleRequest {
+    INT8U holidayIndex = 0;
+    epoch_s localStartTime = 1;
+    epoch_s localEndTime = 2;
+    DlOperatingMode operatingMode = 3;
+  }
+
+  request struct GetHolidayScheduleRequest {
+    INT8U holidayIndex = 0;
+  }
+
+  request struct ClearHolidayScheduleRequest {
+    INT8U holidayIndex = 0;
+  }
+
   request struct SetUserRequest {
     DlDataOperationType operationType = 0;
     INT16U userIndex = 1;
@@ -1567,6 +1582,19 @@ client cluster DoorLock = 257 {
     optional epoch_s localEndTime = 4;
   }
 
+  response struct GetHolidayScheduleResponse {
+    INT8U holidayIndex = 0;
+    DlStatus status = 1;
+    optional epoch_s localStartTime = 2;
+    optional epoch_s localEndTime = 3;
+    optional DlOperatingMode operatingMode = 4;
+  }
+
+  response struct GetUserTypeResponse {
+    INT16U userId = 0;
+    DlUserType userType = 1;
+  }
+
   response struct GetUserResponse {
     INT16U userIndex = 0;
     nullable CHAR_STRING userName = 1;
@@ -1601,6 +1629,9 @@ client cluster DoorLock = 257 {
   command SetYearDaySchedule(SetYearDayScheduleRequest): DefaultSuccess = 14;
   command GetYearDaySchedule(GetYearDayScheduleRequest): GetYearDayScheduleResponse = 15;
   command ClearYearDaySchedule(ClearYearDayScheduleRequest): DefaultSuccess = 16;
+  command SetHolidaySchedule(SetHolidayScheduleRequest): DefaultSuccess = 17;
+  command GetHolidaySchedule(GetHolidayScheduleRequest): GetHolidayScheduleResponse = 18;
+  command ClearHolidaySchedule(ClearHolidayScheduleRequest): DefaultSuccess = 19;
   timed command SetUser(SetUserRequest): DefaultSuccess = 26;
   command GetUser(GetUserRequest): GetUserResponse = 27;
   timed command ClearUser(ClearUserRequest): DefaultSuccess = 29;

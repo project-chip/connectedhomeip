@@ -33,36 +33,21 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::C
 {
     Dnssd::ResolvedNodeData resolutionData;
 
-    bool nodeIDWasResolved = false;
-
-    ChipLogDetail(CASESessionManager,
-                  "FindOrEstablishSession: PeerId = " ChipLogFormatX64 ":" ChipLogFormatX64 ", NodeIdWasResolved = %d",
-                  ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()), nodeIDWasResolved);
+    ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = " ChipLogFormatX64 ":" ChipLogFormatX64,
+                  ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));
 
     OperationalDeviceProxy * session = FindExistingSession(peerId);
     if (session == nullptr)
     {
         ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing session found");
 
-        // TODO - Implement LRU to evict least recently used session to handle mActiveSessions pool exhaustion
-        if (nodeIDWasResolved)
-        {
-            session = mConfig.devicePool->Allocate(mConfig.sessionInitParams, peerId, resolutionData);
-        }
-        else
-        {
-            session = mConfig.devicePool->Allocate(mConfig.sessionInitParams, peerId);
-        }
+        session = mConfig.devicePool->Allocate(mConfig.sessionInitParams, peerId);
 
         if (session == nullptr)
         {
             onFailure->mCall(onFailure->mContext, peerId, CHIP_ERROR_NO_MEMORY);
             return CHIP_ERROR_NO_MEMORY;
         }
-    }
-    else if (nodeIDWasResolved)
-    {
-        session->OnNodeIdResolved(resolutionData);
     }
 
     CHIP_ERROR err = session->Connect(onConnection, onFailure);
