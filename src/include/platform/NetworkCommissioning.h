@@ -304,7 +304,8 @@ public:
      * @brief Initializes a WiFi network scan. callback->OnFinished must be called, on both success and error. Callback can
      * be called inside ScanNetworks.
      *
-     * @param ssid    The interested SSID, the scanning MAY be restricted to to the given SSID.
+     * @param ssid        The interested SSID, the scanning SHALL be restricted to the given SSID if the ssid is not empty (i.e.
+     *                    ssid.empty() is false).
      * @param callback    Callback that will be invoked upon finishing the scan
      */
     virtual void ScanNetworks(ByteSpan ssid, ScanCallback * callback) = 0;

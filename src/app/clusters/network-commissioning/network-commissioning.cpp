@@ -45,6 +45,18 @@ namespace {
 // For WiFi and Thread scan results, each item will cose ~60 bytes in TLV, thus 15 is a safe upper bound of scan results.
 constexpr size_t kMaxNetworksInScanResponse = 15;
 
+enum ValidWiFiCredentialLength
+{
+    kOpen      = 0,
+    kWEP64     = 5,
+    kMinWPAPSK = 8,
+    kMaxWPAPSK = 63,
+    kWPAPSKHex = 64,
+};
+
+// Note: We cannot use the enums from cluster objects since we should avoid using app code in platform drivers. So we make a copy of
+// these enums and ensure they have the same values here.
+
 NetworkCommissioningStatus ToClusterObjectEnum(Status status)
 {
     // clang-format off
@@ -83,18 +95,15 @@ chip::BitFlags<NetworkCommissioning::WiFiSecurity>
 ToClusterObjectBitFlags(const chip::BitFlags<DeviceLayer::NetworkCommissioning::WiFiSecurity> & security)
 {
     using ClusterObject     = NetworkCommissioning::WiFiSecurity;
-    using PlatformInterface = NetworkCommissioning::WiFiSecurity;
+    using PlatformInterface = DeviceLayer::NetworkCommissioning::WiFiSecurity;
 
-    static_assert(to_underlying(ClusterObject::kUnencrypted) == to_underlying(PlatformInterface::kUnencrypted),
-                  "kUnencrypted value mismatch.");
-    static_assert(to_underlying(ClusterObject::kWepPersonal) == to_underlying(PlatformInterface::kWepPersonal),
-                  "kWepPersonal value mismatch.");
-    static_assert(to_underlying(ClusterObject::kWpaPersonal) == to_underlying(PlatformInterface::kWpaPersonal),
-                  "kWpaPersonal value mismatch.");
-    static_assert(to_underlying(ClusterObject::kWpa2Personal) == to_underlying(PlatformInterface::kWpa2Personal),
-                  "kWpa2Personal value mismatch.");
-    static_assert(to_underlying(ClusterObject::kWpa3Personal) == to_underlying(PlatformInterface::kWpa3Personal),
-                  "kWpa3Personal value mismatch.");
+    // clang-format off
+    static_assert(to_underlying(ClusterObject::kUnencrypted) == to_underlying(PlatformInterface::kUnencrypted),"kUnencrypted value mismatch.");
+    static_assert(to_underlying(ClusterObject::kWepPersonal) == to_underlying(PlatformInterface::kWepPersonal),"kWepPersonal value mismatch.");
+    static_assert(to_underlying(ClusterObject::kWpaPersonal) == to_underlying(PlatformInterface::kWpaPersonal),"kWpaPersonal value mismatch.");
+    static_assert(to_underlying(ClusterObject::kWpa2Personal) == to_underlying(PlatformInterface::kWpa2Personal),"kWpa2Personal value mismatch.");
+    static_assert(to_underlying(ClusterObject::kWpa3Personal) == to_underlying(PlatformInterface::kWpa3Personal),"kWpa3Personal value mismatch.");
+    // clang-format on
 
     chip::BitFlags<ClusterObject> ret;
     ret.SetRaw(security.Raw());
@@ -304,6 +313,17 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
         if (!nullableSSID.IsNull())
         {
             ssid = nullableSSID.Value();
+            if (ssid.empty())
+            {
+                // Normalize the zero value to null ByteSpan.
+                // Spec 7.17.1. Empty string is an equivalent of null.
+                ssid = ByteSpan();
+            }
+        }
+        if (!(ssid.size() <= DeviceLayer::Internal::kMaxWiFiSSIDLength))
+        {
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
+            return;
         }
         mAsyncCommandHandle = CommandHandler::Handle(&ctx.mCommandHandler);
         mpDriver.Get<WiFiDriver *>()->ScanNetworks(ssid, this);
@@ -323,7 +343,7 @@ namespace {
 
 void FillDebugTextAndNetworkIndex(Commands::NetworkConfigResponse::Type & response, MutableCharSpan debugText, uint8_t networkIndex)
 {
-    if (debugText.size() > 0)
+    if (!debugText.empty())
     {
         response.debugText.SetValue(CharSpan(debugText.data(), debugText.size()));
     }
@@ -353,6 +373,30 @@ void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands
     MATTER_TRACE_EVENT_SCOPE("HandleAddOrUpdateWiFiNetwork", "NetworkCommissioning");
 
     VerifyOrReturn(CheckFailSafeArmed(ctx));
+
+    if (req.credentials.size() == ValidWiFiCredentialLength::kOpen || req.credentials.size() == ValidWiFiCredentialLength::kWEP64 ||
+        (req.credentials.size() >= ValidWiFiCredentialLength::kMinWPAPSK &&
+         req.credentials.size() <= ValidWiFiCredentialLength::kMaxWPAPSK))
+    {
+        // Valid length, the credentials can have any characters.
+    }
+    else if (req.credentials.size() == ValidWiFiCredentialLength::kWPAPSKHex)
+    {
+        for (size_t d = 0; d < req.credentials.size(); d++)
+        {
+            if (!isxdigit(req.credentials.data()[d]))
+            {
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
+                return;
+            }
+        }
+    }
+    else
+    {
+        // Invalid length
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
+        return;
+    }
 
     Commands::NetworkConfigResponse::Type response;
     MutableCharSpan debugText;
@@ -449,7 +493,7 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
 
     Commands::ConnectNetworkResponse::Type response;
     response.networkingStatus = ToClusterObjectEnum(commissioningError);
-    if (debugText.size() != 0)
+    if (!debugText.empty())
     {
         response.debugText.SetValue(debugText);
     }
@@ -492,7 +536,7 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
     TLV::TLVType listContainerType;
     ThreadScanResponse scanResponse;
     size_t networksEncoded = 0;
-    uint8_t extendedAddressBuffer[8];
+    uint8_t extendedAddressBuffer[Thread::kSizeExtendedPanId];
 
     SuccessOrExit(err = commandHandle->PrepareCommand(
                       ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id)));
