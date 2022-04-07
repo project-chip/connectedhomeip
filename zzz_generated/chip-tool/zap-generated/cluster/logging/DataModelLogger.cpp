@@ -9098,10 +9098,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ac refrigerant type", 1, value);
         }
-        case Thermostat::Attributes::AcCompressor::Id: {
+        case Thermostat::Attributes::AcCompressorType::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac compressor", 1, value);
+            return DataModelLogger::LogValue("ac compressor type", 1, value);
         }
         case Thermostat::Attributes::AcErrorCode::Id: {
             uint32_t value;

@@ -83,19 +83,39 @@ limitations under the License.
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>
 
-        <attribute side="server" code="0x0000" define="MAX_NETWORKS" type="INT8U" writable="false" optional="false">MaxNetworks</attribute>
-        <attribute side="server" code="0x0001" define="NETWORKS" type="ARRAY" entryType="NetworkInfo" length="12" writable="false" optional="false">Networks</attribute>
+        <attribute side="server" code="0x0000" define="MAX_NETWORKS" type="INT8U" writable="false" optional="false">
+            <description>MaxNetworks</description>
+            <access op="read" privilege="administer"/>
+        </attribute>
+        <attribute side="server" code="0x0001" define="NETWORKS" type="ARRAY" entryType="NetworkInfo" length="12" writable="false" optional="false">
+            <description>Networks</description>
+            <access op="read" privilege="administer"/>
+        </attribute>
         <attribute side="server" code="0x0002" define="SCAN_MAX_TIME_SECONDS" type="INT8U" writable="false" optional="true">ScanMaxTimeSeconds</attribute>
         <attribute side="server" code="0x0003" define="CONNECT_MAX_TIME_SECONDS" type="INT8U" writable="false" optional="true">ConnectMaxTimeSeconds</attribute>
-        <attribute side="server" code="0x0004" define="INTERFACE_ENABLED" type="BOOLEAN" writable="true" optional="false">InterfaceEnabled</attribute>
-        <attribute side="server" code="0x0005" define="LAST_NETWORKING_STATUS" type="NetworkCommissioningStatus" writable="false" optional="false" isNullable="true">LastNetworkingStatus</attribute>
-        <attribute side="server" code="0x0006" define="LAST_NETWORK_ID" type="OCTET_STRING" length="32" writable="false" optional="false" isNullable="true">LastNetworkID</attribute>
-        <attribute side="server" code="0x0007" define="LAST_CONNECT_ERROR_VALUE" type="INT32S" writable="false" optional="false" isNullable="true">LastConnectErrorValue</attribute>
+        <attribute side="server" code="0x0004" define="INTERFACE_ENABLED" type="BOOLEAN" writable="true" optional="false">
+            <description>InterfaceEnabled</description>
+            <access op="read" privilege="view"/>
+            <access op="write" privilege="administer"/>
+        </attribute>
+        <attribute side="server" code="0x0005" define="LAST_NETWORKING_STATUS" type="NetworkCommissioningStatus" writable="false" optional="false" isNullable="true">
+            <description>LastNetworkingStatus</description>
+            <access op="read" privilege="administer"/>
+        </attribute>
+        <attribute side="server" code="0x0006" define="LAST_NETWORK_ID" type="OCTET_STRING" length="32" writable="false" optional="false" isNullable="true">
+            <description>LastNetworkID</description>
+            <access op="read" privilege="administer"/>
+        </attribute>
+        <attribute side="server" code="0x0007" define="LAST_CONNECT_ERROR_VALUE" type="INT32S" writable="false" optional="false" isNullable="true">
+            <description>LastConnectErrorValue</description>
+            <access op="read" privilege="administer"/>
+        </attribute>
 
         <command source="client" code="0x00" name="ScanNetworks" optional="false" response="ScanNetworksResponse" cli="chip network_commissioning scannetworks">
             <description>Detemine the set of networks the device sees as available.</description>
             <arg name="SSID" type="OCTET_STRING" length="32" isNullable="true" optional="true"/>
             <arg name="Breadcrumb" type="INT64U" optional="true"/>
+            <access op="invoke" privilege="administer"/>
         </command>
         <command source="server" code="0x01" name="ScanNetworksResponse" optional="false" cli="chip network_commissioning scannetworksresponse">
             <description>Relay the set of networks the device sees as available back to the client.</description>
@@ -109,16 +129,19 @@ limitations under the License.
             <arg name="SSID" type="OCTET_STRING" length="32"/>
             <arg name="Credentials" type="OCTET_STRING" length="64"/>
             <arg name="breadcrumb" type="INT64U" optional="true"/>
+            <access op="invoke" privilege="administer"/>
         </command>
         <command source="client" code="0x03" name="AddOrUpdateThreadNetwork" optional="true" response="NetworkConfigResponse" cli="chip network_commissioning addorupdatethreadnetwork">
             <description>Add or update the credentials for a given Thread network.</description>
             <arg name="OperationalDataset" type="OCTET_STRING" length="254"/>
             <arg name="Breadcrumb" type="INT64U" optional="true"/>
+            <access op="invoke" privilege="administer"/>
         </command>
         <command source="client" code="0x04" name="RemoveNetwork" optional="false" response="NetworkConfigResponse" cli="chip network_commissioning removenetwork">
             <description>Remove the definition of a given network (including its credentials).</description>
             <arg name="NetworkID" type="OCTET_STRING" length="32"/>
             <arg name="Breadcrumb" type="INT64U" optional="true"/>
+            <access op="invoke" privilege="administer"/>
         </command>
         <command source="server" code="0x05" name="NetworkConfigResponse" optional="true" cli="chip network_commissioning addwifiresponse">
             <description>Response command for various commands that add/remove/modify network credentials.</description>
@@ -130,6 +153,7 @@ limitations under the License.
             <description>Connect to the specified network, using previously-defined credentials.</description>
             <arg name="NetworkID" type="OCTET_STRING" length="32"/>
             <arg name="Breadcrumb" type="INT64U" optional="true"/>
+            <access op="invoke" privilege="administer"/>
         </command>
         <command source="server" code="0x07" name="ConnectNetworkResponse" optional="false" cli="chip network_commissioning connectnetworkresponse">
             <description>Command that indicates whether we have succcessfully connected to a network.</description>
@@ -142,6 +166,7 @@ limitations under the License.
             <arg name="NetworkID" type="OCTET_STRING" length="32"/>
             <arg name="NetworkIndex" type="INT8U"/>
             <arg name="Breadcrumb" type="INT64U" optional="true"/>
+            <access op="invoke" privilege="administer"/>
         </command>
     </cluster>
     <bitmap name="NetworkCommissioningFeature" type="BITMAP32">

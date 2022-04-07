@@ -3416,9 +3416,9 @@ namespace AcRefrigerantType {
 static constexpr AttributeId Id = 0x00000042;
 } // namespace AcRefrigerantType
 
-namespace AcCompressor {
+namespace AcCompressorType {
 static constexpr AttributeId Id = 0x00000043;
-} // namespace AcCompressor
+} // namespace AcCompressorType
 
 namespace AcErrorCode {
 static constexpr AttributeId Id = 0x00000044;
