@@ -464,8 +464,9 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
 
             dataAttributePath.mEndpointId = mapping.endpoint_id;
 
-            // Try to get the metadata from for the attribute on a random endpoint, update the path info according to it and recheck
-            // if we need to report list write begin.
+            // Try to get the metadata from for the attribute from one of the expanded endpoints (it doesn't really matter which
+            // endpoint we pick, as long as it's valid) and update the path info according to it and recheck if we need to report
+            // list write begin.
             if (attributeMetadata == nullptr)
             {
                 attributeMetadata = GetAttributeMetadata(dataAttributePath);
