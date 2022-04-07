@@ -588,11 +588,6 @@ uint8_t emberAfGetAddressIndex(void);
 EmberNetworkStatus emberAfNetworkState(void);
 
 /**
- * @brief Get this node's radio channel for the current network.
- */
-uint8_t emberAfGetRadioChannel(void);
-
-/**
  * @brief Returns the current network parameters.
  */
 EmberStatus emberAfGetNetworkParameters(EmberNodeType * nodeType, EmberNetworkParameters * parameters);

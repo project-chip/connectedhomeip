@@ -118,7 +118,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     chip::FabricId fabricId = strtoull(name.c_str(), nullptr, 0);
     if (fabricId >= kIdentityOtherFabricId)
     {
-        ReturnLogErrorOnFailure(InitializeCommissioner(name.c_str(), fabricId, trustStore));
+        ReturnLogErrorOnFailure(InitializeCommissioner(name, fabricId, trustStore));
     }
 
     // Initialize Group Data, including IPK
@@ -168,7 +168,7 @@ CHIP_ERROR CHIPCommand::MaybeTearDownStack()
     chip::FabricId fabricId = strtoull(name.c_str(), nullptr, 0);
     if (fabricId >= kIdentityOtherFabricId)
     {
-        ReturnLogErrorOnFailure(ShutdownCommissioner(name.c_str()));
+        ReturnLogErrorOnFailure(ShutdownCommissioner(name));
     }
 
     StopTracing();
@@ -286,7 +286,7 @@ chip::FabricId CHIPCommand::CurrentCommissionerId()
 chip::Controller::DeviceCommissioner & CHIPCommand::CurrentCommissioner()
 {
     auto item = mCommissioners.find(GetIdentity());
-    return *item->second.get();
+    return *item->second;
 }
 
 CHIP_ERROR CHIPCommand::ShutdownCommissioner(std::string key)
