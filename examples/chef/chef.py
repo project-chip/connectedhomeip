@@ -19,7 +19,6 @@ import optparse
 import os
 import subprocess
 from pathlib import Path
-import chef_config as config
 from sys import platform
 
 global commandQueue
@@ -57,6 +56,10 @@ def definePaths():
     paths["rootSampleFolder"] = paths["scriptFolder"]
     paths["genFolder"] = paths["rootSampleFolder"] + "/zap-generated"
     paths["devices"] = []
+
+    paths["ZEPHYR_BASE"] = os.environ.get('ZEPHYR_BASE')
+    paths["IDF_PATH"] = os.environ.get('IDF_PATH')
+
     for filepath in Path(f"{paths['rootSampleFolder']}/devices").rglob('*.zap'):
         paths["devices"].append(
             str(os.path.splitext(os.path.basename(filepath))[0]))
@@ -104,6 +107,12 @@ def hexInputToInt(valIn):
         valOut = valIn
     return valOut
 
+def checkTty(tty):
+    if tty == None:
+        print("One or more operations require that you provide a tty interface \
+        for your device. Use the -y <path> argument. See the help for more \
+        information.")
+        exit(1)
 
 def main(argv):
     checkPythonVersion()
@@ -125,13 +134,6 @@ def main(argv):
         exit(1)
 
     #
-    # Checks if user has configured its custom settings
-    #
-    if not config.configured:
-        print('Please edit chef_config.py file and change the <configured> flag to True')
-        exit(1)
-
-    #
     # Arguments parser
     #
 
@@ -140,7 +142,7 @@ def main(argv):
     usage = f'''usage: chef.py [options]
 
 Platforms:
-    nrf52840dk_nrf52840
+    nrfconnect
     esp32
     linux
 
@@ -179,7 +181,7 @@ Notes:
                       action='store',
                       dest="buildTarget",
                       help="specifies target platform. Default is esp32. See info below for currently supported target platforms",
-                      choices=['nrf52840dk_nrf52840', 'esp32', 'linux', ],
+                      choices=['nrfconnect', 'esp32', 'linux', ],
                       metavar="TARGET",
                       default="esp32")
     parser.add_option("-r", "--rpc", help="enables Pigweed RPC interface. Enabling RPC disables the shell interface. Your sdkconfig configurations will be reverted to default. Default is PW RPC off. When enabling or disabling this flag, on the first build force a clean build with -c", action="store_true", dest="doRPC")
@@ -189,6 +191,8 @@ Notes:
                       help="specifies the Product ID. Default is 0x8000", metavar="PID", default=0x8000)
     parser.add_option("", "--rpc_console", help="Opens PW RPC Console",
                       action="store_true", dest="doRPC_CONSOLE")
+    parser.add_option("-y", "--tty", help="Enumerated USB tty/serial interface enumerated for your physical device. E.g.: /dev/ACM0",
+                      dest="tty", metavar= "TTY", default=None)
 
     options, _ = parser.parse_args(argv)
 
@@ -201,13 +205,19 @@ Notes:
     queuePrint(f"Target is set to {options.sampleDeviceTypeName}")
     queuePrint("Setting up environment...")
     if options.buildTarget == "esp32":
+        if paths["IDF_PATH"] is None:
+            print('Path for esp32 SDK was not found. Make sure IDF_PATH is set on your shell environment')
+            exit(1)
         paths["platFolder"] = os.path.normpath(
             paths["rootSampleFolder"] + "/esp32")
-        queueCommand(f"source {config.esp32Folder}/export.sh")
-    elif options.buildTarget == "nrf52840dk_nrf52840":
+        queueCommand(f'source {paths["IDF_PATH"]}/export.sh')
+    elif options.buildTarget == "nrfconnect":
+        if paths["ZEPHYR_BASE"] is None:
+            print('Path for nrfconnect SDK was not found. Make sure ZEPHYR_BASE is set on your shell environment')
+            exit(1)
         paths["platFolder"] = os.path.normpath(
             paths["rootSampleFolder"] + "/nrfconnect")
-        queueCommand(f"source {config.nrfconnectFolder}/zephyr/zephyr-env.sh")
+        queueCommand(f'source {paths["ZEPHYR_BASE"]}/zephyr-env.sh')
         queueCommand("export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb")
     elif options.buildTarget == "linux":
         pass
@@ -223,7 +233,7 @@ Notes:
     if options.doUpdateToolchain:
         if options.buildTarget == "esp32":
             queuePrint("ESP32 toolchain update not supported. Skipping")
-        elif options.buildTarget == "nrf52840dk_nrf52840":
+        elif options.buildTarget == "nrfconnect":
             queuePrint("Updating toolchain")
             queueCommand(
                 f"cd {paths['matterFolder']} && python3 scripts/setup/nrfconnect/update_ncs.py --update")
@@ -275,7 +285,7 @@ Notes:
         if options.buildTarget == "esp32":
             queueCommand(f"cd {paths['rootSampleFolder']}/esp32")
             queueCommand("idf.py menuconfig")
-        elif options.buildTarget == "nrf52840dk_nrf52840":
+        elif options.buildTarget == "nrfconnect":
             queueCommand(f"cd {paths['rootSampleFolder']}/nrfconnect")
             queueCommand("west build -t menuconfig")
         elif options.buildTarget == "linux":
@@ -301,7 +311,7 @@ Notes:
             f"Product ID 0x{options.pid:02X} / Vendor ID 0x{options.vid:02X}")
         queueCommand(f"cd {paths['rootSampleFolder']}")
 
-        if (options.buildTarget == "esp32") or (options.buildTarget == "nrf52840dk_nrf52840"):
+        if (options.buildTarget == "esp32") or (options.buildTarget == "nrfconnect"):
             queueCommand(f'''
 cat > project_include.cmake <<EOF
 set(CONFIG_DEVICE_VENDOR_ID {options.vid})
@@ -319,7 +329,7 @@ true''')
                 queueCommand(f"rm -rf {paths['rootSampleFolder']}/build")
                 queueCommand("idf.py fullclean")
             queueCommand("idf.py build")
-        elif options.buildTarget == "nrf52840dk_nrf52840":
+        elif options.buildTarget == "nrfconnect":
             queueCommand(f"cd {paths['rootSampleFolder']}/nrfconnect")
             if options.doClean:
                 queueCommand(f"west build -b {options.buildTarget} -c")
@@ -358,10 +368,11 @@ true''')
         if options.buildTarget == "esp32":
             queueCommand(f"cd {paths['rootSampleFolder']}/esp32")
             if options.doErase:
+                checkTty(options.tty)
                 queueCommand(
-                    f"idf.py -p {config.esp32SerialDevice} erase_flash")
-            queueCommand(f"idf.py -p {config.esp32SerialDevice} flash")
-        elif options.buildTarget == "nrf52840dk_nrf52840":
+                    f"idf.py -p {options.tty} erase_flash")
+            queueCommand(f"idf.py -p {options.tty} flash")
+        elif options.buildTarget == "nrfconnect":
             queueCommand(f"cd {paths['rootSampleFolder']}/nrfconnect")
             if options.doErase:
                 queueCommand("west flash --erase")
@@ -376,10 +387,10 @@ true''')
         queuePrint("Starting terminal...")
         if options.buildTarget == "esp32":
             queueCommand(f"cd {paths['rootSampleFolder']}/esp32")
-            queueCommand(f"idf.py -p {config.esp32SerialDevice} monitor")
-        elif options.buildTarget == "nrf52840dk_nrf52840":
+            queueCommand(f"idf.py -p {options.tty} monitor")
+        elif options.buildTarget == "nrfconnect":
             queueCommand("killall screen")
-            queueCommand(f"screen {config.nrfConnectSerialDevice} 115200")
+            queueCommand(f"screen {options.tty} 115200")
         elif options.buildTarget == "linux":
             queuePrint(
                 f"{paths['rootSampleFolder']}/linux/out/{options.sampleDeviceTypeName}")
@@ -391,7 +402,7 @@ true''')
     #
     if options.doRPC_CONSOLE:
         queueCommand(
-            f"python3 -m chip_rpc.console --device {config.esp32SerialDevice}")
+            f"python3 -m chip_rpc.console --device {options.tty}")
 
     queuePrint("Done")
 
