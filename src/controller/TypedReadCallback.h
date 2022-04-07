@@ -108,12 +108,20 @@ private:
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
     {
-        VerifyOrDie(aReadPrepareParams.mAttributePathParamsListSize == 1 &&
-                    aReadPrepareParams.mpAttributePathParamsList != nullptr);
-        chip::Platform::Delete<app::AttributePathParams>(aReadPrepareParams.mpAttributePathParamsList);
+        if (aReadPrepareParams.mAttributePathParamsListSize == 1 && aReadPrepareParams.mpAttributePathParamsList != nullptr)
+        {
+            chip::Platform::Delete<app::AttributePathParams>(aReadPrepareParams.mpAttributePathParamsList);
+        }
 
-        VerifyOrDie(aReadPrepareParams.mDataVersionFilterListSize == 1 && aReadPrepareParams.mpDataVersionFilterList != nullptr);
-        chip::Platform::Delete<app::DataVersionFilter>(aReadPrepareParams.mpDataVersionFilterList);
+        if (aReadPrepareParams.mEventPathParamsListSize == 1 && aReadPrepareParams.mpEventPathParamsList != nullptr)
+        {
+            chip::Platform::Delete<app::EventPathParams>(aReadPrepareParams.mpEventPathParamsList);
+        }
+
+        if (aReadPrepareParams.mDataVersionFilterListSize == 1 && aReadPrepareParams.mpDataVersionFilterList != nullptr)
+        {
+            chip::Platform::Delete<app::DataVersionFilter>(aReadPrepareParams.mpDataVersionFilterList);
+        }
     }
 
     ClusterId mClusterId;

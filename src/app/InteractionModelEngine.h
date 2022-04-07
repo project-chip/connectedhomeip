@@ -243,6 +243,7 @@ public:
             readClient->mpImEngine = nullptr;
             auto * tmpClient       = readClient->GetNextClient();
             readClient->SetNextClient(nullptr);
+            readClient->Close(CHIP_NO_ERROR);
             readClient = tmpClient;
         }
 
