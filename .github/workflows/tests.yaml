@@ -28,7 +28,7 @@ concurrency:
 jobs:
     test_suites_linux:
         name: Test Suites - Linux
-        timeout-minutes: 120
+        timeout-minutes: 150
 
         strategy:
             matrix:
@@ -98,6 +98,17 @@ jobs:
                      --door-lock-app ./out/linux-x64-door-lock-${BUILD_VARIANT}/chip-door-lock-app \
                      --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                   "
+            - name: Run OTA example
+              timeout-minutes: 30
+              run: |
+                  bash scripts/tests/ota_test.sh
+            - name: Uploading OTA logs
+              if: always()
+              uses: actions/upload-artifact@v2
+              with:
+                  name: OTA,Linux-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
+                  path: |
+                      /tmp/ota/
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
@@ -116,7 +127,7 @@ jobs:
                   retention-days: 5
     test_suites_darwin:
         name: Test Suites - Darwin
-        timeout-minutes: 120
+        timeout-minutes: 150
 
         strategy:
             matrix:
@@ -194,6 +205,18 @@ jobs:
                      --door-lock-app ./out/darwin-x64-door-lock-${BUILD_VARIANT}/chip-door-lock-app \
                      --tv-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                   "
+            - name: Run OTA example
+              timeout-minutes: 30
+              run: |
+                  brew install openssl pkg-config coreutils
+                  bash scripts/tests/ota_test.sh
+            - name: Uploading OTA logs
+              if: always()
+              uses: actions/upload-artifact@v2
+              with:
+                  name: OTA,Darwin-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
+                  path: |
+                      /tmp/ota/
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
