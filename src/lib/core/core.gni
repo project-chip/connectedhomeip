@@ -22,7 +22,7 @@ declare_args() {
   chip_target_style = ""
 
   # Enable error logging.
-  chip_error_logging = false
+  chip_error_logging = true
 
   # Enable progress logging.
   chip_progress_logging = false
