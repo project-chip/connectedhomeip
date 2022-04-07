@@ -524,7 +524,6 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
     ReturnErrorOnFailure(PublishService(k##Type##ServiceName, textEntries, textEntrySize, subTypes, subTypeSize, params));         \
     m##Type##NodeAdvertisingParams = params;                                                                                       \
     mIs##Type##NodePublishing      = true;                                                                                         \
-    return CHIP_NO_ERROR;
 
 CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParameters & params)
 {
@@ -537,6 +536,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     ADD_PTR_RECORD(CompressedFabricId);
 
     PUBLISH_RECORDS(Operational);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameters & params)
@@ -556,6 +557,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissioner)
     {
         PUBLISH_RECORDS(Commissioner);
+        return CHIP_NO_ERROR;
     }
 
     ADD_TXT_RECORD(LongDiscriminator);
@@ -569,6 +571,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     ADD_PTR_RECORD(CommissioningMode);
 
     PUBLISH_RECORDS(Commissionable);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiscoveryImplPlatform::RemoveServices()

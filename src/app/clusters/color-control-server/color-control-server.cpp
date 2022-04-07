@@ -726,6 +726,7 @@ bool ColorControlServer::computeNewHueValue(ColorControlServer::ColorHueTransiti
 
         p->stepsRemaining = p->stepsTotal;
     }
+
     return false;
 }
 
