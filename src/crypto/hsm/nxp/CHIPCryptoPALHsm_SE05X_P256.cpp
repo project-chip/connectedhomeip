@@ -754,14 +754,6 @@ CHIP_ERROR P256KeypairHSM::CreateOperationalKey(FabricIndex fabricIdx)
     return CHIP_ERROR_INTERNAL;
 }
 
-void P256KeypairHSM::SetOperationalKeyId(FabricIndex fabricIdx)
-{
-    (void) fabricIdx;
-    //TBD - Map fabric index to operational keys
-    SetKeyId(kKeyId_operational_key_keyid);
-    provisioned_key = true;
-    return;
-}
 
 } // namespace Crypto
 } // namespace chip

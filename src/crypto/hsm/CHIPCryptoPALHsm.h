@@ -149,8 +149,6 @@ public:
 
     CHIP_ERROR CreateOperationalKey(FabricIndex fabricIdx);
 
-    void SetOperationalKeyId(FabricIndex fabricIdx);
-
 private:
     uint32_t keyid;
     P256PublicKeyHSM mPublicKeyHSM;

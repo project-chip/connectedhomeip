@@ -225,7 +225,6 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
         {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
             mOperationalKey = chip::Platform::New<P256KeypairHSM>();
-            mOperationalKey->SetOperationalKeyId(mFabricIndex);
 #else
             mOperationalKey = chip::Platform::New<P256Keypair>();
 #endif
@@ -325,7 +324,6 @@ CHIP_ERROR FabricInfo::SetOperationalKeypair(const P256Keypair * keyPair)
     {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
         mOperationalKey = chip::Platform::New<P256KeypairHSM>();
-        mOperationalKey->SetOperationalKeyId(mFabricIndex);
 #else
         mOperationalKey = chip::Platform::New<P256Keypair>();
 #endif
