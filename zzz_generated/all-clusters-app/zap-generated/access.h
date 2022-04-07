@@ -70,6 +70,10 @@
     49, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     62, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
+    /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: max cool setpoint limit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: system mode, Privilege: view */ \
@@ -122,6 +126,10 @@
     7, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     0, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
+    /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: max cool setpoint limit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: system mode, Privilege: view */ \
@@ -174,6 +182,10 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
+    /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: max cool setpoint limit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: system mode, Privilege: view */ \
@@ -222,6 +234,10 @@
     8, /* Cluster: Level Control, Attribute: start up current level, Privilege: manage */ \
     49, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     6, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: max cool setpoint limit, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: system mode, Privilege: manage */ \
@@ -268,6 +284,10 @@
     16384, /* Cluster: Level Control, Attribute: start up current level, Privilege: manage */ \
     4, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     16387, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
+    21, /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: manage */ \
+    22, /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: manage */ \
+    23, /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: manage */ \
+    24, /* Cluster: Thermostat, Attribute: max cool setpoint limit, Privilege: manage */ \
     25, /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: manage */ \
     27, /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: manage */ \
     28, /* Cluster: Thermostat, Attribute: system mode, Privilege: manage */ \
@@ -314,6 +334,10 @@
     kMatterAccessPrivilegeManage, /* Cluster: Level Control, Attribute: start up current level, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: max cool setpoint limit, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: system mode, Privilege: manage */ \
