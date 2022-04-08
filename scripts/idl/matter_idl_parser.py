@@ -104,9 +104,6 @@ class MatterIdlTransformer(Transformer):
     def attr_readonly(self, _):
         return AttributeTag.READABLE
 
-    def attr_global(self, _):
-        return AttributeTag.GLOBAL
-
     def attr_nosubscribe(self, _):
         return AttributeTag.NOSUBSCRIBE
 

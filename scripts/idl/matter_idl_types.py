@@ -16,7 +16,6 @@ class CommandAttribute(enum.Enum):
 class AttributeTag(enum.Enum):
     READABLE = enum.auto()
     WRITABLE = enum.auto()
-    GLOBAL = enum.auto()
     NOSUBSCRIBE = enum.auto()
 
 
@@ -78,10 +77,6 @@ class Attribute:
     @property
     def is_writable(self):
         return AttributeTag.WRITABLE in self.tags
-
-    @property
-    def is_global(self):
-        return AttributeTag.GLOBAL in self.tags
 
     @property
     def is_subscribable(self):

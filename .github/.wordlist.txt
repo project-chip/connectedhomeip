@@ -338,6 +338,9 @@ debugText
 DEDEDEDE
 deepnote
 DefaultOTAProviders
+DefaultOTARequestor
+DefaultOTARequestorDriver
+DefaultOTARequestorStorage
 DefaultSuccess
 definedValue
 DehumidificationControl
@@ -414,6 +417,7 @@ DoorLock
 doru
 DOTBR
 DOVERLAY
+DownloadProtocolEnum
 downcasting
 Doxygen
 dpkg
@@ -730,8 +734,6 @@ lightin
 LightingColor
 LightingState
 LinkSoftwareAndDocumentationPack
-LinuxOTAImageProcessor
-LinuxOTARequestorDriver
 LocalConfigDisabled
 localedef
 localhost
@@ -921,9 +923,10 @@ OTAProviderIpAddress
 OTAProviderNodeId
 OTAProviderSerialPort
 OTARequesterImpl
-OTARequestor
+OTARequestorInterface
 OTARequestorDriver
 OTARequestorSerialPort
+OTARequestorStorage
 OtaSoftwareUpdateProvider
 otasoftwareupdaterequestor
 otatesting
@@ -1126,6 +1129,7 @@ SerialNumber
 ServiceId
 SetDns
 SetImageProcessorDelegate
+SetOTADownloader
 SetOtaRequestorDriver
 setpin
 setpoint
