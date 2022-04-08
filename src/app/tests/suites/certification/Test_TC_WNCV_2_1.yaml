@@ -61,6 +61,7 @@ tests:
     - label: "2: read the RO mandatory attribute default: ConfigStatus"
       command: "readAttribute"
       attribute: "ConfigStatus"
+      disabled: true
       response:
           constraints:
               type: map8
@@ -78,6 +79,7 @@ tests:
     - label: "3b: reads back the RO mandatory attribute: ConfigStatus"
       command: "readAttribute"
       attribute: "ConfigStatus"
+      disabled: true
       response:
           constraints:
               type: map8
@@ -138,6 +140,7 @@ tests:
 
     ### Attribute[ 23]: Mode ========================================
     - label: "2: read the RW mandatory attribute default: Mode"
+      disabled: true
       command: "readAttribute"
       attribute: "Mode"
       response:
