@@ -116,24 +116,21 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
         ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB().GetError());
         return attributeReport.EndOfAttributeReportIB().GetError();
     }
-    else
-    {
-        AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
-        ReturnErrorOnFailure(aAttributeReports.GetError());
-        AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
-        AttributePathIB::Builder & attributePath     = attributeStatus.CreatePath();
-        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
-        ReturnErrorOnFailure(attributePath.GetError());
 
-        StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
-        ReturnErrorOnFailure(attributeStatus.GetError());
-        errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Busy));
-        attributeStatus.EndOfAttributeStatusIB();
-        ReturnErrorOnFailure(attributeStatus.GetError());
-        return attributeReport.EndOfAttributeReportIB().GetError();
-    }
+    AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
+    ReturnErrorOnFailure(aAttributeReports.GetError());
+    AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
+    AttributePathIB::Builder & attributePath     = attributeStatus.CreatePath();
+    attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+    ReturnErrorOnFailure(attributePath.GetError());
 
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
+    ReturnErrorOnFailure(attributeStatus.GetError());
+    errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Busy));
+    attributeStatus.EndOfAttributeStatusIB();
+    ReturnErrorOnFailure(attributeStatus.GetError());
+
+    return attributeReport.EndOfAttributeReportIB().GetError();
 }
 
 bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredDataVersion)
