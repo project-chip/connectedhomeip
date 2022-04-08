@@ -158,7 +158,6 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 
 RUN mkdir /root/connectedhomeip
 ADD ./ /root/connectedhomeip/
-# RUN git clone --depth 1 https://github.com/project-chip/connectedhomeip.git
 WORKDIR /root/connectedhomeip/
 RUN scripts/build/gn_bootstrap.sh
 RUN gn gen out/debug --args='chip_mdns="platform" chip_inet_config_enable_ipv4=false'
