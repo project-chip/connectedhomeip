@@ -110,7 +110,7 @@ limitations under the License.
     <command source="client" code="0x05" name="GoToLiftPercentage" optional="true" cli="zcl WindowCovering GoToLiftPercentage">
       <description>Go to lift percentage specified</description>
       <arg name="liftPercentageValue" type="Percent"/>
-      <arg name="liftPercent100thsValue" type="Percent100ths"/>
+      <arg name="liftPercent100thsValue" type="Percent100ths" optional="true"/>
     </command>
     <!-- Conformance feature [TL & ABS] - for now optional -->
     <command source="client" code="0x07" name="GoToTiltValue" optional="true" cli="zcl WindowCovering GoToTiltValue">
@@ -121,7 +121,7 @@ limitations under the License.
     <command source="client" code="0x08" name="GoToTiltPercentage" optional="true" cli="zcl WindowCovering GoToTiltPercentage">
       <description>Go to tilt percentage specified</description>
       <arg name="tiltPercentageValue" type="Percent"/>
-      <arg name="tiltPercent100thsValue" type="Percent100ths"/>
+      <arg name="tiltPercent100thsValue" type="Percent100ths" optional="true"/>
     </command>
   </cluster>
 

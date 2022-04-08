@@ -55132,7 +55132,10 @@ using namespace chip::app::Clusters;
     ListFreer listFreer;
     WindowCovering::Commands::GoToLiftPercentage::Type request;
     request.liftPercentageValue = params.liftPercentageValue.unsignedCharValue;
-    request.liftPercent100thsValue = params.liftPercent100thsValue.unsignedShortValue;
+    if (params.liftPercent100thsValue != nil) {
+        auto & definedValue_0 = request.liftPercent100thsValue.Emplace();
+        definedValue_0 = params.liftPercent100thsValue.unsignedShortValue;
+    }
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -55171,7 +55174,10 @@ using namespace chip::app::Clusters;
     ListFreer listFreer;
     WindowCovering::Commands::GoToTiltPercentage::Type request;
     request.tiltPercentageValue = params.tiltPercentageValue.unsignedCharValue;
-    request.tiltPercent100thsValue = params.tiltPercent100thsValue.unsignedShortValue;
+    if (params.tiltPercent100thsValue != nil) {
+        auto & definedValue_0 = request.tiltPercent100thsValue.Emplace();
+        definedValue_0 = params.tiltPercent100thsValue.unsignedShortValue;
+    }
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
