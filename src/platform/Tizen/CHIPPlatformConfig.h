@@ -28,18 +28,9 @@
 
 #define CHIP_CONFIG_ABORT() abort()
 
-#define CHIP_CONFIG_ENABLE_FABRIC_STATE 0
-
-#define CHIP_CONFIG_TIME_ENABLE_CLIENT 1
-#define CHIP_CONFIG_TIME_ENABLE_SERVER 0
-
 // ==================== Security Adaptations ====================
 
 // ==================== General Configuration Overrides ====================
-
-#ifndef CHIP_CONFIG_MAX_PEER_NODES
-#define CHIP_CONFIG_MAX_PEER_NODES 16
-#endif // CHIP_CONFIG_MAX_PEER_NODES
 
 #ifndef CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
 #define CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS 16

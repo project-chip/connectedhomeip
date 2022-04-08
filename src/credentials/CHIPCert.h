@@ -309,6 +309,7 @@ public:
      **/
     bool IsEmpty() const { return RDNCount() == 0; }
 
+    static_assert((CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES) >= 5, "Spec requires at least 5 RDN to be supported per Matter TLV cert");
     ChipRDN rdn[CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES];
 
     uint8_t RDNCount() const;

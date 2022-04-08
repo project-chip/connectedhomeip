@@ -338,7 +338,6 @@ private:
      */
     CHIP_ERROR UpdateCache(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus);
 
-private:
     //
     // ReadClient::Callback
     //
@@ -360,7 +359,6 @@ private:
         return mCallback.OnDeallocatePaths(std::move(aReadPrepareParams));
     }
 
-private:
     Callback & mCallback;
     NodeState mCache;
     std::set<ConcreteAttributePath> mChangedAttributeSet;

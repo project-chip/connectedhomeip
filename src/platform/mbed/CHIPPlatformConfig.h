@@ -34,11 +34,6 @@
 #define CHIP_CONFIG_PERSISTED_STORAGE_ENC_MSG_CNTR_ID 1
 #define CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH 2
 
-#define CHIP_CONFIG_TIME_ENABLE_CLIENT 1
-#define CHIP_CONFIG_TIME_ENABLE_SERVER 0
-
-#define CHIP_CONFIG_ERROR_CLASS 1
-
 // ==================== Security Adaptations ====================
 
 // FIXME: EFR32 set to MBED-TLS (But this is third-party repo in CHIP, not SDK)
@@ -46,10 +41,6 @@
 // FIXME: EFR32 currently set to CHIP (Does this use Entropy.cpp ?)
 
 // ==================== General Configuration Overrides ====================
-
-#ifndef CHIP_CONFIG_MAX_PEER_NODES
-#define CHIP_CONFIG_MAX_PEER_NODES 16
-#endif // CHIP_CONFIG_MAX_PEER_NODES
 
 #ifndef CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
 #define CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS 16
