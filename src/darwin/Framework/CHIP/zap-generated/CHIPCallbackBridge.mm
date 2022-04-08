@@ -10422,6 +10422,54 @@ void CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBri
     }
 }
 
+void CHIPWindowCoveringConfigStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPWindowCoveringModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPWindowCoveringModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPWindowCoveringModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPWindowCoveringGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {

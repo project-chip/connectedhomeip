@@ -15910,14 +15910,21 @@ typedef NS_ENUM(uint8_t, CHIPWindowCoveringType) {
     CHIPWindowCoveringTypeUnknown = 0xFF,
 };
 
-typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringWcConfigStatus) {
-    CHIPWindowCoveringWcConfigStatusOperational = 0x1,
-    CHIPWindowCoveringWcConfigStatusOnline = 0x2,
-    CHIPWindowCoveringWcConfigStatusOpenAndUpCommandsReversed = 0x4,
-    CHIPWindowCoveringWcConfigStatusLiftPositionAware = 0x8,
-    CHIPWindowCoveringWcConfigStatusTiltPositionAware = 0x10,
-    CHIPWindowCoveringWcConfigStatusLiftEncoderControlled = 0x20,
-    CHIPWindowCoveringWcConfigStatusTiltEncoderControlled = 0x40,
+typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringConfigStatus) {
+    CHIPWindowCoveringConfigStatusOperational = 0x1,
+    CHIPWindowCoveringConfigStatusOnlineReserved = 0x2,
+    CHIPWindowCoveringConfigStatusLiftMovementReversed = 0x4,
+    CHIPWindowCoveringConfigStatusLiftPositionAware = 0x8,
+    CHIPWindowCoveringConfigStatusTiltPositionAware = 0x10,
+    CHIPWindowCoveringConfigStatusLiftEncoderControlled = 0x20,
+    CHIPWindowCoveringConfigStatusTiltEncoderControlled = 0x40,
+};
+
+typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringMode) {
+    CHIPWindowCoveringModeMotorDirectionReversed = 0x1,
+    CHIPWindowCoveringModeCalibrationMode = 0x2,
+    CHIPWindowCoveringModeMaintenanceMode = 0x4,
+    CHIPWindowCoveringModeLedFeedback = 0x8,
 };
 
 typedef NS_OPTIONS(uint32_t, CHIPWindowCoveringWcFeature) {
@@ -15926,13 +15933,6 @@ typedef NS_OPTIONS(uint32_t, CHIPWindowCoveringWcFeature) {
     CHIPWindowCoveringWcFeaturePositionAwareLift = 0x4,
     CHIPWindowCoveringWcFeatureAbsolutePosition = 0x8,
     CHIPWindowCoveringWcFeaturePositionAwareTilt = 0x10,
-};
-
-typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringWcMode) {
-    CHIPWindowCoveringWcModeMotorDirectionReversed = 0x1,
-    CHIPWindowCoveringWcModeCalibrationMode = 0x2,
-    CHIPWindowCoveringWcModeMaintenanceMode = 0x4,
-    CHIPWindowCoveringWcModeLedFeedback = 0x8,
 };
 
 typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringWcOperationalStatus) {

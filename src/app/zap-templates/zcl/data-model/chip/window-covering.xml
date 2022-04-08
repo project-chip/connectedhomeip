@@ -49,7 +49,7 @@ limitations under the License.
     <!-- Conformance feature [TL] - for now optional -->
     <attribute side="server" writable="false" code="0x0006" define="WC_NUMBER_OF_ACTUATIONS_TILT"                 type="INT16U"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >NumberOfActuationsTilt</attribute>
     <!-- Conformance feature M -->
-    <attribute side="server" writable="false" code="0x0007" define="WC_CONFIG_STATUS"                             type="BITMAP8"  min="0x00"   max="0x7F"   default="0x03"   optional="false">ConfigStatus</attribute>
+    <attribute side="server" writable="false" code="0x0007" define="WC_CONFIG_STATUS"                             type="ConfigStatus" min="0x00"   max="0x7F"   default="0x03"   optional="false">ConfigStatus</attribute>
     <!-- Conformance feature [LF & PA_LF] - for now optional -->
     <attribute side="server" writable="false" code="0x0008" define="WC_CURRENT_POSITION_LIFT_PERCENTAGE"          type="Percent"  min="0"      max="100"    isNullable="true" optional="true" reportable="true" >CurrentPositionLiftPercentage</attribute>
     <!-- Conformance feature [TL & PA_TL] - for now optional -->
@@ -79,7 +79,7 @@ limitations under the License.
     <!-- attribute side="server" writable="true"  code="0x0015" define="WC_ACCELERATION_TIME_LIFT"                type="INT16U"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >AccelerationTimeLift -->
     <!-- attribute side="server" writable="true"  code="0x0016" define="WC_DECELERATION_TIME_LIFT"                type="INT16U"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >DecelerationTimeLift -->
     <!-- Conformance feature M -->
-    <attribute side="server" writable="true"  code="0x0017" define="WC_MODE"                                      type="BITMAP8"  min="0x00"   max="0x0F"   default="0x00"   optional="false" >
+    <attribute side="server" writable="true"  code="0x0017" define="WC_MODE"                                      type="Mode"  min="0x00"   max="0x0F"   default="0x00"   optional="false" >
       <description>Mode</description>
       <access op="read" role="view" />
       <access op="write" role="manage" />
@@ -171,7 +171,7 @@ limitations under the License.
   </enum>
 
   <!-- Window Covering BitFlag Meaning Set -->
-  <bitmap name="WcMode" type="BITMAP8">
+  <bitmap name="Mode" type="BITMAP8">
     <cluster code="0x0102"/>
     <field mask="0x01" name="MotorDirectionReversed"/>
     <field mask="0x02" name="CalibrationMode"/>
@@ -186,11 +186,11 @@ limitations under the License.
     <field mask="0x30" name="Tilt"/>
   </bitmap>
 
-  <bitmap name="WcConfigStatus" type="BITMAP8">
+  <bitmap name="ConfigStatus" type="BITMAP8">
     <cluster code="0x0102"/>
     <field mask="0x01" name="Operational"/>
-    <field mask="0x02" name="Online"/>
-    <field mask="0x04" name="OpenAndUpCommandsReversed"/>
+    <field mask="0x02" name="OnlineReserved"/>
+    <field mask="0x04" name="LiftMovementReversed"/>
     <field mask="0x08" name="LiftPositionAware"/>
     <field mask="0x10" name="TiltPositionAware"/>
     <field mask="0x20" name="LiftEncoderControlled"/>

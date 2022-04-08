@@ -599,6 +599,9 @@ typedef void (*TestClusterNullableBitmap64AttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> &);
 typedef void (*TestClusterNullableStructStructAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> &);
+typedef void (*WindowCoveringConfigStatusAttributeCallback)(void *,
+                                                            chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus>);
+typedef void (*WindowCoveringModeAttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>);
 
 class CHIPDefaultSuccessCallbackBridge : public CHIPCallbackBridge<DefaultSuccessCallback>
 {
@@ -8090,6 +8093,59 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPWindowCoveringConfigStatusAttributeCallbackBridge : public CHIPCallbackBridge<WindowCoveringConfigStatusAttributeCallback>
+{
+public:
+    CHIPWindowCoveringConfigStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                          bool keepAlive = false) :
+        CHIPCallbackBridge<WindowCoveringConfigStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value);
+};
+
+class CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge
+    : public CHIPWindowCoveringConfigStatusAttributeCallbackBridge
+{
+public:
+    CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      CHIPActionBlock action,
+                                                                      SubscriptionEstablishedHandler establishedHandler) :
+        CHIPWindowCoveringConfigStatusAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPWindowCoveringModeAttributeCallbackBridge : public CHIPCallbackBridge<WindowCoveringModeAttributeCallback>
+{
+public:
+    CHIPWindowCoveringModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                  bool keepAlive = false) :
+        CHIPCallbackBridge<WindowCoveringModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value);
+};
+
+class CHIPWindowCoveringModeAttributeCallbackSubscriptionBridge : public CHIPWindowCoveringModeAttributeCallbackBridge
+{
+public:
+    CHIPWindowCoveringModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              CHIPActionBlock action,
+                                                              SubscriptionEstablishedHandler establishedHandler) :
+        CHIPWindowCoveringModeAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

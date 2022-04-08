@@ -1425,16 +1425,25 @@ enum class Type : uint8_t
     kUnknown                   = 0xFF,
 };
 
-// Bitmap for WcConfigStatus
-enum class WcConfigStatus : uint8_t
+// Bitmap for ConfigStatus
+enum class ConfigStatus : uint8_t
 {
-    kOperational               = 0x1,
-    kOnline                    = 0x2,
-    kOpenAndUpCommandsReversed = 0x4,
-    kLiftPositionAware         = 0x8,
-    kTiltPositionAware         = 0x10,
-    kLiftEncoderControlled     = 0x20,
-    kTiltEncoderControlled     = 0x40,
+    kOperational           = 0x1,
+    kOnlineReserved        = 0x2,
+    kLiftMovementReversed  = 0x4,
+    kLiftPositionAware     = 0x8,
+    kTiltPositionAware     = 0x10,
+    kLiftEncoderControlled = 0x20,
+    kTiltEncoderControlled = 0x40,
+};
+
+// Bitmap for Mode
+enum class Mode : uint8_t
+{
+    kMotorDirectionReversed = 0x1,
+    kCalibrationMode        = 0x2,
+    kMaintenanceMode        = 0x4,
+    kLedFeedback            = 0x8,
 };
 
 // Bitmap for WcFeature
@@ -1445,15 +1454,6 @@ enum class WcFeature : uint32_t
     kPositionAwareLift = 0x4,
     kAbsolutePosition  = 0x8,
     kPositionAwareTilt = 0x10,
-};
-
-// Bitmap for WcMode
-enum class WcMode : uint8_t
-{
-    kMotorDirectionReversed = 0x1,
-    kCalibrationMode        = 0x2,
-    kMaintenanceMode        = 0x4,
-    kLedFeedback            = 0x8,
 };
 
 // Bitmap for WcOperationalStatus
