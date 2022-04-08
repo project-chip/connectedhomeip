@@ -1387,7 +1387,9 @@ bool registerAttributeAccessOverride(app::AttributeAccessInterface * attrOverrid
     return true;
 }
 
-app::AttributeAccessInterface * findAttributeAccessOverride(EndpointId endpointId, ClusterId clusterId)
+namespace chip {
+namespace app {
+app::AttributeAccessInterface * GetAttributeAccessOverride(EndpointId endpointId, ClusterId clusterId)
 {
     for (app::AttributeAccessInterface * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
     {
@@ -1399,6 +1401,8 @@ app::AttributeAccessInterface * findAttributeAccessOverride(EndpointId endpointI
 
     return nullptr;
 }
+} // namespace app
+} // namespace chip
 
 uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::ClusterId cluster)
 {

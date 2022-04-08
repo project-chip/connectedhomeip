@@ -300,10 +300,3 @@ chip::Optional<chip::AttributeId> emberAfGetServerAttributeIdByIndex(chip::Endpo
  * @return true if registration was successful.
  */
 bool registerAttributeAccessOverride(chip::app::AttributeAccessInterface * attrOverride);
-
-/**
- * Find an attribute access override, if any, that is registered for the given
- * endpoint and cluster id.  This might be an override specific to the given
- * endpoint, or might be one registered for all endpoints.
- */
-chip::app::AttributeAccessInterface * findAttributeAccessOverride(chip::EndpointId endpointId, chip::ClusterId clusterId);
