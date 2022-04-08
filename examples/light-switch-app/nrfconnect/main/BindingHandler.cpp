@@ -35,17 +35,54 @@ void BindingHandler::Init()
     DeviceLayer::PlatformMgr().ScheduleWork(InitInternal);
 }
 
+void BindingHandler::OnInvokeCommandFailure(DeviceProxy * aDevice, BindingData & aBindingData, CHIP_ERROR aError)
+{
+    CHIP_ERROR error;
+
+    if (aError == CHIP_ERROR_TIMEOUT && !BindingHandler::GetInstance().mCaseSessionRecovered)
+    {
+        LOG_INF("Response timeout for invoked command, trying to recover CASE session.");
+        if (!aDevice)
+            return;
+
+        // Release current CASE session.
+        error = aDevice->Disconnect();
+
+        if (CHIP_NO_ERROR != error)
+        {
+            LOG_ERR("Disconnecting from CASE session failed due to: %" CHIP_ERROR_FORMAT, error.Format());
+            return;
+        }
+
+        // Set flag to not try recover session multiple times.
+        BindingHandler::GetInstance().mCaseSessionRecovered = true;
+
+        // Establish new CASE session and retrasmit command that was not applied.
+        error = BindingManager::GetInstance().NotifyBoundClusterChanged(aBindingData.EndpointId, aBindingData.ClusterId,
+                                                                        static_cast<void *>(&aBindingData));
+    }
+    else
+    {
+        LOG_ERR("Binding command was not applied! Reason: %" CHIP_ERROR_FORMAT, aError.Format());
+    }
+}
+
 void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindingTableEntry & aBinding, DeviceProxy * aDevice,
                                          void * aContext)
 {
-    CHIP_ERROR ret = CHIP_NO_ERROR;
+    CHIP_ERROR ret     = CHIP_NO_ERROR;
+    BindingData * data = reinterpret_cast<BindingData *>(aContext);
 
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
         LOG_DBG("Binding command applied successfully!");
+
+        // If session was recovered and communication works, reset flag to the initial state.
+        if (BindingHandler::GetInstance().mCaseSessionRecovered)
+            BindingHandler::GetInstance().mCaseSessionRecovered = false;
     };
 
-    auto onFailure = [](CHIP_ERROR error) {
-        LOG_INF("Binding command was not applied! Reason: %" CHIP_ERROR_FORMAT, error.Format());
+    auto onFailure = [aDevice, dataRef = *data](CHIP_ERROR aError) mutable {
+        BindingHandler::OnInvokeCommandFailure(aDevice, dataRef, aError);
     };
 
     switch (aCommandId)
@@ -105,12 +142,18 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindin
 void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const EmberBindingTableEntry & aBinding,
                                                 DeviceProxy * aDevice, void * aContext)
 {
+    BindingData * data = reinterpret_cast<BindingData *>(aContext);
+
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
         LOG_DBG("Binding command applied successfully!");
+
+        // If session was recovered and communication works, reset flag to the initial state.
+        if (BindingHandler::GetInstance().mCaseSessionRecovered)
+            BindingHandler::GetInstance().mCaseSessionRecovered = false;
     };
 
-    auto onFailure = [](CHIP_ERROR error) {
-        LOG_INF("Binding command was not applied! Reason: %" CHIP_ERROR_FORMAT, error.Format());
+    auto onFailure = [aDevice, dataRef = *data](CHIP_ERROR aError) mutable {
+        BindingHandler::OnInvokeCommandFailure(aDevice, dataRef, aError);
     };
 
     CHIP_ERROR ret = CHIP_NO_ERROR;
@@ -119,7 +162,6 @@ void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const Embe
     {
     case Clusters::LevelControl::Commands::MoveToLevel::Id: {
         Clusters::LevelControl::Commands::MoveToLevel::Type moveToLevelCommand;
-        BindingData * data       = reinterpret_cast<BindingData *>(aContext);
         moveToLevelCommand.level = data->Value;
         if (aDevice)
         {
@@ -192,7 +234,7 @@ void BindingHandler::InitInternal(intptr_t aArg)
     }
 
     BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
-    PrintBindingTable();
+    BindingHandler::GetInstance().PrintBindingTable();
 }
 
 bool BindingHandler::IsGroupBound()
