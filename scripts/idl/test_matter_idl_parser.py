@@ -137,6 +137,49 @@ class TestParser(unittest.TestCase):
                     )])
         self.assertEqual(actual, expected)
 
+    def test_attribute_access(self):
+        actual = parseText("""
+            server cluster MyCluster = 1 {
+                attribute                                      int8s attr1 = 1;
+                attribute access()                             int8s attr2 = 2;
+                attribute access(read: manage)                 int8s attr3 = 3;
+                attribute access(write: administer)            int8s attr4 = 4;
+                attribute access(read: operate, write: manage) int8s attr5 = 5;
+            }
+        """)
+
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.SERVER,
+                    name="MyCluster",
+                    code=1,
+                    attributes=[
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="int8s"), code=1, name="attr1"),
+                            readacl = AccessPrivilege.VIEW,
+                            writeacl = AccessPrivilege.OPERATE
+                        ),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="int8s"), code=2, name="attr2"),
+                            readacl = AccessPrivilege.VIEW,
+                            writeacl = AccessPrivilege.OPERATE
+                            ),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="int8s"), code=3, name="attr3"),
+                            readacl = AccessPrivilege.MANAGE
+                        ),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="int8s"), code=4, name="attr4"),
+                            writeacl = AccessPrivilege.ADMINISTER
+                        ),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="int8s"), code=5, name="attr5"),
+                            readacl = AccessPrivilege.OPERATE,
+                            writeacl = AccessPrivilege.MANAGE
+                        ),
+                    ]
+                    )])
+        self.assertEqual(actual, expected)
+
     def test_cluster_commands(self):
         actual = parseText("""
             server cluster WithCommands = 1 {
