@@ -617,7 +617,7 @@ IdleStateReason DefaultOTARequestor::MapErrorToIdleStateReason(CHIP_ERROR error)
     {
         return IdleStateReason::kIdle;
     }
-    else if (error == CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY)
+    if (error == CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY)
     {
         return IdleStateReason::kInvalidSession;
     }

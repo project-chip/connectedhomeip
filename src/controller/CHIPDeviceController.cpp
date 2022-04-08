@@ -671,18 +671,16 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             }
             return CHIP_NO_ERROR;
         }
-        else if (current->IsSessionSetupInProgress())
+        if (current->IsSessionSetupInProgress())
         {
-            // We're not connected yet, but we're in the process of connecting. Pairing delegate will get a callback when connection
-            // completes
+            // We're not connected yet, but we're in the process of connecting. Pairing delegate will get a callback when
+            // connection completes
             return CHIP_NO_ERROR;
         }
-        else
-        {
-            // Something has gone strange. Delete the old device, try again.
-            ChipLogError(Controller, "Found unconnected device, removing");
-            ReleaseCommissioneeDevice(current);
-        }
+
+        // Something has gone strange. Delete the old device, try again.
+        ChipLogError(Controller, "Found unconnected device, removing");
+        ReleaseCommissioneeDevice(current);
     }
 
     device = mCommissioneeDevicePool.CreateObject();

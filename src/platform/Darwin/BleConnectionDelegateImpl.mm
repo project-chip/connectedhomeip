@@ -186,10 +186,8 @@ namespace DeviceLayer {
     constexpr uint16_t kManualSetupDiscriminatorFieldBitMask = maxManualDiscriminatorValue << manualSetupDiscriminatorOffsetInBits;
     if (_deviceDiscriminator == (_deviceDiscriminator & kManualSetupDiscriminatorFieldBitMask)) {
         return _deviceDiscriminator == (discriminator & kManualSetupDiscriminatorFieldBitMask);
-    } else {
-        // else compare the entire thing
-        return _deviceDiscriminator == discriminator;
-    }
+    } // else compare the entire thing
+    return _deviceDiscriminator == discriminator;
 }
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral

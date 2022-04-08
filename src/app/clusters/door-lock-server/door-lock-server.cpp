@@ -1996,15 +1996,13 @@ DlStatus DoorLockServer::modifyProgrammingPIN(chip::EndpointId endpointId, chip:
                                       endpointId, credentialIndex, to_underlying(credentialType), credentialData.size());
         return DlStatus::kFailure;
     }
-    else
-    {
-        emberAfDoorLockClusterPrintln("[SetCredential] Successfully modified the credential "
-                                      "[endpointId=%d,credentialIndex=%d,credentialType=%u,credentialDataSize=%zu]",
-                                      endpointId, credentialIndex, to_underlying(credentialType), credentialData.size());
 
-        sendRemoteLockUserChange(endpointId, credentialTypeToLockDataType(credentialType), DlDataOperationType::kModify,
-                                 sourceNodeId, modifierFabricIndex, relatedUserIndex, credentialIndex);
-    }
+    emberAfDoorLockClusterPrintln("[SetCredential] Successfully         modified the credential "
+                                  "[endpointId=%d,credentialIndex=%d,credentialType=%u,credentialDataSize=%zu]",
+                                  endpointId, credentialIndex, to_underlying(credentialType), credentialData.size());
+
+    sendRemoteLockUserChange(endpointId, credentialTypeToLockDataType(credentialType), DlDataOperationType::kModify, sourceNodeId,
+                             modifierFabricIndex, relatedUserIndex, credentialIndex);
 
     return DlStatus::kSuccess;
 }

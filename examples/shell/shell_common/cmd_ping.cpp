@@ -140,12 +140,10 @@ Transport::PeerAddress GetEchoPeerAddress()
     {
         return Transport::PeerAddress::TCP(gDestAddr, gPingArguments.GetEchoPort());
     }
-    else
-#endif
-    {
 
-        return Transport::PeerAddress::UDP(gDestAddr, gPingArguments.GetEchoPort(), ::chip::Inet::InterfaceId::Null());
-    }
+#endif
+
+    return Transport::PeerAddress::UDP(gDestAddr, gPingArguments.GetEchoPort(), ::chip::Inet::InterfaceId::Null());
 }
 
 void Shutdown()

@@ -92,12 +92,10 @@ static EmberAfStatus GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, Gr
     {
         return EMBER_ZCL_STATUS_SUCCESS;
     }
-    else
-    {
-        ChipLogDetail(Zcl, "ERR: Failed to add mapping (end:%d, group:0x%x), err:%" CHIP_ERROR_FORMAT, endpointId, groupId,
-                      err.Format());
-        return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
-    }
+
+    ChipLogDetail(Zcl, "ERR: Failed to add mapping (end:%d, group:0x%x), err:%" CHIP_ERROR_FORMAT, endpointId, groupId,
+                  err.Format());
+    return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
 }
 
 static EmberAfStatus GroupRemove(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId)
@@ -113,12 +111,10 @@ static EmberAfStatus GroupRemove(FabricIndex fabricIndex, EndpointId endpointId,
     {
         return EMBER_ZCL_STATUS_SUCCESS;
     }
-    else
-    {
-        ChipLogDetail(Zcl, "ERR: Failed to remove mapping (end:%d, group:0x%x), err:%" CHIP_ERROR_FORMAT, endpointId, groupId,
-                      err.Format());
-        return EMBER_ZCL_STATUS_NOT_FOUND;
-    }
+
+    ChipLogDetail(Zcl, "ERR: Failed to remove mapping (end:%d, group:0x%x), err:%" CHIP_ERROR_FORMAT, endpointId, groupId,
+                  err.Format());
+    return EMBER_ZCL_STATUS_NOT_FOUND;
 }
 
 void emberAfGroupsClusterServerInitCallback(EndpointId endpointId)

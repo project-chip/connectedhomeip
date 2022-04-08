@@ -78,8 +78,8 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
                 return CHIP_NO_ERROR;
             });
         }
-        else if (aPath.mClusterId == app::Clusters::TestCluster::Id &&
-                 aPath.mAttributeId == app::Clusters::TestCluster::Attributes::Int16u::Id)
+        if (aPath.mClusterId == app::Clusters::TestCluster::Id &&
+            aPath.mAttributeId == app::Clusters::TestCluster::Attributes::Int16u::Id)
         {
             AttributeValueEncoder::AttributeEncodeState state =
                 (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
@@ -88,57 +88,49 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
 
             return valueEncoder.Encode(++totalReadCount);
         }
-        else
-        {
-            AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
-            ReturnErrorOnFailure(aAttributeReports.GetError());
-            AttributeDataIB::Builder & attributeData = attributeReport.CreateAttributeData();
-            ReturnErrorOnFailure(attributeReport.GetError());
-            TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
-            TestCluster::Structs::TestListStructOctet::Type valueBuf[4];
 
-            value = valueBuf;
-
-            uint8_t i = 0;
-            for (auto & item : valueBuf)
-            {
-                item.fabricIndex = i;
-                i++;
-            }
-
-            attributeData.DataVersion(kDataVersion);
-            ReturnErrorOnFailure(attributeData.GetError());
-            AttributePathIB::Builder & attributePath = attributeData.CreatePath();
-            attributePath.Endpoint(aPath.mEndpointId)
-                .Cluster(aPath.mClusterId)
-                .Attribute(aPath.mAttributeId)
-                .EndOfAttributePathIB();
-            ReturnErrorOnFailure(attributePath.GetError());
-
-            ReturnErrorOnFailure(DataModel::Encode(*(attributeData.GetWriter()),
-                                                   TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), value));
-            ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB().GetError());
-            return attributeReport.EndOfAttributeReportIB().GetError();
-        }
-    }
-    else
-    {
         AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
         ReturnErrorOnFailure(aAttributeReports.GetError());
-        AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
-        AttributePathIB::Builder & attributePath     = attributeStatus.CreatePath();
+        AttributeDataIB::Builder & attributeData = attributeReport.CreateAttributeData();
+        ReturnErrorOnFailure(attributeReport.GetError());
+        TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
+        TestCluster::Structs::TestListStructOctet::Type valueBuf[4];
+
+        value = valueBuf;
+
+        uint8_t i = 0;
+        for (auto & item : valueBuf)
+        {
+            item.fabricIndex = i;
+            i++;
+        }
+
+        attributeData.DataVersion(kDataVersion);
+        ReturnErrorOnFailure(attributeData.GetError());
+        AttributePathIB::Builder & attributePath = attributeData.CreatePath();
         attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePath.GetError());
 
-        StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
-        ReturnErrorOnFailure(attributeStatus.GetError());
-        errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Busy));
-        attributeStatus.EndOfAttributeStatusIB();
-        ReturnErrorOnFailure(attributeStatus.GetError());
+        ReturnErrorOnFailure(
+            DataModel::Encode(*(attributeData.GetWriter()), TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), value));
+        ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB().GetError());
         return attributeReport.EndOfAttributeReportIB().GetError();
     }
 
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
+    ReturnErrorOnFailure(aAttributeReports.GetError());
+    AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
+    AttributePathIB::Builder & attributePath     = attributeStatus.CreatePath();
+    attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+    ReturnErrorOnFailure(attributePath.GetError());
+
+    StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
+    ReturnErrorOnFailure(attributeStatus.GetError());
+    errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Busy));
+    attributeStatus.EndOfAttributeStatusIB();
+    ReturnErrorOnFailure(attributeStatus.GetError());
+
+    return attributeReport.EndOfAttributeReportIB().GetError();
 }
 
 bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredDataVersion)
@@ -147,10 +139,8 @@ bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath,
     {
         return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
