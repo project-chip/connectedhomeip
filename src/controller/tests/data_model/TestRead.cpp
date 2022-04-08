@@ -40,7 +40,7 @@ using namespace chip::Protocols;
 namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
-DataVersion kDataVersion      = 5;
+DataVersion kDataVersion             = 5;
 
 enum ResponseDirective
 {
