@@ -528,6 +528,8 @@ void ReadServerClusters(EndpointId endpointId)
 
 void ReadServerClustersForNode(NodeId nodeId)
 {
+    ChipLogProgress(NotSpecified,
+                        "ReadServerClustersForNode nodeId=0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
     for (const auto & binding : BindingTable::GetInstance())
     {
         ChipLogProgress(NotSpecified,
@@ -541,8 +543,41 @@ void ReadServerClustersForNode(NodeId nodeId)
             {
                 ReadServerClusters(binding.remote);
             }
+            else
+            {
+                TargetEndpointInfo * endpointInfo = gTargetVideoPlayerInfo.GetEndpoint(binding.remote);
+                if (endpointInfo != nullptr && endpointInfo->IsInitialized())
+                {
+                    endpointInfo->PrintInfo();
+                }
+            }
         }
     }
+}
+
+CHIP_ERROR ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr)
+{
+    OperationalDeviceProxy * operationalDeviceProxy = gTargetVideoPlayerInfo.GetOperationalDeviceProxy();
+    if (operationalDeviceProxy == nullptr)
+    {
+        ChipLogError(AppServer, "Failed in getting an instance of OperationalDeviceProxy");
+        return CHIP_ERROR_PEER_NODE_NOT_FOUND;
+    }
+
+    ContentLauncherCluster cluster;
+    CHIP_ERROR err = cluster.Associate(operationalDeviceProxy, kTvEndpoint);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Associate() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+    LaunchURL::Type request;
+    request.contentURL          = chip::CharSpan::fromCharString(contentUrl);
+    request.displayString       = Optional<CharSpan>(chip::CharSpan::fromCharString(contentDisplayStr));
+    request.brandingInformation = Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type>(
+            chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type());
+    cluster.InvokeCommand(request, nullptr, OnContentLauncherSuccessResponse, OnContentLauncherFailureResponse);
+    return CHIP_NO_ERROR;
 }
 
 void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
@@ -559,26 +594,7 @@ void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t ar
         ReturnOnFailure(gTargetVideoPlayerInfo.Initialize(event->CommissioningComplete.PeerNodeId,
                                                           event->CommissioningComplete.PeerFabricIndex));
 
-        OperationalDeviceProxy * operationalDeviceProxy = gTargetVideoPlayerInfo.GetOperationalDeviceProxy();
-        if (operationalDeviceProxy == nullptr)
-        {
-            ChipLogError(AppServer, "Failed in getting an instance of OperationalDeviceProxy");
-            return;
-        }
-
-        ContentLauncherCluster cluster;
-        CHIP_ERROR err = cluster.Associate(operationalDeviceProxy, kTvEndpoint);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "Associate() failed: %" CHIP_ERROR_FORMAT, err.Format());
-            return;
-        }
-        LaunchURL::Type request;
-        request.contentURL          = chip::CharSpan::fromCharString(kContentUrl);
-        request.displayString       = Optional<CharSpan>(chip::CharSpan::fromCharString(kContentDisplayStr));
-        request.brandingInformation = Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type>(
-            chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type());
-        cluster.InvokeCommand(request, nullptr, OnContentLauncherSuccessResponse, OnContentLauncherFailureResponse);
+        ContentLauncherLaunchURL(kContentUrl, kContentDisplayStr);
     }
 }
 

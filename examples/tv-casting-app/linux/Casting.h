@@ -19,6 +19,9 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/NodeId.h>
 
 CHIP_ERROR DiscoverCommissioners();
 CHIP_ERROR RequestCommissioning(int index);
+void ReadServerClustersForNode(chip::NodeId nodeId);
+CHIP_ERROR ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr);

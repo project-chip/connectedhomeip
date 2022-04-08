@@ -40,6 +40,8 @@ static CHIP_ERROR PrintAllCommands()
     streamer_printf(sout, "  help                 Usage: app <subcommand>\r\n");
     streamer_printf(sout, "  discover             Discover commissioners. Usage: cast discover\r\n");
     streamer_printf(sout, "  request <index>      Request commissioning from discovered commissioner with [index]. Usage: cast request 0\r\n");
+    streamer_printf(sout, "  launch <url> <display>   Launch content. Usage: cast launc https://www.yahoo.com Hello\r\n");
+    streamer_printf(sout, "  access <node>        Read and display clusters on each endpoint for <node>. Usage: access 0xFFFFFFEFFFFFFFFF\r\n");
     streamer_printf(sout, "\r\n");
 
     return CHIP_NO_ERROR;
@@ -69,6 +71,29 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         char * eptr;
         int index = (int) strtol(argv[1], &eptr, 10);
         return error = RequestCommissioning(index);
+    }
+    else if (strcmp(argv[0], "launch") == 0)
+    {
+        ChipLogProgress(DeviceLayer, "launch");
+        if (argc < 3)
+        {
+            return PrintAllCommands();
+        }
+        char * url = argv[1];
+        char * display = argv[2];
+        return error = ContentLauncherLaunchURL(url, display);
+    }
+    else if (strcmp(argv[0], "access") == 0)
+    {
+        ChipLogProgress(DeviceLayer, "access");
+        if (argc < 2)
+        {
+            return PrintAllCommands();
+        }
+        char * eptr;
+        chip::NodeId node = (chip::NodeId) strtoull(argv[1], &eptr, 0);
+        ReadServerClustersForNode(node);
+        return error;
     }
     else
     {
