@@ -140,17 +140,6 @@ class NrfConnectBuilder(Builder):
                     raise Exception(
                         "Directory %s not writable. NRFConnect builds require updates to this directory." % nrfconnect_sdk)
 
-                # validate the the ZEPHYR_BASE is up to date (generally the case in docker images)
-                try:
-                    self._Execute(
-                        ['python3', 'scripts/setup/nrfconnect/update_ncs.py', '--check'])
-                except Exception:
-                    logging.exception('Failed to validate ZEPHYR_BASE status')
-                    logging.error(
-                        'To update $ZEPHYR_BASE run: python3 scripts/setup/nrfconnect/update_ncs.py --update --shallow')
-
-                    raise Exception('ZEPHYR_BASE validation failed')
-
             flags = []
             if self.enable_rpcs:
                 flags.append("-DOVERLAY_CONFIG=rpc.overlay")
