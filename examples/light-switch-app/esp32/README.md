@@ -105,26 +105,28 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 -   Commissioning the Lighting device
 
         $ ./out/debug/chip-tool pairing ble-wifi 12344321 <ssid> <passphrase> 20202021 3840
--  Commissioning the Lighting-switch device
 
-        $ ./out/debug/chip-tool pairing ble-wifi 12344320 <ssid> <passphrase> 20202021 3840
+-   Commissioning the Lighting-switch device
+
+         $ ./out/debug/chip-tool pairing ble-wifi 12344320 <ssid> <passphrase> 20202021 3840
 
 ## Testing the example
 
--   After successful commissioning, use the chip-tool to write the ACL in Lighting device to allow access from Lighting-switch device and chip-tool.
+-   After successful commissioning, use the chip-tool to write the ACL in
+    Lighting device to allow access from Lighting-switch device and chip-tool.
 
         $ ./out/debug/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [12344320], "targets": null }]' 12344321 0
 
 -   we use matter shell to bind and test.
 
     binding:
-    
+
         matter switch binding unicast 1 12344321 1
-        
+
     on:
-    
+
         matter switch onoff on
-        
+
     off:
-    
+
         matter switch onoff off
