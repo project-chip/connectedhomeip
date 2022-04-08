@@ -40,6 +40,12 @@
 #include <transport/raw/PeerAddress.h>
 #include <zap-generated/CHIPClusters.h>
 
+#if defined(ENABLE_CHIP_SHELL)
+#include "CastingShellCommands.h"
+#include <lib/shell/Engine.h>
+#include <thread>
+#endif
+
 #include <list>
 #include <string>
 
@@ -50,6 +56,10 @@ using chip::ArgParser::HelpOptions;
 using chip::ArgParser::OptionDef;
 using chip::ArgParser::OptionSet;
 using namespace chip::app::Clusters::ContentLauncher::Commands;
+
+#if defined(ENABLE_CHIP_SHELL)
+using chip::Shell::Engine;
+#endif
 
 struct TVExampleDeviceType
 {
@@ -130,6 +140,17 @@ CHIP_ERROR InitBindingHandlers()
     return CHIP_NO_ERROR;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+void HandleUDCSendExpiration(System::Layer * aSystemLayer, void * context)
+{
+    Dnssd::DiscoveredNodeData * selectedCommissioner = (Dnssd::DiscoveredNodeData *)context;
+    
+    // Send User Directed commissioning request
+    ReturnOnFailure(Server::GetInstance().SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
+            selectedCommissioner->ipAddress[0], selectedCommissioner->port, selectedCommissioner->interfaceId)));
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
 /**
  * Enters commissioning mode, opens commissioning window, logs onboarding payload.
  * If non-null selectedCommissioner is provided, sends user directed commissioning
@@ -156,8 +177,15 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
     if (selectedCommissioner != nullptr)
     {
         // Send User Directed commissioning request
-        ReturnOnFailure(Server::GetInstance().SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
-            selectedCommissioner->ipAddress[0], selectedCommissioner->port, selectedCommissioner->interfaceId)));
+        // Wait 1 second to allow our commissionee DNS records to publish (needed on Mac)
+        int32_t expiration = 1;
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(expiration),
+                                                 HandleUDCSendExpiration, (void*)selectedCommissioner);
+
+    }
+    else
+    {
+        ChipLogProgress(AppServer, "To run discovery again, enter: cast discover");
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 }
@@ -166,6 +194,7 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
  * Accepts user input of selected commissioner and calls PrepareForCommissioning with
  * the selected commissioner
  */
+/*
 void RequestUserDirectedCommissioning(System::SocketEvents events, intptr_t data)
 {
     // Accept user selection for commissioner to request commissioning from.
@@ -181,6 +210,7 @@ void RequestUserDirectedCommissioning(System::SocketEvents events, intptr_t data
     VerifyOrReturn(selectedCommissioner != nullptr, ChipLogError(AppServer, "No such commissioner!"));
     PrepareForCommissioning(selectedCommissioner);
 }
+*/
 
 void InitCommissioningFlow(intptr_t commandArg)
 {
@@ -192,7 +222,7 @@ void InitCommissioningFlow(intptr_t commandArg)
         const Dnssd::DiscoveredNodeData * commissioner = gCommissionableNodeController.GetDiscoveredCommissioner(i);
         if (commissioner != nullptr)
         {
-            ChipLogProgress(AppServer, "Discovered Commissioner #%d", ++commissionerCount);
+            ChipLogProgress(AppServer, "Discovered Commissioner #%d", commissionerCount++);
             commissioner->LogDetail();
         }
     }
@@ -202,20 +232,39 @@ void InitCommissioningFlow(intptr_t commandArg)
         ChipLogProgress(AppServer, "%d commissioner(s) discovered. Select one (by number# above) to request commissioning from: ",
                         commissionerCount);
 
-        // Setup for async/non-blocking user input from stdin
-        int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
-        VerifyOrReturn(fcntl(0, F_SETFL, flags | O_NONBLOCK) == 0,
-                       ChipLogError(AppServer, "Could not set non-blocking mode for user input!"));
-        ReturnOnFailure(chip::DeviceLayer::SystemLayerSockets().StartWatchingSocket(STDIN_FILENO, &gToken));
-        ReturnOnFailure(
-            chip::DeviceLayer::SystemLayerSockets().SetCallback(gToken, RequestUserDirectedCommissioning, (intptr_t) NULL));
-        ReturnOnFailure(chip::DeviceLayer::SystemLayerSockets().RequestCallbackOnPendingRead(gToken));
+        ChipLogProgress(AppServer, "Example: cast request 0");
     }
     else
     {
         ChipLogError(AppServer, "No commissioner discovered, commissioning must be initiated manually!");
         PrepareForCommissioning();
     }
+}
+
+CHIP_ERROR DiscoverCommissioners()
+{
+    // Send discover commissioners request
+    ReturnErrorOnFailure(gCommissionableNodeController.DiscoverCommissioners(gDiscoveryFilter));
+
+    // Give commissioners some time to respond and then ScheduleWork to initiate commissioning
+    DeviceLayer::SystemLayer().StartTimer(
+        chip::System::Clock::Milliseconds32(kCommissionerDiscoveryTimeoutInMs),
+        [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR RequestCommissioning(int index)
+{
+    const Dnssd::DiscoveredNodeData * selectedCommissioner =
+        gCommissionableNodeController.GetDiscoveredCommissioner(index);
+    if (selectedCommissioner == nullptr)
+    {
+        ChipLogError(AppServer, "No such commissioner!");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    } 
+    PrepareForCommissioning(selectedCommissioner);
+    return CHIP_NO_ERROR;
 }
 
 void OnContentLauncherSuccessResponse(void * context, const LaunchResponse::DecodableType & response)
@@ -579,6 +628,12 @@ LinuxCommissionableDataProvider gCommissionableDataProvider;
 
 int main(int argc, char * argv[])
 {
+#if defined(ENABLE_CHIP_SHELL)
+    Engine::Root().Init();
+    std::thread shellThread([]() { Engine::Root().RunMainLoop(); });
+    Shell::RegisterCastingCommands();
+#endif
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     SuccessOrExit(err = chip::Platform::MemoryInit());
@@ -618,6 +673,9 @@ int main(int argc, char * argv[])
 
     DeviceLayer::PlatformMgr().RunEventLoop();
 exit:
+#if defined(ENABLE_CHIP_SHELL)
+    shellThread.join();
+#endif
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to run TV Casting App: %s", ErrorStr(err));
