@@ -72,12 +72,6 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err);
 constexpr uint8_t kDACCertificate = 1;
 constexpr uint8_t kPAICertificate = 2;
 
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-using OpCred_P256Keypair = Crypto::P256KeypairHSM;
-#else
-using OpCred_P256Keypair = Crypto::P256Keypair;
-#endif
-
 CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(FabricIndex fabricIndex, NodeId subject)
 {
     Access::AccessControl::Entry entry;
@@ -897,7 +891,11 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
     // Prepare NOCSRElements structure
     {
-        OpCred_P256Keypair keypair;
+    #ifdef ENABLE_HSM_CASE_OPS_KEY
+        Crypto::P256KeypairHSM keypair;
+    #else
+        Crypto::P256Keypair keypair;
+    #endif
         size_t csrLength           = Crypto::kMAX_CSR_Length;
         size_t nocsrLengthEstimate = 0;
         ByteSpan kNoVendorReserved;

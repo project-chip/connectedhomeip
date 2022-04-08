@@ -59,12 +59,6 @@ using namespace chip::Crypto;
 extern CHIP_ERROR DecodeConvertTBSCert(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData);
 extern CHIP_ERROR DecodeECDSASignature(TLVReader & reader, ChipCertificateData & certData);
 
-#ifdef ENABLE_HSM_ECDSA_VERIFY
-using chipCert_P256PublicKey = P256PublicKeyHSM;
-#else
-using chipCert_P256PublicKey = P256PublicKey;
-#endif
-
 ChipCertificateSet::ChipCertificateSet()
 {
     mCerts               = nullptr;
@@ -292,7 +286,11 @@ CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const Cer
 
 CHIP_ERROR ChipCertificateSet::VerifySignature(const ChipCertificateData * cert, const ChipCertificateData * caCert)
 {
-    chipCert_P256PublicKey caPublicKey;
+#ifdef ENABLE_HSM_ECDSA_VERIFY
+    P256PublicKeyHSM caPublicKey;
+#else
+    P256PublicKey caPublicKey;
+#endif
     P256ECDSASignature signature;
 
     VerifyOrReturnError((cert != nullptr) && (caCert != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
