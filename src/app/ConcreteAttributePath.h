@@ -137,7 +137,7 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
     uint16_t mListIndex                = 0;
     ListOperation mListOp              = ListOperation::NotList;
     Optional<DataVersion> mDataVersion = NullOptional;
-    ReadClient * mpReadClient = nullptr;
+    ReadClient * mpReadClient          = nullptr;
 };
 
 } // namespace app

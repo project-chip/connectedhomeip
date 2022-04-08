@@ -37,7 +37,7 @@ struct AttributePathParams
     {}
 
     AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, ReadClient * apReadClient) :
-            AttributePathParams(aEndpointId, aClusterId, kInvalidAttributeId, kInvalidListIndex)
+        AttributePathParams(aEndpointId, aClusterId, kInvalidAttributeId, kInvalidListIndex)
     {
         mpReadClient = apReadClient;
     }
