@@ -26,10 +26,13 @@
 
 #include <platform/EFR32/DiagnosticDataProviderImpl.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
+#include <platform/KeyValueStoreManager.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #include "AppConfig.h"
 #include "FreeRTOS.h"
@@ -44,13 +47,16 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     CHIP_ERROR err;
 
     // Initialize the configuration system.
-    err = Internal::EFR32Config::Init();
+    err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
     SuccessOrExit(err);
+
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 

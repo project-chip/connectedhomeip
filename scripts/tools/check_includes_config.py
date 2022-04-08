@@ -48,6 +48,7 @@ IGNORE: Set[str] = {
     '/platform/nxp/',
     '/platform/Tizen/',
     '/platform/P6/',
+    '/platform/bouffalolab/BL602',
     r'POSIX\.h$',
 }
 
@@ -143,4 +144,6 @@ ALLOW: Dict[str, Set[str]] = {
     'src/setup_payload/SetupPayloadHelper.h': {'string'},
     'src/setup_payload/SetupPayload.h': {'map', 'string', 'vector'},
 
+    # Uses platform-define to switch between list and array
+    'src/lib/dnssd/minimal_mdns/ResponseSender.h': {'list'},
 }

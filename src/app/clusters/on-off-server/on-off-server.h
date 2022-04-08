@@ -59,6 +59,7 @@ public:
                                const chip::app::Clusters::OnOff::Commands::OnWithTimedOff::DecodableType & commandData);
     void updateOnOffTimeCommand(chip::EndpointId endpoint);
     EmberAfStatus setOnOffValue(chip::EndpointId endpoint, uint8_t command, bool initiatedByLevelChange);
+    EmberAfStatus getOnOffValueForStartUp(chip::EndpointId endpoint, bool & onOffValueForStartUp);
 
     bool HasFeature(chip::EndpointId endpoint, OnOffFeature feature);
     inline bool SupportsLightingApplications(chip::EndpointId endpointId)

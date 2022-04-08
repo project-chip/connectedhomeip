@@ -31,18 +31,21 @@
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
     31, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     31, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
+    /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
     0, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     1, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
+    /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
     kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
+    /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -51,32 +54,83 @@
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
     31, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     31, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
+    48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
     0, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     1, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
+    0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
     kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // Parallel array data (*cluster*, command, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER { \
+    48, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
+    48, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
+    48, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
+    49, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
+    49, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
+    49, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
+    49, /* Cluster: Network Commissioning, Command: RemoveNetwork, Privilege: administer */ \
+    49, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
+    49, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: AddNOC, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *command*, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__COMMAND { \
+    0, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
+    2, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
+    4, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
+    0, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
+    2, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
+    3, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
+    4, /* Cluster: Network Commissioning, Command: RemoveNetwork, Privilege: administer */ \
+    6, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
+    8, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
+    0, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
+    2, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
+    4, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
+    6, /* Cluster: Operational Credentials, Command: AddNOC, Privilege: administer */ \
+    9, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
+    10, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
+    11, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, command, *privilege*) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__PRIVILEGE { \
+    kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: RemoveNetwork, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: AddNOC, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

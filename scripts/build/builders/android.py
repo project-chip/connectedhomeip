@@ -14,7 +14,6 @@
 
 import os
 import shlex
-
 from enum import Enum, auto
 
 from .builder import Builder
@@ -117,7 +116,8 @@ class AndroidBuilder(Builder):
         # New SDK manager at cmdline-tools/latest/bin/
         new_sdk_manager = os.path.join(os.environ['ANDROID_HOME'], 'cmdline-tools', 'latest',
                                        'bin', 'sdkmanager')
-        if not (os.path.isfile(sdk_manager) and os.access(sdk_manager, os.X_OK)) and not (os.path.isfile(new_sdk_manager) and os.access(new_sdk_manager, os.X_OK)):
+        if (not (os.path.isfile(sdk_manager) and os.access(sdk_manager, os.X_OK)) and
+                not (os.path.isfile(new_sdk_manager) and os.access(new_sdk_manager, os.X_OK))):
             raise Exception("'%s' and '%s' is not executable by the current user" %
                             (sdk_manager, new_sdk_manager))
 
@@ -183,7 +183,8 @@ class AndroidBuilder(Builder):
                       title='Prepare Native libs ' + self.identifier)
 
         if self.app.ExampleName() == 'tv-casting-app':
-            libs = ['libc++_shared.so', 'libTvCastingApp.so']
+            libs = ['libCHIPController.so',
+                    'libc++_shared.so', 'libTvCastingApp.so']
         else:
             libs = ['libSetupPayloadParser.so',
                     'libc++_shared.so', 'libTvApp.so']
@@ -195,6 +196,7 @@ class AndroidBuilder(Builder):
             jars = {
                 'AndroidPlatform.jar': 'third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar',
                 'CHIPAppServer.jar': 'third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar',
+                'CHIPController.jar': 'third_party/connectedhomeip/src/controller/java/CHIPController.jar',
                 'TvCastingApp.jar': 'TvCastingApp.jar',
             }
         else:

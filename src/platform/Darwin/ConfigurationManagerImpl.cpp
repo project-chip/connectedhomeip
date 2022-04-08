@@ -26,6 +26,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/Darwin/DiagnosticDataProviderImpl.h>
 #include <platform/Darwin/PosixConfig.h>
@@ -141,6 +142,16 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     // Initialize the generic implementation base class.
     ReturnErrorOnFailure(Internal::GenericConfigurationManagerImpl<PosixConfig>::Init());
 
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_VendorId))
+    {
+        ReturnErrorOnFailure(StoreVendorId(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID));
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_ProductId))
+    {
+        ReturnErrorOnFailure(StoreProductId(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID));
+    }
+
     uint32_t rebootCount;
     if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_RebootCount))
     {
@@ -160,7 +171,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_BootReason))
     {
-        ReturnErrorOnFailure(StoreBootReason(BootReasonType::Unspecified));
+        ReturnErrorOnFailure(StoreBootReason(to_underlying(BootReasonType::kUnspecified)));
     }
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_RegulatoryLocation))
@@ -205,6 +216,26 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
     ChipLogError(DeviceLayer, "InitiateFactoryReset not implemented");
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetVendorId(uint16_t & vendorId)
+{
+    return ReadConfigValue(PosixConfig::kConfigKey_VendorId, vendorId);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetProductId(uint16_t & productId)
+{
+    return ReadConfigValue(PosixConfig::kConfigKey_ProductId, productId);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreVendorId(uint16_t vendorId)
+{
+    return WriteConfigValue(PosixConfig::kConfigKey_VendorId, vendorId);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreProductId(uint16_t productId)
+{
+    return WriteConfigValue(PosixConfig::kConfigKey_ProductId, productId);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
@@ -290,6 +321,11 @@ CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, bool & val)
     return PosixConfig::ReadConfigValue(key, val);
 }
 
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint16_t & val)
+{
+    return PosixConfig::ReadConfigValue(key, val);
+}
+
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint32_t & val)
 {
     return PosixConfig::ReadConfigValue(key, val);
@@ -311,6 +347,11 @@ CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(Key key, uint8_t * buf, 
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, bool val)
+{
+    return PosixConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint16_t val)
 {
     return PosixConfig::WriteConfigValue(key, val);
 }

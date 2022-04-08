@@ -37,6 +37,7 @@
 
 #if CHIP_HAVE_CONFIG_H
 #include <ble/BleBuildConfig.h>
+#include <platform/CHIPDeviceBuildConfig.h>
 #endif
 
 #include <system/SystemConfig.h>

@@ -37,18 +37,15 @@
 #define ASN1_CONFIG_ERROR_MIN 5000000
 #define ASN1_CONFIG_ERROR_MAX 5000999
 
-#define CHIP_CONFIG_TIME_ENABLE_CLIENT 1
-#define CHIP_CONFIG_TIME_ENABLE_SERVER 0
-
 #define CHIP_CONFIG_ABORT() abort()
 
 // ==================== Security Adaptations ====================
 
 // ==================== General Configuration Overrides ====================
 
-#ifndef CHIP_CONFIG_MAX_PEER_NODES
-#define CHIP_CONFIG_MAX_PEER_NODES 16
-#endif // CHIP_CONFIG_MAX_PEER_NODES
+#ifndef CHIP_CONFIG_MAX_FABRICS
+#define CHIP_CONFIG_MAX_FABRICS 5
+#endif // CHIP_CONFIG_MAX_FABRICS
 
 #ifndef CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
 #define CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS 16

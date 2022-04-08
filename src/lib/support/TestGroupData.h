@@ -18,55 +18,44 @@
 
 #pragma once
 
-#include <credentials/GroupDataProviderImpl.h>
-#include <lib/support/TestPersistentStorageDelegate.h>
-
-namespace {
-
-constexpr uint16_t kMaxGroupsPerFabric    = 5;
-constexpr uint16_t kMaxGroupKeysPerFabric = 8;
-
-static chip::TestPersistentStorageDelegate sDeviceStorage;
-static chip::Credentials::GroupDataProviderImpl sGroupsProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
-
-static const chip::GroupId kGroup1   = 0x0101;
-static const chip::GroupId kGroup2   = 0x0102;
-static const chip::KeysetId kKeySet1 = 0x01a1;
-static const chip::KeysetId kKeySet2 = 0x01a2;
-
-} // namespace
+#include <credentials/GroupDataProvider.h>
+#include <crypto/CHIPCryptoPAL.h>
 
 namespace chip {
 
 namespace GroupTesting {
 
-CHIP_ERROR InitProvider()
+class DefaultIpkValue
 {
-    sGroupsProvider.SetStorageDelegate(&sDeviceStorage);
-    ReturnErrorOnFailure(sGroupsProvider.Init());
-    chip::Credentials::SetGroupDataProvider(&sGroupsProvider);
-    return CHIP_NO_ERROR;
-}
+public:
+    DefaultIpkValue() {}
 
-CHIP_ERROR InitProvider(chip::PersistentStorageDelegate & storageDelegate)
-{
-    sGroupsProvider.SetStorageDelegate(&storageDelegate);
-    ReturnErrorOnFailure(sGroupsProvider.Init());
-    chip::Credentials::SetGroupDataProvider(&sGroupsProvider);
-    return CHIP_NO_ERROR;
-}
+    static ByteSpan GetDefaultIpk()
+    {
+        static const uint8_t mDefaultIpk[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = {
+            't', 'e', 'm', 'p', 'o', 'r', 'a', 'r', 'y', ' ', 'i', 'p', 'k', ' ', '0', '1'
+        };
+        return ByteSpan(mDefaultIpk);
+    }
+};
 
-CHIP_ERROR InitData(chip::FabricIndex fabric_index, const ByteSpan & compressed_fabric_id)
+inline CHIP_ERROR InitData(chip::Credentials::GroupDataProvider * provider, chip::FabricIndex fabric_index,
+                           const ByteSpan & compressed_fabric_id)
 {
+    static const chip::GroupId kGroup1   = 0x0101;
+    static const chip::GroupId kGroup2   = 0x0102;
+    static const chip::KeysetId kKeySet1 = 0x01a1;
+    static const chip::KeysetId kKeySet2 = 0x01a2;
+
     // Groups
 
     const chip::Credentials::GroupDataProvider::GroupInfo group1(kGroup1, "Group #1");
-    ReturnErrorOnFailure(sGroupsProvider.SetGroupInfo(fabric_index, group1));
-    ReturnErrorOnFailure(sGroupsProvider.AddEndpoint(fabric_index, group1.group_id, 1));
+    ReturnErrorOnFailure(provider->SetGroupInfo(fabric_index, group1));
+    ReturnErrorOnFailure(provider->AddEndpoint(fabric_index, group1.group_id, 1));
 
     const chip::Credentials::GroupDataProvider::GroupInfo group2(kGroup2, "Group #2");
-    ReturnErrorOnFailure(sGroupsProvider.SetGroupInfo(fabric_index, group2));
-    ReturnErrorOnFailure(sGroupsProvider.AddEndpoint(fabric_index, group2.group_id, 0));
+    ReturnErrorOnFailure(provider->SetGroupInfo(fabric_index, group2));
+    ReturnErrorOnFailure(provider->AddEndpoint(fabric_index, group2.group_id, 0));
 
     // Key Sets
 
@@ -78,7 +67,7 @@ CHIP_ERROR InitData(chip::FabricIndex fabric_index, const ByteSpan & compressed_
         { 1110002, { 0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf } },
     };
     memcpy(keyset1.epoch_keys, epoch_keys1, sizeof(epoch_keys1));
-    CHIP_ERROR err = sGroupsProvider.SetKeySet(fabric_index, compressed_fabric_id, keyset1);
+    CHIP_ERROR err = provider->SetKeySet(fabric_index, compressed_fabric_id, keyset1);
     ReturnErrorOnFailure(err);
 
     chip::Credentials::GroupDataProvider::KeySet keyset2(kKeySet2,
@@ -89,11 +78,11 @@ CHIP_ERROR InitData(chip::FabricIndex fabric_index, const ByteSpan & compressed_
         { 2220002, { 0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff } },
     };
     memcpy(keyset2.epoch_keys, epoch_keys2, sizeof(epoch_keys2));
-    err = sGroupsProvider.SetKeySet(fabric_index, compressed_fabric_id, keyset2);
+    err = provider->SetKeySet(fabric_index, compressed_fabric_id, keyset2);
     ReturnErrorOnFailure(err);
 
-    sGroupsProvider.SetGroupKeyAt(fabric_index, 0, chip::Credentials::GroupDataProvider::GroupKey(kGroup1, kKeySet1));
-    sGroupsProvider.SetGroupKeyAt(fabric_index, 1, chip::Credentials::GroupDataProvider::GroupKey(kGroup2, kKeySet2));
+    provider->SetGroupKeyAt(fabric_index, 0, chip::Credentials::GroupDataProvider::GroupKey(kGroup1, kKeySet1));
+    provider->SetGroupKeyAt(fabric_index, 1, chip::Credentials::GroupDataProvider::GroupKey(kGroup2, kKeySet2));
 
     return CHIP_NO_ERROR;
 }

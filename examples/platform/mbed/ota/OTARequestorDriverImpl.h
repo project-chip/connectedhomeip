@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/OTARequestorDriver.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <lib/core/CHIPCallback.h>
@@ -38,10 +38,10 @@ namespace DeviceLayer {
 typedef bool (*OnOtaUpdateAvailable)(void * context, const UpdateDescription &);
 typedef bool (*OnOtaUpdateApply)(void * context);
 
-class OTARequestorDriverImpl : public GenericOTARequestorDriver
+class OTARequestorDriverImpl : public DefaultOTARequestorDriver
 {
 
-    friend class GenericOTARequestorDriver;
+    friend class DefaultOTARequestorDriver;
 
 public:
     void Init(OTARequestorInterface * requestor, OTAImageProcessorInterface * processor,

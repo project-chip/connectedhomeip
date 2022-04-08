@@ -18,136 +18,58 @@ name:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "General Commissioning"
     endpoint: 0
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     - label: "TH1 reads the BreadCrumb Attribute from the DUT"
-      verification:
-          "sudo ./chip-tool generalcommissioning read breadcrumb 1 0
-          [1641376645.102405][5256:5261] CHIP:DMG: SuppressResponse = true,
-          [1641376645.102463][5256:5261] CHIP:DMG: }
-          [1641376645.102766][5256:5261] CHIP:TOO:
-          GeneralCommissioning.Breadcrumb response: 0
-          [1641376645.103077][5256:5261] CHIP:EM: Sending Standalone Ack for
-          MessageCounter:11018859 on exchange 10683i"
-      disabled: true
+      command: "readAttribute"
+      attribute: "Breadcrumb"
+      response:
+          value: 0
 
     - label: "TH1 writes the BreadCrumb attribute as 1 to the DUT"
-      verification:
-          "sudo ./chip-tool generalcommissioning write breadcrumb 1 1 0
-          [1641377644.773752][5343:5348] CHIP:TOO: Default Success Response
-          [1641377644.773871][5343:5348] CHIP:DMG: WriteClient moving to
-          [Uninitiali] [1641377644.773951][5343:5348] CHIP:EM: Sending
-          Standalone Ack for MessageCounter:11887576 on exchange 44232i"
-      disabled: true
+      command: "writeAttribute"
+      attribute: "Breadcrumb"
+      arguments:
+          value: 1
 
-    - label: "TH1 reads the BreadCrumb Attribute from the DUT"
-      verification:
-          "sudo ./chip-tool generalcommissioning read breadcrumb 1 0
-          [1641377664.389415][5352:5357] CHIP:DMG: SuppressResponse = true,
-          [1641377664.389459][5352:5357] CHIP:DMG: }
-          [1641377664.389716][5352:5357] CHIP:TOO:
-          GeneralCommissioning.Breadcrumb response: 1
-          [1641377664.389834][5352:5357] CHIP:EM: Sending Standalone Ack for
-          MessageCounter:16174261 on exchange 35502i"
-      disabled: true
+    - label: "TH1 reads the BreadCrumb attribute from the DUT"
+      command: "readAttribute"
+      attribute: "Breadcrumb"
+      response:
+          value: 1
 
     - label: "TH1 reads the RegulatoryConfig attribute from the DUT"
-      verification:
-          "ubuntu@ubuntu:~/apps$ sudo ./chip-tool generalcommissioning read
-          regulatory-config 1 0 [1646201945.126360][2860:2865] CHIP:DMG:
-          SuppressResponse = true, [1646201945.126404][2860:2865] CHIP:DMG:
-          InteractionModelRevision = 1 [1646201945.126437][2860:2865] CHIP:DMG:
-          } [1646201945.126644][2860:2865] CHIP:TOO: Endpoint: 0 Cluster:
-          0x0000_0030 Attribute 0x0000_0002 DataVersion: 1894223167
-          [1646201945.126728][2860:2865] CHIP:TOO: RegulatoryConfig: 0
-          [1646201945.126810][2860:2865] CHIP:EM: Sending Standalone Ack for
-          MessageCounter:2750188 on exchange 60766ii"
-      disabled: true
+      command: "readAttribute"
+      attribute: "RegulatoryConfig"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 2
 
     - label: "TH1 reads the LocationCapability attribute from the DUT"
-      verification:
-          "ubuntu@ubuntu:~/apps$ sudo ./chip-tool generalcommissioning read
-          location-capability 1 0 [1646201921.080496][2848:2853] CHIP:DMG:
-          SuppressResponse = true, [1646201921.080530][2848:2853] CHIP:DMG:
-          InteractionModelRevision = 1 [1646201921.080561][2848:2853] CHIP:DMG:
-          } [1646201921.080735][2848:2853] CHIP:TOO: Endpoint: 0 Cluster:
-          0x0000_0030 Attribute 0x0000_0003 DataVersion: 1894223167
-          [1646201921.080821][2848:2853] CHIP:TOO: LocationCapability: 0
-          [1646201921.080903][2848:2853] CHIP:EM: Sending Standalone Ack for
-          MessageCounter:13587220 on exchange 43838ii"
-      disabled: true
+      command: "readAttribute"
+      attribute: "LocationCapability"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 2
 
     - label: "TH1 reads BasicCommissioningInfo attribute from DUT"
-      verification:
-          "ubuntu@ubuntu:~/apps$ sudo ./chip-tool generalcommissioning read
-          basic-commissioning-info 1 0 [1646201777.003556][2827:2832] CHIP:TOO:
-          Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0001 DataVersion:
-          1894223167 [1646201777.006423][2827:2832] CHIP:TOO:
-          BasicCommissioningInfo: { [1646201777.006478][2827:2832] CHIP:TOO:
-          FailSafeExpiryLengthSeconds: 60 [1646201777.006512][2827:2832]
-          CHIP:TOO: } [1646201777.007955][2827:2832] CHIP:EM: Sending Standalone
-          Ack for MessageCounter:14137789 on exchange 43228i"
       disabled: true
-
-    - label: "TH1 reads the AttributeList attribute from the DUT"
-      verification:
-          "sudo ./chip-tool generalcommissioning read attribute-list 1 0
-          [1641378711.789000][5430:5435] CHIP:DMG: SuppressResponse = true,
-          [1641378711.789043][5430:5435] CHIP:DMG: }
-          [1641378711.790083][5430:5435] CHIP:TOO:
-          GeneralCommissioning.AttributeList response: 7 entries
-          [1641378711.790287][5430:5435] CHIP:TOO: [1]: 0
-          [1641378711.790336][5430:5435] CHIP:TOO: [2]: 1
-          [1641378711.790382][5430:5435] CHIP:TOO: [3]: 2
-          [1641378711.790427][5430:5435] CHIP:TOO: [4]: 3
-          [1641378711.790473][5430:5435] CHIP:TOO: [5]: 65531
-          [1641378711.790518][5430:5435] CHIP:TOO: [6]: 65532
-          [1641378711.790563][5430:5435] CHIP:TOO: [7]: 65533
-          [1641378711.790659][5430:5435] CHIP:EM: Sending Standalone Ack for
-          MessageCounter:1179640 on exchange 62007i"
-      disabled: true
-
-    - label: "TH1 reads the ClusterRevision attribute from the DUT"
-      verification:
-          "sudo ./chip-tool generalcommissioning read cluster-revision 1 0
-          [1641378927.454404][5451:5457] CHIP:DMG: SuppressResponse = true,
-          [1641378927.454442][5451:5457] CHIP:DMG: }
-          [1641378927.454658][5451:5457] CHIP:TOO:
-          GeneralCommissioning.ClusterRevision response: 1
-          [1641378927.454758][5451:5457] CHIP:EM: Sending Standalone Ack for
-          MessageCounter:9230518 on exchange 10269i"
-      disabled: true
-
-    - label: "TH1 reads server-generated-command-list attribute from the DUT"
-      verification:
-          "ubuntu@ubuntu:~/apps$ sudo ./chip-tool generalcommissioning read
-          server-generated-command-list 1 0 [1646202241.425632][2879:2884]
-          CHIP:DMG: SuppressResponse = true,[1646202241.425668][2879:2884]
-          CHIP:DMG: InteractionModelRevision = 1 [1646202241.425702][2879:2884]
-          CHIP:DMG: } [1646202241.426186][2879:2884] CHIP:TOO: Endpoint: 0
-          Cluster: 0x0000_0030 Attribute 0x0000_FFF8 DataVersion: 1894223167
-          [1646202241.426293][2879:2884] CHIP:TOO: GeneratedCommandList: 2
-          entries [1646202241.426379][2879:2884] CHIP:TOO: [1]:
-          1[1646202241.426420][2879:2884] CHIP:TOO: [2]: 5
-          [1646202241.426512][2879:2884] CHIP:EM: Sending Standalone Ack for
-          MessageCounter:14519287 on exchange 9374i"
-      disabled: true
-
-    - label: "TH1 reads client-generated-command-list attribute from the DUT"
-      verification:
-          "ubuntu@ubuntu:~/apps$ sudo ./chip-tool generalcommissioning read
-          client-generated-command-list 1 0 [1646202324.586100][2908:2913]
-          CHIP:DMG: SuppressResponse = true, [1646202324.586156][2908:2913]
-          CHIP:DMG: InteractionModelRevision = 1 [1646202324.586198][2908:2913]
-          CHIP:DMG: } [1646202324.587108][2908:2913] CHIP:TOO: Endpoint: 0
-          Cluster: 0x0000_0030 Attribute 0x0000_FFF9 DataVersion: 1894223167
-          [1646202324.587242][2908:2913] CHIP:TOO: AcceptedCommandList: 4
-          entries [1646202324.587385][2908:2913] CHIP:TOO: [1]: 0
-          [1646202324.587438][2908:2913] CHIP:TOO: [2]: 2
-          [1646202324.587546][2908:2913] CHIP:TOO: [3]: 3
-          [1646202324.587575][2908:2913] CHIP:TOO: [4]: 4
-          [1646202324.587707][2908:2913] CHIP:EM: Sending Standalone Ack for
-          MessageCounter:7277571 on exchange 24863i"
-      disabled: true
+      command: "readAttribute"
+      attribute: "BasicCommissioningInfo"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535

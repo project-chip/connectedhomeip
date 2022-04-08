@@ -39,7 +39,6 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <protocols/secure_channel/SessionIDAllocator.h>
 #include <transport/SessionHolder.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
@@ -69,7 +68,6 @@ struct ControllerDeviceInitParams
     Messaging::ExchangeManager * exchangeMgr                      = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
     PersistentStorageDelegate * storageDelegate                   = nullptr;
-    SessionIDAllocator * idAllocator                              = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
@@ -120,7 +118,6 @@ public:
         mExchangeMgr        = params.exchangeMgr;
         mUDPEndPointManager = params.udpEndPointManager;
         mFabricIndex        = fabric;
-        mIDAllocator        = params.idAllocator;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -206,6 +203,7 @@ public:
     NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
     PeerId GetPeerId() const { return mPeerId; }
     CHIP_ERROR SetPeerId(ByteSpan rcac, ByteSpan noc) override;
+    const Transport::PeerAddress & GetPeerAddress() const { return mDeviceAddress; }
 
     bool MatchesSession(const SessionHandle & session) const { return mSecureSession.Contains(session); }
 
@@ -219,12 +217,6 @@ public:
     PASESession & GetPairing() { return mPairing; }
 
     uint8_t GetNextSequenceNumber() override { return mSequenceNumber++; };
-
-    CHIP_ERROR LoadSecureSessionParametersIfNeeded()
-    {
-        bool loadedSecureSession = false;
-        return LoadSecureSessionParametersIfNeeded(loadedSecureSession);
-    };
 
     Transport::Type GetDeviceTransportType() const { return mDeviceAddress.GetTransportType(); }
 
@@ -268,27 +260,7 @@ private:
 
     uint8_t mSequenceNumber = 0;
 
-    /**
-     * @brief
-     *   This function loads the secure session object from the serialized operational
-     *   credentials corresponding to the device. This is typically done when the device
-     *   does not have an active secure channel.
-     */
-    CHIP_ERROR LoadSecureSessionParameters();
-
-    /**
-     * @brief
-     *   This function loads the secure session object from the serialized operational
-     *   credentials corresponding if needed, based on the current state of the device and
-     *   underlying transport object.
-     *
-     * @param[out] didLoad   Were the secure session params loaded by the call to this function.
-     */
-    CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
-
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
-
-    SessionIDAllocator * mIDAllocator = nullptr;
 };
 
 } // namespace chip

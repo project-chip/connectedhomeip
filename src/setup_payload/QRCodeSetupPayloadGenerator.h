@@ -82,9 +82,18 @@ public:
      */
     CHIP_ERROR payloadBase38Representation(std::string & base38Representation, uint8_t * tlvDataStart, uint32_t tlvDataStartSize);
 
+    /**
+     * This function disable internal checks about the validity of the generated payload.
+     * It allows using the generator to generates invalid payloads.
+     * Defaults is false.
+     */
+    void SetAllowInvalidPayload(bool allow) { mAllowInvalidPayload = allow; }
+
 private:
     CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart, uint32_t maxLen,
                                            size_t & tlvDataLengthInBytes);
+
+    bool mAllowInvalidPayload = false;
 };
 
 /**

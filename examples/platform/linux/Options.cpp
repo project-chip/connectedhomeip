@@ -57,6 +57,8 @@ enum
     kDeviceOption_Spake2pVerifierBase64     = 0x1011,
     kDeviceOption_Spake2pSaltBase64         = 0x1012,
     kDeviceOption_Spake2pIterations         = 0x1013,
+    kDeviceOption_TraceFile                 = 0x1014,
+    kDeviceOption_TraceLog                  = 0x1015,
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -88,6 +90,10 @@ OptionDef sDeviceOptionDefs[] = {
     { "PICS", kArgumentRequired, kDeviceOption_PICS },
     { "KVS", kArgumentRequired, kDeviceOption_KVS },
     { "interface-id", kArgumentRequired, kDeviceOption_InterfaceId },
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    { "trace_file", kArgumentRequired, kDeviceOption_TraceFile },
+    { "trace_log", kArgumentRequired, kDeviceOption_TraceLog },
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     {}
 };
 
@@ -164,6 +170,13 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --interface-id <interface>\n"
     "       A interface id to advertise on.\n"
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    "\n"
+    "  --trace_file <file>\n"
+    "       Output trace data to the provided file.\n"
+    "  --trace_log <1/0>\n"
+    "       A value of 1 enables traces to go to the log, 0 disables this (default 0).\n"
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     "\n";
 
 bool Base64ArgToVector(const char * arg, size_t maxSize, std::vector<uint8_t> & outVector)
@@ -349,6 +362,18 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().interfaceId =
             Inet::InterfaceId(static_cast<chip::Inet::InterfaceId::PlatformType>(atoi(aValue)));
         break;
+
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    case kDeviceOption_TraceFile:
+        LinuxDeviceOptions::GetInstance().traceStreamFilename.SetValue(std::string{ aValue });
+        break;
+    case kDeviceOption_TraceLog:
+        if (atoi(aValue) != 0)
+        {
+            LinuxDeviceOptions::GetInstance().traceStreamToLogEnabled = true;
+        }
+        break;
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);

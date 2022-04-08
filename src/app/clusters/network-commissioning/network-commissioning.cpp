@@ -79,6 +79,28 @@ NetworkCommissioning::WiFiBand ToClusterObjectEnum(DeviceLayer::NetworkCommissio
     return static_cast<ClusterObject>(to_underlying(band));
 }
 
+chip::BitFlags<NetworkCommissioning::WiFiSecurity>
+ToClusterObjectBitFlags(const chip::BitFlags<DeviceLayer::NetworkCommissioning::WiFiSecurity> & security)
+{
+    using ClusterObject     = NetworkCommissioning::WiFiSecurity;
+    using PlatformInterface = NetworkCommissioning::WiFiSecurity;
+
+    static_assert(to_underlying(ClusterObject::kUnencrypted) == to_underlying(PlatformInterface::kUnencrypted),
+                  "kUnencrypted value mismatch.");
+    static_assert(to_underlying(ClusterObject::kWepPersonal) == to_underlying(PlatformInterface::kWepPersonal),
+                  "kWepPersonal value mismatch.");
+    static_assert(to_underlying(ClusterObject::kWpaPersonal) == to_underlying(PlatformInterface::kWpaPersonal),
+                  "kWpaPersonal value mismatch.");
+    static_assert(to_underlying(ClusterObject::kWpa2Personal) == to_underlying(PlatformInterface::kWpa2Personal),
+                  "kWpa2Personal value mismatch.");
+    static_assert(to_underlying(ClusterObject::kWpa3Personal) == to_underlying(PlatformInterface::kWpa3Personal),
+                  "kWpa3Personal value mismatch.");
+
+    chip::BitFlags<ClusterObject> ret;
+    ret.SetRaw(security.Raw());
+    return ret;
+}
+
 } // namespace
 
 CHIP_ERROR Instance::Init()
@@ -272,8 +294,19 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
     MATTER_TRACE_EVENT_SCOPE("HandleScanNetwork", "NetworkCommissioning");
     if (mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface))
     {
+        if (!req.ssid.HasValue())
+        {
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
+            return;
+        }
+        const auto nullableSSID = req.ssid.Value();
+        ByteSpan ssid;
+        if (!nullableSSID.IsNull())
+        {
+            ssid = nullableSSID.Value();
+        }
         mAsyncCommandHandle = CommandHandler::Handle(&ctx.mCommandHandler);
-        mpDriver.Get<WiFiDriver *>()->ScanNetworks(req.ssid, this);
+        mpDriver.Get<WiFiDriver *>()->ScanNetworks(ssid, this);
     }
     else if (mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface))
     {
@@ -286,28 +319,89 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
     }
 }
 
+namespace {
+
+void FillDebugTextAndNetworkIndex(Commands::NetworkConfigResponse::Type & response, MutableCharSpan debugText, uint8_t networkIndex)
+{
+    if (debugText.size() > 0)
+    {
+        response.debugText.SetValue(CharSpan(debugText.data(), debugText.size()));
+    }
+    if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
+    {
+        response.networkIndex.SetValue(networkIndex);
+    }
+}
+
+bool CheckFailSafeArmed(CommandHandlerInterface::HandlerContext & ctx)
+{
+    DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+
+    if (failSafeContext.IsFailSafeArmed(ctx.mCommandHandler.GetAccessingFabricIndex()))
+    {
+        return true;
+    }
+
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::UnsupportedAccess);
+    return false;
+}
+
+} // namespace
+
 void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleAddOrUpdateWiFiNetwork", "NetworkCommissioning");
+
+    VerifyOrReturn(CheckFailSafeArmed(ctx));
+
     Commands::NetworkConfigResponse::Type response;
-    response.networkingStatus = ToClusterObjectEnum(mpDriver.Get<WiFiDriver *>()->AddOrUpdateNetwork(req.ssid, req.credentials));
-    ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
+    MutableCharSpan debugText;
+#if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
+    char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE];
+    debugText = MutableCharSpan(debugTextBuffer);
+#endif
+    uint8_t outNetworkIndex   = 0;
+    response.networkingStatus = ToClusterObjectEnum(
+        mpDriver.Get<WiFiDriver *>()->AddOrUpdateNetwork(req.ssid, req.credentials, debugText, outNetworkIndex));
+    FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
 void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Commands::AddOrUpdateThreadNetwork::DecodableType & req)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleAddOrUpdateThreadNetwork", "NetworkCommissioning");
+
+    VerifyOrReturn(CheckFailSafeArmed(ctx));
+
     Commands::NetworkConfigResponse::Type response;
-    response.networkingStatus = ToClusterObjectEnum(mpDriver.Get<ThreadDriver *>()->AddOrUpdateNetwork(req.operationalDataset));
-    ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
+    MutableCharSpan debugText;
+#if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
+    char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE];
+    debugText = MutableCharSpan(debugTextBuffer);
+#endif
+    uint8_t outNetworkIndex = 0;
+    response.networkingStatus =
+        ToClusterObjectEnum(mpDriver.Get<ThreadDriver *>()->AddOrUpdateNetwork(req.operationalDataset, debugText, outNetworkIndex));
+    FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
 void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveNetwork::DecodableType & req)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleRemoveNetwork", "NetworkCommissioning");
+
+    VerifyOrReturn(CheckFailSafeArmed(ctx));
+
     Commands::NetworkConfigResponse::Type response;
-    response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->RemoveNetwork(req.networkID));
-    ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
+    MutableCharSpan debugText;
+#if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
+    char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE];
+    debugText = MutableCharSpan(debugTextBuffer);
+#endif
+    uint8_t outNetworkIndex   = 0;
+    response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->RemoveNetwork(req.networkID, debugText, outNetworkIndex));
+    FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
 void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::ConnectNetwork::DecodableType & req)
@@ -318,6 +412,8 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidValue);
         return;
     }
+
+    VerifyOrReturn(CheckFailSafeArmed(ctx));
 
     mConnectingNetworkIDLen = static_cast<uint8_t>(req.networkID.size());
     memcpy(mConnectingNetworkID, req.networkID.data(), mConnectingNetworkIDLen);
@@ -330,11 +426,17 @@ void Instance::HandleReorderNetwork(HandlerContext & ctx, const Commands::Reorde
 {
     MATTER_TRACE_EVENT_SCOPE("HandleReorderNetwork", "NetworkCommissioning");
     Commands::NetworkConfigResponse::Type response;
-    response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->ReorderNetwork(req.networkID, req.networkIndex));
-    ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
+    MutableCharSpan debugText;
+#if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
+    char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE];
+    debugText = MutableCharSpan(debugTextBuffer);
+#endif
+    response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->ReorderNetwork(req.networkID, req.networkIndex, debugText));
+    FillDebugTextAndNetworkIndex(response, debugText, req.networkIndex);
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-void Instance::OnResult(Status commissioningError, CharSpan errorText, int32_t interfaceStatus)
+void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t interfaceStatus)
 {
     auto commandHandleRef = std::move(mAsyncCommandHandle);
     auto commandHandle    = commandHandleRef.Get();
@@ -347,28 +449,27 @@ void Instance::OnResult(Status commissioningError, CharSpan errorText, int32_t i
 
     Commands::ConnectNetworkResponse::Type response;
     response.networkingStatus = ToClusterObjectEnum(commissioningError);
-    response.debugText        = errorText;
-    response.errorValue       = interfaceStatus;
-    commandHandle->AddResponseData(mPath, response);
+    if (debugText.size() != 0)
+    {
+        response.debugText.SetValue(debugText);
+    }
+    if (commissioningError == Status::kSuccess)
+    {
+        DeviceLayer::DeviceControlServer::DeviceControlSvr().ConnectNetworkForOperational(
+            ByteSpan(mLastNetworkID, mLastNetworkIDLen));
+        mLastConnectErrorValue.SetNull();
+    }
+    else
+    {
+        response.errorValue.SetNonNull(interfaceStatus);
+        mLastConnectErrorValue.SetNonNull(interfaceStatus);
+    }
 
     mLastNetworkIDLen = mConnectingNetworkIDLen;
     memcpy(mLastNetworkID, mConnectingNetworkID, mLastNetworkIDLen);
     mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(commissioningError));
 
-    if (commissioningError == Status::kSuccess)
-    {
-        mLastConnectErrorValue.SetNull();
-    }
-    else
-    {
-        mLastConnectErrorValue.SetNonNull(interfaceStatus);
-    }
-
-    if (commissioningError == Status::kSuccess)
-    {
-        // TODO: Pass the actual network id to device control server.
-        DeviceLayer::DeviceControlServer::DeviceControlSvr().ConnectNetworkForOperational(ByteSpan());
-    }
+    commandHandle->AddResponse(mPath, response);
 }
 
 void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseIterator * networks)
@@ -391,6 +492,7 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
     TLV::TLVType listContainerType;
     ThreadScanResponse scanResponse;
     size_t networksEncoded = 0;
+    uint8_t extendedAddressBuffer[8];
 
     SuccessOrExit(err = commandHandle->PrepareCommand(
                       ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id)));
@@ -398,8 +500,11 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
 
     SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kNetworkingStatus)),
                                     ToClusterObjectEnum(status)));
-    SuccessOrExit(err = DataModel::Encode(
-                      *writer, TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kDebugText)), debugText));
+    if (debugText.size() != 0)
+    {
+        SuccessOrExit(err = DataModel::Encode(
+                          *writer, TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kDebugText)), debugText));
+    }
     SuccessOrExit(
         err = writer->StartContainer(TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kThreadScanResults)),
                                      TLV::TLVType::kTLVType_Array, listContainerType));
@@ -407,12 +512,13 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
     for (; networks != nullptr && networks->Next(scanResponse) && networksEncoded < kMaxNetworksInScanResponse; networksEncoded++)
     {
         Structs::ThreadInterfaceScanResult::Type result;
+        Encoding::BigEndian::Put64(extendedAddressBuffer, scanResponse.extendedAddress);
         result.panId           = scanResponse.panId;
         result.extendedPanId   = scanResponse.extendedPanId;
         result.networkName     = CharSpan(scanResponse.networkName, scanResponse.networkNameLen);
         result.channel         = scanResponse.channel;
         result.version         = scanResponse.version;
-        result.extendedAddress = scanResponse.extendedAddress;
+        result.extendedAddress = ByteSpan(extendedAddressBuffer);
         result.rssi            = scanResponse.rssi;
         result.lqi             = scanResponse.lqi;
         SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag(), result));
@@ -456,8 +562,11 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
 
     SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kNetworkingStatus)),
                                     ToClusterObjectEnum(status)));
-    SuccessOrExit(err = DataModel::Encode(
-                      *writer, TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kDebugText)), debugText));
+    if (debugText.size() != 0)
+    {
+        SuccessOrExit(err = DataModel::Encode(
+                          *writer, TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kDebugText)), debugText));
+    }
     SuccessOrExit(
         err = writer->StartContainer(TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kWiFiScanResults)),
                                      TLV::TLVType::kTLVType_Array, listContainerType));
@@ -465,7 +574,7 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
     for (; networks != nullptr && networks->Next(scanResponse) && networksEncoded < kMaxNetworksInScanResponse; networksEncoded++)
     {
         Structs::WiFiInterfaceScanResult::Type result;
-        result.security = scanResponse.security;
+        result.security = ToClusterObjectBitFlags(scanResponse.security);
         result.ssid     = ByteSpan(scanResponse.ssid, scanResponse.ssidLen);
         result.bssid    = ByteSpan(scanResponse.bssid, sizeof(scanResponse.bssid));
         result.channel  = scanResponse.channel;
@@ -516,6 +625,7 @@ void Instance::OnFailSafeTimerExpired()
 
     ChipLogDetail(Zcl, "Failsafe timeout, tell platform driver to revert network credentials.");
     mpWirelessDriver->RevertConfiguration();
+    mAsyncCommandHandle.Release();
 }
 
 bool NullNetworkDriver::GetEnabled()

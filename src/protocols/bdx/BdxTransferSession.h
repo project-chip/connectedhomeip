@@ -160,9 +160,8 @@ public:
      *   See OutputEventType for all possible output event types.
      *
      * @param event     Reference to an OutputEvent struct that will be filled out with any pending output data
-     * @param curTime   Current time
      */
-    void PollOutput(OutputEvent & event, System::Clock::Timestamp curTime);
+    void PollOutput(OutputEvent & event);
 
     /**
      * @brief
@@ -173,13 +172,11 @@ public:
      * @param role      Inidcates whether this object will be sending or receiving data
      * @param initData  Data for initializing this object and for populating a TransferInit message
      *                  The role parameter will determine whether to populate a ReceiveInit or SendInit
-     * @param timeout   The amount of time to wait for a response before considering the transfer failed
-     * @param curTime   The current time since epoch. Needed to set a start time for the transfer timeout.
      *
      * @return CHIP_ERROR Result of initialization and preparation of a TransferInit message. May also indicate if the
      *                    TransferSession object is unable to handle this request.
      */
-    CHIP_ERROR StartTransfer(TransferRole role, const TransferInitData & initData, System::Clock::Timeout timeout);
+    CHIP_ERROR StartTransfer(TransferRole role, const TransferInitData & initData);
 
     /**
      * @brief
@@ -190,13 +187,11 @@ public:
      * @param role            Inidcates whether this object will be sending or receiving data
      * @param xferControlOpts Indicates all supported control modes. Used to respond to a TransferInit message
      * @param maxBlockSize    The max Block size that this object supports.
-     * @param timeout         The amount of time to wait for a response before considering the transfer failed
      *
      * @return CHIP_ERROR Result of initialization. May also indicate if the TransferSession object is unable to handle this
      *                    request.
      */
-    CHIP_ERROR WaitForTransfer(TransferRole role, BitFlags<TransferControlFlags> xferControlOpts, uint16_t maxBlockSize,
-                               System::Clock::Timeout timeout);
+    CHIP_ERROR WaitForTransfer(TransferRole role, BitFlags<TransferControlFlags> xferControlOpts, uint16_t maxBlockSize);
 
     /**
      * @brief
@@ -285,13 +280,11 @@ public:
      * @param payloadHeader A PayloadHeader containing the Protocol type and Message Type
      * @param msg           A PacketBufferHandle pointing to the message buffer to process. May be BDX or StatusReport protocol.
      *                      Buffer is expected to start at data (not header).
-     * @param curTime       Current time
      *
      * @return CHIP_ERROR Indicates any problems in decoding the message, or if the message is not of the BDX or StatusReport
      *                    protocols.
      */
-    CHIP_ERROR HandleMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle msg,
-                                     System::Clock::Timestamp curTime);
+    CHIP_ERROR HandleMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle msg);
 
     TransferControlFlags GetControlMode() const { return mControlMode; }
     uint64_t GetStartOffset() const { return mStartOffset; }
@@ -382,10 +375,7 @@ private:
     uint32_t mLastQueryNum = 0;
     uint32_t mNextQueryNum = 0;
 
-    System::Clock::Timeout mTimeout            = System::Clock::kZero;
-    System::Clock::Timestamp mTimeoutStartTime = System::Clock::kZero;
-    bool mShouldInitTimeoutStart               = true;
-    bool mAwaitingResponse                     = false;
+    bool mAwaitingResponse = false;
 };
 
 } // namespace bdx

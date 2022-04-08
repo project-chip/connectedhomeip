@@ -14,6 +14,7 @@
 
 static NSString * const kCHIPToolKeychainLabel = @"Chip Tool Keypair";
 static NSString * const kOperationalCredentialsIssuerKeypairStorage = @"ChipToolOpCredsCAKey";
+static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
 
 std::string StringToBase64(const std::string & value)
 {
@@ -43,6 +44,7 @@ std::string Base64ToString(const std::string & b64Value)
 @interface CHIPToolKeypair ()
 @property (nonatomic) chip::Crypto::P256Keypair mKeyPair;
 @property (nonatomic) chip::Crypto::P256Keypair mIssuer;
+@property (nonatomic) NSData * ipk;
 @property (atomic) uint32_t mNow;
 @end
 
@@ -82,7 +84,7 @@ std::string Base64ToString(const std::string & b64Value)
         (NSString *) kSecAttrLabel : kCHIPToolKeychainLabel,
         (NSString *) kSecAttrApplicationTag : @CHIPPlugin_CAKeyTag,
     };
-    return SecKeyCreateWithData((__bridge CFDataRef) publicKeyNSData, (__bridge CFDictionaryRef) attributes, NULL);
+    return SecKeyCreateWithData((__bridge CFDataRef) publicKeyNSData, (__bridge CFDictionaryRef) attributes, nullptr);
 }
 
 - (CHIP_ERROR)Deserialize:(chip::Crypto::P256SerializedKeypair &)input
@@ -93,6 +95,11 @@ std::string Base64ToString(const std::string & b64Value)
 - (CHIP_ERROR)Serialize:(chip::Crypto::P256SerializedKeypair &)output
 {
     return _mKeyPair.Serialize(output);
+}
+
+- (NSData *)getIPK
+{
+    return _ipk;
 }
 
 - (CHIP_ERROR)createOrLoadKeys:(CHIPToolPersistentStorageDelegate *)storage
@@ -126,7 +133,23 @@ std::string Base64ToString(const std::string & b64Value)
     } else {
         ReturnErrorOnFailure([self Deserialize:serializedKey]);
     }
-    return err;
+
+    NSData * ipk;
+    value = [storage CHIPGetKeyValue:kOperationalCredentialsIPK];
+    err = [self decodeNSStringToNSData:value serializedKey:&ipk];
+    if (err != CHIP_NO_ERROR) {
+        uint8_t tempIPK[chip::Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+
+        ReturnLogErrorOnFailure(chip::Crypto::DRBG_get_bytes(tempIPK, sizeof(tempIPK)));
+
+        _ipk = [NSData dataWithBytes:tempIPK length:sizeof(tempIPK)];
+        NSString * valueString = [_ipk base64EncodedStringWithOptions:0];
+        [storage CHIPSetKeyValue:kOperationalCredentialsIPK value:valueString];
+    } else {
+        _ipk = ipk;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 - (CHIP_ERROR)decodeNSStringWithValue:(NSString *)value serializedKey:(chip::Crypto::P256SerializedKeypair &)serializedKey
@@ -146,4 +169,13 @@ std::string Base64ToString(const std::string & b64Value)
     return CHIP_NO_ERROR;
 }
 
+- (CHIP_ERROR)decodeNSStringToNSData:(NSString *)value serializedKey:(NSData **)decodedData
+{
+    if (value == nil) {
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    }
+
+    *decodedData = [[NSData alloc] initWithBase64EncodedString:value options:0];
+    return CHIP_NO_ERROR;
+}
 @end

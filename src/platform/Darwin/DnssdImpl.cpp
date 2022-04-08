@@ -293,14 +293,14 @@ CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t inte
 
     if (CHIP_NO_ERROR == MdnsContexts::GetInstance().GetRegisterType(type, &sdCtx))
     {
-        err = DNSServiceUpdateRecord(sdCtx->serviceRef, NULL, 0 /* flags */, recordLen, recordBytesPtr, 0 /* ttl */);
+        err = DNSServiceUpdateRecord(sdCtx->serviceRef, nullptr, 0 /* flags */, recordLen, recordBytesPtr, 0 /* ttl */);
         TXTRecordDeallocate(recordRef);
         VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err), CHIP_ERROR_INTERNAL);
         return CHIP_NO_ERROR;
     }
 
     sdCtx = chip::Platform::New<RegisterContext>(type, callback, context);
-    err   = DNSServiceRegister(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDot, NULL, ntohs(port), recordLen,
+    err   = DNSServiceRegister(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDot, nullptr, ntohs(port), recordLen,
                              recordBytesPtr, OnRegister, sdCtx);
     TXTRecordDeallocate(recordRef);
 

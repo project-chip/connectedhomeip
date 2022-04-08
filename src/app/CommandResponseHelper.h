@@ -36,12 +36,9 @@ public:
 
     CHIP_ERROR Success(const CommandData & aResponse)
     {
-        CHIP_ERROR err = mCommandHandler->AddResponseData(mCommandPath, aResponse);
-        if (err == CHIP_NO_ERROR)
-        {
-            mSentResponse = true;
-        }
-        return err;
+        mCommandHandler->AddResponse(mCommandPath, aResponse);
+        mSentResponse = true;
+        return CHIP_NO_ERROR;
     };
 
     CHIP_ERROR Success(ClusterStatus aClusterStatus)

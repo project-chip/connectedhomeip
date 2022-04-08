@@ -59,6 +59,8 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_CONFIG_MEMORY_DEBUG_DMALLOC=${chip_config_memory_debug_dmalloc}",
     "CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES=false",
     "CHIP_CONFIG_TRANSPORT_TRACE_ENABLED=${chip_enable_transport_trace}",
+    "CHIP_CONFIG_TRANSPORT_PW_TRACE_ENABLED=${chip_enable_transport_pw_trace}",
+    "CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST=${chip_config_minmdns_dynamic_operational_responder_list}",
   ]
 }
 
@@ -66,7 +68,6 @@ source_set("chip_config_header") {
   sources = [
     "CHIPConfig.h",
     "CHIPEventLoggingConfig.h",
-    "CHIPTimeConfig.h",
   ]
 
   public_configs = [ "${chip_root}/src:includes" ]

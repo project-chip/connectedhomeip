@@ -58,7 +58,7 @@ OTAProviderDelegate * gDelegateTable[kOtaProviderDelegateTableSize] = { nullptr 
 OTAProviderDelegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, OtaSoftwareUpdateProvider::Id);
-    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+    return (ep == 0xFFFF ? nullptr : gDelegateTable[ep]);
 }
 
 bool SendStatusIfDelegateNull(app::CommandHandler * commandObj, const app::ConcreteCommandPath & path)
@@ -82,11 +82,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::ApplyUpdateRequest::DecodableType & commandData)
 {
-    auto & updateToken = commandData.updateToken;
-
-    EndpointId endpoint = commandPath.mEndpointId;
-
-    EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
+    auto & updateToken             = commandData.updateToken;
+    EndpointId endpoint            = commandPath.mEndpointId;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 
     ChipLogProgress(Zcl, "OTA Provider received ApplyUpdateRequest");
@@ -105,11 +102,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
         return true;
     }
 
-    status = delegate->HandleApplyUpdateRequest(commandObj, commandPath, commandData);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
-    }
+    delegate->HandleApplyUpdateRequest(commandObj, commandPath, commandData);
 
     return true;
 }
@@ -121,11 +114,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::NotifyUpdateApplied::DecodableType & commandData)
 {
-    auto & updateToken = commandData.updateToken;
-
-    EndpointId endpoint = commandPath.mEndpointId;
-
-    EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
+    auto & updateToken             = commandData.updateToken;
+    EndpointId endpoint            = commandPath.mEndpointId;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 
     ChipLogProgress(Zcl, "OTA Provider received NotifyUpdateApplied");
@@ -144,11 +134,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
         return true;
     }
 
-    status = delegate->HandleNotifyUpdateApplied(commandObj, commandPath, commandData);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
-    }
+    delegate->HandleNotifyUpdateApplied(commandObj, commandPath, commandData);
 
     return true;
 }
@@ -173,9 +159,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     (void) productId;
     (void) softwareVersion;
 
-    EndpointId endpoint = commandPath.mEndpointId;
-
-    EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
+    EndpointId endpoint            = commandPath.mEndpointId;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 
     if (SendStatusIfDelegateNull(commandObj, commandPath))
@@ -225,11 +209,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
         return true;
     }
 
-    status = delegate->HandleQueryImage(commandObj, commandPath, commandData);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
-    }
+    delegate->HandleQueryImage(commandObj, commandPath, commandData);
 
     return true;
 }

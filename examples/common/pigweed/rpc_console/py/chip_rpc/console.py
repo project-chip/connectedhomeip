@@ -30,7 +30,6 @@ few variables are predefined in the interactive console. These include:
     rpcs   - used to invoke RPCs
     device - the serial device used for communication
     client - the pw_rpc.Client
-    scripts - helper scripts for working with chip devices
     protos - protocol buffer messages indexed by proto package
 
 An example RPC command:
@@ -47,7 +46,7 @@ import socket
 from concurrent.futures import ThreadPoolExecutor
 import sys
 import threading
-from typing import Any, BinaryIO
+from typing import Any, BinaryIO, Collection
 
 from chip_rpc.plugins.device_toolbar import DeviceToolbar
 from chip_rpc.plugins.helper_scripts import HelperScripts
@@ -58,6 +57,10 @@ from pw_console.pyserial_wrapper import SerialWithLogging
 from pw_hdlc.rpc import HdlcRpcClient, default_channels
 from pw_rpc import callback_client
 from pw_rpc.console_tools.console import ClientInfo, flattened_rpc_completions
+
+from pw_tokenizer.database import LoadTokenDatabases
+from pw_tokenizer.detokenize import Detokenizer, detokenize_base64
+from pw_tokenizer import tokens
 
 # Protos
 from attributes_service import attributes_service_pb2
@@ -112,6 +115,11 @@ def _parse_args():
         '--raw_serial',
         action="store_true",
         help=('Use raw serial instead of HDLC/RPC'))
+    parser.add_argument("--token-databases",
+                        metavar='elf_or_token_database',
+                        nargs="+",
+                        action=LoadTokenDatabases,
+                        help="Path to tokenizer database csv file(s).")
     group.add_argument('-s',
                        '--socket-addr',
                        type=str,
@@ -152,6 +160,7 @@ def _start_ipython_raw_terminal() -> None:
 
     interactive_console.hide_windows('Host Logs')
     interactive_console.hide_windows('Serial Debug')
+    interactive_console.hide_windows('Python Repl')
 
     # Setup Python logger propagation
     interactive_console.setup_python_logging()
@@ -236,7 +245,8 @@ class SocketClientImpl:
 
 
 def write_to_output(data: bytes,
-                    unused_output: BinaryIO = sys.stdout.buffer,):
+                    unused_output: BinaryIO = sys.stdout.buffer,
+                    detokenizer=None):
     log_line = data
     RegexStruct = namedtuple('RegexStruct', 'platform type regex match_num')
     LEVEL_MAPPING = {"I": logging.INFO, "W": logging.WARNING, "P": logging.INFO,
@@ -276,9 +286,17 @@ def write_to_output(data: bytes,
                 fields.update(match.groupdict())
                 if "level" in match.groupdict():
                     fields["level"] = LEVEL_MAPPING[fields["level"]]
+                if detokenizer:
+                    _LOG.warn(fields["msg"])
+                    if len(fields["msg"]) % 2:
+                        # TODO the msg likely wrapped, trim for now
+                        fields["msg"] = fields["msg"][:-1]
+                    fields["msg"] = detokenizer.detokenize(
+                        bytes.fromhex(fields["msg"]))
                 break
+
         _DEVICE_LOG.log(fields["level"], fields["msg"], extra={'extra_metadata_fields': {
-                        "time": fields["time"], "type": fields["type"], "mod": fields["mod"]}})
+                        "timestamp": fields["time"], "type": fields["type"], "mod": fields["mod"]}})
 
 
 def _read_raw_serial(read: Callable[[], bytes], output):
@@ -294,6 +312,7 @@ def _read_raw_serial(read: Callable[[], bytes], output):
 
 
 def console(device: str, baudrate: int,
+            token_databases: Collection[tokens.Database],
             socket_addr: str, output: Any, raw_serial: bool) -> int:
     """Starts an interactive RPC console for HDLC."""
     # argparse.FileType doesn't correctly handle '-' for binary files.
@@ -306,7 +325,7 @@ def console(device: str, baudrate: int,
     serial_impl = SerialWithLogging
 
     if socket_addr is None:
-        serial_device = serial_impl(device, baudrate, timeout=1)
+        serial_device = serial_impl(device, baudrate, timeout=0)
         def read(): return serial_device.read(8192)
         write = serial_device.write
     else:
@@ -323,15 +342,22 @@ def console(device: str, baudrate: int,
         default_stream_timeout_s=None,
     )
 
+    detokenizer = Detokenizer(tokens.Database.merged(*token_databases),
+                              show_errors=False) if token_databases else None
+
     if raw_serial:
         threading.Thread(target=_read_raw_serial,
                          daemon=True,
-                         args=(read, write_to_output)).start()
+                         args=(read,
+                               lambda data: write_to_output(
+                                   data, output, detokenizer),
+                               )).start()
         _start_ipython_raw_terminal()
     else:
         _start_ipython_hdlc_terminal(
             HdlcRpcClient(read, PROTOS, default_channels(write),
-                          lambda data: write_to_output(data, output),
+                          lambda data: write_to_output(
+                              data, output, detokenizer),
                           client_impl=callback_client_impl)
         )
     return 0

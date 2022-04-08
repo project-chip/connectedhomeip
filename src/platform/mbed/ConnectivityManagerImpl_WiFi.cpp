@@ -153,12 +153,15 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
         NetworkCommissioning::Network network;
         for (; networks != nullptr && networks->Next(network);)
         {
+            MutableCharSpan emptyBufferForDebugText;
+            uint8_t outNetworkIndex;
             if (network.connected)
             {
                 NetworkCommissioning::WiFiDriverImpl::GetInstance().DisconnectNetwork(
                     ByteSpan(network.networkID, network.networkIDLen));
             }
-            NetworkCommissioning::WiFiDriverImpl::GetInstance().RemoveNetwork(ByteSpan(network.networkID, network.networkIDLen));
+            NetworkCommissioning::WiFiDriverImpl::GetInstance().RemoveNetwork(ByteSpan(network.networkID, network.networkIDLen),
+                                                                              emptyBufferForDebugText, outNetworkIndex);
         }
         if (networks != nullptr)
         {

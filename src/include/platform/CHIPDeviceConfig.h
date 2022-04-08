@@ -258,6 +258,20 @@
 #endif // CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC
 
 /**
+ * CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+ *
+ * Whether a device supports "concurrent connection commissioning mode" (1) or
+ * or "non-concurrenct connection commissioning mode" (0).
+ *
+ * See section "5.5. Commissioning Flows" in spec for definition.
+ *
+ * The default value is to support concurrent connection.
+ */
+#ifndef CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+#define CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION 1
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+
+/**
  * CHIP_DEVICE_CONFIG_USER_SELECTED_MODE_TIMEOUT_SEC
  *
  * The default amount of time (in whole seconds) that the device will remain in "user selected"
@@ -1233,11 +1247,13 @@
  * Default time in seconds that a device will advertise commissionable node discovery
  * after commissioning mode ends. This value can be overridden by the user.
  *
- * Only valid when CCHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY==1
+ * Only valid when CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY==1
  */
 #define CHIP_DEVICE_CONFIG_DISCOVERY_DISABLED 0
 #define CHIP_DEVICE_CONFIG_DISCOVERY_NO_TIMEOUT -1
+#ifndef CHIP_DEVICE_CONFIG_EXTENDED_DISCOVERY_TIMEOUT_SECS
 #define CHIP_DEVICE_CONFIG_EXTENDED_DISCOVERY_TIMEOUT_SECS (15 * 60)
+#endif
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE

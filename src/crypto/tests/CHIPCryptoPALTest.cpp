@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -1658,7 +1658,7 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
 
         // Compute the first round and send it to the verifier
         X_len = sizeof(X);
-        error = Prover.ComputeRoundOne(NULL, 0, X, &X_len);
+        error = Prover.ComputeRoundOne(nullptr, 0, X, &X_len);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, X_len == vector->X_len);
         NL_TEST_ASSERT(inSuite, memcmp(X, vector->X, vector->X_len) == 0);
@@ -2069,56 +2069,143 @@ static void TestAKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
     }
 }
 
-static void TestVID_x509Extraction(nlTestSuite * inSuite, void * inContext)
+static void TestVIDPID_StringExtraction(nlTestSuite * inSuite, void * inContext)
 {
-    using namespace TestCerts;
-
     HeapChecker heapChecker(inSuite);
 
-    // Test scenario where Certificate does not contain a Vendor ID field
-    ByteSpan kOpCertNoVID;
-    NL_TEST_ASSERT(inSuite, GetTestCert(TestCert::kNode01_01, TestCertLoadFlags::kDERForm, kOpCertNoVID) == CHIP_NO_ERROR);
+    // Matter VID/PID Attribute examples (from the spec):
+    const char * sTestMatterAttribute01 = "FFF1";
+    const char * sTestMatterAttribute02 = "0000";
+    const char * sTestMatterAttribute03 = "ABCD";
+    const char * sTestMatterAttribute04 = "D90F";
+
+    // Matter VID/PID Attribute error cases (from the spec):
+    const char * sTestMatterAttribute05 = "12eF";
+    const char * sTestMatterAttribute06 = "12345";
+    const char * sTestMatterAttribute07 = "AB5";
+    const char * sTestMatterAttribute08 = "abct";
+    const char * sTestMatterAttribute09 = "10FH";
+    const char * sTestMatterAttribute10 = "0x1234";
+    const char * sTestMatterAttribute11 = "0x45";
+    const char * sTestMatterAttribute12 = "Mvip:1234";
+    const char * sTestMatterAttribute13 = "HELLO";
+    const char * sTestMatterAttribute14 = "12";
+
+    // Common Name (CN) VID/PID encoding examples (from the spec):
+    const char * sTestCNAttribute01 = "Mvid:FFF1";
+    const char * sTestCNAttribute02 = "Mvid:002A";
+    const char * sTestCNAttribute03 = "Mpid:C20A";
+    const char * sTestCNAttribute04 = "Mpid:03A5";
+    const char * sTestCNAttribute05 = "ACME Matter Devel DAC 5CDA9899 Mvid:FFF1 Mpid:00B1";
+    const char * sTestCNAttribute06 = "Mpid:00B1,ACME Matter Devel DAC 5CDA9899,Mvid:FFF1";
+    const char * sTestCNAttribute07 = "ACME Matter Devel DAC 5CDA9899 Mvid:FFF1Mpid:00B1";
+    const char * sTestCNAttribute08 = "Mvid:FFF1ACME Matter Devel DAC 5CDAMpid:00B19899";
+
+    // Common Name (CN) VID/PID encoding error cases (from the spec):
+    const char * sTestCNAttribute09 = "ACME Matter Devel DAC 5CDA9899 Mvid:FF1 Mpid:00B1";
+    const char * sTestCNAttribute10 = "ACME Matter Devel DAC 5CDA9899 Mvid:fff1 Mpid:00B1";
+    const char * sTestCNAttribute11 = "ACME Matter Devel DAC 5CDA9899 Mvid:FFF1 Mpid:B1";
+    const char * sTestCNAttribute12 = "ACME Matter Devel DAC 5CDA9899 Mpid: Mvid:FFF1";
+
+    // Common Name (CN) VID/PID encoding error cases (more examples):
+    const char * sTestCNAttribute13 = "Mpid:987Mvid:FFF10x";
+    const char * sTestCNAttribute14 = "MpidMvid:FFF10 Matter Test Mpid:FE67";
+    const char * sTestCNAttribute15 = "Matter Devel Mpid:Mvid:Fff1";
 
     struct TestCase
     {
-        ByteSpan cert;
-        uint16_t expectedVid;
+        DNAttrType attrType;
+        ByteSpan attr;
+        bool expectedVidPresent;
+        bool expectedPidPresent;
+        VendorId expectedVid;
+        uint16_t expectedPid;
         CHIP_ERROR expectedResult;
     };
 
+    // clang-format off
     const TestCase kTestCases[] = {
-        { sTestCert_PAA_FFF1_Cert, 0xFFF1, CHIP_NO_ERROR },
-        { sTestCert_PAI_FFF1_8000_Cert, 0xFFF1, CHIP_NO_ERROR },
-        { sTestCert_DAC_FFF1_8000_0004_Cert, 0xFFF1, CHIP_NO_ERROR },
-        { sTestCert_PAI_FFF2_8001_Cert, 0xFFF2, CHIP_NO_ERROR },
-        { sTestCert_DAC_FFF2_8001_0009_Cert, 0xFFF2, CHIP_NO_ERROR },
-        // VID not present cases:
-        { sTestCert_PAA_NoVID_Cert, 0xFFFF, CHIP_ERROR_KEY_NOT_FOUND },
-        { kOpCertNoVID, 0xFFFF, CHIP_ERROR_KEY_NOT_FOUND },
+        // Matter VID/PID Attribute examples:
+        { DNAttrType::kMatterVID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute01), strlen(sTestMatterAttribute01)), true, false, chip::VendorId::TestVendor1, 0x0000, CHIP_NO_ERROR },
+        { DNAttrType::kMatterVID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute02), strlen(sTestMatterAttribute02)), true, false, chip::VendorId::Common, 0x0000, CHIP_NO_ERROR },
+        { DNAttrType::kMatterPID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute03), strlen(sTestMatterAttribute03)), false, true, chip::VendorId::NotSpecified, 0xABCD, CHIP_NO_ERROR },
+        { DNAttrType::kMatterPID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute04), strlen(sTestMatterAttribute04)), false, true, chip::VendorId::NotSpecified, 0xD90F, CHIP_NO_ERROR },
+        // Matter VID/PID Attribute error cases:
+        { DNAttrType::kMatterVID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute05), strlen(sTestMatterAttribute05)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kMatterPID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute06), strlen(sTestMatterAttribute06)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kMatterVID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute07), strlen(sTestMatterAttribute07)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kMatterPID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute08), strlen(sTestMatterAttribute08)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kMatterVID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute09), strlen(sTestMatterAttribute09)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kMatterPID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute10), strlen(sTestMatterAttribute10)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kMatterVID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute11), strlen(sTestMatterAttribute11)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kMatterPID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute12), strlen(sTestMatterAttribute12)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kMatterVID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute13), strlen(sTestMatterAttribute13)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kMatterPID, ByteSpan(reinterpret_cast<const uint8_t *>(sTestMatterAttribute14), strlen(sTestMatterAttribute14)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        // Common Name (CN) VID/PID encoding examples:
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute01), strlen(sTestCNAttribute01)), true, false, chip::VendorId::TestVendor1, 0, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute02), strlen(sTestCNAttribute02)), true, false, static_cast<chip::VendorId>(0x002A), 0, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute03), strlen(sTestCNAttribute03)), false, true, chip::VendorId::NotSpecified, 0xC20A, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute04), strlen(sTestCNAttribute04)), false, true, chip::VendorId::NotSpecified, 0x03A5, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute05), strlen(sTestCNAttribute05)), true, true, chip::VendorId::TestVendor1, 0x00B1, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute06), strlen(sTestCNAttribute06)), true, true, chip::VendorId::TestVendor1, 0x00B1, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute07), strlen(sTestCNAttribute07)), true, true, chip::VendorId::TestVendor1, 0x00B1, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute08), strlen(sTestCNAttribute08)), true, true, chip::VendorId::TestVendor1, 0x00B1, CHIP_NO_ERROR },
+        // Common Name (CN) VID/PID encoding error cases:
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute09), strlen(sTestCNAttribute09)), false, true, chip::VendorId::NotSpecified, 0x00B1, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute10), strlen(sTestCNAttribute10)), false, true, chip::VendorId::NotSpecified, 0x00B1, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute11), strlen(sTestCNAttribute11)), true, false, chip::VendorId::TestVendor1, 0, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute12), strlen(sTestCNAttribute12)), true, false, chip::VendorId::TestVendor1, 0, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute13), strlen(sTestCNAttribute13)), true, false, chip::VendorId::TestVendor1, 0, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute14), strlen(sTestCNAttribute14)), true, true, chip::VendorId::TestVendor1, 0xFE67, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute15), strlen(sTestCNAttribute15)), false, false, chip::VendorId::NotSpecified, 0, CHIP_NO_ERROR },
+        // Other input combinations:
+        { DNAttrType::kUnspecified, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute15), strlen(sTestCNAttribute15)), false, false, chip::VendorId::NotSpecified, 0, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan(nullptr, 0), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_INVALID_ARGUMENT },
     };
+    // clang-format on
 
+    int i = 1;
     for (const auto & testCase : kTestCases)
     {
-        uint16_t vid;
-        CHIP_ERROR result = ExtractDNAttributeFromX509Cert(MatterOid::kVendorId, testCase.cert, vid);
+        fprintf(stderr, "DEBUG 01 i = %d\n", i);
+        AttestationCertVidPid vidpid;
+        AttestationCertVidPid vidpidFromCN;
+        AttestationCertVidPid vidpidToCheck;
+        CHIP_ERROR result = ExtractVIDPIDFromAttributeString(testCase.attrType, testCase.attr, vidpid, vidpidFromCN);
+        fprintf(stderr, "DEBUG 02 i = %d equal = %d\n", i++, (result == testCase.expectedResult));
         NL_TEST_ASSERT(inSuite, result == testCase.expectedResult);
 
-        // In success cases, make sure the VID matches expectation.
-        if (testCase.expectedResult == CHIP_NO_ERROR)
+        if (testCase.attrType == DNAttrType::kMatterVID || testCase.attrType == DNAttrType::kMatterPID)
         {
-            NL_TEST_ASSERT(inSuite, vid == testCase.expectedVid);
+            NL_TEST_ASSERT(inSuite, !vidpidFromCN.Initialized());
+            vidpidToCheck = vidpid;
+        }
+        else if (testCase.attrType == DNAttrType::kCommonName)
+        {
+            NL_TEST_ASSERT(inSuite, !vidpid.Initialized());
+            vidpidToCheck = vidpidFromCN;
+        }
+
+        NL_TEST_ASSERT(inSuite, vidpidToCheck.mVendorId.HasValue() == testCase.expectedVidPresent);
+        NL_TEST_ASSERT(inSuite, vidpidToCheck.mProductId.HasValue() == testCase.expectedPidPresent);
+
+        if (testCase.expectedVidPresent)
+        {
+            NL_TEST_ASSERT(inSuite, vidpidToCheck.mVendorId.Value() == testCase.expectedVid);
+        }
+
+        if (testCase.expectedPidPresent)
+        {
+            NL_TEST_ASSERT(inSuite, vidpidToCheck.mProductId.Value() == testCase.expectedPid);
         }
     }
 }
 
-static void TestPID_x509Extraction(nlTestSuite * inSuite, void * inContext)
+static void TestVIDPID_x509Extraction(nlTestSuite * inSuite, void * inContext)
 {
     using namespace TestCerts;
 
     HeapChecker heapChecker(inSuite);
-    /*
-    credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0004-Cert.pem
-    */
 
     // Test scenario where Certificate does not contain a Vendor ID field
     ByteSpan kOpCertNoVID;
@@ -2127,33 +2214,53 @@ static void TestPID_x509Extraction(nlTestSuite * inSuite, void * inContext)
     struct TestCase
     {
         ByteSpan cert;
+        bool expectedVidPresent;
+        bool expectedPidPresent;
+        VendorId expectedVid;
         uint16_t expectedPid;
         CHIP_ERROR expectedResult;
     };
 
     const TestCase kTestCases[] = {
-        { sTestCert_PAI_FFF1_8000_Cert, 0x8000, CHIP_NO_ERROR },
-        { sTestCert_DAC_FFF1_8000_0004_Cert, 0x8000, CHIP_NO_ERROR },
-        { sTestCert_PAI_FFF2_8001_Cert, 0x8001, CHIP_NO_ERROR },
-        { sTestCert_DAC_FFF2_8001_0009_Cert, 0x8001, CHIP_NO_ERROR },
-        { sTestCert_DAC_FFF2_8002_0016_Cert, 0x8002, CHIP_NO_ERROR },
-        // PID not present cases:
-        { sTestCert_PAA_FFF1_Cert, 0xFFFF, CHIP_ERROR_KEY_NOT_FOUND },
-        { sTestCert_PAA_NoVID_Cert, 0xFFFF, CHIP_ERROR_KEY_NOT_FOUND },
-        { sTestCert_PAI_FFF2_NoPID_Cert, 0xFFFF, CHIP_ERROR_KEY_NOT_FOUND },
-        { kOpCertNoVID, 0xFFFF, CHIP_ERROR_KEY_NOT_FOUND },
+        // VID and PID preset cases:
+        { sTestCert_PAI_FFF1_8000_Cert, true, true, chip::VendorId::TestVendor1, 0x8000, CHIP_NO_ERROR },
+        { sTestCert_DAC_FFF1_8000_0004_Cert, true, true, chip::VendorId::TestVendor1, 0x8000, CHIP_NO_ERROR },
+        { sTestCert_PAI_FFF2_8001_Cert, true, true, chip::VendorId::TestVendor2, 0x8001, CHIP_NO_ERROR },
+        { sTestCert_DAC_FFF2_8001_0009_Cert, true, true, chip::VendorId::TestVendor2, 0x8001, CHIP_NO_ERROR },
+        { sTestCert_DAC_FFF2_8002_0016_Cert, true, true, chip::VendorId::TestVendor2, 0x8002, CHIP_NO_ERROR },
+        { sTestCert_DAC_FFF2_8003_0019_FB_Cert, true, true, chip::VendorId::TestVendor2, 0x8003, CHIP_NO_ERROR },
+        { sTestCert_DAC_FFF2_8004_001E_FB_Cert, true, true, chip::VendorId::TestVendor2, 0x8004, CHIP_NO_ERROR },
+        { sTestCert_PAI_FFF2_8004_FB_Cert, true, true, chip::VendorId::TestVendor2, 0x8004, CHIP_NO_ERROR },
+        // VID present and PID not present cases:
+        { sTestCert_PAA_FFF1_Cert, true, false, chip::VendorId::TestVendor1, 0x0000, CHIP_NO_ERROR },
+        { sTestCert_PAI_FFF2_NoPID_Cert, true, false, chip::VendorId::TestVendor2, 0x0000, CHIP_NO_ERROR },
+        { sTestCert_PAI_FFF2_NoPID_FB_Cert, true, false, chip::VendorId::TestVendor2, 0x0000, CHIP_NO_ERROR },
+        // VID and PID not present cases:
+        { sTestCert_PAA_NoVID_Cert, false, false, chip::VendorId::NotSpecified, 0x0000, CHIP_NO_ERROR },
+        { kOpCertNoVID, false, false, chip::VendorId::NotSpecified, 0x0000, CHIP_NO_ERROR },
     };
 
+    int i = 1;
     for (const auto & testCase : kTestCases)
     {
-        uint16_t pid;
-        CHIP_ERROR result = ExtractDNAttributeFromX509Cert(MatterOid::kProductId, testCase.cert, pid);
+        fprintf(stderr, "DEBUG 01 i = %d\n", i);
+        AttestationCertVidPid vidpid;
+        CHIP_ERROR result = ExtractVIDPIDFromX509Cert(testCase.cert, vidpid);
+        fprintf(stderr, "DEBUG 02 i = %d equal = %d\n", i++, (result == testCase.expectedResult));
         NL_TEST_ASSERT(inSuite, result == testCase.expectedResult);
+        NL_TEST_ASSERT(inSuite, vidpid.mVendorId.HasValue() == testCase.expectedVidPresent);
+        NL_TEST_ASSERT(inSuite, vidpid.mProductId.HasValue() == testCase.expectedPidPresent);
 
-        // In success cases, make sure the PID matches expectation.
-        if (testCase.expectedResult == CHIP_NO_ERROR)
+        // If present, make sure the VID matches expectation.
+        if (testCase.expectedVidPresent)
         {
-            NL_TEST_ASSERT(inSuite, pid == testCase.expectedPid);
+            NL_TEST_ASSERT(inSuite, vidpid.mVendorId.Value() == testCase.expectedVid);
+        }
+
+        // If present, make sure the VID matches expectation.
+        if (testCase.expectedPidPresent)
+        {
+            NL_TEST_ASSERT(inSuite, vidpid.mProductId.Value() == testCase.expectedPid);
         }
     }
 }
@@ -2170,8 +2277,16 @@ const uint8_t kGroupOperationalKey1[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYT
 const uint8_t kGroupOperationalKey2[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0xaa, 0x97, 0x9a, 0x48, 0xbd, 0x8c,
                                                                                         0xdf, 0x29, 0x3a, 0x07, 0x09, 0xb9,
                                                                                         0xc1, 0xeb, 0x19, 0x30 };
-const uint16_t kGroupSessionId1                                                     = 0x6c80;
-const uint16_t kGroupSessionId2                                                     = 0x0c48;
+
+static const uint8_t kCompressedFabricId2[]                                    = { 0x87, 0xe1, 0xb0, 0x04, 0xe2, 0x35, 0xa1, 0x30 };
+const uint8_t kEpochKeyBuffer3[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0x23, 0x5b, 0xf7, 0xe6, 0x28, 0x23, 0xd3, 0x58,
+                                                                                   0xdc, 0xa4, 0xba, 0x50, 0xb1, 0x53, 0x5f, 0x4b };
+const uint8_t kGroupOperationalKey3[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0xa6, 0xf5, 0x30, 0x6b, 0xaf, 0x6d,
+                                                                                        0x05, 0x0a, 0xf2, 0x3b, 0xa4, 0xbd,
+                                                                                        0x6b, 0x9d, 0xd9, 0x60 };
+
+const uint16_t kGroupSessionId1 = 0x6c80;
+const uint16_t kGroupSessionId2 = 0x0c48;
 
 static void TestGroup_OperationalKeyDerivation(nlTestSuite * inSuite, void * inContext)
 {
@@ -2192,6 +2307,12 @@ static void TestGroup_OperationalKeyDerivation(nlTestSuite * inSuite, void * inC
     epoch_key = ByteSpan(kEpochKeyBuffer2, sizeof(kEpochKeyBuffer2));
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == DeriveGroupOperationalKey(epoch_key, compressed_fabric_id, operational_key));
     NL_TEST_ASSERT(inSuite, 0 == memcmp(operational_key.data(), kGroupOperationalKey2, sizeof(kGroupOperationalKey2)));
+
+    // Epoch Key 3 (example from spec)
+    epoch_key            = ByteSpan(kEpochKeyBuffer3, sizeof(kEpochKeyBuffer3));
+    compressed_fabric_id = ByteSpan(kCompressedFabricId2);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == DeriveGroupOperationalKey(epoch_key, compressed_fabric_id, operational_key));
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(operational_key.data(), kGroupOperationalKey3, sizeof(kGroupOperationalKey3)));
 }
 
 static void TestGroup_SessionIdDerivation(nlTestSuite * inSuite, void * inContext)
@@ -2277,8 +2398,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test x509 Certificate Timestamp Validation", TestX509_IssuingTimestampValidation),
     NL_TEST_DEF("Test Subject Key Id Extraction from x509 Certificate", TestSKID_x509Extraction),
     NL_TEST_DEF("Test Authority Key Id Extraction from x509 Certificate", TestAKID_x509Extraction),
-    NL_TEST_DEF("Test Vendor ID Extraction from x509 Attestation Certificate", TestVID_x509Extraction),
-    NL_TEST_DEF("Test Product ID Extraction from x509 Attestation Certificate", TestPID_x509Extraction),
+    NL_TEST_DEF("Test Vendor ID and Product ID Extraction from Attribute String", TestVIDPID_StringExtraction),
+    NL_TEST_DEF("Test Vendor ID and Product ID Extraction from x509 Attestation Certificate", TestVIDPID_x509Extraction),
     NL_TEST_DEF("Test Group Operation Key Derivation", TestGroup_OperationalKeyDerivation),
     NL_TEST_DEF("Test Group Session ID Derivation", TestGroup_SessionIdDerivation),
     NL_TEST_SENTINEL()

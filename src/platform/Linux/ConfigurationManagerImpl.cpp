@@ -31,6 +31,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <netpacket/packet.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Linux/PosixConfig.h>
@@ -51,7 +52,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     uint32_t rebootCount;
-    bool failSafeArmed;
 
     // Force initialization of NVS namespaces if they doesn't already exist.
     err = PosixConfig::EnsureNamespace(PosixConfig::kConfigNamespace_ChipFactory);
@@ -64,6 +64,18 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<PosixConfig>::Init();
     SuccessOrExit(err);
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_VendorId))
+    {
+        err = StoreVendorId(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
+        SuccessOrExit(err);
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_ProductId))
+    {
+        err = StoreProductId(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
+        SuccessOrExit(err);
+    }
 
     if (PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_RebootCount))
     {
@@ -88,7 +100,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_BootReason))
     {
-        err = StoreBootReason(BootReasonType::Unspecified);
+        err = StoreBootReason(to_underlying(BootReasonType::kUnspecified));
         SuccessOrExit(err);
     }
 
@@ -104,13 +116,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
         err               = WriteConfigValue(PosixConfig::kConfigKey_LocationCapability, location);
         SuccessOrExit(err);
-    }
-
-    // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
-    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
-    {
-        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
-        InitiateFactoryReset();
     }
 
     err = CHIP_NO_ERROR;
@@ -220,6 +225,11 @@ CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, bool & val)
     return PosixConfig::ReadConfigValue(key, val);
 }
 
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint16_t & val)
+{
+    return PosixConfig::ReadConfigValue(key, val);
+}
+
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint32_t & val)
 {
     return PosixConfig::ReadConfigValue(key, val);
@@ -241,6 +251,11 @@ CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(Key key, uint8_t * buf, 
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, bool val)
+{
+    return PosixConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint16_t val)
 {
     return PosixConfig::WriteConfigValue(key, val);
 }
@@ -303,6 +318,26 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting (not implemented)");
     // TODO(#742): restart CHIP exe
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetVendorId(uint16_t & vendorId)
+{
+    return ReadConfigValue(PosixConfig::kConfigKey_VendorId, vendorId);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetProductId(uint16_t & productId)
+{
+    return ReadConfigValue(PosixConfig::kConfigKey_ProductId, productId);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreVendorId(uint16_t vendorId)
+{
+    return WriteConfigValue(PosixConfig::kConfigKey_VendorId, vendorId);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreProductId(uint16_t productId)
+{
+    return WriteConfigValue(PosixConfig::kConfigKey_ProductId, productId);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)

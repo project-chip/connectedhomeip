@@ -40,6 +40,7 @@
 #include <credentials/DeviceAttestationConstructor.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/FabricTable.h>
+#include <credentials/GroupDataProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/PeerId.h>
@@ -61,8 +62,8 @@ using namespace chip::Protocols::InteractionModel;
 
 namespace {
 
-CHIP_ERROR SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath & path, OperationalCertStatus status,
-                           uint8_t index, const CharSpan & debug_text);
+void SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath & path, OperationalCertStatus status,
+                     uint8_t index, const CharSpan & debug_text);
 OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err);
 
 constexpr uint8_t kDACCertificate = 1;
@@ -519,8 +520,8 @@ namespace {
 // TODO: Manage ephemeral RCAC/ICAC/NOC storage to avoid a full FabricInfo being needed here.
 FabricInfo gFabricBeingCommissioned;
 
-CHIP_ERROR SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath & path, OperationalCertStatus status,
-                           uint8_t index, const CharSpan & debug_text)
+void SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath & path, OperationalCertStatus status,
+                     uint8_t index, const CharSpan & debug_text)
 {
     Commands::NOCResponse::Type payload;
     payload.statusCode = status;
@@ -535,7 +536,7 @@ CHIP_ERROR SendNOCResponse(app::CommandHandler * commandObj, const ConcreteComma
         payload.debugText.Emplace(to_send);
     }
 
-    return commandObj->AddResponseData(path, payload);
+    commandObj->AddResponse(path, payload);
 }
 
 OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
@@ -589,6 +590,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     CHIP_ERROR err          = CHIP_NO_ERROR;
     FabricIndex fabricIndex = 0;
     Credentials::GroupDataProvider::KeySet keyset;
+    FabricInfo * newFabricInfo = nullptr;
 
     uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
     MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
@@ -626,8 +628,15 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     err = Server::GetInstance().GetFabricTable().AddNewFabric(gFabricBeingCommissioned, &fabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-    err = Server::GetInstance().GetFabricTable().Store(fabricIndex);
-    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+    // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
+    // Index just allocated.
+    err = failSafeContext.SetAddNocCommandInvoked(fabricIndex);
+    if (err != CHIP_NO_ERROR)
+    {
+        Server::GetInstance().GetFabricTable().Delete(fabricIndex);
+        nocResponse = ConvertToNOCResponseStatus(err);
+        SuccessOrExit(err);
+    }
 
     // Keep this after other possible failures, so it doesn't need to be rolled back in case of
     // subsequent failures. This should only typically fail if there is no space for the new entry.
@@ -640,20 +649,22 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     // Set the Identity Protection Key (IPK)
     VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES,
                  nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_ARGUMENT));
-    keyset.keyset_id     = 0; // The IPK SHALL be the operational group key under GroupKeySetID of 0
+    // The IPK SHALL be the operational group key under GroupKeySetID of 0
+    keyset.keyset_id     = Credentials::GroupDataProvider::kIdentityProtectionKeySetId;
     keyset.policy        = GroupKeyManagement::GroupKeySecurityPolicy::kTrustFirst;
     keyset.num_keys_used = 1;
     memcpy(keyset.epoch_keys[0].key, ipkValue.data(), Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
-    err = gFabricBeingCommissioned.GetCompressedId(compressed_fabric_id);
+
+    newFabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+    VerifyOrExit(newFabricInfo != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INTERNAL));
+    err = newFabricInfo->GetCompressedId(compressed_fabric_id);
+    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
     err = groups->SetKeySet(fabricIndex, compressed_fabric_id, keyset);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // We might have a new operational identity, so we should start advertising it right away.
     app::DnssdServer::Instance().AdvertiseOperational();
-
-    // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
-    // Index just allocated.
-    failSafeContext.SetAddNocCommandInvoked(fabricIndex);
 
 exit:
 
@@ -705,6 +716,10 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     FabricInfo * fabric = RetrieveCurrentFabric(commandObj);
     VerifyOrExit(fabric != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_FABRIC_ID));
 
+    // Flag on the fail-safe context that the UpdateNOC command was invoked.
+    err = failSafeContext.SetUpdateNocCommandInvoked();
+    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
     err = fabric->SetNOCCert(NOCValue);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
@@ -717,10 +732,6 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     // it right away.  Also, we need to withdraw our old operational identity.
     // So we need to StartServer() here.
     app::DnssdServer::Instance().StartServer();
-
-    // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
-    // Index associated with the UpdateNOC command being invoked.
-    failSafeContext.SetUpdateNocCommandInvoked(fabricIndex);
 
 exit:
 
@@ -774,7 +785,7 @@ bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
     }
 
     response.certificate = derBufSpan;
-    SuccessOrExit(err = commandObj->AddResponseData(commandPath, response));
+    commandObj->AddResponse(commandPath, response);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -834,7 +845,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
 
         response.attestationElements = attestationElementsSpan;
         response.signature           = signatureSpan;
-        SuccessOrExit(err = commandObj->AddResponseData(commandPath, response));
+        commandObj->AddResponse(commandPath, response);
     }
 
 exit:
@@ -922,7 +933,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
         response.NOCSRElements        = nocsrElementsSpan;
         response.attestationSignature = signatureSpan;
-        SuccessOrExit(err = commandObj->AddResponseData(commandPath, response));
+        commandObj->AddResponse(commandPath, response);
     }
 
 exit:

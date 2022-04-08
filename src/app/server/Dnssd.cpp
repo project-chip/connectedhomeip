@@ -84,15 +84,15 @@ bool DnssdServer::HaveOperationalCredentials()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
-void DnssdServer::SetExtendedDiscoveryTimeoutSecs(int16_t secs)
+void DnssdServer::SetExtendedDiscoveryTimeoutSecs(int32_t secs)
 {
-    ChipLogDetail(Discovery, "Setting extended discovery timeout to %" PRId16 "s", secs);
+    ChipLogDetail(Discovery, "Setting extended discovery timeout to %" PRId32 "s", secs);
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(DefaultStorageKeyAllocator::DNSExtendedDiscoveryTimeout(), secs);
 }
 
-int16_t DnssdServer::GetExtendedDiscoveryTimeoutSecs()
+int32_t DnssdServer::GetExtendedDiscoveryTimeoutSecs()
 {
-    int16_t secs;
+    int32_t secs;
     CHIP_ERROR err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(
         DefaultStorageKeyAllocator::DNSExtendedDiscoveryTimeout(), &secs);
 
@@ -199,7 +199,7 @@ void DnssdServer::OnDiscoveryExpiration(System::Layer * aSystemLayer, void * aAp
     ChipLogDetail(Discovery, "OnDiscoveryExpiration callback for valid session");
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    int16_t extTimeout = GetExtendedDiscoveryTimeoutSecs();
+    int32_t extTimeout = GetExtendedDiscoveryTimeoutSecs();
     if (extTimeout != CHIP_DEVICE_CONFIG_DISCOVERY_DISABLED)
     {
         CHIP_ERROR err = AdvertiseCommissionableNode(chip::Dnssd::CommissioningMode::kDisabled);
@@ -232,16 +232,16 @@ CHIP_ERROR DnssdServer::ScheduleDiscoveryExpiration()
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 CHIP_ERROR DnssdServer::ScheduleExtendedDiscoveryExpiration()
 {
-    int16_t extendedDiscoveryTimeoutSecs = GetExtendedDiscoveryTimeoutSecs();
+    int32_t extendedDiscoveryTimeoutSecs = GetExtendedDiscoveryTimeoutSecs();
     if (extendedDiscoveryTimeoutSecs == CHIP_DEVICE_CONFIG_DISCOVERY_NO_TIMEOUT)
     {
         return CHIP_NO_ERROR;
     }
-    ChipLogDetail(Discovery, "Scheduling extended discovery timeout in %" PRId16 "s", extendedDiscoveryTimeoutSecs);
+    ChipLogDetail(Discovery, "Scheduling extended discovery timeout in %" PRId32 "s", extendedDiscoveryTimeoutSecs);
 
-    mExtendedDiscoveryExpiration = mTimeSource.GetMonotonicTimestamp() + System::Clock::Seconds16(extendedDiscoveryTimeoutSecs);
+    mExtendedDiscoveryExpiration = mTimeSource.GetMonotonicTimestamp() + System::Clock::Seconds32(extendedDiscoveryTimeoutSecs);
 
-    return DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(extendedDiscoveryTimeoutSecs),
+    return DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(extendedDiscoveryTimeoutSecs),
                                                  HandleExtendedDiscoveryExpiration, nullptr);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
@@ -378,7 +378,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 
     advertiseParameters.SetMRPConfig(GetLocalMRPConfig()).SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
 
-    if (mode != chip::Dnssd::CommissioningMode::kEnabledEnhanced)
+    if (!HaveOperationalCredentials())
     {
         if (DeviceLayer::ConfigurationMgr().GetInitialPairingHint(value) != CHIP_NO_ERROR)
         {

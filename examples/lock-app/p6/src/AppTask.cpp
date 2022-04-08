@@ -83,6 +83,17 @@ void NetWorkCommissioningInstInit()
     sWiFiNetworkCommissioningInstance.Init();
 }
 
+static void InitServer(intptr_t context)
+{
+    // Init ZCL Data Model
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+}
+
 CHIP_ERROR AppTask::StartAppTask()
 {
     sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
@@ -115,11 +126,8 @@ CHIP_ERROR AppTask::Init()
             }
         },
         0);
-    // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 
     // Initialise WSTK buttons PB0 and PB1 (including debounce).
     ButtonHandler::Init();
@@ -151,7 +159,6 @@ CHIP_ERROR AppTask::Init()
     sStatusLED.Init(SYSTEM_STATE_LED);
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
-    UpdateClusterState();
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -490,7 +497,7 @@ void AppTask::DispatchEvent(AppEvent * event)
     }
 }
 
-void AppTask::UpdateClusterState(void)
+void AppTask::UpdateCluster(intptr_t context)
 {
     uint8_t newValue = !BoltLockMgr().IsUnlocked();
 
@@ -502,6 +509,12 @@ void AppTask::UpdateClusterState(void)
         P6_LOG("ERR: updating on/off %x", status);
     }
 }
+
+void AppTask::UpdateClusterState(void)
+{
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateCluster, reinterpret_cast<intptr_t>(nullptr));
+}
+
 void vApplicationStackOverflowHook(TaskHandle_t pxTask, char * pcTaskName)
 {
     (void) pxTask;

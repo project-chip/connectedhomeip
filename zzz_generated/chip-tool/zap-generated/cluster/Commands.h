@@ -27,6 +27,7 @@
 #include <commands/clusters/ClusterCommand.h>
 #include <commands/clusters/ComplexArgument.h>
 #include <commands/clusters/ReportCommand.h>
+#include <commands/clusters/SubscriptionsCommands.h>
 #include <commands/clusters/WriteAttributeCommand.h>
 
 /*----------------------------------------------------------------------------*\
@@ -241,9 +242,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000010, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000010, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000010, mValue);
     }
 
 private:
@@ -268,9 +269,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000011, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000011, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000011, mValue);
     }
 
 private:
@@ -295,9 +296,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000012, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000012, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000012, mValue);
     }
 
 private:
@@ -322,9 +323,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000013, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000013, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000013, mValue);
     }
 
 private:
@@ -349,9 +350,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000030, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000030, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000030, mValue);
     }
 
 private:
@@ -376,9 +377,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000031, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000031, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000031, mValue);
     }
 
 private:
@@ -403,9 +404,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000032, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000032, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000032, mValue);
     }
 
 private:
@@ -430,9 +431,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000033, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000033, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000033, mValue);
     }
 
 private:
@@ -457,9 +458,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000034, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000034, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000034, mValue);
     }
 
 private:
@@ -484,9 +485,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000035, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000035, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000035, mValue);
     }
 
 private:
@@ -511,9 +512,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000036, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000036, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000036, mValue);
     }
 
 private:
@@ -538,9 +539,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000037, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000037, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000037, mValue);
     }
 
 private:
@@ -565,9 +566,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000038, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000038, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000038, mValue);
     }
 
 private:
@@ -592,9 +593,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000039, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000039, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000039, mValue);
     }
 
 private:
@@ -619,9 +620,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000003A, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x0000003A, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x0000003A, mValue);
     }
 
 private:
@@ -646,9 +647,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000003B, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x0000003B, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x0000003B, mValue);
     }
 
 private:
@@ -673,9 +674,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000003C, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x0000003C, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x0000003C, mValue);
     }
 
 private:
@@ -700,9 +701,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000003D, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x0000003D, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x0000003D, mValue);
     }
 
 private:
@@ -727,9 +728,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000050, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000050, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000050, mValue);
     }
 
 private:
@@ -754,9 +755,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000051, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000051, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000051, mValue);
     }
 
 private:
@@ -781,9 +782,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000052, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000052, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000052, mValue);
     }
 
 private:
@@ -808,9 +809,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000053, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000053, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000053, mValue);
     }
 
 private:
@@ -835,9 +836,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000054, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000054, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000054, mValue);
     }
 
 private:
@@ -862,9 +863,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000055, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000055, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000055, mValue);
     }
 
 private:
@@ -889,9 +890,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000056, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000056, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000056, mValue);
     }
 
 private:
@@ -916,9 +917,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000057, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000057, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000057, mValue);
     }
 
 private:
@@ -943,9 +944,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000058, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000058, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000058, mValue);
     }
 
 private:
@@ -970,9 +971,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000059, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000059, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000059, mValue);
     }
 
 private:
@@ -997,9 +998,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000005A, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x0000005A, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x0000005A, mValue);
     }
 
 private:
@@ -1024,9 +1025,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000005B, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x0000005B, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x0000005B, mValue);
     }
 
 private:
@@ -1051,9 +1052,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000005C, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x0000005C, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x0000005C, mValue);
     }
 
 private:
@@ -1078,9 +1079,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000005D, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x0000005D, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x0000005D, mValue);
     }
 
 private:
@@ -1105,9 +1106,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000070, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000070, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000070, mValue);
     }
 
 private:
@@ -1132,9 +1133,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000071, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000071, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000071, mValue);
     }
 
 private:
@@ -1159,9 +1160,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000072, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000072, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000072, mValue);
     }
 
 private:
@@ -1186,9 +1187,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000073, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000073, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000073, mValue);
     }
 
 private:
@@ -1213,9 +1214,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000074, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000074, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000074, mValue);
     }
 
 private:
@@ -1240,9 +1241,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000075, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000075, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000075, mValue);
     }
 
 private:
@@ -1267,9 +1268,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000076, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000076, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000076, mValue);
     }
 
 private:
@@ -1294,9 +1295,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000077, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000077, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000077, mValue);
     }
 
 private:
@@ -1321,9 +1322,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000078, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000078, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000078, mValue);
     }
 
 private:
@@ -1348,9 +1349,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000079, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x00000079, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x00000079, mValue);
     }
 
 private:
@@ -1375,9 +1376,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000007A, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x0000007A, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x0000007A, mValue);
     }
 
 private:
@@ -1402,9 +1403,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000007B, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x0000007B, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x0000007B, mValue);
     }
 
 private:
@@ -1429,9 +1430,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000007C, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x0000007C, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x0000007C, mValue);
     }
 
 private:
@@ -1456,9 +1457,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000007D, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000001, 0x0000007D, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000001, 0x0000007D, mValue);
     }
 
 private:
@@ -1507,9 +1508,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000002, 0x00000010, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000002, 0x00000010, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000002, 0x00000010, mValue);
     }
 
 private:
@@ -1534,9 +1535,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000002, 0x00000011, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000002, 0x00000011, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000002, 0x00000011, mValue);
     }
 
 private:
@@ -1561,9 +1562,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000002, 0x00000012, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000002, 0x00000012, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000002, 0x00000012, mValue);
     }
 
 private:
@@ -1588,9 +1589,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000002, 0x00000013, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000002, 0x00000013, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000002, 0x00000013, mValue);
     }
 
 private:
@@ -1615,9 +1616,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000002, 0x00000014, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000002, 0x00000014, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000002, 0x00000014, mValue);
     }
 
 private:
@@ -1663,11 +1664,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000003, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000003, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000003, 0x00000000, mRequest);
     }
 
 private:
@@ -1692,11 +1693,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000003, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000003, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000003, 0x00000001, mRequest);
     }
 
 private:
@@ -1723,11 +1724,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000003, 0x00000040, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000040) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000003, 0x00000040, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000003, 0x00000040, mRequest);
     }
 
 private:
@@ -1751,9 +1752,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000003, 0x00000000, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000003, 0x00000000, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000003, 0x00000000, mValue);
     }
 
 private:
@@ -1802,11 +1803,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000004, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000004, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000004, 0x00000000, mRequest);
     }
 
 private:
@@ -1832,11 +1833,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000004, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000004, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000004, 0x00000001, mRequest);
     }
 
 private:
@@ -1863,11 +1864,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000004, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000004, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000004, 0x00000002, mRequest);
     }
 
 private:
@@ -1894,11 +1895,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000004, 0x00000003, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000003) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000004, 0x00000003, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000004, 0x00000003, mRequest);
     }
 
 private:
@@ -1923,11 +1924,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000004, 0x00000004, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000004) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000004, 0x00000004, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000004, 0x00000004, mRequest);
     }
 
 private:
@@ -1955,11 +1956,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000004, 0x00000005, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000005) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000004, 0x00000005, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000004, 0x00000005, mRequest);
     }
 
 private:
@@ -2021,11 +2022,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000005, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000005, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000005, 0x00000000, mRequest);
     }
 
 private:
@@ -2054,11 +2055,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000005, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000005, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000005, 0x00000001, mRequest);
     }
 
 private:
@@ -2085,11 +2086,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000005, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000005, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000005, 0x00000002, mRequest);
     }
 
 private:
@@ -2115,11 +2116,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000005, 0x00000003, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000003) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000005, 0x00000003, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000005, 0x00000003, mRequest);
     }
 
 private:
@@ -2146,11 +2147,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000005, 0x00000004, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000004) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000005, 0x00000004, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000005, 0x00000004, mRequest);
     }
 
 private:
@@ -2178,11 +2179,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000005, 0x00000005, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000005) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000005, 0x00000005, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000005, 0x00000005, mRequest);
     }
 
 private:
@@ -2209,11 +2210,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000005, 0x00000006, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000006) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000005, 0x00000006, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000005, 0x00000006, mRequest);
     }
 
 private:
@@ -2244,11 +2245,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000005, 0x00000040, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000040) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000005, 0x00000040, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000005, 0x00000040, mRequest);
     }
 
 private:
@@ -2277,11 +2278,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000005, 0x00000041, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000041) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000005, 0x00000041, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000005, 0x00000041, mRequest);
     }
 
 private:
@@ -2311,11 +2312,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000005, 0x00000042, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000042) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000005, 0x00000042, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000005, 0x00000042, mRequest);
     }
 
 private:
@@ -2366,11 +2367,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000006, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000006, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000006, 0x00000000, mRequest);
     }
 
 private:
@@ -2395,11 +2396,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000006, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000006, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000006, 0x00000001, mRequest);
     }
 
 private:
@@ -2424,11 +2425,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000006, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000006, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000006, 0x00000002, mRequest);
     }
 
 private:
@@ -2455,11 +2456,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000006, 0x00000040, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000040) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000006, 0x00000040, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000006, 0x00000040, mRequest);
     }
 
 private:
@@ -2485,11 +2486,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000006, 0x00000041, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000041) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000006, 0x00000041, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000006, 0x00000041, mRequest);
     }
 
 private:
@@ -2517,11 +2518,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000006, 0x00000042, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000042) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000006, 0x00000042, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000006, 0x00000042, mRequest);
     }
 
 private:
@@ -2545,9 +2546,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000006, 0x00004001, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000006, 0x00004001, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000006, 0x00004001, mValue);
     }
 
 private:
@@ -2571,9 +2572,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000006, 0x00004002, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000006, 0x00004002, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000006, 0x00004002, mValue);
     }
 
 private:
@@ -2597,9 +2598,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000006, 0x00004003, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000006, 0x00004003, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000006, 0x00004003, mValue);
     }
 
 private:
@@ -2641,9 +2642,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000007, 0x00000010, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000007, 0x00000010, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000007, 0x00000010, mValue);
     }
 
 private:
@@ -2709,11 +2710,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000008, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000000, mRequest);
     }
 
 private:
@@ -2742,11 +2743,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000008, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000001, mRequest);
     }
 
 private:
@@ -2776,11 +2777,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000008, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000002, mRequest);
     }
 
 private:
@@ -2807,11 +2808,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000003, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000003) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000008, 0x00000003, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000003, mRequest);
     }
 
 private:
@@ -2839,11 +2840,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000004, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000004) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000008, 0x00000004, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000004, mRequest);
     }
 
 private:
@@ -2870,11 +2871,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000005, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000005) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000008, 0x00000005, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000005, mRequest);
     }
 
 private:
@@ -2902,11 +2903,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000006, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000006) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000008, 0x00000006, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000006, mRequest);
     }
 
 private:
@@ -2931,11 +2932,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000007, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000007) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000008, 0x00000007, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000007, mRequest);
     }
 
 private:
@@ -2959,9 +2960,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000008, 0x0000000F, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000008, 0x0000000F, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x0000000F, mValue);
     }
 
 private:
@@ -2986,9 +2987,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000010, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000008, 0x00000010, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000010, mValue);
     }
 
 private:
@@ -3012,9 +3013,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000011, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000008, 0x00000011, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000011, mValue);
     }
 
 private:
@@ -3039,9 +3040,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000012, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000008, 0x00000012, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000012, mValue);
     }
 
 private:
@@ -3066,9 +3067,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000013, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000008, 0x00000013, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000013, mValue);
     }
 
 private:
@@ -3093,9 +3094,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000014, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000008, 0x00000014, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000014, mValue);
     }
 
 private:
@@ -3120,9 +3121,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00004000, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000008, 0x00004000, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00004000, mValue);
     }
 
 private:
@@ -3169,11 +3170,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000009, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000009, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000009, 0x00000000, mRequest);
     }
 
 private:
@@ -3198,11 +3199,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000009, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000009, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000009, 0x00000001, mRequest);
     }
 
 private:
@@ -3227,11 +3228,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000009, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000009, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000009, 0x00000002, mRequest);
     }
 
 private:
@@ -3256,11 +3257,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000009, 0x00000003, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000003) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000009, 0x00000003, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000009, 0x00000003, mRequest);
     }
 
 private:
@@ -3309,9 +3310,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000A, 0x00000000, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000000A, 0x00000000, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000000A, 0x00000000, mValue);
     }
 
 private:
@@ -3335,9 +3336,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000A, 0x00000001, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000000A, 0x00000001, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000000A, 0x00000001, mValue);
     }
 
 private:
@@ -3361,9 +3362,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000A, 0x00000002, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000000A, 0x00000002, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000000A, 0x00000002, mValue);
     }
 
 private:
@@ -3387,9 +3388,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000A, 0x00000003, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000000A, 0x00000003, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000000A, 0x00000003, mValue);
     }
 
 private:
@@ -3413,9 +3414,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000A, 0x00000004, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000000A, 0x00000004, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000000A, 0x00000004, mValue);
     }
 
 private:
@@ -3439,9 +3440,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000A, 0x00000005, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000000A, 0x00000005, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000000A, 0x00000005, mValue);
     }
 
 private:
@@ -3465,9 +3466,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000A, 0x00000009, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000000A, 0x00000009, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000000A, 0x00000009, mValue);
     }
 
 private:
@@ -3515,9 +3516,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000F, 0x00000004, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000000F, 0x00000004, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000000F, 0x00000004, mValue);
     }
 
 private:
@@ -3542,9 +3543,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000F, 0x0000001C, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000000F, 0x0000001C, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000000F, 0x0000001C, mValue);
     }
 
 private:
@@ -3569,9 +3570,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000F, 0x0000002E, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000000F, 0x0000002E, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000000F, 0x0000002E, mValue);
     }
 
 private:
@@ -3596,9 +3597,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000F, 0x00000051, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000000F, 0x00000051, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000000F, 0x00000051, mValue);
     }
 
 private:
@@ -3623,9 +3624,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000F, 0x00000055, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000000F, 0x00000055, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000000F, 0x00000055, mValue);
     }
 
 private:
@@ -3650,9 +3651,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000F, 0x00000067, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000000F, 0x00000067, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000000F, 0x00000067, mValue);
     }
 
 private:
@@ -3708,11 +3709,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001A, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000001A, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001A, 0x00000000, mRequest);
     }
 
 private:
@@ -3738,11 +3739,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001A, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000001A, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001A, 0x00000001, mRequest);
     }
 
 private:
@@ -3772,11 +3773,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001A, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000001A, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001A, 0x00000002, mRequest);
     }
 
 private:
@@ -3805,11 +3806,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001A, 0x00000003, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000003) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000001A, 0x00000003, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001A, 0x00000003, mRequest);
     }
 
 private:
@@ -3839,11 +3840,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001A, 0x00000004, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000004) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000001A, 0x00000004, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001A, 0x00000004, mRequest);
     }
 
 private:
@@ -3874,11 +3875,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001A, 0x00000005, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000005) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000001A, 0x00000005, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001A, 0x00000005, mRequest);
     }
 
 private:
@@ -3907,11 +3908,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001A, 0x00000006, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000006) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000001A, 0x00000006, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001A, 0x00000006, mRequest);
     }
 
 private:
@@ -3938,11 +3939,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001A, 0x00000007, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000007) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000001A, 0x00000007, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001A, 0x00000007, mRequest);
     }
 
 private:
@@ -3972,11 +3973,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001A, 0x00000008, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000008) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000001A, 0x00000008, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001A, 0x00000008, mRequest);
     }
 
 private:
@@ -4000,9 +4001,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000001A, 0x00000004, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000001A, 0x00000004, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000001A, 0x00000004, mValue);
     }
 
 private:
@@ -4053,11 +4054,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001B, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000001B, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001B, 0x00000000, mRequest);
     }
 
 private:
@@ -4082,11 +4083,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001B, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000001B, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001B, 0x00000001, mRequest);
     }
 
 private:
@@ -4115,11 +4116,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001B, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000001B, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001B, 0x00000002, mRequest);
     }
 
 private:
@@ -4146,11 +4147,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001B, 0x00000003, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000003) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000001B, 0x00000003, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001B, 0x00000003, mRequest);
     }
 
 private:
@@ -4176,11 +4177,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001B, 0x00000004, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000004) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000001B, 0x00000004, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001B, 0x00000004, mRequest);
     }
 
 private:
@@ -4207,11 +4208,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001B, 0x00000005, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000005) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000001B, 0x00000005, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001B, 0x00000005, mRequest);
     }
 
 private:
@@ -4286,9 +4287,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000001E, 0x00000000, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000001E, 0x00000000, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000001E, 0x00000000, mValue);
     }
 
 private:
@@ -4333,9 +4334,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000001F, 0x00000000, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000001F, 0x00000000, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000001F, 0x00000000, mValue);
     }
 
 private:
@@ -4362,9 +4363,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000001F, 0x00000001, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000001F, 0x00000001, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000001F, 0x00000001, mValue);
     }
 
 private:
@@ -4420,11 +4421,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000020, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000020, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000020, 0x00000000, mRequest);
     }
 
 private:
@@ -4449,11 +4450,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000020, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000020, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000020, 0x00000001, mRequest);
     }
 
 private:
@@ -4480,11 +4481,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000020, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000020, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000020, 0x00000002, mRequest);
     }
 
 private:
@@ -4511,11 +4512,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000020, 0x00000003, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000003) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000020, 0x00000003, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000020, 0x00000003, mRequest);
     }
 
 private:
@@ -4540,9 +4541,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000020, 0x00000000, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000020, 0x00000000, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000020, 0x00000000, mValue);
     }
 
 private:
@@ -4567,9 +4568,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000020, 0x00000003, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000020, 0x00000003, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000020, 0x00000003, mValue);
     }
 
 private:
@@ -4628,11 +4629,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000025, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x00000000, mRequest);
     }
 
 private:
@@ -4661,11 +4662,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000025, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x00000001, mRequest);
     }
 
 private:
@@ -4692,11 +4693,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000025, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x00000002, mRequest);
     }
 
 private:
@@ -4725,11 +4726,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x00000003, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000003) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000025, 0x00000003, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x00000003, mRequest);
     }
 
 private:
@@ -4756,11 +4757,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x00000004, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000004) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000025, 0x00000004, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x00000004, mRequest);
     }
 
 private:
@@ -4787,11 +4788,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x00000005, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000005) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000025, 0x00000005, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x00000005, mRequest);
     }
 
 private:
@@ -4820,11 +4821,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x00000006, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000006) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000025, 0x00000006, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x00000006, mRequest);
     }
 
 private:
@@ -4851,11 +4852,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x00000007, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000007) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000025, 0x00000007, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x00000007, mRequest);
     }
 
 private:
@@ -4882,11 +4883,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x00000008, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000008) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000025, 0x00000008, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x00000008, mRequest);
     }
 
 private:
@@ -4915,11 +4916,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x00000009, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000009) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000025, 0x00000009, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x00000009, mRequest);
     }
 
 private:
@@ -4946,11 +4947,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x0000000A, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000A) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000025, 0x0000000A, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x0000000A, mRequest);
     }
 
 private:
@@ -4979,11 +4980,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x0000000B, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000B) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000025, 0x0000000B, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x0000000B, mRequest);
     }
 
 private:
@@ -5047,11 +5048,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000028, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000028, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000028, 0x00000000, mRequest);
     }
 
 private:
@@ -5075,9 +5076,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000028, 0x00000005, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000028, 0x00000005, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000028, 0x00000005, mValue);
     }
 
 private:
@@ -5101,9 +5102,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000028, 0x00000006, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000028, 0x00000006, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000028, 0x00000006, mValue);
     }
 
 private:
@@ -5128,9 +5129,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000028, 0x00000010, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000028, 0x00000010, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000028, 0x00000010, mValue);
     }
 
 private:
@@ -5182,11 +5183,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000029, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000029, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000029, 0x00000000, mRequest);
     }
 
 private:
@@ -5216,11 +5217,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000029, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000029, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000029, 0x00000002, mRequest);
     }
 
 private:
@@ -5248,11 +5249,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000029, 0x00000004, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000004) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000029, 0x00000004, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000029, 0x00000004, mRequest);
     }
 
 private:
@@ -5306,11 +5307,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000002A, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000002A) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000002A, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000002A, 0x00000000, mRequest);
     }
 
 private:
@@ -5335,9 +5336,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000002A, 0x00000000, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000002A, 0x00000000, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000002A, 0x00000000, mValue);
     }
 
 private:
@@ -5382,9 +5383,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000002B, 0x00000001, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000002B, 0x00000001, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000002B, 0x00000001, mValue);
     }
 
 private:
@@ -5427,9 +5428,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000002C, 0x00000000, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000002C, 0x00000000, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000002C, 0x00000000, mValue);
     }
 
 private:
@@ -5454,9 +5455,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000002C, 0x00000001, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000002C, 0x00000001, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000002C, 0x00000001, mValue);
     }
 
 private:
@@ -5497,9 +5498,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000002D, 0x00000000, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000002D, 0x00000000, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000002D, 0x00000000, mValue);
     }
 
 private:
@@ -5581,6 +5582,7 @@ private:
 | * BasicCommissioningInfo                                            | 0x0001 |
 | * RegulatoryConfig                                                  | 0x0002 |
 | * LocationCapability                                                | 0x0003 |
+| * SupportsConcurrentConnection                                      | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -5601,7 +5603,6 @@ public:
     {
         AddArgument("ExpiryLengthSeconds", 0, UINT16_MAX, &mRequest.expiryLengthSeconds);
         AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
         ClusterCommand::AddArguments();
     }
 
@@ -5612,11 +5613,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000030, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000030, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000030, 0x00000000, mRequest);
     }
 
 private:
@@ -5632,10 +5633,9 @@ public:
     GeneralCommissioningSetRegulatoryConfig(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("set-regulatory-config", credsIssuerConfig)
     {
-        AddArgument("Location", 0, UINT8_MAX, &mRequest.location);
+        AddArgument("NewRegulatoryConfig", 0, UINT8_MAX, &mRequest.newRegulatoryConfig);
         AddArgument("CountryCode", &mRequest.countryCode);
         AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
         ClusterCommand::AddArguments();
     }
 
@@ -5646,11 +5646,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000030, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000030, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000030, 0x00000002, mRequest);
     }
 
 private:
@@ -5676,11 +5676,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000030, 0x00000004, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000004) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000030, 0x00000004, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000030, 0x00000004, mRequest);
     }
 
 private:
@@ -5705,9 +5705,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000030, 0x00000000, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000030, 0x00000000, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000030, 0x00000000, mValue);
     }
 
 private:
@@ -5764,11 +5764,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000031, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000031, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000031, 0x00000000, mRequest);
     }
 
 private:
@@ -5797,11 +5797,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000031, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000031, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000031, 0x00000002, mRequest);
     }
 
 private:
@@ -5829,11 +5829,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000031, 0x00000003, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000003) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000031, 0x00000003, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000031, 0x00000003, mRequest);
     }
 
 private:
@@ -5861,11 +5861,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000031, 0x00000004, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000004) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000031, 0x00000004, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000031, 0x00000004, mRequest);
     }
 
 private:
@@ -5893,11 +5893,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000031, 0x00000006, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000006) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000031, 0x00000006, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000031, 0x00000006, mRequest);
     }
 
 private:
@@ -5926,11 +5926,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000031, 0x00000008, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000008) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000031, 0x00000008, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000031, 0x00000008, mRequest);
     }
 
 private:
@@ -5955,9 +5955,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000031, 0x00000004, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000031, 0x00000004, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000031, 0x00000004, mValue);
     }
 
 private:
@@ -6002,11 +6002,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000032, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000032) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000032, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000032, 0x00000000, mRequest);
     }
 
 private:
@@ -6080,11 +6080,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000034, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000034) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000034, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000034, 0x00000000, mRequest);
     }
 
 private:
@@ -6190,11 +6190,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000035, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000035) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000035, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000035, 0x00000000, mRequest);
     }
 
 private:
@@ -6252,11 +6252,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000036, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000036) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000036, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000036, 0x00000000, mRequest);
     }
 
 private:
@@ -6307,11 +6307,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000037, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000037) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000037, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000037, 0x00000000, mRequest);
     }
 
 private:
@@ -6384,9 +6384,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000039, 0x00000005, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000039, 0x00000005, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000039, 0x00000005, mValue);
     }
 
 private:
@@ -6463,11 +6463,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003C, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000003C, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003C, 0x00000000, mRequest);
     }
 
 private:
@@ -6494,11 +6494,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003C, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000003C, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003C, 0x00000001, mRequest);
     }
 
 private:
@@ -6524,11 +6524,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003C, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000003C, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003C, 0x00000002, mRequest);
     }
 
 private:
@@ -6585,11 +6585,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003E, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000003E, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003E, 0x00000000, mRequest);
     }
 
 private:
@@ -6616,11 +6616,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003E, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000003E, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003E, 0x00000002, mRequest);
     }
 
 private:
@@ -6646,11 +6646,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003E, 0x00000004, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000004) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000003E, 0x00000004, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003E, 0x00000004, mRequest);
     }
 
 private:
@@ -6680,11 +6680,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003E, 0x00000006, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000006) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000003E, 0x00000006, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003E, 0x00000006, mRequest);
     }
 
 private:
@@ -6711,11 +6711,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003E, 0x00000007, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000007) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000003E, 0x00000007, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003E, 0x00000007, mRequest);
     }
 
 private:
@@ -6742,11 +6742,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003E, 0x00000009, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000009) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000003E, 0x00000009, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003E, 0x00000009, mRequest);
     }
 
 private:
@@ -6773,11 +6773,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003E, 0x0000000A, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000A) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000003E, 0x0000000A, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003E, 0x0000000A, mRequest);
     }
 
 private:
@@ -6804,11 +6804,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003E, 0x0000000B, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000B) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000003E, 0x0000000B, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003E, 0x0000000B, mRequest);
     }
 
 private:
@@ -6835,11 +6835,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003E, 0x0000000C, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000C) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000003E, 0x0000000C, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003E, 0x0000000C, mRequest);
     }
 
 private:
@@ -6889,11 +6889,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003F, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000003F, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003F, 0x00000000, mRequest);
     }
 
 private:
@@ -6920,11 +6920,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003F, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000003F, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003F, 0x00000001, mRequest);
     }
 
 private:
@@ -6951,11 +6951,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003F, 0x00000003, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000003) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000003F, 0x00000003, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003F, 0x00000003, mRequest);
     }
 
 private:
@@ -6982,11 +6982,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003F, 0x00000004, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000004) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000003F, 0x00000004, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003F, 0x00000004, mRequest);
     }
 
 private:
@@ -7012,9 +7012,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000003F, 0x00000000, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000003F, 0x00000000, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000003F, 0x00000000, mValue);
     }
 
 private:
@@ -7074,9 +7074,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000041, 0x00000000, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000041, 0x00000000, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000041, 0x00000000, mValue);
     }
 
 private:
@@ -7187,11 +7187,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000050, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000050) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000050, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000050, 0x00000000, mRequest);
     }
 
 private:
@@ -7215,9 +7215,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000050, 0x00000004, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000050, 0x00000004, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000050, 0x00000004, mValue);
     }
 
 private:
@@ -7241,9 +7241,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000050, 0x00000005, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000050, 0x00000005, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000050, 0x00000005, mValue);
     }
 
 private:
@@ -7287,9 +7287,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000100, 0x00000002, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000100, 0x00000002, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000100, 0x00000002, mValue);
     }
 
 private:
@@ -7314,9 +7314,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000100, 0x00000010, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000100, 0x00000010, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000100, 0x00000010, mValue);
     }
 
 private:
@@ -7340,9 +7340,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000100, 0x00000011, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000100, 0x00000011, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000100, 0x00000011, mValue);
     }
 
 private:
@@ -7464,11 +7464,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000000, mRequest);
     }
 
 private:
@@ -7494,11 +7494,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000001, mRequest);
     }
 
 private:
@@ -7526,11 +7526,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000003, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000003) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000003, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000003, mRequest);
     }
 
 private:
@@ -7556,11 +7556,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000004, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000004) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000004, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000004, mRequest);
     }
 
 private:
@@ -7589,11 +7589,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000005, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000005) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000005, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000005, mRequest);
     }
 
 private:
@@ -7619,11 +7619,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000006, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000006) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000006, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000006, mRequest);
     }
 
 private:
@@ -7649,11 +7649,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000007, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000007) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000007, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000007, mRequest);
     }
 
 private:
@@ -7678,11 +7678,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000008, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000008) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000008, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000008, mRequest);
     }
 
 private:
@@ -7709,11 +7709,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000009, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000009) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000009, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000009, mRequest);
     }
 
 private:
@@ -7739,11 +7739,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000000A, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000A) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x0000000A, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000000A, mRequest);
     }
 
 private:
@@ -7776,11 +7776,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000000B, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000B) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x0000000B, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000000B, mRequest);
     }
 
 private:
@@ -7808,11 +7808,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000000C, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000C) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x0000000C, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000000C, mRequest);
     }
 
 private:
@@ -7840,11 +7840,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000000D, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000D) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x0000000D, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000000D, mRequest);
     }
 
 private:
@@ -7874,11 +7874,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000000E, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000E) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x0000000E, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000000E, mRequest);
     }
 
 private:
@@ -7906,11 +7906,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000000F, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000F) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x0000000F, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000000F, mRequest);
     }
 
 private:
@@ -7938,11 +7938,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000010, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000010) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000010, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000010, mRequest);
     }
 
 private:
@@ -7972,11 +7972,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000011, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000011) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000011, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000011, mRequest);
     }
 
 private:
@@ -8003,11 +8003,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000012, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000012) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000012, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000012, mRequest);
     }
 
 private:
@@ -8034,11 +8034,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000013, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000013) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000013, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000013, mRequest);
     }
 
 private:
@@ -8065,11 +8065,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000014, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000014) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000014, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000014, mRequest);
     }
 
 private:
@@ -8095,11 +8095,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000015, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000015) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000015, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000015, mRequest);
     }
 
 private:
@@ -8128,11 +8128,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000016, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000016) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000016, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000016, mRequest);
     }
 
 private:
@@ -8158,11 +8158,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000017, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000017) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000017, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000017, mRequest);
     }
 
 private:
@@ -8188,11 +8188,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000018, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000018) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000018, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000018, mRequest);
     }
 
 private:
@@ -8218,11 +8218,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000019, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000019) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000019, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000019, mRequest);
     }
 
 private:
@@ -8254,11 +8254,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000001A, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001A) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x0000001A, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000001A, mRequest);
     }
 
 private:
@@ -8284,11 +8284,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000001B, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001B) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x0000001B, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000001B, mRequest);
     }
 
 private:
@@ -8314,11 +8314,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000001D, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001D) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x0000001D, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000001D, mRequest);
     }
 
 private:
@@ -8350,11 +8350,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000022, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000022) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000022, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000022, mRequest);
     }
 
 private:
@@ -8382,11 +8382,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000024, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000024) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000024, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000024, mRequest);
     }
 
 private:
@@ -8414,11 +8414,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000026, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000026) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000026, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000026, mRequest);
     }
 
 private:
@@ -8444,9 +8444,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000004, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000004, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000004, mValue);
     }
 
 private:
@@ -8471,9 +8471,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000005, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000005, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000005, mValue);
     }
 
 private:
@@ -8497,9 +8497,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000006, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000006, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000006, mValue);
     }
 
 private:
@@ -8523,9 +8523,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000020, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000020, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000020, mValue);
     }
 
 private:
@@ -8549,9 +8549,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000021, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000021, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000021, mValue);
     }
 
 private:
@@ -8575,9 +8575,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000022, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000022, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000022, mValue);
     }
 
 private:
@@ -8601,9 +8601,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000023, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000023, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000023, mValue);
     }
 
 private:
@@ -8627,9 +8627,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000024, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000024, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000024, mValue);
     }
 
 private:
@@ -8653,9 +8653,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000025, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000025, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000025, mValue);
     }
 
 private:
@@ -8680,9 +8680,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000028, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000028, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000028, mValue);
     }
 
 private:
@@ -8707,9 +8707,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000029, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000029, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000029, mValue);
     }
 
 private:
@@ -8734,9 +8734,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000002A, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x0000002A, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000002A, mValue);
     }
 
 private:
@@ -8761,9 +8761,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000002B, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x0000002B, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000002B, mValue);
     }
 
 private:
@@ -8788,9 +8788,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000002C, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x0000002C, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000002C, mValue);
     }
 
 private:
@@ -8815,9 +8815,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000030, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000030, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000030, mValue);
     }
 
 private:
@@ -8842,9 +8842,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000031, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000031, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000031, mValue);
     }
 
 private:
@@ -8869,9 +8869,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000032, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000032, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000032, mValue);
     }
 
 private:
@@ -8896,9 +8896,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000033, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000033, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000033, mValue);
     }
 
 private:
@@ -8923,9 +8923,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000035, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000035, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000035, mValue);
     }
 
 private:
@@ -8949,9 +8949,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000040, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000040, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000040, mValue);
     }
 
 private:
@@ -8976,9 +8976,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000041, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000041, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000041, mValue);
     }
 
 private:
@@ -9003,9 +9003,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000042, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000042, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000042, mValue);
     }
 
 private:
@@ -9030,9 +9030,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000043, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000043, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000043, mValue);
     }
 
 private:
@@ -9057,9 +9057,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000044, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000044, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000044, mValue);
     }
 
 private:
@@ -9084,9 +9084,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000045, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000045, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000045, mValue);
     }
 
 private:
@@ -9111,9 +9111,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000046, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000046, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000046, mValue);
     }
 
 private:
@@ -9138,9 +9138,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000047, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000101, 0x00000047, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000047, mValue);
     }
 
 private:
@@ -9209,11 +9209,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000102, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000102, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000102, 0x00000000, mRequest);
     }
 
 private:
@@ -9238,11 +9238,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000102, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000102, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000102, 0x00000001, mRequest);
     }
 
 private:
@@ -9267,11 +9267,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000102, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000102, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000102, 0x00000002, mRequest);
     }
 
 private:
@@ -9298,11 +9298,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000102, 0x00000004, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000004) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000102, 0x00000004, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000102, 0x00000004, mRequest);
     }
 
 private:
@@ -9330,11 +9330,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000102, 0x00000005, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000005) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000102, 0x00000005, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000102, 0x00000005, mRequest);
     }
 
 private:
@@ -9361,11 +9361,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000102, 0x00000007, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000007) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000102, 0x00000007, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000102, 0x00000007, mRequest);
     }
 
 private:
@@ -9393,11 +9393,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000102, 0x00000008, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000008) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000102, 0x00000008, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000102, 0x00000008, mRequest);
     }
 
 private:
@@ -9421,9 +9421,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000102, 0x00000017, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000102, 0x00000017, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000102, 0x00000017, mValue);
     }
 
 private:
@@ -9477,11 +9477,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000103, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000103) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000103, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000103, 0x00000000, mRequest);
     }
 
 private:
@@ -9507,11 +9507,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000103, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000103) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000103, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000103, 0x00000001, mRequest);
     }
 
 private:
@@ -9536,9 +9536,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000103, 0x00000004, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000103, 0x00000004, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000103, 0x00000004, mValue);
     }
 
 private:
@@ -9563,9 +9563,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000103, 0x00000005, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000103, 0x00000005, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000103, 0x00000005, mValue);
     }
 
 private:
@@ -9590,9 +9590,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000103, 0x00000006, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000103, 0x00000006, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000103, 0x00000006, mValue);
     }
 
 private:
@@ -9617,9 +9617,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000103, 0x00000007, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000103, 0x00000007, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000103, 0x00000007, mValue);
     }
 
 private:
@@ -9644,9 +9644,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000103, 0x00000008, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000103, 0x00000008, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000103, 0x00000008, mValue);
     }
 
 private:
@@ -9671,9 +9671,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000103, 0x00000009, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000103, 0x00000009, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000103, 0x00000009, mValue);
     }
 
 private:
@@ -9754,9 +9754,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000200, 0x00000015, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000200, 0x00000015, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000200, 0x00000015, mValue);
     }
 
 private:
@@ -9781,9 +9781,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000200, 0x00000017, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000200, 0x00000017, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000200, 0x00000017, mValue);
     }
 
 private:
@@ -9808,9 +9808,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000200, 0x00000020, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000200, 0x00000020, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000200, 0x00000020, mValue);
     }
 
 private:
@@ -9835,9 +9835,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000200, 0x00000021, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000200, 0x00000021, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000200, 0x00000021, mValue);
     }
 
 private:
@@ -9893,7 +9893,7 @@ private:
 | * AcType                                                            | 0x0040 |
 | * AcCapacity                                                        | 0x0041 |
 | * AcRefrigerantType                                                 | 0x0042 |
-| * AcCompressor                                                      | 0x0043 |
+| * AcCompressorType                                                  | 0x0043 |
 | * AcErrorCode                                                       | 0x0044 |
 | * AcLouverPosition                                                  | 0x0045 |
 | * AcCoilTemperature                                                 | 0x0046 |
@@ -9928,11 +9928,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000000, mRequest);
     }
 
 private:
@@ -9962,11 +9962,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000001, mRequest);
     }
 
 private:
@@ -9995,11 +9995,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000002, mRequest);
     }
 
 private:
@@ -10025,11 +10025,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000003, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000003) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000003, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000003, mRequest);
     }
 
 private:
@@ -10055,11 +10055,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000004, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000004) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000004, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000004, mRequest);
     }
 
 private:
@@ -10084,9 +10084,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000009, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000009, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000009, mValue);
     }
 
 private:
@@ -10111,9 +10111,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000010, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000010, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000010, mValue);
     }
 
 private:
@@ -10138,9 +10138,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000011, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000011, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000011, mValue);
     }
 
 private:
@@ -10165,9 +10165,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000012, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000012, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000012, mValue);
     }
 
 private:
@@ -10192,9 +10192,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000013, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000013, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000013, mValue);
     }
 
 private:
@@ -10219,9 +10219,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000014, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000014, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000014, mValue);
     }
 
 private:
@@ -10246,9 +10246,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000015, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000015, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000015, mValue);
     }
 
 private:
@@ -10273,9 +10273,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000016, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000016, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000016, mValue);
     }
 
 private:
@@ -10300,9 +10300,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000017, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000017, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000017, mValue);
     }
 
 private:
@@ -10327,9 +10327,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000018, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000018, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000018, mValue);
     }
 
 private:
@@ -10354,9 +10354,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000019, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000019, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000019, mValue);
     }
 
 private:
@@ -10380,9 +10380,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x0000001A, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x0000001A, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x0000001A, mValue);
     }
 
 private:
@@ -10407,9 +10407,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x0000001B, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x0000001B, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x0000001B, mValue);
     }
 
 private:
@@ -10433,9 +10433,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x0000001C, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x0000001C, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x0000001C, mValue);
     }
 
 private:
@@ -10460,9 +10460,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000023, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000023, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000023, mValue);
     }
 
 private:
@@ -10487,9 +10487,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000024, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000024, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000024, mValue);
     }
 
 private:
@@ -10514,9 +10514,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000025, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000025, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000025, mValue);
     }
 
 private:
@@ -10540,9 +10540,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000040, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000040, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000040, mValue);
     }
 
 private:
@@ -10566,9 +10566,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000041, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000041, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000041, mValue);
     }
 
 private:
@@ -10593,35 +10593,36 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000042, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000042, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000042, mValue);
     }
 
 private:
     uint8_t mValue;
 };
 
-class WriteThermostatAcCompressor : public WriteAttribute
+class WriteThermostatAcCompressorType : public WriteAttribute
 {
 public:
-    WriteThermostatAcCompressor(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("AcCompressor", credsIssuerConfig)
+    WriteThermostatAcCompressorType(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("AcCompressorType", credsIssuerConfig)
     {
-        AddArgument("attr-name", "ac-compressor");
+        AddArgument("attr-name", "ac-compressor-type");
         AddArgument("attr-value", 0, UINT8_MAX, &mValue);
         WriteAttribute::AddArguments();
     }
 
-    ~WriteThermostatAcCompressor() {}
+    ~WriteThermostatAcCompressorType() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000043, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000043, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000043, mValue);
     }
 
 private:
@@ -10645,9 +10646,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000044, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000044, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000044, mValue);
     }
 
 private:
@@ -10672,9 +10673,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000045, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000045, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000045, mValue);
     }
 
 private:
@@ -10699,9 +10700,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000047, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000201, 0x00000047, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000047, mValue);
     }
 
 private:
@@ -10742,9 +10743,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000202, 0x00000000, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000202, 0x00000000, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000202, 0x00000000, mValue);
     }
 
 private:
@@ -10769,9 +10770,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000202, 0x00000001, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000202, 0x00000001, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000202, 0x00000001, mValue);
     }
 
 private:
@@ -10819,9 +10820,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000203, 0x00000010, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000203, 0x00000010, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000203, 0x00000010, mValue);
     }
 
 private:
@@ -10846,9 +10847,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000203, 0x00000011, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000203, 0x00000011, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000203, 0x00000011, mValue);
     }
 
 private:
@@ -10873,9 +10874,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000203, 0x00000012, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000203, 0x00000012, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000203, 0x00000012, mValue);
     }
 
 private:
@@ -10900,9 +10901,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000203, 0x00000013, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000203, 0x00000013, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000203, 0x00000013, mValue);
     }
 
 private:
@@ -10927,9 +10928,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000203, 0x00000014, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000203, 0x00000014, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000203, 0x00000014, mValue);
     }
 
 private:
@@ -10954,9 +10955,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000203, 0x00000015, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000203, 0x00000015, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000203, 0x00000015, mValue);
     }
 
 private:
@@ -10999,9 +11000,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000204, 0x00000000, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000204, 0x00000000, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000204, 0x00000000, mValue);
     }
 
 private:
@@ -11026,9 +11027,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000204, 0x00000001, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000204, 0x00000001, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000204, 0x00000001, mValue);
     }
 
 private:
@@ -11053,9 +11054,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000204, 0x00000002, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000204, 0x00000002, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000204, 0x00000002, mValue);
     }
 
 private:
@@ -11171,11 +11172,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000000, mRequest);
     }
 
 private:
@@ -11204,11 +11205,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000001, mRequest);
     }
 
 private:
@@ -11238,11 +11239,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000002, mRequest);
     }
 
 private:
@@ -11272,11 +11273,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000003, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000003) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000003, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000003, mRequest);
     }
 
 private:
@@ -11305,11 +11306,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000004, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000004) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000004, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000004, mRequest);
     }
 
 private:
@@ -11339,11 +11340,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000005, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000005) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000005, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000005, mRequest);
     }
 
 private:
@@ -11374,11 +11375,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000006, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000006) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000006, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000006, mRequest);
     }
 
 private:
@@ -11408,11 +11409,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000007, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000007) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000007, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000007, mRequest);
     }
 
 private:
@@ -11441,11 +11442,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000008, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000008) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000008, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000008, mRequest);
     }
 
 private:
@@ -11475,11 +11476,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000009, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000009) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000009, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000009, mRequest);
     }
 
 private:
@@ -11509,11 +11510,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x0000000A, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000000A) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x0000000A, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x0000000A, mRequest);
     }
 
 private:
@@ -11544,11 +11545,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000040, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000040) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000040, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000040, mRequest);
     }
 
 private:
@@ -11578,11 +11579,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000041, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000041) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000041, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000041, mRequest);
     }
 
 private:
@@ -11613,11 +11614,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000042, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000042) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000042, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000042, mRequest);
     }
 
 private:
@@ -11648,11 +11649,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000043, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000043) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000043, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000043, mRequest);
     }
 
 private:
@@ -11684,11 +11685,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000044, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000044) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000044, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000044, mRequest);
     }
 
 private:
@@ -11715,11 +11716,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000047, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000047) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000047, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000047, mRequest);
     }
 
 private:
@@ -11751,11 +11752,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x0000004B, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000004B) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x0000004B, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x0000004B, mRequest);
     }
 
 private:
@@ -11788,11 +11789,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x0000004C, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000004C) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x0000004C, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x0000004C, mRequest);
     }
 
 private:
@@ -11817,9 +11818,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x0000000F, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x0000000F, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x0000000F, mValue);
     }
 
 private:
@@ -11843,9 +11844,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000030, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000030, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000030, mValue);
     }
 
 private:
@@ -11869,9 +11870,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000031, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000031, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000031, mValue);
     }
 
 private:
@@ -11895,9 +11896,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000032, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000032, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000032, mValue);
     }
 
 private:
@@ -11921,9 +11922,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000033, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000033, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000033, mValue);
     }
 
 private:
@@ -11948,9 +11949,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000034, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000034, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000034, mValue);
     }
 
 private:
@@ -11974,9 +11975,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000036, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000036, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000036, mValue);
     }
 
 private:
@@ -12000,9 +12001,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000037, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000037, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000037, mValue);
     }
 
 private:
@@ -12027,9 +12028,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000038, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00000038, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000038, mValue);
     }
 
 private:
@@ -12053,9 +12054,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x0000003A, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x0000003A, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x0000003A, mValue);
     }
 
 private:
@@ -12079,9 +12080,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x0000003B, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x0000003B, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x0000003B, mValue);
     }
 
 private:
@@ -12106,9 +12107,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x0000003C, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x0000003C, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x0000003C, mValue);
     }
 
 private:
@@ -12133,9 +12134,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00004010, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000300, 0x00004010, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00004010, mValue);
     }
 
 private:
@@ -12190,9 +12191,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000010, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000301, 0x00000010, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000301, 0x00000010, mValue);
     }
 
 private:
@@ -12216,9 +12217,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000011, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000301, 0x00000011, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000301, 0x00000011, mValue);
     }
 
 private:
@@ -12243,9 +12244,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000012, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000301, 0x00000012, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000301, 0x00000012, mValue);
     }
 
 private:
@@ -12270,9 +12271,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000013, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000301, 0x00000013, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000301, 0x00000013, mValue);
     }
 
 private:
@@ -12297,9 +12298,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000014, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000301, 0x00000014, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000301, 0x00000014, mValue);
     }
 
 private:
@@ -12324,9 +12325,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000015, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000301, 0x00000015, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000301, 0x00000015, mValue);
     }
 
 private:
@@ -12350,9 +12351,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000030, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000301, 0x00000030, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000301, 0x00000030, mValue);
     }
 
 private:
@@ -12377,9 +12378,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000031, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000301, 0x00000031, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000301, 0x00000031, mValue);
     }
 
 private:
@@ -12404,9 +12405,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000032, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000301, 0x00000032, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000301, 0x00000032, mValue);
     }
 
 private:
@@ -12431,9 +12432,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000033, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000301, 0x00000033, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000301, 0x00000033, mValue);
     }
 
 private:
@@ -12458,9 +12459,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000034, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000301, 0x00000034, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000301, 0x00000034, mValue);
     }
 
 private:
@@ -12485,9 +12486,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000035, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000301, 0x00000035, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000301, 0x00000035, mValue);
     }
 
 private:
@@ -12640,9 +12641,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000406, 0x00000010, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000406, 0x00000010, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000406, 0x00000010, mValue);
     }
 
 private:
@@ -12667,9 +12668,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000406, 0x00000011, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000406, 0x00000011, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000406, 0x00000011, mValue);
     }
 
 private:
@@ -12694,9 +12695,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000406, 0x00000012, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000406, 0x00000012, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000406, 0x00000012, mValue);
     }
 
 private:
@@ -12721,9 +12722,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000406, 0x00000020, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000406, 0x00000020, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000406, 0x00000020, mValue);
     }
 
 private:
@@ -12748,9 +12749,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000406, 0x00000021, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000406, 0x00000021, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000406, 0x00000021, mValue);
     }
 
 private:
@@ -12775,9 +12776,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000406, 0x00000022, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000406, 0x00000022, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000406, 0x00000022, mValue);
     }
 
 private:
@@ -12802,9 +12803,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000406, 0x00000030, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000406, 0x00000030, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000406, 0x00000030, mValue);
     }
 
 private:
@@ -12829,9 +12830,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000406, 0x00000031, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000406, 0x00000031, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000406, 0x00000031, mValue);
     }
 
 private:
@@ -12856,9 +12857,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000406, 0x00000032, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000406, 0x00000032, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000406, 0x00000032, mValue);
     }
 
 private:
@@ -13481,11 +13482,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000500, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000500) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000500, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000500, 0x00000000, mRequest);
     }
 
 private:
@@ -13511,11 +13512,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000500, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000500) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000500, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000500, 0x00000001, mRequest);
     }
 
 private:
@@ -13542,11 +13543,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000500, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000500) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000500, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000500, 0x00000002, mRequest);
     }
 
 private:
@@ -13570,9 +13571,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000500, 0x00000010, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000500, 0x00000010, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000500, 0x00000010, mValue);
     }
 
 private:
@@ -13597,9 +13598,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000500, 0x00000013, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000500, 0x00000013, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000500, 0x00000013, mValue);
     }
 
 private:
@@ -13652,11 +13653,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000501, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000501, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000501, 0x00000000, mRequest);
     }
 
 private:
@@ -13685,11 +13686,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000501, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000501, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000501, 0x00000001, mRequest);
     }
 
 private:
@@ -13715,11 +13716,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000501, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000501, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000501, 0x00000002, mRequest);
     }
 
 private:
@@ -13744,11 +13745,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000501, 0x00000003, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000003) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000501, 0x00000003, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000501, 0x00000003, mRequest);
     }
 
 private:
@@ -13773,11 +13774,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000501, 0x00000004, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000004) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000501, 0x00000004, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000501, 0x00000004, mRequest);
     }
 
 private:
@@ -13802,11 +13803,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000501, 0x00000005, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000005) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000501, 0x00000005, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000501, 0x00000005, mRequest);
     }
 
 private:
@@ -13833,11 +13834,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000501, 0x00000006, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000006) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000501, 0x00000006, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000501, 0x00000006, mRequest);
     }
 
 private:
@@ -13862,11 +13863,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000501, 0x00000007, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000007) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000501, 0x00000007, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000501, 0x00000007, mRequest);
     }
 
 private:
@@ -13892,11 +13893,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000501, 0x00000008, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000008) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000501, 0x00000008, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000501, 0x00000008, mRequest);
     }
 
 private:
@@ -13925,11 +13926,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000501, 0x00000009, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000009) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000501, 0x00000009, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000501, 0x00000009, mRequest);
     }
 
 private:
@@ -13976,11 +13977,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000502, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000502) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000502, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000502, 0x00000000, mRequest);
     }
 
 private:
@@ -14006,11 +14007,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000502, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000502) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000502, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000502, 0x00000001, mRequest);
     }
 
 private:
@@ -14034,9 +14035,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000502, 0x00000000, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000502, 0x00000000, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000502, 0x00000000, mValue);
     }
 
 private:
@@ -14099,11 +14100,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000504, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000504, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000504, 0x00000000, mRequest);
     }
 
 private:
@@ -14131,11 +14132,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000504, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000504, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000504, 0x00000002, mRequest);
     }
 
 private:
@@ -14161,11 +14162,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000504, 0x00000003, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000003) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000504, 0x00000003, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000504, 0x00000003, mRequest);
     }
 
 private:
@@ -14211,11 +14212,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000505, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000505) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000505, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000505, 0x00000000, mRequest);
     }
 
 private:
@@ -14273,11 +14274,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000506, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x00000000, mRequest);
     }
 
 private:
@@ -14302,11 +14303,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000506, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x00000001, mRequest);
     }
 
 private:
@@ -14331,11 +14332,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000506, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x00000002, mRequest);
     }
 
 private:
@@ -14360,11 +14361,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x00000003, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000003) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000506, 0x00000003, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x00000003, mRequest);
     }
 
 private:
@@ -14389,11 +14390,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x00000004, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000004) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000506, 0x00000004, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x00000004, mRequest);
     }
 
 private:
@@ -14418,11 +14419,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x00000005, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000005) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000506, 0x00000005, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x00000005, mRequest);
     }
 
 private:
@@ -14447,11 +14448,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x00000006, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000006) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000506, 0x00000006, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x00000006, mRequest);
     }
 
 private:
@@ -14476,11 +14477,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x00000007, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000007) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000506, 0x00000007, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x00000007, mRequest);
     }
 
 private:
@@ -14506,11 +14507,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x00000008, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000008) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000506, 0x00000008, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x00000008, mRequest);
     }
 
 private:
@@ -14536,11 +14537,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x00000009, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000009) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000506, 0x00000009, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x00000009, mRequest);
     }
 
 private:
@@ -14566,11 +14567,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x0000000B, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x0000000B) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000506, 0x0000000B, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x0000000B, mRequest);
     }
 
 private:
@@ -14617,11 +14618,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000507, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000507, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000507, 0x00000000, mRequest);
     }
 
 private:
@@ -14646,11 +14647,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000507, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000507, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000507, 0x00000001, mRequest);
     }
 
 private:
@@ -14675,11 +14676,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000507, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000507, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000507, 0x00000002, mRequest);
     }
 
 private:
@@ -14706,11 +14707,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000507, 0x00000003, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000003) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000507, 0x00000003, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000507, 0x00000003, mRequest);
     }
 
 private:
@@ -14751,11 +14752,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000508, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000508) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000508, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000508, 0x00000000, mRequest);
     }
 
 private:
@@ -14797,11 +14798,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000509, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000509) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000509, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000509, 0x00000000, mRequest);
     }
 
 private:
@@ -14849,11 +14850,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050A, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050A) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050A, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050A, 0x00000000, mRequest);
     }
 
 private:
@@ -14883,11 +14884,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050A, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050A) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050A, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050A, 0x00000001, mRequest);
     }
 
 private:
@@ -14914,9 +14915,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050A, 0x00000001, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050A, 0x00000001, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050A, 0x00000001, mValue);
     }
 
 private:
@@ -14961,11 +14962,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050B, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050B) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050B, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050B, 0x00000000, mRequest);
     }
 
 private:
@@ -14992,11 +14993,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050B, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050B) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050B, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050B, 0x00000001, mRequest);
     }
 
 private:
@@ -15044,11 +15045,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050C, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050C, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050C, 0x00000000, mRequest);
     }
 
 private:
@@ -15076,11 +15077,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050C, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050C, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050C, 0x00000001, mRequest);
     }
 
 private:
@@ -15108,11 +15109,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050C, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050C, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050C, 0x00000002, mRequest);
     }
 
 private:
@@ -15138,9 +15139,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050C, 0x00000001, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050C, 0x00000001, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050C, 0x00000001, mValue);
     }
 
 private:
@@ -15209,11 +15210,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050E, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050E, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050E, 0x00000000, mRequest);
     }
 
 private:
@@ -15240,11 +15241,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050E, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050E, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050E, 0x00000002, mRequest);
     }
 
 private:
@@ -15269,11 +15270,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050E, 0x00000003, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000003) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050E, 0x00000003, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050E, 0x00000003, mRequest);
     }
 
 private:
@@ -15418,11 +15419,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000000, mRequest);
     }
 
 private:
@@ -15447,11 +15448,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000001, mRequest);
     }
 
 private:
@@ -15476,11 +15477,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000002, mRequest);
     }
 
 private:
@@ -15506,11 +15507,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000003, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000003) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000003, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000003, mRequest);
     }
 
 private:
@@ -15538,11 +15539,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000004, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000004) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000004, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000004, mRequest);
     }
 
 private:
@@ -15569,11 +15570,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000005, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000005) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000005, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000005, mRequest);
     }
 
 private:
@@ -15606,11 +15607,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000006, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000006) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000006, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000006, mRequest);
     }
 
 private:
@@ -15643,11 +15644,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000007, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000007) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000007, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000007, mRequest);
     }
 
 private:
@@ -15675,11 +15676,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000008, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000008) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000008, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000008, mRequest);
     }
 
 private:
@@ -15707,11 +15708,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000009, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000009) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000009, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000009, mRequest);
     }
 
 private:
@@ -15740,11 +15741,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000A, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000A) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000000A, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000A, mRequest);
     }
 
 private:
@@ -15772,11 +15773,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000B, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000B) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000000B, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000B, mRequest);
     }
 
 private:
@@ -15804,11 +15805,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000C, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000C) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000000C, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000C, mRequest);
     }
 
 private:
@@ -15837,11 +15838,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000D, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000D) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000000D, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000D, mRequest);
     }
 
 private:
@@ -15870,11 +15871,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000E, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000E) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000000E, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000E, mRequest);
     }
 
 private:
@@ -15901,11 +15902,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000F, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000F) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000000F, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000F, mRequest);
     }
 
 private:
@@ -15946,11 +15947,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000010, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000010) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000010, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000010, mRequest);
     }
 
 private:
@@ -15991,11 +15992,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000011, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000011) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000011, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000011, mRequest);
     }
 
 private:
@@ -16022,11 +16023,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000012, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000012) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000012, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000012, mRequest);
     }
 
 private:
@@ -16053,11 +16054,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000013, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000013) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000013, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000013, mRequest);
     }
 
 private:
@@ -16086,11 +16087,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000014, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000014) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000014, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000014, mRequest);
     }
 
 private:
@@ -16117,11 +16118,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000015, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000015) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000015, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000015, mRequest);
     }
 
 private:
@@ -16145,9 +16146,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000000, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000000, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000000, mValue);
     }
 
 private:
@@ -16171,9 +16172,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000001, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000001, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000001, mValue);
     }
 
 private:
@@ -16197,9 +16198,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000002, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000002, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000002, mValue);
     }
 
 private:
@@ -16223,9 +16224,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000003, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000003, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000003, mValue);
     }
 
 private:
@@ -16249,9 +16250,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000004, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000004, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000004, mValue);
     }
 
 private:
@@ -16275,9 +16276,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000005, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000005, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000005, mValue);
     }
 
 private:
@@ -16301,9 +16302,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000006, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000006, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000006, mValue);
     }
 
 private:
@@ -16327,9 +16328,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000007, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000007, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000007, mValue);
     }
 
 private:
@@ -16353,9 +16354,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000008, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000008, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000008, mValue);
     }
 
 private:
@@ -16379,9 +16380,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000009, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000009, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000009, mValue);
     }
 
 private:
@@ -16405,9 +16406,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000A, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000000A, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000A, mValue);
     }
 
 private:
@@ -16431,9 +16432,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000B, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000000B, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000B, mValue);
     }
 
 private:
@@ -16457,9 +16458,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000C, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000000C, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000C, mValue);
     }
 
 private:
@@ -16483,9 +16484,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000D, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000000D, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000D, mValue);
     }
 
 private:
@@ -16509,9 +16510,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000E, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000000E, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000E, mValue);
     }
 
 private:
@@ -16535,9 +16536,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000F, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000000F, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000F, mValue);
     }
 
 private:
@@ -16561,9 +16562,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000010, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000010, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000010, mValue);
     }
 
 private:
@@ -16587,9 +16588,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000011, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000011, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000011, mValue);
     }
 
 private:
@@ -16613,9 +16614,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000012, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000012, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000012, mValue);
     }
 
 private:
@@ -16639,9 +16640,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000013, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000013, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000013, mValue);
     }
 
 private:
@@ -16665,9 +16666,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000014, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000014, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000014, mValue);
     }
 
 private:
@@ -16691,9 +16692,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000015, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000015, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000015, mValue);
     }
 
 private:
@@ -16717,9 +16718,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000016, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000016, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000016, mValue);
     }
 
 private:
@@ -16743,9 +16744,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000017, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000017, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000017, mValue);
     }
 
 private:
@@ -16769,9 +16770,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000018, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000018, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000018, mValue);
     }
 
 private:
@@ -16795,9 +16796,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000019, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000019, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000019, mValue);
     }
 
 private:
@@ -16822,9 +16823,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000001A, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000001A, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000001A, mValue);
     }
 
 private:
@@ -16850,9 +16851,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000001B, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000001B, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000001B, mValue);
     }
 
 private:
@@ -16878,9 +16879,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000001C, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000001C, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000001C, mValue);
     }
 
 private:
@@ -16907,9 +16908,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000001D, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000001D, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000001D, mValue);
     }
 
 private:
@@ -16933,9 +16934,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000001E, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000001E, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000001E, mValue);
     }
 
 private:
@@ -16960,9 +16961,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000001F, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000001F, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000001F, mValue);
     }
 
 private:
@@ -16986,9 +16987,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000020, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000020, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000020, mValue);
     }
 
 private:
@@ -17012,9 +17013,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000021, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000021, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000021, mValue);
     }
 
 private:
@@ -17038,9 +17039,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000022, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000022, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000022, mValue);
     }
 
 private:
@@ -17065,9 +17066,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000023, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000023, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000023, mValue);
     }
 
 private:
@@ -17094,9 +17095,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000024, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000024, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000024, mValue);
     }
 
 private:
@@ -17121,9 +17122,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000025, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000025, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000025, mValue);
     }
 
 private:
@@ -17149,9 +17150,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000026, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000026, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000026, mValue);
     }
 
 private:
@@ -17176,9 +17177,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000027, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000027, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000027, mValue);
     }
 
 private:
@@ -17203,9 +17204,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000028, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000028, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000028, mValue);
     }
 
 private:
@@ -17230,9 +17231,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000029, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000029, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000029, mValue);
     }
 
 private:
@@ -17257,9 +17258,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000002A, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000002A, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000002A, mValue);
     }
 
 private:
@@ -17285,9 +17286,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000002B, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000002B, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000002B, mValue);
     }
 
 private:
@@ -17314,9 +17315,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000030, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000030, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000030, mValue);
     }
 
 private:
@@ -17341,9 +17342,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000031, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000031, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000031, mValue);
     }
 
 private:
@@ -17368,9 +17369,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000032, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00000032, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000032, mValue);
     }
 
 private:
@@ -17394,9 +17395,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x000000FF, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x000000FF, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x000000FF, mValue);
     }
 
 private:
@@ -17421,9 +17422,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008000, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008000, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008000, mValue);
     }
 
 private:
@@ -17448,9 +17449,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008001, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008001, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008001, mValue);
     }
 
 private:
@@ -17475,9 +17476,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008002, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008002, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008002, mValue);
     }
 
 private:
@@ -17502,9 +17503,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008003, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008003, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008003, mValue);
     }
 
 private:
@@ -17529,9 +17530,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008004, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008004, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008004, mValue);
     }
 
 private:
@@ -17555,9 +17556,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008005, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008005, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008005, mValue);
     }
 
 private:
@@ -17582,9 +17583,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008006, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008006, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008006, mValue);
     }
 
 private:
@@ -17609,9 +17610,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008007, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008007, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008007, mValue);
     }
 
 private:
@@ -17636,9 +17637,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008008, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008008, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008008, mValue);
     }
 
 private:
@@ -17663,9 +17664,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008009, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008009, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008009, mValue);
     }
 
 private:
@@ -17690,9 +17691,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000800A, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000800A, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000800A, mValue);
     }
 
 private:
@@ -17717,9 +17718,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000800B, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000800B, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000800B, mValue);
     }
 
 private:
@@ -17744,9 +17745,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000800C, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000800C, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000800C, mValue);
     }
 
 private:
@@ -17770,9 +17771,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000800D, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000800D, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000800D, mValue);
     }
 
 private:
@@ -17797,9 +17798,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000800E, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000800E, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000800E, mValue);
     }
 
 private:
@@ -17824,9 +17825,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000800F, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000800F, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000800F, mValue);
     }
 
 private:
@@ -17851,9 +17852,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008010, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008010, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008010, mValue);
     }
 
 private:
@@ -17878,9 +17879,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008011, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008011, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008011, mValue);
     }
 
 private:
@@ -17905,9 +17906,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008012, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008012, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008012, mValue);
     }
 
 private:
@@ -17932,9 +17933,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008013, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008013, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008013, mValue);
     }
 
 private:
@@ -17959,9 +17960,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008014, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008014, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008014, mValue);
     }
 
 private:
@@ -17985,9 +17986,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008015, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008015, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008015, mValue);
     }
 
 private:
@@ -18012,9 +18013,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008016, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008016, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008016, mValue);
     }
 
 private:
@@ -18039,9 +18040,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008017, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008017, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008017, mValue);
     }
 
 private:
@@ -18066,9 +18067,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008018, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008018, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008018, mValue);
     }
 
 private:
@@ -18093,9 +18094,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008019, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008019, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008019, mValue);
     }
 
 private:
@@ -18120,9 +18121,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000801E, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000801E, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000801E, mValue);
     }
 
 private:
@@ -18147,9 +18148,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008024, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008024, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008024, mValue);
     }
 
 private:
@@ -18174,9 +18175,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008025, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008025, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008025, mValue);
     }
 
 private:
@@ -18202,9 +18203,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008026, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008026, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008026, mValue);
     }
 
 private:
@@ -18229,9 +18230,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008027, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008027, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008027, mValue);
     }
 
 private:
@@ -18256,9 +18257,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008028, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008028, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008028, mValue);
     }
 
 private:
@@ -18283,9 +18284,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008029, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x00008029, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008029, mValue);
     }
 
 private:
@@ -18328,11 +18329,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000703, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000703, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000703, 0x00000000, mRequest);
     }
 
 private:
@@ -18362,11 +18363,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000703, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000703, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000703, 0x00000001, mRequest);
     }
 
 private:
@@ -18393,11 +18394,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000703, 0x00000002, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000002) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000703, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000703, 0x00000002, mRequest);
     }
 
 private:
@@ -18476,9 +18477,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000B01, 0x00000005, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000B01, 0x00000005, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000B01, 0x00000005, mValue);
     }
 
 private:
@@ -18519,11 +18520,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000B02, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000B02) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000B02, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000B02, 0x00000000, mRequest);
     }
 
 private:
@@ -18568,11 +18569,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000B03, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000B03) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000B03, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000B03, 0x00000000, mRequest);
     }
 
 private:
@@ -18598,11 +18599,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000B03, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000B03) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000B03, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000B03, 0x00000001, mRequest);
     }
 
 private:
@@ -18773,11 +18774,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000B04, 0x00000000, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000B04) command (0x00000000) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000B04, 0x00000000, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000B04, 0x00000000, mRequest);
     }
 
 private:
@@ -18806,11 +18807,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000B04, 0x00000001, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000B04) command (0x00000001) on Group %" PRIu16, groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000B04, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000B04, 0x00000001, mRequest);
     }
 
 private:
@@ -18835,9 +18836,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000B04, 0x00000511, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000B04, 0x00000511, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000B04, 0x00000511, mValue);
     }
 
 private:
@@ -18862,9 +18863,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000B04, 0x00000513, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000B04, 0x00000513, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000B04, 0x00000513, mValue);
     }
 
 private:
@@ -18889,9 +18890,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000B04, 0x00000514, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000B04, 0x00000514, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000B04, 0x00000514, mValue);
     }
 
 private:
@@ -18916,9 +18917,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000B04, 0x00000515, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000B04, 0x00000515, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000B04, 0x00000515, mValue);
     }
 
 private:
@@ -18943,9 +18944,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000B04, 0x00000516, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000B04, 0x00000516, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000B04, 0x00000516, mValue);
     }
 
 private:
@@ -18970,9 +18971,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000B04, 0x00000517, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000B04, 0x00000517, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000B04, 0x00000517, mValue);
     }
 
 private:
@@ -18997,9 +18998,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000B04, 0x00000700, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000B04, 0x00000700, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000B04, 0x00000700, mValue);
     }
 
 private:
@@ -19024,9 +19025,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000B04, 0x00000800, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000B04, 0x00000800, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000B04, 0x00000800, mValue);
     }
 
 private:
@@ -20705,19 +20706,23 @@ void registerClusterGeneralCommissioning(Commands & commands, CredentialIssuerCo
         make_unique<ReadAttribute>(Id, "basic-commissioning-info", Attributes::BasicCommissioningInfo::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "regulatory-config", Attributes::RegulatoryConfig::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "location-capability", Attributes::LocationCapability::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                    //
-        make_unique<WriteGeneralCommissioningBreadcrumb>(credsIssuerConfig),                                                   //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                //
-        make_unique<SubscribeAttribute>(Id, "breadcrumb", Attributes::Breadcrumb::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "supports-concurrent-connection", Attributes::SupportsConcurrentConnection::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<WriteGeneralCommissioningBreadcrumb>(credsIssuerConfig),                                               //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                            //
+        make_unique<SubscribeAttribute>(Id, "breadcrumb", Attributes::Breadcrumb::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "basic-commissioning-info", Attributes::BasicCommissioningInfo::Id,
+                                        credsIssuerConfig),                                                                //
+        make_unique<SubscribeAttribute>(Id, "regulatory-config", Attributes::RegulatoryConfig::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "location-capability", Attributes::LocationCapability::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "supports-concurrent-connection", Attributes::SupportsConcurrentConnection::Id,
                                         credsIssuerConfig),                                                                     //
-        make_unique<SubscribeAttribute>(Id, "regulatory-config", Attributes::RegulatoryConfig::Id, credsIssuerConfig),          //
-        make_unique<SubscribeAttribute>(Id, "location-capability", Attributes::LocationCapability::Id, credsIssuerConfig),      //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -22504,7 +22509,7 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "ac-type", Attributes::AcType::Id, credsIssuerConfig),                              //
         make_unique<ReadAttribute>(Id, "ac-capacity", Attributes::AcCapacity::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "ac-refrigerant-type", Attributes::AcRefrigerantType::Id, credsIssuerConfig),       //
-        make_unique<ReadAttribute>(Id, "ac-compressor", Attributes::AcCompressor::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "ac-compressor-type", Attributes::AcCompressorType::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "ac-error-code", Attributes::AcErrorCode::Id, credsIssuerConfig),                   //
         make_unique<ReadAttribute>(Id, "ac-louver-position", Attributes::AcLouverPosition::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "ac-coil-temperature", Attributes::AcCoilTemperature::Id, credsIssuerConfig),       //
@@ -22535,7 +22540,7 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteThermostatAcType>(credsIssuerConfig),                                                             //
         make_unique<WriteThermostatAcCapacity>(credsIssuerConfig),                                                         //
         make_unique<WriteThermostatAcRefrigerantType>(credsIssuerConfig),                                                  //
-        make_unique<WriteThermostatAcCompressor>(credsIssuerConfig),                                                       //
+        make_unique<WriteThermostatAcCompressorType>(credsIssuerConfig),                                                   //
         make_unique<WriteThermostatAcErrorCode>(credsIssuerConfig),                                                        //
         make_unique<WriteThermostatAcLouverPosition>(credsIssuerConfig),                                                   //
         make_unique<WriteThermostatAcCapacityFormat>(credsIssuerConfig),                                                   //
@@ -22596,7 +22601,7 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "ac-type", Attributes::AcType::Id, credsIssuerConfig),                              //
         make_unique<SubscribeAttribute>(Id, "ac-capacity", Attributes::AcCapacity::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "ac-refrigerant-type", Attributes::AcRefrigerantType::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "ac-compressor", Attributes::AcCompressor::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "ac-compressor-type", Attributes::AcCompressorType::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "ac-error-code", Attributes::AcErrorCode::Id, credsIssuerConfig),                   //
         make_unique<SubscribeAttribute>(Id, "ac-louver-position", Attributes::AcLouverPosition::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "ac-coil-temperature", Attributes::AcCoilTemperature::Id, credsIssuerConfig),       //
@@ -26421,4 +26426,5 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterApplianceEventsAndAlert(commands, credsIssuerConfig);
     registerClusterApplianceStatistics(commands, credsIssuerConfig);
     registerClusterElectricalMeasurement(commands, credsIssuerConfig);
+    registerClusterSubscriptions(commands, credsIssuerConfig);
 }

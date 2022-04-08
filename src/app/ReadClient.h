@@ -238,6 +238,21 @@ public:
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };
 
+    /*
+     * Retrieve the reporting intervals associated with an active subscription. This should only be called if we're of subscription
+     * interaction type and after a subscription has been established.
+     */
+    CHIP_ERROR GetReportingIntervals(uint16_t & aMinIntervalFloorSeconds, uint16_t & aMaxIntervalCeilingSeconds) const
+    {
+        VerifyOrReturnError(IsSubscriptionType(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(IsSubscriptionIdle(), CHIP_ERROR_INCORRECT_STATE);
+
+        aMinIntervalFloorSeconds   = mMinIntervalFloorSeconds;
+        aMaxIntervalCeilingSeconds = mMaxIntervalCeilingSeconds;
+
+        return CHIP_NO_ERROR;
+    }
+
     ReadClient * GetNextClient() { return mpNext; }
     void SetNextClient(ReadClient * apClient) { mpNext = apClient; }
 
@@ -339,7 +354,8 @@ private:
     FabricIndex mFabricIndex            = kUndefinedFabricIndex;
     InteractionType mInteractionType    = InteractionType::Read;
     Timestamp mEventTimestamp;
-    EventNumber mEventMin = 0;
+    EventNumber mEventMin                    = 0;
+    bool mSawAttributeReportsInCurrentReport = false;
 
     ReadClient * mpNext                 = nullptr;
     InteractionModelEngine * mpImEngine = nullptr;

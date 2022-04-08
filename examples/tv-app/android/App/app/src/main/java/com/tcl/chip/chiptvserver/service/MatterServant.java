@@ -32,15 +32,24 @@ import com.tcl.chip.tvapp.Clusters;
 import com.tcl.chip.tvapp.ContentLaunchManagerStub;
 import com.tcl.chip.tvapp.DACProviderStub;
 import com.tcl.chip.tvapp.KeypadInputManagerStub;
+import com.tcl.chip.tvapp.LevelManagerStub;
 import com.tcl.chip.tvapp.LowPowerManagerStub;
 import com.tcl.chip.tvapp.MediaInputManagerStub;
 import com.tcl.chip.tvapp.MediaPlaybackManagerStub;
+import com.tcl.chip.tvapp.OnOffManagerStub;
 import com.tcl.chip.tvapp.TvApp;
 import com.tcl.chip.tvapp.WakeOnLanManagerStub;
 
 public class MatterServant {
 
+  public int testSetupPasscode = 20202021;
+  public int testDiscriminator = 0xF00;
+
   private ChipAppServer chipAppServer;
+  private TvApp mTvApp;
+  private boolean mIsOn = true;
+  private int mOnOffEndpoint;
+  private int mLevelEndpoint;
 
   private MatterServant() {}
 
@@ -58,7 +67,7 @@ public class MatterServant {
     // then chipPlatform to prepare platform
     // then TvApp.postInit to init app which needs platform
     // then start ChipAppServer
-    TvApp tvApp =
+    mTvApp =
         new TvApp(
             (app, clusterId, endpoint) -> {
               switch (clusterId) {
@@ -83,9 +92,17 @@ public class MatterServant {
                 case Clusters.ClusterId_Channel:
                   app.setChannelManager(endpoint, new ChannelManagerStub(endpoint));
                   break;
+                case Clusters.ClusterId_OnOff:
+                  mOnOffEndpoint = endpoint;
+                  app.setOnOffManager(endpoint, new OnOffManagerStub(endpoint));
+                  break;
+                case Clusters.ClusterId_LevelControl:
+                  mLevelEndpoint = endpoint;
+                  app.setLevelManager(endpoint, new LevelManagerStub(endpoint));
+                  break;
               }
             });
-    tvApp.setDACProvider(new DACProviderStub());
+    mTvApp.setDACProvider(new DACProviderStub());
 
     Context applicationContext = context.getApplicationContext();
     AndroidChipPlatform chipPlatform =
@@ -97,7 +114,10 @@ public class MatterServant {
             new ChipMdnsCallbackImpl(),
             new DiagnosticDataProviderImpl(applicationContext));
 
-    tvApp.postInit();
+    chipPlatform.updateCommissionableDataProviderData(
+        null, null, 0, testSetupPasscode, testDiscriminator);
+
+    mTvApp.postInit();
 
     chipAppServer = new ChipAppServer();
     chipAppServer.startApp();
@@ -106,5 +126,14 @@ public class MatterServant {
   public void restart() {
     chipAppServer.stopApp();
     chipAppServer.startApp();
+  }
+
+  public void toggleOnOff() {
+    mTvApp.setOnOff(mOnOffEndpoint, mIsOn);
+    mIsOn = !mIsOn;
+  }
+
+  public void updateLevel(int value) {
+    mTvApp.setCurrentLevel(mLevelEndpoint, value);
   }
 }

@@ -19,7 +19,6 @@
 #pragma once
 
 #include <access/SubjectDescriptor.h>
-#include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/data-model/DecodableList.h>
@@ -414,6 +413,33 @@ public:
      *    callbacks.
      */
     virtual CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) { return CHIP_NO_ERROR; }
+
+    /**
+     * Indicates the start of a series of list operations. This function will be called before the first Write operation of a series
+     * of consequence attribute data of the same attribute.
+     *
+     * 1) This function will be called if the client tries to set a nullable list attribute to null.
+     * 2) This function will only be called once for a series of consequent attribute data (regardless the kind of list operation)
+     * of the same attribute.
+     *
+     * @param [in] aPath indicates the path of the modified list.
+     */
+    virtual void OnListWriteBegin(const ConcreteAttributePath & aPath) {}
+
+    /**
+     * Indicates the end of a series of list operations. This function will be called after the last Write operation of a series
+     * of consequence attribute data of the same attribute.
+     *
+     * 1) This function will be called if the client tries to set a nullable list attribute to null.
+     * 2) This function will only be called once for a series of consequent attribute data (regardless the kind of list operation)
+     * of the same attribute.
+     * 3) When aWriteWasSuccessful is true, the data written must be consistent or the list is untouched.
+     *
+     * @param [in] aPath indicates the path of the modified list
+     * @param [in] aWriteWasSuccessful indicates whether the delivered list is complete.
+     *
+     */
+    virtual void OnListWriteEnd(const ConcreteAttributePath & aPath, bool aWriteWasSuccessful) {}
 
     /**
      * Mechanism for keeping track of a chain of AttributeAccessInterfaces.

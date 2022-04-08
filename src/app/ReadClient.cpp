@@ -26,6 +26,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
 #include <app/StatusResponse.h>
+#include <assert.h>
 #include <lib/core/CHIPTLVTypes.h>
 #include <lib/support/FibonacciUtils.h>
 
@@ -68,7 +69,6 @@ static void DefaultResubscribePolicy(uint32_t aNumCumulativeRetries, uint32_t & 
                     "Computing Resubscribe policy: attempts %" PRIu32 ", max wait time %" PRIu32 " ms, selected wait time %" PRIu32
                     " ms",
                     aNumCumulativeRetries, maxWaitTimeInMsec, waitTimeInMsec);
-    return;
 }
 
 ReadClient::ReadClient(InteractionModelEngine * apImEngine, Messaging::ExchangeManager * apExchangeMgr, Callback & apCallback,
@@ -416,10 +416,8 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReportDataMessage::Parser report;
 
-    bool isEventReportsPresent       = false;
-    bool isAttributeReportIBsPresent = false;
-    bool suppressResponse            = true;
-    uint64_t subscriptionId          = 0;
+    bool suppressResponse   = true;
+    uint64_t subscriptionId = 0;
     EventReportIBs::Parser eventReportIBs;
     AttributeReportIBs::Parser attributeReportIBs;
     System::PacketBufferTLVReader reader;
@@ -474,33 +472,28 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     }
     SuccessOrExit(err);
 
-    err                   = report.GetEventReports(&eventReportIBs);
-    isEventReportsPresent = (err == CHIP_NO_ERROR);
+    err = report.GetEventReports(&eventReportIBs);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
-    SuccessOrExit(err);
-
-    if (isEventReportsPresent)
+    else if (err == CHIP_NO_ERROR)
     {
         chip::TLV::TLVReader EventReportsReader;
         eventReportIBs.GetReader(&EventReportsReader);
         err = ProcessEventReportIBs(EventReportsReader);
-        SuccessOrExit(err);
     }
+    SuccessOrExit(err);
 
-    err                         = report.GetAttributeReportIBs(&attributeReportIBs);
-    isAttributeReportIBsPresent = (err == CHIP_NO_ERROR);
+    err = report.GetAttributeReportIBs(&attributeReportIBs);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
-    SuccessOrExit(err);
-
-    if (isAttributeReportIBsPresent)
+    else if (err == CHIP_NO_ERROR)
     {
         TLV::TLVReader attributeReportIBsReader;
+        mSawAttributeReportsInCurrentReport = true;
         attributeReportIBs.GetReader(&attributeReportIBsReader);
 
         if (mIsInitialReport)
@@ -510,13 +503,14 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
         }
 
         err = ProcessAttributeReportIBs(attributeReportIBsReader);
-        SuccessOrExit(err);
+    }
+    SuccessOrExit(err);
 
-        if (!mPendingMoreChunks)
-        {
-            mpCallback.OnReportEnd();
-            mIsInitialReport = true;
-        }
+    if (mSawAttributeReportsInCurrentReport && !mPendingMoreChunks)
+    {
+        mpCallback.OnReportEnd();
+        mIsInitialReport                    = true;
+        mSawAttributeReportsInCurrentReport = false;
     }
 
     SuccessOrExit(err = report.ExitContainer());
@@ -765,9 +759,10 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
                     ChipLogValueX64(mPeerNodeId));
 
     ReturnErrorOnFailure(subscribeResponse.ExitContainer());
-    mpCallback.OnSubscriptionEstablished(subscriptionId);
 
     MoveToState(ClientState::SubscriptionActive);
+
+    mpCallback.OnSubscriptionEstablished(subscriptionId);
 
     if (mReadPrepareParams.mResubscribePolicy != nullptr)
     {

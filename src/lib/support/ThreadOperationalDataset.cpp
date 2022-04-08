@@ -277,28 +277,34 @@ CHIP_ERROR OperationalDataset::SetChannel(uint16_t aChannel)
 
 CHIP_ERROR OperationalDataset::GetExtendedPanId(uint8_t (&aExtendedPanId)[kSizeExtendedPanId]) const
 {
-    const ThreadTLV * tlv = Locate(ThreadTLV::kExtendedPanId);
+    ByteSpan extPanIdSpan;
+    CHIP_ERROR error = GetExtendedPanIdAsByteSpan(extPanIdSpan);
 
-    if (tlv != nullptr)
+    if (error != CHIP_NO_ERROR)
     {
-        memcpy(aExtendedPanId, tlv->GetValue(), sizeof(aExtendedPanId));
-        return CHIP_NO_ERROR;
+        return error;
     }
 
-    return CHIP_ERROR_TLV_TAG_NOT_FOUND;
+    memcpy(aExtendedPanId, extPanIdSpan.data(), extPanIdSpan.size());
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OperationalDataset::GetExtendedPanIdAsByteSpan(ByteSpan & span) const
 {
     const ThreadTLV * tlv = Locate(ThreadTLV::kExtendedPanId);
 
-    if (tlv != nullptr)
+    if (tlv == nullptr)
     {
-        span = ByteSpan(reinterpret_cast<const uint8_t *>(tlv->GetValue()), tlv->GetLength());
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_TLV_TAG_NOT_FOUND;
     }
 
-    return CHIP_ERROR_TLV_TAG_NOT_FOUND;
+    if (tlv->GetLength() != kSizeExtendedPanId)
+    {
+        return CHIP_ERROR_INVALID_TLV_ELEMENT;
+    }
+
+    span = ByteSpan(static_cast<const uint8_t *>(tlv->GetValue()), tlv->GetLength());
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OperationalDataset::SetExtendedPanId(const uint8_t (&aExtendedPanId)[kSizeExtendedPanId])

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#if CONFIG_ENABLE_YAML_TESTS
+
 #include <commands/tests/TestCommand.h>
 #include <commands/common/CommandInvoker.h>
 #include <lib/core/Optional.h>
@@ -37,11 +39,14 @@ public:
 {{>test_cluster tests=(getTests) credsIssuerConfigArg=true needsWaitDuration=true}}
 {{>test_cluster tests=(getManualTests) credsIssuerConfigArg=true needsWaitDuration=true}}
 
+#endif // CONFIG_ENABLE_YAML_TESTS
+
 void registerCommandsTests(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     const char * clusterName = "Tests";
 
     commands_list clusterCommands = {
+#if CONFIG_ENABLE_YAML_TESTS
         make_unique<TestList>(),
         make_unique<ManualTestList>(),
       {{#chip_tests (getTests)}}
@@ -50,6 +55,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
       {{#chip_tests (getManualTests)}}
         make_unique<{{filename}}Suite>(credsIssuerConfig),
       {{/chip_tests}}
+#endif // CONFIG_ENABLE_YAML_TESTS
     };
 
     commands.Register(clusterName, clusterCommands);

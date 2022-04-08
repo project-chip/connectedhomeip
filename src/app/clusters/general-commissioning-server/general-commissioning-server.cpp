@@ -25,6 +25,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/server/CommissioningWindowManager.h>
+#include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/Span.h>
@@ -40,6 +42,8 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GeneralCommissioning;
 using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
 using namespace chip::DeviceLayer;
+using Transport::SecureSession;
+using Transport::Session;
 
 #define CheckSuccess(expr, code)                                                                                                   \
     do                                                                                                                             \
@@ -68,6 +72,7 @@ public:
 private:
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &), AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadBasicCommissioningInfo(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadSupportsConcurrentConnection(AttributeValueEncoder & aEncoder);
 };
 
 GeneralCommissioningAttrAccess gAttrAccess;
@@ -90,6 +95,9 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
     }
     case BasicCommissioningInfo::Id: {
         return ReadBasicCommissioningInfo(aEncoder);
+    }
+    case SupportsConcurrentConnection::Id: {
+        return ReadSupportsConcurrentConnection(aEncoder);
     }
     default: {
         break;
@@ -126,6 +134,17 @@ CHIP_ERROR GeneralCommissioningAttrAccess::ReadBasicCommissioningInfo(AttributeV
     return aEncoder.Encode(basicCommissioningInfo);
 }
 
+CHIP_ERROR GeneralCommissioningAttrAccess::ReadSupportsConcurrentConnection(AttributeValueEncoder & aEncoder)
+{
+    SupportsConcurrentConnection::TypeInfo::Type supportsConcurrentConnection;
+
+    // TODO: The commissioner might use the critical parameters in BasicCommissioningInfo to initialize
+    // the CommissioningParameters at the beginning of commissioning flow.
+    supportsConcurrentConnection = (CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC) != 0;
+
+    return aEncoder.Encode(supportsConcurrentConnection);
+}
+
 } // anonymous namespace
 
 bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler * commandObj,
@@ -137,6 +156,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
     Commands::ArmFailSafeResponse::Type response;
 
     /*
+     * If the fail-safe timer is not fully disarmed, don't allow arming a new fail-safe.
      * If the fail-safe timer was not currently armed, then the fail-safe timer SHALL be armed.
      * If the fail-safe timer was currently armed, and current accessing fabric matches the fail-safe
      * context’s Fabric Index, then the fail-safe timer SHALL be re-armed.
@@ -144,17 +164,41 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
 
     FabricIndex accessingFabricIndex = commandObj->GetAccessingFabricIndex();
 
-    if (!failSafeContext.IsFailSafeArmed() || failSafeContext.MatchesFabricIndex(accessingFabricIndex))
+    // We do not allow CASE connections to arm the failsafe for the first time while the commissioning window is open in order
+    // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
+    if (!failSafeContext.IsFailSafeBusy() &&
+        (!failSafeContext.IsFailSafeArmed() || failSafeContext.MatchesFabricIndex(accessingFabricIndex)))
     {
-        CheckSuccess(failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
-                     Failure);
-        response.errorCode = CommissioningError::kOk;
-        CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+        // We do not allow CASE connections to arm the failsafe for the first time while the commissioning window is open in order
+        // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
+        if (!failSafeContext.IsFailSafeArmed() &&
+            Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() !=
+                AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen &&
+            commandObj->GetSubjectDescriptor().authMode == Access::AuthMode::kCase)
+        {
+            response.errorCode = CommissioningError::kBusyWithOtherAdmin;
+            commandObj->AddResponse(commandPath, response);
+        }
+        else if (commandData.expiryLengthSeconds == 0)
+        {
+            // Force the timer to expire immediately.
+            failSafeContext.ForceFailSafeTimerExpiry();
+            response.errorCode = CommissioningError::kOk;
+            commandObj->AddResponse(commandPath, response);
+        }
+        else
+        {
+            CheckSuccess(
+                failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
+                Failure);
+            response.errorCode = CommissioningError::kOk;
+            commandObj->AddResponse(commandPath, response);
+        }
     }
     else
     {
         response.errorCode = CommissioningError::kBusyWithOtherAdmin;
-        CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+        commandObj->AddResponse(commandPath, response);
     }
 
     return true;
@@ -165,20 +209,41 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     const Commands::CommissioningComplete::DecodableType & commandData)
 {
     MATTER_TRACE_EVENT_SCOPE("CommissioningComplete", "GeneralCommissioning");
+
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-
-    /*
-     * Pass fabric of commissioner to DeviceControlSvr.
-     * This allows device to send messages back to commissioner.
-     * Once bindings are implemented, this may no longer be needed.
-     */
-    SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
-
-    CheckSuccess(server->CommissioningComplete(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()), Failure);
+    const auto & failSafe        = server->GetFailSafeContext();
 
     Commands::CommissioningCompleteResponse::Type response;
-    response.errorCode = CommissioningError::kOk;
-    CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+    if (!failSafe.IsFailSafeArmed())
+    {
+        response.errorCode = CommissioningError::kNoFailSafe;
+    }
+    else
+    {
+        SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
+        // If not a CASE session, or the fabric does not match the fail-safe,
+        // error out.
+        if (handle->GetSessionType() != Session::SessionType::kSecure ||
+            handle->AsSecureSession()->GetSecureSessionType() != SecureSession::Type::kCASE ||
+            !failSafe.MatchesFabricIndex(commandObj->GetAccessingFabricIndex()))
+        {
+            response.errorCode = CommissioningError::kInvalidAuthentication;
+        }
+        else
+        {
+            /*
+             * Pass fabric of commissioner to DeviceControlSvr.
+             * This allows device to send messages back to commissioner.
+             * Once bindings are implemented, this may no longer be needed.
+             */
+            CheckSuccess(server->CommissioningComplete(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()),
+                         Failure);
+
+            response.errorCode = CommissioningError::kOk;
+        }
+    }
+
+    commandObj->AddResponse(commandPath, response);
 
     return true;
 }
@@ -190,12 +255,13 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
     MATTER_TRACE_EVENT_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
 
-    CheckSuccess(server->SetRegulatoryConfig(to_underlying(commandData.location), commandData.countryCode, commandData.breadcrumb),
+    CheckSuccess(server->SetRegulatoryConfig(to_underlying(commandData.newRegulatoryConfig), commandData.countryCode,
+                                             commandData.breadcrumb),
                  Failure);
 
     Commands::SetRegulatoryConfigResponse::Type response;
     response.errorCode = CommissioningError::kOk;
-    CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+    commandObj->AddResponse(commandPath, response);
 
     return true;
 }

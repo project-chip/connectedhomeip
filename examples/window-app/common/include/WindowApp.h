@@ -110,16 +110,18 @@ public:
         void LiftUpdate(bool newTarget);
         void LiftGoToTarget() { LiftUpdate(true); }
         void LiftContinueToTarget() { LiftUpdate(false); }
-        void LiftUp();
-        void LiftDown();
+        void LiftStepToward(OperationalState direction);
+        void LiftSchedulePositionSet(chip::Percent100ths position) { SchedulePositionSet(position, false); }
 
         void TiltUpdate(bool newTarget);
         void TiltGoToTarget() { TiltUpdate(true); }
         void TiltContinueToTarget() { TiltUpdate(false); }
-        void TiltUp();
-        void TiltDown();
+        void TiltStepToward(OperationalState direction);
+        void TiltSchedulePositionSet(chip::Percent100ths position) { SchedulePositionSet(position, true); }
 
-        EmberAfWcType CycleType();
+        void StepToward(OperationalState direction, bool isTilt);
+
+        Type CycleType();
 
         static void OnLiftTimeout(Timer & timer);
         static void OnTiltTimeout(Timer & timer);
@@ -139,6 +141,7 @@ public:
         struct CoverWorkData
         {
             chip::EndpointId mEndpointId;
+            bool isTilt;
 
             union
             {
@@ -147,9 +150,10 @@ public:
             };
         };
 
-        static void ScheduleTiltPositionSet(intptr_t arg);
-        static void ScheduleLiftPositionSet(intptr_t arg);
-        static void ScheduleOperationalStatusSetWithGlobalUpdate(intptr_t arg);
+        void SchedulePositionSet(chip::Percent100ths position, bool isTilt);
+        static void CallbackPositionSet(intptr_t arg);
+        void ScheduleOperationalStatusSetWithGlobalUpdate(OperationalStatus opStatus);
+        static void CallbackOperationalStatusSetWithGlobalUpdate(intptr_t arg);
     };
 
     static WindowApp & Instance();

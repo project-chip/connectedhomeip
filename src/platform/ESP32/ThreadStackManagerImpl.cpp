@@ -26,6 +26,7 @@
 
 #include <platform/ThreadStackManager.h>
 
+#include <platform/ESP32/OpenthreadLauncher.h>
 #include <platform/ESP32/ThreadStackManagerImpl.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
 
@@ -51,6 +52,7 @@ ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
+    openthread_launch_task();
     return GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(esp_openthread_get_instance());
 }
 

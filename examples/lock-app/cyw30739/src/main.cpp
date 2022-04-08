@@ -132,7 +132,9 @@ APPLICATION_START()
     PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 
     /* Start CHIP datamodel server */
-    chip::Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
 
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
@@ -170,15 +172,7 @@ void EventHandler(const ChipDeviceEvent * event, intptr_t arg)
     }
 }
 
-void HandleThreadStateChangeEvent(const ChipDeviceEvent * event)
-{
-#if CHIP_BYPASS_RENDEZVOUS
-    if (event->ThreadStateChange.NetDataChanged && !ConnectivityMgr().IsThreadProvisioned())
-    {
-        ThreadStackMgr().JoinerStart();
-    }
-#endif /* CHIP_BYPASS_RENDEZVOUS */
-}
+void HandleThreadStateChangeEvent(const ChipDeviceEvent * event) {}
 
 void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
 {

@@ -28,11 +28,13 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    #issue #12190 as per spec default value is 3 but expecting 2
     - label: "read the global attribute: ClusterRevision"
+      disabled: true
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 2
+          value: 3
 
     - label: "Read the global attribute constraints: ClusterRevision"
       command: "readAttribute"
@@ -40,22 +42,6 @@ tests:
       response:
           constraints:
               type: uint16
-
-    - label:
-          "write the default values to mandatory global attribute:
-          ClusterRevision"
-      command: "writeAttribute"
-      attribute: "ClusterRevision"
-      arguments:
-          value: 1
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "reads back global attribute: ClusterRevision"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
-          value: 2
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"
@@ -74,7 +60,6 @@ tests:
               type: list
 
     - label: "Read the global attribute: AcceptedCommandList"
-      disabled: true
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -82,17 +67,8 @@ tests:
               type: list
 
     - label: "Read the global attribute: GeneratedCommandList"
-      disabled: true
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
           constraints:
               type: list
-
-    - label: "Read the optional global attribute : FeatureMap"
-      disabled: true
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: map32

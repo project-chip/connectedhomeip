@@ -17,7 +17,10 @@
 
 #pragma once
 
+#include <app/AppBuildConfig.h>
+
 #include <access/AccessControl.h>
+#include <access/examples/ExampleAccessControlDelegate.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/DefaultAttributePersistenceProvider.h>
@@ -25,21 +28,28 @@
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <credentials/FabricTable.h>
+#include <credentials/GroupDataProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <inet/InetConfig.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/SafeInt.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/KeyValueStoreManager.h>
+#include <platform/KvsPersistentStorageDelegate.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
+#if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
+#include <protocols/secure_channel/SimpleSessionResumptionStorage.h>
+#endif
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/TransportMgrBase.h>
+#if CONFIG_NETWORK_LAYER_BLE
 #include <transport/raw/BLE.h>
+#endif
 #include <transport/raw/UDP.h>
 
 namespace chip {
@@ -57,17 +67,141 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #endif
                                               >;
 
+struct ServerInitParams
+{
+    ServerInitParams()          = default;
+    virtual ~ServerInitParams() = default;
+
+    // Not copyable
+    ServerInitParams(const ServerInitParams &) = delete;
+    ServerInitParams & operator=(const ServerInitParams &) = delete;
+
+    // Application delegate to handle some commissioning lifecycle events
+    AppDelegate * appDelegate = nullptr;
+    // Port to use for Matter commissioning/operational traffic
+    uint16_t operationalServicePort = CHIP_PORT;
+    // Port to use for UDC if supported
+    uint16_t userDirectedCommissioningPort = CHIP_UDC_PORT;
+    // Interface on which to run daemon
+    Inet::InterfaceId interfaceId = Inet::InterfaceId::Null();
+
+    // Persistent storage delegate: MUST be injected. Used to maintain storage by much common code.
+    // Must be initialized before being provided.
+    PersistentStorageDelegate * persistentStorageDelegate = nullptr;
+    // Session resumption storage: Optional. Support session resumption when provided.
+    // Must be initialized before being provided.
+    SessionResumptionStorage * sessionResumptionStorage = nullptr;
+    // Group data provider: MUST be injected. Used to maintain critical keys such as the Identity
+    // Protection Key (IPK) for CASE. Must be initialized before being provided.
+    Credentials::GroupDataProvider * groupDataProvider = nullptr;
+    // Access control delegate: MUST be injected. Used to look up access control rules. Must be
+    // initialized before being provided
+    Access::AccessControl::Delegate * accessDelegate = nullptr;
+};
+
+/**
+ * Transitional version of ServerInitParams to assist SDK integrators in
+ * transitioning to injecting product/platform-owned resources. This version
+ * of `ServerInitParams` statically owns and initializes (via the
+ * `InitializeStaticResourcesBeforeServerInit()` method) the persistent storage
+ * delegate, the group data provider, and the access control delegate. This is to reduce
+ * the amount of copied boilerplate in all the example initializations (e.g. AppTask.cpp,
+ * main.cpp).
+ *
+ * This version SHOULD BE USED ONLY FOR THE IN-TREE EXAMPLES.
+ *
+ * ACTION ITEMS FOR TRANSITION from a example in-tree to a product:
+ *
+ * While this could be used indefinitely, it does not exemplify orderly management of
+ * application-injected resources. It is recommended for actual products to instead:
+ *   - Use the basic ServerInitParams in the application
+ *   - Have the application own an instance of the resources being injected in its own
+ *     state (e.g. an implementation of PersistentStorageDelegate and GroupDataProvider
+ *     interfaces).
+ *   - Initialize the injected resources prior to calling Server::Init()
+ *   - De-initialize the injected resources after calling Server::Shutdown()
+ *
+ * WARNING: DO NOT replicate the pattern shown here of having a subclass of ServerInitParams
+ *          own the resources outside of examples. This was done to reduce the amount of change
+ *          to existing examples while still supporting non-example versions of the
+ *          resources to be injected.
+ */
+struct CommonCaseDeviceServerInitParams : public ServerInitParams
+{
+    CommonCaseDeviceServerInitParams() = default;
+
+    // Not copyable
+    CommonCaseDeviceServerInitParams(const CommonCaseDeviceServerInitParams &) = delete;
+    CommonCaseDeviceServerInitParams & operator=(const CommonCaseDeviceServerInitParams &) = delete;
+
+    /**
+     * Call this before Server::Init() to initialize the internally-owned resources.
+     * Server::Init() will fail if this is not done, since several params required to
+     * be non-null will be null without calling this method. ** See the transition method
+     * in the outer comment of this class **.
+     *
+     * @return CHIP_NO_ERROR on success or a CHIP_ERROR value from APIs called to initialize
+     *         resources on failure.
+     */
+    virtual CHIP_ERROR InitializeStaticResourcesBeforeServerInit()
+    {
+        static chip::KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
+        static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
+#if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
+        static chip::SimpleSessionResumptionStorage sSessionResumptionStorage;
+#endif
+
+        // KVS-based persistent storage delegate injection
+        chip::DeviceLayer::PersistedStorage::KeyValueStoreManager & kvsManager = DeviceLayer::PersistedStorage::KeyValueStoreMgr();
+        ReturnErrorOnFailure(sKvsPersistenStorageDelegate.Init(&kvsManager));
+        this->persistentStorageDelegate = &sKvsPersistenStorageDelegate;
+
+        // Group Data provider injection
+        sGroupDataProvider.SetStorageDelegate(&sKvsPersistenStorageDelegate);
+        ReturnErrorOnFailure(sGroupDataProvider.Init());
+        this->groupDataProvider = &sGroupDataProvider;
+
+#if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
+        ReturnErrorOnFailure(sSessionResumptionStorage.Init(&sKvsPersistenStorageDelegate));
+        this->sessionResumptionStorage = &sSessionResumptionStorage;
+#else
+        this->sessionResumptionStorage = nullptr;
+#endif
+
+        // Inject access control delegate
+        this->accessDelegate = Access::Examples::GetAccessControlDelegate(&sKvsPersistenStorageDelegate);
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+/**
+ * The `Server` singleton class is an aggregate for all the resources needed to run a
+ * Node that is both Commissionable and mainly used as an end-node with server clusters.
+ * In other words, it aggregates the state needed for the type of Node used for most
+ * products that are not mainly controller/administrator role.
+ *
+ * This sington class expects `ServerInitParams` initialization parameters but does not
+ * own the resources injected from `ServerInitParams`. Any object pointers/references
+ * passed in ServerInitParams must be pre-initialized externally, and shutdown/finalized
+ * after `Server::Shutdown()` is called.
+ *
+ * TODO: Separate lifecycle ownership for some more capabilities that should not belong to
+ *       common logic, such as `DispatchShutDownAndStopEventLoop`.
+ *
+ * TODO: Replace all uses of GetInstance() to "reach in" to this state from all cluster
+ *       server common logic that deal with global node state with either a common NodeState
+ *       compatible with OperationalDeviceProxy/DeviceProxy, or with injection at common
+ *       SDK logic init.
+ */
 class Server
 {
 public:
-    CHIP_ERROR Init(AppDelegate * delegate = nullptr, uint16_t secureServicePort = CHIP_PORT,
-                    uint16_t unsecureServicePort = CHIP_UDC_PORT, Inet::InterfaceId interfaceId = Inet::InterfaceId::Null());
+    CHIP_ERROR Init(const ServerInitParams & initParams);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-
-    CHIP_ERROR AddTestCommissioning();
 
     /**
      * @brief Call this function to rejoin existing groups found in the GroupDataProvider
@@ -80,11 +214,13 @@ public:
 
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
 
-    SessionIDAllocator & GetSessionIDAllocator() { return mSessionIDAllocator; }
-
     SessionManager & GetSecureSessionManager() { return mSessions; }
 
+    SessionResumptionStorage * GetSessionResumptionStorage() { return mSessionResumptionStorage; }
+
     TransportMgrBase & GetTransportManager() { return mTransports; }
+
+    Credentials::GroupDataProvider * GetGroupDataProvider() { return mGroupsProvider; }
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * GetBleLayerObject() { return mBleLayer; }
@@ -92,7 +228,7 @@ public:
 
     CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
 
-    PersistentStorageDelegate & GetPersistentStorage() { return mDeviceStorage; }
+    PersistentStorageDelegate & GetPersistentStorage() { return *mDeviceStorage; }
 
     /**
      * This function send the ShutDown event before stopping
@@ -107,65 +243,9 @@ public:
     static Server & GetInstance() { return sServer; }
 
 private:
-    Server();
+    Server() = default;
 
     static Server sServer;
-
-    class DeviceStorageDelegate : public PersistentStorageDelegate
-    {
-        CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
-        {
-            uint8_t emptyPlaceholder = 0;
-            if (buffer == nullptr)
-            {
-                if (size != 0)
-                {
-                    return CHIP_ERROR_INVALID_ARGUMENT;
-                }
-
-                // When size is zero, let's give a non-nullptr to the KVS backend
-                buffer = &emptyPlaceholder;
-            }
-
-            size_t bytesRead = 0;
-            CHIP_ERROR err   = DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead);
-
-            // Update size only if it made sense
-            if ((CHIP_ERROR_BUFFER_TOO_SMALL == err) || (CHIP_NO_ERROR == err))
-            {
-                size = CanCastTo<uint16_t>(bytesRead) ? static_cast<uint16_t>(bytesRead) : 0;
-            }
-
-            if (err == CHIP_NO_ERROR)
-            {
-                ChipLogProgress(AppServer, "Retrieved from server storage: %s", key);
-            }
-
-            return err;
-        }
-
-        CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
-        {
-            uint8_t placeholderForEmpty = 0;
-            if (value == nullptr)
-            {
-                if (size == 0)
-                {
-                    value = &placeholderForEmpty;
-                }
-                else
-                {
-                    return CHIP_ERROR_INVALID_ARGUMENT;
-                }
-            }
-            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
-        }
-
-        CHIP_ERROR SyncDeleteKeyValue(const char * key) override
-        {
-            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
-        }
-    };
 
     class GroupDataProviderListener final : public Credentials::GroupDataProvider::GroupListener
     {
@@ -203,33 +283,33 @@ private:
     public:
         ServerFabricDelegate() {}
 
-        CHIP_ERROR Init(SessionManager * sessionManager)
+        CHIP_ERROR Init(Server * server)
         {
-            VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(server != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-            mSessionManager = sessionManager;
+            mServer = server;
             return CHIP_NO_ERROR;
         };
 
         void OnFabricDeletedFromStorage(CompressedFabricId compressedId, FabricIndex fabricIndex) override
         {
             (void) compressedId;
-            if (mSessionManager != nullptr)
-            {
-                mSessionManager->FabricRemoved(fabricIndex);
-            }
-            Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
+            auto & sessionManager = mServer->GetSecureSessionManager();
+            sessionManager.FabricRemoved(fabricIndex);
+
+            Credentials::GroupDataProvider * groupDataProvider = mServer->GetGroupDataProvider();
             if (groupDataProvider != nullptr)
             {
                 groupDataProvider->RemoveFabric(fabricIndex);
             }
+            Access::GetAccessControl().RemoveFabric(fabricIndex);
         };
         void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
 
         void OnFabricPersistedToStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
 
     private:
-        SessionManager * mSessionManager = nullptr;
+        Server * mServer = nullptr;
     };
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -246,27 +326,23 @@ private:
 
     Messaging::ExchangeManager mExchangeMgr;
     FabricTable mFabrics;
-    SessionIDAllocator mSessionIDAllocator;
     secure_channel::MessageCounterManager mMessageCounterManager;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDCClient;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    SecurePairingUsingTestSecret mTestPairing;
     CommissioningWindowManager mCommissioningWindowManager;
 
-    // Both PersistentStorageDelegate, and GroupDataProvider should be injected by the applications
-    // See: https://github.com/project-chip/connectedhomeip/issues/12276
-    DeviceStorageDelegate mDeviceStorage;
-    Credentials::GroupDataProviderImpl mGroupsProvider;
+    PersistentStorageDelegate * mDeviceStorage;
+    SessionResumptionStorage * mSessionResumptionStorage;
+    Credentials::GroupDataProvider * mGroupsProvider;
     app::DefaultAttributePersistenceProvider mAttributePersister;
     GroupDataProviderListener mListener;
     ServerFabricDelegate mFabricDelegate;
 
     Access::AccessControl mAccessControl;
 
-    // TODO @ceille: Maybe use OperationalServicePort and CommissionableServicePort
-    uint16_t mSecuredServicePort;
-    uint16_t mUnsecuredServicePort;
+    uint16_t mOperationalServicePort;
+    uint16_t mUserDirectedCommissioningPort;
     Inet::InterfaceId mInterfaceId;
 };
 

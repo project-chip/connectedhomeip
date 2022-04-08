@@ -22,24 +22,12 @@ get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-cluster
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
-# Load NCS/Zephyr build system
-set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/app/sample-defaults.conf prj.conf)
+# Set Kconfig root files that will be processed as a first Kconfig for used child images.
+set(mcuboot_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.mcuboot.root)
+set(multiprotocol_rpmsg_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.multiprotocol_rpmsg.root)
 
-if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.conf)
-  list(APPEND CONF_FILE boards/${BOARD}.conf)
-endif()
-
-option(BUILD_WITH_DFU "Build target with Device Firmware Upgrade support" OFF)
-if(BUILD_WITH_DFU)
-    list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-mcuboot_qspi_nor_support.conf)
-    # Enable Matter OTA Requestor
-    list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-ota_requestor.conf)
-    if(BOARD STREQUAL "nrf5340dk_nrf5340_cpuapp")
-        set(mcuboot_OVERLAY_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/configuration/mcuboot_multi_image_dfu.conf CACHE INTERNAL "")
-    else()
-        set(mcuboot_OVERLAY_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/configuration/mcuboot_single_image_dfu.conf CACHE INTERNAL "")
-    endif()
-    set(PM_STATIC_YML_FILE ${CMAKE_CURRENT_SOURCE_DIR}/configuration/${BOARD}/pm_static.yml)
+if(DEFINED CONF_FILE AND NOT CONF_FILE STREQUAL "prj.conf")
+    set(PM_STATIC_YML_FILE ${CMAKE_CURRENT_SOURCE_DIR}/configuration/${BOARD}/pm_static_dfu.yml)
 endif()
 
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
@@ -73,8 +61,11 @@ target_sources(app PRIVATE
                ${GEN_DIR}/all-clusters-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp)
 
-
 chip_configure_data_model(app
     INCLUDE_SERVER
     ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
 )
+
+if(CONFIG_CHIP_OTA_REQUESTOR)
+    target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/OTAUtil.cpp)
+endif()

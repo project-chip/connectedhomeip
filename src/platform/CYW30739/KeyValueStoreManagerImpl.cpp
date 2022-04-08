@@ -27,6 +27,10 @@
 #include <platform_nvram.h>
 #include <string.h>
 
+namespace {
+constexpr size_t kMaxPersistedValueLengthSupported = 2048;
+} // namespace
+
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
@@ -46,7 +50,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
     const size_t keyLength = strnlen(key, CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH);
     VerifyOrExit(keyLength != 0 && keyLength <= CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH &&
-                     value_size <= CHIP_CONFIG_PERSISTED_STORAGE_MAX_VALUE_LENGTH,
+                     value_size <= kMaxPersistedValueLengthSupported,
                  err = CHIP_ERROR_INVALID_ARGUMENT);
 
     keyEntryStorage = new KeyEntryStorage();
@@ -80,7 +84,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 
     const size_t keyLength = strnlen(key, CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH + 1);
     VerifyOrExit(keyLength != 0 && keyLength <= CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH &&
-                     value_size <= CHIP_CONFIG_PERSISTED_STORAGE_MAX_VALUE_LENGTH,
+                     value_size <= kMaxPersistedValueLengthSupported,
                  err = CHIP_ERROR_INVALID_ARGUMENT);
 
     keyEntryStorage = new KeyEntryStorage();
