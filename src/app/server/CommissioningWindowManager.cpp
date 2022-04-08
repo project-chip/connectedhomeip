@@ -318,10 +318,12 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
     }
 #endif
 
+#if CONFIG_NETWORK_LAYER_BLE
     if (mIsBLE)
     {
         ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
     }
+#endif // CONFIG_NETWORK_LAYER_BLE
 
     if (mAppDelegate != nullptr)
     {
@@ -367,10 +369,12 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
         app::DnssdServer::Instance().StartServer();
     }
 
+#if CONFIG_NETWORK_LAYER_BLE
     if (mIsBLE)
     {
         ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false));
     }
+#endif // CONFIG_NETWORK_LAYER_BLE
 
     if (mAppDelegate != nullptr)
     {
