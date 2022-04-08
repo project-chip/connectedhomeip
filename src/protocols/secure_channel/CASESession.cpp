@@ -108,7 +108,7 @@ void CASESession::Clear()
     PairingSession::Clear();
 
     mState = kInitialized;
-    Crypto::ClearSecretData(&mIPK[0], sizeof(mIPK));
+    Crypto::ClearSecretData(mIPK);
 
     AbortExchange();
 }
