@@ -45,19 +45,6 @@ struct Mode
     uint8_t ledDisplay : 1;       // bit 3
 };
 static_assert(sizeof(Mode) == sizeof(uint8_t), "Mode Size is not correct");
-
-struct ConfigStatus
-{
-    uint8_t operational : 1;             // bit 0 M
-    uint8_t online : 1;                  // bit 1 M
-    uint8_t liftIsReversed : 1;          // bit 2 LF
-    uint8_t liftIsPA : 1;                // bit 3 LF & PA
-    uint8_t tiltIsPA : 1;                // bit 4 TL & PA
-    uint8_t liftIsEncoderControlled : 1; // bit 5 LF & PA
-    uint8_t tiltIsEncoderControlled : 1; // bit 6 LF & PA
-};
-static_assert(sizeof(ConfigStatus) == sizeof(uint8_t), "ConfigStatus Size is not correct");
-
 // Match directly with OperationalStatus 2 bits Fields
 enum class OperationalState : uint8_t
 {
@@ -117,8 +104,10 @@ bool HasFeaturePaTilt(chip::EndpointId endpoint);
 void TypeSet(chip::EndpointId endpoint, Type type);
 Type TypeGet(chip::EndpointId endpoint);
 
-void ConfigStatusSet(chip::EndpointId endpoint, const ConfigStatus & status);
-const ConfigStatus ConfigStatusGet(chip::EndpointId endpoint);
+void ConfigStatusPrint(const chip::BitFlags<ConfigStatus> & configStatus);
+void ConfigStatusSet(chip::EndpointId endpoint, const chip::BitFlags<ConfigStatus> & status);
+chip::BitFlags<ConfigStatus> ConfigStatusGet(chip::EndpointId endpoint);
+void ConfigStatusUpdateFeatures(chip::EndpointId endpoint);
 
 void OperationalStatusSet(chip::EndpointId endpoint, const OperationalStatus & status);
 void OperationalStatusSetWithGlobalUpdated(chip::EndpointId endpoint, OperationalStatus & status);

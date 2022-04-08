@@ -170,34 +170,49 @@ Type TypeGet(chip::EndpointId endpoint)
     return value;
 }
 
-void ConfigStatusSet(chip::EndpointId endpoint, const ConfigStatus & status)
+
+void ConfigStatusPrint(const chip::BitFlags<ConfigStatus> & configStatus)
 {
-    /* clang-format off */
-    uint8_t value = (status.operational ? 0x01 : 0)
-                    | (status.online ? 0x02 : 0)
-                    | (status.liftIsReversed ? 0x04 : 0)
-                    | (status.liftIsPA ? 0x08 : 0)
-                    | (status.tiltIsPA ? 0x10 : 0)
-                    | (status.liftIsEncoderControlled ? 0x20 : 0)
-                    | (status.tiltIsEncoderControlled ? 0x40 : 0);
-    /* clang-format on */
-    Attributes::ConfigStatus::Set(endpoint, value);
+    emberAfWindowCoveringClusterPrint("ConfigStatus 0x%02X Operational=%u OnlineReserved=%u",
+        configStatus.Raw(),
+        configStatus.Has(ConfigStatus::kOperational),
+        configStatus.Has(ConfigStatus::kOnlineReserved));
+
+    emberAfWindowCoveringClusterPrint("Lift(PA=%u Encoder=%u Reversed=%u) Tilt(PA=%u Encoder=%u)",
+        configStatus.Has(ConfigStatus::kLiftPositionAware),
+        configStatus.Has(ConfigStatus::kLiftEncoderControlled),
+        configStatus.Has(ConfigStatus::kLiftMovementReversed),
+        configStatus.Has(ConfigStatus::kTiltPositionAware),
+        configStatus.Has(ConfigStatus::kTiltEncoderControlled));
 }
 
-const ConfigStatus ConfigStatusGet(chip::EndpointId endpoint)
+void ConfigStatusSet(chip::EndpointId endpoint, const chip::BitFlags<ConfigStatus> & configStatus)
 {
-    uint8_t value = 0;
-    ConfigStatus status;
+    Attributes::ConfigStatus::Set(endpoint, configStatus);
+}
 
-    Attributes::ConfigStatus::Get(endpoint, &value);
-    status.operational             = (value & 0x01) ? 1 : 0;
-    status.online                  = (value & 0x02) ? 1 : 0;
-    status.liftIsReversed          = (value & 0x04) ? 1 : 0;
-    status.liftIsPA                = (value & 0x08) ? 1 : 0;
-    status.tiltIsPA                = (value & 0x10) ? 1 : 0;
-    status.liftIsEncoderControlled = (value & 0x20) ? 1 : 0;
-    status.tiltIsEncoderControlled = (value & 0x40) ? 1 : 0;
-    return status;
+chip::BitFlags<ConfigStatus> ConfigStatusGet(chip::EndpointId endpoint)
+{
+    chip::BitFlags<ConfigStatus> configStatus;
+    Attributes::ConfigStatus::Get(endpoint, &configStatus);
+
+    return configStatus;
+}
+
+void ConfigStatusUpdateFeatures(chip::EndpointId endpoint)
+{
+    chip::BitFlags<ConfigStatus> configStatus = ConfigStatusGet(endpoint);
+
+    configStatus.Set(ConfigStatus::kLiftPositionAware, HasFeaturePaLift(endpoint));
+    configStatus.Set(ConfigStatus::kTiltPositionAware, HasFeaturePaTilt(endpoint));
+
+    if (!HasFeaturePaLift(endpoint))
+        configStatus.Clear(ConfigStatus::kLiftEncoderControlled);
+
+    if (!HasFeaturePaTilt(endpoint))
+        configStatus.Clear(ConfigStatus::kTiltEncoderControlled);
+
+    ConfigStatusSet(endpoint, configStatus);
 }
 
 void OperationalStatusSetWithGlobalUpdated(chip::EndpointId endpoint, OperationalStatus & status)
@@ -565,6 +580,7 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
 {
     // all-cluster-app: simulation for the CI testing
     // otherwise it is defined for manufacturer specific implementation */
+    BitFlags<ConfigStatus> configStatus;
     NPercent100ths current, target;
     OperationalStatus prevOpStatus = OperationalStatusGet(endpoint);
     OperationalStatus opStatus     = prevOpStatus;
@@ -610,6 +626,10 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
         Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, current);
         opStatus.tilt = ComputeOperationalState(target, current);
         break;
+    case Attributes::ConfigStatus::Id:
+        configStatus = ConfigStatusGet(endpoint);
+        ConfigStatusPrint(configStatus);
+        break;
     default:
         break;
     }
@@ -637,6 +657,8 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
 void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint)
 {
     emberAfWindowCoveringClusterPrint("Window Covering Cluster init");
+
+    ConfigStatusUpdateFeatures(endpoint);
 }
 
 /**

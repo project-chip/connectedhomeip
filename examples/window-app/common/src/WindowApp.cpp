@@ -294,6 +294,7 @@ void WindowApp::DispatchEvent(const WindowApp::Event & event)
 void WindowApp::DispatchEventAttributeChange(chip::EndpointId endpoint, chip::AttributeId attribute)
 {
     Cover * cover = GetCover(endpoint);
+    chip::BitFlags<ConfigStatus> configStatus;
 
     if (nullptr == cover)
     {
@@ -321,13 +322,18 @@ void WindowApp::DispatchEventAttributeChange(chip::EndpointId endpoint, chip::At
     case Attributes::Mode::Id:
         emberAfWindowCoveringClusterPrint("Mode set: ignored");
         break;
+    /* RO ConfigStatus: set by WC server */
+    case Attributes::ConfigStatus::Id:
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
+        configStatus = ConfigStatusGet(endpoint);
+        ConfigStatusPrint(configStatus);
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+        break;
     /* ### ATTRIBUTEs CHANGEs IGNORED ### */
     /* RO Type: not supposed to dynamically change */
     case Attributes::Type::Id:
     /* RO EndProductType: not supposed to dynamically change */
     case Attributes::EndProductType::Id:
-    /* RO ConfigStatus: set by WC server */
-    case Attributes::ConfigStatus::Id:
     /* RO SafetyStatus: set by WC server */
     case Attributes::SafetyStatus::Id:
     /* ============= Positions for Position Aware ============= */
@@ -415,13 +421,10 @@ void WindowApp::Cover::Init(chip::EndpointId endpoint)
     TypeSet(endpoint, Type::kTiltBlindLiftAndTilt);
 
     // Attribute: Id  7 ConfigStatus
-    ConfigStatus configStatus = { .operational             = 1,
-                                  .online                  = 1,
-                                  .liftIsReversed          = 0,
-                                  .liftIsPA                = HasFeaturePaLift(endpoint),
-                                  .tiltIsPA                = HasFeaturePaTilt(endpoint),
-                                  .liftIsEncoderControlled = 1,
-                                  .tiltIsEncoderControlled = 1 };
+    chip::BitFlags<ConfigStatus> configStatus = ConfigStatusGet(endpoint);
+    configStatus.Set(ConfigStatus::kLiftEncoderControlled);
+    configStatus.Set(ConfigStatus::kTiltEncoderControlled);
+    configStatus.Set(ConfigStatus::kOnlineReserved);
     ConfigStatusSet(endpoint, configStatus);
 
     OperationalStatusSetWithGlobalUpdated(endpoint, mOperationalStatus);
