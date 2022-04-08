@@ -24,24 +24,24 @@
 #pragma once
 
 #include <lib/core/ReferenceCounted.h>
-#include <messaging/ExchangeACL.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/ReferenceCountedHandle.h>
+#include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
 #include <protocols/Protocols.h>
-#include <support/BitFlags.h>
-#include <support/DLLUtil.h>
-#include <system/SystemTimer.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
-
-constexpr uint16_t kMsgCounterChallengeSize = 8; // The size of the message counter synchronization request message.
 
 namespace Messaging {
 
 class ExchangeManager;
 class ExchangeContext;
+class ExchangeMessageDispatch;
+using ExchangeHandle = ReferenceCountedHandle<ExchangeContext>;
 
 class ExchangeContextDeletor
 {
@@ -55,14 +55,20 @@ public:
  *    It defines methods for encoding and communicating CHIP messages within an ExchangeContext
  *    over various transport mechanisms, for example, TCP, UDP, or CHIP Reliable Messaging.
  */
-class DLL_EXPORT ExchangeContext : public ReferenceCounted<ExchangeContext, ExchangeContextDeletor, 0>
+class DLL_EXPORT ExchangeContext : public ReliableMessageContext,
+                                   public ReferenceCounted<ExchangeContext, ExchangeContextDeletor>,
+                                   public SessionReleaseDelegate
 {
     friend class ExchangeManager;
     friend class ExchangeContextDeletor;
-    friend class MessageCounterSyncMgr;
 
 public:
-    typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
+    typedef System::Clock::Timeout Timeout; // Type used to express the timeout in this ExchangeContext
+
+    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
+                    ExchangeDelegate * delegate);
+
+    ~ExchangeContext() override;
 
     /**
      *  Determine whether the context is the initiator of the exchange.
@@ -71,25 +77,21 @@ public:
      */
     bool IsInitiator() const;
 
-    /**
-     *  Determine whether a response is expected for messages sent over
-     *  this exchange.
-     *
-     *  @return Returns 'true' if response expected, else 'false'.
-     */
-    bool IsResponseExpected() const;
+    bool IsEncryptionRequired() const { return mDispatch.IsEncryptionRequired(); }
 
-    /**
-     *  Set whether a response is expected on this exchange.
-     *
-     *  @param[in]  inResponseExpected  A Boolean indicating whether (true) or not
-     *                                  (false) a response is expected on this
-     *                                  exchange.
-     */
-    void SetResponseExpected(bool inResponseExpected);
+    bool IsGroupExchangeContext() const { return mSession && mSession->IsGroupSession(); }
+
+    // Implement SessionReleaseDelegate
+    void OnSessionReleased() override;
 
     /**
      *  Send a CHIP message on this exchange.
+     *
+     *  If SendMessage returns success and the message was not expecting a
+     *  response, the exchange will close itself before returning, unless the
+     *  message being sent is a standalone ack.  If SendMessage returns failure,
+     *  the caller is responsible for deciding what to do (e.g. closing the
+     *  exchange, trying to re-establish a secure session, etc).
      *
      *  @param[in]    protocolId    The protocol identifier of the CHIP message to be sent.
      *
@@ -108,68 +110,57 @@ public:
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully sent the message down to the
      *                                                       network layer.
      */
-    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload,
-                           const SendFlags & sendFlags);
+    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle && msgPayload,
+                           const SendFlags & sendFlags = SendFlags(SendMessageFlags::kNone));
 
     /**
      * A strongly-message-typed version of SendMessage.
      */
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
-    CHIP_ERROR SendMessage(MessageType msgType, System::PacketBufferHandle && msgPayload, const SendFlags & sendFlags)
+    CHIP_ERROR SendMessage(MessageType msgType, System::PacketBufferHandle && msgPayload,
+                           const SendFlags & sendFlags = SendFlags(SendMessageFlags::kNone))
     {
-        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
-        return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), static_cast<uint8_t>(msgType),
-                           std::move(msgPayload), sendFlags);
+        return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), to_underlying(msgType), std::move(msgPayload),
+                           sendFlags);
     }
+
+    /**
+     * A notification that we will have SendMessage called on us in the future
+     * (and should stay open until that happens).
+     */
+    void WillSendMessage() { mFlags.Set(Flags::kFlagWillSendMessage); }
 
     /**
      *  Handle a received CHIP message on this exchange.
      *
-     *  @param[in]    packetHeader  A reference to the PacketHeader object.
-     *
-     *  @param[in]    payloadHeader A reference to the PayloadHeader object.
-     *
-     *  @param[in]    msgBuf        A handle to the packet buffer holding the CHIP message.
+     *  @param[in]    messageCounter  The message counter of the packet.
+     *  @param[in]    payloadHeader   A reference to the PayloadHeader object.
+     *  @param[in]    peerAddress     The address of the sender
+     *  @param[in]    msgFlags        The message flags corresponding to the received message
+     *  @param[in]    msgBuf          A handle to the packet buffer holding the CHIP message.
      *
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this HandleMessage API.
      *  @retval  #CHIP_ERROR_INCORRECT_STATE                if the state of the exchange context is incorrect.
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully delivered the message up to the
      *                                                       protocol layer.
      */
-    CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                             System::PacketBufferHandle msgBuf);
+    CHIP_ERROR HandleMessage(uint32_t messageCounter, const PayloadHeader & payloadHeader,
+                             const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
+                             System::PacketBufferHandle && msgBuf);
 
     ExchangeDelegate * GetDelegate() const { return mDelegate; }
     void SetDelegate(ExchangeDelegate * delegate) { mDelegate = delegate; }
-    void SetReliableMessageDelegate(ReliableMessageDelegate * delegate) { mReliableMessageContext.SetDelegate(delegate); }
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
-    ReliableMessageContext * GetReliableMessageContext() { return &mReliableMessageContext; };
+    ReliableMessageContext * GetReliableMessageContext() { return static_cast<ReliableMessageContext *>(this); };
 
-    ExchangeACL * GetExchangeACL(Transport::AdminPairingTable & table)
-    {
-        if (mExchangeACL == nullptr)
-        {
-            Transport::AdminPairingInfo * admin = table.FindAdmin(mSecureSession.GetAdminId());
-            if (admin != nullptr)
-            {
-                mExchangeACL = chip::Platform::New<CASEExchangeACL>(admin);
-            }
-        }
+    ExchangeMessageDispatch & GetMessageDispatch() { return mDispatch; }
 
-        return mExchangeACL;
-    }
-
-    SecureSessionHandle GetSecureSession() { return mSecureSession; }
+    SessionHandle GetSessionHandle() const { return mSession.Get(); }
+    bool HasSessionHandle() const { return mSession; }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
-
-    void SetChallenge(const uint8_t * value) { memcpy(&mChallenge[0], value, kMsgCounterChallengeSize); }
-
-    const uint8_t * GetChallenge() const { return mChallenge; }
-
-    SecureSessionHandle GetSecureSessionHandle() const { return mSecureSession; }
 
     /*
      * In order to use reference counting (see refCount below) we use a hold/free paradigm where users of the exchange
@@ -179,34 +170,43 @@ public:
     void Close();
     void Abort();
 
-    ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                            ExchangeDelegate * delegate);
-    void Free();
-    void Reset();
-
     void SetResponseTimeout(Timeout timeout);
 
 private:
-    enum class ExFlagValues : uint16_t
-    {
-        kFlagInitiator        = 0x0001, // This context is the initiator of the exchange.
-        kFlagResponseExpected = 0x0002, // If a response is expected for a message that is being sent.
-    };
-
-    Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
-    ReliableMessageContext mReliableMessageContext;
+    Timeout mResponseTimeout{ 0 }; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
-    ExchangeACL * mExchangeACL     = nullptr;
 
-    SecureSessionHandle mSecureSession; // The connection state
+    ExchangeMessageDispatch & mDispatch;
+
+    SessionHolderWithDelegate mSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.
 
-    // [TODO: #4711]: this field need to be moved to appState object which implement 'exchange-specific' contextual
-    // actions with a delegate pattern.
-    uint8_t mChallenge[kMsgCounterChallengeSize]; // Challenge number to identify the sychronization request cryptographically.
+    /**
+     *  Determine whether a response is currently expected for a message that was sent over
+     *  this exchange.  While this is true, attempts to send other messages that expect a response
+     *  will fail.
+     *
+     *  @return Returns 'true' if response expected, else 'false'.
+     */
+    bool IsResponseExpected() const;
 
-    BitFlags<ExFlagValues> mFlags; // Internal state flags
+    /**
+     * Determine whether we are expecting our consumer to send a message on
+     * this exchange (i.e. WillSendMessage was called and the message has not
+     * yet been sent).
+     */
+    bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
+
+    /**
+     *  Track whether we are now expecting a response to a message sent via this exchange (because that
+     *  message had the kExpectResponse flag set in its sendFlags).
+     *
+     *  @param[in]  inResponseExpected  A Boolean indicating whether (true) or not
+     *                                  (false) a response is currently expected on this
+     *                                  exchange.
+     */
+    void SetResponseExpected(bool inResponseExpected);
 
     /**
      *  Search for an existing exchange that the message applies to.
@@ -220,26 +220,46 @@ private:
      *  @retval  true                                       If a match is found.
      *  @retval  false                                      If a match is not found.
      */
-    bool MatchExchange(SecureSessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
+    bool MatchExchange(const SessionHandle & session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
+
+    /**
+     * Notify our delegate, if any, that we have timed out waiting for a
+     * response.
+     */
+    void NotifyResponseTimeout();
 
     CHIP_ERROR StartResponseTimer();
 
-    /**
-     * A subset of SendMessage functionality that does not perform message
-     * counter sync for group keys.
-     */
-    CHIP_ERROR SendMessageImpl(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle msgBuf,
-                               const SendFlags & sendFlags, Transport::PeerConnectionState * state = nullptr);
     void CancelResponseTimer();
-    static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
+    static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState);
 
     void DoClose(bool clearRetransTable);
-};
 
-inline void ExchangeContextDeletor::Release(ExchangeContext * obj)
-{
-    obj->Free();
-}
+    /**
+     * We have handled an application-level message in some way and should
+     * re-evaluate out state to see whether we should still be open.
+     */
+    void MessageHandled();
+
+    /**
+     * Updates Sleepy End Device polling mode in the following way:
+     * - does nothing for exchanges over Bluetooth LE
+     * - requests fast-polling (active) mode if there are more messages,
+     *   including MRP acknowledgements, expected to be sent or received on
+     *   this exchange.
+     * - withdraws the request for fast-polling (active) mode, otherwise.
+     */
+    void UpdateSEDPollingMode();
+
+    /**
+     * Requests or withdraws the request for Sleepy End Device fast-polling mode
+     * based on the argument value.
+     *
+     * Note that the device switches to the slow-polling (idle) mode if no
+     * exchange nor other component requests the fast-polling mode.
+     */
+    void UpdateSEDPollingMode(bool fastPollingMode);
+};
 
 } // namespace Messaging
 } // namespace chip

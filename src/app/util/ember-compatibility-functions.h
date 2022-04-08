@@ -23,15 +23,16 @@
 
 #pragma once
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
+#include <app/util/af-types.h>
 #include <lib/core/CHIPCore.h>
-#include <util/af-types.h>
 
 namespace chip {
 namespace app {
 namespace Compatibility {
 
-void SetupEmberAfObjects(Command * command, ClusterId clusterId, CommandId commandId, EndpointId endpointId);
+void SetupEmberAfCommandHandler(CommandHandler * command, const ConcreteCommandPath & commandPath);
 bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status);
 void ResetEmberAfObjects();
 

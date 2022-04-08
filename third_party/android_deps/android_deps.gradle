@@ -1,0 +1,16 @@
+// This file is kept separate from build.gradle, so that the chipDeps configuration it defines can be shared.
+
+apply plugin: 'base'
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+configurations {
+    chipDeps
+}
+
+dependencies {
+    chipDeps "androidx.annotation:annotation:1.1.0"    
+}

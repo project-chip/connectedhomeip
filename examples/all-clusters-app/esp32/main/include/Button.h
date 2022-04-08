@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2018 Nest Labs, Inc.
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +19,7 @@
 /**
  * @file Button.h
  *
- * Describes a Button tied to a GPIO that provides debouncing and polling APIs
+ * Describes a Button tied to a GPIO that provides debouncing
  *
  **/
 
@@ -31,83 +30,60 @@
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/timers.h"
 
+#define APP_BUTTON_PRESSED 0
+#define APP_BUTTON_RELEASED 1
+#define BUTTON_NUMBER 3
 class Button
 {
 public:
     /**
      * @brief
+     *  construct a button
+     */
+    Button();
+    /**
+     * @brief
+     *  construct a button with given GPIO number
+     */
+    Button(gpio_num_t gpioNum);
+    /**
+     * @brief
      *  Initialize a button
-     *
-     * @param gpioNum           The GPIO pin this button should keep track of
-     * @param debouncePeriod    The debouncing period in FreeRTOS ticks
      * @return esp_err_t
      */
-    esp_err_t Init(gpio_num_t gpioNum, uint16_t debouncePeriod);
+    esp_err_t Init();
     /**
      * @brief
-     *  Poll on the button and read its current state
-     *
-     * @return true     If a button event occurred
-     * @return false    If no button event occurred
+     *  Initialize a button with given GPIO number
+     * @param gpioNum           The GPIO pin this button should keep track of
+     * @return esp_err_t
      */
-    bool Poll();
+    esp_err_t Init(gpio_num_t gpioNum);
     /**
      * @brief
-     *  Returns the state of the button
-     *
-     * @return true     If the button is pressed
-     * @return false    If the button is not pressed or released if poll() is true.
+     *  Get the pin number assosiate to a button
+     * @return gpio_num_t
      */
-    bool IsPressed();
+    inline gpio_num_t GetGPIONum();
     /**
      * @brief
-     *  Get the time timestamp since the button entered its current state
-     *
-     * @return uint32_t The time in milliseconds since the app started
+     *  Global Button debouncing Timer Callback function
      */
-    uint32_t GetStateStartTime();
+    static void TimerCallback(TimerHandle_t xTimer);
     /**
      * @brief
-     *  Get the duration in milliseconds since the button entered its current state
-     *
-     * @return uint32_t The time in milliseconds
+     *  Button gpio isr
      */
-    uint32_t GetStateDuration();
-    /**
-     * @brief
-     *  Get the duration in milliseconds the button spent in its previous state
-     *
-     * @return uint32_t The time in milliseconds
-     */
-    uint32_t GetPrevStateDuration();
+    friend void IRAM_ATTR button_isr_handler(void * arg);
 
 private:
-    // in ticks
-    uint32_t mLastReadTime;
-    // in ticks
-    uint32_t mStateStartTime;
-    // in ticks
-    uint32_t mPrevStateDur;
     gpio_num_t mGPIONum;
-    // in ticks
-    uint16_t mDebouncePeriod;
-    // true when button is pressed
-    bool mState;
-    bool mLastPolledState;
+    TimerHandle_t mbuttonTimer; // FreeRTOS timers used for debouncing buttons
 };
 
-inline bool Button::IsPressed()
+inline gpio_num_t Button::GetGPIONum()
 {
-    return mState;
-}
-
-inline uint32_t Button::GetStateStartTime()
-{
-    return mStateStartTime * portTICK_PERIOD_MS;
-}
-
-inline uint32_t Button::GetPrevStateDuration()
-{
-    return mPrevStateDur * portTICK_PERIOD_MS;
+    return mGPIONum;
 }

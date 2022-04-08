@@ -1,4 +1,4 @@
-# CHIP EFR32 Persistent Storage Example
+#CHIP EFR32 Persistent Storage Example
 
 An example testing and demonstrating the key value storage API.
 
@@ -28,15 +28,7 @@ platforms.
 
 ## EFR32
 
-The EFR32 platform KVS is fully implemented, the KVS is enabled and configured
-using theese defines:
-
-```
-defines = [
-  "CHIP_KVS_SECTOR_COUNT=4",
-  "CHIP_KVS_BASE_SECTOR_INDEX=((FLASH_SIZE/FLASH_PAGE_SIZE)-(CHIP_KVS_SECTOR_COUNT))",
-]
-```
+The EFR32 platform KVS is fully implemented
 
 <a name="building"></a>
 
@@ -53,11 +45,9 @@ defines = [
 
 -   Install some additional tools(likely already present for CHIP developers):
 
-           # Linux
-           $ sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
+#Linux \$ sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
 
-           # Mac OS X
-           $ brew install ninja
+#Mac OS X \$ brew install ninja
 
 -   Supported hardware:
 
@@ -155,3 +145,12 @@ combination with JLinkRTTClient as follows:
 -   In a second terminal, run the JLinkRTTClient to view logs:
 
           $ JLinkRTTClient
+
+## Memory settings
+
+While most of the RAM usage in CHIP is static, allowing easier debugging and
+optimization with symbols analysis, we still need some HEAP for the crypto and
+OpenThread. Size of the HEAP can be modified by changing the value of the
+`SL_STACK_SIZE` define inside of the BUILD.gn file of this example. Please take
+note that a HEAP size smaller than 5k can and will cause a Mbedtls failure
+during the BLE rendez-vous.

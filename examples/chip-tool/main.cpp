@@ -17,26 +17,31 @@
  */
 
 #include "commands/common/Commands.h"
+#include "commands/example/ExampleCredentialIssuerCommands.h"
 
-#include "commands/clusters/Commands.h"
+#include "commands/discover/Commands.h"
+#include "commands/group/Commands.h"
+#include "commands/interactive/Commands.h"
 #include "commands/pairing/Commands.h"
 #include "commands/payload/Commands.h"
-#include "commands/reporting/Commands.h"
 
-#include <transport/PASESession.h>
+#include <zap-generated/cluster/Commands.h>
+#include <zap-generated/test/Commands.h>
 
 // ================================================================================
 // Main Code
 // ================================================================================
 int main(int argc, char * argv[])
 {
-    InitDataModelHandler();
-
+    ExampleCredentialIssuerCommands credIssuerCommands;
     Commands commands;
+    registerCommandsDiscover(commands, &credIssuerCommands);
+    registerCommandsInteractive(commands, &credIssuerCommands);
     registerCommandsPayload(commands);
-    registerCommandsPairing(commands);
-    registerCommandsReporting(commands);
-    registerClusters(commands);
+    registerCommandsPairing(commands, &credIssuerCommands);
+    registerCommandsTests(commands, &credIssuerCommands);
+    registerCommandsGroup(commands, &credIssuerCommands);
+    registerClusters(commands, &credIssuerCommands);
 
-    return commands.Run(chip::kTestControllerNodeId, chip::kTestDeviceNodeId, argc, argv);
+    return commands.Run(argc, argv);
 }

@@ -18,8 +18,8 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#include <core/CHIPError.h>
-#include <support/CHIPMem.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CHIPMem.h>
 
 #include "KeyValueStorageTest.h"
 #include <platform/KeyValueStoreManager.h>

@@ -1,41 +1,64 @@
 package com.google.chip.chiptool.clusterclient
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import chip.devicecontroller.ChipCommandType
+import androidx.lifecycle.lifecycleScope
+import chip.devicecontroller.ChipClusters
+import chip.devicecontroller.ChipClusters.OnOffCluster
 import chip.devicecontroller.ChipDeviceController
-import chip.devicecontroller.ChipDeviceControllerException
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
-import com.google.chip.chiptool.util.DeviceIdUtil
-import kotlinx.android.synthetic.main.on_off_client_fragment.*
-import kotlinx.android.synthetic.main.on_off_client_fragment.view.*
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+import kotlinx.android.synthetic.main.on_off_client_fragment.commandStatusTv
+import kotlinx.android.synthetic.main.on_off_client_fragment.levelBar
+import kotlinx.android.synthetic.main.on_off_client_fragment.reportStatusTv
+import kotlinx.android.synthetic.main.on_off_client_fragment.view.levelBar
+import kotlinx.android.synthetic.main.on_off_client_fragment.view.offBtn
+import kotlinx.android.synthetic.main.on_off_client_fragment.view.onBtn
+import kotlinx.android.synthetic.main.on_off_client_fragment.view.readBtn
+import kotlinx.android.synthetic.main.on_off_client_fragment.view.showSubscribeDialogBtn
+import kotlinx.android.synthetic.main.on_off_client_fragment.view.toggleBtn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class OnOffClientFragment : Fragment() {
   private val deviceController: ChipDeviceController
-    get() = ChipClient.getDeviceController()
+    get() = ChipClient.getDeviceController(requireContext())
 
-  private var commandType: ChipCommandType? = null
-  private var levelValue: Int? = null
+  private lateinit var scope: CoroutineScope
+
+  private lateinit var addressUpdateFragment: AddressUpdateFragment
 
   override fun onCreateView(
-      inflater: LayoutInflater,
-      container: ViewGroup?,
-      savedInstanceState: Bundle?
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
   ): View {
+    scope = viewLifecycleOwner.lifecycleScope
+
     return inflater.inflate(R.layout.on_off_client_fragment, container, false).apply {
       deviceController.setCompletionListener(ChipControllerCallback())
 
-      onBtn.setOnClickListener { sendOnCommandClick() }
-      offBtn.setOnClickListener { sendOffCommandClick() }
-      toggleBtn.setOnClickListener { sendToggleCommandClick() }
+      addressUpdateFragment =
+        childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
+
+      onBtn.setOnClickListener { scope.launch { sendOnCommandClick() } }
+      offBtn.setOnClickListener { scope.launch { sendOffCommandClick() } }
+      toggleBtn.setOnClickListener { scope.launch { sendToggleCommandClick() } }
+      readBtn.setOnClickListener { scope.launch { sendReadOnOffClick() } }
+      showSubscribeDialogBtn.setOnClickListener { showSubscribeDialog() }
 
       levelBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
@@ -46,29 +69,84 @@ class OnOffClientFragment : Fragment() {
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?) {
-          Toast.makeText(requireContext(),
-                  "Level is: " + levelBar.progress,
-                  Toast.LENGTH_SHORT).show()
-          commandType = ChipCommandType.LEVEL
-          levelValue = levelBar.progress
-          sendCommand()
+          Toast.makeText(
+            requireContext(),
+            "Level is: " + levelBar.progress,
+            Toast.LENGTH_SHORT
+          ).show()
+          scope.launch { sendLevelCommandClick() }
         }
       })
     }
   }
 
-  override fun onStart() {
-    super.onStart()
-    deviceIdEd.setText(DeviceIdUtil.getLastDeviceId(requireContext()).toString())
+  private suspend fun sendReadOnOffClick() {
+    getOnOffClusterForDevice().readOnOffAttribute(object : ChipClusters.BooleanAttributeCallback {
+      override fun onSuccess(on: Boolean) {
+        Log.v(TAG, "On/Off attribute value: $on")
+        showMessage("On/Off attribute value: $on")
+      }
+
+      override fun onError(ex: Exception) {
+        Log.e(TAG, "Error reading onOff attribute", ex)
+      }
+    })
+  }
+
+  private fun showSubscribeDialog() {
+    val dialogView = requireActivity().layoutInflater.inflate(R.layout.subscribe_dialog, null)
+    val dialog = AlertDialog.Builder(requireContext()).apply {
+      setView(dialogView)
+    }.create()
+
+    val minIntervalEd = dialogView.findViewById<EditText>(R.id.minIntervalEd)
+    val maxIntervalEd = dialogView.findViewById<EditText>(R.id.maxIntervalEd)
+    dialogView.findViewById<Button>(R.id.subscribeBtn).setOnClickListener {
+      scope.launch {
+        sendSubscribeOnOffClick(
+          minIntervalEd.text.toString().toInt(),
+          maxIntervalEd.text.toString().toInt()
+        )
+        requireActivity().runOnUiThread {
+          dialog.dismiss()
+        }
+      }
+    }
+    dialog.show()
+  }
+
+  private suspend fun sendSubscribeOnOffClick(minInterval: Int, maxInterval: Int) {
+    val onOffCluster = getOnOffClusterForDevice()
+
+    val subscribeCallback = object : ChipClusters.BooleanAttributeCallback {
+      override fun onSuccess(value: Boolean) {
+        val formatter = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+        val time = formatter.format(Calendar.getInstance(Locale.getDefault()).time)
+        val message = "Subscribed on/off value at $time: ${if (value) "ON" else "OFF"}"
+
+        Log.v(TAG, message)
+        showReportMessage(message)
+      }
+
+      override fun onSubscriptionEstablished() {
+        val message = "Subscription for on/off established"
+        Log.v(TAG, message)
+        showMessage(message)
+      }
+
+      override fun onError(ex: Exception) {
+        Log.e(TAG, "Error configuring on/off attribute", ex)
+      }
+    }
+    onOffCluster.subscribeOnOffAttribute(subscribeCallback, minInterval, maxInterval)
   }
 
   inner class ChipControllerCallback : GenericChipDeviceListener() {
-    override fun onConnectDeviceComplete() {
-      sendCommand()
-    }
+    override fun onConnectDeviceComplete() {}
 
-    override fun onSendMessageComplete(message: String?) {
-      commandStatusTv.text = requireContext().getString(R.string.echo_status_response, message)
+    override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
+      Log.d(TAG, "onCommissioningComplete for nodeId $nodeId: $errorCode")
+      showMessage("Address update complete for nodeId $nodeId with code $errorCode")
     }
 
     override fun onNotifyChipConnectionClosed() {
@@ -84,47 +162,89 @@ class OnOffClientFragment : Fragment() {
     }
   }
 
-  private fun sendOnCommandClick() {
-    commandType = ChipCommandType.ON
-    levelValue = 0
-    sendCommand()
+  private suspend fun sendLevelCommandClick() {
+    val cluster = ChipClusters.LevelControlCluster(
+      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      LEVEL_CONTROL_CLUSTER_ENDPOINT
+    )
+    cluster.moveToLevel(object : ChipClusters.DefaultClusterCallback {
+      override fun onSuccess() {
+        showMessage("MoveToLevel command success")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("MoveToLevel command failure $ex")
+        Log.e(TAG, "MoveToLevel command failure", ex)
+      }
+
+    }, levelBar.progress, 0, 0, 0)
   }
 
-  private fun sendOffCommandClick() {
-    commandType = ChipCommandType.OFF
-    levelValue = 0
-    sendCommand()
+  private suspend fun sendOnCommandClick() {
+    getOnOffClusterForDevice().on(object : ChipClusters.DefaultClusterCallback {
+      override fun onSuccess() {
+        showMessage("ON command success")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("ON command failure $ex")
+        Log.e(TAG, "ON command failure", ex)
+      }
+
+    })
   }
 
-  private fun sendToggleCommandClick() {
-    commandType = ChipCommandType.TOGGLE
-    levelValue = 0
-    sendCommand()
+  private suspend fun sendOffCommandClick() {
+    getOnOffClusterForDevice().off(object : ChipClusters.DefaultClusterCallback {
+      override fun onSuccess() {
+        showMessage("OFF command success")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("OFF command failure $ex")
+        Log.e(TAG, "OFF command failure", ex)
+      }
+    })
   }
 
-  private fun sendCommand() {
-    val chipCommandType = commandType ?: run {
-      Log.e(TAG, "No ChipCommandType specified.")
-      return
+  private suspend fun sendToggleCommandClick() {
+    getOnOffClusterForDevice().toggle(object : ChipClusters.DefaultClusterCallback {
+      override fun onSuccess() {
+        showMessage("TOGGLE command success")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("TOGGLE command failure $ex")
+        Log.e(TAG, "TOGGLE command failure", ex)
+      }
+    })
+  }
+
+  private suspend fun getOnOffClusterForDevice(): OnOffCluster {
+    return OnOffCluster(
+      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      ON_OFF_CLUSTER_ENDPOINT
+    )
+  }
+
+  private fun showMessage(msg: String) {
+    requireActivity().runOnUiThread {
+      commandStatusTv.text = msg
     }
+  }
 
-    commandStatusTv.text = requireContext()
-      .getString(R.string.send_command_type_label_text, chipCommandType.name, levelValue)
-
-    try {
-      // mask levelValue from integer to uint8_t and if null use 0
-      deviceController.sendCommand(
-        DeviceIdUtil.getLastDeviceId(requireContext()),
-        commandType,
-        ( 0xff and (levelValue ?: 0))
-      )
-    } catch (e: ChipDeviceControllerException) {
-      commandStatusTv.text = e.toString()
+  private fun showReportMessage(msg: String) {
+    requireActivity().runOnUiThread {
+      reportStatusTv.text = msg
     }
   }
 
   companion object {
     private const val TAG = "OnOffClientFragment"
+
+    private const val ON_OFF_CLUSTER_ENDPOINT = 1
+    private const val LEVEL_CONTROL_CLUSTER_ENDPOINT = 1
+
     fun newInstance(): OnOffClientFragment = OnOffClientFragment()
   }
 }

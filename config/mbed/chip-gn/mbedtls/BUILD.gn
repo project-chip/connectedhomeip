@@ -1,0 +1,40 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Options from standalone-chip.mk that differ from configure defaults. These
+# options are used from examples/.
+
+import("//build_overrides/chip.gni")
+
+declare_args() {
+  chip_with_platform_mbedtls = false
+}
+
+config("chip_mbedtls_config") {
+  include_dirs = [ "${chip_root}/config/mbed/mbedtls" ]
+}
+
+if (!chip_with_platform_mbedtls) {
+  import("//build_overrides/mbedtls.gni")
+  import("${mbedtls_root}/mbedtls.gni")
+
+  mbedtls_target("mbedtls") {
+    public_configs = [ ":chip_mbedtls_config" ]
+  }
+} else {
+  # Mbed provides its own mbedtls, so nothing to do, just provide a target
+  group("mbedtls") {
+    public_configs = [ ":chip_mbedtls_config" ]
+  }
+}

@@ -17,10 +17,9 @@
  */
 
 /**
- *    @file
- *      This file defines the chip::System::Timer class and its
- *      related types used for representing an in-progress one-shot
- *      timer.
+ *  This file defines the chip::System::Timer class and related types that can be used for representing
+ *  an in-progress one-shot timer. Implementations of System::Layer may (but are not required to) use
+ *  these for their versions of timer events.
  */
 
 #pragma once
@@ -29,74 +28,206 @@
 #include <system/SystemConfig.h>
 
 // Include dependent headers
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/Pool.h>
 
 #include <system/SystemClock.h>
 #include <system/SystemError.h>
-#include <system/SystemObject.h>
+#include <system/SystemLayer.h>
 #include <system/SystemStats.h>
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+#include <dispatch/dispatch.h>
+#endif
 
 namespace chip {
 namespace System {
 
 class Layer;
+class TestTimer;
 
 /**
- * @class Timer
- *
- * @brief
- *  This is an internal class to CHIP System Layer, used to represent an in-progress one-shot timer. There is no real public
- *  interface available for the application layer. The static public methods used to acquire current system time are intended for
- *  internal use.
- *
+ * Basic Timer information: time and callback.
  */
-class DLL_EXPORT Timer : public Object
+class DLL_EXPORT TimerData
 {
-    friend class Layer;
-
 public:
+    class Callback
+    {
+    public:
+        Callback(Layer & systemLayer, TimerCompleteCallback onComplete, void * appState) :
+            mSystemLayer(&systemLayer), mOnComplete(onComplete), mAppState(appState)
+        {}
+        void Invoke() const { mOnComplete(mSystemLayer, mAppState); }
+        const TimerCompleteCallback & GetOnComplete() const { return mOnComplete; }
+        void * GetAppState() const { return mAppState; }
+        Layer * GetSystemLayer() const { return mSystemLayer; }
+
+    private:
+        Layer * mSystemLayer;
+        TimerCompleteCallback mOnComplete;
+        void * mAppState;
+    };
+
+    TimerData(Layer & systemLayer, System::Clock::Timestamp awakenTime, TimerCompleteCallback onComplete, void * appState) :
+        mAwakenTime(awakenTime), mCallback(systemLayer, onComplete, appState)
+    {}
+    ~TimerData() = default;
+
     /**
-     *  Represents an epoch in the local system timescale, usually the POSIX timescale.
-     *
-     *  The units are dependent on the context. If used with values returned by GetCurrentEpoch, the units are milliseconds.
+     * Return the expiration time.
      */
-    typedef uint64_t Epoch;
+    Clock::Timestamp AwakenTime() const { return mAwakenTime; }
 
-    static Epoch GetCurrentEpoch();
-    static bool IsEarlierEpoch(const Epoch & first, const Epoch & second);
-
-    typedef void (*OnCompleteFunct)(Layer * aLayer, void * aAppState, Error aError);
-    OnCompleteFunct OnComplete;
-
-    Error Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, void * aAppState);
-    Error Cancel();
-
-    static void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark);
+    /**
+     * Return callback information.
+     */
+    const Callback & GetCallback() const { return mCallback; }
 
 private:
-    static ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> sPool;
+    Clock::Timestamp mAwakenTime;
+    Callback mCallback;
 
-    Epoch mAwakenEpoch;
-
-    void HandleComplete();
-
-    Error ScheduleWork(OnCompleteFunct aOnComplete, void * aAppState);
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    Timer * mNextTimer;
-
-    static Error HandleExpiredTimers(Layer & aLayer);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    friend class LayerImplSelect;
+    dispatch_source_t mTimerSource = nullptr;
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
     // Not defined
-    Timer(const Timer &) = delete;
-    Timer & operator=(const Timer &) = delete;
+    TimerData(const TimerData &) = delete;
+    TimerData & operator=(const TimerData &) = delete;
 };
 
-inline void Timer::GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark)
+/**
+ * List of `Timer`s ordered by expiration time.
+ */
+class TimerList
 {
-    sPool.GetStatistics(aNumInUse, aHighWatermark);
-}
+public:
+    class Node : public TimerData
+    {
+    public:
+        Node(Layer & systemLayer, System::Clock::Timestamp awakenTime, TimerCompleteCallback onComplete, void * appState) :
+            TimerData(systemLayer, awakenTime, onComplete, appState), mNextTimer(nullptr)
+        {}
+        Node * mNextTimer;
+    };
+
+    TimerList() : mEarliestTimer(nullptr) {}
+
+    /**
+     * Add a timer to the list
+     *
+     * @return  The new earliest timer in the list. If this is the newly added timer, that implies it is earlier
+     *          than any existing timer.
+     */
+    Node * Add(Node * timer);
+
+    /**
+     * Remove the given timer from the list, if present. It is not an error for the timer not to be present.
+     *
+     * @return  The new earliest timer in the list, or nullptr if the list is empty.
+     */
+    Node * Remove(Node * remove);
+
+    /**
+     * Remove the first timer with the given properties, if present. It is not an error for no such timer to be present.
+     *
+     * @return  The removed timer, or nullptr if the list contains no matching timer.
+     */
+    Node * Remove(TimerCompleteCallback onComplete, void * appState);
+
+    /**
+     * Remove and return the earliest timer in the list.
+     *
+     * @return  The earliest timer, or nullptr if the list is empty.
+     */
+    Node * PopEarliest();
+
+    /**
+     * Remove and return the earliest timer in the list, provided it expires earlier than the given time @a t.
+     *
+     * @return  The earliest timer expiring before @a t, or nullptr if there is no such timer.
+     */
+    Node * PopIfEarlier(Clock::Timestamp t);
+
+    /**
+     * Get the earliest timer in the list.
+     *
+     * @return  The earliest timer, or nullptr if there are no timers.
+     */
+    Node * Earliest() const { return mEarliestTimer; }
+
+    /**
+     * Test whether there are any timers.
+     */
+    bool Empty() const { return mEarliestTimer == nullptr; }
+
+    /**
+     * Remove and return all timers that expire before the given time @a t.
+     */
+    TimerList ExtractEarlier(Clock::Timestamp t);
+
+    /**
+     * Remove all timers.
+     */
+    void Clear() { mEarliestTimer = nullptr; }
+
+private:
+    Node * mEarliestTimer;
+};
+
+/**
+ * ObjectPool wrapper that keeps System Timer statistics.
+ */
+template <typename T = TimerList::Node>
+class TimerPool
+{
+public:
+    using Timer = T;
+
+    /**
+     * Create a new timer from the pool.
+     */
+    Timer * Create(Layer & systemLayer, System::Clock::Timestamp awakenTime, TimerCompleteCallback onComplete, void * appState)
+    {
+        Timer * timer = mTimerPool.CreateObject(systemLayer, awakenTime, onComplete, appState);
+        SYSTEM_STATS_INCREMENT(Stats::kSystemLayer_NumTimers);
+        return timer;
+    }
+
+    /**
+     * Release a timer to the pool.
+     */
+    void Release(Timer * timer)
+    {
+        SYSTEM_STATS_DECREMENT(Stats::kSystemLayer_NumTimers);
+        mTimerPool.ReleaseObject(timer);
+    }
+
+    /**
+     * Release all timers.
+     */
+    void ReleaseAll()
+    {
+        SYSTEM_STATS_RESET(Stats::kSystemLayer_NumTimers);
+        mTimerPool.ReleaseAll();
+    }
+
+    /**
+     * Release a timer to the pool and invoke its callback.
+     */
+    void Invoke(Timer * timer)
+    {
+        typename Timer::Callback callback = timer->GetCallback();
+        Release(timer);
+        callback.Invoke();
+    }
+
+private:
+    friend class TestTimer;
+    ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> mTimerPool;
+};
 
 } // namespace System
 } // namespace chip

@@ -24,8 +24,6 @@
 @property (nonatomic, strong) UITextField * groupIDTextField;
 @property (nonatomic, strong) UITextField * endpointIDTextField;
 @property (nonatomic, strong) UITextField * clusterIDTextField;
-
-@property (nonatomic, strong) CHIPBinding * cluster;
 @end
 
 @implementation BindingsViewController
@@ -37,8 +35,6 @@
 
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
-
-    self.cluster = [[CHIPBinding alloc] initWithDevice:CHIPGetPairedDevice() endpoint:1 queue:dispatch_get_main_queue()];
 }
 
 - (void)dismissKeyboard
@@ -136,37 +132,36 @@
     uint64_t nodeId;
     NSScanner * scanner = [NSScanner scannerWithString:_nodeIDTextField.text];
     [scanner scanUnsignedLongLong:&nodeId];
-    int endpointId = [_endpointIDTextField.text intValue];
-    int groupId = [_groupIDTextField.text intValue];
-    int clusterId = [_clusterIDTextField.text intValue];
 
-    [self.cluster bind:nodeId
-                  groupId:groupId
-               endpointId:endpointId
-                clusterId:clusterId
-        completionHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-            NSString * resultString
-                = (error == nil) ? @"Bind command: success!" : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
-            NSLog(resultString, nil);
-        }];
+    // TODO Binding Support was removed from ObjC Clusters.h
+    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+            if (chipDevice) {
+                NSString * resultString = [NSString stringWithFormat:@"Not Supported"];
+                NSLog(resultString, nil);
+            } else {
+                NSLog(@"Status: Failed to establish a connection with the device");
+            }
+        })) {
+        NSLog(@"Status: Waiting for connection with the device");
+    } else {
+        NSLog(@"Status: Failed to trigger the connection with the device");
+    }
 }
 
 - (IBAction)unbind:(id)sender
 {
-    int nodeId = [_nodeIDTextField.text intValue];
-    int endpointId = [_endpointIDTextField.text intValue];
-    int groupId = [_groupIDTextField.text intValue];
-    int clusterId = [_clusterIDTextField.text intValue];
-
-    [self.cluster unbind:nodeId
-                  groupId:groupId
-               endpointId:endpointId
-                clusterId:clusterId
-        completionHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-            NSString * resultString = (error == nil) ? @"Unbind command: success!"
-                                                     : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
-            NSLog(resultString, nil);
-        }];
+    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+            if (chipDevice) {
+                NSString * resultString = [NSString stringWithFormat:@"Not Supported"];
+                NSLog(resultString, nil);
+            } else {
+                NSLog(@"Status: Failed to establish a connection with the device");
+            }
+        })) {
+        NSLog(@"Status: Waiting for connection with the device");
+    } else {
+        NSLog(@"Status: Failed to trigger the connection with the device");
+    }
 }
 
 @end

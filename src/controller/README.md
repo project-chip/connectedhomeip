@@ -18,6 +18,11 @@ The Android chip-tool is located in [../android/CHIPTool](../android/CHIPTool).
 The POSIX CLI chip-tool is located in
 [../../examples/chip-tool](../../examples/chip-tool).
 
+### Darwin CLI
+
+The POSIX CLI chip-tool is located in
+[../../examples/chip-tool-darwin](../../examples/chip-tool).
+
 ### Python
 
 The Python chip-device-ctrl is located in
@@ -49,12 +54,12 @@ The Python chip-device-ctrl is located in
 
 | Attributes/Clusters | iOS | Android | CLI | Python |
 | ------------------- | --- | ------- | --- | ------ |
-| Read                | n   | n(\*2)  | y   | n      |
+| Read                | n   | n(\*2)  | y   | y      |
 | Write               | n   | n(\*2)  | y   | n      |
 
 |                  | iOS | Android | CLI | Python |
 | ---------------- | --- | ------- | --- | ------ |
-| Multiple Devices | y   | n(\*3)  | ?   | ?      |
+| Multiple Devices | y   | n       | ?   | y      |
 
 Notes:
 
@@ -63,6 +68,3 @@ Notes:
 (\*1) Only static commissioning, not MeshCoP.
 
 (\*2) Locally a patch exists, could be upstreamed.
-
-(\*3) Uses deprecated Chip Device Controller, move to new CHIP Device controller
-WIP according to Slack conversation.

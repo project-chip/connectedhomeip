@@ -22,12 +22,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <core/CHIPCore.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CHIPMem.h>
-#include <support/CHIPMemString.h>
-#include <support/ScopedBuffer.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/EnforceFormat.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/logging/Constants.h>
 
 #if CHIP_CONFIG_ENABLE_ARG_PARSER
 
@@ -730,7 +732,7 @@ static bool HandleNonOptionArgs(const char * progName, int argc, char * argv[])
     return true;
 }
 
-static void HandleArgError(const char * msg, ...)
+static void ENFORCE_FORMAT(1, 2) HandleArgError(const char * msg, ...)
 {
     size_t msgLen;
     int status;
@@ -785,6 +787,8 @@ int TestCHIPArgParser(void)
     ClearCallbackRecords();
 
     printf("All tests succeeded\n");
+
+    chip::Platform::MemoryShutdown();
 
     return (EXIT_SUCCESS);
 }

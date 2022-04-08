@@ -44,7 +44,7 @@
 
 /*
  * If the CHIP_SYSTEM_CONFIG_TRANSFER_INETLAYER_PROJECT_CONFIGURATION option is not applicable, then the "InetProjectConfig.h"
- * header was not included by <SystemLayer/SystemConfig.h> and therefore it must be included here.
+ * header was not included by <system/SystemConfig.h> and therefore it must be included here.
  */
 #if !CHIP_SYSTEM_CONFIG_TRANSFER_INETLAYER_PROJECT_CONFIGURATION
 
@@ -88,150 +88,6 @@
 #endif // INET_CONFIG_MAX_IP_AND_UDP_HEADER_SIZE
 
 /**
- *  @def INET_CONFIG_ERROR_TYPE
- *
- *  @brief
- *    This defines the data type used to represent errors for the
- *    InetLayer subsystem.
- *
- *  @note
- *    By default, this parameter is a copy of CHIP_SYSTEM_CONFIG_ERROR_TYPE.
- *
- */
-#ifndef INET_CONFIG_ERROR_TYPE
-#define INET_CONFIG_ERROR_TYPE                              CHIP_SYSTEM_CONFIG_ERROR_TYPE
-#endif // !defined(INET_CONFIG_ERROR_TYPE)
-
-/**
- *  @def INET_CONFIG_NO_ERROR
- *
- *  @brief
- *    This defines the InetLayer error code for no error or success.
- *
- *  @note
- *    By default, this parameter is a copy of CHIP_SYSTEM_CONFIG_NO_ERROR.
- *
- */
-#ifndef INET_CONFIG_NO_ERROR
-#define INET_CONFIG_NO_ERROR                                CHIP_SYSTEM_CONFIG_NO_ERROR
-#endif // !defined(INET_CONFIG_NO_ERROR)
-
-/**
- *  @def INET_CONFIG_ERROR_MIN
- *
- *  @brief
- *    This defines the base or minimum InetLayer error number range.
- *
- */
-#ifndef INET_CONFIG_ERROR_MIN
-#define INET_CONFIG_ERROR_MIN                               1000
-#endif // INET_CONFIG_ERROR_MIN
-
-/**
- *  @def INET_CONFIG_ERROR_MAX
- *
- *  @brief
- *    This defines the top or maximum InetLayer error number range.
- *
- */
-#ifndef INET_CONFIG_ERROR_MAX
-#define INET_CONFIG_ERROR_MAX                               1999
-#endif // INET_CONFIG_ERROR_MAX
-
-/**
- *  @def _INET_CONFIG_ERROR
- *
- *  @brief
- *    This defines a mapping function for InetLayer errors that allows
- *    mapping such errors into a platform- or system-specific range.
- *
- */
-#ifndef _INET_CONFIG_ERROR
-#define _INET_CONFIG_ERROR(e)                               (INET_ERROR_MIN + (e))
-#endif // _INET_CONFIG_ERROR
-
-/**
- *  @def INET_CONFIG_WILL_OVERRIDE_OS_ERROR_FUNCS
- *
- *  @brief
- *    This defines whether (1) or not (0) your platform will override
- *    the platform- and system-specific INET_MapOSError,
- *    INET_DescribeOSError, and INET_IsOSError functions.
- *
- */
-#ifndef INET_CONFIG_WILL_OVERRIDE_OS_ERROR_FUNCS
-#define INET_CONFIG_WILL_OVERRIDE_OS_ERROR_FUNCS            0
-#endif // INET_CONFIG_WILL_OVERRIDE_OS_ERROR_FUNCS
-
-/**
- *  @def INET_CONFIG_WILL_OVERRIDE_LWIP_ERROR_FUNCS
- *
- *  @brief
- *    This defines whether (1) or not (0) your platform will override
- *    the platform- and system-specific INET_MapLwIPError,
- *    INET_DescribeLwIPError, and INET_IsLwIPError functions.
- *
- */
-#ifndef INET_CONFIG_WILL_OVERRIDE_LWIP_ERROR_FUNCS
-#define INET_CONFIG_WILL_OVERRIDE_LWIP_ERROR_FUNCS          0
-#endif // INET_CONFIG_WILL_OVERRIDE_LWIP_ERROR_FUNCS
-
-/**
- *  @def INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS
- *
- *  @brief
- *    This defines whether (1) or not (0) your platform will override
- *    the platform- and system-specific InetLayer WillInit, DidInit,
- *    WillShutdown, and DidShutdown.
- *
- */
-#ifndef INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS
-#define INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS       0
-#endif // INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS
-
-/**
- *  @def INET_CONFIG_MAX_DROPPABLE_EVENTS
- *
- *  @brief
- *    This is the maximum number of UDP or raw network transport
- *    packet events / messages that may be dropped due to packet
- *    buffer starvation.
- *
- *    In some implementations, there may be a shared event / message
- *    queue for the InetLayer used by other system events / messages.
- *
- *    If the length of that queue is considerably longer than the
- *    number of packet buffers available, it may lead to buffer
- *    exhaustion. As a result, using the queue itself to implement
- *    backpressure is insufficient, and we need an external mechanism
- *    to prevent buffer starvation in the rest of the system and
- *    getting into deadlock situations.
- *
- *    For both UDP and raw network transport traffic we can easily
- *    drop incoming packets without impacting the correctness of
- *    higher level protocols.
- *
- */
-#ifndef INET_CONFIG_MAX_DROPPABLE_EVENTS
-#define INET_CONFIG_MAX_DROPPABLE_EVENTS                    0
-#endif // INET_CONFIG_MAX_DROPPABLE_EVENTS
-
-/**
- *  @def INET_CONFIG_NUM_RAW_ENDPOINTS
- *
- *  @brief
- *    This is the total number of "raw" (direct-IP, non-TCP/-UDP) end
- *    point context structures.
- *
- *    Up to this many outstanding "raw" communication flows may be in
- *    use.
- *
- */
-#ifndef INET_CONFIG_NUM_RAW_ENDPOINTS
-#define INET_CONFIG_NUM_RAW_ENDPOINTS                       8
-#endif // INET_CONFIG_NUM_RAW_ENDPOINTS
-
-/**
  *  @def INET_CONFIG_NUM_TCP_ENDPOINTS
  *
  *  @brief
@@ -260,32 +116,6 @@
 #endif // INET_CONFIG_NUM_UDP_ENDPOINTS
 
 /**
- *  @def INET_CONFIG_NUM_DNS_RESOLVERS
- *
- *  @brief
- *    This is the total number of outstanding DNS resolution request
- *    contexts.
- *
- *    Up to this many DNS resolution requests may be in in use.
- *
- */
-#ifndef INET_CONFIG_NUM_DNS_RESOLVERS
-#define INET_CONFIG_NUM_DNS_RESOLVERS                       4
-#endif // INET_CONFIG_NUM_DNS_RESOLVERS
-
-/**
- *  @def INET_CONFIG_MAX_DNS_ADDRS
- *
- *  @brief
- *    This is the maximum allowable number of addresses that may
- *    be returned in a single DNS hostname lookup.
- *
- */
-#ifndef INET_CONFIG_MAX_DNS_ADDRS
-#define INET_CONFIG_MAX_DNS_ADDRS                           16
-#endif // INET_CONFIG_MAX_DNS_ADDRS
-
-/**
  *  @def INET_TCP_IDLE_CHECK_INTERVAL
  *
  *  @brief
@@ -296,30 +126,6 @@
 #ifndef INET_TCP_IDLE_CHECK_INTERVAL
 #define INET_TCP_IDLE_CHECK_INTERVAL                        100
 #endif // INET_TCP_IDLE_CHECK_INTERVAL
-
-/**
- *  @def INET_CONFIG_ENABLE_DNS_RESOLVER
- *
- *  @brief
- *    Defines whether (1) or not (0) to enable the ability
- *    to instantiate the DNS resolver.
- *
- */
-#ifndef INET_CONFIG_ENABLE_DNS_RESOLVER
-#define INET_CONFIG_ENABLE_DNS_RESOLVER                     0
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
-
-/**
- *  @def INET_CONFIG_ENABLE_RAW_ENDPOINT
- *
- *  @brief
- *    Defines whether (1) or not (0) to enable the ability
- *    to instantiate a Raw endpoint.
- *
- */
-#ifndef INET_CONFIG_ENABLE_RAW_ENDPOINT
-#define INET_CONFIG_ENABLE_RAW_ENDPOINT                     0
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 /**
  *  @def INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -346,32 +152,6 @@
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
 /**
- *  @def INET_CONFIG_EVENT_RESERVED
- *
- *  @brief
- *      This defines the first number in the default chip System Layer event code space reserved for use by the Inet Layer.
- *      Event codes used by each layer must not overlap.
- */
-#ifndef INET_CONFIG_EVENT_RESERVED
-#define INET_CONFIG_EVENT_RESERVED                          1000
-#endif /* INET_CONFIG_EVENT_RESERVED */
-
-/**
- *  @def _INET_CONFIG_EVENT
- *
- *  @brief
- *    This defines a mapping function for InetLayer event types that allows
- *    mapping such event types into a platform- or system-specific range.
- *
- *  @note
- *    By default, this definition is a copy of _CHIP_SYSTEM_CONFIG_LWIP_EVENT.
- *
- */
-#ifndef _INET_CONFIG_EVENT
-#define _INET_CONFIG_EVENT(e)                               _CHIP_SYSTEM_CONFIG_LWIP_EVENT(INET_CONFIG_EVENT_RESERVED + (e))
-#endif // _INET_CONFIG_EVENT
-
-/**
  *  @def INET_CONFIG_TEST
  *
  *  @brief
@@ -380,25 +160,6 @@
 #ifndef INET_CONFIG_TEST
 #define INET_CONFIG_TEST                                   0
 #endif
-
-/**
- * @def INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
- *
- * @brief Enable asynchronous dns name resolution for Linux sockets.
- */
-#ifndef INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-#define INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS               1
-#endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
-/**
- * @def INET_CONFIG_DNS_ASYNC_MAX_THREAD_COUNT
- *
- * @brief The maximum number of POSIX threads that would be performing
- * asynchronous DNS resolution.
- */
-#ifndef INET_CONFIG_DNS_ASYNC_MAX_THREAD_COUNT
-#define INET_CONFIG_DNS_ASYNC_MAX_THREAD_COUNT             2
-#endif // INET_CONFIG_DNS_ASYNC_MAX_THREAD_COUNT
 
 /**
  *  @def INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
@@ -430,25 +191,6 @@
 #ifndef INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 #define INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT       1
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-
-/**
- *  @def INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
- *
- *  @brief
- *    When this flag is set, the InetLayer enables
- *    callbacks to the upper layer notifying it when
- *    the send channel of the TCP connection changes
- *    between being idle or not idle.
- *
- *  @note
- *    When enabled, the TCP send queue is actively
- *    polled to determine if sent data has been
- *    acknowledged.
- *
- */
-#ifndef INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-#define INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS         0
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
 
 /**
  *  @def INET_CONFIG_TCP_SEND_QUEUE_POLL_INTERVAL_MSEC

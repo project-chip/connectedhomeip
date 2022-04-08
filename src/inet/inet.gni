@@ -20,21 +20,18 @@ declare_args() {
   # Enable IPv4 support.
   chip_inet_config_enable_ipv4 = true
 
-  # Enable DNS resolver.
-  chip_inet_config_enable_dns_resolver = true
-
-  # Enable raw endpoint.
-  chip_inet_config_enable_raw_endpoint = true
-
   # Enable UDP endpoint.
   chip_inet_config_enable_udp_endpoint = true
 
   # Enable TCP endpoint.
   chip_inet_config_enable_tcp_endpoint = true
-}
 
-declare_args() {
-  # Enable async DNS.
-  chip_inet_config_enable_async_dns_sockets =
-      chip_inet_config_enable_dns_resolver && chip_system_config_use_sockets
+  # Inet implementation type.
+  if (chip_system_config_use_open_thread_inet_endpoints) {
+    chip_system_config_inet = "OpenThread"
+  } else if (chip_system_config_use_lwip) {
+    chip_system_config_inet = "LwIP"
+  } else {
+    chip_system_config_inet = "Sockets"
+  }
 }

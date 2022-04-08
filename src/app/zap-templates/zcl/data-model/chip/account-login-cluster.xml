@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <cluster>
+    <domain>Media</domain>
+    <name>Account Login</name>
+    <code>0x050e</code>
+    <define>ACCOUNT_LOGIN_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user account on the Content App match the user account on the Client.</description>
+
+    <command source="client" code="0x00" name="GetSetupPIN" response="GetSetupPINResponse" mustUseTimedInvoke="true" optional="false">
+      <description>Upon receipt, the Content App checks if the account associated with the client Temp Account Identifier Rotating ID is the same acount that is active on the given Content App. If the accounts are the same, then the Content App includes the Setup PIN in the GetSetupPIN Response.</description>
+      <arg name="tempAccountIdentifier" minLength="16" length="100" type="CHAR_STRING"/>
+    </command>
+
+    <command source="client" code="0x02" name="Login" mustUseTimedInvoke="true" optional="false">
+      <description>Upon receipt, the Content App checks if the account associated with the client’s Temp Account Identifier (Rotating ID) has a current active Setup PIN with the given value. If the Setup PIN is valid for the user account associated with the Temp Account Identifier, then the Content App MAY make that user account active.</description>
+      <arg name="tempAccountIdentifier" minLength="16" length="100" type="CHAR_STRING"/>
+      <arg name="setupPIN" minLength="11" type="CHAR_STRING"/>
+    </command>
+
+    <command source="client" code="0x03" name="Logout" mustUseTimedInvoke="true" optional="false">
+      <description>The purpose of this command is to instruct the Content App to clear the current user account. This command SHOULD be used by clients of a Content App to indicate the end of a user session.</description>
+    </command>
+
+    <command source="server" code="0x01" name="GetSetupPINResponse" optional="false" disableDefaultResponse="true">
+      <description>This message is sent in response to the GetSetupPIN Request, and contains the Setup PIN code, or null when the accounts identified in the request does not match the active account of the running Content App.</description>
+      <arg name="setupPIN" type="CHAR_STRING"/>
+    </command>
+
+  </cluster>
+</configurator>

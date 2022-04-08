@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <enum name="PHYRateType" type="ENUM8">
+    <cluster code="0x0037"/>
+    <item name="10M" value="0x00"/>
+    <item name="100M" value="0x01"/>
+    <item name="1000M" value="0x02"/>
+    <item name="2.5G" value="0x03"/>
+    <item name="5G" value="0x04"/>
+    <item name="10G" value="0x05"/>
+    <item name="40G" value="0x06"/>
+    <item name="100G" value="0x07"/>
+    <item name="200G" value="0x08"/>
+    <item name="400G" value="0x09"/>                
+  </enum>
+  <cluster>
+    <domain>General</domain>
+    <name>Ethernet Network Diagnostics</name>
+    <code>0x0037</code>
+    <define>ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER</define>
+    <description>The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.</description>
+    <attribute side="server" code="0x00" define="PHY_RATE" type="PHYRateType" writable="false" isNullable="true" optional="true">PHYRate</attribute>
+    <attribute side="server" code="0x01" define="FULL_DUPLEX" type="BOOLEAN" min="0x00" max="0x01" writable="false" isNullable="true" optional="true">FullDuplex</attribute>
+    <attribute side="server" code="0x02" define="PACKET_RX_COUNT" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">PacketRxCount</attribute>
+    <attribute side="server" code="0x03" define="PACKET_TX_COUNT" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">PacketTxCount</attribute>
+    <attribute side="server" code="0x04" define="TX_ERR_COUNT" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">TxErrCount</attribute>
+    <attribute side="server" code="0x05" define="COLLISION_COUNT" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CollisionCount</attribute>
+    <attribute side="server" code="0x06" define="ETHERNET_OVERRUN_COUNT" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">OverrunCount</attribute>
+    <attribute side="server" code="0x07" define="CARRIER_DETECT" type="BOOLEAN" min="0x00" max="0x01" writable="false" isNullable="true" optional="true">CarrierDetect</attribute>
+    <attribute side="server" code="0x08" define="TIME_SINCE_RESET" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">TimeSinceReset</attribute>            
+    <command source="client" code="0x00" name="ResetCounts" optional="false" cli="chip ethernet_network_diagnostics resetcounts">
+      <description>Reception of this command SHALL reset the attributes: PacketRxCount, PacketTxCount, TxErrCount, CollisionCount, OverrunCount to 0</description>
+    </command>           
+  </cluster>
+  <bitmap name="EthernetNetworkDiagnosticsFeature" type="BITMAP32">
+    <field name="PacketCounts" mask="0x1"/>
+    <field name="ErrorCounts" mask="0x2"/>
+  </bitmap>  
+</configurator>

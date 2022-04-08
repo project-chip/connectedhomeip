@@ -19,7 +19,8 @@
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
 
-#include <support/UnitTestRegistration.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/UnitTestRegistration.h>
 
 using namespace chip;
 using namespace std;
@@ -78,7 +79,7 @@ void TestSimpleWrite(nlTestSuite * inSuite, void * inContext)
 
     QRCodeSetupPayloadGenerator generator(inPayload);
     string result;
-    CHIP_ERROR err = generator.payloadBase41Representation(result);
+    CHIP_ERROR err = generator.payloadBase38Representation(result);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -89,7 +90,7 @@ void TestSimpleRead(nlTestSuite * inSuite, void * inContext)
 
     QRCodeSetupPayloadGenerator generator(inPayload);
     string result;
-    CHIP_ERROR err = generator.payloadBase41Representation(result);
+    CHIP_ERROR err = generator.payloadBase38Representation(result);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     QRCodeSetupPayloadParser parser = QRCodeSetupPayloadParser(result);
@@ -104,19 +105,19 @@ void TestOptionalTagValues(nlTestSuite * inSuite, void * inContext)
     SetupPayload payload = GetDefaultPayload();
     CHIP_ERROR err;
 
-    err = payload.addOptionalVendorData(kOptionalDefaultStringTag, kOptionalDefaultStringValue);
+    err = payload.addOptionalVendorData(kOptionalDefaultStringTag, kOptionalDefaultStringValue); // Vendor specific tag
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = payload.addOptionalVendorData(0, kOptionalDefaultStringValue);
+    err = payload.addOptionalVendorData(0x80, kOptionalDefaultStringValue); // Vendor specific tag
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = payload.addOptionalVendorData(127, kOptionalDefaultStringValue);
+    err = payload.addOptionalVendorData(0x82, kOptionalDefaultStringValue); // Vendor specific tag
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = payload.addOptionalVendorData(128, kOptionalDefaultStringValue);
+    err = payload.addOptionalVendorData(127, kOptionalDefaultStringValue); // Common tag
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = payload.addOptionalVendorData(255, kOptionalDefaultStringValue);
+    err = payload.addOptionalVendorData(0, kOptionalDefaultStringValue); // Common tag
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
@@ -150,11 +151,11 @@ void TestOptionalDataWriteSerial(nlTestSuite * inSuite, void * inContext)
 
     QRCodeSetupPayloadGenerator generator(inPayload);
     string result;
-    err = generator.payloadBase41Representation(result);
+    err = generator.payloadBase38Representation(result);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 
     uint8_t optionalInfo[kDefaultBufferSizeInBytes];
-    err = generator.payloadBase41Representation(result, optionalInfo, sizeof(optionalInfo));
+    err = generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -165,7 +166,7 @@ void TestOptionalDataWrite(nlTestSuite * inSuite, void * inContext)
     QRCodeSetupPayloadGenerator generator(inPayload);
     string result;
     uint8_t optionalInfo[kDefaultBufferSizeInBytes];
-    CHIP_ERROR err = generator.payloadBase41Representation(result, optionalInfo, sizeof(optionalInfo));
+    CHIP_ERROR err = generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -209,7 +210,7 @@ void TestOptionalDataWriteNoBuffer(nlTestSuite * inSuite, void * inContext)
 
     QRCodeSetupPayloadGenerator generator(inPayload);
     string result;
-    CHIP_ERROR err = generator.payloadBase41Representation(result);
+    CHIP_ERROR err = generator.payloadBase38Representation(result);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 }
 
@@ -220,7 +221,7 @@ void TestOptionalDataWriteSmallBuffer(nlTestSuite * inSuite, void * inContext)
     QRCodeSetupPayloadGenerator generator(inPayload);
     string result;
     uint8_t optionalInfo[kSmallBufferSizeInBytes];
-    CHIP_ERROR err = generator.payloadBase41Representation(result, optionalInfo, sizeof(optionalInfo));
+    CHIP_ERROR err = generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 }
 

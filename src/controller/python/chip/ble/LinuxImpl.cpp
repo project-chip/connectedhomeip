@@ -1,9 +1,9 @@
 
+#include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Linux/bluez/AdapterIterator.h>
 #include <platform/Linux/bluez/MainLoop.h>
 #include <platform/internal/BLEManager.h>
-#include <support/CHIPMem.h>
 
 using namespace chip::DeviceLayer::Internal;
 
@@ -104,7 +104,7 @@ private:
 
 } // namespace
 
-extern "C" void * pychip_ble_start_scanning(PyObject * context, void * adapter, uint32_t timeout,
+extern "C" void * pychip_ble_start_scanning(PyObject * context, void * adapter, uint32_t timeoutMs,
                                             ScannerDelegateImpl::DeviceScannedCallback scanCallback,
                                             ScannerDelegateImpl::ScanCompleteCallback completeCallback)
 {
@@ -117,7 +117,7 @@ extern "C" void * pychip_ble_start_scanning(PyObject * context, void * adapter, 
         return nullptr;
     }
 
-    if (scanner->StartScan(timeout) != CHIP_NO_ERROR)
+    if (scanner->StartScan(chip::System::Clock::Milliseconds32(timeoutMs)) != CHIP_NO_ERROR)
     {
         return nullptr;
     }

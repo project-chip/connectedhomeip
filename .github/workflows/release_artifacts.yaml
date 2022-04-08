@@ -29,14 +29,30 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-esp32:latest
+            image: connectedhomeip/chip-build-esp32:0.5.58
 
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
                   ref: "${{ github.event.inputs.releaseTag }}"
+            - name: Bootstrap
+              timeout-minutes: 25
+              run: scripts/build/gn_bootstrap.sh
+            - name: Uploading bootstrap logs
+              uses: actions/upload-artifact@v2
+              if: ${{ always() }} && ${{ !env.ACT }}
+              with:
+                  name: bootstrap-logs
+                  path: |
+                      .environment/gn_out/.ninja_log
+                      .environment/pigweed-venv/*.log
             - name: Build
               run: scripts/examples/esp_example.sh all-clusters-app
 
@@ -59,16 +75,31 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-efr32:latest
+            image: connectedhomeip/chip-build-efr32:0.5.58
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
                   ref: "${{ github.event.inputs.releaseTag }}"
+            - name: Bootstrap
+              timeout-minutes: 25
+              run: scripts/build/gn_bootstrap.sh
+            - name: Uploading bootstrap logs
+              uses: actions/upload-artifact@v2
+              if: ${{ always() }} && ${{ !env.ACT }}
+              with:
+                  name: bootstrap-logs
+                  path: |
+                      .environment/gn_out/.ninja_log
+                      .environment/pigweed-venv/*.log
             - name: Build example EFR32 Lock App
-              run:
-                  scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/
+              run: scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/
                   out/lock_app_debug $EFR32_BOARD
 
             - name: Upload artifact

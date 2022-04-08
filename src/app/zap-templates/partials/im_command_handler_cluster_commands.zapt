@@ -1,34 +1,64 @@
-{{#if (zcl_command_arguments_count this.id)}}
-CHIP_ERROR TLVError = CHIP_NO_ERROR;
-{{#zcl_command_arguments}}
-{{#if (isOctetString type)}}
-chip::ByteSpan {{asSymbol label}};
-{{else if (isString type)}}
-const uint8_t * {{asSymbol label}};
+{{#if (isServer parent.clusterSide)}}
+Commands::{{asUpperCamelCase commandName}}::DecodableType commandData;
+TLVError = DataModel::Decode(aDataTlv, commandData);
+if (TLVError == CHIP_NO_ERROR) {
+wasHandled = emberAf{{asUpperCamelCase parent.clusterName}}Cluster{{asUpperCamelCase commandName}}Callback(apCommandObj, aCommandPath, commandData);
+}
 {{else}}
-{{asUnderlyingZclType type}} {{asSymbol label}};
-{{/if}}
+{{#if (zcl_command_arguments_count this.id)}}
+expectArgumentCount = {{ zcl_command_arguments_count this.id }};
+{{#zcl_command_arguments}}
+  {{#if isArray}}
+    {{asUnderlyingZclType type}} {{asSymbol label}};
+  {{else}}
+    {{#if_is_struct type}}
+      {{zapTypeToDecodableClusterObjectType type ns=parent.parent.clusterName}} {{asSymbol label}};
+    {{else}}
+      {{asUnderlyingZclType type}} {{asSymbol label}};
+    {{/if_is_struct}}
+  {{/if}}
 {{/zcl_command_arguments}}
+bool argExists[{{zcl_command_arguments_count this.id}}];
 
-while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
+memset(argExists, 0, sizeof argExists);
+
+while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
 {
-  switch (TLV::TagNumFromTag(dataTlv.GetTag()))
+  // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
+  // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
+  if (!TLV::IsContextTag(aDataTlv.GetTag()))
+  {
+    continue;
+  }
+  currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
+  if (currentDecodeTagId < {{zcl_command_arguments_count this.id}})
+  {
+    if (argExists[currentDecodeTagId])
+    {
+      ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+      TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+      break;
+    }
+    else
+    {
+      argExists[currentDecodeTagId] = true;
+      validArgumentCount++;
+    }
+  }
+  switch (currentDecodeTagId)
   {
 {{#zcl_command_arguments}}
-    case {{index}}:
-{{#if (isOctetString type)}}
-    {
-        const uint8_t * data = nullptr;
-        TLVError = dataTlv.GetDataPtr(data);
-        {{asSymbol label}} = chip::ByteSpan(data, dataTlv.GetLength());
-    }
-{{else if (isString type)}}
-      TLVError = dataTlv.GetDataPtr({{asSymbol label}});
-{{else if isArray}}
+    case {{fieldIdentifier}}:
+{{#if isArray}}
       // Just for compatibility, we will add array type support in IM later.
-      TLVError = dataTlv.GetDataPtr(const_cast<const uint8_t *&>({{asSymbol label}}));
+      TLVUnpackError = aDataTlv.GetDataPtr(const_cast<const uint8_t *&>({{asSymbol label}}));
 {{else}}
-      TLVError = dataTlv.Get({{asSymbol label}});
+  {{#if_is_struct type}}
+      // Not supported, just error out.
+      TLVUnpackError = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
+  {{else}}
+      TLVUnpackError = aDataTlv.Get({{asSymbol label}});
+  {{/if_is_struct}}
 {{/if}}
       break;
 {{/zcl_command_arguments}}
@@ -37,11 +67,25 @@ while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
       ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
       break;
   }
-  if (TLVError != CHIP_NO_ERROR)
+  if (CHIP_NO_ERROR != TLVUnpackError)
   {
-    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32, TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
+    break;
   }
 }
+
+if (CHIP_END_OF_TLV == TLVError)
+{
+  // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+  TLVError = CHIP_NO_ERROR;
+}
 {{/if}}
-// TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback({{#zcl_command_arguments}}{{#if (isCharString type)}}const_cast<uint8_t*>({{asSymbol label}}){{else}}{{asSymbol label}}{{/if}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}});
+
+{{#if (zcl_command_arguments_count this.id)}}
+if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && {{zcl_command_arguments_count this.id}} == validArgumentCount)
+{
+{{/if}}
+wasHandled = emberAf{{asUpperCamelCase parent.clusterName}}Cluster{{asUpperCamelCase commandName}}Callback(aCommandPath.mEndpointId, apCommandObj{{#zcl_command_arguments}}, {{asSymbol label}}{{/zcl_command_arguments}});
+{{#if (zcl_command_arguments_count this.id)}}
+}
+{{/if}}
+{{/if}}

@@ -1,4 +1,4 @@
-# CHIP EFR32 Lock Example
+#CHIP EFR32 Lock Example
 
 An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
 
@@ -12,6 +12,8 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
     -   [Viewing Logging Output](#viewing-logging-output)
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
+    -   [Memory settings](#memory-settings)
+    -   [OTA Software Update](#ota-software-update)
 
 <hr>
 
@@ -50,11 +52,9 @@ Silicon Labs platform.
 
 -   Install some additional tools(likely already present for CHIP developers):
 
-           # Linux
-           $ sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
+#Linux \$ sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
 
-           # Mac OS X
-           $ brew install ninja
+#Mac OS X \$ brew install ninja
 
 -   Supported hardware:
 
@@ -67,9 +67,14 @@ Silicon Labs platform.
         915MHz@19dBm
     -   BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
 
-    MG21 boards:
+    MG21 boards: Currently not supported due to RAM limitation.
 
     -   BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+
+    MG24 boards :
+
+    -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
 *   Build the example application:
 
@@ -81,7 +86,7 @@ Silicon Labs platform.
           $ cd ~/connectedhomeip
           $ rm -rf ./out/
 
-OR use GN/Ninja directly
+    OR use GN/Ninja directly
 
           $ cd ~/connectedhomeip/examples/lock-app/efr32
           $ git submodule update --init
@@ -94,6 +99,34 @@ OR use GN/Ninja directly
 
           $ cd ~/connectedhomeip/examples/lock-app/efr32
           $ rm -rf out/
+
+*   Build the example as Sleepy End Device (SED)
+
+          $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32/ ./out/lighting-app_SED BRD4161A --sed
+
+    or use gn as previously mentioned but adding the following arguments:
+
+          $ gn gen out/debug '--args=efr32_board="BRD4161A" enable_sleepy_device=true chip_openthread_ftd=false'
+
+*   Build the example with pigweed RCP
+
+          $ ./scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/ out/lock_app_rpc BRD4161A 'import("//with_pw_rpc.gni")'
+
+    or use GN/Ninja Directly
+
+          $ cd ~/connectedhomeip/examples/lock-app/efr32
+          $ git submodule update --init
+          $ source third_party/connectedhomeip/scripts/activate.sh
+          $ export EFR32_BOARD=BRD4161A
+          $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
+          $ ninja -C out/debug
+
+    [Running Pigweed RPC console](#running-pigweed-rpc-console)
+
+For more build options, help is provided when running the build script without
+arguments
+
+         ./scripts/examples/gn_efr32_example.sh
 
 <a name="flashing"></a>
 
@@ -161,10 +194,11 @@ combination with JLinkRTTClient as follows:
 ## Running the Complete Example
 
 -   It is assumed here that you already have an OpenThread border router
-    configured and running. If not, see the following guide
-    [OpenThread Border Router](https://openthread.io/guides/border-router) for
-    more information on how to setup a border router. Take note that the RCP
-    code is available directly through
+    configured and running. If not see the following guide
+    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/openthread_border_router_pi.md)
+    for more information on how to setup a border router on a raspberryPi.
+
+    Take note that the RCP code is available directly through
     [Simplicity Studio 5](https://www.silabs.com/products/development-tools/software/simplicity-studio/simplicity-studio-5)
     under File->New->Project Wizard->Examples->Thread : ot-rcp
 
@@ -202,53 +236,31 @@ combination with JLinkRTTClient as follows:
         -   _Blinking_ ; Bolt is moving to the desired state
         -   _Off_ ; Bolt is unlocked
 
-    **Push Button 0** - Press and Release : If not commissioned, start thread
-    with default configurations (DEBUG)
+    **Push Button 0**
 
-        -   Pressed and hold for 6 s: Initiates the factory reset of the device.
+        -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
+            for 30 seconds. The device will then switch to a slower interval advertisement.
+            After 15 minutes, the advertisement stops.
+
+        -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
             Releasing the button within the 6-second window cancels the factory reset
             procedure. **LEDs** blink in unison when the factory reset procedure is
             initiated.
 
     **Push Button 1** Toggles the bolt state On/Off
 
--   Once the device is provisioned, it will join the Thread network is
-    established, look for the RTT log
+-   You can provision and control the Chip device using the python controller,
+    Chip tool standalone, Android or iOS app
+
+    [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
+
+    Here is an example with the CHIPTool:
 
     ```
-        [DL] Device Role: CHILD
-        [DL] Partition Id:0x6A7491B7
-        [DL] \_OnPlatformEvent default: event->Type = 32778
-        [DL] OpenThread State Changed (Flags: 0x00000001)
-        [DL] Thread Unicast Addresses:
-        [DL]    2001:DB8::E1A2:87F1:7D5D:FECA/64 valid preferred
-        [DL]    FDDE:AD00:BEEF::FF:FE00:2402/64 valid preferred rloc
-        [DL]    FDDE:AD00:BEEF:0:383F:5E81:A05A:B168/64 valid preferred
-        [DL]    FE80::D8F2:592E:C109:CF00/64 valid preferred
-        [DL] LwIP Thread interface addresses updated
-        [DL] FE80::D8F2:592E:C109:CF00 IPv6 link-local address, preferred)
-        [DL] FDDE:AD00:BEEF:0:383F:5E81:A05A:B168 Thread mesh-local address, preferred)
-        [DL] 2001:DB8::E1A2:87F1:7D5D:FECA IPv6 global unicast address, preferred)
+    chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
+
+    chip-tool onoff toggle 1 1
     ```
-
-    Keep The global unicast address; It is to be used to reach the Device with
-    the chip-tool. The device will be promoted to Router shortly after [DL]
-    Device Role: ROUTER
-
-    (you can verify that the device is on the thread network with the command
-    `router table` using a serial terminal (screen / minicom etc.) on the board
-    running the lighting-app example. You can also get the address list with the
-    command ipaddr again in the serial terminal )
-
--   Using chip-tool you can now control the lock status with on/off command such
-    as `chip-tool onoff on 1`
-
-    \*\* Currently, chip-tool for Mac or Linux do not yet have the Thread
-    provisioning feature
-    `chip-tool bypass <Global ipv6 address of the node> 11097`
-
-    You can provision the Chip device using Chip tool Android or iOS app or
-    through CLI commands on your OT BR
 
 ### Notes
 
@@ -257,11 +269,64 @@ combination with JLinkRTTClient as follows:
     need to add a static ipv6 addresses on both device and then an ipv6 route to
     the border router on your PC
 
-          # On Border Router :
-          $ sudo ip addr add dev <Network interface> 2002::2/64
+#On Border Router: \$ sudo ip addr add dev <Network interface> 2002::2/64
 
-          # On PC (Linux) :
-          $ sudo ip addr add dev <Network interface> 2002::1/64
+#On PC(Linux): \$ sudo ip addr add dev <Network interface> 2002::1/64
 
-          # Add Ipv6 route on PC (Linux)
-          $ sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2
+#Add Ipv6 route on PC(Linux) \$ sudo ip route add <Thread global ipv6 prefix>/64
+via 2002::2
+
+## Memory settings
+
+While most of the RAM usage in CHIP is static, allowing easier debugging and
+optimization with symbols analysis, we still need some HEAP for the crypto and
+OpenThread. Size of the HEAP can be modified by changing the value of the
+`configTOTAL_HEAP_SIZE` define inside of the FreeRTOSConfig.h file of this
+example. Please take note that a HEAP size smaller than 13k can and will cause a
+Mbedtls failure during the BLE rendez-vous or CASE session
+
+To track memory usage you can set `enable_heap_monitoring = true` either in the
+BUILD.gn file or pass it as a build argument to gn. This will print on the RTT
+console the RAM usage of each individual task and the number of Memory
+allocation and Free. While this is not extensive monitoring you're welcome to
+modify `examples/platform/efr32/MemMonitoring.cpp` to add your own memory
+tracking code inside the `trackAlloc` and `trackFree` function
+
+## OTA Software Update
+
+For the description of Software Update process with EFR32 example applications
+see
+[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
+
+## Building options
+
+All of Silabs's examples within the Matter repo have all the features enabled by
+default, as to provide the best end user experience. However some of those
+features can easily be toggled on or off. Here is a short list of options :
+
+### Disabling logging
+
+chip_progress_logging, chip_detail_logging, chip_automation_logging
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
+
+### Debug build / release build
+
+is_debug
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "is_debug=false"
+
+### Disabling LCD
+
+show_qr_code
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "show_qr_code=false"
+
+### KVS maximum entry count
+
+kvs_max_entries
+
+    Set the maximum Kvs entries that can be stored in NVM (Default 75)
+    Thresholds: 30 <= kvs_max_entries <= 255
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A kvs_max_entries=50

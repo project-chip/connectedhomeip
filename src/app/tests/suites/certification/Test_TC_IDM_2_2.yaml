@@ -1,0 +1,289 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.2.2. [TC-IDM-2.2] Report Data Action from DUT to TH [DUT - Controller]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "TH sends the Read Request Message to the DUT to read one attribute on
+          a given cluster and endpoint. The Message should contain one valid
+          CommandDataIB, which has the specific Endpoint, Specific Cluster and
+          Specific Attribute. On receipt of this message, DUT should send a
+          report data action with the attribute value to the DUT."
+      verification:
+          "In case of chip tool, here is an example command to use sudo
+          ./chip-tool identify read identify-time 1 1"
+      disabled: true
+
+    - label:
+          "TH sends the Read Request Message to the TH. The Message should read
+          all attributes on a given cluster and Endpoint AttributePath =
+          [[Endpoint = Endpoint1, Cluster = ClusterID]] On receipt of this
+          message, DUT should send a report data action with the attribute value
+          to the DUT."
+      verification:
+          "In case of chip tool, here is an example command to use sudo
+          ./chip-tool any read-by-id 0x3 0xFFFFFFFF 1 0"
+      disabled: true
+
+    - label:
+          "TH sends the Read Request Message to the TH. The Message should read
+          an attribute from a cluster at all Endpoints AttributePath = [[Cluster
+          = ClusterID, Attribute = AttributeID]] On receipt of this message, DUT
+          should send a report data action with the attribute value from all the
+          Endpoints to the DUT."
+      verification:
+          "In case of chip tool, here is an example command to use ./chip-tool
+          any read-by-id 0x03 1 1 0xffff"
+      disabled: true
+
+    - label:
+          "TH sends the Read Request Message to the TH. The Message should read
+          an attribute from all clusters at that Endpoint AttributePath =
+          [[Endpoint = Endpoint1, Attribute = AttributeID]] On receipt of this
+          message, DUT should send a report data action with the attribute value
+          from all the clusters to the DUT."
+      verification:
+          "In case of chip tool, here is an example command to use sudo
+          ./chip-tool any read-by-id 0xFFFFFFFF 0 1 1"
+      disabled: true
+
+    - label:
+          "TH sends the Read Request Message to the TH. The Message should read
+          all attributes from all clusters AttributePath = [[]] On receipt of
+          this message, DUT should send a report data action with the attribute
+          value from all the clusters to the DUT."
+      verification:
+          "In case of chip tool, here is an example command to use sudo
+          ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 1"
+      disabled: true
+
+    - label:
+          "[Optional] TH sends the Read Request Message to the DUT to read an
+          attribute of data type bool. DUT responds with the report data action
+          with the right attribute value."
+      verification:
+          "In case of chip tool, here is an example command to use sudo
+          ./chip-tool onoff read on-off 1 1"
+      disabled: true
+
+    - label:
+          "[Optional] TH sends the Read Request Message to the DUT to read an
+          attribute of data type string. DUT responds with the report data
+          action with the right attribute value."
+      verification:
+          "In case of chip tool, here is an example command to use sudo
+          ./chip-tool modeselect read description 1 1"
+      disabled: true
+
+    - label:
+          "[Optional] TH sends the Read Request Message to the DUT to read an
+          attribute of data type unsigned integer. DUT responds with the report
+          data action with the right attribute value."
+      verification:
+          "In case of chip tool, here is an example command to use sudo
+          ./chip-tool any read-by-id 0x3 0x1 1 0"
+      disabled: true
+
+    - label:
+          "[Optional] TH sends the Read Request Message to the DUT to read an
+          attribute of data type signed integer. DUT responds with the report
+          data action with the right attribute value."
+      verification:
+          "In case of chip tool, here is an example command to use sudo
+          ./chip-tool pressuremeasurement read measured-value 1 1"
+      disabled: true
+
+    - label:
+          "[Optional] TH sends the Read Request Message to the DUT to read an
+          attribute of data type floating point. DUT responds with the report
+          data action with the right attribute value."
+      verification: "Currently the Spec is not supporting for this data type."
+      disabled: true
+
+    - label:
+          "[Optional] TH sends the Read Request Message to the DUT to read an
+          attribute of data type Octet String. DUT responds with the report data
+          action with the right attribute value."
+      verification:
+          "In case of chip tool, here is an example command to use sudo
+          ./chip-tool operationalcredentials read trusted-root-certificates 1 0"
+      disabled: true
+
+    - label:
+          "[Optional] TH sends the Read Request Message to the DUT to read an
+          attribute of data type Struct. DUT responds with the report data
+          action with the right attribute value."
+      verification: "Currently the Spec is not supporting for this data type."
+      disabled: true
+
+    - label:
+          "[Optional] TH sends the Read Request Message to the DUT to read an
+          attribute of data type List. DUT responds with the report data action
+          with the right attribute value."
+      verification:
+          "In case of chip tool, here is an example command to use sudo
+          ./chip-tool modeselect read supported-modes 1 1"
+      disabled: true
+
+    - label:
+          "[Optional] TH sends the Read Request Message to the DUT to read an
+          attribute of data type enum. DUT responds with the report data action
+          with the right attribute value."
+      verification:
+          "In case of chip tool, here is an example command to use sudo
+          ./chip-tool occupancysensing read occupancy-sensor-type 1 1"
+      disabled: true
+
+    - label:
+          "[Optional] TH sends the Read Request Message to the DUT to read an
+          attribute of data type bitmap. DUT responds with the report data
+          action with the right attribute value."
+      verification:
+          "In case of chip tool, here is an example command to use sudo
+          ./chip-tool levelcontrol read options 1 1"
+      disabled: true
+
+    - label:
+          "TH sends the Read Request Message to the DUT to read any attribute to
+          an unsupported node. DUT responds with the report data action."
+      verification:
+          "Unsupported for TE8 -
+          https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/4999"
+      disabled: true
+
+    - label:
+          "TH sends the Read Request Message to the DUT to read any attribute to
+          an unsupported Endpoint. DUT responds with the report data action."
+      verification:
+          "In case of chip tool, here is an example command to use sudo
+          ./chip-tool levelcontrol read-by-id 0 1 4"
+      disabled: true
+
+    - label:
+          "TH sends the Read Request Message to the DUT to read any attribute to
+          an unsupported cluster. DUT responds with the report data action."
+      verification:
+          "In case of chip tool, here is an example command to use ./chip-tool
+          any command-by-id 0x0003 0 1 1 2"
+      disabled: true
+
+    - label:
+          "TH sends the Read Request Message to the DUT to read an unsupported
+          attribute DUT responds with the report data action."
+      verification: "Check for optional one that is not implemented"
+      disabled: true
+
+    - label:
+          "TH sends the Read Request Message to the DUT to read an attribute
+          which is not readable. DUT responds with the report data action."
+      verification: "Need to find more info"
+      disabled: true
+
+    - label:
+          "TH sends the Read Request Message to the DUT to read an attribute in
+          the path that requires a privilege that is not granted for the cluster
+          in the path. DUT responds with the report data action."
+      verification: "Unsupported in TE8 - Out of scope"
+      disabled: true
+
+    - label:
+          "TH sends the Read Request Message to the DUT to read an attribute in
+          the path that is fabric scoped, and the associated fabric does not
+          match the accessing fabric. DUT responds with the Report Data action"
+      verification: "Unsupported in TE8 - Out of scope"
+      disabled: true
+
+    - label:
+          "TH sends the Read Request Message to the DUT to read an attribute
+          Repeat the above steps 3 times."
+      verification:
+          "In case of chip tool, here is an example command to use sudo
+          ./chip-tool occupancysensing read occupancy 1 1 sudo ./chip-tool
+          occupancysensing read occupancy 1 1 sudo ./chip-tool occupancysensing
+          read occupancy 1 1"
+      disabled: true
+
+    - label:
+          "TH sends the Read Request Message to the DUT. The Message should read
+          an attribute from all clusters and all endpoints for a particular
+          attribute AttributePath = [[ Attribute = AttributeID]] On receipt of
+          this message, DUT should send a report data action with the attribute
+          value from all the clusters and endpoints to the DUT."
+      verification:
+          "In case of chip tool, here is an example command to use sudo
+          ./chip-tool any read-by-id 0xFFFFFFFF 0 1 0xFFFF"
+      disabled: true
+
+    - label:
+          "TH sends the Read Request Message to the DUT. The Message should read
+          all attributes from all clusters from a specific endpoint
+          AttributePath = [[ Endpoint = EndpointID]] On receipt of this message,
+          DUT should send a report data action with all the attribute values
+          from all the clusters from that particular endpointID to the DUT."
+      verification:
+          "In case of chip tool, here is an example command to use sudo
+          ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 1"
+      disabled: true
+
+    - label:
+          "TH sends the Read Request Message to the DUT. The Message should read
+          all attributes from all endpoints from a specific cluster+
+          AttributePath = [[ Cluster = ClusterID]] On receipt of this message,
+          DUT should send a report data action with all the attribute values
+          from all the endpoints from that particular ClusterID to the DUT."
+      verification:
+          "In case of chip tool, here is an example command to use sudo
+          ./chip-tool any read-by-id 0x3 0xFFFFFFFF 1 0xFFFF"
+      disabled: true
+
+    - label:
+          "TH sends a Read Request Message to the DUT to read a particular
+          attribute with the DataVersionFilter Field not set. DUT sends back the
+          attribute value with the DataVersion of the cluster. TH sends a second
+          read request to the same cluster with the DataVersionFilter Field set
+          with the dataversion value received before."
+      verification:
+          "Unsupported in TE8 - Out of scope - Need to file ticket (No
+          DataVersionFilter available)"
+      disabled: true
+
+    - label:
+          "TH sends a Read Request Message to the DUT to read a particular
+          attribute with the DataVersionFilter Field not set. DUT sends back the
+          attribute value with the DataVersion of the cluster. TH sends a write
+          request to the same cluster to write to any attribute. TH sends a
+          second read request to read an attribute from the same cluster with
+          the DataVersionFilter Field set with the dataversion value received
+          before."
+      verification: "Unsupported in TE8 - Out of scope"
+      disabled: true
+
+    - label:
+          "TH sends a Read Request Message to the DUT to read all attributes on
+          a cluster with the DataVersionFilter Field not set. DUT sends back the
+          all the attribute values with the DataVersion of the cluster. TH sends
+          a write request to the same cluster to write to any attribute. TH
+          sends a second read request to read all the attributes from the same
+          cluster with the DataVersionFilter Field set with the dataversion
+          value received before."
+      verification:
+          "Unsupported in TE8
+          https://github.com/project-chip/connectedhomeip/issues/15812"
+      disabled: true

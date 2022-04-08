@@ -17,6 +17,9 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/openthread.gni")
 
 import("${efr32_sdk_build_root}/efr32_board.gni")
+import("${efr32_sdk_build_root}/efr32_sdk.gni")
+
+openthread_efr32_root = "${chip_root}/third_party/openthread/ot-efr32"
 
 config("openthread_efr32_config") {
   defines = [
@@ -27,16 +30,16 @@ config("openthread_efr32_config") {
 
   include_dirs = [
     "${chip_root}/examples/platform/efr32",
-    "${chip_root}/examples/platform/efr32/${efr32_family}/${efr32_board}",
-    "${openthread_root}/examples/platforms/efr32/src",
-    "${openthread_root}/examples/platforms/efr32/${efr32_family}",
+    "${efr32_sdk_root}/matter/efr32/${efr32_family}/${efr32_board}",
+    "${openthread_efr32_root}/src/src",
   ]
 }
 
 source_set("openthread_core_config_efr32") {
   sources = [
-    "${openthread_root}/examples/platforms/efr32/src/openthread-core-efr32-config-check.h",
-    "${openthread_root}/examples/platforms/efr32/src/openthread-core-efr32-config.h",
+    "${openthread_efr32_root}/src/src/openthread-core-efr32-config-check.h",
+    "${openthread_efr32_root}/src/src/openthread-core-efr32-config.h",
+    "${openthread_root}/src/cli/cli_config.h",
   ]
 
   public_deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
@@ -44,20 +47,15 @@ source_set("openthread_core_config_efr32") {
   public_configs = [ ":openthread_efr32_config" ]
 }
 
-source_set("openthread_mbedtls_config_efr32") {
-  sources = [ "${openthread_root}/examples/platforms/efr32/${efr32_family}/crypto/mbedtls_config_autogen.h" ]
-}
-
 source_set("libopenthread-efr32") {
   sources = [
-    "${openthread_root}/examples/platforms/efr32/src/alarm.c",
-    "${openthread_root}/examples/platforms/efr32/src/entropy.c",
-    "${openthread_root}/examples/platforms/efr32/src/flash.c",
-    "${openthread_root}/examples/platforms/efr32/src/misc.c",
-    "${openthread_root}/examples/platforms/efr32/src/radio.c",
-    "${openthread_root}/examples/platforms/efr32/src/system.c",
-    "${openthread_root}/examples/platforms/efr32/src/uart.c",
-    "${openthread_root}/third_party/silabs/rail_config/rail_config.c",
+    "${openthread_efr32_root}/src/src/alarm.c",
+    "${openthread_efr32_root}/src/src/entropy.c",
+    "${openthread_efr32_root}/src/src/flash.c",
+    "${openthread_efr32_root}/src/src/misc.c",
+    "${openthread_efr32_root}/src/src/radio.c",
+    "${openthread_efr32_root}/src/src/system.c",
+    "${openthread_root}/examples/apps/cli/cli_uart.cpp",
   ]
 
   public_deps = [

@@ -39,9 +39,10 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "af.h"
-#include "config.h"
-#include "util.h"
+#include <app/util/af.h>
+#include <app/util/config.h>
+#include <app/util/util.h>
+#include <lib/support/TypeTraits.h>
 
 using namespace chip;
 
@@ -55,7 +56,7 @@ using namespace chip;
 // receives multiple ZCL messages, the stack will queue these and hand
 // these to the application via emberIncomingMsgHandler one at a time.
 EmberApsFrame emberAfResponseApsFrame;
-NodeId emberAfResponseDestination;
+Messaging::ExchangeContext * emberAfResponseDestination;
 uint8_t appResponseData[EMBER_AF_RESPONSE_BUFFER_LEN];
 uint16_t appResponseLength;
 
@@ -72,7 +73,7 @@ void emberAfClearResponseData(void)
     emberAfResponseType = ZCL_UTIL_RESP_NORMAL;
     // To prevent accidentally sending to someone else,
     // set the destination to ourselves.
-    emberAfResponseDestination = 0 /* emberAfGetNodeId() */;
+    emberAfResponseDestination = nullptr /* emberAfGetNodeId() */;
     memset(appResponseData, 0, EMBER_AF_RESPONSE_BUFFER_LEN);
     appResponseLength = 0;
     memset(&emberAfResponseApsFrame, 0, sizeof(EmberApsFrame));
@@ -89,7 +90,7 @@ uint8_t * emberAfPutInt8uInResp(uint8_t value)
         return &appResponseData[appResponseLength - 1];
     }
 
-    return NULL;
+    return nullptr;
 }
 
 uint16_t * emberAfPutInt16uInResp(uint16_t value)
@@ -101,10 +102,8 @@ uint16_t * emberAfPutInt16uInResp(uint16_t value)
     {
         return (uint16_t *) low;
     }
-    else
-    {
-        return NULL;
-    }
+
+    return nullptr;
 }
 
 uint32_t * emberAfPutInt32uInResp(uint32_t value)
@@ -118,10 +117,8 @@ uint32_t * emberAfPutInt32uInResp(uint32_t value)
     {
         return (uint32_t *) a;
     }
-    else
-    {
-        return NULL;
-    }
+
+    return nullptr;
 }
 
 uint32_t * emberAfPutInt24uInResp(uint32_t value)
@@ -134,10 +131,8 @@ uint32_t * emberAfPutInt24uInResp(uint32_t value)
     {
         return (uint32_t *) a;
     }
-    else
-    {
-        return NULL;
-    }
+
+    return nullptr;
 }
 
 uint8_t * emberAfPutBlockInResp(const uint8_t * data, uint16_t length)
@@ -148,10 +143,8 @@ uint8_t * emberAfPutBlockInResp(const uint8_t * data, uint16_t length)
         appResponseLength = static_cast<uint16_t>(appResponseLength + length);
         return &appResponseData[appResponseLength - length];
     }
-    else
-    {
-        return NULL;
-    }
+
+    return nullptr;
 }
 
 uint8_t * emberAfPutStringInResp(const uint8_t * buffer)
@@ -171,15 +164,18 @@ uint8_t * emberAfPutDateInResp(EmberAfDate * value)
     {
         return a;
     }
-    else
-    {
-        return NULL;
-    }
+
+    return nullptr;
 }
 
 void emberAfPutInt16sInResp(int16_t value)
 {
     emberAfPutInt16uInResp(static_cast<uint16_t>(value));
+}
+
+void emberAfPutStatusInResp(EmberAfStatus value)
+{
+    emberAfPutInt8uInResp(to_underlying(value));
 }
 
 // ------------------------------------

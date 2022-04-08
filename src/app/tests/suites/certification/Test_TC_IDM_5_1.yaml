@@ -1,0 +1,102 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    19.7.1. [TC-IDM-5.1] Timed Request Action from DUT to TH [DUT - Controller]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "DUT sends the Timed Request to the TH and then sends an Invoke
+          Request Message to the TH after receiving the status response message
+          from the TH. The Time Request Message should contain a timeout value
+          in milliseconds. (Example - 200 milliseconds)"
+      verification:
+          "Chip-tool as controller , here is the example command you can use
+          sudo ./chip-tool onoff on 0x9f2bf1a1e3cc12c7 1
+          --timedInteractionTimeoutMs 100 on the TH (reference all cluster app)
+          you should see [1641535680.295759][3878:3878] CHIP:DMG:
+          TimedRequestMessage = [1641535680.295785][3878:3878] CHIP:DMG: {
+          [1641535680.295806][3878:3878] CHIP:DMG: TimeoutMs = 0x64,
+          [1641535680.295828][3878:3878] CHIP:DMG: } DUT should receive the
+          status response messge [1641535680.296922][30856:30861] CHIP:DMG:
+          StatusResponseMessage = [1641535680.296965][30856:30861] CHIP:DMG: {
+          [1641535680.297002][30856:30861] CHIP:DMG: Status = 0x0,
+          [1641535680.297040][30856:30861] CHIP:DMG: } TH receives
+          InvokeRequestMessage [1641535680.297385][3878:3878] CHIP:DMG:
+          InvokeRequestMessage = [1641535680.297408][3878:3878] CHIP:DMG: {
+          [1641535680.297429][3878:3878] CHIP:DMG: suppressResponse = false,
+          [1641535680.297453][3878:3878] CHIP:DMG: timedRequest = true,
+          [1641535680.297475][3878:3878] CHIP:DMG: InvokeRequests =
+          [1641535680.297503][3878:3878] CHIP:DMG: [
+          [1641535680.297525][3878:3878] CHIP:DMG: CommandDataIB =
+          [1641535680.297554][3878:3878] CHIP:DMG: {
+          [1641535680.297579][3878:3878] CHIP:DMG: CommandPathIB =
+          [1641535680.297610][3878:3878] CHIP:DMG: {
+          [1641535680.297644][3878:3878] CHIP:DMG: EndpointId = 0x1,
+          [1641535680.297676][3878:3878] CHIP:DMG: ClusterId = 0x6,
+          [1641535680.297706][3878:3878] CHIP:DMG: CommandId = 0x1,
+          [1641535680.297738][3878:3878] CHIP:DMG: },
+          [1641535680.297771][3878:3878] CHIP:DMG:
+          [1641535680.297797][3878:3878] CHIP:DMG: CommandData =
+          [1641535680.297825][3878:3878] CHIP:DMG: {
+          [1641535680.297853][3878:3878] CHIP:DMG: },
+          [1641535680.297880][3878:3878] CHIP:DMG: },
+          [1641535680.297909][3878:3878] CHIP:DMG:
+          [1641535680.297931][3878:3878] CHIP:DMG: ],
+          [1641535680.297957][3878:3878] CHIP:DMG:
+          [1641535680.297976][3878:3878] CHIP:DMG: },"
+      disabled: true
+
+    - label:
+          "DUT sends the Timed Request to the TH and then sends a Write Request
+          Message to the TH after receiving the status response message from the
+          TH. The Time Request Message should contain a timeout value in
+          milliseconds. (Example - 200 milliseconds)"
+      verification:
+          "Chip-tool as controller , here is the example command to write an
+          attribute you can use sudo ./chip-tool onoff write on-time 1
+          0x9f2bf1a1e3cc12c7 1 --timedInteractionTimeoutMs 100 on the TH
+          (reference all cluster app) you should see
+          [1641535415.492509][3878:3878] CHIP:DMG: TimedRequestMessage =
+          [1641535415.492560][3878:3878] CHIP:DMG: {
+          [1641535415.492584][3878:3878] CHIP:DMG: TimeoutMs = 0x64,
+          [1641535415.492606][3878:3878] CHIP:DMG: }
+          [1641535415.494355][3878:3878] CHIP:DMG: WriteRequestMessage =
+          [1641535415.494388][3878:3878] CHIP:DMG: {
+          [1641535415.494410][3878:3878] CHIP:DMG: timedRequest = true,
+          [1641535415.494442][3878:3878] CHIP:DMG: AttributeDataIBs =
+          [1641535415.494519][3878:3878] CHIP:DMG: [
+          [1641535415.494602][3878:3878] CHIP:DMG: AttributeDataIB =
+          [1641535415.494641][3878:3878] CHIP:DMG: {
+          [1641535415.494668][3878:3878] CHIP:DMG: DataVersion = 0x0,
+          [1641535415.494746][3878:3878] CHIP:DMG: AttributePathIB =
+          [1641535415.494811][3878:3878] CHIP:DMG: {
+          [1641535415.494854][3878:3878] CHIP:DMG: Endpoint = 0x1,
+          [1641535415.494887][3878:3878] CHIP:DMG: Cluster = 0x6,
+          [1641535415.494927][3878:3878] CHIP:DMG: Attribute = 0x0000_4001,
+          [1641535415.494993][3878:3878] CHIP:DMG: }
+          [1641535415.495060][3878:3878] CHIP:DMG:
+          [1641535415.495092][3878:3878] CHIP:DMG: Data = 1,
+          [1641535415.495129][3878:3878] CHIP:DMG: },
+          [1641535415.495187][3878:3878] CHIP:DMG:
+          [1641535415.495219][3878:3878] CHIP:DMG: ],
+          [1641535415.495248][3878:3878] CHIP:DMG:
+          [1641535415.495323][3878:3878] CHIP:DMG: isFabricFiltered = false,
+          [1641535415.495345][3878:3878] CHIP:DMG: },"
+      disabled: true

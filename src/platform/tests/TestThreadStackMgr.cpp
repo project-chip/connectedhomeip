@@ -16,11 +16,11 @@
  */
 
 #include <assert.h>
-#include <dbus/dbus.h>
 #include <memory>
 
-#include <support/CHIPMem.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/ThreadOperationalDataset.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include "platform/internal/CHIPDeviceLayerInternal.h"
 
@@ -28,6 +28,7 @@
 #include "platform/ThreadStackManager.h"
 
 #if CHIP_DEVICE_LAYER_TARGET == LINUX
+#include <dbus/dbus.h>
 #include <thread>
 
 struct DBusConnectionDeleter
@@ -45,6 +46,7 @@ void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg
     {
         if (event->ThreadConnectivityChange.Result == chip::DeviceLayer::ConnectivityChange::kConnectivity_Established)
         {
+            chip::Platform::MemoryShutdown();
             exit(0);
         }
     }
@@ -53,16 +55,15 @@ void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg
 int TestThreadStackManager()
 {
     chip::DeviceLayer::ThreadStackManagerImpl impl;
-    chip::DeviceLayer::Internal::DeviceNetworkInfo info;
-    uint16_t masterKey[16] = { 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+    chip::Thread::OperationalDataset dataset{};
+    constexpr uint8_t masterKey[] = {
+        0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff
+    };
 
-    strncpy(info.ThreadNetworkName, "CHIP-TEST", sizeof(info.ThreadNetworkName));
-    info.ThreadChannel                    = UINT8_MAX;
-    info.ThreadPANId                      = 0x3455;
-    info.FieldPresent.ThreadExtendedPANId = false;
-    info.FieldPresent.ThreadMeshPrefix    = false;
-    info.FieldPresent.ThreadPSKc          = false;
-    memcpy(&info.ThreadMasterKey, &masterKey, sizeof(masterKey));
+    dataset.SetNetworkName("CHIP-TEST");
+    dataset.SetChannel(UINT8_MAX);
+    dataset.SetPanId(0x3455);
+    dataset.SetMasterKey(masterKey);
 
     chip::Platform::MemoryInit();
     chip::DeviceLayer::PlatformMgrImpl().InitChipStack();
@@ -70,12 +71,13 @@ int TestThreadStackManager()
 
     impl.InitThreadStack();
     impl.StartThreadTask();
-    impl._SetThreadProvision(info);
+    impl._SetThreadProvision(dataset.AsByteSpan());
     impl._SetThreadEnabled(true);
 
     printf("Start Thread task done\n");
 
     chip::DeviceLayer::PlatformMgrImpl().RunEventLoop();
+    chip::Platform::MemoryShutdown();
 
     return -1;
 }

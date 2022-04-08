@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,10 +24,6 @@
 #ifndef CHIPPROJECTCONFIG_H
 #define CHIPPROJECTCONFIG_H
 
-#define CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT 1
-
-#define CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
-
 #define CHIP_CONFIG_EVENT_LOGGING_NUM_EXTERNAL_CALLBACKS 2
 
 #define CHIP_CONFIG_EVENT_LOGGING_EXTERNAL_EVENT_SUPPORT 1
@@ -38,9 +34,12 @@
 // Enable support functions for parsing command-line arguments
 #define CHIP_CONFIG_ENABLE_ARG_PARSER 1
 
-// Use a default pairing code if one hasn't been provisioned in flash.
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 12345678
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
+//  Enable use of test setup parameters for testing purposes only.
+//
+//    WARNING: This option makes it possible to circumvent basic chip security functionality.
+//    Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
+//
+#define CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS 1
 
 // Enable reading DRBG seed data from /dev/(u)random.
 // This is needed for test applications and the CHIP device manager to function
@@ -53,24 +52,36 @@
 //    WARNING: These options make it possible to circumvent basic Chip security functionality,
 //    including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
 //
+//    To build with this flag, pass 'treat_warnings_as_errors=false' to gn/ninja.
+//
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
-#define CHIP_CONFIG_REQUIRE_AUTH 1
-
-// Increase session idle timeout in stand-alone builds for the convenience of developers.
-#define CHIP_CONFIG_DEFAULT_SECURITY_SESSION_IDLE_TIMEOUT 120000
 
 #define CHIP_CONFIG_ENABLE_UPDATE 1
 
-#define CHIP_CONFIG_LEGACY_CASE_AUTH_DELEGATE 0
-
-#define CHIP_CONFIG_LEGACY_KEY_EXPORT_DELEGATE 0
-
 #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 0
-
-#define CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING 1
 
 #define CHIP_CONFIG_DATA_MANAGEMENT_CLIENT_EXPERIMENTAL 1
 
-#define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 1
+#ifndef CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
+#define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 4
+#endif
+
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 1
+#endif
+
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "1.0"
+#endif
+
+//
+// Default of 8 ECs is not sufficient for some of the unit tests
+// that try to validate multiple simultaneous interactions.
+//
+#define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS 24
+
+#define CHIP_IM_MAX_NUM_READ_HANDLER 8
+
+#define CONFIG_IM_BUILD_FOR_UNIT_TEST 1
 
 #endif /* CHIPPROJECTCONFIG_H */

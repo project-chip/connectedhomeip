@@ -1,0 +1,159 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 24.3.1. [TC-LVL-3.1] MoveToLevel Verification (DUT as Server)
+
+config:
+    nodeId: 0x12344321
+    cluster: "Level Control"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "reads CurrentLevel attribute from DUT"
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          constraints:
+              type: uint8
+
+    - label: "Reads the MinLevel attribute"
+      command: "readAttribute"
+      attribute: "min level"
+      response:
+          constraints:
+              type: uint8
+
+    - label: "Reads the MaxLevel attribute"
+      command: "readAttribute"
+      attribute: "max level"
+      response:
+          constraints:
+              type: uint8
+
+    - label: "sends a Move to level command"
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "level"
+                value: 64
+              - name: "transitionTime"
+                value: 65535
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label: "reads CurrentLevel attribute from DUT"
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          value: 64
+
+    - label: "sends a Move to level command"
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "level"
+                value: 100
+              - name: "transitionTime"
+                value: 100
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "Wait 11000 second"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 11000
+
+    - label: "reads CurrentLevel attribute from DUT"
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          value: 100
+
+    - label: "reads On Off Transition Time attribute from DUT"
+      command: "readAttribute"
+      attribute: "On Off Transition Time"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "sends a Move to level command"
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "level"
+                value: 128
+              - name: "transitionTime"
+                value: 65535
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "reads CurrentLevel attribute from DUT"
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          value: 128
+
+    - label: "Reset level to 254"
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "level"
+                value: 254
+              - name: "transitionTime"
+                value: 0
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100

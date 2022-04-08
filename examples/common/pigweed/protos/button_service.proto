@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+import 'pw_protobuf_protos/common.proto';
+
+package chip.rpc;
+
+message ButtonEvent {
+  uint32 idx = 1;
+  bool pushed = 2;
+}
+
+service Button {
+  rpc Event(ButtonEvent) returns (pw.protobuf.Empty){}
+}

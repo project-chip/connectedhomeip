@@ -1,8 +1,8 @@
 #include <ble/BleUUID.h>
 #include <ble/CHIPBleServiceData.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/Darwin/UUIDHelper.h>
-#include <support/CHIPMem.h>
-#include <support/logging/CHIPLogging.h>
 
 #import <CoreBluetooth/CoreBluetooth.h>
 
@@ -55,7 +55,7 @@ using ScanCompleteCallback = void (*)(PyObject * context);
             [self stopTimeoutReached];
         });
         dispatch_source_set_timer(
-            _timer, dispatch_walltime(NULL, timeout * NSEC_PER_MSEC), DISPATCH_TIME_FOREVER, 50 * NSEC_PER_MSEC);
+            _timer, dispatch_walltime(nullptr, timeout * NSEC_PER_MSEC), DISPATCH_TIME_FOREVER, 50 * NSEC_PER_MSEC);
         dispatch_resume(_timer);
     }
     return self;
@@ -135,5 +135,5 @@ extern "C" void * pychip_ble_start_scanning(
                                                                   completeCallback:completeCallback
                                                                          timeoutMs:timeout];
 
-    return static_cast<void *>(scanner);
+    return (__bridge_retained void *) (scanner);
 }

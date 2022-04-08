@@ -30,6 +30,7 @@ enum LogModule
     kLogModule_Crypto,
     kLogModule_Controller,
     kLogModule_Alarm,
+    kLogModule_SecureChannel,
     kLogModule_BDX,
     kLogModule_DataManagement,
     kLogModule_DeviceControl,
@@ -53,6 +54,11 @@ enum LogModule
     kLogModule_SetupPayload,
     kLogModule_AppServer,
     kLogModule_Discovery,
+    kLogModule_InteractionModel,
+    kLogModule_Test,
+    kLogModule_OperationalDeviceProxy,
+    kLogModule_Automation,
+    kLogModule_CASESessionManager,
 
     kLogModule_Max
 };
@@ -121,7 +127,16 @@ enum LogCategory
      */
     kLogCategory_Detail = 3,
 
-    kLogCategory_Max = kLogCategory_Detail
+    /*!<
+     *   Indicates a category of log message that describes automation
+     *   information about an event or the state of the system.
+     *
+     *   Such messages can be used by automation for test validation.
+     *
+     */
+    kLogCategory_Automation = 4,
+
+    kLogCategory_Max = kLogCategory_Automation
 };
 
 } // namespace Logging

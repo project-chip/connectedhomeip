@@ -1,0 +1,148 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 3.2.2. [TC-OO-2.2] Primary functionality with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "On/Off"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Send Off Command"
+      command: "Off"
+
+    - label: "Check on/off attribute value is false after off command"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0
+
+    - label: "Send On Command"
+      command: "On"
+
+    - label: "Check on/off attribute value is true after on command"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
+    - label: "Send On Command"
+      command: "On"
+
+    - label: "Check on/off attribute value is true after on command"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
+    - label: "Send Off Command"
+      command: "Off"
+
+    - label: "Check on/off attribute value is false after off command"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0
+
+    - label: "Send Off Command"
+      command: "Off"
+
+    - label: "Check on/off attribute value is false after off command"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0
+
+    - label: "Send Toggle Command"
+      command: "Toggle"
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Check on/off attribute value is true after toggle command"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
+    - label: "Send Toggle Command"
+      command: "Toggle"
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Check on/off attribute value is false after toggle command"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0
+
+    - label: "User prompt Set OnOff attribute manually to on"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operate on device to set OnOff attribute manually to on"
+
+    - label: "Check on/off attribute value is true after on command"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
+    - label: "User prompt Set OnOff attribute manually to off"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Operate on device to set OnOff attribute manually to off"
+
+    - label: "Check on/off attribute value is false after off command"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0
+
+    - label: "Reset Off Command"
+      command: "Off"
+
+    - label: "Check on/off attribute value is false after off command"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0

@@ -25,14 +25,17 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <support/TimeUtils.h>
+#include <lib/support/TimeUtils.h>
 
 #include "FreeRTOS.h"
 
 namespace chip {
 namespace System {
-namespace Platform {
-namespace Layer {
+namespace Clock {
+
+namespace Internal {
+ClockImpl gClockImpl;
+} // namespace Internal
 
 namespace {
 
@@ -89,6 +92,16 @@ uint64_t FreeRTOSTicksSinceBoot(void)
     return static_cast<uint64_t>(timeOut.xTimeOnEntering) + (static_cast<uint64_t>(timeOut.xOverflowCount) << kTicksOverflowShift);
 }
 
+Clock::Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
+{
+    return Clock::Microseconds64((FreeRTOSTicksSinceBoot() * kMicrosecondsPerSecond) / configTICK_RATE_HZ);
+}
+
+Clock::Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
+{
+    return Clock::Milliseconds64((FreeRTOSTicksSinceBoot() * kMillisecondsPerSecond) / configTICK_RATE_HZ);
+}
+
 uint64_t GetClock_Monotonic(void)
 {
     return (FreeRTOSTicksSinceBoot() * kMicrosecondsPerSecond) / configTICK_RATE_HZ;
@@ -96,7 +109,7 @@ uint64_t GetClock_Monotonic(void)
 
 uint64_t GetClock_MonotonicMS(void)
 {
-    return (FreeRTOSTicksSinceBoot() * kMillisecondPerSecond) / configTICK_RATE_HZ;
+    return (FreeRTOSTicksSinceBoot() * kMillisecondsPerSecond) / configTICK_RATE_HZ;
 }
 
 uint64_t GetClock_MonotonicHiRes(void)
@@ -104,41 +117,49 @@ uint64_t GetClock_MonotonicHiRes(void)
     return GetClock_Monotonic();
 }
 
-Error GetClock_RealTime(uint64_t & curTime)
+CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & aCurTime)
 {
     if (sBootTimeUS == 0)
     {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
-    curTime = sBootTimeUS + GetClock_Monotonic();
-    return CHIP_SYSTEM_NO_ERROR;
+    aCurTime = Clock::Microseconds64(sBootTimeUS + GetClock_Monotonic());
+    return CHIP_NO_ERROR;
 }
 
-Error GetClock_RealTimeMS(uint64_t & curTime)
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & aCurTime)
 {
     if (sBootTimeUS == 0)
     {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
-    curTime = (sBootTimeUS + GetClock_Monotonic()) / 1000;
-    return CHIP_SYSTEM_NO_ERROR;
+    aCurTime = Clock::Milliseconds64((sBootTimeUS + GetClock_Monotonic()) / 1000);
+    return CHIP_NO_ERROR;
 }
 
-Error SetClock_RealTime(uint64_t newCurTime)
+CHIP_ERROR ClockImpl::SetClock_RealTime(Clock::Microseconds64 aNewCurTime)
 {
     uint64_t timeSinceBootUS = GetClock_Monotonic();
-    if (newCurTime > timeSinceBootUS)
+    if (aNewCurTime.count() > timeSinceBootUS)
     {
-        sBootTimeUS = newCurTime - timeSinceBootUS;
+        sBootTimeUS = aNewCurTime.count() - timeSinceBootUS;
     }
     else
     {
         sBootTimeUS = 0;
     }
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-} // namespace Layer
-} // namespace Platform
+CHIP_ERROR InitClock_RealTime()
+{
+    Clock::Microseconds64 curTime =
+        Clock::Microseconds64((static_cast<uint64_t>(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD) * UINT64_C(1000000)));
+    // Use CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD as the initial value of RealTime.
+    // Then the RealTime obtained from GetClock_RealTime will be always valid.
+    return System::SystemClock().SetClock_RealTime(curTime);
+}
+
+} // namespace Clock
 } // namespace System
 } // namespace chip

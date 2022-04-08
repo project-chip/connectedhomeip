@@ -30,7 +30,7 @@
 
 #if CONFIG_HAVE_DISPLAY
 
-#include <support/CHIPMem.h>
+#include <lib/support/CHIPMem.h>
 
 #include <functional>
 #include <string>

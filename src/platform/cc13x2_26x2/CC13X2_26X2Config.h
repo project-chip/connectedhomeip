@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2020 Texas Instruments Incorporated
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,11 +46,12 @@ public:
 
     // Key definitions for well-known keys.
     static const Key kConfigKey_SerialNum;
+    static const Key kConfigKey_UniqueId;
     static const Key kConfigKey_MfrDeviceId;
     static const Key kConfigKey_MfrDeviceCert;
     static const Key kConfigKey_MfrDeviceICACerts;
     static const Key kConfigKey_MfrDevicePrivateKey;
-    static const Key kConfigKey_ProductRevision;
+    static const Key kConfigKey_HardwareVersion;
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
     static const Key kConfigKey_SetupDiscriminator;
@@ -63,10 +64,14 @@ public:
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
     static const Key kConfigKey_WiFiStationSecType;
-    static const Key kConfigKey_OperationalDeviceId;
-    static const Key kConfigKey_OperationalDeviceCert;
-    static const Key kConfigKey_OperationalDeviceICACerts;
-    static const Key kConfigKey_OperationalDevicePrivateKey;
+    static const Key kConfigKey_RegulatoryLocation;
+    static const Key kConfigKey_CountryCode;
+    static const Key kConfigKey_Breadcrumb;
+    static const Key kConfigKey_KVS_key;   // special key for KVS system, key storage
+    static const Key kConfigKey_KVS_value; // special key for KVS system, value storage
+    static const Key kConfigKey_Spake2pIterationCount;
+    static const Key kConfigKey_Spake2pSalt;
+    static const Key kConfigKey_Spake2pVerifier;
 
     static CHIP_ERROR Init(void);
 
@@ -87,6 +92,11 @@ public:
     static CHIP_ERROR FactoryResetConfig(void);
 
     static void RunConfigUnitTest(void);
+
+    // internal to the platform for KeyValueStoreManagerImpl.cpp
+    static CHIP_ERROR ReadKVS(const char * key, void * value, size_t value_size, size_t * read_bytes_size, size_t offset_bytes);
+    static CHIP_ERROR WriteKVS(const char * key, const void * value, size_t value_size);
+    static CHIP_ERROR ClearKVS(const char * key);
 };
 
 struct CC13X2_26X2Config::Key

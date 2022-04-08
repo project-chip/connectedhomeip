@@ -18,8 +18,8 @@
 
 #include "Options.h"
 
-#include <core/CHIPError.h>
-#include <support/CHIPArgParser.hpp>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CHIPArgParser.hpp>
 
 using namespace chip;
 using namespace chip::ArgParser;

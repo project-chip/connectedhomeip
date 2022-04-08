@@ -27,7 +27,7 @@
 
 #if CONFIG_HAVE_DISPLAY
 
-#include <support/CHIPMem.h>
+#include <lib/support/CHIPMem.h>
 
 #include <cassert>
 #include <vector>
@@ -53,7 +53,7 @@ SemaphoreHandle_t mutex;
 struct Lock
 {
     Lock() { xSemaphoreTakeRecursive(mutex, portMAX_DELAY); }
-    ~Lock() { xSemaphoreGive(mutex); }
+    ~Lock() { xSemaphoreGiveRecursive(mutex); }
 };
 
 struct VLED

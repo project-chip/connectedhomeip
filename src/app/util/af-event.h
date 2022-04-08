@@ -39,7 +39,7 @@
 
 #pragma once
 
-#include "af.h"
+#include <app/util/af.h>
 
 #define MAX_TIMER_UNITS_HOST 0x7fff
 #define MAX_TIMER_MILLISECONDS_HOST (MAX_TIMER_UNITS_HOST * MILLISECOND_TICKS_PER_MINUTE)

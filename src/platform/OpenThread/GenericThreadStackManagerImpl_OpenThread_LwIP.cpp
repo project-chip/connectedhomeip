@@ -34,7 +34,15 @@
 #include <openthread/netdata.h>
 #include <openthread/thread.h>
 
+#include <credentials/GroupDataProvider.h>
+
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
+
+#include <transport/raw/PeerAddress.h>
+
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#error "When using OpenThread Endpoints, one should also use GenericThreadStackManagerImpl_OpenThread"
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 namespace chip {
 namespace DeviceLayer {
@@ -153,7 +161,11 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
             event.Clear();
             event.Type                            = DeviceEventType::kThreadConnectivityChange;
             event.ThreadConnectivityChange.Result = (isInterfaceUp) ? kConnectivity_Established : kConnectivity_Lost;
-            PlatformMgr().PostEvent(&event);
+            CHIP_ERROR status                     = PlatformMgr().PostEvent(&event);
+            if (status != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
+            }
         }
 
         // Presume the interface addresses are also changing.
@@ -172,7 +184,7 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
             const otNetifAddress * otAddrs = otIp6GetUnicastAddresses(Impl()->OTInstance());
             for (const otNetifAddress * otAddr = otAddrs; otAddr != NULL; otAddr = otAddr->mNext)
             {
-                IPAddress addr = ToIPAddress(otAddr->mAddress);
+                Inet::IPAddress addr = ToIPAddress(otAddr->mAddress);
 
                 // Assign the following OpenThread addresses to LwIP's address table:
                 //   - link-local addresses.
@@ -211,8 +223,11 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
                         }
                     }
 
-                    // Set the address state to PREFERRED or ACTIVE depending on the state in OpenThread.
-                    netif_ip6_addr_set_state(mNetIf, addrIdx, (otAddr->mPreferred) ? IP6_ADDR_PREFERRED : IP6_ADDR_VALID);
+                    // Set non-mesh-local address state to PREFERRED or ACTIVE depending on the state in OpenThread.
+                    netif_ip6_addr_set_state(mNetIf, addrIdx,
+                                             (otAddr->mPreferred && !IsOpenThreadMeshLocalAddress(Impl()->OTInstance(), addr))
+                                                 ? IP6_ADDR_PREFERRED
+                                                 : IP6_ADDR_VALID);
 
                     // Record that the netif address slot was assigned during this loop.
                     addrAssigned[addrIdx] = true;
@@ -240,7 +255,7 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
                 uint8_t state = netif_ip6_addr_state(mNetIf, addrIdx);
                 if (state != IP6_ADDR_INVALID)
                 {
-                    IPAddress addr = IPAddress::FromLwIPAddr(*netif_ip6_addr(mNetIf, addrIdx));
+                    Inet::IPAddress addr = Inet::IPAddress(*netif_ip6_addr(mNetIf, addrIdx));
                     char addrStr[50];
                     addr.ToString(addrStr, sizeof(addrStr));
                     const char * typeStr;
@@ -268,9 +283,9 @@ err_t GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::DoInitThreadNetI
     netif->name[0]    = CHIP_DEVICE_CONFIG_LWIP_THREAD_IF_NAME[0];
     netif->name[1]    = CHIP_DEVICE_CONFIG_LWIP_THREAD_IF_NAME[1];
     netif->output_ip6 = SendPacket;
-#if LWIP_IPV4 || LWIP_VERSION_MAJOR < 2
+#if LWIP_IPV4
     netif->output = NULL;
-#endif /* LWIP_IPV4 || LWIP_VERSION_MAJOR < 2 */
+#endif // LWIP_IPV4
     netif->linkoutput = NULL;
     netif->flags      = NETIF_FLAG_UP | NETIF_FLAG_LINK_UP | NETIF_FLAG_BROADCAST;
     netif->mtu        = CHIP_DEVICE_CONFIG_THREAD_IF_MTU;
@@ -286,13 +301,8 @@ err_t GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::DoInitThreadNetI
  * NB: This method is called in the LwIP TCPIP thread with the LwIP core lock held.
  */
 template <class ImplClass>
-#if LWIP_VERSION_MAJOR < 2
-err_t GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::SendPacket(struct netif * netif, struct pbuf * pktPBuf,
-                                                                           struct ip6_addr * ipaddr)
-#else
 err_t GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::SendPacket(struct netif * netif, struct pbuf * pktPBuf,
                                                                            const struct ip6_addr * ipaddr)
-#endif
 {
     err_t lwipErr = ERR_OK;
     otError otErr;
@@ -344,6 +354,11 @@ exit:
     if (pktMsg != NULL)
     {
         otMessageFree(pktMsg);
+    }
+
+    if (lwipErr == ERR_MEM)
+    {
+        ThreadStackMgrImpl().OverrunErrorTally();
     }
 
     // Unlock the OpenThread stack.

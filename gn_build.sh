@@ -54,17 +54,19 @@ echo 'To re-create the build environment from scratch, run:'
 echo source "$CHIP_ROOT/scripts/bootstrap.sh"
 
 echo
-echo 'To build a debug build:'
-echo gn gen "$CHIP_ROOT/out/debug" --args=\''target_os="all"'"$extra_args"\'
+echo 'To compile the generated debug build:'
 echo ninja -C "$CHIP_ROOT/out/debug"
 
 echo
-echo 'To run tests (idempotent):'
+echo 'To test the generated debug build (idempotent):'
 echo ninja -C "$CHIP_ROOT/out/debug" check
 
 echo
-echo 'To build & test an optimized build:'
-echo gn gen "$CHIP_ROOT/out/release" --args=\''target_os="all" is_debug=false'"$extra_args"\'
+echo 'To compile the generated release build':
+echo ninja -C "$CHIP_ROOT/out/release"
+
+echo
+echo 'To test the generated release build (idempotent):'
 echo ninja -C "$CHIP_ROOT/out/release" check
 
 echo
@@ -95,15 +97,25 @@ shift $((OPTIND - 1))
 
 for arg; do
     case $arg in
-        enable_qpg6100_builds=true)
-            qpg6100_enabled=1
+        enable_qpg_builds=true)
+            qpg_enabled=1
             ;;
         enable_efr32_builds=true)
             efr32_enabled=1
             ;;
+        enable_p6_builds=true)
+            p6_builds_enabled=1
+            ;;
+        p6_board=*)
+            p6_board_selected=1
+            ;;
     esac
     user_args+=" $arg"
 done
+
+# Android prebuilt JAR setup
+python3 build/chip/java/tests/generate_jars_for_test.py
+python3 third_party/android_deps/set_up_android_deps.py
 
 # Android SDK setup
 android_sdk_args=""
@@ -114,6 +126,8 @@ if [[ -d "${ANDROID_NDK_HOME}/toolchains" && -d "${ANDROID_HOME}/platforms" ]]; 
 else
     echo
     echo "Hint: Set \$ANDROID_HOME and \$ANDROID_NDK_HOME to enable building for Android"
+    echo "      The required android sdk platform version is 21. It can be obtained from"
+    echo "      https://dl.google.com/android/repository/android-21_r02.zip"
 fi
 
 echo
@@ -126,28 +140,55 @@ else
     echo "(cd $CHIP_ROOT/examples/lock-app/efr32; gn gen out/debug; ninja -C out/debug)"
 fi
 
+echo
+
+# P6 Build setup
+if [[ -z "$p6_builds_enabled" ]]; then
+    echo "Hint: Pass enable_p6_builds=true to this script to enable building for PSoC6-43012"
+else
+    p6_sdk_args=""
+    if [[ -z "$p6_board_selected" ]]; then
+        p6_sdk_args="p6_board=\"CY8CKIT-062S2-43012\""
+    fi
+fi
+
 # K32W SDK setup
 k32w_sdk_args=""
 
-if [[ -d "$K32W061_SDK_ROOT" ]]; then
-    k32w_sdk_args+="k32w_sdk_root=\"$K32W061_SDK_ROOT\""
-    extra_args+=" $k32w_sdk_args enable_k32w_builds=true"
+if [[ -d "$NXP_K32W061_SDK_ROOT" ]]; then
+    k32w_sdk_args+="k32w0_sdk_root=\"$NXP_K32W061_SDK_ROOT\""
+    extra_args+=" $k32w0_sdk_args enable_k32w_builds=true"
 fi
 
 echo
-if [[ ! -d "$K32W061_SDK_ROOT" ]]; then
-    echo "Hint: Set \$K32W061_SDK_ROOT to enable building for K32W061"
+if [[ ! -d "$NXP_K32W061_SDK_ROOT" ]]; then
+    echo "Hint: Set \$NXP_K32W061_SDK_ROOT to enable building for K32W061"
 else
     echo 'To build the K32W lock sample as a standalone project':
-    echo "(cd $CHIP_ROOT/examples/lock-app/k32w; gn gen out/debug --args='$k32w_sdk_args'; ninja -C out/debug)"
+    echo "(cd $CHIP_ROOT/examples/lock-app/nxp/k32w/k32w0; gn gen out/debug --args='$k32w_sdk_args'; ninja -C out/debug)"
 fi
 echo
 
-if [[ -z "$qpg6100_enabled" ]]; then
-    echo "Hint: Pass enable_qpg6100_builds=true to this script to enable building for QPG6100"
+if [[ -z "$qpg_enabled" ]]; then
+    echo "Hint: Pass enable_qpg_builds=true to this script to enable building for QPG"
 else
     echo 'To build the QPG6100 lock sample as a standalone project:'
-    echo "(cd $CHIP_ROOT/examples/lock-app/qpg6100; gn gen out/debug; ninja -C out/debug)"
+    echo "(cd $CHIP_ROOT/examples/lock-app/qpg; gn gen out/debug; ninja -C out/debug)"
+fi
+
+echo
+
+# TI SimpleLink Build setup
+ti_simplelink_sdk_args=""
+
+if [[ -f "${TI_SYSCONFIG_ROOT}/sysconfig_cli.sh" ]]; then
+    ti_simplelink_sdk_args+="ti_sysconfig_root=\"$TI_SYSCONFIG_ROOT\""
+    extra_args+=" $ti_simplelink_sdk_args enable_ti_simplelink_builds=true"
+
+    echo 'To build the cc13x2x7_26x2x7 lock sample as a standalone project':
+    echo "(cd $CHIP_ROOT/examples/lock-app/cc13x2x7_26x2x7; gn gen out/debug --args='$ti_simplelink_sdk_args'; ninja -C out/debug)"
+else
+    echo "Hint: Set \$TI_SYSCONFIG_ROOT to enable building for cc13x2_26x2"
 fi
 
 echo
@@ -155,7 +196,7 @@ echo
 _chip_banner "Build: GN configure"
 
 gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/debug" --args='target_os="all"'"$extra_args$user_args"
-gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'"$extra_arg$user_args"
+gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'"$extra_args$user_args"
 
 _chip_banner "Build: Ninja build"
 

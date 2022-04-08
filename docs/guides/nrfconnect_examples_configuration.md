@@ -1,17 +1,11 @@
-# Configuring nRF Connect SDK examples
+# Configuring nRF Connect examples
 
-The nRF Connect SDK example applications all come with a default configuration
-for building. Check the information on this page if you want to modify the
+The nRF Connect example applications all come with a default configuration for
+building. Check the information on this page if you want to modify the
 application configuration or add new functionalities to build your own
 application based on the provided example. This page also contains information
 about the configuration structure, which can be useful to better understand the
 building process.
-
-This guide can be used with the following examples:
-
--   [CHIP nRF Connect Lock Example Application](../../examples/lock-app/nrfconnect/README.md)
--   [CHIP nRF Connect Lighting Example Application](../../examples/lighting-app/nrfconnect/README.md)
--   [CHIP nRF Connect Pigweed Example Application](../../examples/pigweed-app/nrfconnect/README.md)
 
 <hr>
 
@@ -113,7 +107,7 @@ them default values for any application.
 
 The application configuration is specified using Kconfig configuration files
 (`*.conf`), where available Kconfig options can be used and their default values
-overrided. Typically, there are many files having impact on the final
+overridden. Typically, there are many files having impact on the final
 configuration shape.
 
 There is no need to modify all these files separately. See the following list
@@ -148,3 +142,85 @@ Read the
 guide in the nRF Connect SDK's Zephyr documentation if you are interested in
 getting more advanced and detailed information about the configuration
 structure.
+
+<hr>
+
+## Configuring Matter in nRF Connect platform
+
+### Mandatory configuration
+
+To use the Matter protocol, you need to set the `CONFIG_CHIP` Kconfig option.
+Setting this option enables the Matter protocol stack and other associated
+Kconfig options, including `CONFIG_CHIP_ENABLE_DNSSD_SRP` that is required for
+the Matter device to be discoverable using DNS-SD.
+
+After that, make sure to set the `CONFIG_CHIP_PROJECT_CONFIG` Kconfig option and
+define the path to the configuration file that specifies Vendor ID, Product ID,
+and other project-specific Matter settings.
+
+<hr>
+
+### Optional configuration
+
+After enabling the Matter protocol and defining the path to the Matter
+configuration file, you can enable additional options in Kconfig.
+
+**Sleepy End Device support**
+
+You can enable the support for Thread Sleepy End Device in Matter by setting the
+following Kconfig options:
+
+-   `CONFIG_OPENTHREAD_MTD`
+-   `CONFIG_CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT`
+
+**Commissioning with NFC support**
+
+You can configure the Matter protocol to use an NFC tag for commissioning,
+instead of using a QR code, which is the default configuration.
+
+To enable NFC for commissioning and share the onboarding payload in an NFC tag,
+set the `CONFIG_CHIP_NFC_COMMISSIONING` option.
+
+**Logging**
+
+You can enable logging for both the stack and Zephyr’s
+[Logging](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/reference/logging/index.html#logging-api)
+API by setting the `CONFIG_LOG` option.
+
+Zephyr allows you to configure log levels of different software modules
+independently. To change the log level configuration for the Matter module, set
+one of the available options:
+
+-   `CONFIG_MATTER_LOG_LEVEL_ERR`
+-   `CONFIG_MATTER_LOG_LEVEL_INFO`
+-   `CONFIG_MATTER_LOG_LEVEL_DBG`
+
+**Shell**
+
+You can enable the Matter shell library using the `CONFIG_CHIP_LIB_SHELL`
+Kconfig option. This option lets you use the Matter specific shell commands. See
+[Using CLI in nRF Connect examples](nrfconnect_examples_cli.md) for the list of
+available Matter shell commands.
+
+**Matter device identification**
+
+Matter has many mandatory and optional ways to identify a specific device. These
+can be used for various purposes, such as dividing devices into groups (by
+function, by vendor or by location), device commissioning or vendor-specific
+cases before the device was commissioned (for example, identifying factory
+software version or related features).
+
+Only some part of these features can be configured using Kconfig options and
+only those were listed below:
+
+-   `CONFIG_CHIP_DEVICE_TYPE` - type of device that uses the Matter Device Type
+    Identifier, for example Door Lock (0x000A) or Dimmable Light Bulb (0x0101).
+-   `CONFIG_CHIP_COMMISSIONABLE_DEVICE_TYPE` - enables including optional device
+    type subtype in the commissionable node discovery record, which allows
+    filtering of the discovery results to find the nodes that match the device
+    type.
+-   `CONFIG_CHIP_ROTATING_DEVICE_ID` - enables rotating device identifier, an
+    optional feature that provides an additional unique identifier for each
+    device. This identifier is similar to the serial number, but it additionally
+    changes at predefined times to protect against long-term tracking of the
+    device.

@@ -17,7 +17,8 @@
 
 #pragma once
 
-#include "debug-printing.h"
+#include <app/util/debug-printing.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -27,14 +28,18 @@
  * @param category - Currently ignored as zcl categories do not map to chip categories. Defaults to kLogCategory_Progress
  * @param format - Format string to print
  * */
-void emberAfPrint(int category, const char * format, ...);
+void emberAfPrint(int category, const char * format, ...) ENFORCE_FORMAT(2, 3);
 
 /**
  * @brief Prints a log followed by new line line
  * @param category - Currently ignored as zcl categories do not map to chip categories. Defaults to kLogCategory_Progress
  * @param format - Format string to print
  * */
-void emberAfPrintln(int category, const char * format, ...);
+#if CHIP_PW_TOKENIZER_LOGGING
+#define emberAfPrintln(MOD, MSG, ...) ChipLogProgress(Zcl, MSG, __VA_ARGS__);
+#else
+void emberAfPrintln(int category, const char * format, ...) ENFORCE_FORMAT(2, 3);
+#endif
 
 /**
  * @brief Prints a buffer

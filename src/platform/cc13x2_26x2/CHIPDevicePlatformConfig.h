@@ -19,9 +19,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for the chip Device Layer
- *          for the Texas Instruments CC1352 platform.
- *
- * NOTE: currently a bare-bones implementation to allow for building.
+ *          for the Texas Instruments CC2652R7 platform.
  */
 
 #pragma once
@@ -41,8 +39,20 @@
 
 // ========== CHIP Platform Configuration =========
 
-#define BLEMANAGER_EVENT_HANDLER_STACK_SIZE (4096)
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE (8192)
+
+#define CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE (7168)
+
+#define BLEMANAGER_EVENT_HANDLER_STACK_SIZE (924)
 #define BLEMANAGER_EVENT_HANDLER_PRIORITY (2)
-#define CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART 0
 
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD 1
+
+// Per 5.2.5.2. Commencement Section of CHIP spec, BLE advertisement is
+// disabled for Locks and Barrier Access Devices.
+#define CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART 0
+#define CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART 0
+
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT 1
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT 1
+#define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1

@@ -22,9 +22,8 @@ chip_test_suite("tests") {
   output_name = "libTestShell"
 
   sources = [
-    "TestShell.cpp",
-    "TestShell.h",
     "TestStreamerStdio.cpp",
+    "TestStreamerStdio.h",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -35,8 +34,5 @@ chip_test_suite("tests") {
     "${nlunit_test_root}:nlunit-test",
   ]
 
-  tests = [
-    "TestShell",
-    "TestStreamerStdio",
-  ]
+  tests = [ "TestStreamerStdio" ]
 }

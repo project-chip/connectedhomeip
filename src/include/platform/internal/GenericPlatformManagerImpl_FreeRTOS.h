@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
 #if defined(ESP_PLATFORM)
@@ -37,6 +38,8 @@
 #include "semphr.h"
 #include "task.h"
 #endif
+
+#include <atomic>
 
 namespace chip {
 namespace DeviceLayer {
@@ -53,6 +56,7 @@ namespace Internal {
 template <class ImplClass>
 class GenericPlatformManagerImpl_FreeRTOS : public GenericPlatformManagerImpl<ImplClass>
 {
+
 protected:
     TimeOut_t mNextTimerBaseTime;
     TickType_t mNextTimerDurationTicks;
@@ -67,11 +71,16 @@ protected:
     void _LockChipStack(void);
     bool _TryLockChipStack(void);
     void _UnlockChipStack(void);
-    void _PostEvent(const ChipDeviceEvent * event);
+    CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
     void _RunEventLoop(void);
     CHIP_ERROR _StartEventLoopTask(void);
-    CHIP_ERROR _StartChipTimer(uint32_t durationMS);
+    CHIP_ERROR _StopEventLoopTask();
+    CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);
     CHIP_ERROR _Shutdown(void);
+
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
+    bool _IsChipStackLockedByCurrentThread() const;
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
 
     // ===== Methods available to the implementation subclass.
 
@@ -83,6 +92,21 @@ private:
     inline ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 
     static void EventLoopTaskMain(void * arg);
+
+#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE) && CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE
+    uint8_t mEventQueueBuffer[CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE * sizeof(ChipDeviceEvent)];
+    StaticQueue_t mEventQueueStruct;
+#endif
+
+    std::atomic<bool> mShouldRunEventLoop;
+#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_TASK) && CHIP_CONFIG_FREERTOS_USE_STATIC_TASK
+    StackType_t mEventLoopStack[CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE / sizeof(StackType_t)];
+    StaticTask_t mventLoopTaskStruct;
+#endif
+
+#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE) && CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE
+    StaticSemaphore_t mChipStackLockMutex;
+#endif
 };
 
 // Instruct the compiler to instantiate the template only when explicitly told to do so.

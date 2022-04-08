@@ -27,9 +27,10 @@
 
 #pragma once
 
+#include <system/SystemLayer.h>
 #include <system/SystemMutex.h>
 
-#include <ble/BleLayer.h>
+#include <ble/BleRole.h>
 #include <ble/BtpEngine.h>
 #if CHIP_ENABLE_CHIPOBLE_TEST
 #include <ble/BtpEngineTest.h>
@@ -49,11 +50,13 @@ enum
 // Forward declarations
 class BleLayer;
 class BleEndPointPool;
+// BLEEndPoint holds a pointer to BleLayerDelegate for messages, while BleLayerDelegate functions also accepts BLEEndPoint.
+class BleLayerDelegate;
 #if CHIP_ENABLE_CHIPOBLE_TEST
 class BtpEngineTest;
 #endif
 
-class DLL_EXPORT BLEEndPoint : public BleLayerObject
+class DLL_EXPORT BLEEndPoint
 {
     friend class BleLayer;
     friend class BleEndPointPool;
@@ -77,17 +80,17 @@ public:
               // BLE transport protocol connection, not of underlying BLE connection.
 
     // Public function pointers:
-    typedef void (*OnConnectCompleteFunct)(BLEEndPoint * endPoint, BLE_ERROR err);
+    typedef void (*OnConnectCompleteFunct)(BLEEndPoint * endPoint, CHIP_ERROR err);
     OnConnectCompleteFunct OnConnectComplete;
 
-    typedef void (*OnMessageReceivedFunct)(BLEEndPoint * endPoint, PacketBufferHandle msg);
+    typedef void (*OnMessageReceivedFunct)(BLEEndPoint * endPoint, PacketBufferHandle && msg);
     OnMessageReceivedFunct OnMessageReceived;
 
-    typedef void (*OnConnectionClosedFunct)(BLEEndPoint * endPoint, BLE_ERROR err);
+    typedef void (*OnConnectionClosedFunct)(BLEEndPoint * endPoint, CHIP_ERROR err);
     OnConnectionClosedFunct OnConnectionClosed;
 
 #if CHIP_ENABLE_CHIPOBLE_TEST
-    typedef void (*OnCommandReceivedFunct)(BLEEndPoint * endPoint, PacketBufferHandle msg);
+    typedef void (*OnCommandReceivedFunct)(BLEEndPoint * endPoint, PacketBufferHandle && msg);
     OnCommandReceivedFunct OnCommandReceived;
     inline void SetOnCommandReceivedCB(OnCommandReceivedFunct cb) { OnCommandReceived = cb; };
     BtpEngineTest mBtpEngineTest;
@@ -96,9 +99,9 @@ public:
 #endif
 
     // Public functions:
-    BLE_ERROR Send(PacketBufferHandle data);
-    BLE_ERROR Receive(PacketBufferHandle data);
-    BLE_ERROR StartConnect();
+    CHIP_ERROR Send(PacketBufferHandle && data);
+    CHIP_ERROR Receive(PacketBufferHandle && data);
+    CHIP_ERROR StartConnect();
 
     bool IsUnsubscribePending() const;
     bool ConnectionObjectIs(BLE_CONNECTION_OBJECT connObj) { return connObj == mConnObj; }
@@ -106,6 +109,14 @@ public:
     void Abort();
 
 private:
+    BleLayer * mBle; ///< [READ-ONLY] Pointer to the BleLayer object that owns this object.
+    BleLayerDelegate * mBleTransport;
+
+    uint32_t mRefCount;
+
+    void AddRef();
+    void Release();
+
     // Private data members:
     enum class ConnectionStateFlag : uint8_t
     {
@@ -141,7 +152,7 @@ private:
     // connection is established.
     PacketBufferHandle mSendQueue;
 
-    // Pending stand-alone BTP acknolwedgement. Pre-empts regular send queue or fragmented message transmission in
+    // Pending stand-alone BTP acknowledgement. Pre-empts regular send queue or fragmented message transmission in
     // progress.
     PacketBufferHandle mAckToSend;
 
@@ -160,42 +171,42 @@ private:
     BLEEndPoint()  = delete;
     ~BLEEndPoint() = delete;
 
-    BLE_ERROR Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
+    CHIP_ERROR Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
     bool IsConnected(uint8_t state) const;
-    void DoClose(uint8_t flags, BLE_ERROR err);
+    void DoClose(uint8_t flags, CHIP_ERROR err);
 
     // Transmit path:
-    BLE_ERROR DriveSending();
-    BLE_ERROR DriveStandAloneAck();
+    CHIP_ERROR DriveSending();
+    CHIP_ERROR DriveStandAloneAck();
     bool PrepareNextFragment(PacketBufferHandle && data, bool & sentAck);
-    BLE_ERROR SendNextMessage();
-    BLE_ERROR ContinueMessageSend();
-    BLE_ERROR DoSendStandAloneAck();
-    BLE_ERROR SendCharacteristic(PacketBufferHandle && buf);
+    CHIP_ERROR SendNextMessage();
+    CHIP_ERROR ContinueMessageSend();
+    CHIP_ERROR DoSendStandAloneAck();
+    CHIP_ERROR SendCharacteristic(PacketBufferHandle && buf);
     bool SendIndication(PacketBufferHandle && buf);
     bool SendWrite(PacketBufferHandle && buf);
 
     // Receive path:
-    BLE_ERROR HandleConnectComplete();
-    BLE_ERROR HandleReceiveConnectionComplete();
+    CHIP_ERROR HandleConnectComplete();
+    CHIP_ERROR HandleReceiveConnectionComplete();
     void HandleSubscribeReceived();
     void HandleSubscribeComplete();
     void HandleUnsubscribeComplete();
-    BLE_ERROR HandleGattSendConfirmationReceived();
-    BLE_ERROR HandleHandshakeConfirmationReceived();
-    BLE_ERROR HandleFragmentConfirmationReceived();
-    BLE_ERROR HandleCapabilitiesRequestReceived(PacketBufferHandle data);
-    BLE_ERROR HandleCapabilitiesResponseReceived(PacketBufferHandle data);
+    CHIP_ERROR HandleGattSendConfirmationReceived();
+    CHIP_ERROR HandleHandshakeConfirmationReceived();
+    CHIP_ERROR HandleFragmentConfirmationReceived();
+    CHIP_ERROR HandleCapabilitiesRequestReceived(PacketBufferHandle && data);
+    CHIP_ERROR HandleCapabilitiesResponseReceived(PacketBufferHandle && data);
     SequenceNumber_t AdjustRemoteReceiveWindow(SequenceNumber_t lastReceivedAck, SequenceNumber_t maxRemoteWindowSize,
                                                SequenceNumber_t newestUnackedSentSeqNum);
 
     // Timer control functions:
-    BLE_ERROR StartConnectTimer();           // Start connect timer.
-    BLE_ERROR StartReceiveConnectionTimer(); // Start receive connection timer.
-    BLE_ERROR StartAckReceivedTimer();       // Start ack-received timer if it's not already running.
-    BLE_ERROR RestartAckReceivedTimer();     // Restart ack-received timer.
-    BLE_ERROR StartSendAckTimer();           // Start send-ack timer if it's not already running.
-    BLE_ERROR StartUnsubscribeTimer();
+    CHIP_ERROR StartConnectTimer();           // Start connect timer.
+    CHIP_ERROR StartReceiveConnectionTimer(); // Start receive connection timer.
+    CHIP_ERROR StartAckReceivedTimer();       // Start ack-received timer if it's not already running.
+    CHIP_ERROR RestartAckReceivedTimer();     // Restart ack-received timer.
+    CHIP_ERROR StartSendAckTimer();           // Start send-ack timer if it's not already running.
+    CHIP_ERROR StartUnsubscribeTimer();
     void StopConnectTimer();           // Stop connect timer.
     void StopReceiveConnectionTimer(); // Stop receive connection timer.
     void StopAckReceivedTimer();       // Stop ack-received timer.
@@ -203,15 +214,15 @@ private:
     void StopUnsubscribeTimer();       // Stop unsubscribe timer.
 
     // Timer expired callbacks:
-    static void HandleConnectTimeout(chip::System::Layer * systemLayer, void * appState, chip::System::Error err);
-    static void HandleReceiveConnectionTimeout(chip::System::Layer * systemLayer, void * appState, chip::System::Error err);
-    static void HandleAckReceivedTimeout(chip::System::Layer * systemLayer, void * appState, chip::System::Error err);
-    static void HandleSendAckTimeout(chip::System::Layer * systemLayer, void * appState, chip::System::Error err);
-    static void HandleUnsubscribeTimeout(chip::System::Layer * systemLayer, void * appState, chip::System::Error err);
+    static void HandleConnectTimeout(chip::System::Layer * systemLayer, void * appState);
+    static void HandleReceiveConnectionTimeout(chip::System::Layer * systemLayer, void * appState);
+    static void HandleAckReceivedTimeout(chip::System::Layer * systemLayer, void * appState);
+    static void HandleSendAckTimeout(chip::System::Layer * systemLayer, void * appState);
+    static void HandleUnsubscribeTimeout(chip::System::Layer * systemLayer, void * appState);
 
     // Close functions:
-    void DoCloseCallback(uint8_t state, uint8_t flags, BLE_ERROR err);
-    void FinalizeClose(uint8_t state, uint8_t flags, BLE_ERROR err);
+    void DoCloseCallback(uint8_t state, uint8_t flags, CHIP_ERROR err);
+    void FinalizeClose(uint8_t state, uint8_t flags, CHIP_ERROR err);
     void ReleaseBleConnection();
     void Free();
     void FreeBtpEngine();

@@ -1,0 +1,126 @@
+
+/*
+ *
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+/**
+ *    @file
+ *          Provides implementations of the CHIP System Layer platform
+ *          time/clock functions that are suitable for use on the Ameba platform.
+ */
+/* this file behaves like a config.h, comes first */
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+
+#include <platform/Ameba/SystemTimeSupport.h>
+#include <support/logging/CHIPLogging.h>
+
+#include "rtc_api.h"
+#include "task.h"
+#include <time.h>
+
+extern void rtc_init(void);
+extern time_t rtc_read(void);
+extern void rtc_write(time_t t);
+
+struct rtkTimeVal
+{
+    uint32_t tv_sec;  /* seconds */
+    uint32_t tv_usec; /* microseconds */
+};
+
+namespace chip {
+namespace System {
+namespace Clock {
+
+namespace Internal {
+ClockImpl gClockImpl;
+} // namespace Internal
+
+Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
+{
+    return (Clock::Microseconds64(xTaskGetTickCount()) * configTICK_RATE_HZ);
+}
+
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
+{
+    return (Clock::Milliseconds64(xTaskGetTickCount()));
+}
+
+CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & curTime)
+{
+    time_t seconds;
+    struct rtkTimeVal tv;
+
+    seconds = rtc_read();
+
+    tv.tv_sec  = (uint32_t) seconds;
+    tv.tv_usec = 0;
+
+    if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
+    {
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
+    }
+    static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
+    curTime = Clock::Microseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000000)) + static_cast<uint64_t>(tv.tv_usec));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & curTime)
+{
+    time_t seconds;
+    struct rtkTimeVal tv;
+
+    seconds = rtc_read();
+
+    tv.tv_sec  = (uint32_t) seconds;
+    tv.tv_usec = 0;
+
+    if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
+    {
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
+    }
+    static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
+    curTime =
+        Clock::Milliseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000)) + (static_cast<uint64_t>(tv.tv_usec) / 1000));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClockImpl::SetClock_RealTime(Clock::Microseconds64 aNewCurTime)
+{
+    struct rtkTimeVal tv;
+    tv.tv_sec  = static_cast<uint32_t>(aNewCurTime.count() / UINT64_C(1000000));
+    tv.tv_usec = static_cast<uint32_t>(aNewCurTime.count() % UINT64_C(1000000));
+    rtc_init();
+    rtc_write(tv.tv_sec);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR InitClock_RealTime()
+{
+    Clock::Microseconds64 curTime =
+        Clock::Microseconds64((static_cast<uint64_t>(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD) * UINT64_C(1000000)));
+    // Use CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD as the initial value of RealTime.
+    // Then the RealTime obtained from GetClock_RealTime will be always valid.
+    return System::SystemClock().SetClock_RealTime(curTime);
+}
+
+} // namespace Clock
+} // namespace System
+} // namespace chip

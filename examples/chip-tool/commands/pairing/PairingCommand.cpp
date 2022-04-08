@@ -17,105 +17,142 @@
  */
 
 #include "PairingCommand.h"
+#include "platform/PlatformManager.h"
+#include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <protocols/secure_channel/PASESession.h>
+
+#include <setup_payload/ManualSetupPayloadParser.h>
+#include <setup_payload/QRCodeSetupPayloadParser.h>
 
 using namespace ::chip;
+using namespace ::chip::Controller;
 
-constexpr uint16_t kWaitDurationInSeconds = 120;
-
-CHIP_ERROR PairingCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
+CHIP_ERROR PairingCommand::RunCommand()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    err = mCommissioner.Init(localId, &storage, this);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
-
-    err = mCommissioner.ServiceEvents();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Run Loop: %s", chip::ErrorStr(err)));
-
-    err = RunInternal(remoteId);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init Failure! PairDevice: %s", chip::ErrorStr(err)));
-
-exit:
-    mCommissioner.ServiceEventSignal();
-    mCommissioner.Shutdown();
-    return err;
+    CurrentCommissioner().RegisterPairingDelegate(this);
+    return RunInternal(mNodeId);
 }
 
 CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    UpdateWaitForResponse(true);
     switch (mPairingMode)
     {
     case PairingMode::None:
         err = Unpair(remoteId);
         break;
-    case PairingMode::Bypass:
-        err = PairWithoutSecurity(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
+    case PairingMode::QRCode:
+        err = PairWithCode(remoteId);
+        break;
+    case PairingMode::ManualCode:
+        err = PairWithCode(remoteId);
+        break;
+    case PairingMode::QRCodePaseOnly:
+    case PairingMode::ManualCodePaseOnly:
+        err = PaseWithCode(remoteId);
         break;
     case PairingMode::Ble:
         err = Pair(remoteId, PeerAddress::BLE());
         break;
+    case PairingMode::OnNetwork:
+        err = PairWithMdns(remoteId);
+        break;
     case PairingMode::SoftAP:
-        err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
+        err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort, mRemoteAddr.interfaceId));
+        break;
+    case PairingMode::Ethernet:
+        err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort, mRemoteAddr.interfaceId));
         break;
     }
-    WaitForResponse(kWaitDurationInSeconds);
 
     return err;
+}
+
+CommissioningParameters PairingCommand::GetCommissioningParameters()
+{
+    switch (mNetworkType)
+    {
+    case PairingNetworkType::WiFi:
+        return CommissioningParameters().SetWiFiCredentials(Controller::WiFiCredentials(mSSID, mPassword));
+    case PairingNetworkType::Thread:
+        return CommissioningParameters().SetThreadOperationalDataset(mOperationalDataset);
+    case PairingNetworkType::Ethernet:
+    case PairingNetworkType::None:
+        return CommissioningParameters();
+    }
+    return CommissioningParameters();
+}
+
+CHIP_ERROR PairingCommand::PaseWithCode(NodeId remoteId)
+{
+    return CurrentCommissioner().EstablishPASEConnection(remoteId, mOnboardingPayload);
+}
+
+CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
+{
+    CommissioningParameters commissioningParams = GetCommissioningParameters();
+    return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams);
 }
 
 CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
 {
     RendezvousParameters params =
         RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
-
-    return mCommissioner.PairDevice(remoteId, params);
+    CommissioningParameters commissioningParams = GetCommissioningParameters();
+    return CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
 }
 
-CHIP_ERROR PairingCommand::PairWithoutSecurity(NodeId remoteId, PeerAddress address)
+CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
 {
-    ChipSerializedDevice serializedTestDevice;
-    return mCommissioner.PairTestDeviceWithoutSecurity(remoteId, address, serializedTestDevice);
+    Dnssd::DiscoveryFilter filter(mFilterType);
+    switch (mFilterType)
+    {
+    case chip::Dnssd::DiscoveryFilterType::kNone:
+        break;
+    case chip::Dnssd::DiscoveryFilterType::kShortDiscriminator:
+    case chip::Dnssd::DiscoveryFilterType::kLongDiscriminator:
+    case chip::Dnssd::DiscoveryFilterType::kCompressedFabricId:
+    case chip::Dnssd::DiscoveryFilterType::kVendorId:
+    case chip::Dnssd::DiscoveryFilterType::kDeviceType:
+        filter.code = mDiscoveryFilterCode;
+        break;
+    case chip::Dnssd::DiscoveryFilterType::kCommissioningMode:
+        break;
+    case chip::Dnssd::DiscoveryFilterType::kCommissioner:
+        filter.code = 1;
+        break;
+    case chip::Dnssd::DiscoveryFilterType::kInstanceName:
+        filter.code         = 0;
+        filter.instanceName = mDiscoveryFilterInstanceName;
+        break;
+    }
+
+    CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
+    return CurrentCommissioner().DiscoverCommissionableNodes(filter);
 }
 
 CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
 {
-    SetCommandExitStatus(true);
-    return mCommissioner.UnpairDevice(remoteId);
+    CHIP_ERROR err = CurrentCommissioner().UnpairDevice(remoteId);
+    SetCommandExitStatus(err);
+    return err;
 }
 
-void PairingCommand::OnStatusUpdate(RendezvousSessionDelegate::Status status)
+void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
 {
     switch (status)
     {
-    case RendezvousSessionDelegate::Status::SecurePairingSuccess:
+    case DevicePairingDelegate::Status::SecurePairingSuccess:
         ChipLogProgress(chipTool, "Secure Pairing Success");
         break;
-    case RendezvousSessionDelegate::Status::SecurePairingFailed:
+    case DevicePairingDelegate::Status::SecurePairingFailed:
         ChipLogError(chipTool, "Secure Pairing Failed");
         break;
-    case RendezvousSessionDelegate::Status::NetworkProvisioningSuccess:
-        ChipLogProgress(chipTool, "Network Provisioning Success");
-        break;
-    case RendezvousSessionDelegate::Status::NetworkProvisioningFailed:
-        ChipLogError(chipTool, "Network Provisioning Failed");
-        break;
     }
-}
-
-void PairingCommand::OnNetworkCredentialsRequested(RendezvousDeviceCredentialsDelegate * callback)
-{
-    ChipLogProgress(chipTool, "OnNetworkCredentialsRequested");
-    callback->SendNetworkCredentials(mSSID, mPassword);
-}
-
-void PairingCommand::OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
-                                                       RendezvousDeviceCredentialsDelegate * callback)
-{
-    // TODO Implement this
-    ChipLogProgress(chipTool, "OnOperationalCredentialsRequested");
 }
 
 void PairingCommand::OnPairingComplete(CHIP_ERROR err)
@@ -123,13 +160,20 @@ void PairingCommand::OnPairingComplete(CHIP_ERROR err)
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(chipTool, "Pairing Success");
+        if (mPairingMode == PairingMode::QRCodePaseOnly || mPairingMode == PairingMode::ManualCodePaseOnly)
+        {
+            SetCommandExitStatus(err);
+        }
     }
     else
     {
-        ChipLogProgress(chipTool, "Pairing Failure: %s", chip::ErrorStr(err));
+        ChipLogProgress(chipTool, "Pairing Failure: %s", ErrorStr(err));
     }
 
-    SetCommandExitStatus(err == CHIP_NO_ERROR);
+    if (err != CHIP_NO_ERROR)
+    {
+        SetCommandExitStatus(err);
+    }
 }
 
 void PairingCommand::OnPairingDeleted(CHIP_ERROR err)
@@ -140,8 +184,44 @@ void PairingCommand::OnPairingDeleted(CHIP_ERROR err)
     }
     else
     {
-        ChipLogProgress(chipTool, "Pairing Deleted Failure: %s", chip::ErrorStr(err));
+        ChipLogProgress(chipTool, "Pairing Deleted Failure: %s", ErrorStr(err));
     }
 
-    SetCommandExitStatus(err == CHIP_NO_ERROR);
+    SetCommandExitStatus(err);
+}
+
+void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
+{
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(chipTool, "Device commissioning completed with success");
+    }
+    else
+    {
+        ChipLogProgress(chipTool, "Device commissioning Failure: %s", ErrorStr(err));
+    }
+
+    SetCommandExitStatus(err);
+}
+
+void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
+{
+    // Ignore nodes with closed comissioning window
+    VerifyOrReturn(nodeData.commissioningMode != 0);
+
+    const uint16_t port = nodeData.port;
+    char buf[chip::Inet::IPAddress::kMaxStringLength];
+    nodeData.ipAddress[0].ToString(buf);
+    ChipLogProgress(chipTool, "Discovered Device: %s:%u", buf, port);
+
+    // Stop Mdns discovery. Is it the right method ?
+    CurrentCommissioner().RegisterDeviceDiscoveryDelegate(nullptr);
+
+    Inet::InterfaceId interfaceId = nodeData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.interfaceId : Inet::InterfaceId::Null();
+    PeerAddress peerAddress       = PeerAddress::UDP(nodeData.ipAddress[0], port, interfaceId);
+    CHIP_ERROR err                = Pair(mNodeId, peerAddress);
+    if (CHIP_NO_ERROR != err)
+    {
+        SetCommandExitStatus(err);
+    }
 }

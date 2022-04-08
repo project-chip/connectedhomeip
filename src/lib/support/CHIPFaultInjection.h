@@ -23,15 +23,14 @@
 
 #pragma once
 
-#include <core/CHIPConfig.h>
-#include <core/CHIPEventLoggingConfig.h>
-#include <core/CHIPTimeConfig.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPEventLoggingConfig.h>
 
 #if CHIP_CONFIG_TEST && CHIP_WITH_NLFAULTINJECTION
 
 #include <nlfaultinjection.hpp>
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 namespace chip {
 namespace FaultInjection {

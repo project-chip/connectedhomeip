@@ -34,8 +34,10 @@ GN_CFLAG_EXCLUDES = [
     '-W*',
 ]
 
+
 def escape_strings(gn_args):
     return [[key, re.sub(GN_SPECIAL_CHARACTERS, r'\\\1', value)] for key, value in gn_args]
+
 
 def write_gn_args(args):
     if args.module:
@@ -47,13 +49,16 @@ def write_gn_args(args):
     for key, value in args.arg_string:
         sys.stdout.write('{} = "{}"\n'.format(key, value))
 
-    cflag_excludes = ', '.join(['"{}"'.format(exclude) for exclude in GN_CFLAG_EXCLUDES])
+    cflag_excludes = ', '.join(['"{}"'.format(exclude)
+                               for exclude in GN_CFLAG_EXCLUDES])
 
     for key, value in args.arg_cflags:
-        sys.stdout.write('{} = filter_exclude(string_split("{}"), [{}])\n'.format(key, value, cflag_excludes))
+        sys.stdout.write('{} = filter_exclude(string_split("{}"), [{}])\n'.format(
+            key, value, cflag_excludes))
+
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(fromfile_prefix_chars='@')
     parser.add_argument('--module', action='store')
     parser.add_argument('--arg', action='append', nargs=2, default=[])
     parser.add_argument('--arg-string', action='append', nargs=2, default=[])
@@ -62,6 +67,7 @@ def main():
     args.arg_string = escape_strings(args.arg_string)
     args.arg_cflags = escape_strings(args.arg_cflags)
     write_gn_args(args)
+
 
 if __name__ == "__main__":
     main()

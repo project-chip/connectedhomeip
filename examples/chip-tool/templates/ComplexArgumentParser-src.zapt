@@ -1,0 +1,48 @@
+{{> header}}
+
+#include <commands/clusters/ComplexArgument.h>
+
+{{#structs_with_cluster_name}}
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, {{zapTypeToEncodableClusterObjectType name ns=clusterName}} & request, Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    {{#zcl_struct_items}}
+    {{#unless isOptional}}
+    {{~! Fabric index fields are not sent on writes, so don't force people to
+      provide them. ~}}
+    {{#unless (isStrEqual label ../struct_fabric_idx_field)}}
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("{{parent.name}}.{{asLowerCamelCase label}}", "{{asLowerCamelCase label}}", value.isMember("{{asLowerCamelCase label}}")));
+    {{/unless}}
+    {{/unless}}
+    {{/zcl_struct_items}}
+
+    char labelWithMember[kMaxLabelLength];
+    {{#zcl_struct_items}}
+    {{#if isOptional}}
+    if (value.isMember("{{asLowerCamelCase label}}"))
+    {
+    {{else if (isStrEqual label ../struct_fabric_idx_field)}}
+    if (value.isMember("{{asLowerCamelCase label}}"))
+    {
+    {{/if}}
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "{{asLowerCamelCase label}}");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.{{asLowerCamelCase label}}, value["{{asLowerCamelCase label}}"]));
+    {{#if isOptional}}
+    }
+    {{else if (isStrEqual label ../struct_fabric_idx_field)}}
+    }
+    {{/if}}
+
+    {{/zcl_struct_items}}
+    return CHIP_NO_ERROR;
+}
+
+void ComplexArgumentParser::Finalize({{zapTypeToEncodableClusterObjectType name ns=clusterName}} & request)
+{
+    {{#zcl_struct_items}}
+    ComplexArgumentParser::Finalize(request.{{asLowerCamelCase label}});
+    {{/zcl_struct_items}}
+}
+{{/structs_with_cluster_name}}
+

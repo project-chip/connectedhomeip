@@ -16,16 +16,15 @@
 
 #include <transport/TransportMgrBase.h>
 
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/Base.h>
 
 namespace chip {
 
-CHIP_ERROR TransportMgrBase::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address,
-                                         System::PacketBufferHandle && msgBuf)
+CHIP_ERROR TransportMgrBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
-    return mTransport->SendMessage(header, address, std::move(msgBuf));
+    return mTransport->SendMessage(address, std::move(msgBuf));
 }
 
 void TransportMgrBase::Disconnect(const Transport::PeerAddress & address)
@@ -45,20 +44,37 @@ CHIP_ERROR TransportMgrBase::Init(Transport::Base * transport)
     return CHIP_NO_ERROR;
 }
 
-void TransportMgrBase::HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                             System::PacketBufferHandle msg)
+void TransportMgrBase::Close()
 {
-    TransportMgrDelegate * handler = packetHeader.GetFlags().Has(Header::FlagValues::kSecure) ? mSecureSessionMgr : mRendezvous;
-    if (handler != nullptr)
+    mSessionManager = nullptr;
+    mTransport      = nullptr;
+}
+
+CHIP_ERROR TransportMgrBase::MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join)
+{
+    return mTransport->MulticastGroupJoinLeave(address, join);
+}
+
+void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg)
+{
+    if (msg->HasChainedBuffer())
     {
-        handler->OnMessageReceived(packetHeader, peerAddress, std::move(msg));
+        // Something in the lower levels messed up.
+        char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
+        peerAddress.ToString(addrBuffer);
+        ChipLogError(Inet, "message from %s dropped due to lower layers not ensuring a single packet buffer.", addrBuffer);
+        return;
+    }
+
+    if (mSessionManager != nullptr)
+    {
+        mSessionManager->OnMessageReceived(peerAddress, std::move(msg));
     }
     else
     {
         char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
         peerAddress.ToString(addrBuffer);
-        ChipLogError(Inet, "%s message from %s is dropped since no corresponding handler is set in TransportMgr.",
-                     packetHeader.GetFlags().Has(Header::FlagValues::kSecure) ? "Encrypted" : "Unencrypted", addrBuffer);
+        ChipLogError(Inet, "message from %s is dropped since no corresponding handler is set in TransportMgr.", addrBuffer);
     }
 }
 

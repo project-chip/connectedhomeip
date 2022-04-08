@@ -15,41 +15,49 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/common_flags.gni")
 
+# Move this inside the GroupDataProvider once implemented Issue #11075
+declare_args() {
+  #Enable Multicast listenening on HardCoded IPV6 address for Test suite
+  chip_enable_group_messaging_tests = false
+}
+
 config("server_config") {
   defines = []
-
-  if (chip_app_use_interaction_model) {
-    defines += [ "CHIP_APP_USE_INTERACTION_MODEL" ]
-  }
 
   if (chip_app_use_echo) {
     defines += [ "CHIP_APP_USE_ECHO" ]
   }
 
-  include_dirs = [ "." ]
+  if (chip_enable_group_messaging_tests) {
+    defines += [ "CHIP_ENABLE_GROUP_MESSAGING_TESTS" ]
+  }
 }
 
 static_library("server") {
   output_name = "libCHIPAppServer"
 
   sources = [
+    "CommissioningModeProvider.h",
+    "CommissioningWindowManager.cpp",
+    "CommissioningWindowManager.h",
+    "Dnssd.cpp",
+    "Dnssd.h",
     "EchoHandler.cpp",
     "EchoHandler.h",
-    "Mdns.cpp",
-    "Mdns.h",
     "OnboardingCodesUtil.cpp",
     "OnboardingCodesUtil.h",
-    "RendezvousServer.cpp",
-    "RendezvousServer.h",
     "Server.cpp",
     "Server.h",
   ]
 
   public_configs = [ ":server_config" ]
 
+  cflags = [ "-Wconversion" ]
+
   public_deps = [
     "${chip_root}/src/app",
-    "${chip_root}/src/lib/mdns",
+    "${chip_root}/src/lib/address_resolve",
+    "${chip_root}/src/lib/dnssd",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
     "${chip_root}/src/protocols",

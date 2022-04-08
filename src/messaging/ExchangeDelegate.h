@@ -17,13 +17,17 @@
 
 /**
  *    @file
- *      This file defines the classes corresponding to CHIP Exchange Context.
+ *      This file defines the classes corresponding to CHIP Exchange Context Delegate.
  *
  */
 
 #pragma once
 
+#include <lib/support/CHIPMem.h>
+#include <messaging/ApplicationExchangeDispatch.h>
+#include <messaging/ExchangeMessageDispatch.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/SessionManager.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
@@ -45,20 +49,40 @@ public:
 
     /**
      * @brief
-     *   This function is the protocol callback for handling a received CHIP message.
+     *   This function is the protocol callback for handling a received CHIP
+     *   message.
+     *
+     *   After calling this method an exchange will close itself unless one of
+     *   two things happens:
+     *
+     *   1) A call to SendMessage on the exchange with the kExpectResponse flag
+     *      set.
+     *   2) A call to WillSendMessage on the exchange.
+     *
+     *   Consumers that don't do one of those things MUST NOT retain a pointer
+     *   to the exchange.
      *
      *  @param[in]    ec            A pointer to the ExchangeContext object.
-     *  @param[in]    packetHeader  A reference to the PacketHeader object.
      *  @param[in]    payloadHeader A reference to the PayloadHeader object.
      *  @param[in]    payload       A handle to the PacketBuffer object holding the message payload.
      */
-    virtual void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   System::PacketBufferHandle payload) = 0;
+    virtual CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                         System::PacketBufferHandle && payload) = 0;
 
     /**
      * @brief
      *   This function is the protocol callback to invoke when the timeout for the receipt
      *   of a response message has expired.
+     *
+     *   After calling this method an exchange will close itself unless one of
+     *   two things happens:
+     *
+     *   1) A call to SendMessage on the exchange with the kExpectResponse flag
+     *      set.
+     *   2) A call to WillSendMessage on the exchange.
+     *
+     *   Consumers that don't do one of those things MUST NOT retain a pointer
+     *   to the exchange.
      *
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      */
@@ -72,6 +96,8 @@ public:
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      */
     virtual void OnExchangeClosing(ExchangeContext * ec) {}
+
+    virtual ExchangeMessageDispatch & GetMessageDispatch() { return ApplicationExchangeDispatch::Instance(); }
 };
 
 } // namespace Messaging

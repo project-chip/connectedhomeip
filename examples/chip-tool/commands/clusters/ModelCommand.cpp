@@ -18,40 +18,48 @@
 
 #include "ModelCommand.h"
 
+#include <app/InteractionModelEngine.h>
 #include <inttypes.h>
 
 using namespace ::chip;
 
-namespace {
-constexpr uint16_t kWaitDurationInSeconds = 10;
-} // namespace
-
-CHIP_ERROR ModelCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
+CHIP_ERROR ModelCommand::RunCommand()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
+    if (IsGroupId(mNodeId))
+    {
+        FabricIndex fabricIndex;
+        ReturnErrorOnFailure(CurrentCommissioner().GetFabricIndex(&fabricIndex));
+        ChipLogProgress(chipTool, "Sending command to group 0x%" PRIx16, GroupIdFromNodeId(mNodeId));
 
-    err = mCommissioner.Init(localId, &storage);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
+        return SendGroupCommand(GroupIdFromNodeId(mNodeId), fabricIndex);
+    }
 
-    err = mCommissioner.ServiceEvents();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Run Loop: %s", ErrorStr(err)));
+    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
+    return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+}
 
-    err = mCommissioner.GetDevice(remoteId, &mDevice);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
+void ModelCommand::OnDeviceConnectedFn(void * context, ChipDevice * device)
+{
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectedFn: context is null"));
 
-    err = SendCommand(mDevice, mEndPointId);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Failed to send message: %s", ErrorStr(err)));
+    CHIP_ERROR err = command->SendCommand(device, command->mEndPointId);
+    VerifyOrReturn(CHIP_NO_ERROR == err, command->SetCommandExitStatus(err));
+}
 
-    UpdateWaitForResponse(true);
-    WaitForResponse(kWaitDurationInSeconds);
+void ModelCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR err)
+{
+    LogErrorOnFailure(err);
 
-    VerifyOrExit(GetCommandExitStatus(), err = CHIP_ERROR_INTERNAL);
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectionFailureFn: context is null"));
+    command->SetCommandExitStatus(err);
+}
 
-exit:
-    mCommissioner.ServiceEventSignal();
-    mCommissioner.Shutdown();
-    return err;
+void ModelCommand::Shutdown()
+{
+    ResetArguments();
+    mOnDeviceConnectedCallback.Cancel();
+    mOnDeviceConnectionFailureCallback.Cancel();
 }

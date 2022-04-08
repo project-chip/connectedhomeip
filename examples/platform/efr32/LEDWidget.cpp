@@ -18,36 +18,43 @@
  */
 
 #include "LEDWidget.h"
-
-#include "bsp.h"
+#include "sl_simple_led_instances.h"
 
 #include <platform/CHIPDeviceLayer.h>
+
+using namespace ::chip::System;
 
 void LEDWidget::InitGpio(void)
 {
     // Sets gpio pin mode for ALL board Leds.
-    BSP_LedsInit();
+    sl_simple_led_init_instances();
 }
 
-void LEDWidget::Init(int ledNum)
+void LEDWidget::Init(const sl_led_t * led)
 {
-    mLastChangeTimeUS = 0;
+    mLastChangeTimeMS = 0;
     mBlinkOnTimeMS    = 0;
     mBlinkOffTimeMS   = 0;
-    mLedNum           = ledNum;
+    mLed              = led;
 
     Set(false);
 }
 
 void LEDWidget::Invert(void)
 {
-    Set(!mState);
+    if (mLed)
+    {
+        sl_led_toggle(mLed);
+    }
 }
 
 void LEDWidget::Set(bool state)
 {
-    mLastChangeTimeUS = mBlinkOnTimeMS = mBlinkOffTimeMS = 0;
-    DoSet(state);
+    mLastChangeTimeMS = mBlinkOnTimeMS = mBlinkOffTimeMS = 0;
+    if (mLed)
+    {
+        state ? sl_led_turn_on(mLed) : sl_led_turn_off(mLed);
+    }
 }
 
 void LEDWidget::Blink(uint32_t changeRateMS)
@@ -66,28 +73,14 @@ void LEDWidget::Animate()
 {
     if (mBlinkOnTimeMS != 0 && mBlinkOffTimeMS != 0)
     {
-        int64_t nowUS            = ::chip::System::Layer::GetClock_MonotonicHiRes();
-        int64_t stateDurUS       = ((mState) ? mBlinkOnTimeMS : mBlinkOffTimeMS) * 1000LL;
-        int64_t nextChangeTimeUS = mLastChangeTimeUS + stateDurUS;
+        uint64_t nowMS            = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
+        uint64_t stateDurMS       = sl_led_get_state(mLed) ? mBlinkOnTimeMS : mBlinkOffTimeMS;
+        uint64_t nextChangeTimeMS = mLastChangeTimeMS + stateDurMS;
 
-        if (nowUS > nextChangeTimeUS)
+        if (nextChangeTimeMS < nowMS)
         {
-            DoSet(!mState);
-            mLastChangeTimeUS = nowUS;
+            Invert();
+            mLastChangeTimeMS = nowMS;
         }
-    }
-}
-
-void LEDWidget::DoSet(bool state)
-{
-    mState = state;
-
-    if (state)
-    {
-        BSP_LedSet(mLedNum);
-    }
-    else
-    {
-        BSP_LedClear(mLedNum);
     }
 }

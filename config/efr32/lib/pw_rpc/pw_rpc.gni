@@ -20,4 +20,9 @@ pw_assert_BACKEND = "$dir_pw_assert_log"
 pw_sys_io_BACKEND =
     "${chip_root}/examples/platform/efr32/pw_sys_io:pw_sys_io_efr32"
 
+pw_build_LINK_DEPS = [
+  "$dir_pw_assert:impl",
+  "$dir_pw_log:impl",
+]
+
 dir_pw_third_party_nanopb = "${chip_root}/third_party/nanopb/repo"

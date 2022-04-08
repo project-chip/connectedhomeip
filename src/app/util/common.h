@@ -42,14 +42,16 @@
 #pragma once
 
 // App framework
-#include "af.h"
-#include "attribute-storage.h"
-#include "attribute-table.h"
-#include "time-util.h"
-#include "util.h"
+#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/attribute-table.h>
+#include <app/util/time-util.h>
+#include <app/util/util.h>
+
+#include <messaging/ExchangeContext.h>
 
 // the variables used to setup and send responses to cluster messages
 extern EmberApsFrame emberAfResponseApsFrame;
 extern uint8_t appResponseData[EMBER_AF_RESPONSE_BUFFER_LEN];
 extern uint16_t appResponseLength;
-extern chip::NodeId emberAfResponseDestination;
+extern chip::Messaging::ExchangeContext * emberAfResponseDestination;

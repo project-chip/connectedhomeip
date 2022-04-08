@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 
 namespace chip {
 namespace Protocols {
@@ -41,6 +41,8 @@ public:
     {
         return mVendorId == aOther.mVendorId && mProtocolId == aOther.mProtocolId;
     }
+
+    constexpr bool operator!=(const Id & aOther) const { return !(*this == aOther); }
 
     // Convert the Protocols::Id to a TLV profile id.
     // NOTE: We may want to change the TLV reader/writer to take Protocols::Id
@@ -71,14 +73,11 @@ private:
     static constexpr Protocols::Id Id(VendorId::Common, id);                                                                       \
     } // namespace name.
 
-CHIP_STANDARD_PROTOCOL(SecureChannel, 0x0000)       // Secure Channel Protocol
-CHIP_STANDARD_PROTOCOL(Echo, 0x0002)                // Echo Protocol
-CHIP_STANDARD_PROTOCOL(BDX, 0x0003)                 // Bulk Data Exchange Protocol
-CHIP_STANDARD_PROTOCOL(NetworkProvisioning, 0x0004) // Network Provisioning Protocol
-CHIP_STANDARD_PROTOCOL(InteractionModel, 0x0005)    // Interaction Model Protocol
-CHIP_STANDARD_PROTOCOL(FabricProvisioning, 0x0006)  // Fabric Provisioning Protocol
-CHIP_STANDARD_PROTOCOL(ServiceProvisioning, 0x0007) // Service Provisioning Protocol
-CHIP_STANDARD_PROTOCOL(OpCredentials, 0x0008)       // Operational Credentials
+CHIP_STANDARD_PROTOCOL(SecureChannel, 0x0000)             // Secure Channel Protocol
+CHIP_STANDARD_PROTOCOL(InteractionModel, 0x0001)          // Interaction Model Protocol
+CHIP_STANDARD_PROTOCOL(BDX, 0x0002)                       // Bulk Data Exchange Protocol
+CHIP_STANDARD_PROTOCOL(UserDirectedCommissioning, 0x0003) // User Directed Commissioning Protocol
+CHIP_STANDARD_PROTOCOL(Echo, 0x0004)                      // Echo Protocol.  To be removed or standardized.
 
 #undef CHIP_STANDARD_PROTOCOL
 

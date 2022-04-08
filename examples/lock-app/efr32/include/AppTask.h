@@ -24,28 +24,37 @@
 
 #include "AppEvent.h"
 #include "BoltLockManager.h"
+#include "sl_simple_button_instances.h"
 
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
 #include <ble/BLEEndPoint.h>
 #include <platform/CHIPDeviceLayer.h>
 
+// Application-defined error codes in the CHIP_ERROR space.
+#define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
+#define APP_ERROR_CREATE_TASK_FAILED CHIP_APPLICATION_ERROR(0x02)
+#define APP_ERROR_UNHANDLED_EVENT CHIP_APPLICATION_ERROR(0x03)
+#define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x04)
+#define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
+#define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
+
 class AppTask
 {
 
 public:
-    int StartAppTask();
+    CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
 
     void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);
     void PostEvent(const AppEvent * event);
 
-    void ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction);
+    void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction);
 
 private:
     friend AppTask & GetAppTask(void);
 
-    int Init();
+    CHIP_ERROR Init();
 
     static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
     static void ActionCompleted(BoltLockManager::Action_t aAction);
@@ -59,7 +68,7 @@ private:
     static void LockActionEventHandler(AppEvent * aEvent);
     static void TimerEventHandler(TimerHandle_t xTimer);
 
-    static void UpdateClusterState(void);
+    static void UpdateClusterState(intptr_t context);
 
     void StartTimer(uint32_t aTimeoutMs);
 
@@ -67,7 +76,7 @@ private:
     {
         kFunction_NoneSelected   = 0,
         kFunction_SoftwareUpdate = 0,
-        kFunction_StartThread    = 1,
+        kFunction_StartBleAdv    = 1,
         kFunction_FactoryReset   = 2,
 
         kFunction_Invalid

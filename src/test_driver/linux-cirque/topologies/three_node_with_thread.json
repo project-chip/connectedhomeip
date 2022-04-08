@@ -1,0 +1,23 @@
+{
+    "device0": {
+        "type": "CHIP-00",
+        "base_image": "connectedhomeip/chip-cirque-device-base",
+        "capability": ["Thread", "Interactive", "Mount"],
+        "mount_pairs": [["{chip_repo}", "{chip_repo}"]],
+        "rcp_mode": true
+    },
+    "device1": {
+        "type": "CHIP-01",
+        "base_image": "connectedhomeip/chip-cirque-device-base",
+        "capability": ["Thread", "Interactive", "Mount"],
+        "mount_pairs": [["{chip_repo}", "{chip_repo}"]],
+        "rcp_mode": true
+    },
+    "device2": {
+        "type": "CHIP-02",
+        "base_image": "connectedhomeip/chip-cirque-device-base",
+        "capability": ["Thread", "Interactive", "Mount"],
+        "mount_pairs": [["{chip_repo}", "{chip_repo}"]],
+        "rcp_mode": true
+    }
+}

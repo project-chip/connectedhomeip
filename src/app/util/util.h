@@ -47,6 +47,9 @@
 
 #pragma once
 
+#include <inttypes.h>
+#include <messaging/ExchangeMgr.h>
+
 // User asserts can override SLAB_ASSERT and should be defined as follows:
 // void userAssert (int file, int line);                   // declaration
 // #define USER_ASSERT(file, line) userAssert(file, line)  // definition
@@ -80,7 +83,7 @@ extern const EmberAfClusterName zclClusterNames[];
 
 #define ZCL_NULL_CLUSTER_ID 0xFFFF
 
-#include "af.h"
+#include <app/util/af.h>
 
 // Override APS retry: 0 - don't touch, 1 - always set, 2 - always unset
 typedef enum
@@ -139,21 +142,12 @@ uint16_t emberAfGetMfgCodeFromCurrentCommand(void);
 // EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH is defined in config.h
 #define EMBER_AF_RESPONSE_BUFFER_LEN EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH
 
-void emberAfInit(void);
+void emberAfInit(chip::Messaging::ExchangeManager * exchangeContext);
 void emberAfTick(void);
 uint16_t emberAfFindClusterNameIndex(chip::ClusterId cluster);
-uint16_t emberAfFindClusterNameIndexWithMfgCode(chip::ClusterId cluster, uint16_t mfgCode);
 void emberAfStackDown(void);
 
 void emberAfDecodeAndPrintCluster(chip::ClusterId cluster);
-void emberAfDecodeAndPrintClusterWithMfgCode(chip::ClusterId cluster, uint16_t mfgCode);
-
-bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message, uint16_t msgLen,
-                           chip::NodeId source, InterPanHeader * interPanHeader);
-
-bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message,
-                                     uint16_t messageLength, chip::NodeId source, InterPanHeader * interPanHeader,
-                                     EmberAfClusterCommand * returnCmd);
 
 /**
  * Retrieves the difference between the two passed values.
@@ -186,6 +180,7 @@ uint8_t * emberAfPutBlockInResp(const uint8_t * data, uint16_t length);
 uint8_t * emberAfPutStringInResp(const uint8_t * buffer);
 uint8_t * emberAfPutDateInResp(EmberAfDate * value);
 void emberAfPutInt16sInResp(int16_t value);
+void emberAfPutStatusInResp(EmberAfStatus value);
 
 bool emberAfIsThisMyEui64(EmberEUI64 eui64);
 
@@ -208,9 +203,6 @@ void emberAfSetNoReplyForNextMessage(bool set);
 
 #define isThisDataTypeSentLittleEndianOTA(dataType) (!(emberAfIsThisDataTypeAStringType(dataType)))
 
-bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd);
-bool emAfProcessClusterSpecificCommand(EmberAfClusterCommand * cmd);
-
 extern uint8_t emberAfResponseType;
 
 uint16_t emberAfStrnlen(const uint8_t * string, uint16_t maxLength);
@@ -230,8 +222,6 @@ uint16_t emberAfStrnlen(const uint8_t * string, uint16_t maxLength);
  */
 uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, const uint8_t * appendingChars,
                                 uint8_t appendingCharsLen);
-
-extern uint8_t emAfExtendedPanId[];
 
 EmberStatus emAfValidateChannelPages(uint8_t page, uint8_t channel);
 
@@ -284,3 +274,11 @@ uint8_t emberAfGetChannelFrom8bitEncodedChanPg(uint8_t chanPg);
  * @return 8-bit encoded channel-page, 0xFF if invalid
  */
 uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel);
+
+bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId, bool asServer);
+bool emberAfIsNonVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                                   bool asServer);
+
+namespace chip {
+chip::Messaging::ExchangeManager * ExchangeManager();
+} // namespace chip

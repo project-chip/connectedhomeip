@@ -21,7 +21,8 @@
 #  https://github.com/project-chip/connectedhomeip/issues/710
 #
 set -e
-find . -name Dockerfile | while read -r dockerfile; do
-    dir=${dockerfile%/*}
-    (cd "$dir" && ./build.sh "$@") || exit $?
+find "$(git rev-parse --show-toplevel)"/integrations/docker/images/ -name Dockerfile | while read -r dockerfile; do
+    pushd "$(dirname "$dockerfile")" >/dev/null
+    ./build.sh "$@"
+    popd >/dev/null
 done

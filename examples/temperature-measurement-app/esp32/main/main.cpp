@@ -16,9 +16,7 @@
  */
 
 #include "CHIPDeviceManager.h"
-#include "DataModelHandler.h"
 #include "DeviceCallbacks.h"
-#include "Server.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
 #include "esp_netif.h"
@@ -28,15 +26,26 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
+#include <app/server/Server.h>
 
 #include <cmath>
 #include <cstdio>
 #include <string>
 #include <vector>
 
-#include <support/ErrorStr.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <platform/ESP32/NetworkCommissioningDriver.h>
+
+#include <lib/support/ErrorStr.h>
+
+#if CONFIG_ENABLE_PW_RPC
+#include "Rpc.h"
+#endif
 
 using namespace ::chip;
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
@@ -44,8 +53,28 @@ const char * TAG = "temperature-measurement-app";
 
 static DeviceCallbacks EchoCallbacks;
 
+namespace {
+
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+
+static void InitServer(intptr_t context)
+{
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
+
+    sWiFiNetworkCommissioningInstance.Init();
+}
+
+} // namespace
+
 extern "C" void app_main()
 {
+#if CONFIG_ENABLE_PW_RPC
+    chip::rpc::Init();
+#endif
+
     ESP_LOGI(TAG, "Temperature sensor!");
 
     /* Print chip information */
@@ -60,35 +89,25 @@ extern "C" void app_main()
     ESP_LOGI(TAG, "%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
              (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
 
-    CHIP_ERROR err; // A quick note about errors: CHIP adopts the error type and numbering
-                    // convention of the environment into which it is ported.  Thus esp_err_t
-                    // and CHIP_ERROR are in fact the same type, and both ESP-IDF errors
-                    // and CHIO-specific errors can be stored in the same value without
-                    // ambiguity.  For convenience, ESP_OK and CHIP_NO_ERROR are mapped
-                    // to the same value.
-
     // Initialize the ESP NVS layer.
-    err = nvs_flash_init();
-    if (err != CHIP_NO_ERROR)
+    esp_err_t err = nvs_flash_init();
+    if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "nvs_flash_init() failed: %s", ErrorStr(err));
+        ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
         return;
     }
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
-    err = deviceMgr.Init(&EchoCallbacks);
-    if (err != CHIP_NO_ERROR)
+    CHIP_ERROR error = deviceMgr.Init(&EchoCallbacks);
+    if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(err));
+        ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(error));
         return;
     }
 
-    InitServer();
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 
-    // Run the UI Loop
-    while (true)
-    {
-        vTaskDelay(50 / portTICK_PERIOD_MS);
-    }
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 }

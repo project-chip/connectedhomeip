@@ -18,48 +18,20 @@
 
 #include "SerializableIntegerSet.h"
 
-#include <core/CHIPEncoding.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 
-const char * SerializableU64SetBase::SerializeBase64(char * buf, uint16_t & buflen)
+CHIP_ERROR SerializableU64SetBase::Deserialize(ByteSpan serialized)
 {
-    char * out = nullptr;
-    size_t len = sizeof(uint64_t) * mNextAvailable;
-    VerifyOrExit(buflen >= SerializedSize(), buflen = SerializedSize());
-    VerifyOrExit(buf != nullptr, buflen = SerializedSize());
+    VerifyOrReturnError(serialized.size() <= MaxSerializedSize(), CHIP_ERROR_INVALID_ARGUMENT);
+    memcpy(mData, serialized.data(), serialized.size());
+    mNextAvailable = static_cast<uint16_t>(serialized.size()) / static_cast<uint16_t>(sizeof(uint64_t));
 
-    // Swap to little endian order if needed.
+    // Our serialized data is always little-endian; swap to native.
     SwapByteOrderIfNeeded();
-
-    buflen      = Base64Encode(reinterpret_cast<const uint8_t *>(mData), static_cast<uint16_t>(len), buf);
-    buf[buflen] = '\0';
-    out         = buf;
-
-    // Swap back to the original order
-    SwapByteOrderIfNeeded();
-
-exit:
-    return out;
-}
-
-CHIP_ERROR SerializableU64SetBase::DeserializeBase64(const char * serialized, uint16_t buflen)
-{
-    CHIP_ERROR err     = CHIP_NO_ERROR;
-    uint16_t decodelen = 0;
-    VerifyOrExit(buflen <= MaxSerializedSize(), err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    decodelen = Base64Decode(serialized, buflen, reinterpret_cast<uint8_t *>(mData));
-    VerifyOrExit(decodelen <= sizeof(uint64_t) * mCapacity, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(decodelen % sizeof(uint64_t) == 0, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    mNextAvailable = decodelen / static_cast<uint16_t>(sizeof(uint64_t));
-
-    // Swap from little endian if needed
-    SwapByteOrderIfNeeded();
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void SerializableU64SetBase::SwapByteOrderIfNeeded()
@@ -93,11 +65,9 @@ uint16_t SerializableU64SetBase::FindIndex(uint64_t value)
 
 CHIP_ERROR SerializableU64SetBase::Insert(uint64_t value)
 {
-    CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
-    uint16_t index = 0;
-    VerifyOrExit(value != mEmptyValue, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(value != mEmptyValue, CHIP_ERROR_INVALID_ARGUMENT);
 
-    index = FirstAvailableForUniqueId(value);
+    const uint16_t index = FirstAvailableForUniqueId(value);
     if (index < mCapacity)
     {
         mData[index] = value;
@@ -105,18 +75,17 @@ CHIP_ERROR SerializableU64SetBase::Insert(uint64_t value)
         {
             mNextAvailable = static_cast<uint16_t>(index + 1);
         }
-        err = CHIP_NO_ERROR;
+        return CHIP_NO_ERROR;
     }
 
-exit:
-    return err;
+    return CHIP_ERROR_NO_MEMORY;
 }
 
 void SerializableU64SetBase::Remove(uint64_t value)
 {
     if (value != mEmptyValue)
     {
-        uint16_t index = FindIndex(value);
+        const uint16_t index = FindIndex(value);
         if (index < mCapacity)
         {
             mData[index] = mEmptyValue;

@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 // Local variable names used by utility macros.
 
@@ -75,12 +75,18 @@
 
 #define ASN1_EXIT_CONSTRUCTED                                                                                                      \
     ASN1_ERR = ASN1_READER.Next();                                                                                                 \
-    if (ASN1_ERR == ASN1_NO_ERROR)                                                                                                 \
+    if (ASN1_ERR == CHIP_NO_ERROR)                                                                                                 \
         ASN1_ERR = ASN1_ERROR_INVALID_ENCODING;                                                                                    \
     else if (ASN1_ERR == ASN1_END)                                                                                                 \
-        ASN1_ERR = ASN1_NO_ERROR;                                                                                                  \
+        ASN1_ERR = CHIP_NO_ERROR;                                                                                                  \
     SuccessOrExit(ASN1_ERR);                                                                                                       \
                                                                                                                                    \
+    ASN1_ERR = ASN1_READER.ExitConstructedType();                                                                                  \
+    SuccessOrExit(ASN1_ERR);                                                                                                       \
+    }                                                                                                                              \
+    while (0)
+
+#define ASN1_SKIP_AND_EXIT_CONSTRUCTED                                                                                             \
     ASN1_ERR = ASN1_READER.ExitConstructedType();                                                                                  \
     SuccessOrExit(ASN1_ERR);                                                                                                       \
     }                                                                                                                              \
@@ -92,11 +98,15 @@
 
 #define ASN1_EXIT_SEQUENCE ASN1_EXIT_CONSTRUCTED
 
+#define ASN1_SKIP_AND_EXIT_SEQUENCE ASN1_SKIP_AND_EXIT_CONSTRUCTED
+
 #define ASN1_PARSE_ENTER_SET ASN1_PARSE_ENTER_CONSTRUCTED(kASN1TagClass_Universal, kASN1UniversalTag_Set)
 
 #define ASN1_ENTER_SET ASN1_ENTER_CONSTRUCTED(kASN1TagClass_Universal, kASN1UniversalTag_Set)
 
 #define ASN1_EXIT_SET ASN1_EXIT_CONSTRUCTED
+
+#define ASN1_SKIP_AND_EXIT_SET ASN1_SKIP_AND_EXIT_CONSTRUCTED
 
 #define ASN1_ENTER_ENCAPSULATED(CLASS, TAG)                                                                                        \
     do                                                                                                                             \
@@ -119,10 +129,10 @@
 
 #define ASN1_EXIT_ENCAPSULATED                                                                                                     \
     ASN1_ERR = ASN1_READER.Next();                                                                                                 \
-    if (ASN1_ERR == ASN1_NO_ERROR)                                                                                                 \
+    if (ASN1_ERR == CHIP_NO_ERROR)                                                                                                 \
         ASN1_ERR = ASN1_ERROR_INVALID_ENCODING;                                                                                    \
     else if (ASN1_ERR == ASN1_END)                                                                                                 \
-        ASN1_ERR = ASN1_NO_ERROR;                                                                                                  \
+        ASN1_ERR = CHIP_NO_ERROR;                                                                                                  \
     SuccessOrExit(ASN1_ERR);                                                                                                       \
                                                                                                                                    \
     ASN1_ERR = ASN1_READER.ExitEncapsulatedType();                                                                                 \

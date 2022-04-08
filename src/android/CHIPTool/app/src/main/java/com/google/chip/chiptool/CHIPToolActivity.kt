@@ -18,38 +18,53 @@
 package com.google.chip.chiptool
 
 import android.content.Intent
+import android.net.Uri
 import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
 import android.os.Bundle
+import android.util.Base64
+import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import chip.devicecontroller.NetworkCredentials
+import chip.setuppayload.SetupPayload
 import chip.setuppayload.SetupPayloadParser
+import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
 import com.google.chip.chiptool.attestation.AttestationTestFragment
+import com.google.chip.chiptool.clusterclient.clusterinteraction.ClusterInteractionFragment
+import com.google.chip.chiptool.clusterclient.MultiAdminClientFragment
+import com.google.chip.chiptool.clusterclient.OpCredClientFragment
+import com.google.chip.chiptool.clusterclient.BasicClientFragment
 import com.google.chip.chiptool.clusterclient.OnOffClientFragment
-import com.google.chip.chiptool.commissioner.CommissionerActivity
-import com.google.chip.chiptool.echoclient.EchoClientFragment
+import com.google.chip.chiptool.clusterclient.SensorClientFragment
+import com.google.chip.chiptool.clusterclient.WildcardFragment
+import com.google.chip.chiptool.provisioning.AddressCommissioningFragment
 import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
+import com.google.chip.chiptool.provisioning.EnterNetworkFragment
 import com.google.chip.chiptool.provisioning.ProvisionNetworkType
 import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
-import com.google.chip.chiptool.setuppayloadscanner.QrCodeInfo
-import chip.devicecontroller.PersistentStorage
+import com.google.chip.chiptool.setuppayloadscanner.CHIPLedgerDetailsFragment
+import org.json.JSONObject
 
 class CHIPToolActivity :
-    AppCompatActivity(),
-    BarcodeFragment.Callback,
-    SelectActionFragment.Callback,
-    DeviceProvisioningFragment.Callback {
+  AppCompatActivity(),
+  BarcodeFragment.Callback,
+  SelectActionFragment.Callback,
+  DeviceProvisioningFragment.Callback,
+  EnterNetworkFragment.Callback,
+  CHIPDeviceDetailsFragment.Callback,
+  CHIPLedgerDetailsFragment.Callback {
 
   private var networkType: ProvisionNetworkType? = null
+  private var deviceInfo: CHIPDeviceInfo? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.top_activity)
-
-    PersistentStorage.initialize(this);
 
     if (savedInstanceState == null) {
       val fragment = SelectActionFragment.newInstance()
@@ -64,6 +79,10 @@ class CHIPToolActivity :
 
     if (intent?.action == NfcAdapter.ACTION_NDEF_DISCOVERED)
       onNfcIntent(intent)
+
+    if (Intent.ACTION_VIEW == intent?.action) {
+      onReturnIntent(intent)
+    }
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
@@ -73,22 +92,34 @@ class CHIPToolActivity :
   }
 
   override fun onCHIPDeviceInfoReceived(deviceInfo: CHIPDeviceInfo) {
+    this.deviceInfo = deviceInfo
     if (networkType == null) {
       showFragment(CHIPDeviceDetailsFragment.newInstance(deviceInfo))
     } else {
-      showFragment(DeviceProvisioningFragment.newInstance(deviceInfo, networkType!!), false)
+      if (deviceInfo.ipAddress != null) {
+        showFragment(DeviceProvisioningFragment.newInstance(deviceInfo!!, null))
+      } else {
+        showFragment(EnterNetworkFragment.newInstance(networkType!!), false)
+      }
     }
   }
 
-  override fun onPairingComplete() {
-    showFragment(OnOffClientFragment.newInstance(), false)
+  override fun onCommissioningComplete(code: Int) {
+    runOnUiThread {
+      Toast.makeText(
+          this,
+          getString(R.string.commissioning_completed, code),
+          Toast.LENGTH_SHORT).show()
+    }
+    ChipClient.getDeviceController(this).close()
+    showFragment(SelectActionFragment.newInstance(), false)
   }
 
   override fun handleScanQrCodeClicked() {
     showFragment(BarcodeFragment.newInstance())
   }
 
-  override fun onProvisionWifiCredentialsClicked() {
+  override fun onProvisionWiFiCredentialsClicked() {
     networkType = ProvisionNetworkType.WIFI
     showFragment(BarcodeFragment.newInstance(), false)
   }
@@ -98,21 +129,53 @@ class CHIPToolActivity :
     showFragment(BarcodeFragment.newInstance(), false)
   }
 
-  override fun handleCommissioningClicked() {
-    var intent = Intent(this, CommissionerActivity::class.java)
-    startActivityForResult(intent, REQUEST_CODE_COMMISSIONING)
+  override fun onShowDeviceAddressInput() {
+    showFragment(AddressCommissioningFragment.newInstance(), false)
   }
 
-  override fun handleEchoClientClicked() {
-    showFragment(EchoClientFragment.newInstance())
+  override fun onNetworkCredentialsEntered(networkCredentials: NetworkCredentials) {
+    showFragment(DeviceProvisioningFragment.newInstance(deviceInfo!!, networkCredentials))
+  }
+
+  override fun handleClusterInteractionClicked() {
+    showFragment(ClusterInteractionFragment.newInstance())
+  }
+
+  override fun handleWildcardClicked() {
+    showFragment(WildcardFragment.newInstance())
   }
 
   override fun handleOnOffClicked() {
     showFragment(OnOffClientFragment.newInstance())
   }
 
+  override fun handleSensorClicked() {
+    showFragment(SensorClientFragment.newInstance())
+  }
+
+  override fun handleMultiAdminClicked() {
+    showFragment(MultiAdminClientFragment.newInstance())
+  }
+
+  override fun handleOpCredClicked() {
+    showFragment(OpCredClientFragment.newInstance())
+  }
+
+  override fun handleBasicClicked() {
+    showFragment(BasicClientFragment.newInstance())
+  }
+
   override fun handleAttestationTestClicked() {
     showFragment(AttestationTestFragment.newInstance())
+  }
+
+  override fun handleReadFromLedgerClicked(deviceInfo: CHIPDeviceInfo) {
+    showFragment(CHIPLedgerDetailsFragment.newInstance(deviceInfo))
+  }
+
+  override fun handleCustomFlowRedirectClicked(redirectUrl: String) {
+    val redirectIntent = Intent(Intent.ACTION_VIEW, Uri.parse(redirectUrl))
+    startActivity(redirectIntent)
   }
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -122,6 +185,10 @@ class CHIPToolActivity :
       // Simply ignore the commissioning result.
       // TODO: tracking commissioned devices.
     }
+  }
+
+  override fun handleCustomFlowClicked() {
+    showFragment(BarcodeFragment.newInstance())
   }
 
   private fun showFragment(fragment: Fragment, showOnBack: Boolean = true) {
@@ -144,20 +211,21 @@ class CHIPToolActivity :
     val records = (messages[0] as NdefMessage).records
     if (records.size != 1) return
 
-    // Require NDEF URI record starting with "ch:"
+    // Require NDEF URI record starting with "mt:"
     val uri = records[0].toUri()
-    if (!uri?.scheme.equals("ch", true)) return
+    if (!uri?.scheme.equals("mt", true)) return
 
-    // TODO: Issue #4504 - Remove replacing _ with spaces after problem described in #415 will be fixed.
-    val setupPayload = SetupPayloadParser().parseQrCode(uri.toString().toUpperCase().replace('_', ' '))
-    val deviceInfo = CHIPDeviceInfo(
-        setupPayload.version,
-        setupPayload.vendorId,
-        setupPayload.productId,
-        setupPayload.discriminator,
-        setupPayload.setupPinCode,
-        setupPayload.optionalQRCodeInfo.mapValues { (_, info) -> QrCodeInfo(info.tag, info.type, info.data, info.int32) }
-    )
+    lateinit var setupPayload: SetupPayload
+    try {
+      setupPayload =
+        SetupPayloadParser().parseQrCode(uri.toString().toUpperCase())
+    } catch (ex: UnrecognizedQrCodeException) {
+      Log.e(TAG, "Unrecognized QR Code", ex)
+      Toast.makeText(this, "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
+      return
+    }
+
+    val deviceInfo = CHIPDeviceInfo.fromSetupPayload(setupPayload)
 
     val buttons = arrayOf(
         getString(R.string.nfc_tag_action_show),
@@ -178,7 +246,68 @@ class CHIPToolActivity :
         .show()
   }
 
+  private fun onReturnIntent(intent: Intent) {
+    val appLinkData = intent.data
+    // Require URI schema "mt:"
+    if (!appLinkData?.scheme.equals("mt", true)) {
+      Log.d(TAG, "Unrecognized URI schema : ${appLinkData?.scheme}")
+      return
+    }
+    // Require URI host "modelinfo"
+    if (!appLinkData?.host.equals("modelinfo", true)) {
+      Log.d(TAG, "Unrecognized URI host : ${appLinkData?.host}")
+      return
+    }
+
+    // parse payload
+    try {
+      val payloadBase64String = appLinkData?.getQueryParameter("payload")
+      if (payloadBase64String.isNullOrEmpty()) {
+        Log.d(TAG, "Unrecognized payload")
+        return
+      }
+
+      val decodeBytes = Base64.decode(payloadBase64String, Base64.DEFAULT)
+      val payloadString = String(decodeBytes)
+      val payload = JSONObject(payloadString)
+
+      // parse payload from JSON
+      val setupPayload = SetupPayload()
+      // set defaults
+      setupPayload.discoveryCapabilities = setOf()
+      setupPayload.optionalQRCodeInfo = mapOf()
+
+      // read from payload
+      setupPayload.version = payload.getInt("version")
+      setupPayload.vendorId = payload.getInt("vendorId")
+      setupPayload.productId = payload.getInt("productId")
+      setupPayload.commissioningFlow = payload.getInt("commissioningFlow")
+      setupPayload.discriminator = payload.getInt("discriminator")
+      setupPayload.setupPinCode = payload.getLong("setupPinCode")
+
+      val deviceInfo = CHIPDeviceInfo.fromSetupPayload(setupPayload)
+      val buttons = arrayOf(
+        getString(R.string.nfc_tag_action_show)
+      )
+
+      AlertDialog.Builder(this)
+        .setTitle(R.string.provision_custom_flow_alert_title)
+        .setItems(buttons) { _, _ ->
+          onCHIPDeviceInfoReceived(deviceInfo)
+        }
+        .create()
+        .show()
+
+    } catch (ex: UnrecognizedQrCodeException) {
+      Log.e(TAG, "Unrecognized Payload", ex)
+      Toast.makeText(this, "Unrecognized Setup Payload", Toast.LENGTH_SHORT).show()
+      return
+    }
+  }
+
   companion object {
+    private const val TAG = "CHIPToolActivity"
+    private const val ADDRESS_COMMISSIONING_FRAGMENT_TAG = "address_commissioning_fragment"
     private const val ARG_PROVISION_NETWORK_TYPE = "provision_network_type"
 
     var REQUEST_CODE_COMMISSIONING = 0xB003

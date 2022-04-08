@@ -17,7 +17,7 @@
 
 #include "TestRetransmit.h"
 
-#include <support/UnitTestRegistration.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <transport/retransmit/Cache.h>
 
 #include <bitset>
@@ -53,23 +53,23 @@ public:
     void Acquire(int value)
     {
         NL_TEST_ASSERT(mSuite, (value > 0) && value < kMaxPayloadValue);
-        mAquired.set(static_cast<size_t>(value));
+        mAcquired.set(static_cast<size_t>(value));
     }
 
     void Release(int value)
     {
         NL_TEST_ASSERT(mSuite, (value > 0) && value < kMaxPayloadValue);
-        NL_TEST_ASSERT(mSuite, mAquired.test(static_cast<size_t>(value)));
-        mAquired.reset(static_cast<size_t>(value));
+        NL_TEST_ASSERT(mSuite, mAcquired.test(static_cast<size_t>(value)));
+        mAcquired.reset(static_cast<size_t>(value));
     }
 
-    size_t Count() const { return mAquired.count(); }
+    size_t Count() const { return mAcquired.count(); }
 
-    bool IsAquired(int value) const { return mAquired.test(static_cast<size_t>(value)); }
+    bool IsAcquired(int value) const { return mAcquired.test(static_cast<size_t>(value)); }
 
 private:
     nlTestSuite * mSuite;
-    std::bitset<kMaxPayloadValue> mAquired;
+    std::bitset<kMaxPayloadValue> mAcquired;
 };
 
 IntPayloadTracker gPayloadTracker;
@@ -109,7 +109,7 @@ namespace {
 
 void TestNoOp(nlTestSuite * inSuite, void * inContext)
 {
-    // unused address cache should not do any aquire/release at any time
+    // unused address cache should not do any Acquire/release at any time
     NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 0);
     {
         TestableCache<int, int, 20> test;
@@ -212,12 +212,12 @@ void RemoveMatching(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, gPayloadTracker.Count() == 2);
 
     // keys 1 and 3 remain
-    NL_TEST_ASSERT(inSuite, gPayloadTracker.IsAquired(1));
-    NL_TEST_ASSERT(inSuite, gPayloadTracker.IsAquired(4));
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.IsAcquired(1));
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.IsAcquired(4));
 
     NL_TEST_ASSERT(inSuite, test.Remove(3) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, gPayloadTracker.IsAquired(1));
-    NL_TEST_ASSERT(inSuite, !gPayloadTracker.IsAquired(4));
+    NL_TEST_ASSERT(inSuite, gPayloadTracker.IsAcquired(1));
+    NL_TEST_ASSERT(inSuite, !gPayloadTracker.IsAcquired(4));
 }
 
 void FindMatching(nlTestSuite * inSuite, void * inContext)

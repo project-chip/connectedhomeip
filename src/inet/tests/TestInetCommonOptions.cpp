@@ -37,9 +37,9 @@
 #include <string.h>
 
 #include <inet/InetFaultInjection.h>
-#include <support/CHIPFaultInjection.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPMemString.h>
+#include <lib/support/CHIPFaultInjection.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
 #include <system/SystemFaultInjection.h>
 
 using namespace chip;

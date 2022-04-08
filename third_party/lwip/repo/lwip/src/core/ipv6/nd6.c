@@ -1111,8 +1111,8 @@ nd6_send_ns(struct netif *netif, const ip6_addr_t *target_addr, u8_t flags)
   }
 
   /* Allocate a packet. */
-  p = pbuf_alloc(PBUF_IP, sizeof(struct ns_header) + ND6_LLADDR_OPTION_SIZE(netif->hwaddr_len), PBUF_RAM);
-  if ((p == NULL) || (p->len < (sizeof(struct ns_header) + ND6_LLADDR_OPTION_SIZE(netif->hwaddr_len)))) {
+  p = pbuf_alloc(PBUF_IP, sizeof(struct ns_header) + (lladdr_opt_len << 3), PBUF_RAM);
+  if ((p == NULL) || (p->len < (sizeof(struct ns_header) + (lladdr_opt_len << 3)))) {
     /* We couldn't allocate a suitable pbuf for the ns. drop it. */
     if (p != NULL) {
       pbuf_free(p);

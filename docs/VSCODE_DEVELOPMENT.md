@@ -1,16 +1,17 @@
 # Visual Studio Code Development
 
 [Visual Studio Code](https://code.visualstudio.com/) is a great and simple IDE
-that can be used to build & develop with for CHIP.
+that can be used to build & develop with for Matter.
 
-CHIP supports the docker / remote container workflow in Visual Studio Code, and
-has a container environment setup automatically. You can read more about this
-workflow [here](https://code.visualstudio.com/docs/remote/containers).
+Matter supports the docker / remote container workflow in Visual Studio Code,
+and has a container environment setup automatically. You can read more about
+this workflow [here](https://code.visualstudio.com/docs/remote/containers).
 
 Tested on:
 
 -   macOS 10.5
 -   Windows 10 Pro + WSL + Ubuntu 18 LTS
+-   Linux - Fedora Core 35 distribution
 
 ## Setup Steps
 
@@ -26,7 +27,7 @@ Tested on:
 1. Install [Git](https://git-scm.com/) if you haven't already
 1. _Windows Only_ Enable git to use LF instead of CLRF by default:
    `git config --global core.autocrlf false`
-1. Git clone the main CHIP repository here:
+1. Git clone the main Matter repository here:
    <https://github.com/project-chip/connectedhomeip>
 1. Launch Visual Studio Code, and open the cloned folder from
 1. Install the
@@ -42,7 +43,7 @@ Tested on:
    to use Bash on Ubuntu (on Windows) eg:
    `"terminal.integrated.shell.windows": "C:\\Windows\\System32\\bash.exe"`
 1. Now your local machine is building a docker image that has all the tools
-   necessary to build and test CHIP. This can take some time, but will
+   necessary to build and test Matter. This can take some time, but will
    eventually complete and open up the source tree
 
 ## Bootstrapping your source tree (one time)
@@ -85,7 +86,7 @@ session.
 
 Developers are encouraged to add tasks to the
 [launch json](../.vscode/launch.json) over time to make sure everyone is using
-the same base debuging setup.
+the same base debugging setup.
 
 ## Submitting a Pull Request - Practical Advice
 
@@ -98,6 +99,47 @@ the same base debuging setup.
 -   [Missing Git credential](https://code.visualstudio.com/docs/remote/containers#_sharing-git-credentials-with-your-container)
 -   [Missing Git SSH keys](https://code.visualstudio.com/docs/remote/containers#_sharing-git-credentials-with-your-container)
 -   [Using GPG signing keys](https://github.com/microsoft/vscode-remote-release/issues/72)
+
+## Docker FAQ
+
+### DNS problem: can't resolve archive.ubuntu.com
+
+A common problem encountered is that a container can't resolve
+`archive.ubuntu.com` and can't install anything via `apt-get`, during the
+creation of the container image, resulting in an error like:
+
+```
+E: Package 'locales' has no installation candidate
+The command '/bin/sh -c apt-get install -y locales && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8' returned a non-zero code: 100
+```
+
+Most common reason for this is that the DNS for docker daemon has not been set
+up correctly and is simply using a default: 8.8.8.8, which in many corporate or
+more secure environments is not accessible. A typical solution for this is to
+put a following key/value into your system-wide docker `daemon.json` (Typically
+located under `/etc/docker/daemon.json` on a Linux system):
+
+```
+"dns": ["<<IP ADDRESS OF YOUR NAMESERVER>>", "8.8.8.8"]
+```
+
+You can obtain the address you should put into that line of your nameserver by
+running:
+
+```
+nmcli dev show | grep 'IP4.DNS'
+```
+
+After you update the dns, you should restart docker, specific to your system. On
+a typical Linux workstation, you do this via:
+
+```
+sudo service docker restart
+```
+
+Alternatively, you can also pass the `--dns` argument to your docker daemon, but
+creating a `daemon.json` and following the above method will solve the problem
+system-wide.
 
 ## Visual Studio Code FAQ
 

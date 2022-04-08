@@ -1,15 +1,8 @@
-# Using CLI in nRF Connect SDK examples
+# Using CLI in nRF Connect examples
 
-The following examples for the development kits from Nordic Semiconductor
-include a command-line interface that allows access to application logs and
-[Zephyr shell](https://docs.zephyrproject.org/1.13.0/subsystems/shell.html):
-
--   [CHIP nRF Connect Lock Example Application](../../examples/lock-app/nrfconnect/README.md)
--   [CHIP nRF Connect Lighting Example Application](../../examples/lighting-app/nrfconnect/README.md)
-
-The
-[CHIP nRF Connect Pigweed Example Application](../../examples/pigweed-app/nrfconnect/README.md)
-does not support CLI.
+Some Matter examples for the development kits from Nordic Semiconductor include
+a command-line interface that allows access to application logs and
+[Zephyr shell](https://docs.zephyrproject.org/1.13.0/subsystems/shell.html).
 
 ## Accessing the CLI console
 
@@ -84,4 +77,275 @@ example:
 uart:~$ ot masterkey
 00112233445566778899aabbccddeeff
 Done
+```
+
+## Using Matter-specific commands
+
+The nRF Connect examples let you use several Matter-specific CLI commands.
+
+These commands are not available by default and to enable using them, set the
+`CONFIG_CHIP_LIB_SHELL=y` Kconfig option in the `prj.conf` file of the given
+example.
+
+Every invoked command must be preceded by the `matter` prefix.
+
+See the following subsections for the description of each Matter-specific
+command.
+
+### device
+
+Handles a group of commands that are used to manage the device. You must use
+this command together with one of the additional subcommands listed below.
+
+#### factoryreset
+
+Performs device factory reset that is hardware reset preceded by erasing of the
+whole Matter settings stored in a non-volatile memory.
+
+```shell
+uart:~$ matter device factoryreset
+Performing factory reset ...
+```
+
+### onboardingcodes
+
+Handles a group of commands that are used to view information about device
+onboarding codes. The `onboardingcodes` command takes one required parameter for
+the rendezvous type, then an optional parameter for printing a specific type of
+onboarding code.
+
+The full format of the command is:
+
+```
+onboardingcodes none|softap|ble|onnetwork [qrcode|qrcodeurl|manualpairingcode]
+```
+
+To print all the onboardingcodes:
+
+```shell
+uart:~$ matter onboardingcodes none
+QRCode:             MT:W0GU2OTB00KA0648G00
+QRCodeUrl:          https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
+ManualPairingCode:  34970112332
+```
+
+To print a specific type of onboarding code:
+
+#### qrcode
+
+Prints the device
+[onboarding QR code payload](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/nrfconnect_android_commissioning.md#preparing-accessory-device).
+Takes no arguments.
+
+```shell
+uart:~$ matter onboardingcodes none qrcode
+MT:W0GU2OTB00KA0648G00
+```
+
+#### qrcodeurl
+
+Prints the URL to view the
+[device onboarding QR code](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/nrfconnect_android_commissioning.md#preparing-accessory-device)
+in a web browser. Takes no arguments.
+
+```shell
+uart:~$ matter onboardingcodes none qrcodeurl
+https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
+```
+
+#### manualpairingcode
+
+Prints the pairing code for the manual onboarding of a device. Takes no
+arguments.
+
+```shell
+uart:~$ matter onboardingcodes none manualpairingcode
+34970112332
+```
+
+### config
+
+Handles a group of commands that are used to view device configuration
+information. You can use this command without any subcommand to print all
+available configuration data or to add a specific subcommand.
+
+```shell
+VendorId:        65521 (0xFFF1)
+ProductId:       32768 (0x8000)
+HardwareVersion: 1 (0x1)
+FabricId:
+PinCode:         020202021
+Discriminator:   f00
+DeviceId:
+```
+
+The `config` command can also take the subcommands listed below.
+
+#### pincode
+
+Prints the PIN code for device setup. Takes no arguments.
+
+```shell
+uart:~$ matter config pincode
+020202021
+```
+
+#### discriminator
+
+Prints the device setup discriminator. Takes no arguments.
+
+```shell
+uart:~$ matter config discriminator
+f00
+```
+
+#### vendorid
+
+Prints the vendor ID of the device. Takes no arguments.
+
+```shell
+uart:~$ matter config vendorid
+65521 (0xFFFF1)
+```
+
+#### productid
+
+Prints the product ID of the device. Takes no arguments.
+
+```shell
+uart:~$ matter config productid
+32768 (0x8000)
+```
+
+#### hardwarever
+
+Prints the hardware version of the device. Takes no arguments.
+
+```shell
+uart:~$ matter config hardwarever
+1 (0x1)
+```
+
+#### deviceid
+
+Prints the device identifier. Takes no arguments.
+
+#### fabricid
+
+Prints the fabric identifier. Takes no arguments.
+
+### ble
+
+Handles a group of commands that are used to control the device Bluetooth LE
+transport state. You must use this command together with one of the additional
+subcommands listed below.
+
+#### help
+
+Prints help information about `ble` commands group.
+
+```shell
+uart:~$ matter ble help
+  help            Usage: ble <subcommand>
+  adv             Enable or disable advertisement. Usage: ble adv <start|stop|state>
+```
+
+#### adv start
+
+Enables Bluetooth LE advertising.
+
+```shell
+uart:~$ matter ble adv start
+Starting BLE advertising
+```
+
+#### adv stop
+
+Disables Bluetooth LE advertising.
+
+```shell
+uart:~$ matter ble adv stop
+Stopping BLE advertising
+```
+
+#### adv status
+
+Prints the information about the current Bluetooth LE advertising status.
+
+```shell
+uart:~$ matter ble adv state
+BLE advertising is disabled
+
+```
+
+### nfc
+
+Handles a group of commands that are used to control the device NFC tag
+emulation state. You must use this command together with one of the additional
+subcommands listed below.
+
+#### start
+
+Starts the NFC tag emulation.
+
+```shell
+uart:~$ matter nfc start
+NFC tag emulation started
+```
+
+#### stop
+
+Stops the NFC tag emulation.
+
+```shell
+uart:~$ matter nfc stop
+NFC tag emulation stopped
+```
+
+#### state
+
+Prints the information about the NFC tag emulation status.
+
+```shell
+uart:~$ matter nfc state
+NFC tag emulation is disabled
+```
+
+### dns
+
+Handles a group of commands that are used to trigger performing DNS queries. You
+must use this command together with one of the additional subcommands listed
+below.
+
+#### browse
+
+Browses for DNS services of `_matterc_udp` type and prints the received
+response. Takes no argument.
+
+```shell
+uart:~$ matter dns browse
+Browsing ...
+DNS browse succeeded:
+   Hostname: 0E824F0CA6DE309C
+   Vendor ID: 9050
+   Product ID: 20043
+   Long discriminator: 3840
+   Device type: 0
+   Device name:
+   Commissioning mode: 0
+   IP addresses:
+      fd08:b65e:db8e:f9c7:2cc2:2043:1366:3b31
+```
+
+#### resolve
+
+Resolves the specified Matter node service given by the <fabric-id> and
+<node-id>.
+
+```shell
+uart:~$ matter dns resolve <fabric-id> <node-id>
+Resolving ...
+DNS resolve for 000000014A77CBB3-0000000000BC5C01 succeeded:
+   IP address: fd08:b65e:db8e:f9c7:8052:1a8e:4dd4:e1f3
+   Port: 5540
 ```

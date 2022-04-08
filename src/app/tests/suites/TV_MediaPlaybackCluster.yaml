@@ -1,0 +1,200 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Media Playback Cluster Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Media Playback"
+    endpoint: 3
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read attribute playback state"
+      command: "readAttribute"
+      attribute: "CurrentState"
+      response:
+          value: 0
+
+    - label: "Read attribute start time"
+      command: "readAttribute"
+      attribute: "StartTime"
+      response:
+          value: 0
+
+    - label: "Read attribute duration"
+      command: "readAttribute"
+      attribute: "Duration"
+      response:
+          value: 80000
+
+    - label: "Read attribute position"
+      command: "readAttribute"
+      attribute: "SampledPosition"
+      response:
+          value: { updatedAt: 0, position: 0 }
+
+    - label: "Read attribute playback speed"
+      command: "readAttribute"
+      attribute: "PlaybackSpeed"
+      response:
+          value: 0.0
+
+    - label: "Read attribute seek range end"
+      command: "readAttribute"
+      attribute: "SeekRangeEnd"
+      response:
+          value: 80000
+
+    - label: "Read attribute seek range start"
+      command: "readAttribute"
+      attribute: "SeekRangeStart"
+      response:
+          value: 0
+
+    - label: "Media Playback Play Command"
+      command: "play"
+      response:
+          values:
+              - name: "data"
+                value: "data response"
+              - name: "status"
+                value: 0
+
+    - label: "Media Playback Pause Command"
+      command: "pause"
+      response:
+          values:
+              - name: "data"
+                value: "data response"
+              - name: "status"
+                value: 0
+
+    - label: "Media Playback Stop Command"
+      command: "stopPlayback"
+      response:
+          values:
+              - name: "data"
+                value: "data response"
+              - name: "status"
+                value: 0
+
+    - label: "Media Playback Start Over Command"
+      command: "startOver"
+      response:
+          values:
+              - name: "data"
+                value: "data response"
+              - name: "status"
+                value: 0
+
+    - label: "Media Playback Previous Command"
+      command: "previous"
+      response:
+          values:
+              - name: "data"
+                value: "data response"
+              - name: "status"
+                value: 0
+
+    - label: "Media Playback Next Command"
+      command: "next"
+      response:
+          values:
+              - name: "data"
+                value: "data response"
+              - name: "status"
+                value: 0
+
+    - label: "Media Playback Rewind Command"
+      command: "rewind"
+      response:
+          values:
+              - name: "data"
+                value: "data response"
+              - name: "status"
+                value: 0
+
+    - label: "Media Playback Fast Forward Command"
+      command: "fastForward"
+      response:
+          values:
+              - name: "data"
+                value: "data response"
+              - name: "status"
+                value: 0
+
+    - label: "Media Playback Skip Forward Command"
+      command: "skipForward"
+      arguments:
+          values:
+              - name: "deltaPositionMilliseconds"
+                value: 500
+      response:
+          values:
+              - name: "data"
+                value: "data response"
+              - name: "status"
+                value: 0
+
+    - label: "Read attribute position after skip forward"
+      command: "readAttribute"
+      attribute: "SampledPosition"
+      response:
+          value: { updatedAt: 0, position: 500 }
+
+    - label: "Media Playback Skip Backward Command"
+      command: "skipBackward"
+      arguments:
+          values:
+              - name: "deltaPositionMilliseconds"
+                value: 100
+      response:
+          values:
+              - name: "data"
+                value: "data response"
+              - name: "status"
+                value: 0
+
+    - label: "Read attribute position after skip backward"
+      command: "readAttribute"
+      attribute: "SampledPosition"
+      response:
+          value: { updatedAt: 0, position: 400 }
+
+    - label: "Media Playback Seek Command"
+      command: "seek"
+      arguments:
+          values:
+              - name: "position"
+                value: 1000
+      response:
+          values:
+              - name: "data"
+                value: "data response"
+              - name: "status"
+                value: 0
+
+    - label: "Read attribute position after seek"
+      command: "readAttribute"
+      attribute: "SampledPosition"
+      response:
+          value: { updatedAt: 0, position: 1000 }

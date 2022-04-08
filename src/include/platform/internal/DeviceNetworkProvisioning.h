@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
 namespace chip {
@@ -47,7 +47,7 @@ public:
      *   Called to provision Thread credentials in a device
      *
      */
-    virtual CHIP_ERROR ProvisionThread(DeviceLayer::Internal::DeviceNetworkInfo & threadData) = 0;
+    virtual CHIP_ERROR ProvisionThread(ByteSpan threadData) = 0;
 
     virtual ~DeviceNetworkProvisioningDelegate() {}
 };

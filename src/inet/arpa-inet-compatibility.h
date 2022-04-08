@@ -25,18 +25,25 @@
 
 #else // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-// NOTE WELL: when LWIP_VERSION_MAJOR == 1, LWIP_PREFIX_BYTEORDER_FUNCS instead of LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #include <lwip/def.h>
 #include <lwip/opt.h>
 
-#if (defined(LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS) || defined(LWIP_PREFIX_BYTEORDER_FUNCS))
+#if defined(LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS)
+#ifndef htons
 #define htons(x) lwip_htons(x)
+#endif
+#ifndef ntohs
 #define ntohs(x) lwip_ntohs(x)
+#endif
+#ifndef htonl
 #define htonl(x) lwip_htonl(x)
+#endif
+#ifndef ntohl
 #define ntohl(x) lwip_ntohl(x)
-#endif // (defined(LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS) || defined(LWIP_PREFIX_BYTEORDER_FUNCS))
+#endif
+#endif // defined(LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS)
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 #endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS

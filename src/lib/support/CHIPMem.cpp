@@ -23,9 +23,9 @@
  *
  */
 
-#include <core/CHIPConfig.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPPlatformMemory.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
 
 #include <atomic>
 #include <stdlib.h>

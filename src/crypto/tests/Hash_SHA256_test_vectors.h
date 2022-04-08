@@ -21,8 +21,7 @@
  *         http://csrc.nist.gov/groups/STM/cavp/index.html
  */
 
-#ifndef _HASH_SHA256_TEST_VECTOR
-#define _HASH_SHA256_TEST_VECTOR
+#pragma once
 
 #include <stddef.h>
 
@@ -164,4 +163,3 @@ const uint8_t hash11[] = { 0x6c, 0x83, 0xf9, 0xb6, 0x97, 0x54, 0xfa, 0xcc, 0x31,
 hash_sha256_vector v11 = { .data = data11, .data_length = sizeof(data11), .hash = hash11 };
 
 hash_sha256_vector hash_sha256_test_vectors[] = { v01, v02, v03, v04, v05, v06, v07, v08, v09, v10, v11 };
-#endif

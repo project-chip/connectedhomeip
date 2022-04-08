@@ -1,0 +1,84 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 36.2.3. [TC-WNCV-2.3] Mode Attribute with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Check Lift Reversal (If PICS_WNCV_REVERSAL)"
+      disabled: true
+
+    - label: "TH set the Mode attribute bit0 of the DUT"
+      disabled: true
+
+    - label: "TH reads ConfigStatus attribute from DUT"
+      disabled: true
+
+    - label: "TH clear the Mode attribute bit0 of the DUT"
+      disabled: true
+
+    - label: "TH reads ConfigStatus attribute from DUT"
+      disabled: true
+
+    - label: "Check Calibration"
+      disabled: true
+
+    - label: "TH set the Mode attribute bit1 of the DUT"
+      disabled: true
+
+    - label: "TH reads ConfigStatus attribute from DUT"
+      disabled: true
+
+    - label: "If (ConfigStatus bit0 == 0) TH sends DownOrClose command to DUT"
+      disabled: true
+
+    - label:
+          "Clear the Mode attribute bit1 by perforimg a calibration of the DUT.
+          Refer to manufacturer provided instructions for how a calibration is
+          performed."
+      disabled: true
+
+    - label: "TH reads ConfigStatus attribute from DUT"
+      disabled: true
+
+    - label: "TH reads Mode attribute from DUT"
+      disabled: true
+
+    - label: "TH sends DownOrClose command to DUT"
+      disabled: true
+
+    - label: "Check Maintenance (If PICS_WNCV_MAINTENANCE)"
+      disabled: true
+
+    - label: "TH set the Mode attribute bit2 of the DUT"
+      disabled: true
+
+    - label: "TH sends DownOrClose command to DUT"
+      disabled: true
+
+    - label: "TH reads ConfigStatus attribute from DUT"
+      disabled: true
+
+    - label: "TH clear the Mode attribute bit2 of the DUT"
+      disabled: true
+
+    - label: "TH sends DownOrClose command to DUT"
+      disabled: true
+
+    - label: "TH reads ConfigStatus attribute from DUT"
+      disabled: true

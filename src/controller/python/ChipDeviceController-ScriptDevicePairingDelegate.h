@@ -27,48 +27,45 @@
 
 #include <controller/CHIPDeviceController.h>
 
-#include <platform/internal/DeviceNetworkInfo.h>
-#include <transport/RendezvousSessionDelegate.h>
-
 namespace chip {
 namespace Controller {
 
 extern "C" {
-typedef void (*DevicePairingDelegate_OnPairingCompleteFunct)(CHIP_ERROR err);
+typedef void (*DevicePairingDelegate_OnPairingCompleteFunct)(ChipError::StorageType err);
+typedef void (*DevicePairingDelegate_OnCommissioningCompleteFunct)(NodeId nodeId, ChipError::StorageType err);
+
+// Used for testing by OpCredsBinding
+typedef void (*DevicePairingDelegate_OnCommissioningSuccessFunct)(PeerId peerId);
+typedef void (*DevicePairingDelegate_OnCommissioningFailureFunct)(
+    PeerId peerId, CHIP_ERROR err, chip::Controller::CommissioningStage stageFailed,
+    chip::Optional<chip::Credentials::AttestationVerificationResult> attestationResult);
+typedef void (*DevicePairingDelegate_OnCommissioningStatusUpdateFunct)(PeerId peerId,
+                                                                       chip::Controller::CommissioningStage stageCompleted,
+                                                                       CHIP_ERROR err);
 }
 
 class ScriptDevicePairingDelegate final : public Controller::DevicePairingDelegate
 {
 public:
     ~ScriptDevicePairingDelegate() = default;
-    void SetWifiCredential(const char * ssid, const char * password);
-    void SetThreadCredential(uint8_t channel, uint16_t panId,
-                             uint8_t (&masterKey)[chip::DeviceLayer::Internal::kThreadMasterKeyLength]);
     void SetKeyExchangeCallback(DevicePairingDelegate_OnPairingCompleteFunct callback);
-
-    void OnNetworkCredentialsRequested(RendezvousDeviceCredentialsDelegate * callback) override;
-
-    void OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
-                                           RendezvousDeviceCredentialsDelegate * callback) override;
-
+    void SetCommissioningCompleteCallback(DevicePairingDelegate_OnCommissioningCompleteFunct callback);
+    void SetCommissioningStatusUpdateCallback(DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback);
+    void SetCommissioningSuccessCallback(DevicePairingDelegate_OnCommissioningSuccessFunct callback);
+    void SetCommissioningFailureCallback(DevicePairingDelegate_OnCommissioningFailureFunct callback);
     void OnPairingComplete(CHIP_ERROR error) override;
+    void OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err) override;
+    void OnCommissioningSuccess(PeerId peerId) override;
+    void OnCommissioningFailure(PeerId peerId, CHIP_ERROR error, CommissioningStage stageFailed,
+                                Optional<Credentials::AttestationVerificationResult> additionalErrorInfo) override;
+    void OnCommissioningStatusUpdate(PeerId peerId, CommissioningStage stageCompleted, CHIP_ERROR error) override;
 
 private:
-    // WiFi Provisioning Data
-    char mWifiSSID[chip::DeviceLayer::Internal::kMaxWiFiSSIDLength + 1];
-    char mWifiPassword[chip::DeviceLayer::Internal::kMaxWiFiKeyLength];
-
-    // Thread Provisioning Data
-    chip::DeviceLayer::Internal::DeviceNetworkInfo mThreadInfo = {};
-
-    enum class Mode
-    {
-        Wifi,
-        Thread
-    };
-
-    Mode mMode                                                              = Mode::Wifi;
-    DevicePairingDelegate_OnPairingCompleteFunct mOnPairingCompleteCallback = nullptr;
+    DevicePairingDelegate_OnPairingCompleteFunct mOnPairingCompleteCallback                     = nullptr;
+    DevicePairingDelegate_OnCommissioningCompleteFunct mOnCommissioningCompleteCallback         = nullptr;
+    DevicePairingDelegate_OnCommissioningSuccessFunct mOnCommissioningSuccessCallback           = nullptr;
+    DevicePairingDelegate_OnCommissioningFailureFunct mOnCommissioningFailureCallback           = nullptr;
+    DevicePairingDelegate_OnCommissioningStatusUpdateFunct mOnCommissioningStatusUpdateCallback = nullptr;
 };
 
 } // namespace Controller

@@ -18,8 +18,8 @@
 
 #include <nlunit-test.h>
 
-#include <support/CHIPCounter.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/CHIPCounter.h>
+#include <lib/support/UnitTestRegistration.h>
 
 static void CheckStartWithZero(nlTestSuite * inSuite, void * inContext)
 {

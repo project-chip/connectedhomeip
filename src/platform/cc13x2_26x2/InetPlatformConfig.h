@@ -16,24 +16,13 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific configuration overrides for the Openchip Inet
- *          Layer on nRF52 platforms using the Nordic nRF5 SDK.
- *
- */
-
 #pragma once
 
 // ==================== Platform Adaptations ====================
 
-#define INET_CONFIG_ERROR_TYPE uint32_t
-#define INET_CONFIG_NO_ERROR (0)
-
-#define INET_CONFIG_ERROR_MIN 1000000
-#define INET_CONFIG_ERROR_MAX 1000999
-
-#define INET_CONFIG_ENABLE_IPV4 0
+#ifndef INET_CONFIG_ENABLE_IPV4
+#error Inet IPv4 configuration should be configured at build generation time
+#endif
 
 // ========== Platform-specific Configuration Overrides =========
 

@@ -16,12 +16,12 @@
  *    limitations under the License.
  */
 
+#include <lib/support/BufferWriter.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/StatusReport.h>
-#include <support/BufferWriter.h>
-#include <support/CHIPMem.h>
-#include <support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
 
 #include <nlunit-test.h>

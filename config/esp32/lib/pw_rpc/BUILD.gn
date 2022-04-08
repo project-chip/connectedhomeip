@@ -30,6 +30,8 @@ static_library("pw_rpc") {
     dir_pw_log,
   ]
 
+  deps += pw_build_LINK_DEPS
+
   output_dir = "${root_out_dir}/lib"
 
   complete_static_lib = true

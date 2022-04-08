@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="General"/>
+
+  <enum name="OnOffStartUpOnOff" type="ENUM8">
+    <cluster code="0x0006"/>
+    <item name="Off" value="0x00"/>
+    <item name="On" value="0x01"/>
+    <item name="TogglePreviousOnOff" value="0x02"/>
+  </enum>
+
+  <enum name="OnOffEffectIdentifier" type="enum8">
+    <cluster code="0x0006"/>
+    <item name="DelayedAllOff" value="0x00"/>
+    <item name="DyingLight" value="0x01"/>
+  </enum>
+
+  <enum name="OnOffDelayedAllOffEffectVariant" type="enum8">
+    <cluster code="0x0006"/>
+    <item name="FadeToOffIn_0p8Seconds" value="0x00"/>
+    <item name="NoFade" value="0x01"/>
+    <item name="50PercentDimDownIn_0p8SecondsThenFadeToOffIn_12Seconds" value="0x02"/>
+  </enum>
+
+  <enum name="OnOffDyingLightEffectVariant" type="enum8">
+    <cluster code="0x0006"/>
+    <item name="20PercenterDimUpIn_0p5SecondsThenFadeToOffIn_1Second" value="0x00"/>
+  </enum>
+
+  <bitmap name="OnOffControl" type="BITMAP8">
+    <cluster code="0x0006"/>
+    <field name="AcceptOnlyWhenOn" mask="0x01"/>
+  </bitmap>
+
+  <cluster>
+    <name>On/Off</name>
+    <domain>General</domain>
+    <code>0x0006</code>
+    <define>ON_OFF_CLUSTER</define>
+    <description>Attributes and commands for switching devices between 'On' and 'Off' states.</description>
+    <globalAttribute side="either" code="0xFFFD" value="4"/>
+
+    <attribute side="server" code="0x0000" define="ON_OFF"               type="boolean" default="0" reportable="true"              >OnOff</attribute>
+    <attribute side="server" code="0x4000" define="GLOBAL_SCENE_CONTROL" type="boolean" default="1"                 optional="true">GlobalSceneControl</attribute>
+    <attribute side="server" code="0x4001" define="ON_TIME"              type="int16u"  default="0" writable="true" optional="true">OnTime</attribute>
+    <attribute side="server" code="0x4002" define="OFF_WAIT_TIME"        type="int16u"  default="0" writable="true" optional="true">OffWaitTime</attribute>
+    <attribute side="server" code="0x4003" define="START_UP_ON_OFF"      type="OnOffStartUpOnOff" min="0" max="2" isNullable="true" writable="true" optional="true">
+      <description>StartUpOnOff</description>
+      <access op="read" privilege="view"/>
+      <access op="write" privilege="manage"/>
+    </attribute>
+
+    <command source="client" code="0x00" name="Off" optional="false">
+      <description>On receipt of this command, a device SHALL enter its ‘Off’ state. This state is device dependent, but it is recommended that it is used for power off or similar functions. On receipt of the Off command, the OnTime attribute SHALL be set to 0.</description>
+    </command>
+
+    <command source="client" code="0x01" name="On" optional="false">
+      <description>On receipt of this command, a device SHALL enter its ‘On’ state. This state is device dependent, but it is recommended that it is used for power on or similar functions. On receipt of the On command, if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0.</description>
+    </command>
+
+    <command source="client" code="0x02" name="Toggle" optional="false">
+      <description>On receipt of this command, if a device is in its ‘Off’ state it SHALL enter its ‘On’ state. Otherwise, if it is in its ‘On’ state it SHALL enter its ‘Off’ state. On receipt of the Toggle command, if the value of the OnOff attribute is equal to FALSE and if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. If the value of the OnOff attribute is equal to TRUE, the OnTime attribute SHALL be set to 0.</description>
+    </command>
+
+    <command source="client" code="0x40" name="OffWithEffect" optional="true">
+      <description>The OffWithEffect command allows devices to be turned off using enhanced ways of fading.</description>
+      <arg name="EffectId" type="OnOffEffectIdentifier"/>
+      <arg name="EffectVariant" type="OnOffDelayedAllOffEffectVariant"/>
+    </command>
+
+    <command source="client" code="0x41" name="OnWithRecallGlobalScene" optional="true">
+      <description>The OnWithRecallGlobalScene command allows the recall of the settings when the device was turned off.</description>
+    </command>
+
+    <command source="client" code="0x42" name="OnWithTimedOff" optional="true">
+      <description>The OnWithTimedOff command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently switched off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on.</description>
+      <arg name="OnOffControl" type="OnOffControl"/>
+      <arg name="OnTime" type="int16u"/><!-- min:0 max:0xfe -->
+      <arg name="OffWaitTime" type="int16u"/><!-- min:0 max:0xfe -->
+    </command>
+  </cluster>
+
+  <bitmap name="OnOffFeature" type="BITMAP32">
+    <cluster code="0x0006" />
+    <field name="Lighting" mask="0x01" />
+  </bitmap>
+</configurator>

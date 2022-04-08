@@ -26,7 +26,7 @@
 
 #include <ble/BleConfig.h>
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 namespace chip {
 namespace Ble {
@@ -39,7 +39,7 @@ public:
 
     // CHIP calls this function once it closes the last BLEEndPoint associated with a BLE given connection object.
     // A call to this function means CHIP no longer cares about the state of the given BLE connection.
-    // The application can use this callback to e.g. close the underlying BLE conection if it is no longer needed,
+    // The application can use this callback to e.g. close the underlying BLE connection if it is no longer needed,
     // decrement the connection's refcount if it has one, or perform any other sort of cleanup as desired.
     virtual void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj) = 0;
 };

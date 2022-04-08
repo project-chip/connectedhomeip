@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 
 #include <ChipShellCollection.h>
 
@@ -27,7 +27,7 @@
 
 #include <stdio.h>
 
-#include <lib/shell/shell.h>
+#include <lib/shell/Engine.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -39,6 +39,15 @@
 #include <openthread/ip6.h>
 #include <openthread/link.h>
 #include <openthread/thread.h>
+#if OPENTHREAD_API_VERSION >= 85
+#if !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#ifndef SHELL_OTCLI_TX_BUFFER_SIZE
+#define SHELL_OTCLI_TX_BUFFER_SIZE 1024
+#endif
+static char sTxBuffer[SHELL_OTCLI_TX_BUFFER_SIZE];
+static constexpr uint16_t sTxLength = SHELL_OTCLI_TX_BUFFER_SIZE;
+#endif // !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI)
+#endif
 #else
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -52,23 +61,23 @@ using namespace chip::DeviceLayer;
 using namespace chip::Logging;
 using namespace chip::ArgParser;
 
-static chip::Shell::Shell sShellOtcliSubcommands;
+static chip::Shell::Engine sShellOtcliSubcommands;
 
-int cmd_otcli_help_iterator(shell_command_t * command, void * arg)
+CHIP_ERROR cmd_otcli_help_iterator(shell_command_t * command, void * arg)
 {
     streamer_printf(streamer_get(), "  %-15s %s\n\r", command->cmd_name, command->cmd_help);
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
-int cmd_otcli_help(int argc, char ** argv)
+CHIP_ERROR cmd_otcli_help(int argc, char ** argv)
 {
     sShellOtcliSubcommands.ForEachCommand(cmd_otcli_help_iterator, nullptr);
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
 #if CHIP_TARGET_STYLE_EMBEDDED
 
-int cmd_otcli_dispatch(int argc, char ** argv)
+CHIP_ERROR cmd_otcli_dispatch(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
@@ -98,18 +107,21 @@ int cmd_otcli_dispatch(int argc, char ** argv)
         }
     }
     buff_ptr = 0;
-
+    chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
+#if OPENTHREAD_API_VERSION >= 85
+    otCliInputLine(buff);
+#else
     otCliConsoleInputLine(buff, buff_ptr - buff);
+#endif
+    chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
 exit:
     return error;
 }
 
 #elif CHIP_TARGET_STYLE_UNIX
 
-int cmd_otcli_dispatch(int argc, char ** argv)
+CHIP_ERROR cmd_otcli_dispatch(int argc, char ** argv)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
     int pid;
     uid_t euid         = geteuid();
     char ctl_command[] = "/usr/local/sbin/ot-ctl";
@@ -118,15 +130,14 @@ int cmd_otcli_dispatch(int argc, char ** argv)
     if (euid != 0)
     {
         streamer_printf(streamer_get(), "Error otcli: requires running chip-shell as sudo\n\r");
-        error = CHIP_ERROR_INCORRECT_STATE;
-        ExitNow();
+        return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(argc > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Fork and execute the command.
     pid = fork();
-    VerifyOrExit(pid != -1, error = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(pid != -1, CHIP_ERROR_INCORRECT_STATE);
 
     if (pid == 0)
     {
@@ -144,11 +155,8 @@ int cmd_otcli_dispatch(int argc, char ** argv)
         // Parent process to wait on child.
         int status;
         wait(&status);
-        error = (status) ? CHIP_ERROR_INCORRECT_STATE : CHIP_NO_ERROR;
+        return (status) ? CHIP_ERROR_INCORRECT_STATE : CHIP_NO_ERROR;
     }
-
-exit:
-    return error;
 }
 
 #endif // CHIP_TARGET_STYLE_UNIX
@@ -156,10 +164,24 @@ exit:
 static const shell_command_t cmds_otcli_root = { &cmd_otcli_dispatch, "otcli", "Dispatch OpenThread CLI command" };
 
 #if CHIP_TARGET_STYLE_EMBEDDED
+#if OPENTHREAD_API_VERSION >= 85
+#if !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+static int OnOtCliOutput(void * aContext, const char * aFormat, va_list aArguments)
+{
+    int rval = vsnprintf(sTxBuffer, sTxLength, aFormat, aArguments);
+    VerifyOrExit(rval >= 0 && rval < sTxLength, rval = CHIP_ERROR_BUFFER_TOO_SMALL.AsInteger());
+    return streamer_write(streamer_get(), (const char *) sTxBuffer, rval);
+exit:
+    return rval;
+}
+#endif // !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#else
+
 static int OnOtCliOutput(const char * aBuf, uint16_t aBufLength, void * aContext)
 {
     return streamer_write(streamer_get(), aBuf, aBufLength);
 }
+#endif
 #endif
 
 #endif // CHIP_ENABLE_OPENTHREAD
@@ -168,10 +190,16 @@ void cmd_otcli_init()
 {
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_TARGET_STYLE_EMBEDDED
+#if !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#if OPENTHREAD_API_VERSION >= 85
+    otCliInit(otInstanceInitSingle(), &OnOtCliOutput, NULL);
+#else
     otCliConsoleInit(otInstanceInitSingle(), &OnOtCliOutput, NULL);
-#endif
+#endif // OPENTHREAD_API_VERSION >= 85
+#endif // !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#endif // CHIP_TARGET_STYLE_EMBEDDED
 
     // Register the root otcli command with the top-level shell.
-    shell_register(&cmds_otcli_root, 1);
+    Engine::Root().RegisterCommands(&cmds_otcli_root, 1);
 #endif // CHIP_ENABLE_OPENTHREAD
 }

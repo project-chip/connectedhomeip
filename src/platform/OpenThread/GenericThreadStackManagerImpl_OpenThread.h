@@ -26,13 +26,21 @@
 #pragma once
 
 #include <openthread/instance.h>
+#include <openthread/link.h>
 #include <openthread/netdata.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 #include <openthread/srp_client.h>
 #endif
 
-#include <lib/mdns/platform/Mdns.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+#include <openthread/dns_client.h>
+#endif
+
+#include <app/AttributeAccessInterface.h>
+#include <lib/dnssd/Advertiser.h>
+#include <lib/dnssd/platform/Dnssd.h>
+#include <platform/NetworkCommissioning.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -40,8 +48,6 @@ namespace DeviceLayer {
 class ThreadStackManagerImpl;
 
 namespace Internal {
-
-class DeviceNetworkInfo;
 
 /**
  * Provides a generic implementation of ThreadStackManager features that works in conjunction
@@ -63,6 +69,12 @@ public:
 
     otInstance * OTInstance() const;
     static void OnOpenThreadStateChange(uint32_t flags, void * context);
+    inline void OverrunErrorTally(void);
+    void
+    SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
+    {
+        mpStatusChangeCallback = statusChangeCallback;
+    }
 
 protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.
@@ -75,30 +87,55 @@ protected:
 
     bool _IsThreadProvisioned(void);
     bool _IsThreadAttached(void);
-    CHIP_ERROR _GetThreadProvision(DeviceNetworkInfo & netInfo, bool includeCredentials);
-    CHIP_ERROR _SetThreadProvision(const DeviceNetworkInfo & netInfo);
-    CHIP_ERROR _SetThreadProvision(const uint8_t * operationalDataset, size_t operationalDatasetLen);
+    CHIP_ERROR _GetThreadProvision(Thread::OperationalDataset & dataset);
+    CHIP_ERROR _SetThreadProvision(ByteSpan netInfo);
+    CHIP_ERROR _AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
+                                      NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
+    void _OnThreadAttachFinished(void);
     void _ErasePersistentInfo(void);
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType(void);
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
-    void _GetThreadPollingConfig(ConnectivityManager::ThreadPollingConfig & pollingConfig);
-    CHIP_ERROR _SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig);
+    CHIP_ERROR _StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
+    static void _OnNetworkScanFinished(otActiveScanResult * aResult, void * aContext);
+    void _OnNetworkScanFinished(otActiveScanResult * aResult);
+    void _UpdateNetworkStatus();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    CHIP_ERROR _GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);
+    CHIP_ERROR _SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig);
+    CHIP_ERROR _RequestSEDFastPollingMode(bool onOff);
+#endif
+
     bool _HaveMeshConnectivity(void);
-    void _OnMessageLayerActivityChanged(bool messageLayerIsActive);
     CHIP_ERROR _GetAndLogThreadStatsCounters(void);
     CHIP_ERROR _GetAndLogThreadTopologyMinimal(void);
     CHIP_ERROR _GetAndLogThreadTopologyFull(void);
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
-    CHIP_ERROR _GetFactoryAssignedEUI64(uint8_t (&buf)[8]);
     CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
+    void _ResetThreadNetworkDiagnosticsCounts(void);
+    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
+    CHIP_ERROR _GetPollPeriod(uint32_t & buf);
     void _OnWoBLEAdvertisingStart(void);
     void _OnWoBLEAdvertisingStop(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    CHIP_ERROR _AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort, chip::Mdns::TextEntry * aTxtEntries,
-                              size_t aTxtEntiresSize, uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
+    CHIP_ERROR _AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort,
+                              const Span<const char * const> & aSubTypes, const Span<const Dnssd::TextEntry> & aTxtEntries,
+                              uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
     CHIP_ERROR _RemoveSrpService(const char * aInstanceName, const char * aName);
+    CHIP_ERROR _InvalidateAllSrpServices();
+    CHIP_ERROR _RemoveInvalidSrpServices();
+
     CHIP_ERROR _SetupSrpHost(const char * aHostName);
+    CHIP_ERROR _ClearSrpHost(const char * aHostName);
+    CHIP_ERROR _SetSrpDnsCallbacks(DnsAsyncReturnCallback aInitCallback, DnsAsyncReturnCallback aErrorCallback, void * aContext);
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+    CHIP_ERROR _DnsBrowse(const char * aServiceName, DnsBrowseCallback aCallback, void * aContext);
+    CHIP_ERROR _DnsResolve(const char * aServiceName, const char * aInstanceName, DnsResolveCallback aCallback, void * aContext);
+    static void DispatchResolve(intptr_t context);
+    static void DispatchBrowseEmpty(intptr_t context);
+    static void DispatchBrowse(intptr_t context);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     // ===== Members available to the implementation subclass.
@@ -106,7 +143,6 @@ protected:
     CHIP_ERROR DoInit(otInstance * otInst);
     bool IsThreadAttachedNoLock(void);
     bool IsThreadInterfaceUpNoLock(void);
-    CHIP_ERROR AdjustPollingInterval(void);
 
     CHIP_ERROR _JoinerStart(void);
 
@@ -114,34 +150,66 @@ private:
     // ===== Private members for use by this class only.
 
     otInstance * mOTInst;
-    ConnectivityManager::ThreadPollingConfig mPollingConfig;
+    uint64_t mOverrunCount = 0;
+
+    NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
+    NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
+    NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    ConnectivityManager::SEDPollingConfig mPollingConfig;
+    ConnectivityManager::SEDPollingMode mPollingMode = ConnectivityManager::SEDPollingMode::Idle;
+    uint32_t mFastPollingConsumers                   = 0;
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     struct SrpClient
     {
-        static constexpr uint8_t kServiceId           = 0x5d;
-        static constexpr uint8_t kMaxServicesNumber   = 3;
-        static constexpr uint8_t kMaxInstanceNameSize = 64;
-        static constexpr uint8_t kMaxNameSize         = 16;
-        static constexpr uint8_t kMaxHostNameSize     = 32;
-        static constexpr uint8_t kMaxTxtEntriesNumber = 4;
-        static constexpr uint8_t kMaxTxtValueSize     = 255;
-        static constexpr uint8_t kMaxTxtKeySize       = 16;
+        static constexpr uint8_t kMaxServicesNumber      = CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES;
+        static constexpr const char * kDefaultDomainName = "default.service.arpa";
+        static constexpr uint8_t kDefaultDomainNameSize  = 20;
+        static constexpr uint8_t kMaxDomainNameSize      = 32;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+        // Thread supports both operational and commissionable discovery, so buffers sizes must be worst case.
+        static constexpr size_t kSubTypeMaxNumber   = Dnssd::Common::kSubTypeMaxNumber;
+        static constexpr size_t kSubTypeTotalLength = Dnssd::Common::kSubTypeTotalLength;
+        static constexpr size_t kTxtMaxNumber =
+            std::max(Dnssd::CommissionAdvertisingParameters::kTxtMaxNumber, Dnssd::OperationalAdvertisingParameters::kTxtMaxNumber);
+        static constexpr size_t kTxtTotalValueLength = std::max(Dnssd::CommissionAdvertisingParameters::kTxtTotalValueSize,
+                                                                Dnssd::OperationalAdvertisingParameters::kTxtTotalValueSize);
+#else
+        // Thread only supports operational discovery.
+        static constexpr size_t kSubTypeMaxNumber    = Dnssd::Operational::kSubTypeMaxNumber;
+        static constexpr size_t kSubTypeTotalLength  = Dnssd::Operational::kSubTypeTotalLength;
+        static constexpr size_t kTxtMaxNumber        = Dnssd::OperationalAdvertisingParameters::kTxtMaxNumber;
+        static constexpr size_t kTxtTotalValueLength = Dnssd::OperationalAdvertisingParameters::kTxtTotalValueSize;
+#endif
+
+        static constexpr size_t kServiceBufferSize = Dnssd::Common::kInstanceNameMaxLength + 1 + // add null-terminator
+            Dnssd::kDnssdTypeAndProtocolMaxSize + 1 +                                            // add null-terminator
+            kSubTypeTotalLength + kSubTypeMaxNumber + // add null-terminator for each subtype
+            kTxtTotalValueLength;
 
         struct Service
         {
             otSrpClientService mService;
-            char mInstanceName[kMaxInstanceNameSize];
-            char mName[kMaxNameSize];
-            otDnsTxtEntry mTxtEntries[kMaxTxtEntriesNumber];
-            uint8_t mTxtValueBuffers[kMaxTxtEntriesNumber][kMaxTxtValueSize];
-            char mTxtKeyBuffers[kMaxTxtEntriesNumber][kMaxTxtKeySize];
+            bool mIsInvalid;
+            uint8_t mServiceBuffer[kServiceBufferSize];
+            const char * mSubTypes[kSubTypeMaxNumber + 1]; // extra entry for null terminator
+            otDnsTxtEntry mTxtEntries[kTxtMaxNumber];
+
+            bool IsUsed() const { return mService.mInstanceName != nullptr; }
+            bool Matches(const char * aInstanceName, const char * aName) const;
         };
 
-        char mHostName[kMaxHostNameSize];
+        char mHostName[Dnssd::kHostNameMaxLength + 1];
         otIp6Address mHostAddress;
         Service mServices[kMaxServicesNumber];
+        bool mIsInitialized;
+        DnsAsyncReturnCallback mInitializedCallback;
+        void * mCallbackContext;
     };
 
     SrpClient mSrpClient;
@@ -150,10 +218,61 @@ private:
                                         const otSrpClientService * aRemovedServices, void * aContext);
     static void OnSrpClientStateChange(const otSockAddr * aServerSockAddr, void * aContext);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY
+    // Thread supports both operational and commissionable discovery, so buffers sizes must be worst case.
+    static constexpr uint8_t kMaxDnsServiceTxtEntriesNumber =
+        std::max(Dnssd::CommissionAdvertisingParameters::kTxtMaxNumber, Dnssd::OperationalAdvertisingParameters::kTxtMaxNumber);
+    static constexpr size_t kTotalDnsServiceTxtValueSize = std::max(Dnssd::CommissionAdvertisingParameters::kTxtTotalValueSize,
+                                                                    Dnssd::OperationalAdvertisingParameters::kTxtTotalValueSize);
+    static constexpr size_t kTotalDnsServiceTxtKeySize   = std::max(Dnssd::CommissionAdvertisingParameters::kTxtTotalKeySize,
+                                                                  Dnssd::OperationalAdvertisingParameters::kTxtTotalKeySize);
+#else
+    // Thread only supports operational discovery.
+    static constexpr uint8_t kMaxDnsServiceTxtEntriesNumber = Dnssd::OperationalAdvertisingParameters::kTxtMaxNumber;
+    static constexpr size_t kTotalDnsServiceTxtValueSize    = Dnssd::OperationalAdvertisingParameters::kTxtTotalValueSize;
+    static constexpr size_t kTotalDnsServiceTxtKeySize      = Dnssd::OperationalAdvertisingParameters::kTxtTotalKeySize;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY
+    static constexpr size_t kTotalDnsServiceTxtBufferSize =
+        kTotalDnsServiceTxtKeySize + kMaxDnsServiceTxtEntriesNumber + kTotalDnsServiceTxtValueSize;
+
+    DnsBrowseCallback mDnsBrowseCallback;
+    DnsResolveCallback mDnsResolveCallback;
+
+    struct DnsServiceTxtEntries
+    {
+        uint8_t mBuffer[kTotalDnsServiceTxtBufferSize];
+        Dnssd::TextEntry mTxtEntries[kMaxDnsServiceTxtEntriesNumber];
+    };
+
+    struct DnsResult
+    {
+        void * context;
+        chip::Dnssd::DnssdService mMdnsService;
+        DnsServiceTxtEntries mServiceTxtEntry;
+        CHIP_ERROR error;
+
+        DnsResult(void * cbContext, CHIP_ERROR aError)
+        {
+            context = cbContext;
+            error   = aError;
+        }
+    };
+
+    static void OnDnsBrowseResult(otError aError, const otDnsBrowseResponse * aResponse, void * aContext);
+    static void OnDnsResolveResult(otError aError, const otDnsServiceResponse * aResponse, void * aContext);
+    static CHIP_ERROR FromOtDnsResponseToMdnsData(otDnsServiceInfo & serviceInfo, const char * serviceType,
+                                                  chip::Dnssd::DnssdService & mdnsService,
+                                                  DnsServiceTxtEntries & serviceTxtEntries);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     static void OnJoinerComplete(otError aError, void * aContext);
     void OnJoinerComplete(otError aError);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    CHIP_ERROR SetSEDPollingMode(ConnectivityManager::SEDPollingMode pollingType);
+#endif
 
     inline ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
@@ -168,6 +287,12 @@ template <class ImplClass>
 inline otInstance * GenericThreadStackManagerImpl_OpenThread<ImplClass>::OTInstance() const
 {
     return mOTInst;
+}
+
+template <class ImplClass>
+inline void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OverrunErrorTally(void)
+{
+    mOverrunCount++;
 }
 
 template <class ImplClass>

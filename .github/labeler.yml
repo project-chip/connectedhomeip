@@ -154,3 +154,6 @@ openthread:
 
 zephyr:
     - src/platform/Zephyr/*
+
+telink:
+    - src/platform/telink/*

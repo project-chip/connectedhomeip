@@ -1,0 +1,106 @@
+{
+    "name": "Framework templates",
+    "version": "chip-v1",
+    "helpers": [
+        "../../../../../src/app/zap-templates/partials/helper.js",
+        "../../../../../src/app/zap-templates/common/ChipTypesHelper.js",
+        "../../../../../src/app/zap-templates/common/StringHelper.js",
+        "../../../../../src/app/zap-templates/templates/app/helper.js",
+        "../../../../../src/app/zap-templates/templates/chip/helper.js",
+        "../../../../../src/app/zap-templates/common/ClusterTestGeneration.js",
+        "helper.js"
+    ],
+    "override": "../../../../../src/app/zap-templates/common/override.js",
+    "partials": [
+        {
+            "name": "header",
+            "path": "../../../../../src/app/zap-templates/partials/header.zapt"
+        },
+        {
+            "name": "CHIPCallbackBridge",
+            "path": "partials/CHIPCallbackBridge.zapt"
+        },
+        {
+            "name": "encode_value",
+            "path": "partials/encode_value.zapt"
+        },
+        {
+            "name": "decode_value",
+            "path": "partials/decode_value.zapt"
+        },
+        {
+            "name": "init_struct_member",
+            "path": "partials/init_struct_member.zapt"
+        },
+        {
+            "name": "command_completion_type",
+            "path": "partials/command_completion_type.zapt"
+        },
+        {
+            "name": "attribute_data_callback_name",
+            "path": "partials/attribute_data_callback_name.zapt"
+        }
+    ],
+    "templates": [
+        {
+            "path": "CHIPCallbackBridge_internal.zapt",
+            "name": "Objc CHIPCallbackBridge Internal header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPCallbackBridge_internal.h"
+        },
+        {
+            "path": "CHIPCallbackBridge-src.zapt",
+            "name": "Objc CHIPCallbackBridge",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPCallbackBridge.mm"
+        },
+        {
+            "path": "CHIPClustersObjc_internal.zapt",
+            "name": "Objc ZCL API Internal Header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPClustersObjc_internal.h"
+        },
+        {
+            "path": "CHIPClustersObjc.zapt",
+            "name": "Objc ZCL API Header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPClustersObjc.h"
+        },
+        {
+            "path": "CHIPClustersObjc-src.zapt",
+            "name": "Objc ZCL API",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPClustersObjc.mm"
+        },
+        {
+            "path": "CHIPStructsObjc.zapt",
+            "name": "Objc reflections of CHIP spec structs header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPStructsObjc.h"
+        },
+        {
+            "path": "CHIPStructsObjc-src.zapt",
+            "name": "Objc reflections of CHIP spec structs",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPStructsObjc.mm"
+        },
+        {
+            "path": "CHIPCommandPayloadsObjc.zapt",
+            "name": "Objc reflections of CHIP command payloads header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPCommandPayloadsObjc.h"
+        },
+        {
+            "path": "CHIPCommandPayloadsObjc-src.zapt",
+            "name": "Objc reflections of CHIP command payloads header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPCommandPayloadsObjc.mm"
+        },
+        {
+            "path": "../../../../../examples/chip-tool-darwin/templates/CHIPTestClustersObjc.zapt",
+            "name": "Test Objc API Header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPTestClustersObjc.h"
+        },
+        {
+            "path": "../../../../../examples/chip-tool-darwin/templates/CHIPTestClustersObjc-src.zapt",
+            "name": "Test Objc API",
+            "output": "src/darwin/Framework/CHIP/zap-generated//CHIPTestClustersObjc.mm"
+        },
+        {
+            "path": "CHIPAttributeTLVValueDecoder-src.zapt",
+            "name": "Decode TLV attribute values into Objc objects",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPAttributeTLVValueDecoder.mm"
+        }
+    ]
+}

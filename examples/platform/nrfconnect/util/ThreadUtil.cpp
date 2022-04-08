@@ -19,7 +19,9 @@
 #include "ThreadUtil.h"
 
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/internal/DeviceNetworkInfo.h>
+
+#include <app/server/Dnssd.h>
+#include <lib/support/ThreadOperationalDataset.h>
 
 #include <zephyr.h>
 
@@ -27,25 +29,22 @@
 
 void StartDefaultThreadNetwork(void)
 {
-    chip::DeviceLayer::Internal::DeviceNetworkInfo deviceNetworkInfo;
-    memset(&deviceNetworkInfo, 0, sizeof(deviceNetworkInfo));
-
-    const uint8_t masterKey[chip::DeviceLayer::Internal::kThreadMasterKeyLength] = {
-        0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff
+    chip::Thread::OperationalDataset dataset{};
+    uint8_t xpanid[8];
+    constexpr uint8_t masterkey[] = {
+        0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF
     };
-    const uint8_t threadMeshPrefix[chip::DeviceLayer::Internal::kThreadMeshPrefixLength] = { 0xfd, 0x11, 0x11, 0x11,
-                                                                                             0x11, 0x22, 0x00, 0x00 };
+    net_bytes_from_str(xpanid, sizeof(xpanid), CONFIG_OPENTHREAD_XPANID);
 
-    memcpy(deviceNetworkInfo.ThreadNetworkName, CONFIG_OPENTHREAD_NETWORK_NAME, strlen(CONFIG_OPENTHREAD_NETWORK_NAME));
-    net_bytes_from_str(deviceNetworkInfo.ThreadExtendedPANId, 8, CONFIG_OPENTHREAD_XPANID);
-    deviceNetworkInfo.FieldPresent.ThreadExtendedPANId = true;
-    memcpy(deviceNetworkInfo.ThreadMasterKey, masterKey, sizeof(masterKey));
-    deviceNetworkInfo.FieldPresent.ThreadMeshPrefix = true;
-    memcpy(deviceNetworkInfo.ThreadMeshPrefix, threadMeshPrefix, sizeof(threadMeshPrefix));
-    deviceNetworkInfo.ThreadPANId   = CONFIG_OPENTHREAD_PANID;
-    deviceNetworkInfo.ThreadChannel = CONFIG_OPENTHREAD_CHANNEL;
+    dataset.SetChannel(CONFIG_OPENTHREAD_CHANNEL);
+    dataset.SetExtendedPanId(xpanid);
+    dataset.SetMasterKey(masterkey);
+    dataset.SetNetworkName(CONFIG_OPENTHREAD_NETWORK_NAME);
+    dataset.SetPanId(CONFIG_OPENTHREAD_PANID);
 
     chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(false);
-    chip::DeviceLayer::ThreadStackMgr().SetThreadProvision(deviceNetworkInfo);
+    chip::DeviceLayer::ThreadStackMgr().SetThreadProvision(dataset.AsByteSpan());
     chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(true);
+
+    chip::app::DnssdServer::Instance().StartServer();
 }

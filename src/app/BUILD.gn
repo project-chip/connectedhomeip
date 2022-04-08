@@ -14,13 +14,24 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
+
+import("${chip_root}/build/chip/buildconfig_header.gni")
 import("common_flags.gni")
 
-config("app_config") {
-  include_dirs = [
-    "util",
-    ".",
-    "${target_gen_dir}/include",
+declare_args() {
+  # Enable strict schema checks.
+  chip_enable_schema_check =
+      is_debug && (current_os == "linux" || current_os == "mac")
+  chip_enable_session_resumption = true
+}
+
+buildconfig_header("app_buildconfig") {
+  header = "AppBuildConfig.h"
+  header_dir = "app"
+
+  defines = [
+    "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=${chip_enable_schema_check}",
+    "CHIP_CONFIG_ENABLE_SESSION_RESUMPTION=${chip_enable_session_resumption}",
   ]
 }
 
@@ -28,80 +39,137 @@ static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
-    "Command.cpp",
-    "Command.h",
+    "AttributeAccessInterface.cpp",
+    "AttributeCache.cpp",
+    "AttributeCache.h",
+    "AttributePathExpandIterator.cpp",
+    "AttributePathExpandIterator.h",
+    "AttributePathParams.h",
+    "AttributePersistenceProvider.h",
+    "BufferedReadCallback.cpp",
+    "CASEClient.cpp",
+    "CASEClient.h",
+    "CASEClientPool.h",
+    "CASESessionManager.cpp",
+    "CASESessionManager.h",
+    "ChunkedWriteCallback.cpp",
+    "ChunkedWriteCallback.h",
     "CommandHandler.cpp",
+    "CommandResponseHelper.h",
     "CommandSender.cpp",
+    "DefaultAttributePersistenceProvider.cpp",
+    "DeviceProxy.cpp",
+    "DeviceProxy.h",
+    "EventManagement.cpp",
+    "EventPathParams.h",
+    "GlobalAttributes.h",
     "InteractionModelEngine.cpp",
-    "MessageDef/AttributeDataElement.cpp",
-    "MessageDef/AttributeDataElement.h",
-    "MessageDef/AttributeDataList.cpp",
-    "MessageDef/AttributeDataList.h",
-    "MessageDef/AttributeDataVersionList.cpp",
-    "MessageDef/AttributeDataVersionList.h",
-    "MessageDef/AttributePath.cpp",
-    "MessageDef/AttributePath.h",
-    "MessageDef/AttributePathList.cpp",
-    "MessageDef/AttributePathList.h",
-    "MessageDef/AttributeStatusElement.cpp",
-    "MessageDef/AttributeStatusElement.h",
-    "MessageDef/AttributeStatusList.cpp",
-    "MessageDef/AttributeStatusList.h",
+    "InteractionModelRevision.h",
+    "InteractionModelTimeout.h",
+    "MessageDef/ArrayBuilder.cpp",
+    "MessageDef/ArrayParser.cpp",
+    "MessageDef/AttributeDataIB.cpp",
+    "MessageDef/AttributeDataIB.h",
+    "MessageDef/AttributeDataIBs.cpp",
+    "MessageDef/AttributeDataIBs.h",
+    "MessageDef/AttributePathIB.cpp",
+    "MessageDef/AttributePathIB.h",
+    "MessageDef/AttributePathIBs.cpp",
+    "MessageDef/AttributePathIBs.h",
+    "MessageDef/AttributeReportIB.cpp",
+    "MessageDef/AttributeReportIB.h",
+    "MessageDef/AttributeReportIBs.cpp",
+    "MessageDef/AttributeReportIBs.h",
+    "MessageDef/AttributeStatusIB.cpp",
+    "MessageDef/AttributeStatusIB.h",
+    "MessageDef/AttributeStatusIBs.cpp",
+    "MessageDef/AttributeStatusIBs.h",
     "MessageDef/Builder.cpp",
     "MessageDef/Builder.h",
-    "MessageDef/CommandDataElement.cpp",
-    "MessageDef/CommandDataElement.h",
-    "MessageDef/CommandList.cpp",
-    "MessageDef/CommandList.h",
-    "MessageDef/CommandPath.cpp",
-    "MessageDef/CommandPath.h",
-    "MessageDef/EventDataElement.cpp",
-    "MessageDef/EventDataElement.h",
-    "MessageDef/EventList.cpp",
-    "MessageDef/EventList.h",
-    "MessageDef/EventPath.cpp",
-    "MessageDef/EventPath.h",
-    "MessageDef/EventPathList.cpp",
-    "MessageDef/EventPathList.h",
-    "MessageDef/InvokeCommand.cpp",
-    "MessageDef/InvokeCommand.h",
+    "MessageDef/ClusterPathIB.cpp",
+    "MessageDef/ClusterPathIB.h",
+    "MessageDef/CommandDataIB.cpp",
+    "MessageDef/CommandPathIB.cpp",
+    "MessageDef/CommandStatusIB.cpp",
+    "MessageDef/DataVersionFilterIB.cpp",
+    "MessageDef/DataVersionFilterIB.h",
+    "MessageDef/DataVersionFilterIBs.cpp",
+    "MessageDef/DataVersionFilterIBs.h",
+    "MessageDef/EventDataIB.cpp",
+    "MessageDef/EventDataIB.h",
+    "MessageDef/EventFilterIB.cpp",
+    "MessageDef/EventFilterIBs.cpp",
+    "MessageDef/EventPathIB.cpp",
+    "MessageDef/EventPathIB.h",
+    "MessageDef/EventPathIBs.cpp",
+    "MessageDef/EventPathIBs.h",
+    "MessageDef/EventReportIB.cpp",
+    "MessageDef/EventReportIB.h",
+    "MessageDef/EventReportIBs.cpp",
+    "MessageDef/EventReportIBs.h",
+    "MessageDef/EventStatusIB.cpp",
+    "MessageDef/EventStatusIB.h",
+    "MessageDef/InvokeRequestMessage.cpp",
+    "MessageDef/InvokeRequests.cpp",
+    "MessageDef/InvokeResponseIB.cpp",
+    "MessageDef/InvokeResponseIBs.cpp",
+    "MessageDef/InvokeResponseMessage.cpp",
     "MessageDef/ListBuilder.cpp",
-    "MessageDef/ListBuilder.h",
     "MessageDef/ListParser.cpp",
-    "MessageDef/ListParser.h",
+    "MessageDef/MessageBuilder.cpp",
+    "MessageDef/MessageBuilder.h",
+    "MessageDef/MessageDefHelper.cpp",
     "MessageDef/MessageDefHelper.h",
+    "MessageDef/MessageParser.cpp",
+    "MessageDef/MessageParser.h",
     "MessageDef/Parser.cpp",
     "MessageDef/Parser.h",
-    "MessageDef/ReadRequest.cpp",
-    "MessageDef/ReadRequest.h",
-    "MessageDef/ReportData.cpp",
-    "MessageDef/ReportData.h",
-    "MessageDef/StatusElement.cpp",
-    "MessageDef/StatusElement.h",
+    "MessageDef/ReadRequestMessage.cpp",
+    "MessageDef/ReadRequestMessage.h",
+    "MessageDef/ReportDataMessage.cpp",
+    "MessageDef/ReportDataMessage.h",
+    "MessageDef/StatusIB.cpp",
+    "MessageDef/StatusIB.h",
+    "MessageDef/StatusResponseMessage.cpp",
+    "MessageDef/StructBuilder.cpp",
+    "MessageDef/StructParser.cpp",
+    "MessageDef/SubscribeRequestMessage.cpp",
+    "MessageDef/SubscribeResponseMessage.cpp",
+    "MessageDef/TimedRequestMessage.cpp",
+    "MessageDef/WriteRequestMessage.cpp",
+    "MessageDef/WriteResponseMessage.cpp",
+    "OTAUserConsentCommon.h",
+    "OperationalDeviceProxy.cpp",
+    "OperationalDeviceProxy.h",
+    "OperationalDeviceProxyPool.h",
     "ReadClient.cpp",
     "ReadHandler.cpp",
-    "decoder.cpp",
-    "encoder.cpp",
+    "RequiredPrivilege.cpp",
+    "RequiredPrivilege.h",
+    "StatusResponse.cpp",
+    "StatusResponse.h",
+    "TimedHandler.cpp",
+    "TimedHandler.h",
+    "TimedRequest.cpp",
+    "TimedRequest.h",
+    "WriteClient.cpp",
+    "WriteHandler.cpp",
+    "reporting/Engine.cpp",
+    "reporting/Engine.h",
   ]
 
   public_deps = [
-    ":codec_headers",
+    ":app_buildconfig",
+    "${chip_root}/src/access",
+    "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
   ]
 
   cflags = [ "-Wconversion" ]
 
-  public_configs = [
-    ":app_config",
-    "${chip_root}/src:includes",
-  ]
-}
-
-copy("codec_headers") {
-  sources = [ "chip-zcl-zpro-codec.h" ]
-
-  outputs = [ "${target_gen_dir}/include/app/{{source_file_part}}" ]
+  public_configs = [ "${chip_root}/src:includes" ]
 }

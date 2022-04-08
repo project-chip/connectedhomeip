@@ -17,13 +17,14 @@
 
 #import "RootViewController.h"
 #import "BindingsViewController.h"
-#import "EchoViewController.h"
+#import "EnumerateViewController.h"
+#import "FabricUIViewController.h"
 #import "MultiAdminViewController.h"
 #import "OnOffViewController.h"
 #import "QRCodeViewController.h"
 #import "TemperatureSensorViewController.h"
 #import "UnpairDevicesViewController.h"
-#import "WifiViewController.h"
+#import "WiFiViewController.h"
 
 @implementation RootViewController
 
@@ -41,8 +42,8 @@
     self.tableView.dataSource = self;
     [self.view addSubview:self.tableView];
     self.options = @[
-        @"QRCode scanner", @"Echo client", @"Light on / off cluster", @"Temperature Sensor", @"Bindings", @"Wifi Configuration",
-        @"Enable Pairing", @"Unpair Devices"
+        @"QRCode scanner", @"Enumeration", @"Light on / off cluster", @"Temperature Sensor", @"Bindings", @"WiFi Configuration",
+        @"Enable Pairing", @"Unpair Devices", @"Fabric Management"
     ];
 }
 
@@ -69,10 +70,10 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     switch (indexPath.row) {
     case 0:
-        [self pushQRCodeScanner];
+        [self pushQRCodeScannerWithSkipCheck:NO];
         break;
     case 1:
-        [self pushEchoClient];
+        [self pushEnumeration];
         break;
     case 2:
         [self pushLightOnOffCluster];
@@ -92,9 +93,18 @@
     case 7:
         [self pushUnpairDevices];
         break;
+    case 8:
+        [self pushFabric];
+        break;
     default:
         break;
     }
+}
+
+- (void)pushFabric
+{
+    FabricUIViewController * controller = [FabricUIViewController new];
+    [self.navigationController pushViewController:controller animated:YES];
 }
 
 - (void)pushBindings
@@ -111,19 +121,43 @@
 
 - (void)pushNetworkConfiguration
 {
-    WifiViewController * controller = [WifiViewController new];
+    WiFiViewController * controller = [WiFiViewController new];
     [self.navigationController pushViewController:controller animated:YES];
 }
 
-- (void)pushQRCodeScanner
+- (void)pushQRCodeScannerWithSkipCheck:(BOOL)skipIosCheck
 {
-    QRCodeViewController * controller = [QRCodeViewController new];
-    [self.navigationController pushViewController:controller animated:YES];
+    if (skipIosCheck) {
+        QRCodeViewController * controller = [QRCodeViewController new];
+        [self.navigationController pushViewController:controller animated:YES];
+    } else {
+        if (@available(iOS 15.4, *)) {
+            // Device using the required iOS version (>= 15.4)
+            [self pushQRCodeScannerWithSkipCheck:YES];
+        } else {
+            // Device NOT using the required iOS version (< 15.4)
+            // Show a warning, but let the user continue
+            UIAlertController * alertController =
+                [UIAlertController alertControllerWithTitle:@"Warning"
+                                                    message:@"QRCode scanner to pair a matter device requires iOS >= 15.4"
+                                             preferredStyle:UIAlertControllerStyleAlert];
+            __weak typeof(self) weakSelf = self;
+            [alertController addAction:[UIAlertAction actionWithTitle:@"I understand"
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction * action) {
+                                                                  typeof(self) strongSelf = weakSelf;
+                                                                  if (strongSelf) {
+                                                                      [strongSelf pushQRCodeScannerWithSkipCheck:YES];
+                                                                  }
+                                                              }]];
+            [self presentViewController:alertController animated:YES completion:nil];
+        }
+    }
 }
 
-- (void)pushEchoClient
+- (void)pushEnumeration
 {
-    EchoViewController * controller = [EchoViewController new];
+    EnumerateViewController * controller = [EnumerateViewController new];
     [self.navigationController pushViewController:controller animated:YES];
 }
 

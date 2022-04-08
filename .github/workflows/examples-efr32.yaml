@@ -18,9 +18,15 @@ on:
     push:
     pull_request:
 
+concurrency:
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    cancel-in-progress: true
+
 jobs:
     efr32:
         name: EFR32
+        timeout-minutes: 60
+
         env:
             EFR32_BOARD: BRD4161A
             BUILD_TYPE: gn_efr32
@@ -29,49 +35,76 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-efr32:latest
+            image: connectedhomeip/chip-build-efr32:0.5.58
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
-                - "/tmp/output_binaries:/tmp/output_binaries"
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
-              # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
               with:
-                  fetch-depth: 0
-                  submodules: true
-#             - name: Initialize CodeQL
-#               uses: github/codeql-action/init@v1
-#               with:
-#                   languages: "cpp, python"
-            - name: Build example EFR32 Lock App for BRD4161A
-              run:
-                  scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/
-                  out/lock_app_debug BRD4161A
-            - name: Build example EFR32 Lighting App for BRD4161A
-              run:
-                  scripts/examples/gn_efr32_example.sh
-                  examples/lighting-app/efr32/ out/lighting_app_debug BRD4161A
-            - name: Binary artifact suffix
-              id: outsuffix
-              uses: haya14busa/action-cond@v1.0.0
-              with:
-                  cond: ${{ github.event.pull_request.number == '' }}
-                  if_true: "${{ github.sha }}"
-                  if_false: "pull-${{ github.event.pull_request.number }}"
-            - name: Uploading Binaries
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
+
+            - name: Set up environment for size reports
+              if: ${{ !env.ACT }}
+              env:
+                  GH_CONTEXT: ${{ toJson(github) }}
+              run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
+
+            - name: Bootstrap
+              timeout-minutes: 25
+              run: scripts/build/gn_bootstrap.sh
+            - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
+              if: ${{ always() }} && ${{ !env.ACT }}
               with:
-                  name:
-                      ${{ env.BUILD_TYPE }}-example-build-${{
-                      steps.outsuffix.outputs.value }}
+                  name: bootstrap-logs
                   path: |
-                      out/lock_app_debug/BRD4161A/chip-efr32-lock-example.out
-                      out/lighting_app_debug/BRD4161A/chip-efr32-lighting-example.out
-            - name: Remove third_party binaries for CodeQL Analysis
-              run: find out -type d -name "third_party" -exec rm -rf {} +
-            - name: Remove SiliconLabs binaries for CodeQL Analysis
-              run: find out -type d -name "SiliconLabs" -exec rm -rf {} +
-#             - name: Perform CodeQL Analysis
-#               if: ${{ github.event_name == 'push' }}
-#               uses: github/codeql-action/analyze@v1
+                      .environment/gn_out/.ninja_log
+                      .environment/pigweed-venv/*.log
+
+            - name: Build some BRD4161A variants
+              timeout-minutes: 50
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --enable-flashbundle \
+                        --target-glob '*-brd4161a-{lock,light,switch,window-covering,unit-test}' \
+                        build \
+                        --copy-artifacts-to out/artifacts \
+                     "
+            - name: Prepare some bloat report from the previous builds
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                     efr32 BRD4161A lighting-app \
+                     out/efr32-brd4161a-light/chip-efr32-lighting-example.out \
+                     /tmp/bloat_reports/
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py  \
+                     efr32 BRD4161A window-app \
+                     out/efr32-brd4161a-window-covering/chip-efr32-window-example.out \
+                     /tmp/bloat_reports/
+            - name: Build example EFR32 Lighting App for BRD4161A with RPCs
+              timeout-minutes: 10
+              run: |
+                  scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/lighting_app_debug_rpc BRD4161A \
+                    'import("//with_pw_rpc.gni")'
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+rpc lighting-app \
+                    out/lighting_app_debug_rpc/BRD4161A/chip-efr32-lighting-example.out /tmp/bloat_reports/
+            # Disabled until Flash usage is reduced        
+            # - name: Build example EFR32+WF200 WiFi Lock app for BRD4161A
+            #   timeout-minutes: 10
+            #   run: |
+            #       scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/ out/lock_app_wifi_wf200 BRD4161A --wifi wf200
+            #       .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+wf200 lock-app \
+            #         out/lock_app_wifi_wf200/BRD4161A/chip-efr32-lock-example.out /tmp/bloat_reports/
+            - name: Uploading Size Reports
+              uses: actions/upload-artifact@v2
+              if: ${{ !env.ACT }}
+              with:
+                  name: Size,EFR32-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
+                  path: |
+                      /tmp/bloat_reports/

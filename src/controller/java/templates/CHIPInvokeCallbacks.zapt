@@ -1,0 +1,29 @@
+{{> header}}
+{{#if (chip_has_client_clusters)}}
+#include "CHIPCallbackTypes.h"
+
+#include <app-common/zap-generated/cluster-objects.h>
+#include <jni.h>
+#include <zap-generated/CHIPClientCallbacks.h>
+
+namespace chip {
+
+{{#chip_client_clusters}}
+{{#chip_cluster_responses}}
+class CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback : public Callback::Callback<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackType>
+{
+public:
+    CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback(jobject javaCallback);
+
+    ~CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback();
+
+    static void CallbackFn(void * context, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & data);
+    
+private:
+    jobject javaCallbackRef;
+};
+
+{{/chip_cluster_responses}}
+{{/chip_client_clusters}}
+} // namespace chip
+{{/if}}

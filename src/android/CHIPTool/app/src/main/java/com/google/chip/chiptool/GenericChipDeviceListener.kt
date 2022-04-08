@@ -7,18 +7,6 @@ open class GenericChipDeviceListener : ChipDeviceController.CompletionListener {
     // No op
   }
 
-  override fun onSendMessageComplete(message: String?) {
-    // No op
-  }
-
-  override fun onNetworkCredentialsRequested() {
-    // No op
-  }
-
-  override fun onOperationalCredentialsRequested(opCreds: ByteArray?) {
-    // No op
-  }
-
   override fun onStatusUpdate(status: Int) {
     // No op
   }
@@ -31,6 +19,10 @@ open class GenericChipDeviceListener : ChipDeviceController.CompletionListener {
     // No op
   }
 
+  override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
+    // No op
+  }
+
   override fun onNotifyChipConnectionClosed() {
     // No op
   }
@@ -40,6 +32,10 @@ open class GenericChipDeviceListener : ChipDeviceController.CompletionListener {
   }
 
   override fun onError(error: Throwable?) {
+    // No op
+  }
+
+  override fun onOpCSRGenerationComplete(csr: ByteArray) {
     // No op
   }
 }

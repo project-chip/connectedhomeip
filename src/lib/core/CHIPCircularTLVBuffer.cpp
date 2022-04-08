@@ -30,13 +30,13 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
-#include <core/CHIPCircularTLVBuffer.h>
+#include <lib/core/CHIPCircularTLVBuffer.h>
 
-#include <core/CHIPCore.h>
-#include <core/CHIPEncoding.h>
-#include <core/CHIPTLV.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPTLV.h>
 
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 #include <stdint.h>
 
@@ -81,6 +81,19 @@ CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t * inBuffer, uint32_t inBuff
  * @param[in] inBufferLength Length, in bytes, of the backing store
  */
 CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t * inBuffer, uint32_t inBufferLength)
+{
+    Init(inBuffer, inBufferLength);
+}
+
+/**
+ * @brief
+ *   CHIPCircularTLVBuffer Init function
+ *
+ * @param[in] inBuffer       A pointer to the backing store for the queue
+ *
+ * @param[in] inBufferLength Length, in bytes, of the backing store
+ */
+void CHIPCircularTLVBuffer::Init(uint8_t * inBuffer, uint32_t inBufferLength)
 {
     mQueue       = inBuffer;
     mQueueSize   = inBufferLength;

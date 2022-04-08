@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 
-#include <lib/shell/shell.h>
+#include <lib/shell/Engine.h>
 
+#include <crypto/RandUtils.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/RandUtils.h>
 
 #include <inttypes.h>
 #include <stdarg.h>
@@ -35,29 +35,29 @@ using namespace chip;
 using namespace chip::Shell;
 using namespace chip::Logging;
 
-int cmd_echo(int argc, char ** argv)
+CHIP_ERROR cmd_echo(int argc, char ** argv)
 {
     for (int i = 0; i < argc; i++)
     {
         streamer_printf(streamer_get(), "%s ", argv[i]);
     }
     streamer_printf(streamer_get(), "\n\r");
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
-int cmd_log(int argc, char ** argv)
+CHIP_ERROR cmd_log(int argc, char ** argv)
 {
     for (int i = 0; i < argc; i++)
     {
         ChipLogProgress(chipTool, "%s", argv[i]);
     }
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
-int cmd_rand(int argc, char ** argv)
+CHIP_ERROR cmd_rand(int argc, char ** argv)
 {
-    streamer_printf(streamer_get(), "%d\n\r", GetRandU8());
-    return 0;
+    streamer_printf(streamer_get(), "%d\n\r", static_cast<int>(chip::Crypto::GetRandU8()));
+    return CHIP_NO_ERROR;
 }
 
 static shell_command_t cmds_misc[] = {
@@ -68,5 +68,5 @@ static shell_command_t cmds_misc[] = {
 
 void cmd_misc_init()
 {
-    shell_register(cmds_misc, ArraySize(cmds_misc));
+    Engine::Root().RegisterCommands(cmds_misc, ArraySize(cmds_misc));
 }

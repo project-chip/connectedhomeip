@@ -14,7 +14,6 @@ RUN set -x \
     clang \
     clang-format \
     clang-tidy \
-    cmake \
     curl \
     flex \
     g++ \
@@ -51,10 +50,10 @@ RUN set -x \
     ninja-build \
     openjdk-8-jdk \
     pkg-config \
-    python3 \
-    python3-dev \
-    python3-pip \
-    python3-venv \
+    python3.9 \
+    python3.9-dev \
+    python3.9-venv \
+    rsync \
     shellcheck \
     strace \
     systemd \
@@ -65,20 +64,29 @@ RUN set -x \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
-# Python 2 and PIP
+# Cmake (Mbed OS requires >=3.19.0-rc3 version which is not available in Ubuntu 20.04 repository)
 RUN set -x \
-    && apt-get update \
+    && (cd /tmp \
+    && wget --progress=dot:giga https://github.com/Kitware/CMake/releases/download/v3.19.3/cmake-3.19.3-Linux-x86_64.sh \
+    && sh cmake-3.19.3-Linux-x86_64.sh --exclude-subdir --prefix=/usr/local \
+    && rm -rf cmake-3.19.3-Linux-x86_64.sh) \
+    && exec bash \
+    && : # last line
+
+# Python 3.9 and PIP
+RUN set -x \
+    && DEBIAN_FRONTEND=noninteractive  apt-get update \
+    && DEBIAN_FRONTEND=noninteractive  apt-get install -y libgirepository1.0-dev \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common \
     && add-apt-repository universe \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y python python2 \
-    && curl https://bootstrap.pypa.io/2.7/get-pip.py --output get-pip.py \
-    && python2 get-pip.py \
+    && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
+    && python3.9 get-pip.py \
+    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1 \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
 RUN set -x \
-    && pip3 install circleci attrs coloredlogs PyGithub pygit future \
-    portpicker mobly                                                 \
+    && pip3 install attrs coloredlogs PyGithub pygit future portpicker mobly click cxxfilt ghapi pandas tabulate \
     && : # last line
 
 # build and install gn

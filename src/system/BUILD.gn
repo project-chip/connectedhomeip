@@ -47,6 +47,7 @@ buildconfig_header("system_buildconfig") {
   config_device_layer = chip_device_platform != "none"
   chip_system_config_posix_locking = chip_system_config_locking == "posix"
   chip_system_config_freertos_locking = chip_system_config_locking == "freertos"
+  chip_system_config_mbed_locking = chip_system_config_locking == "mbed"
   chip_system_config_no_locking = chip_system_config_locking == "none"
   have_clock_gettime = chip_system_config_clock == "clock_gettime"
   have_clock_settime = have_clock_gettime
@@ -56,11 +57,14 @@ buildconfig_header("system_buildconfig") {
     "CONFIG_DEVICE_LAYER=${config_device_layer}",
     "CHIP_SYSTEM_CONFIG_TEST=${chip_build_tests}",
     "CHIP_WITH_NLFAULTINJECTION=${chip_with_nlfaultinjection}",
+    "CHIP_SYSTEM_CONFIG_USE_DISPATCH=${chip_system_config_use_dispatch}",
     "CHIP_SYSTEM_CONFIG_USE_LWIP=${chip_system_config_use_lwip}",
+    "CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT=${chip_system_config_use_open_thread_inet_endpoints}",
     "CHIP_SYSTEM_CONFIG_USE_SOCKETS=${chip_system_config_use_sockets}",
     "CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK=false",
     "CHIP_SYSTEM_CONFIG_POSIX_LOCKING=${chip_system_config_posix_locking}",
     "CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING=${chip_system_config_freertos_locking}",
+    "CHIP_SYSTEM_CONFIG_MBED_LOCKING=${chip_system_config_mbed_locking}",
     "CHIP_SYSTEM_CONFIG_NO_LOCKING=${chip_system_config_no_locking}",
     "CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS=${chip_system_config_provide_statistics}",
     "HAVE_CLOCK_GETTIME=${have_clock_gettime}",
@@ -91,6 +95,12 @@ buildconfig_header("system_buildconfig") {
       "SYSTEM_PLATFORM_CONFIG_INCLUDE=${chip_system_platform_config_include}",
     ]
   }
+
+  if (chip_system_layer_impl_config_file != "") {
+    defines += [ "CHIP_SYSTEM_LAYER_IMPL_CONFIG_FILE=${chip_system_layer_impl_config_file}" ]
+  } else {
+    defines += [ "CHIP_SYSTEM_LAYER_IMPL_CONFIG_FILE=<system/SystemLayerImpl${chip_system_config_event_loop}.h>" ]
+  }
 }
 
 config("system_config") {
@@ -105,7 +115,10 @@ source_set("system_config_header") {
     "${chip_root}/src:includes",
   ]
 
-  public_deps = [ ":system_buildconfig" ]
+  public_deps = [
+    ":system_buildconfig",
+    "${chip_root}/src/platform:platform_buildconfig",
+  ]
 
   if (target_cpu != "esp32") {
     if (chip_system_config_use_lwip) {
@@ -118,6 +131,7 @@ static_library("system") {
   output_name = "libSystemLayer"
 
   sources = [
+    "PlatformEventSupport.h",
     "SystemAlignSize.h",
     "SystemClock.cpp",
     "SystemClock.h",
@@ -128,32 +142,46 @@ static_library("system") {
     "SystemFaultInjection.h",
     "SystemLayer.cpp",
     "SystemLayer.h",
-    "SystemLayerPrivate.h",
+    "SystemLayerImpl.h",
     "SystemMutex.cpp",
     "SystemMutex.h",
-    "SystemObject.cpp",
-    "SystemObject.h",
     "SystemPacketBuffer.cpp",
     "SystemPacketBuffer.h",
+    "SystemPacketBufferInternal.h",
     "SystemStats.cpp",
     "SystemStats.h",
     "SystemTimer.cpp",
     "SystemTimer.h",
-    "SystemWakeEvent.cpp",
-    "SystemWakeEvent.h",
     "TLVPacketBufferBackingStore.cpp",
     "TLVPacketBufferBackingStore.h",
     "TimeSource.h",
+    "WakeEvent.cpp",
+    "WakeEvent.h",
   ]
+
+  if (chip_system_layer_impl_config_file == "") {
+    sources += [
+      "SystemLayerImpl${chip_system_config_event_loop}.cpp",
+      "SystemLayerImpl${chip_system_config_event_loop}.h",
+    ]
+  }
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform:platform_buildconfig",
     "${nlassert_root}:nlassert",
   ]
 
   allow_circular_includes_from = [ "${chip_root}/src/lib/support" ]
+
+  if (chip_system_config_use_sockets) {
+    sources += [ "SocketEvents.h" ]
+    if (chip_system_config_event_loop == "Libevent") {
+      libs = [ "event" ]
+    }
+  }
 
   if (chip_with_nlfaultinjection) {
     sources += [ "SystemFaultInjection.cpp" ]

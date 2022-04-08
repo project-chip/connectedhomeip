@@ -19,24 +19,19 @@
  *          Provides a C-callable wrapper around CHIPMem.h.
  */
 
-#include <support/CHIPMem.h>
-#include <support/CHIPPlatformMemory.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
 
 extern "C" {
 
 extern int CHIPPlatformMemoryInit(void * buf, size_t bufSize)
 {
-    return static_cast<int>(chip::Platform::MemoryInit(buf, bufSize));
+    return static_cast<int>(chip::Platform::MemoryInit(buf, bufSize).AsInteger());
 }
 
 extern void CHIPPlatformMemoryShutdown()
 {
     return chip::Platform::MemoryShutdown();
-}
-
-extern void * CHIPPlatformMemoryAllocLongTerm(size_t size, bool isLongTermAlloc)
-{
-    return chip::Platform::MemoryAlloc(size, isLongTermAlloc);
 }
 
 extern void * CHIPPlatformMemoryAlloc(size_t size)

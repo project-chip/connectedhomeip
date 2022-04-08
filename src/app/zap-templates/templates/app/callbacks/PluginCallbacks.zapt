@@ -1,0 +1,8 @@
+{{> header}}
+
+#pragma once
+
+{{#zcl_clusters}}
+void __attribute__((weak))  Matter{{asUpperCamelCase label}}PluginClientInitCallback() {}
+void Matter{{asUpperCamelCase label}}PluginServerInitCallback();
+{{/zcl_clusters}}

@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>
@@ -35,22 +35,21 @@ class TransportMgrBase : public Transport::RawTransportDelegate
 public:
     CHIP_ERROR Init(Transport::Base * transport);
 
-    CHIP_ERROR SendMessage(const PacketHeader & header, const Transport::PeerAddress & address,
-                           System::PacketBufferHandle && msgBuf);
+    CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf);
+
+    void Close();
 
     void Disconnect(const Transport::PeerAddress & address);
 
-    void SetSecureSessionMgr(TransportMgrDelegate * secureSessionMgr) { mSecureSessionMgr = secureSessionMgr; }
+    void SetSessionManager(TransportMgrDelegate * sessionManager) { mSessionManager = sessionManager; }
 
-    void SetRendezvousSession(TransportMgrDelegate * rendezvousSessionMgr) { mRendezvous = rendezvousSessionMgr; }
+    CHIP_ERROR MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join);
 
-    void HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                               System::PacketBufferHandle msg) override;
+    void HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg) override;
 
 private:
-    TransportMgrDelegate * mSecureSessionMgr = nullptr;
-    TransportMgrDelegate * mRendezvous       = nullptr;
-    Transport::Base * mTransport             = nullptr;
+    TransportMgrDelegate * mSessionManager = nullptr;
+    Transport::Base * mTransport           = nullptr;
 };
 
 } // namespace chip

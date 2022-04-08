@@ -16,44 +16,12 @@
  */
 
 // Import helpers from zap core
-const zapPath      = '../../../third_party/zap/repo/src-electron/';
-const queryImpexp  = require(zapPath + 'db/query-impexp.js')
-const templateUtil = require(zapPath + 'generator/template-util.js')
-const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
-const zclQuery     = require(zapPath + 'db/query-zcl.js')
-const cHelper      = require(zapPath + 'generator/helper-c.js')
+const zapPath      = '../../../third_party/zap/repo/dist/src-electron/';
+const templateUtil = require(zapPath + 'generator/template-util.js');
+const zclHelper    = require(zapPath + 'generator/helper-zcl.js');
+const zclQuery     = require(zapPath + 'db/query-zcl.js');
 
-const StringHelper    = require('../../../src/app/zap-templates/common/StringHelper.js');
 const ChipTypesHelper = require('../../../src/app/zap-templates/common/ChipTypesHelper.js');
-
-function hasSpecificResponse(commandName)
-{
-  // Retrieve the clusterName and the clusterSide. If any if not available, an error will be thrown.
-  const clusterName = this.parent.name;
-  const clusterSide = this.parent.side;
-  if (clusterName == undefined || clusterSide == undefined) {
-    const error = 'chip_server_cluster_commands: Could not find relevant parent cluster.';
-    console.log(error);
-    throw error;
-  }
-
-  function filterCommand(cmd)
-  {
-    return cmd.clusterName == clusterName && cmd.name == (commandName + "Response");
-  }
-
-  function fn(pkgId)
-  {
-    const db = this.global.db;
-    return queryImpexp.exportendPointTypeIds(db, this.global.sessionId)
-        .then(endpointTypes => zclQuery.exportClustersAndEndpointDetailsFromEndpointTypes(db, endpointTypes))
-        .then(endpointsAndClusters => zclQuery.exportCommandDetailsFromAllEndpointTypesAndClusters(db, endpointsAndClusters))
-        .then(endpointCommands => endpointCommands.filter(filterCommand).length)
-  }
-
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
-  return templateUtil.templatePromise(this.global, promise);
-}
 
 function asDelimitedCommand(name)
 {
@@ -69,6 +37,8 @@ function asTypeMinValue(type)
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
+      case 'bool':
+        return '0';
       case 'int8_t':
       case 'int16_t':
       case 'int32_t':
@@ -79,14 +49,20 @@ function asTypeMinValue(type)
       case 'uint32_t':
       case 'uint64_t':
         return '0';
+      case 'float':
+      case 'double':
+        return `-std::numeric_limits<${basicType}>::infinity()`;
       default:
-        error = 'Unhandled underlying type ' + zclType + ' for original type ' + type;
+        error = 'asTypeMinValue: Unhandled underlying type ' + zclType + ' for original type ' + type;
         throw error;
       }
     })
   }
 
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
+    console.log(err);
+    throw err;
+  });
   return templateUtil.templatePromise(this.global, promise);
 }
 
@@ -98,6 +74,8 @@ function asTypeMaxValue(type)
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
+      case 'bool':
+        return '1';
       case 'int8_t':
       case 'int16_t':
       case 'int32_t':
@@ -108,28 +86,61 @@ function asTypeMaxValue(type)
       case 'uint32_t':
       case 'uint64_t':
         return 'UINT' + parseInt(basicType.slice(4)) + '_MAX';
+      case 'float':
+      case 'double':
+        return `std::numeric_limits<${basicType}>::infinity()`;
       default:
         return 'err';
-        error = 'Unhandled underlying type ' + zclType + ' for original type ' + type;
+        error = 'asTypeMaxValue: Unhandled underlying type ' + zclType + ' for original type ' + type;
         throw error;
       }
     })
   }
 
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
+    console.log(err);
+    throw err;
+  });
   return templateUtil.templatePromise(this.global, promise);
 }
 
-function isStrEndsWith(str, substr)
+async function structs_with_cluster_name(options)
 {
-  return str.endsWith(substr);
+  const packageId = await templateUtil.ensureZclPackageId(this);
+
+  const structs = await zclQuery.selectAllStructsWithItems(this.global.db, packageId);
+
+  let blocks = [];
+  for (const s of structs) {
+    if (s.struct_cluster_count == 0) {
+      continue;
+    }
+
+    s.items.forEach(i => {
+      if (i.type.toLowerCase() == "fabric_idx") {
+        s.struct_fabric_idx_field = i.label;
+      }
+    })
+
+    if (s.struct_cluster_count == 1)
+    {
+      const clusters = await zclQuery.selectStructClusters(this.global.db, s.id);
+      blocks.push(
+          { id : s.id, name : s.name, struct_fabric_idx_field : s.struct_fabric_idx_field, clusterName : clusters[0].name });
+    }
+
+    if (s.struct_cluster_count > 1) {
+      blocks.push({ id : s.id, name : s.name, struct_fabric_idx_field : s.struct_fabric_idx_field, clusterName : "detail" });
+    }
+  }
+
+  return templateUtil.collectBlocks(blocks, options, this);
 }
 
 //
 // Module exports
 //
-exports.hasSpecificResponse = hasSpecificResponse;
-exports.asDelimitedCommand  = asDelimitedCommand;
-exports.asTypeMinValue      = asTypeMinValue;
-exports.asTypeMaxValue      = asTypeMaxValue;
-exports.isStrEndsWith       = isStrEndsWith;
+exports.asDelimitedCommand        = asDelimitedCommand;
+exports.asTypeMinValue            = asTypeMinValue;
+exports.asTypeMaxValue            = asTypeMaxValue;
+exports.structs_with_cluster_name = structs_with_cluster_name;

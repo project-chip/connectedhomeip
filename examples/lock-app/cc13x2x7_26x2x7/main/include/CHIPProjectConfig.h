@@ -29,33 +29,11 @@
 #define CHIP_PROJECT_CONFIG_H
 
 #if BUILD_RELEASE // release build
-
-// Security and Authentication enabled for release build.
-#define CHIP_CONFIG_SECURITY_TEST_MODE 0
-#define CHIP_CONFIG_REQUIRE_AUTH 1
-
-#else // development build
-
-// Security and Authentication disabled for development build.
-// For convenience, enable CHIP Security Test Mode and disable the requirement for
-// authentication in various protocols.
-// WARNING: These options make it possible to circumvent basic CHIP security functionality,
-// including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
-#define CHIP_CONFIG_SECURITY_TEST_MODE 1
-#define CHIP_CONFIG_REQUIRE_AUTH 0
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
- *
- * Enables the use of a hard-coded default CHIP device id and credentials if no device id
- * is found in CHIP NV storage.
- *
- * This option is for testing only and should be disabled in production releases.
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 34
+// Note: Default Pairing/PIN/Serial Numbers being used. These should not be enabled for production builds
+#endif // BUILD_RELEASE
 
 // Use a default pairing code if one hasn't been provisioned in flash.
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 12345678
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
 // Use a default pairing code if one hasn't been provisioned in flash.
@@ -69,48 +47,39 @@
  */
 #define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
 
-#endif // BUILD_RELEASE
-
-/**
- * CHIP_DEVICE_CONFIG_THREAD_FTD
- *
- * Disable Full Thread Device features
- */
-#define CHIP_DEVICE_CONFIG_THREAD_FTD 1
-
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
- * 0x235A: Chip's Vendor Id.
+ * 0xFFF1: Test vendor
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x235A
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0x434B: cc13x2x7_26x2x7 lock-app
+ * 0x8006: example lock app
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x434B
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8006
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION
+ * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
  *
- * The product revision number assigned to device or product by the device vendor.  This
+ * The hardware version number assigned to device or product by the device vendor.  This
  * number is scoped to the device product id, and typically corresponds to a revision of the
  * physical device, a change to its packaging, and/or a change to its marketing presentation.
- * This value is generally *not* incremented for device software revisions.
+ * This value is generally *not* incremented for device software versions.
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION 1
+#define CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION 1
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
+ * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
  *
- * A string identifying the firmware revision running on the device.
- * CHIP currently expects the firmware version to be in the format
+ * A string identifying the software version running on the device.
+ * CHIP currently expects the software version to be in the format
  * {MAJOR_VERSION}.0d{MINOR_VERSION}
  */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
-#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION "1.0d1"
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "1.0d1"
 #endif
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -128,18 +97,18 @@
 //#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
 
 /**
- * CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
- *
- * Enable recording UTC timestamps.
- */
-#define CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
-
-/**
  * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
  *
  * A size, in bytes, of the individual debug event logging buffer.
  */
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+ *
+ * Enable the OpenThread SRP client to allow for CHIP device discovery.
+ */
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT 1
 
 /**
  * CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE

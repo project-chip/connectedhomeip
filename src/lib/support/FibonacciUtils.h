@@ -25,11 +25,13 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace chip {
 
 /**
  *  This function generates 32-bit Fibonacci number
- *  for a given 32 bit index.
+ *  for a given 32 bit index. The index boundary is 47, then it would overflow.
  *
  * @return  32-bit unsigned fibonacci number.
  *

@@ -19,7 +19,7 @@
 # Installs required packages and configuration for Raspberry Pi to be able
 # to build CHIP and run example/integration applications
 #
-# See docs/BUILDING.md for more details
+# See docs/guides/BUILDING.md for more details
 
 set -ex
 

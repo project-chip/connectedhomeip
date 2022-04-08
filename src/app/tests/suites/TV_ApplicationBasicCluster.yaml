@@ -1,0 +1,80 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Application Basic Cluster Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Application Basic"
+    endpoint: 3
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    # TODO(#14054): Support chars validation
+    - label: "Read attribute vendor name"
+      command: "readAttribute"
+      attribute: "VendorName"
+      response:
+          value: "exampleVendorName1"
+
+    - label: "Read attribute vendor id"
+      command: "readAttribute"
+      attribute: "VendorID"
+      response:
+          value: 1
+
+    # TODO(#14054): Support chars validation
+    - label: "Read attribute application name"
+      command: "readAttribute"
+      attribute: "ApplicationName"
+      response:
+          value: "exampleName1"
+
+    - label: "Read attribute product id"
+      command: "readAttribute"
+      attribute: "ProductID"
+      response:
+          value: 1
+
+    - label: "Read attribute application status"
+      command: "readAttribute"
+      attribute: "Status"
+      response:
+          value: 0
+
+    - label: "Read attribute application status"
+      command: "readAttribute"
+      attribute: "Application"
+      response:
+          value: { catalogVendorId: 123, applicationId: "applicationId" }
+
+    # TODO(#14054): Support chars validation
+    - label: "Read attribute application version"
+      command: "readAttribute"
+      attribute: "ApplicationVersion"
+      response:
+          value: "exampleVersion"
+
+    - label: "Read attribute application allowed vendor list"
+      command: "readAttribute"
+      attribute: "AllowedVendorList"
+      response:
+          value: [1, 456]

@@ -43,7 +43,7 @@
 {{else if (isStrEqual name "Level Control")}}
 {{#if (isServer side)}}
 // User options for {{side}} plugin {{name}}
-#define EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL 255
+#define EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL 254
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL 0
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL_RATE 0
 {{/if}}

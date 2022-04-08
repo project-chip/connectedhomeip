@@ -116,8 +116,8 @@ limitations under the License.
     <define>SAMPLE_MFG_SPECIFIC_CLUSTER_2</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
-    <attribute side="server" code="0x0000" define="ATTRIBUTE_THREE" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0x0000" optional="true">ember sample attribute 2</attribute>
-    <attribute side="server" code="0x0001" define="ATTRIBUTE_FOUR" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0x0000" optional="true">ember sample attribute 2</attribute>
+    <attribute side="server" code="0x0000" define="ATTRIBUTE_THREE" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0x0000" optional="true">ember sample attribute 3</attribute>
+    <attribute side="server" code="0x0001" define="ATTRIBUTE_FOUR" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0x0000" optional="true">ember sample attribute 4</attribute>
     <command source="client" code="0x00" name="CommandTwo" optional="true">
       <description>
         A sample manufacturer specific command within the sample manufacturer specific

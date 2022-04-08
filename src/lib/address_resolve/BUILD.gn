@@ -1,0 +1,78 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+declare_args() {
+  # Define as "default" to include the built in resolution strategy in
+  # CHIP (i.e. sources within this directory).
+  #
+  # Define as "custom" to only have relevant type definitions included
+  # in which case the application is expected to provide a
+  #    CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER
+  # include to use
+  chip_address_resolve_strategy = "default"
+}
+
+config("default_address_resolve_config") {
+  defines = [ "CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>" ]
+}
+
+static_library("address_resolve") {
+  public_deps = [
+    "${chip_root}/src/lib/asn1",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/dnssd",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/transport/raw",
+  ]
+
+  sources = [
+    "AddressResolve.cpp",
+    "AddressResolve.h",
+  ]
+
+  if (chip_address_resolve_strategy == "default") {
+    sources += [
+      "AddressResolve_DefaultImpl.cpp",
+      "AddressResolve_DefaultImpl.h",
+    ]
+
+    public_configs = [ ":default_address_resolve_config" ]
+  } else if (chip_address_resolve_strategy == "custom") {
+    # nothing to do here, custom implementation
+    # assume CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER is defined as a constant
+    # when headers are included.
+    #
+    # This is likely to be done using a global config on the project.
+  } else {
+    assert(false, "Unknown chip address resolution strategy.")
+  }
+}
+
+executable("address-resolve-tool") {
+  sources = [ "tool.cpp" ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    ":address_resolve",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform/logging:stdio",
+  ]
+
+  output_dir = root_out_dir
+}

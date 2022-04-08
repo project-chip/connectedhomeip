@@ -51,7 +51,7 @@
 #pragma once
 
 #ifndef CONFIGURATION_HEADER
-#define CONFIGURATION_HEADER "config.h"
+#define CONFIGURATION_HEADER <app/util/config.h>
 #endif
 #include CONFIGURATION_HEADER
 
@@ -66,14 +66,20 @@
 #include "stack/include/error.h"
 #endif // EZSP_HOST
 
-#include "af-types.h"
+#include <app/util/af-types.h>
 
-#include "client-api.h"
-#include "debug-printing.h"
-#include "ember-print.h"
+#include <app/util/client-api.h>
+#include <app/util/debug-printing.h>
+#include <app/util/ember-print.h>
+
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/Iterators.h>
+#include <lib/support/SafeInt.h>
 
 /** @name Attribute Storage */
 // @{
+
+static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 
 /**
  * @brief locate attribute metadata
@@ -82,89 +88,47 @@
  * or NULL if attribute was not found.
  *
  * @param endpoint Zigbee endpoint number.
- * @param cluster Cluster ID of the sought cluster.
- * @param attribute Attribute ID of the sought attribute.
+ * @param clusterId Cluster ID of the sought cluster.
+ * @param attributeId Attribute ID of the sought attribute.
  * @param mask CLUSTER_MASK_SERVER or CLUSTER_MASK_CLIENT
  *
  * @return Returns pointer to the attribute metadata location.
  */
-EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                          chip::AttributeId attributeId, uint8_t mask, uint16_t manufacturerCode);
-
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-/** @brief Returns true if the attribute exists. */
-bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId, uint8_t mask,
-                              uint16_t manufacturerCode);
-#else
-#define emberAfContainsAttribute(endpoint, clusterId, attributeId, mask, manufacturerCode)                                         \
-    (emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId, mask, manufacturerCode) != NULL)
-#endif
-
-/**
- * @brief Returns true if endpoint contains a cluster, checking for mfg code.
- *
- * This function returns true regardless of whether
- * the endpoint contains server, client or both.
- * For standard libraries (when ClusterId < FC00),
- * the manufacturerCode is ignored.
- */
-bool emberAfContainsClusterWithMfgCode(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode);
+const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                chip::AttributeId attributeId, uint8_t mask);
 
 /**
  * @brief Returns true if endpoint contains the ZCL cluster with specified id.
  *
  * This function returns true regardless of whether
  * the endpoint contains server, client or both in the Zigbee cluster Library.
- * This wraps emberAfContainsClusterWithMfgCode with
- * manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE
- * If this function is used with a manufacturer specific clusterId
- * then this will return the first cluster that it finds in the Cluster table.
- * and will not return any other clusters that share that id.
  */
 bool emberAfContainsCluster(chip::EndpointId endpoint, chip::ClusterId clusterId);
-
-/**
- * @brief Returns true if endpoint has cluster server, checking for mfg code.
- *
- * This function returns true if
- * the endpoint contains server of a given cluster.
- * For standard librarys (when ClusterId < FC00), the manufacturerCode is ignored.
- */
-bool emberAfContainsServerWithMfgCode(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode);
 
 /**
  * @brief Returns true if endpoint contains the ZCL server with specified id.
  *
  * This function returns true if
  * the endpoint contains server of a given cluster.
- * This wraps emberAfContainsServer with
- * manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE
- * If this function is used with a manufacturer specific clusterId
- * then this will return the first cluster that it finds in the Cluster table.
- * and will not return any other clusters that share that id.
  */
 bool emberAfContainsServer(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 /**
- * @brief Returns true if endpoint contains cluster client.
+ * @brief Returns true if endpoint of given index contains the ZCL server with specified id.
  *
  * This function returns true if
- * the endpoint contains client of a given cluster.
- * For standard library clusters (when ClusterId < FC00),
- * the manufacturerCode is ignored.
+ * the endpoint of given index contains server of a given cluster.
+ * If this function is used with a manufacturer specific clusterId
+ * then this will return the first cluster that it finds in the Cluster table.
+ * and will not return any other clusters that share that id.
  */
-bool emberAfContainsClientWithMfgCode(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode);
+bool emberAfContainsServerFromIndex(uint16_t index, chip::ClusterId clusterId);
 
 /**
  * @brief Returns true if endpoint contains the ZCL client with specified id.
  *
  * This function returns true if
  * the endpoint contains client of a given cluster.
- * This wraps emberAfContainsClient with
- * manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE
- * If this function is used with a manufacturer specific clusterId
- * then this will return the first cluster that it finds in the Cluster table.
- * and will not return any other clusters that share that id.
  */
 bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
@@ -184,8 +148,6 @@ bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId)
  * to perform the given operation.
  *
  * @see emberAfWriteClientAttribute, emberAfWriteServerAttribute,
- *      emberAfWriteManufacturerSpecificClientAttribute,
- *      emberAfWriteManufacturerSpecificServerAttribute
  */
 EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t mask,
                                     uint8_t * dataPtr, EmberAfAttributeType dataType);
@@ -199,8 +161,6 @@ EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId c
  * is used frequently throughout the framework
  *
  * @see emberAfWriteClientAttribute,
- *      emberAfWriteManufacturerSpecificClientAttribute,
- *      emberAfWriteManufacturerSpecificServerAttribute
  */
 EmberAfStatus emberAfWriteServerAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                           uint8_t * dataPtr, EmberAfAttributeType dataType);
@@ -214,43 +174,9 @@ EmberAfStatus emberAfWriteServerAttribute(chip::EndpointId endpoint, chip::Clust
  * is used frequently throughout the framework
  *
  * @see emberAfWriteServerAttribute,
- *      emberAfWriteManufacturerSpecificClientAttribute,
- *      emberAfWriteManufacturerSpecificServerAttribute
  */
 EmberAfStatus emberAfWriteClientAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                           uint8_t * dataPtr, EmberAfAttributeType dataType);
-
-/**
- * @brief write a manufacturer specific server attribute.
- *
- * This function is the same as emberAfWriteAttribute
- * except that it saves having to pass the cluster mask
- * and allows passing of a manufacturer code.
- * This is useful for code savings since write attribute
- * is used frequently throughout the framework
- *
- * @see emberAfWriteClientAttribute, emberAfWriteServerAttribute,
- *      emberAfWriteManufacturerSpecificClientAttribute
- */
-EmberAfStatus emberAfWriteManufacturerSpecificServerAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
-                                                              chip::AttributeId attributeID, uint16_t manufacturerCode,
-                                                              uint8_t * dataPtr, EmberAfAttributeType dataType);
-
-/**
- * @brief write a manufacturer specific client attribute.
- *
- * This function is the same as emberAfWriteAttribute
- * except that it saves having to pass the cluster mask.
- * and allows passing of a manufacturer code.
- * This is useful for code savings since write attribute
- * is used frequently throughout the framework
- *
- * @see emberAfWriteClientAttribute, emberAfWriteServerAttribute,
- *      emberAfWriteManufacturerSpecificServerAttribute
- */
-EmberAfStatus emberAfWriteManufacturerSpecificClientAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
-                                                              chip::AttributeId attributeID, uint16_t manufacturerCode,
-                                                              uint8_t * dataPtr, EmberAfAttributeType dataType);
 
 /**
  * @brief Function that test the success of attribute write.
@@ -261,14 +187,13 @@ EmberAfStatus emberAfWriteManufacturerSpecificClientAttribute(chip::EndpointId e
  *
  * @param endpoint Zigbee endpoint number
  * @param cluster Cluster ID of the sought cluster.
- * @param attribute Attribute ID of the sought attribute.
+ * @param attributeID Attribute ID of the sought attribute.
  * @param mask CLUSTER_MASK_SERVER or CLUSTER_MASK_CLIENT
- * @param buffer Location where attribute will be written from.
+ * @param dataPtr Location where attribute will be written from.
  * @param dataType ZCL attribute type.
  */
 EmberAfStatus emberAfVerifyAttributeWrite(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                          uint8_t mask, uint16_t manufacturerCode, uint8_t * dataPtr,
-                                          EmberAfAttributeType dataType);
+                                          uint8_t mask, uint8_t * dataPtr, EmberAfAttributeType dataType);
 
 /**
  * @brief Read the attribute value, performing all the checks.
@@ -279,11 +204,9 @@ EmberAfStatus emberAfVerifyAttributeWrite(chip::EndpointId endpoint, chip::Clust
  * value or type is not desired.
  *
  * @see emberAfReadClientAttribute, emberAfReadServerAttribute,
- *      emberAfReadManufacturerSpecificClientAttribute,
- *      emberAfReadManufacturerSpecificServerAttribute
  */
 EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t mask,
-                                   uint8_t * dataPtr, uint8_t readLength, EmberAfAttributeType * dataType);
+                                   uint8_t * dataPtr, uint16_t readLength, EmberAfAttributeType * dataType);
 
 /**
  * @brief Read the server attribute value, performing all the checks.
@@ -294,11 +217,9 @@ EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cl
  * value or type is not desired.
  *
  * @see emberAfReadClientAttribute,
- *      emberAfReadManufacturerSpecificClientAttribute,
- *      emberAfReadManufacturerSpecificServerAttribute
  */
 EmberAfStatus emberAfReadServerAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                         uint8_t * dataPtr, uint8_t readLength);
+                                         uint8_t * dataPtr, uint16_t readLength);
 
 /**
  * @brief Read the client attribute value, performing all the checks.
@@ -309,41 +230,9 @@ EmberAfStatus emberAfReadServerAttribute(chip::EndpointId endpoint, chip::Cluste
  * value or type is not desired.
  *
  * @see emberAfReadServerAttribute,
- *      emberAfReadManufacturerSpecificClientAttribute,
- *      emberAfReadManufacturerSpecificServerAttribute
  */
 EmberAfStatus emberAfReadClientAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                         uint8_t * dataPtr, uint8_t readLength);
-
-/**
- * @brief Read the manufacturer-specific server attribute value, performing all checks.
- *
- * This function will attempt to read the attribute and store
- * it into the pointer. It will also read the data type.
- * Both dataPtr and dataType may be NULL, signifying that either
- * value or type is not desired.
- *
- * @see emberAfReadClientAttribute, emberAfReadServerAttribute,
- *      emberAfReadManufacturerSpecificClientAttribute
- */
-EmberAfStatus emberAfReadManufacturerSpecificServerAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
-                                                             chip::AttributeId attributeID, uint16_t manufacturerCode,
-                                                             uint8_t * dataPtr, uint8_t readLength);
-
-/**
- * @brief Read the manufacturer-specific client attribute value, performing all checks.
- *
- * This function will attempt to read the attribute and store
- * it into the pointer. It will also read the data type.
- * Both dataPtr and dataType may be NULL, signifying that either
- * value or type is not desired.
- *
- * @see emberAfReadClientAttribute, emberAfReadServerAttribute,
- *      emberAfReadManufacturerSpecificServerAttribute
- */
-EmberAfStatus emberAfReadManufacturerSpecificClientAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
-                                                             chip::AttributeId attributeID, uint16_t manufacturerCode,
-                                                             uint8_t * dataPtr, uint8_t readLength);
+                                         uint8_t * dataPtr, uint16_t readLength);
 
 /**
  * @brief this function returns the size of the ZCL data in bytes.
@@ -361,25 +250,11 @@ uint8_t emberAfGetDataSize(uint8_t dataType);
 #define emberAfClusterIsManufacturerSpecific(cluster) ((cluster)->clusterId >= 0xFC00)
 
 /**
- * @brief macro that returns true if attribute is read only.
- *
- * @param metadata EmberAfAttributeMetadata* to consider.
- */
-#define emberAfAttributeIsReadOnly(metadata) (((metadata)->mask & ATTRIBUTE_MASK_WRITABLE) == 0)
-
-/**
  * @brief macro that returns true if client attribute, and false if server.
  *
  * @param metadata EmberAfAttributeMetadata* to consider.
  */
 #define emberAfAttributeIsClient(metadata) (((metadata)->mask & ATTRIBUTE_MASK_CLIENT) != 0)
-
-/**
- * @brief macro that returns true if attribute is saved to token.
- *
- * @param metadata EmberAfAttributeMetadata* to consider.
- */
-#define emberAfAttributeIsTokenized(metadata) (((metadata)->mask & ATTRIBUTE_MASK_TOKENIZE) != 0)
 
 /**
  * @brief macro that returns true if attribute is saved in external storage.
@@ -396,13 +271,6 @@ uint8_t emberAfGetDataSize(uint8_t dataType);
 #define emberAfAttributeIsSingleton(metadata) (((metadata)->mask & ATTRIBUTE_MASK_SINGLETON) != 0)
 
 /**
- * @brief macro that returns true if attribute is manufacturer specific
- *
- * @param metadata EmberAfAttributeMetadata* to consider.
- */
-#define emberAfAttributeIsManufacturerSpecific(metadata) (((metadata)->mask & ATTRIBUTE_MASK_MANUFACTURER_SPECIFIC) != 0)
-
-/**
  * @brief macro that returns size of attribute in bytes.
  *
  * @param metadata EmberAfAttributeMetadata* to consider.
@@ -417,44 +285,31 @@ extern EmberAfDefinedEndpoint emAfEndpoints[];
 /**
  * @brief Macro that takes index of endpoint, and returns Zigbee endpoint
  */
-chip::EndpointId emberAfEndpointFromIndex(uint8_t index);
+chip::EndpointId emberAfEndpointFromIndex(uint16_t index);
 
 /**
- * Returns the index of a given endpoint
+ * Returns the index of a given endpoint.  Will return 0xFFFF if this is not a
+ * valid endpoint id or if the endpoint is disabled.
  */
-uint8_t emberAfIndexFromEndpoint(chip::EndpointId endpoint);
+uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint);
 
 /**
- * Returns the index of a given endpoint; Does not ignore disabled endpoints
+ * Returns the index of a given endpoint; Does not ignore disabled endpoints.
+ * Will return 0xFFFF if this is not a valid endpoint id.
  */
-uint8_t emberAfIndexFromEndpointIncludingDisabledEndpoints(chip::EndpointId endpoint);
+uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(chip::EndpointId endpoint);
 
 /**
  * Returns the endpoint index within a given cluster (Client-side),
  * looking only for standard clusters.
  */
-uint8_t emberAfFindClusterClientEndpointIndex(chip::EndpointId endpoint, chip::ClusterId clusterId);
+uint16_t emberAfFindClusterClientEndpointIndex(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 /**
  * Returns the endpoint index within a given cluster (Server-side),
  * looking only for standard clusters.
  */
-uint8_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId clusterId);
-
-/**
- * @brief Macro that takes index of endpoint, and returns device Id for it
- */
-#define emberAfDeviceIdFromIndex(index) (emAfEndpoints[(index)].deviceId)
-
-/**
- * @brief Macro that takes index of endpoint, and returns device version for it
- */
-#define emberAfDeviceVersionFromIndex(index) (emAfEndpoints[(index)].deviceVersion)
-
-/**
- * @brief Macro that takes index of endpoint, and returns network index for it
- */
-#define emberAfNetworkIndexFromEndpointIndex(index) (emAfEndpoints[(index)].networkIndex)
+uint16_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 /**
  * @brief Macro that returns the primary endpoint.
@@ -464,12 +319,12 @@ uint8_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::C
 /**
  * @brief Returns the total number of endpoints (dynamic and pre-compiled).
  */
-uint8_t emberAfEndpointCount(void);
+uint16_t emberAfEndpointCount(void);
 
 /**
  * @brief Returns the number of pre-compiled endpoints.
  */
-uint8_t emberAfFixedEndpointCount(void);
+uint16_t emberAfFixedEndpointCount(void);
 
 /**
  * Data types are either analog or discrete. This makes a difference for
@@ -483,11 +338,6 @@ enum
 };
 
 /**
- * @brief Returns the type of the attribute, either ANALOG, DISCRETE or NONE
- */
-uint8_t emberAfGetAttributeAnalogOrDiscreteType(uint8_t dataType);
-
-/**
  *@brief Returns true if type is signed, false otherwise.
  */
 bool emberAfIsTypeSigned(EmberAfAttributeType dataType);
@@ -496,21 +346,26 @@ bool emberAfIsTypeSigned(EmberAfAttributeType dataType);
  * @brief Function that extracts a 64-bit integer from the message buffer
  */
 uint64_t emberAfGetInt64u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
+#define emberAfGetInt64s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt64u(message, currentIndex, msgLen))
 
 /**
  * @brief Function that extracts a 32-bit integer from the message buffer
  */
 uint32_t emberAfGetInt32u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
+#define emberAfGetInt32s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt32u(message, currentIndex, msgLen))
 
 /**
  * @brief Function that extracts a 24-bit integer from the message buffer
  */
 uint32_t emberAfGetInt24u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
+#define emberAfGetInt24s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt24u(message, currentIndex, msgLen))
 
 /**
  * @brief Function that extracts a 16-bit integer from the message buffer
  */
 uint16_t emberAfGetInt16u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
+#define emberAfGetInt16s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt16u(message, currentIndex, msgLen))
+
 /**
  * @brief Function that extracts a ZCL string from the message buffer
  */
@@ -529,6 +384,7 @@ uint8_t emberAfGetDate(uint8_t * message, uint16_t currentIndex, uint16_t msgLen
  * @brief Macro for consistency, that extracts single byte out of the message
  */
 #define emberAfGetInt8u(message, currentIndex, msgLen) message[currentIndex]
+#define emberAfGetInt8s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt8u(message, currentIndex, msgLen))
 
 /**
  * @brief Macro for consistency that copies a uint8_t from variable into buffer.
@@ -551,23 +407,13 @@ void emberAfCopyInt32u(uint8_t * data, uint16_t index, uint32_t x);
  * parameter should indicate the maximum number of characters to copy to the
  * destination buffer not including the length byte.
  */
-void emberAfCopyString(uint8_t * dest, const uint8_t * src, uint8_t size);
+void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size);
 /*
  * @brief Function that copies a ZCL long string into a buffer.  The size
  * parameter should indicate the maximum number of characters to copy to the
  * destination buffer not including the length bytes.
  */
-void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, uint16_t size);
-/*
- * @brief Function that determines the length of a zigbee Cluster Library string
- *   (where the first byte is assumed to be the length).
- */
-uint8_t emberAfStringLength(const uint8_t * buffer);
-/*
- * @brief Function that determines the length of a zigbee Cluster Library long string.
- *   (where the first two bytes are assumed to be the length).
- */
-uint16_t emberAfLongStringLength(const uint8_t * buffer);
+void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size);
 
 /*
  * @brief Function that determines the size of a zigbee Cluster Library
@@ -575,7 +421,8 @@ uint16_t emberAfLongStringLength(const uint8_t * buffer);
  * string). For strings, the size includes the length of the string plus the
  * number of the string's length prefix byte(s).
  */
-uint16_t emberAfAttributeValueSize(EmberAfAttributeType dataType, const uint8_t * buffer);
+uint16_t emberAfAttributeValueSize(chip::ClusterId clusterId, chip::AttributeId attributeId, EmberAfAttributeType dataType,
+                                   const uint8_t * buffer);
 
 /** @} END Attribute Storage */
 
@@ -625,7 +472,7 @@ bool emberAfEndpointEnableDisable(chip::EndpointId endpoint, bool enable);
 /**
  * @brief Determine if an endpoint at the specified index is enabled or disabled
  */
-bool emberAfEndpointIndexIsEnabled(uint8_t index);
+bool emberAfEndpointIndexIsEnabled(uint16_t index);
 
 /**
  * @brief Returns true if a given ZCL data type is a string type.
@@ -639,11 +486,8 @@ bool emberAfEndpointIndexIsEnabled(uint8_t index);
  */
 bool emberAfIsThisDataTypeAStringType(EmberAfAttributeType dataType);
 
-/** @brief Returns true if the given attribute type is a string. */
-bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType);
-
-/** @brief Returns true if the given attribute type is a long string. */
-bool emberAfIsLongStringAttributeType(EmberAfAttributeType attributeType);
+/** @brief Returns true if a given ZCL data type is a list type. */
+bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType);
 
 /**
  * @brief The mask applied by ::emberAfNextSequence when generating ZCL
@@ -688,14 +532,14 @@ uint8_t emberAfGetLastSequenceNumber(void);
  *          greater than 4 is being compared
  *          1, if val2 is smaller.
  */
-int8_t emberAfCompareValues(uint8_t * val1, uint8_t * val2, uint8_t len, bool signedNumber);
+int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t len, bool signedNumber);
 
 /**
  * @brief populates the passed EUI64 with the local EUI64 MAC address.
  */
 void emberAfGetEui64(EmberEUI64 returnEui64);
 
-#ifdef EZSP_HOST
+#if (BIGENDIAN_CPU) || defined(EZSP_HOST)
 // Normally this is provided by the stack code, but on the host
 // it is provided by the application code.
 void emberReverseMemCopy(uint8_t * dest, const uint8_t * src, uint16_t length);
@@ -742,11 +586,6 @@ uint8_t emberAfGetAddressIndex(void);
  *   on the host to prevent frequent EZSP transactions.
  */
 EmberNetworkStatus emberAfNetworkState(void);
-
-/**
- * @brief Get this node's radio channel for the current network.
- */
-uint8_t emberAfGetRadioChannel(void);
 
 /**
  * @brief Returns the current network parameters.
@@ -1125,8 +964,8 @@ EmberStatus emberAfEndpointEventControlSetDelayMinutes(EmberEventControl * contr
  * @brief A function used to retrieve the number of milliseconds until
  * the next event scheduled in the application framework's event
  * mechanism.
- * @param maxMs, the maximum number of milliseconds until the next
- *        event.
+ * @param maxMs the maximum number of milliseconds until the next
+ *              event.
  * @return The number of milliseconds until the next event or
  * maxMs if no event is scheduled before then.
  */
@@ -1194,211 +1033,9 @@ uint32_t emberAfMsToNextEventExtended(uint32_t maxMs, uint8_t * returnIndex);
 // @{
 
 /**
- * @brief This function sends a ZCL response, based on the information
- * that is currently in the outgoing buffer. It is expected that a complete
- * ZCL message is present, including header.  The application may use
- * this method directly from within the message handling function
- * and associated callbacks.  However this will result in the
- * response being sent before the APS Ack is sent which is not
- * ideal.
- *
- * NOTE:  This will overwrite the ZCL sequence number of the message
- * to use the LAST received sequence number.
- */
-EmberStatus emberAfSendResponse(void);
-
-/**
- * @brief Send ZCL response with attached message sent callback
- */
-EmberStatus emberAfSendResponseWithCallback(EmberAfMessageSentFunction callback);
-
-/**
- * @brief Sends multicast.
- */
-EmberStatus emberAfSendMulticast(chip::GroupId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message);
-
-/**
- * @brief Multicasts the message to the group in the binding table that
- * matches the cluster and source endpoint in the APS frame.  Note: if the
- * binding table contains many matching entries, calling this API cause a
- * significant amount of network traffic. Care should be taken when considering
- * the effects of broadcasts in a network.
- */
-EmberStatus emberAfSendMulticastToBindings(EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message);
-
-/**
- * @brief Sends Multicast with alias with attached message sent callback
- */
-EmberStatus emberAfSendMulticastWithAliasWithCallback(chip::GroupId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength,
-                                                      uint8_t * message, EmberNodeId alias, uint8_t sequence,
-                                                      EmberAfMessageSentFunction callback);
-
-/**
- * @brief Sends multicast with attached message sent callback.
- */
-EmberStatus emberAfSendMulticastWithCallback(chip::GroupId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength,
-                                             uint8_t * message, EmberAfMessageSentFunction callback);
-
-/**
- * @brief Sends broadcast.
- */
-EmberStatus emberAfSendBroadcast(EmberNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message);
-
-/**
- * @brief Sends broadcast with attached message sent callback.
- */
-EmberStatus emberAfSendBroadcastWithCallback(EmberNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength,
-                                             uint8_t * message, EmberAfMessageSentFunction callback);
-
-/**
- * @brief Sends broadcast with alias with attached message sent callback.
- */
-EmberStatus emberAfSendBroadcastWithAliasWithCallback(EmberNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength,
-                                                      uint8_t * message, EmberNodeId alias, uint8_t sequence,
-                                                      EmberAfMessageSentFunction callback);
-
-/**
- * @brief Sends unicast.
- */
-EmberStatus emberAfSendUnicast(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
-                               uint16_t messageLength, uint8_t * message);
-
-/**
- * @brief Sends unicast with attached message sent callback.
- */
-EmberStatus emberAfSendUnicastWithCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
-                                           uint16_t messageLength, uint8_t * message, EmberAfMessageSentFunction callback);
-
-/**
- * @brief Unicasts the message to each remote node in the binding table that
- * matches the cluster and source endpoint in the APS frame.  Note: if the
- * binding table contains many matching entries, calling this API cause a
- * significant amount of network traffic.
- */
-EmberStatus emberAfSendUnicastToBindings(EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message);
-
-/**
- * @brief emberAfSendUnicastToBindings with attached message sent callback.
- */
-EmberStatus emberAfSendUnicastToBindingsWithCallback(EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message,
-                                                     EmberAfMessageSentFunction callback);
-
-/**
- * @brief Sends interpan message.
- */
-EmberStatus emberAfSendInterPan(EmberPanId panId, const EmberEUI64 destinationLongId, EmberNodeId destinationShortId,
-                                chip::GroupId multicastId, chip::ClusterId clusterId, uint16_t messageLength,
-                                uint8_t * messageBytes);
-
-/**
  * @brief Sends end device binding request.
  */
 EmberStatus emberAfSendEndDeviceBind(chip::EndpointId endpoint);
-
-/**
- * @brief Sends the command prepared with emberAfFill.... macro.
- *
- * This function is used to send a command that was previously prepared
- * using the emberAfFill... macros from the client command API. It
- * will be sent as unicast to each remote node in the binding table that
- * matches the cluster and source endpoint in the APS frame.  Note: if the
- * binding table contains many matching entries, calling this API cause a
- * significant amount of network traffic.
- */
-EmberStatus emberAfSendCommandUnicastToBindings(void);
-
-/**
- * @brief emberAfSendCommandUnicastToBindings with attached message sent callback.
- */
-EmberStatus emberAfSendCommandUnicastToBindingsWithCallback(EmberAfMessageSentFunction callback);
-
-/**
- * @brief Sends the command prepared with emberAfFill.... macro.
- *
- * This function is used to send a command that was previously prepared
- * using the emberAfFill... macros from the client command API. It
- * will be sent as multicast.
- */
-EmberStatus emberAfSendCommandMulticast(chip::GroupId multicastId);
-
-/**
- * @brief Sends the command prepared with emberAfFill.... macro.
- *
- * This function is used to send a command that was previously prepared
- * using the emberAfFill... macros from the client command API. It
- * will be sent as multicast.
- */
-EmberStatus emberAfSendCommandMulticastWithAlias(chip::GroupId multicastId, EmberNodeId alias, uint8_t sequence);
-
-/**
- * @brief emberAfSendCommandMulticast with attached message sent callback.
- */
-EmberStatus emberAfSendCommandMulticastWithCallback(chip::GroupId multicastId, EmberAfMessageSentFunction callback);
-
-/**
- * @brief Sends the command prepared with emberAfFill.... macro.
- *
- * This function is used to send a command that was previously prepared
- * using the emberAfFill... macros from the client command API. It
- * will be sent as multicast to the group specified in the binding table that
- * matches the cluster and source endpoint in the APS frame.  Note: if the
- * binding table contains many matching entries, calling this API cause a
- * significant amount of network traffic.
- */
-EmberStatus emberAfSendCommandMulticastToBindings(void);
-/**
- * @brief Sends the command prepared with emberAfFill.... macro.
- *
- * This function is used to send a command that was previously prepared
- * using the emberAfFill... macros from the client command API.
- * It will be sent as unicast.
- */
-EmberStatus emberAfSendCommandUnicast(EmberOutgoingMessageType type, uint16_t indexOrDestination);
-
-/**
- * @brief emberAfSendCommandUnicast with attached message sent callback.
- */
-EmberStatus emberAfSendCommandUnicastWithCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
-                                                  EmberAfMessageSentFunction callback);
-
-/**
- * @brief Sends the command prepared with emberAfFill.... macro.
- *
- * This function is used to send a command that was previously prepared
- * using the emberAfFill... macros from the client command API.
- */
-EmberStatus emberAfSendCommandBroadcast(EmberNodeId destination);
-
-/**
- * @brief emberAfSendCommandBroadcast with attached message sent callback.
- */
-EmberStatus emberAfSendCommandBroadcastWithCallback(EmberNodeId destination, EmberAfMessageSentFunction callback);
-
-/**
- * @brief emberAfSendCommandBroadcast from alias with attached message sent callback.
- */
-EmberStatus emberAfSendCommandBroadcastWithAliasWithCallback(EmberNodeId destination, EmberNodeId alias, uint8_t sequence,
-                                                             EmberAfMessageSentFunction callback);
-
-/**
- * @brief Sends the command prepared with emberAfFill.... macro.
- *
- * This function is used to send a command that was previously prepared
- * using the emberAfFill... macros from the client command API.
- */
-EmberStatus emberAfSendCommandBroadcastWithAlias(EmberNodeId destination, EmberNodeId alias, uint8_t sequence);
-/**
- * @brief Sends the command prepared with emberAfFill.... macro.
- *
- * This function is used to send a command that was previously prepared
- * using the emberAfFill... macros from the client command API.
- * It will be sent via inter-PAN.  If destinationLongId is not NULL, the message
- * will be sent to that long address using long addressing mode; otherwise, the
- * message will be sent to destinationShortId using short address mode.  IF
- * multicastId is not zero, the message will be sent using multicast mode.
- */
-EmberStatus emberAfSendCommandInterPan(EmberPanId panId, const EmberEUI64 destinationLongId, EmberNodeId destinationShortId,
-                                       chip::GroupId multicastId);
 
 /**
  * @brief Sends a default response to a cluster command.
@@ -1414,12 +1051,6 @@ EmberStatus emberAfSendCommandInterPan(EmberPanId panId, const EmberEUI64 destin
 EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberAfStatus status);
 
 /**
- * @brief emberAfSendDefaultResponse with attached message sent callback.
- */
-EmberStatus emberAfSendDefaultResponseWithCallback(const EmberAfClusterCommand * cmd, EmberAfStatus status,
-                                                   EmberAfMessageSentFunction callback);
-
-/**
  * @brief Sends a default response to a cluster command using the
  * current command.
  *
@@ -1431,29 +1062,6 @@ EmberStatus emberAfSendDefaultResponseWithCallback(const EmberAfClusterCommand *
  * sending the response.
  */
 EmberStatus emberAfSendImmediateDefaultResponse(EmberAfStatus status);
-
-/**
- * @brief emberAfSendImmediateDefaultResponse with attached message sent callback.
- */
-EmberStatus emberAfSendImmediateDefaultResponseWithCallback(EmberAfStatus status, EmberAfMessageSentFunction callback);
-
-/**
- * @brief Returns the maximum size of the payload that the Application
- * Support sub-layer will accept for the given message type, destination, and
- * APS frame.
- *
- * The size depends on multiple factors, including the security level in use
- * and additional information added to the message to support the various
- * options.
- *
- * @param type The outgoing message type.
- * @param indexOrDestination Depending on the message type, this is either the
- *  EmberNodeId of the destination, an index into the address table, an index
- *  into the binding table, the multicast identifier, or a broadcast address.
- * @param apsFrame The APS frame for the message.
- * @return The maximum APS payload length for the given message.
- */
-uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame);
 
 /**
  * @brief Access to client API APS frame.
@@ -1741,53 +1349,6 @@ EmberStatus emberAfStartSearchForJoinableNetwork(void);
 #define emberAfStartSearchForJoinableNetwork() emberAfStartSearchForJoinableNetworkCallback()
 #endif
 
-/** @brief Sets the current network to that of the given index and adds it to
- * the stack of networks maintained by the framework.  Every call to this API
- * must be paired with a subsequent call to ::emberAfPopNetworkIndex.
- */
-
-EmberStatus emberAfPushNetworkIndex(uint8_t networkIndex);
-/** @brief Sets the current network to the callback network and adds it to
- * the stack of networks maintained by the framework.  Every call to this API
- * must be paired with a subsequent call to ::emberAfPopNetworkIndex.
- */
-
-EmberStatus emberAfPushCallbackNetworkIndex(void);
-/** @brief Sets the current network to that of the given endpoint and adds it
- * to the stack of networks maintained by the framework.  Every call to this
- * API must be paired with a subsequent call to ::emberAfPopNetworkIndex.
- */
-
-EmberStatus emberAfPushEndpointNetworkIndex(chip::EndpointId endpoint);
-/** @brief Removes the topmost network from the stack of networks maintained by
- * the framework and sets the current network to the new topmost network.
- * Every call to this API must be paired with a prior call to
- * ::emberAfPushNetworkIndex, ::emberAfPushCallbackNetworkIndex, or
- * ::emberAfPushEndpointNetworkIndex.
- */
-
-EmberStatus emberAfPopNetworkIndex(void);
-/** @brief Returns the primary endpoint of the given network index or 0xFF if
- * no endpoints belong to the network.
- */
-
-uint8_t emberAfPrimaryEndpointForNetworkIndex(uint8_t networkIndex);
-/** @brief Returns the primary endpoint of the current network index or 0xFF if
- * no endpoints belong to the current network.
- */
-
-uint8_t emberAfPrimaryEndpointForCurrentNetworkIndex(void);
-
-#if !defined(DOXYGEN_SHOULD_SKIP_THIS)
-/** @brief Initializes the stack of networks maintained by the framework,
- * including setting the default network.
- *
- * @return An ::EmberStatus value that indicates either that the network stack
- * has been successfully initialized or the reason for failure.
- */
-EmberStatus emAfInitializeNetworkIndexStack(void);
-void emAfAssertNetworkIndexStackIsEmpty(void);
-#endif
 /** @brief Basic initialization API to be invoked before ::emberAfMain.
  */
 void emberAfMainInit(void);
@@ -1818,3 +1379,49 @@ int emberAfMain(MAIN_FUNCTION_PARAMETERS);
  * generated code.
  */
 EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd);
+
+/**
+ * Returns the pointer to the data version storage for the given endpoint and
+ * cluster.  Can return null in the following cases:
+ *
+ * 1) There is no such endpoint.
+ * 2) There is no such server cluster on the given endpoint.
+ * 3) No storage for a data version was provided for the endpoint.
+ */
+chip::DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & aConcreteClusterPath);
+
+namespace chip {
+namespace app {
+
+class EnabledEndpointsWithServerCluster
+{
+public:
+    EnabledEndpointsWithServerCluster(ClusterId clusterId);
+
+    // Instead of having a separate Iterator class, optimize for codesize by
+    // just reusing ourselves as our own iterator.  We could do a bit better
+    // here with C++17 and using a different type for the end iterator, but this
+    // is the best I've found with C++14 so far.
+    //
+    // This does mean that you can only iterate a given
+    // EnabledEndpointsWithServerCluster once, but that's OK given how we use it
+    // in practice.
+    EnabledEndpointsWithServerCluster & begin() { return *this; }
+    const EnabledEndpointsWithServerCluster & end() const { return *this; }
+
+    bool operator!=(const EnabledEndpointsWithServerCluster & other) const { return mEndpointIndex != mEndpointCount; }
+
+    EnabledEndpointsWithServerCluster & operator++();
+
+    EndpointId operator*() const { return emberAfEndpointFromIndex(mEndpointIndex); }
+
+private:
+    void EnsureMatchingEndpoint();
+
+    uint16_t mEndpointIndex = 0;
+    uint16_t mEndpointCount = emberAfEndpointCount();
+    ClusterId mClusterId;
+};
+
+} // namespace app
+} // namespace chip

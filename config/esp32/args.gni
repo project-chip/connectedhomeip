@@ -24,12 +24,17 @@ chip_ble_project_config_include = ""
 mbedtls_target = "//mbedtls:mbedtls"
 lwip_platform = "external"
 
-chip_build_tests = true
-chip_inet_config_enable_dns_resolver = false
-
 #Enabling this causes some error
 #chip_inet_config_enable_tun_endpoint = false
 chip_inet_config_enable_tcp_endpoint = true
 chip_inet_config_enable_udp_endpoint = true
 
 custom_toolchain = "//third_party/connectedhomeip/config/esp32/toolchain:esp32"
+
+# Avoid constraint forcing for ESP32:
+#   Esp32 is also building based on python and there are requirements
+# conflicts (e.g. pyparsing at the time this was added)
+#   Matter already fixes python constraints, we use those instead of
+# whatever pigweed ships with
+pw_build_PIP_CONSTRAINTS =
+    [ "//third_party/connectedhomeip/scripts/constraints.txt" ]

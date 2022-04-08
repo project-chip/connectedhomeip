@@ -23,8 +23,8 @@
 
 #pragma once
 
+#include <lib/support/BitFlags.h>
 #include <stdint.h>
-#include <support/BitFlags.h>
 
 namespace chip {
 namespace Messaging {
@@ -37,22 +37,8 @@ namespace Messaging {
  */
 enum class MessageFlagValues : uint32_t
 {
-    /**< Indicates that the existing source node identifier must be reused. */
-    kReuseSourceId = 0x00000020,
-    /**< Indicates that the CHIP message is already encoded. */
-    kMessageEncoded = 0x00001000,
-    /**< Indicates that default IPv6 source address selection should be used when sending IPv6 multicast messages. */
-    kDefaultMulticastSourceAddress = 0x00002000,
-    /**< Indicates that the sender of the  message requested an acknowledgment. */
-    kPeerRequestedAck = 0x00004000,
     /**< Indicates that the message is a duplicate of a previously received message. */
-    kDuplicateMessage = 0x00008000,
-    /**< Indicates that the peer's group key message counter is not synchronized. */
-    kPeerGroupMsgIdNotSynchronized = 0x00010000,
-    /**< Indicates that the source of the message is the initiator of the CHIP exchange. */
-    kFromInitiator = 0x00020000,
-    /**< Indicates that message is being sent/received via the local ephemeral UDP port. */
-    kViaEphemeralUDPPort = 0x00040000,
+    kDuplicateMessage = 0x00000001,
 };
 
 using MessageFlags = BitFlags<MessageFlagValues>;
@@ -60,20 +46,10 @@ using MessageFlags = BitFlags<MessageFlagValues>;
 enum class SendMessageFlags : uint16_t
 {
     kNone = 0x0000,
-    /**< Used to indicate that automatic retransmission is enabled. */
-    kAutoRetrans = 0x0001,
     /**< Used to indicate that a response is expected within a specified timeout. */
-    kExpectResponse = 0x0002,
-    /**< Used to indicate that the source node ID in the message header can be reused. */
-    kReuseSourceId = 0x0020,
-    /**< Used to indicate that the message is already encoded. */
-    kAlreadyEncoded = 0x0080,
-    /**< Used to indicate that default IPv6 source address selection should be used when sending IPv6 multicast messages. */
-    kDefaultMulticastSourceAddress = 0x0100,
-    /**< Used to indicate that the current message is the initiator of the exchange. */
-    kFromInitiator = 0x0200,
+    kExpectResponse = 0x0001,
     /**< Suppress the auto-request acknowledgment feature when sending a message. */
-    kNoAutoRequestAck = 0x0400,
+    kNoAutoRequestAck = 0x0002,
 };
 
 using SendFlags = BitFlags<SendMessageFlags>;

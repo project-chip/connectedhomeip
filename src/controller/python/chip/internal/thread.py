@@ -15,48 +15,18 @@
 #
 
 # Contains type definition to help with thread credentials.
-# Generally thread credentials are assumed to be binary objects, however for 
+# Generally thread credentials are assumed to be binary objects, however for
 # testing purposes, we expose the internal structure here.
 
-from construct import BitStruct, Byte, Bytes, Enum, Flag, Int16ul, Int32ul, Int64ul, PaddedString, Padding, Struct
+from construct import Byte, Bytes, Int16ul, Int64ul, PaddedString, Struct
 
-ThreadDeviceNetworkInfo = Struct(
-    "NetworkId" / Int32ul,
-    "FieldPresent" / BitStruct (
-        "NetworkId" / Flag,
-        "ThreadExtendedPANId" / Flag,
-        "ThreadMeshPrefix" / Flag,
-        "ThreadPSKc" / Flag,
-        "Padding" / Padding(4),
-    ),
-    "WiFiSSID" / PaddedString(33, 'utf8'),
-    "WiFikey" / Bytes(64),
-    "WiFiKeyLen" / Byte,
-    "WiFiAuthSecurityType" / Enum(Byte, 
-       # NotAvailable is the same as None/NotSpecified in DeviceNetworkInfo.h
-       # Used this name because 'None' is reserved in python
-       NotAvailable        = 1, 
-       WEP                 = 2,
-       WPAPersonal         = 3,
-       WPA2Personal        = 4,
-       WPA2MixedPersonal   = 5,
-       WPAEnterprise       = 6,
-       WPA2Enterprise      = 7,
-       WPA2MixedEnterprise = 8,
-       WPA3Personal        = 9,
-       WPA3MixedPersonal   = 10,
-       WPA3Enterprise      = 11,
-       WPA3MixedEnterprise = 12,
-    ),
-    "ThreadNetworkName" / PaddedString(17, 'utf8'),
-    "ThreadExtendedPANId" / Bytes(8),
-    "ThreadMeshPrefix" / Bytes(8),
-    "ThreadMasterKey" / Bytes(16),
-    "ThreadPSKc" / Bytes(16),
-    "_ThreadPANIdPadding" / Padding(1), # Aligns ThreadPANId
-    "ThreadPANId" / Int16ul,
-    "ThreadChannel" / Byte,
-    "_ThreadDatasetTimestampPadding" / Padding(3), # Aligns ThreadDAtasetTimestamp
-    "ThreadDatasetTimestamp" / Int64ul,
+ThreadNetworkInfo = Struct(
+    "ActiveTimestamp" / Int64ul,
+    "MasterKey" / Bytes(16),
+    "PSKc" / Bytes(16),
+    "ExtendedPanId" / Bytes(8),
+    "MeshPrefix" / Bytes(8),
+    "PanId" / Int16ul,
+    "NetworkName" / PaddedString(17, 'utf8'),
+    "Channel" / Byte,
 )
-

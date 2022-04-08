@@ -57,6 +57,7 @@ template("gen_flashing_script") {
                          [
                            "flashing_script_generator",
                            "flashing_script_name",
+                           "flashing_script_inputs",
                            "flashing_options",
                            "deps",
                            "data_deps",
@@ -72,6 +73,7 @@ template("gen_flashing_script") {
     ]
 
     script = flashing_script_generator
+    inputs = flashing_script_inputs
   }
 }
 
@@ -94,6 +96,13 @@ template("flashable_executable") {
     # The executable is the final target.
     final_target = executable_target
   }
+
+  if (defined(invoker.flashbundle_name)) {
+    flashbundle_name = invoker.flashbundle_name
+  } else {
+    flashbundle_name = "${target_name}.flashbundle.txt"
+  }
+
   group(target_name) {
     data_deps = [ ":$final_target" ]
 
@@ -101,7 +110,7 @@ template("flashable_executable") {
       data_deps += invoker.data_deps
     }
 
-    write_runtime_deps = "${root_out_dir}/${target_name}.flashbundle.txt"
+    write_runtime_deps = "${root_out_dir}/${flashbundle_name}"
   }
 
   if (defined(invoker.objcopy_image_name)) {
@@ -131,6 +140,7 @@ template("flashable_executable") {
 
     gen_flashing_script("$target_name.flashing") {
       flashing_script_generator = invoker.flashing_script_generator
+      flashing_script_inputs = invoker.flashing_script_inputs
       flashing_script_name = "$root_out_dir/${invoker.flashing_script_name}"
       if (defined(invoker.flashing_options)) {
         flashing_options = invoker.flashing_options

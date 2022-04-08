@@ -16,8 +16,8 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
-import("${build_root}/config/defaults.gni")
 
+import("${build_root}/config/defaults.gni")
 import("${chip_root}/config/efr32/lib/pw_rpc/pw_rpc.gni")
 import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
@@ -28,17 +28,15 @@ efr32_project_dir = "${chip_root}/examples/pigweed-app/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/efr32"
 
 efr32_sdk("sdk") {
+  sources = [
+    "${efr32_project_dir}/include/CHIPProjectConfig.h",
+    "${efr32_project_dir}/include/FreeRTOSConfig.h",
+  ]
+
   include_dirs = [
     "${chip_root}/src/platform/EFR32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}",
-  ]
-
-  sources = [
-    "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${efr32_project_dir}/include/FreeRTOSConfig.h",
-    "${efr32_sdk_root}/hardware/kit/common/drivers/retargetserial.c",
   ]
 
   defines = [
@@ -50,11 +48,20 @@ efr32_sdk("sdk") {
 }
 
 efr32_executable("pigweed_app") {
-  include_dirs = []
-  defines = []
   output_name = "chip-efr32-pigweed-example.out"
 
-  public_deps = [
+  sources = [
+    "${chip_root}/examples/common/pigweed/RpcService.cpp",
+    "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
+    "${examples_plat_dir}/LEDWidget.cpp",
+    "${examples_plat_dir}/PigweedLogger.cpp",
+    "${examples_plat_dir}/heap_4_silabs.c",
+    "${examples_plat_dir}/init_efrPlatform.cpp",
+    "${examples_plat_dir}/uart.cpp",
+    "src/main.cpp",
+  ]
+
+  deps = [
     ":sdk",
     "$dir_pw_assert",
     "$dir_pw_checksum",
@@ -64,27 +71,15 @@ efr32_executable("pigweed_app") {
     "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
   ]
 
-  include_dirs += [ "${chip_root}/examples/common/pigweed/efr32" ]
+  include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]
 
-  sources = [
-    "${chip_root}/examples/common/pigweed/RpcService.cpp",
-    "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-    "${examples_plat_dir}/LEDWidget.cpp",
-    "${examples_plat_dir}/PigweedLogger.cpp",
-    "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/uart.c",
-    "src/main.cpp",
-  ]
+  ldscript = "${examples_plat_dir}/ldscripts/${efr32_family}.ld"
 
-  output_dir = root_out_dir
-
-  if (efr32_family == "efr32mg12") {
-    ldscript = "${efr32_project_dir}/ldscripts/efr32-pigweed-example-MG12P.ld"
-  } else if (efr32_family == "efr32mg21") {
-    ldscript = "${efr32_project_dir}/ldscripts/efr32-pigweed-example-MG21.ld"
-  }
+  inputs = [ ldscript ]
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  output_dir = root_out_dir
 }
 
 group("efr32") {

@@ -79,7 +79,10 @@
  ******************************************************************************/
 
 #include "ias-zone-client.h"
-#include "af.h"
+#include <app/CommandHandler.h>
+#include <app/util/af.h>
+
+using namespace chip;
 
 //-----------------------------------------------------------------------------
 // Globals
@@ -306,8 +309,8 @@ static uint8_t findIasZoneServerByNodeId(EmberNodeId nodeId)
     return i;
 }
 
-bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(uint16_t zoneStatus, uint8_t extendedStatus, uint8_t zoneId,
-                                                               uint16_t delay)
+bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(app::CommandHandler * commandObj, uint16_t zoneStatus,
+                                                               uint8_t extendedStatus, uint8_t zoneId, uint16_t delay)
 {
     uint8_t serverIndex = findIasZoneServerByNodeId(emberAfCurrentCommand()->source);
     uint8_t status      = EMBER_ZCL_STATUS_NOT_FOUND;
@@ -327,7 +330,7 @@ bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(uint16_t zoneStat
     return true;
 }
 
-bool emberAfIasZoneClusterZoneEnrollRequestCallback(uint16_t zoneType, uint16_t manufacturerCode)
+bool emberAfIasZoneClusterZoneEnrollRequestCallback(app::CommandHandler * commandObj, uint16_t zoneType, uint16_t manufacturerCode)
 {
     EmberAfIasEnrollResponseCode responseCode = EMBER_ZCL_IAS_ENROLL_RESPONSE_CODE_NO_ENROLL_PERMIT;
     uint8_t zoneId                            = UNKNOWN_ZONE_ID;
@@ -389,7 +392,7 @@ static void removeServer(uint8_t * ieeeAddress)
 static EmberStatus sendCommand(EmberNodeId destAddress)
 {
     emberAfSetCommandEndpoints(myEndpoint, emberAfIasZoneClientKnownServers[currentIndex].endpoint);
-    EmberStatus status = emberAfSendCommandUnicast(EMBER_OUTGOING_DIRECT, destAddress);
+    EmberStatus status = emberAfSendCommandUnicast(MessageSendDestination::Direct(destAddress));
     emberAfIasZoneClusterPrintln("Sent IAS Zone Client Command to 0x%2X (%d -> %d) status: 0x%X", destAddress, myEndpoint,
                                  emberAfIasZoneClientKnownServers[currentIndex].endpoint, status);
     if (status != EMBER_SUCCESS)

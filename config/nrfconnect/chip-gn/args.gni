@@ -23,3 +23,5 @@ chip_system_project_config_include = ""
 chip_ble_project_config_include = ""
 
 custom_toolchain = "${chip_root}/config/nrfconnect/chip-gn/toolchain:zephyr"
+
+pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/constraints.txt" ]

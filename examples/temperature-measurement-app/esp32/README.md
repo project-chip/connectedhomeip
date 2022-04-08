@@ -1,4 +1,19 @@
-# Temperature Sensor Example
+# CHIP ESP32 Temperature Sensor Example
+
+This example is meant to represent a minimal-sized application.
+
+---
+
+-   [CHIP ESP32 Temperature Sensor Example](#chip-esp32-temperature-sensor-example)
+    -   [Building the Example Application](#building-the-example-application)
+    -   [Commissioning and cluster control](#commissioning-and-cluster-control)
+        -   [Setting up chip-tool](#setting-up-chip-tool)
+        -   [Commissioning over BLE](#commissioning-over-ble)
+        -   [Cluster control](#cluster-control)
+    -   [Flashing app using script](#flashing-app-using-script)
+    -   [Optimization](#optimization)
+
+---
 
 ## Building the Example Application
 
@@ -8,64 +23,49 @@ Development Framework and the xtensa-esp32-elf toolchain.
 The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
 
--   Clone the Espressif ESP-IDF and checkout release/v4.2 branch
+-   Clone the Espressif ESP-IDF and checkout
+    [v4.4 release](https://github.com/espressif/esp-idf/releases/tag/v4.4)
 
           $ mkdir ${HOME}/tools
           $ cd ${HOME}/tools
           $ git clone https://github.com/espressif/esp-idf.git
           $ cd esp-idf
-          $ git checkout release/v4.2
+          $ git checkout v4.4
           $ git submodule update --init
-          $ export IDF_PATH=${HOME}/tools/esp-idf
           $ ./install.sh
 
 -   Install ninja-build
 
           $ sudo apt-get install ninja-build
 
-### To build the application, follow these steps:
-
 Currently building in VSCode _and_ deploying from native is not supported, so
 make sure the IDF_PATH has been exported(See the manual setup steps above).
 
 -   Setting up the environment
 
-To download and install packages.
-
         $ cd ${HOME}/tools/esp-idf
         $ ./install.sh
         $ . ./export.sh
         $ cd {path-to-connectedhomeip}
+
+    To download and install packages.
+
         $ source ./scripts/bootstrap.sh
         $ source ./scripts/activate.sh
-        $ cd {path-to-connectedhomeip-examples}
 
-If packages are already installed then simply activate it.
+    If packages are already installed then simply activate them.
 
-        $ cd ${HOME}/tools/esp-idf
-        $ ./install.sh
-        $ . ./export.sh
-        $ cd {path-to-connectedhomeip}
         $ source ./scripts/activate.sh
-        $ cd {path-to-connectedhomeip-examples}
+
+-   Target Select
+
+        $ idf.py set-target esp32(or esp32c3)
 
 -   Configuration Options
 
-        To choose from the different configuration options, run menuconfig
-
-          $ idf.py menuconfig
-
-        Select ESP32 based `Device Type` through `Demo`->`Device Type`.
-        The device types that are currently supported include `ESP32-DevKitC` (default),
-        and `M5Stack`
-
-        If you are using `standalone chip-tool` to communicate with the ESP32, bypass the
-        Rendezvous mode so that the device can communicate over an insecure channel.
-        This can be done through `Demo`->`Rendezvous Mode`->`Bypass`
-
-        To connect the ESP32 to your network, configure the Wi-Fi SSID and Passphrase through
-        `Component config`->`CHIP Device Layer`->`WiFi Station Options`->`Default WiFi SSID` and
-        `Default WiFi Password` respectively.
+    This application uses `ESP32-DevKitC` as a default device type. To use other
+    ESP32 based device types, please refer
+    [examples/all-clusters-app/esp32](https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/esp32)
 
 -   To build the demo application.
 
@@ -80,7 +80,7 @@ If packages are already installed then simply activate it.
     before flashing. For ESP32-DevKitC devices this is labeled in the
     [functional description diagram](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-devkitc.html#functional-description).
 
-          $ idf.py flash monitor ESPPORT=/dev/ttyUSB0
+          $ idf.py -p /dev/tty.SLAB_USBtoUART flash monitor
 
     Note: Some users might have to install the
     [VCP driver](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
@@ -93,41 +93,114 @@ If packages are already installed then simply activate it.
 
 -   If desired, the monitor can be run again like so:
 
-          $ idf.py monitor ESPPORT=/dev/ttyUSB0
+          $ idf.py -p /dev/tty.SLAB_USBtoUART monitor
 
-## Using the Echo Server
+## Commissioning and cluster control
 
-### Connect the ESP32 to a 2.4GHz Network of your choice
+Commissioning can be carried out using WiFi or BLE.
 
-1.  If the `WiFi Station Options` mentioned above are populated through
-    menuconfig, then ESP32 connects to the AP with those credentials (STA mode).
+1.  Set the `Rendezvous Mode` for commissioning using menuconfig; the default
+    Rendezvous mode is BLE.
+
+         $ idf.py menuconfig
+
+Select the Rendezvous Mode via `Demo -> Rendezvous Mode`.
 
 2.  Now flash the device with the same command as before. (Use the right `/dev`
     device)
 
-          $ idf make flash monitor ESPPORT=/dev/ttyUSB0
+          $ idf.py -p /dev/tty.SLAB_USBtoUART flash monitor
 
-3.  The device should boot up and connect to your network. When that happens you
-    will see a log like this in the monitor.
+3.  The device should boot up. When device connects to your network, you will
+    see a log like this on the device console.
 
           I (5524) chip[DL]: SYSTEM_EVENT_STA_GOT_IP
           I (5524) chip[DL]: IPv4 address changed on WiFi station interface: <IP_ADDRESS>...
 
-    Note: If you are using the M5Stack, the screen will display the server's IP
-    Address if it successfully connects to the configured 2.4GHz Network.
-
 4.  Use
+    [python based device controller](https://github.com/project-chip/connectedhomeip/tree/master/src/controller/python)
+    or
     [standalone chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
     or
-    [iOS chip-tool app](https://github.com/project-chip/connectedhomeip/tree/master/src/darwin)
+    [iOS chip-tool app](https://github.com/project-chip/connectedhomeip/tree/master/src/darwin/CHIPTool)
+    or
+    [Android chip-tool app](https://github.com/project-chip/connectedhomeip/tree/master/src/android/CHIPTool)
     to communicate with the device.
 
 Note: The ESP32 does not support 5GHz networks. Also, the Device will persist
 your network configuration. To erase it, simply run.
 
-    $ idf make erase_flash ESPPORT=/dev/ttyUSB0
+    $ idf.py -p /dev/tty.SLAB_USBtoUART erase_flash
 
-The demo application supports temperaturemeasurement and basic cluster.
+-   Once ESP32 is up and running, we need to set up a device controller to
+    perform commissioning and cluster control.
+
+### Setting up chip-tool
+
+See [the build guide](../../../docs/guides/BUILDING.md#prerequisites) for
+general background on build prerequisites.
+
+Building the example:
+
+```
+$ cd examples/chip-tool
+
+$ rm -rf out
+
+$ gn gen out/debug
+
+$ ninja -C out/debug
+```
+
+which puts the binary at `out/debug/chip-tool`
+
+### Commission a device using chip-tool
+
+To initiate a client commissioning request to a device, run the built executable
+and choose the pairing mode.
+
+#### Commissioning over BLE
+
+Run the built executable and pass it the discriminator and pairing code of the
+remote device, as well as the network credentials to use.
+
+The command below uses the default values hard-coded into the debug versions of
+the ESP32 all-clusters-app to commission it onto a Wi-Fi network:
+
+    $ ./out/debug/chip-tool pairing ble-wifi 12344321 ${SSID} ${PASSWORD} 20202021 3840
+
+Parameters:
+
+1. Discriminator: 3840 (configurable through menuconfig)
+2. Setup-pin-code: 20202021 (configurable through menuconfig)
+3. Node-id: 12344321 (you can assign any node id)
+
+### Cluster control
+
+#### temperaturemeasurement
+
+```bash
+Usage:
+  ./out/debug/chip-tool temperaturemeasurement read measured-value 12344321 1
+```
+
+## Flashing app using script
+
+-   Follow these steps to use `${app_name}.flash.py`.
+
+    -   First set IDF target, run set-target with one of the commands.
+
+            $ idf.py set-target esp32
+            $ idf.py set-target esp32c3
+
+    -   Execute below sequence of commands
+
+```
+        $ export ESPPORT=/dev/tty.SLAB_USBtoUART
+        $ idf.py build
+        $ idf.py flashing_script
+        $ python ${app_name}.flash.py
+```
 
 ## Optimization
 
@@ -135,5 +208,13 @@ Optimization related to WiFi, BLuetooth, Asserts etc are the part of this
 example by default. To enable this option set is_debug=false from command-line.
 
 ```
-idf make build flash monitor 'is_debug=false'
+# Reconfigure the project for additional optimizations
+rm -rf sdkconfig build/
+idf.py -Dis_debug=false reconfigure
+
+# Set additional configurations if required
+idf.py menuconfig
+
+# Build, flash, and monitor the device
+idf.py -p /dev/tty.SLAB_USBtoUART build flash monitor
 ```

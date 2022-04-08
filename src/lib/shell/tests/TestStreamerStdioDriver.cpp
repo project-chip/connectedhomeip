@@ -23,7 +23,7 @@
  *
  */
 
-#include "TestShell.h"
+#include "TestStreamerStdio.h"
 
 int main(int argc, char * argv[])
 {

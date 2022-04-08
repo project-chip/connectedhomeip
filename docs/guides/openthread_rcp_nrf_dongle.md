@@ -8,57 +8,54 @@ You can build and program
 (RCP) firmware onto Nordic Semiconductor's
 [nRF52840 Dongle](https://www.nordicsemi.com/Software-and-tools/Development-Kits/nRF52840-Dongle).
 Once programmed, the dongle can be used for
-[configuring Thread network on a Linux machine](linux_thread_connectivity.md).
+[configuring Thread network on a Linux machine](./openthread_border_router_pi.md).
 
 ## Building and programming the RCP firmware onto an nRF52840 Dongle
 
 Run the following commands to build and program the RCP firmware onto an
 nRF52840 Dongle:
 
-1.  Clone the OpenThread repository into the current directory:
+1.  Clone the OpenThread nRF528xx platform repository into the current
+    directory:
 
-        $ git clone https://github.com/openthread/openthread.git
+        $ git clone --recursive https://github.com/openthread/ot-nrf528xx.git
 
-2.  Enter the _openthread_ directory:
+2.  Enter the _ot-nrf528xx_ directory:
 
-        $ cd openthread
+        $ cd ot-nrf528xx
 
 3.  Install OpenThread dependencies:
 
         $ ./script/bootstrap
 
-4.  Set up the build environment:
+4.  Build OpenThread for the nRF52840 Dongle:
 
-        $ ./bootstrap
+         $ script/build nrf52840 USB_trans -DOT_BOOTLOADER=USB -DOT_THREAD_VERSION=1.2
 
-5.  Build OpenThread for the nRF52840 Dongle:
+    This creates an RCP image at `build/bin/ot-rcp`.
 
-         $ make -f examples/Makefile-nrf52840 BOOTLOADER=USB USB=1 THREAD_VERSION=1.2
+5.  Convert the RCP image to the `.hex` format:
 
-    This creates an RCP image at `output/nrf52840/bin/ot-rcp`.
+        $ arm-none-eabi-objcopy -O ihex build/bin/ot-rcp build/bin/ot-rcp.hex
 
-6.  Convert the RCP image to the `.hex` format:
-
-        $ arm-none-eabi-objcopy -O ihex output/nrf52840/bin/ot-rcp output/nrf52840/bin/ot-rcp.hex
-
-7.  Install
+6.  Install
     [nRF Util](https://www.nordicsemi.com/Software-and-tools/Development-Tools/nRF-Util):
 
         $ python3 -m pip install -U nrfutil
 
-8.  Generate the RCP firmware package:
+7.  Generate the RCP firmware package:
 
         $ nrfutil pkg generate --hw-version 52 --sd-req=0x00 \
-            --application output/nrf52840/bin/ot-rcp.hex \
-            --application-version 1 output/nrf52840/bin/ot-rcp.zip
+            --application build/bin/ot-rcp.hex \
+            --application-version 1 build/bin/ot-rcp.zip
 
-9.  Connect the nRF52840 Dongle to the USB port.
+8.  Connect the nRF52840 Dongle to the USB port.
 
-10. Press the **Reset** button on the dongle to put it into the DFU mode. Red
+9.  Press the **Reset** button on the dongle to put it into the DFU mode. Red
     LED on the dongle starts blinking.
 
-11. To install the RCP firmware package onto the dongle, run the following
+10. To install the RCP firmware package onto the dongle, run the following
     command, with _/dev/ttyACM0_ replaced with the device node name of your
     nRF52840 Dongle:
 
-        $ nrfutil dfu usb-serial -pkg output/nrf52840/bin/ot-rcp.zip -p /dev/ttyACM0
+        $ nrfutil dfu usb-serial -pkg build/bin/ot-rcp.zip -p /dev/ttyACM0

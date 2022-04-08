@@ -26,12 +26,12 @@
 #ifndef GENERIC_THREAD_STACK_MANAGER_IMPL_FREERTOS_IPP
 #define GENERIC_THREAD_STACK_MANAGER_IMPL_FREERTOS_IPP
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -44,8 +44,12 @@ template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::DoInit(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
+#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE) && CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE
+    mThreadStackLock = xSemaphoreCreateMutexStatic(&mThreadStackLockMutex);
+#else
     mThreadStackLock = xSemaphoreCreateMutex();
+#endif // CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE
+
     if (mThreadStackLock == NULL)
     {
         ChipLogError(DeviceLayer, "Failed to create Thread stack lock");
@@ -61,18 +65,25 @@ exit:
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::_StartThreadTask(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    BaseType_t res;
+    if (mThreadTask != NULL)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_TASK) && CHIP_CONFIG_FREERTOS_USE_STATIC_TASK
+    mThreadTask = xTaskCreateStatic(ThreadTaskMain, CHIP_DEVICE_CONFIG_THREAD_TASK_NAME, ArraySize(mThreadStack), this,
+                                    CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY, mThreadStack, &mThreadTaskStruct);
 
-    VerifyOrExit(mThreadTask == NULL, err = CHIP_ERROR_INCORRECT_STATE);
+#else
+    xTaskCreate(ThreadTaskMain, CHIP_DEVICE_CONFIG_THREAD_TASK_NAME,
+                CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE / sizeof(StackType_t), this, CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY,
+                &mThreadTask);
+#endif
 
-    res = xTaskCreate(ThreadTaskMain, CHIP_DEVICE_CONFIG_THREAD_TASK_NAME,
-                      CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE / sizeof(StackType_t), this,
-                      CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY, NULL);
-    VerifyOrExit(res == pdPASS, err = CHIP_ERROR_NO_MEMORY);
-
-exit:
-    return err;
+    if (mThreadTask == NULL)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
@@ -116,46 +127,12 @@ BaseType_t GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::SignalThreadActivi
 }
 
 template <class ImplClass>
-void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::OnJoinerTimer(TimerHandle_t xTimer)
-{
-    GenericThreadStackManagerImpl_FreeRTOS<ImplClass> * self =
-        static_cast<GenericThreadStackManagerImpl_FreeRTOS<ImplClass> *>(pvTimerGetTimerID(xTimer));
-
-    ChipLogDetail(DeviceLayer, "Thread joiner timer running");
-
-    if (xTaskGetTickCount() > self->mJoinerExpire || self->Impl()->IsThreadProvisioned())
-    {
-        ChipLogDetail(DeviceLayer, "Thread joiner timer stopped");
-
-        VerifyOrDie(pdPASS == xTimerStop(xTimer, portMAX_DELAY) && pdPASS == xTimerDelete(xTimer, portMAX_DELAY));
-    }
-    else if (!self->mJoinerStartPending)
-    {
-        ChipLogDetail(DeviceLayer, "Request Thread joiner start");
-
-        self->mJoinerStartPending = true;
-        self->Impl()->SignalThreadActivityPending();
-    }
-}
-
-template <class ImplClass>
 void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::ThreadTaskMain(void * arg)
 {
     GenericThreadStackManagerImpl_FreeRTOS<ImplClass> * self =
         static_cast<GenericThreadStackManagerImpl_FreeRTOS<ImplClass> *>(arg);
 
-    VerifyOrDie(self->mThreadTask == NULL);
-
     ChipLogDetail(DeviceLayer, "Thread task running");
-
-    self->mThreadTask = xTaskGetCurrentTaskHandle();
-
-    // Try starting joiner within 15m.
-    self->mJoinerExpire = xTaskGetTickCount() + pdMS_TO_TICKS(15 * 60 * 1000);
-
-    TimerHandle_t joinerTimer = xTimerCreate("JoinerTimer", pdMS_TO_TICKS(10000), pdTRUE, self, &OnJoinerTimer);
-    VerifyOrDie(joinerTimer != NULL);
-    VerifyOrDie(pdPASS == xTimerStart(joinerTimer, portMAX_DELAY));
 
     while (true)
     {
@@ -164,12 +141,6 @@ void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::ThreadTaskMain(void * ar
         self->Impl()->UnlockThreadStack();
 
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-
-        if (self->mJoinerStartPending)
-        {
-            self->mJoinerStartPending = false;
-            self->Impl()->JoinerStart();
-        }
     }
 }
 

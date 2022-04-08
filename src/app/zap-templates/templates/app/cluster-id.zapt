@@ -3,9 +3,11 @@
 // Prevent multiple inclusion
 #pragma once
 
+#include <app/util/basic-types.h>
+
 {{#zcl_clusters}}
 
 // Definitions for cluster: {{label}}
-#define ZCL_{{asDelimitedMacro define}}_ID ({{asHex code 4}})
+static constexpr chip::ClusterId ZCL_{{asDelimitedMacro define}}_ID = {{asHex code 4}};
 
 {{/zcl_clusters}}

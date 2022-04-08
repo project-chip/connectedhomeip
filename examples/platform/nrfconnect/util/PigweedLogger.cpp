@@ -93,7 +93,7 @@ int putString(uint8_t * buffer, size_t size, void * /* ctx */)
 
 LOG_OUTPUT_DEFINE(pigweedLogOutput, putString, nullptr, 0);
 
-void init()
+void init(const log_backend *)
 {
     pw_sys_io_Init();
 }

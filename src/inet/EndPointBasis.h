@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2015-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,172 +19,62 @@
 /**
  *    @file
  *      This file contains the basis class for all the various transport
- *      endpoint classes in the Inet layer, i.e. TCP, UDP, Raw and Tun.
+ *      endpoint classes in the Inet layer, i.e. TCP and UDP.
  */
 
 #pragma once
 
 #include <inet/InetConfig.h>
-
-#include "inet/IANAConstants.h"
-#include "inet/InetLayerBasis.h"
-#include <inet/InetError.h>
-#include <inet/InetInterface.h>
-#include <inet/InetLayerEvents.h>
-
-#include <support/DLLUtil.h>
-
-#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-#include <Network/Network.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
-//--- Declaration of LWIP protocol control buffer structure names
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-struct raw_pcb;
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-struct udp_pcb;
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-struct tcp_pcb;
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lib/core/ReferenceCounted.h>
+#include <lib/support/DLLUtil.h>
 
 namespace chip {
+
+namespace System {
+class Layer;
+} // namespace System
+
 namespace Inet {
 
+template <typename EndPointType>
+class EndPointManager;
+
+template <typename EndPointType>
+class EndPointDeletor;
+
 /**
- * @class EndPointBasis
- *
- * @brief Basis of internet transport endpoint classes
+ * Basis of internet transport endpoint classes.
  */
-class DLL_EXPORT EndPointBasis : public InetLayerBasis
+template <typename EndPointType>
+class DLL_EXPORT EndPointBasis : public ReferenceCounted<EndPointType, EndPointDeletor<EndPointType>>
 {
 public:
-    /** Common state codes */
-    enum
-    {
-        kBasisState_Closed = 0 /**< Encapsulated descriptor is not valid. */
-    };
+    using EndPoint = EndPointType;
 
-#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    /** Test whether endpoint is a Network.framework endpoint */
-    bool IsNetworkFrameworkEndPoint(void) const;
-#endif
+    EndPointBasis(EndPointManager<EndPoint> & endPointManager) : mAppState(nullptr), mEndPointManager(endPointManager) {}
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    /** Test whether endpoint is a POSIX socket */
-    bool IsSocketsEndPoint() const;
-#endif
+    /**
+     *  Returns a reference to the endpoint fatory that owns this basis object.
+     */
+    EndPointManager<EndPoint> & GetEndPointManager() const { return mEndPointManager; }
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    /** Test whether endpoint is a LwIP protocol control buffer */
-    bool IsLWIPEndPoint(void) const;
-#endif
+    /**
+     *  Returns a reference to the System::Layer associated with this object.
+     */
+    chip::System::Layer & GetSystemLayer() const { return mEndPointManager.SystemLayer(); }
 
-    /** Test whether endpoint has a valid descriptor. */
-    bool IsOpenEndPoint() const;
+    void * mAppState;
 
-protected:
-#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    nw_parameters_t mParameters;
-    IPAddressType mAddrType; /**< Protocol family, i.e. IPv4 or IPv6. */
-#endif
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    int mSocket;             /**< Encapsulated socket descriptor. */
-    IPAddressType mAddrType; /**< Protocol family, i.e. IPv4 or IPv6. */
-    SocketEvents mPendingIO; /**< Socket event masks */
-#endif                       // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    /** Encapsulated LwIP protocol control block */
-    union
-    {
-        const void * mVoid; /**< An untyped protocol control buffer reference */
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-        raw_pcb * mRaw; /**< Raw network interface protocol control */
-#endif                  // INET_CONFIG_ENABLE_RAW_ENDPOINT
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-        udp_pcb * mUDP; /**< User datagram protocol (UDP) control */
-#endif                  // INET_CONFIG_ENABLE_UDP_ENDPOINT
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        tcp_pcb * mTCP; /**< Transmission control protocol (TCP) control */
-#endif                  // INET_CONFIG_ENABLE_TCP_ENDPOINT
-    };
-
-    enum
-    {
-        kLwIPEndPointType_Unknown = 0,
-
-        kLwIPEndPointType_Raw = 1,
-        kLwIPEndPointType_UDP = 2,
-        kLwIPEndPointType_UCP = 3,
-        kLwIPEndPointType_TCP = 4
-    };
-
-    uint8_t mLwIPEndPointType;
-
-    void DeferredFree(chip::System::Object::ReleaseDeferralErrorTactic aTactic);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-    void InitEndPointBasis(InetLayer & aInetLayer, void * aAppState = nullptr);
+private:
+    EndPointManager<EndPoint> & mEndPointManager; /**< Factory that owns this object. */
 };
 
-#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-inline bool EndPointBasis::IsNetworkFrameworkEndPoint(void) const
+template <typename EndPointType>
+class EndPointDeletor
 {
-    return mParameters != NULL;
-}
-#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-inline bool EndPointBasis::IsSocketsEndPoint() const
-{
-    return mSocket >= 0;
-}
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-inline bool EndPointBasis::IsLWIPEndPoint(void) const
-{
-    return mVoid != NULL;
-}
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-inline bool EndPointBasis::IsOpenEndPoint() const
-{
-    bool lResult = false;
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    lResult = (lResult || IsLWIPEndPoint());
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    lResult = (lResult || IsSocketsEndPoint());
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    lResult = (lResult || IsNetworkFrameworkEndPoint());
-#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
-    return lResult;
-}
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-inline void EndPointBasis::DeferredFree(chip::System::Object::ReleaseDeferralErrorTactic aTactic)
-{
-    if (!CHIP_SYSTEM_CONFIG_USE_SOCKETS || IsLWIPEndPoint())
-    {
-        DeferredRelease(aTactic);
-    }
-    else
-    {
-        Release();
-    }
-}
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+public:
+    static void Release(EndPointType * obj) { obj->GetEndPointManager().DeleteEndPoint(obj); }
+};
 
 } // namespace Inet
 } // namespace chip

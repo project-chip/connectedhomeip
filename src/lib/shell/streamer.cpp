@@ -23,6 +23,8 @@
 
 #include "streamer.h"
 
+#include <lib/support/EnforceFormat.h>
+#include <lib/support/logging/Constants.h>
 #include <limits.h>
 #include <stdio.h>
 
@@ -48,7 +50,7 @@ ssize_t streamer_write(streamer_t * self, const char * buf, size_t len)
     return self->write_cb(self, buf, len);
 }
 
-ssize_t streamer_vprintf(streamer_t * self, const char * fmt, va_list ap)
+ssize_t ENFORCE_FORMAT(2, 0) streamer_vprintf(streamer_t * self, const char * fmt, va_list ap)
 {
     char buf[CONSOLE_DEFAULT_MAX_LINE];
     unsigned len;
@@ -64,7 +66,7 @@ ssize_t streamer_vprintf(streamer_t * self, const char * fmt, va_list ap)
     return streamer_write(self, buf, len);
 }
 
-ssize_t streamer_printf(streamer_t * self, const char * fmt, ...)
+ssize_t ENFORCE_FORMAT(2, 3) streamer_printf(streamer_t * self, const char * fmt, ...)
 {
     va_list ap;
     ssize_t rc;

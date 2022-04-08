@@ -93,8 +93,6 @@ public:
 
     using ThreadStackManager::InitThreadStack;
     CHIP_ERROR InitThreadStack(otInstance * otInst);
-    void _OnCHIPoBLEAdvertisingStart(void);
-    void _OnCHIPoBLEAdvertisingStop(void);
     void _SendProcMessage(procQueueMsg & procMsg);
     void _ProcMessage(otInstance * aInstance);
 

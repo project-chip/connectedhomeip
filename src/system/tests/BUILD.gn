@@ -22,9 +22,10 @@ chip_test_suite("tests") {
   output_name = "libSystemLayerTests"
 
   test_sources = [
+    "TestSystemClock.cpp",
     "TestSystemErrorStr.cpp",
-    "TestSystemObject.cpp",
     "TestSystemPacketBuffer.cpp",
+    "TestSystemScheduleLambda.cpp",
     "TestSystemTimer.cpp",
     "TestSystemWakeEvent.cpp",
     "TestTimeSource.cpp",
@@ -34,6 +35,7 @@ chip_test_suite("tests") {
 
   public_deps = [
     "${chip_root}/src/inet",
+    "${chip_root}/src/platform",
     "${chip_root}/src/system",
     "${nlunit_test_root}:nlunit-test",
   ]

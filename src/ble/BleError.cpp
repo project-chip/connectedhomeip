@@ -30,7 +30,7 @@
 #include <ble/BleError.h>
 #include <ble/BleLayer.h>
 
-#include <support/ErrorStr.h>
+#include <lib/support/ErrorStr.h>
 
 namespace chip {
 namespace Ble {
@@ -45,113 +45,89 @@ void RegisterLayerErrorFormatter()
     RegisterErrorFormatter(&sBleLayerErrorFormatter);
 }
 
-bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err)
+bool FormatLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
     const char * desc = nullptr;
 
-    if (err < BLE_ERROR_MIN || err > BLE_ERROR_MAX)
+    if (!err.IsPart(ChipError::SdkPart::kBLE))
     {
         return false;
     }
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
-    switch (err)
+    switch (err.AsInteger())
     {
-    case BLE_ERROR_BAD_ARGS:
-        desc = "Bad arguments";
-        break;
-    case BLE_ERROR_INCORRECT_STATE:
-        desc = "Incorrect state";
-        break;
-    case BLE_ERROR_NO_ENDPOINTS:
-        desc = "No more BLE endpoints";
-        break;
-    case BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK:
+    case BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK.AsInteger():
         desc = "No chip over BLE connection received callback set";
         break;
-    case BLE_ERROR_CENTRAL_UNSUBSCRIBED:
+    case BLE_ERROR_CENTRAL_UNSUBSCRIBED.AsInteger():
         desc = "BLE central unsubscribed";
         break;
-    case BLE_ERROR_GATT_SUBSCRIBE_FAILED:
+    case BLE_ERROR_GATT_SUBSCRIBE_FAILED.AsInteger():
         desc = "GATT subscribe operation failed";
         break;
-    case BLE_ERROR_GATT_UNSUBSCRIBE_FAILED:
+    case BLE_ERROR_GATT_UNSUBSCRIBE_FAILED.AsInteger():
         desc = "GATT unsubscribe operation failed";
         break;
-    case BLE_ERROR_GATT_WRITE_FAILED:
+    case BLE_ERROR_GATT_WRITE_FAILED.AsInteger():
         desc = "GATT write characteristic operation failed";
         break;
-    case BLE_ERROR_GATT_INDICATE_FAILED:
+    case BLE_ERROR_GATT_INDICATE_FAILED.AsInteger():
         desc = "GATT indicate characteristic operation failed";
         break;
-    case BLE_ERROR_NOT_IMPLEMENTED:
-        desc = "Not implemented";
-        break;
-    case BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT:
+    case BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT.AsInteger():
         desc = "BLE transport protocol fired abort";
         break;
-    case BLE_ERROR_REMOTE_DEVICE_DISCONNECTED:
+    case BLE_ERROR_REMOTE_DEVICE_DISCONNECTED.AsInteger():
         desc = "Remote device closed BLE connection";
         break;
-    case BLE_ERROR_APP_CLOSED_CONNECTION:
+    case BLE_ERROR_APP_CLOSED_CONNECTION.AsInteger():
         desc = "Application closed BLE connection";
         break;
-    case BLE_ERROR_OUTBOUND_MESSAGE_TOO_BIG:
-        desc = "Outbound message too big";
-        break;
-    case BLE_ERROR_NOT_CHIP_DEVICE:
+    case BLE_ERROR_NOT_CHIP_DEVICE.AsInteger():
         desc = "BLE device doesn't seem to support chip";
         break;
-    case BLE_ERROR_INCOMPATIBLE_PROTOCOL_VERSIONS:
+    case BLE_ERROR_INCOMPATIBLE_PROTOCOL_VERSIONS.AsInteger():
         desc = "Incompatible BLE transport protocol versions";
         break;
-    case BLE_ERROR_NO_MEMORY:
-        desc = "No memory";
-        break;
-    case BLE_ERROR_MESSAGE_INCOMPLETE:
-        desc = "Message incomplete";
-        break;
-    case BLE_ERROR_INVALID_FRAGMENT_SIZE:
+    case BLE_ERROR_INVALID_FRAGMENT_SIZE.AsInteger():
         desc = "Invalid fragment size";
         break;
-    case BLE_ERROR_START_TIMER_FAILED:
+    case BLE_ERROR_START_TIMER_FAILED.AsInteger():
         desc = "Start timer failed";
         break;
-    case BLE_ERROR_CONNECT_TIMED_OUT:
+    case BLE_ERROR_CONNECT_TIMED_OUT.AsInteger():
         desc = "Connect handshake timed out";
         break;
-    case BLE_ERROR_RECEIVE_TIMED_OUT:
+    case BLE_ERROR_RECEIVE_TIMED_OUT.AsInteger():
         desc = "Receive handshake timed out";
         break;
-    case BLE_ERROR_INVALID_MESSAGE:
+    case BLE_ERROR_INVALID_MESSAGE.AsInteger():
         desc = "Invalid message";
         break;
-    case BLE_ERROR_FRAGMENT_ACK_TIMED_OUT:
+    case BLE_ERROR_FRAGMENT_ACK_TIMED_OUT.AsInteger():
         desc = "Message fragment acknowledgement timed out";
         break;
-    case BLE_ERROR_KEEP_ALIVE_TIMED_OUT:
+    case BLE_ERROR_KEEP_ALIVE_TIMED_OUT.AsInteger():
         desc = "Keep-alive receipt timed out";
         break;
-    case BLE_ERROR_NO_CONNECT_COMPLETE_CALLBACK:
+    case BLE_ERROR_NO_CONNECT_COMPLETE_CALLBACK.AsInteger():
         desc = "Missing required callback";
         break;
-    case BLE_ERROR_INVALID_ACK:
+    case BLE_ERROR_INVALID_ACK.AsInteger():
         desc = "Received invalid BLE transport protocol fragment acknowledgement";
         break;
-    case BLE_ERROR_REASSEMBLER_MISSING_DATA:
+    case BLE_ERROR_REASSEMBLER_MISSING_DATA.AsInteger():
         desc = "BLE message reassembler did not receive enough data";
         break;
-    case BLE_ERROR_INVALID_BTP_HEADER_FLAGS:
+    case BLE_ERROR_INVALID_BTP_HEADER_FLAGS.AsInteger():
         desc = "Received invalid BLE transport protocol header flags";
         break;
-    case BLE_ERROR_INVALID_BTP_SEQUENCE_NUMBER:
+    case BLE_ERROR_INVALID_BTP_SEQUENCE_NUMBER.AsInteger():
         desc = "Received invalid BLE transport protocol sequence number";
         break;
-    case BLE_ERROR_REASSEMBLER_INCORRECT_STATE:
+    case BLE_ERROR_REASSEMBLER_INCORRECT_STATE.AsInteger():
         desc = "BLE message reassembler received packet in incorrect state";
-        break;
-    case BLE_ERROR_RECEIVED_MESSAGE_TOO_BIG:
-        desc = "Message received by BLE message reassembler was too large";
         break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR

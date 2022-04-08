@@ -21,10 +21,14 @@
 
 #include "lcd.h"
 
-#include "display.h"
 #include "dmd.h"
 #include "glib.h"
+
+#ifdef QR_CODE_ENABLED
 #include "qrcodegen.h"
+#endif // QR_CODE_ENABLED
+
+#include "sl_board_control.h"
 
 #define LCD_SIZE 128
 #define QR_CODE_VERSION 4
@@ -32,14 +36,25 @@
 #define QR_CODE_BORDER_SIZE 0
 
 static GLIB_Context_t glibContext;
+#ifdef QR_CODE_ENABLED
 static uint8_t qrCode[qrcodegen_BUFFER_LEN_FOR_VERSION(QR_CODE_VERSION)];
 static uint8_t workBuffer[qrcodegen_BUFFER_LEN_FOR_VERSION(QR_CODE_VERSION)];
+#endif // QR_CODE_ENABLED
 
+#ifdef QR_CODE_ENABLED
 static void LCDFillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h);
+#endif // QR_CODE_ENABLED
 
 void initLCD(void)
 {
     EMSTATUS status;
+
+    /* Enable the memory lcd */
+    status = sl_board_enable_display();
+    if (status == SL_STATUS_OK)
+    {
+        EFR32_LOG("Board Display enable fail %d", status);
+    }
 
     /* Initialize the DMD module for the DISPLAY device driver. */
     status = DMD_init(0);
@@ -64,6 +79,28 @@ void initLCD(void)
     }
 }
 
+/* This function is necessary because currently glib.h cannot be used within a C++ context. */
+void * LCDContext()
+{
+    return (void *) &glibContext;
+}
+
+int LCD_clear(void * pContext)
+{
+    return GLIB_clear((GLIB_Context_t *) pContext);
+}
+
+int LCD_drawPixel(void * pContext, int32_t x, int32_t y)
+{
+    return GLIB_drawPixel((GLIB_Context_t *) pContext, x, y);
+}
+
+int LCD_update(void)
+{
+    return DMD_updateDisplay();
+}
+
+#ifdef QR_CODE_ENABLED
 void LCDWriteQRCode(uint8_t * str)
 {
     if (!qrcodegen_encodeText((const char *) str, workBuffer, qrCode, qrcodegen_Ecc_LOW, QR_CODE_VERSION, QR_CODE_VERSION,
@@ -106,3 +143,4 @@ void LCDFillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h)
         }
     }
 }
+#endif // QR_CODE_ENABLED

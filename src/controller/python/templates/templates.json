@@ -1,0 +1,38 @@
+{
+    "name": "CHIP Python templates",
+    "version": "chip-v1",
+    "helpers": [
+        "../../../../src/app/zap-templates/partials/helper.js",
+        "../../../../src/app/zap-templates/common/StringHelper.js",
+        "../../../../src/app/zap-templates/templates/app/helper.js",
+        "../../../../src/app/zap-templates/templates/chip/helper.js",
+        "helper.js"
+    ],
+    "override": "../../../../src/app/zap-templates/common/override.js",
+    "partials": [
+        {
+            "name": "header",
+            "path": "../../../../src/app/zap-templates/partials/header.zapt"
+        },
+        {
+            "name": "clusters_header",
+            "path": "../../../../src/app/zap-templates/partials/clusters_header.zapt"
+        },
+        {
+            "name": "cluster_header",
+            "path": "../../../../src/app/zap-templates/partials/cluster_header.zapt"
+        }
+    ],
+    "templates": [
+        {
+            "path": "python-CHIPClusters-py.zapt",
+            "name": "CHIP ZCL API for Python",
+            "output": "src/controller/python/chip/clusters/CHIPClusters.py"
+        },
+        {
+            "path": "python-cluster-Objects-py.zapt",
+            "name": "CHIP ClusterObjects for Python",
+            "output": "src/controller/python/chip/clusters/Objects.py"
+        }
+    ]
+}

@@ -35,8 +35,12 @@ class DeviceNetworkProvisioningDelegateImpl final
     friend class GenericDeviceNetworkProvisioningDelegateImpl<DeviceNetworkProvisioningDelegateImpl>;
 
 private:
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+    CHIP_ERROR _ProvisionWiFiNetwork(const char * ssid, const char * passwd);
+#else
     CHIP_ERROR _ProvisionWiFiNetwork(const char * ssid, const char * passwd) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _ProvisionThreadNetwork(DeviceLayer::Internal::DeviceNetworkInfo & threadData);
+#endif
+    CHIP_ERROR _ProvisionThreadNetwork(ByteSpan threadData);
 };
 
 } // namespace DeviceLayer

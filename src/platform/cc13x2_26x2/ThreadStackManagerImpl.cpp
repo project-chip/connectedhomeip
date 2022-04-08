@@ -111,34 +111,6 @@ bool ThreadStackManagerImpl::IsInitialized()
     return sInstance.mThreadStackLock != NULL;
 }
 
-void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStart(void)
-{
-    // If Thread-over-BLE is enabled, ensure that ToBLE advertising is stopped before
-    // starting CHIPoBLE advertising.  This is accomplished by disabling the OpenThread
-    // IPv6 interface via a call to otIp6SetEnabled(false).
-    //
-#if OPENTHREAD_CONFIG_ENABLE_TOBLE
-    LockThreadStack();
-    otIp6SetEnabled(OTInstance(), false);
-    UnlockThreadStack();
-#endif
-}
-
-void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStop(void)
-{
-    // If Thread-over-BLE is enabled, and a Thread provision exists, ensure that ToBLE
-    // advertising is re-activated once CHIPoBLE advertising stops.
-    //
-#if OPENTHREAD_CONFIG_ENABLE_TOBLE
-    LockThreadStack();
-    if (otThreadGetDeviceRole(OTInstance()) != OT_DEVICE_ROLE_DISABLED && otDatasetIsCommissioned(OTInstance()))
-    {
-        otIp6SetEnabled(OTInstance(), true);
-    }
-    UnlockThreadStack();
-#endif
-}
-
 void ThreadStackManagerImpl::_SendProcMessage(ThreadStackManagerImpl::procQueueMsg & procMsg)
 {
     xQueueSendFromISR(procQueue, &procMsg, NULL);
@@ -166,11 +138,6 @@ void ThreadStackManagerImpl::_ProcMessage(otInstance * aInstance)
 
         case procQueueCmd_tasklets: {
             otTaskletsProcess(aInstance);
-            break;
-        }
-
-        case procQueueCmd_uart: {
-            platformUartProcess(procMsg.arg);
             break;
         }
 
@@ -228,17 +195,6 @@ extern "C" void platformRadioSignal(uintptr_t arg)
 }
 
 /**
- * Glue function called by UART processing layer to notify OpenThread the driver needs processing.
- */
-extern "C" void platformUartSignal(uintptr_t arg)
-{
-    ThreadStackManagerImpl::procQueueMsg msg;
-    msg.cmd = ThreadStackManagerImpl::procQueueCmd_uart;
-    msg.arg = arg;
-    ThreadStackMgrImpl()._SendProcMessage(msg);
-}
-
-/**
  * Glue function called directly by the OpenThread stack when tasklet processing work
  * is pending.
  */
@@ -253,4 +209,14 @@ extern "C" void otTaskletsSignalPending(otInstance * p_instance)
 extern "C" void otSysProcessDrivers(otInstance * aInstance)
 {
     ThreadStackMgrImpl()._ProcMessage(aInstance);
+}
+
+/**
+ * Get a pointer to the OpenThread instance object.
+ *
+ * @return Pointer to the OpenThread instance object.
+ */
+extern "C" otInstance * OtInstance_get(void)
+{
+    return ThreadStackMgrImpl().OTInstance();
 }

@@ -22,72 +22,11 @@
  *          General utility functions available on all platforms.
  */
 
+#include <lib/support/CodeUtils.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {
-
-CHIP_ERROR ParseCompilerDateStr(const char * dateStr, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    char monthStr[4];
-    const char * p;
-    char * endptr;
-
-    static const char months[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
-
-    VerifyOrExit(strlen(dateStr) == 11, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    memcpy(monthStr, dateStr, 3);
-    monthStr[3] = 0;
-
-    p = strstr(months, monthStr);
-    VerifyOrExit(p != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Safe to cast because "months" is not too long.
-    static_assert(sizeof(months) < UINT8_MAX, "Too many months");
-    month = static_cast<uint8_t>(((p - months) / 3) + 1);
-
-    // Cast does not lose information, because we then check that we only parsed
-    // 2 digits, so our number can't be bigger than 99.
-    dayOfMonth = static_cast<uint8_t>(strtoul(dateStr + 4, &endptr, 10));
-    VerifyOrExit(endptr == dateStr + 6, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Cast does not lose information, because we then check that we only parsed
-    // 4 digits, so our number can't be bigger than 9999.
-    year = static_cast<uint16_t>(strtoul(dateStr + 7, &endptr, 10));
-    VerifyOrExit(endptr == dateStr + 11, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-exit:
-    return err;
-}
-
-CHIP_ERROR Parse24HourTimeStr(const char * timeStr, uint8_t & hour, uint8_t & minute, uint8_t & second)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    char * p;
-
-    VerifyOrExit(strlen(timeStr) == 8, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Cast does not lose information, because we then check that we only parsed
-    // 2 digits, so our number can't be bigger than 99.
-    hour = static_cast<uint8_t>(strtoul(timeStr, &p, 10));
-    VerifyOrExit(p == timeStr + 2, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Cast does not lose information, because we then check that we only parsed
-    // 2 digits, so our number can't be bigger than 99.
-    minute = static_cast<uint8_t>(strtoul(timeStr + 3, &p, 10));
-    VerifyOrExit(p == timeStr + 5, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Cast does not lose information, because we then check that we only parsed
-    // 2 digits, so our number can't be bigger than 99.
-    second = static_cast<uint8_t>(strtoul(timeStr + 6, &p, 10));
-    VerifyOrExit(p == timeStr + 8, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-exit:
-    return err;
-}
 
 /**
  * Register a text error formatter for Device Layer errors.
@@ -111,22 +50,22 @@ void RegisterDeviceLayerErrorFormatter()
  * @return false                    If the supplied error was not a Device Layer error.
  *
  */
-bool FormatDeviceLayerError(char * buf, uint16_t bufSize, int32_t err)
+bool FormatDeviceLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
     const char * desc = nullptr;
 
-    if (err < CHIP_DEVICE_ERROR_MIN || err > CHIP_DEVICE_ERROR_MAX)
+    if (!err.IsPart(ChipError::SdkPart::kDevice))
     {
         return false;
     }
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
-    switch (err)
+    switch (err.AsInteger())
     {
-    case CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND:
+    case CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND.AsInteger():
         desc = "Config not found";
         break;
-    case CHIP_DEVICE_ERROR_NOT_SERVICE_PROVISIONED:
+    case CHIP_DEVICE_ERROR_NOT_SERVICE_PROVISIONED.AsInteger():
         desc = "Not service provisioned";
         break;
     }

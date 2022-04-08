@@ -45,20 +45,6 @@ typedef enum
 } IPVersion;
 
 /**
- *  @enum IPProtocol
- *
- *  The numbers of some of the protocols in the IP family.
- *
- */
-typedef enum
-{
-    kIPProtocol_ICMPv6 = 58, /**< ICMPv6 */
-#if INET_CONFIG_ENABLE_IPV4
-    kIPProtocol_ICMPv4 = 1, /**< ICMPv4 */
-#endif                      // INET_CONFIG_ENABLE_IPV4
-} IPProtocol;
-
-/**
  * @brief   Internet protocol multicast address scope
  *
  * @details

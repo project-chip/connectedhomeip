@@ -1,0 +1,538 @@
+/*
+ *
+ *    Copyright (c) 2021 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include <app/server/Dnssd.h>
+
+#include <inttypes.h>
+
+#include <lib/core/Optional.h>
+#include <lib/dnssd/Advertiser.h>
+#include <lib/dnssd/ServiceNaming.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
+#include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/CommissionableDataProvider.h>
+#include <platform/ConfigurationManager.h>
+#include <platform/KeyValueStoreManager.h>
+#include <protocols/secure_channel/PASESession.h>
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
+#endif
+#include <credentials/FabricTable.h>
+#include <setup_payload/SetupPayload.h>
+#include <system/TimeSource.h>
+
+#include <app/server/Server.h>
+
+namespace chip {
+namespace app {
+namespace {
+
+void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
+{
+    if (event->Type == DeviceLayer::DeviceEventType::kDnssdPlatformInitialized
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+        || event->Type == DeviceLayer::DeviceEventType::kSEDPollingIntervalChange
+#endif
+    )
+    {
+        app::DnssdServer::Instance().StartServer();
+    }
+}
+
+void OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    (void) arg;
+    OnPlatformEvent(event);
+}
+
+} // namespace
+
+constexpr System::Clock::Timestamp DnssdServer::kTimeoutCleared;
+
+bool DnssdServer::HaveOperationalCredentials()
+{
+    VerifyOrDie(mFabricTable != nullptr);
+
+    // Look for any fabric info that has a useful operational identity.
+    for (const FabricInfo & fabricInfo : *mFabricTable)
+    {
+        if (fabricInfo.IsInitialized())
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+
+void DnssdServer::SetExtendedDiscoveryTimeoutSecs(int32_t secs)
+{
+    ChipLogDetail(Discovery, "Setting extended discovery timeout to %" PRId32 "s", secs);
+    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(DefaultStorageKeyAllocator::DNSExtendedDiscoveryTimeout(), secs);
+}
+
+int32_t DnssdServer::GetExtendedDiscoveryTimeoutSecs()
+{
+    int32_t secs;
+    CHIP_ERROR err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(
+        DefaultStorageKeyAllocator::DNSExtendedDiscoveryTimeout(), &secs);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        return secs;
+    }
+
+    if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        ChipLogError(Discovery, "Failed to load extended discovery timeout: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    return CHIP_DEVICE_CONFIG_EXTENDED_DISCOVERY_TIMEOUT_SECS;
+}
+
+/// Callback from Extended Discovery Expiration timer
+void HandleExtendedDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
+{
+    DnssdServer::Instance().OnExtendedDiscoveryExpiration(aSystemLayer, aAppState);
+}
+
+void DnssdServer::OnExtendedDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
+{
+    if (!DnssdServer::OnExpiration(mExtendedDiscoveryExpiration))
+    {
+        ChipLogDetail(Discovery, "Extended discovery timeout cancelled");
+        return;
+    }
+
+    ChipLogDetail(Discovery, "Extended discovery timed out");
+
+    mExtendedDiscoveryExpiration = kTimeoutCleared;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+
+/// Callback from Discovery Expiration timer
+void HandleDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
+{
+    DnssdServer::Instance().OnDiscoveryExpiration(aSystemLayer, aAppState);
+}
+
+bool DnssdServer::OnExpiration(System::Clock::Timestamp expirationMs)
+{
+    if (expirationMs == kTimeoutCleared)
+    {
+        ChipLogDetail(Discovery, "OnExpiration callback for cleared session");
+        return false;
+    }
+    System::Clock::Timestamp now = mTimeSource.GetMonotonicTimestamp();
+    if (expirationMs > now)
+    {
+        ChipLogDetail(Discovery, "OnExpiration callback for reset session");
+        return false;
+    }
+
+    ChipLogDetail(Discovery, "OnExpiration - valid time out");
+
+    CHIP_ERROR err = Dnssd::ServiceAdvertiser::Instance().Init(chip::DeviceLayer::UDPEndPointManager());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to initialize advertiser: %s", chip::ErrorStr(err));
+    }
+
+    // reset advertising
+    err = Dnssd::ServiceAdvertiser::Instance().RemoveServices();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to remove advertised services: %s", chip::ErrorStr(err));
+    }
+
+    // restart operational (if needed)
+    err = AdvertiseOperational();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to advertise operational node: %s", chip::ErrorStr(err));
+    }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+    err = AdvertiseCommissioner();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to advertise commissioner: %s", chip::ErrorStr(err));
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
+    err = Dnssd::ServiceAdvertiser::Instance().FinalizeServiceUpdate();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to finalize service update: %s", chip::ErrorStr(err));
+    }
+
+    return true;
+}
+
+void DnssdServer::OnDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
+{
+    if (!DnssdServer::OnExpiration(mDiscoveryExpiration))
+    {
+        ChipLogDetail(Discovery, "OnDiscoveryExpiration callback for cleared session");
+        return;
+    }
+
+    ChipLogDetail(Discovery, "OnDiscoveryExpiration callback for valid session");
+
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    int32_t extTimeout = GetExtendedDiscoveryTimeoutSecs();
+    if (extTimeout != CHIP_DEVICE_CONFIG_DISCOVERY_DISABLED)
+    {
+        CHIP_ERROR err = AdvertiseCommissionableNode(chip::Dnssd::CommissioningMode::kDisabled);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to advertise extended commissionable node: %s", chip::ErrorStr(err));
+        }
+        // set timeout
+        ScheduleExtendedDiscoveryExpiration();
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+
+    mDiscoveryExpiration = kTimeoutCleared;
+}
+
+CHIP_ERROR DnssdServer::ScheduleDiscoveryExpiration()
+{
+    if (mDiscoveryTimeoutSecs == CHIP_DEVICE_CONFIG_DISCOVERY_NO_TIMEOUT)
+    {
+        return CHIP_NO_ERROR;
+    }
+    ChipLogDetail(Discovery, "Scheduling discovery timeout in %" PRId16 "s", mDiscoveryTimeoutSecs);
+
+    mDiscoveryExpiration = mTimeSource.GetMonotonicTimestamp() + System::Clock::Seconds16(mDiscoveryTimeoutSecs);
+
+    return DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(mDiscoveryTimeoutSecs), HandleDiscoveryExpiration,
+                                                 nullptr);
+}
+
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+CHIP_ERROR DnssdServer::ScheduleExtendedDiscoveryExpiration()
+{
+    int32_t extendedDiscoveryTimeoutSecs = GetExtendedDiscoveryTimeoutSecs();
+    if (extendedDiscoveryTimeoutSecs == CHIP_DEVICE_CONFIG_DISCOVERY_NO_TIMEOUT)
+    {
+        return CHIP_NO_ERROR;
+    }
+    ChipLogDetail(Discovery, "Scheduling extended discovery timeout in %" PRId32 "s", extendedDiscoveryTimeoutSecs);
+
+    mExtendedDiscoveryExpiration = mTimeSource.GetMonotonicTimestamp() + System::Clock::Seconds32(extendedDiscoveryTimeoutSecs);
+
+    return DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(extendedDiscoveryTimeoutSecs),
+                                                 HandleExtendedDiscoveryExpiration, nullptr);
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+
+CHIP_ERROR DnssdServer::GetCommissionableInstanceName(char * buffer, size_t bufferLen)
+{
+    auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
+    return mdnsAdvertiser.GetCommissionableInstanceName(buffer, bufferLen);
+}
+
+CHIP_ERROR DnssdServer::SetEphemeralDiscriminator(Optional<uint16_t> discriminator)
+{
+    VerifyOrReturnError(discriminator.ValueOr(0) <= kMaxDiscriminatorValue, CHIP_ERROR_INVALID_ARGUMENT);
+    mEphemeralDiscriminator = discriminator;
+
+    return CHIP_NO_ERROR;
+}
+
+/// Set MDNS operational advertisement
+CHIP_ERROR DnssdServer::AdvertiseOperational()
+{
+    VerifyOrDie(mFabricTable != nullptr);
+
+    for (const FabricInfo & fabricInfo : *mFabricTable)
+    {
+        if (fabricInfo.IsInitialized())
+        {
+            uint8_t macBuffer[DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength];
+            MutableByteSpan mac(macBuffer);
+            if (chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac) != CHIP_NO_ERROR)
+            {
+                ChipLogError(Discovery, "Failed to get primary mac address of device. Generating a random one.");
+                Crypto::DRBG_get_bytes(macBuffer, sizeof(macBuffer));
+            }
+
+            const auto advertiseParameters = chip::Dnssd::OperationalAdvertisingParameters()
+                                                 .SetPeerId(fabricInfo.GetPeerId())
+                                                 .SetMac(mac)
+                                                 .SetPort(GetSecuredPort())
+                                                 .SetInterfaceId(GetInterfaceId())
+                                                 .SetMRPConfig(GetLocalMRPConfig())
+                                                 .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
+                                                 .EnableIpV4(true);
+
+            auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
+
+            ChipLogProgress(Discovery, "Advertise operational node " ChipLogFormatX64 "-" ChipLogFormatX64,
+                            ChipLogValueX64(advertiseParameters.GetPeerId().GetCompressedFabricId()),
+                            ChipLogValueX64(advertiseParameters.GetPeerId().GetNodeId()));
+            // Should we keep trying to advertise the other operational
+            // identities on failure?
+            ReturnErrorOnFailure(mdnsAdvertiser.Advertise(advertiseParameters));
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::CommissioningMode mode)
+{
+    auto advertiseParameters = chip::Dnssd::CommissionAdvertisingParameters()
+                                   .SetPort(commissionableNode ? GetSecuredPort() : GetUnsecuredPort())
+                                   .SetInterfaceId(GetInterfaceId())
+                                   .EnableIpV4(true);
+    advertiseParameters.SetCommissionAdvertiseMode(commissionableNode ? chip::Dnssd::CommssionAdvertiseMode::kCommissionableNode
+                                                                      : chip::Dnssd::CommssionAdvertiseMode::kCommissioner);
+
+    advertiseParameters.SetCommissioningMode(mode);
+
+    char pairingInst[chip::Dnssd::kKeyPairingInstructionMaxLength + 1];
+
+    uint8_t macBuffer[DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength];
+    MutableByteSpan mac(macBuffer);
+    if (chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac) != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to get primary mac address of device. Generating a random one.");
+        Crypto::DRBG_get_bytes(macBuffer, sizeof(macBuffer));
+    }
+    advertiseParameters.SetMac(mac);
+
+    uint16_t value;
+    uint32_t val32;
+    if (DeviceLayer::ConfigurationMgr().GetVendorId(value) != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Discovery, "Vendor ID not known");
+    }
+    else
+    {
+        advertiseParameters.SetVendorId(chip::Optional<uint16_t>::Value(value));
+    }
+
+    if (DeviceLayer::ConfigurationMgr().GetProductId(value) != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Discovery, "Product ID not known");
+    }
+    else
+    {
+        advertiseParameters.SetProductId(chip::Optional<uint16_t>::Value(value));
+    }
+
+    uint16_t discriminator = 0;
+    CHIP_ERROR error       = DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery,
+                     "Setup discriminator read error (%" CHIP_ERROR_FORMAT ")! Critical error, will not be commissionable.",
+                     error.Format());
+        return error;
+    }
+
+    // Override discriminator with temporary one if one is set
+    discriminator = mEphemeralDiscriminator.ValueOr(discriminator);
+
+    advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>((discriminator >> 8) & 0x0F))
+        .SetLongDiscriminator(discriminator);
+
+    if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceTypeEnabled() &&
+        DeviceLayer::ConfigurationMgr().GetDeviceTypeId(val32) == CHIP_NO_ERROR)
+    {
+        advertiseParameters.SetDeviceType(chip::Optional<uint32_t>::Value(val32));
+    }
+
+    char deviceName[chip::Dnssd::kKeyDeviceNameMaxLength + 1];
+    if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceNameEnabled() &&
+        DeviceLayer::ConfigurationMgr().GetCommissionableDeviceName(deviceName, sizeof(deviceName)) == CHIP_NO_ERROR)
+    {
+        advertiseParameters.SetDeviceName(chip::Optional<const char *>::Value(deviceName));
+    }
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
+    ReturnErrorOnFailure(GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer)));
+    advertiseParameters.SetRotatingDeviceId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
+#endif
+
+    advertiseParameters.SetMRPConfig(GetLocalMRPConfig()).SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
+
+    if (!HaveOperationalCredentials())
+    {
+        if (DeviceLayer::ConfigurationMgr().GetInitialPairingHint(value) != CHIP_NO_ERROR)
+        {
+            ChipLogDetail(Discovery, "DNS-SD Pairing Hint not set");
+        }
+        else
+        {
+            advertiseParameters.SetPairingHint(chip::Optional<uint16_t>::Value(value));
+        }
+
+        if (DeviceLayer::ConfigurationMgr().GetInitialPairingInstruction(pairingInst, sizeof(pairingInst)) != CHIP_NO_ERROR)
+        {
+            ChipLogDetail(Discovery, "DNS-SD Pairing Instruction not set");
+        }
+        else
+        {
+            advertiseParameters.SetPairingInstruction(chip::Optional<const char *>::Value(pairingInst));
+        }
+    }
+    else
+    {
+        if (DeviceLayer::ConfigurationMgr().GetSecondaryPairingHint(value) != CHIP_NO_ERROR)
+        {
+            ChipLogDetail(Discovery, "DNS-SD Pairing Hint not set");
+        }
+        else
+        {
+            advertiseParameters.SetPairingHint(chip::Optional<uint16_t>::Value(value));
+        }
+
+        if (DeviceLayer::ConfigurationMgr().GetSecondaryPairingInstruction(pairingInst, sizeof(pairingInst)) != CHIP_NO_ERROR)
+        {
+            ChipLogDetail(Discovery, "DNS-SD Pairing Instruction not set");
+        }
+        else
+        {
+            advertiseParameters.SetPairingInstruction(chip::Optional<const char *>::Value(pairingInst));
+        }
+    }
+
+    auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
+
+    ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u",
+                    advertiseParameters.GetVendorId().ValueOr(0), advertiseParameters.GetProductId().ValueOr(0),
+                    advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator());
+    return mdnsAdvertiser.Advertise(advertiseParameters);
+}
+
+CHIP_ERROR DnssdServer::AdvertiseCommissioner()
+{
+    return Advertise(false /* commissionableNode */, chip::Dnssd::CommissioningMode::kDisabled);
+}
+
+CHIP_ERROR DnssdServer::AdvertiseCommissionableNode(chip::Dnssd::CommissioningMode mode)
+{
+    return Advertise(true /* commissionableNode */, mode);
+}
+
+void DnssdServer::StartServer()
+{
+    Dnssd::CommissioningMode mode = Dnssd::CommissioningMode::kDisabled;
+    if (mCommissioningModeProvider)
+    {
+        mode = mCommissioningModeProvider->GetCommissioningMode();
+    }
+    return StartServer(mode);
+}
+
+void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
+{
+    ChipLogProgress(Discovery, "Updating services using commissioning mode %d", static_cast<int>(mode));
+
+    ClearTimeouts();
+
+    DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, 0);
+
+    CHIP_ERROR err = Dnssd::ServiceAdvertiser::Instance().Init(chip::DeviceLayer::UDPEndPointManager());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to initialize advertiser: %s", chip::ErrorStr(err));
+    }
+
+    err = Dnssd::ServiceAdvertiser::Instance().RemoveServices();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to remove advertised services: %s", chip::ErrorStr(err));
+    }
+
+    err = AdvertiseOperational();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to advertise operational node: %s", chip::ErrorStr(err));
+    }
+
+    if (mode != chip::Dnssd::CommissioningMode::kDisabled)
+    {
+        err = AdvertiseCommissionableNode(mode);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to advertise commissionable node: %s", chip::ErrorStr(err));
+        }
+
+        // If any fabrics exist, the commissioning window must have been opened by the administrator
+        // commissioning cluster commands which take care of the timeout.
+        if (!HaveOperationalCredentials())
+        {
+            ScheduleDiscoveryExpiration();
+        }
+    }
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    else if (GetExtendedDiscoveryTimeoutSecs() != CHIP_DEVICE_CONFIG_DISCOVERY_DISABLED)
+    {
+        err = AdvertiseCommissionableNode(mode);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to advertise extended commissionable node: %s", chip::ErrorStr(err));
+        }
+        // set timeout
+        ScheduleExtendedDiscoveryExpiration();
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+    err = AdvertiseCommissioner();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to advertise commissioner: %s", chip::ErrorStr(err));
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
+    err = Dnssd::ServiceAdvertiser::Instance().FinalizeServiceUpdate();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to finalize service update: %s", chip::ErrorStr(err));
+    }
+}
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+CHIP_ERROR DnssdServer::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize)
+{
+    AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
+    uint8_t rotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
+    MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
+    size_t rotatingDeviceIdValueOutputSize = 0;
+
+    ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan));
+    ReturnErrorOnFailure(
+        chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter));
+    additionalDataPayloadParams.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
+
+    return AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsHexString(
+        additionalDataPayloadParams, rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize, rotatingDeviceIdValueOutputSize);
+}
+#endif
+
+} // namespace app
+} // namespace chip

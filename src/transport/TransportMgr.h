@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
  * @file
  *   This file implements a stateless TransportMgr, it will took a raw message
  * buffer from transports, and then extract the message header without decode it.
- * For secure messages, it will pass it to the SecureSessionMgr, and for unsecure
+ * For secure messages, it will pass it to the SessionManager, and for unsecure
  * messages (rendezvous messages), it will pass it to RendezvousSession.
  *   When sending messages, it will encode the packet header, and pass it to the
  * transports.
@@ -27,8 +27,8 @@
 
 #pragma once
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <transport/TransportMgrBase.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>
@@ -47,12 +47,10 @@ public:
      * @brief
      *   Handle received secure message.
      *
-     * @param header    the received message header
      * @param source    the source address of the package
-     * @param msgBuf    the buffer of (encrypted) payload
+     * @param msgBuf    the buffer containing a full CHIP message (except for the optional length field).
      */
-    virtual void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                                   System::PacketBufferHandle msgBuf) = 0;
+    virtual void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) = 0;
 };
 
 template <typename... TransportTypes>
@@ -62,13 +60,8 @@ public:
     template <typename... Args>
     CHIP_ERROR Init(Args &&... transportInitArgs)
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        err = mTransport.Init(this, std::forward<Args>(transportInitArgs)...);
-        SuccessOrExit(err);
-        err = TransportMgrBase::Init(&mTransport);
-    exit:
-        return err;
+        ReturnErrorOnFailure(mTransport.Init(this, std::forward<Args>(transportInitArgs)...));
+        return TransportMgrBase::Init(&mTransport);
     }
 
     template <typename... Args>
@@ -77,8 +70,17 @@ public:
         return mTransport.Init(this, std::forward<Args>(transportInitArgs)...);
     }
 
+    void Close()
+    {
+        TransportMgrBase::Close();
+        mTransport.Close();
+    };
+
 private:
     Transport::Tuple<TransportTypes...> mTransport;
+
+public:
+    auto & GetTransport() { return mTransport; }
 };
 
 } // namespace chip

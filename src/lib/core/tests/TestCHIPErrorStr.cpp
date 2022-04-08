@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -36,9 +36,9 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <core/CHIPError.h>
-#include <support/ErrorStr.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -47,7 +47,7 @@ using namespace chip;
 // Test input data.
 
 // clang-format off
-static int32_t sContext[] =
+static const CHIP_ERROR kTestElements[] =
 {
     CHIP_ERROR_TOO_MANY_CONNECTIONS,
     CHIP_ERROR_SENDING_BLOCKED,
@@ -137,8 +137,7 @@ static int32_t sContext[] =
     CHIP_ERROR_CERT_LOAD_FAILED,
     CHIP_ERROR_CERT_NOT_TRUSTED,
     CHIP_ERROR_INVALID_ACCESS_TOKEN,
-    CHIP_ERROR_WRONG_CERT_SUBJECT,
-    CHIP_ERROR_WRONG_CERTIFICATE_SUBJECT,
+    CHIP_ERROR_WRONG_CERT_DN,
     CHIP_ERROR_INVALID_PROVISIONING_BUNDLE,
     CHIP_ERROR_PROVISIONING_BUNDLE_DECRYPTION_ERROR,
     CHIP_ERROR_WRONG_NODE_ID,
@@ -150,7 +149,7 @@ static int32_t sContext[] =
     CHIP_ERROR_DEVICE_AUTH_TIMEOUT,
     CHIP_ERROR_MESSAGE_NOT_ACKNOWLEDGED,
     CHIP_ERROR_RETRANS_TABLE_FULL,
-    CHIP_ERROR_INVALID_ACK_ID,
+    CHIP_ERROR_INVALID_ACK_MESSAGE_COUNTER,
     CHIP_ERROR_SEND_THROTTLED,
     CHIP_ERROR_WRONG_MSG_VERSION_FOR_EXCHANGE,
     CHIP_ERROR_TRANSACTION_CANCELED,
@@ -165,14 +164,7 @@ static int32_t sContext[] =
     CHIP_ERROR_INVALID_FABRIC_ID,
     CHIP_ERROR_DRBG_ENTROPY_SOURCE_FAILED,
     CHIP_ERROR_TLV_TAG_NOT_FOUND,
-    CHIP_ERROR_INVALID_TOKENPAIRINGBUNDLE,
-    CHIP_ERROR_UNSUPPORTED_TOKENPAIRINGBUNDLE_VERSION,
-    CHIP_ERROR_NO_TAKE_AUTH_DELEGATE,
-    CHIP_ERROR_TAKE_RECONFIGURE_REQUIRED,
-    CHIP_ERROR_TAKE_REAUTH_POSSIBLE,
-    CHIP_ERROR_INVALID_TAKE_PARAMETER,
-    CHIP_ERROR_UNSUPPORTED_TAKE_CONFIGURATION,
-    CHIP_ERROR_TAKE_TOKEN_IDENTIFICATION_FAILED,
+    CHIP_ERROR_FABRIC_EXISTS,
     CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER,
     CHIP_ERROR_WRONG_ENCRYPTION_TYPE_FROM_PEER,
     CHIP_ERROR_UNKNOWN_KEY_TYPE_FROM_PEER,
@@ -210,7 +202,6 @@ static int32_t sContext[] =
     CHIP_ERROR_PROFILE_STRING_CONTEXT_ALREADY_REGISTERED,
     CHIP_ERROR_PROFILE_STRING_CONTEXT_NOT_REGISTERED,
     CHIP_ERROR_INCOMPATIBLE_SCHEMA_VERSION,
-    CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION,
     CHIP_ERROR_ACCESS_DENIED,
     CHIP_ERROR_UNKNOWN_RESOURCE_ID,
     CHIP_ERROR_VERSION_MISMATCH,
@@ -226,6 +217,7 @@ static int32_t sContext[] =
     CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT,
     CHIP_ERROR_IM_MALFORMED_STATUS_CODE,
     CHIP_ERROR_PEER_NODE_NOT_FOUND,
+    CHIP_ERROR_IM_STATUS_CODE_RECEIVED,
 };
 // clang-format on
 
@@ -236,13 +228,13 @@ static void CheckCoreErrorStr(nlTestSuite * inSuite, void * inContext)
     RegisterCHIPLayerErrorFormatter();
 
     // For each defined error...
-    for (int err : sContext)
+    for (const auto & err : kTestElements)
     {
         const char * errStr = ErrorStr(err);
         char expectedText[9];
 
         // Assert that the error string contains the error number in hex.
-        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, err);
+        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, static_cast<uint32_t>(err.AsInteger()));
         NL_TEST_ASSERT(inSuite, (strstr(errStr, expectedText) != nullptr));
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
@@ -279,7 +271,7 @@ int TestCHIPErrorStr(void)
     // clang-format on
 
     // Run test suit againt one context.
-    nlTestRunner(&theSuite, &sContext);
+    nlTestRunner(&theSuite, nullptr);
 
     return nlTestRunnerStats(&theSuite);
 }

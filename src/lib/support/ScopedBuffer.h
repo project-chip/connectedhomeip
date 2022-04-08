@@ -100,12 +100,6 @@ protected:
         mBuffer = Impl::MemoryAlloc(size);
     }
 
-    void LongTermAlloc(size_t size)
-    {
-        Free();
-        mBuffer = Impl::MemoryAlloc(size, true /* isLongTermAlloc */);
-    }
-
     void Calloc(size_t elementCount, size_t elementSize)
     {
         Free();
@@ -124,7 +118,6 @@ class PlatformMemoryManagement
 public:
     static void MemoryFree(void * p) { chip::Platform::MemoryFree(p); }
     static void * MemoryAlloc(size_t size) { return chip::Platform::MemoryAlloc(size); }
-    static void * MemoryAlloc(size_t size, bool longTerm) { return chip::Platform::MemoryAlloc(size, longTerm); }
     static void * MemoryCalloc(size_t num, size_t size) { return chip::Platform::MemoryCalloc(num, size); }
 };
 
@@ -163,12 +156,6 @@ public:
     ScopedMemoryBuffer & Alloc(size_t size)
     {
         Base::Alloc(size * sizeof(T));
-        return *this;
-    }
-
-    ScopedMemoryBuffer & LongTermAlloc(size_t size)
-    {
-        Base::LongTermAlloc(size * sizeof(T));
         return *this;
     }
 };

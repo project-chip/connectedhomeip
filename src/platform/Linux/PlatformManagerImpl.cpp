@@ -24,26 +24,70 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <app-common/zap-generated/enums.h>
+#include <app-common/zap-generated/ids/Events.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/DeviceControlServer.h>
+#include <platform/Linux/DeviceInfoProviderImpl.h>
+#include <platform/Linux/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
-#include <support/CHIPMem.h>
-#include <support/logging/CHIPLogging.h>
+#include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
 
 #include <thread>
 
 #include <arpa/inet.h>
+#include <dirent.h>
+#include <errno.h>
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 #include <net/if.h>
 #include <netinet/in.h>
+#include <signal.h>
+#include <unistd.h>
+
+#if __GLIBC__ == 2 && __GLIBC_MINOR__ < 30
+#include <sys/syscall.h>
+#define gettid() syscall(SYS_gettid)
+#endif
+
+using namespace ::chip::app::Clusters;
 
 namespace chip {
 namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
+namespace {
+
+void SignalHandler(int signum)
+{
+    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
+
+    switch (signum)
+    {
+    case SIGUSR1:
+        PlatformMgrImpl().HandleSoftwareFault(SoftwareDiagnostics::Events::SoftwareFault::Id);
+        break;
+    case SIGUSR2:
+        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::HardwareFaultChange::Id);
+        break;
+    case SIGHUP:
+        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::RadioFaultChange::Id);
+        break;
+    case SIGTERM:
+        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::NetworkFaultChange::Id);
+        break;
+    case SIGTSTP:
+        PlatformMgrImpl().HandleSwitchEvent(Switch::Events::SwitchLatched::Id);
+        break;
+    default:
+        break;
+    }
+}
+
 #if CHIP_WITH_GIO
-static void GDBus_Thread()
+void GDBus_Thread()
 {
     GMainLoop * loop = g_main_loop_new(nullptr, false);
 
@@ -51,7 +95,9 @@ static void GDBus_Thread()
     g_main_loop_unref(loop);
 }
 #endif
+} // namespace
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 void PlatformManagerImpl::WiFIIPChangeListener()
 {
     int sock;
@@ -86,18 +132,24 @@ void PlatformManagerImpl::WiFIIPChangeListener()
                 struct rtattr * routeInfo         = IFA_RTA(addressMessage);
                 size_t rtl                        = IFA_PAYLOAD(header);
 
-                while (rtl && RTA_OK(routeInfo, rtl))
+                for (; rtl && RTA_OK(routeInfo, rtl); routeInfo = RTA_NEXT(routeInfo, rtl))
                 {
                     if (routeInfo->rta_type == IFA_LOCAL)
                     {
                         char name[IFNAMSIZ];
-                        ChipDeviceEvent event;
-                        if_indextoname(addressMessage->ifa_index, name);
-                        if (strcmp(name, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME) != 0)
+                        if (if_indextoname(addressMessage->ifa_index, name) == nullptr)
+                        {
+                            ChipLogError(DeviceLayer, "Error %d when getting the interface name at index: %d", errno,
+                                         addressMessage->ifa_index);
+                            continue;
+                        }
+
+                        if (strcmp(name, ConnectivityManagerImpl::GetWiFiIfName()) != 0)
                         {
                             continue;
                         }
 
+                        ChipDeviceEvent event;
                         event.Type                            = DeviceEventType::kInternetConnectivityChange;
                         event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
                         event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
@@ -107,20 +159,30 @@ void PlatformManagerImpl::WiFIIPChangeListener()
                         ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", name,
                                       event.InternetConnectivityChange.address);
 
-                        PlatformMgr().LockChipStack();
-                        PlatformMgr().PostEvent(&event);
-                        PlatformMgr().UnlockChipStack();
+                        CHIP_ERROR status = PlatformMgr().PostEvent(&event);
+                        if (status != CHIP_NO_ERROR)
+                        {
+                            ChipLogDetail(DeviceLayer, "Failed to report IP address: %" CHIP_ERROR_FORMAT, status.Format());
+                        }
                     }
-                    routeInfo = RTA_NEXT(routeInfo, rtl);
                 }
             }
         }
     }
 }
+#endif // #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
-    CHIP_ERROR err;
+    struct sigaction action;
+
+    memset(&action, 0, sizeof(action));
+    action.sa_handler = SignalHandler;
+    sigaction(SIGHUP, &action, nullptr);
+    sigaction(SIGTERM, &action, nullptr);
+    sigaction(SIGUSR1, &action, nullptr);
+    sigaction(SIGUSR2, &action, nullptr);
+    sigaction(SIGTSTP, &action, nullptr);
 
 #if CHIP_WITH_GIO
     GError * error = nullptr;
@@ -131,19 +193,218 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     gdbusThread.detach();
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     std::thread wifiIPThread(WiFIIPChangeListener);
     wifiIPThread.detach();
+#endif
 
     // Initialize the configuration system.
-    err = Internal::PosixConfig::Init();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(Internal::PosixConfig::Init());
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
+    SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());
+    ReturnErrorOnFailure(DeviceInfoProviderImpl::GetDefaultInstance().Init());
+
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack());
 
-exit:
-    return err;
+    mStartTime = System::SystemClock().GetMonotonicTimestamp();
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PlatformManagerImpl::_Shutdown()
+{
+    uint64_t upTime = 0;
+
+    if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
+    {
+        uint32_t totalOperationalHours = 0;
+
+        if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
+        {
+            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
+        }
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
+    }
+
+    return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
+}
+
+void PlatformManagerImpl::HandleGeneralFault(uint32_t EventId)
+{
+    GeneralDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
+
+    if (delegate == nullptr)
+    {
+        ChipLogError(DeviceLayer, "No delegate registered to handle General Diagnostics event");
+        return;
+    }
+
+    if (EventId == GeneralDiagnostics::Events::HardwareFaultChange::Id)
+    {
+        GeneralFaults<kMaxHardwareFaults> previous;
+        GeneralFaults<kMaxHardwareFaults> current;
+
+#if CHIP_CONFIG_TEST
+        // On Linux Simulation, set following hardware faults statically.
+        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
+        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
+
+        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
+        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_SENSOR));
+        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
+        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT));
+#endif
+        delegate->OnHardwareFaultsDetected(previous, current);
+    }
+    else if (EventId == GeneralDiagnostics::Events::RadioFaultChange::Id)
+    {
+        GeneralFaults<kMaxRadioFaults> previous;
+        GeneralFaults<kMaxRadioFaults> current;
+
+#if CHIP_CONFIG_TEST
+        // On Linux Simulation, set following radio faults statically.
+        ReturnOnFailure(previous.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
+        ReturnOnFailure(previous.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
+
+        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
+        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_CELLULAR_FAULT));
+        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
+        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_NFC_FAULT));
+#endif
+        delegate->OnRadioFaultsDetected(previous, current);
+    }
+    else if (EventId == GeneralDiagnostics::Events::NetworkFaultChange::Id)
+    {
+        GeneralFaults<kMaxNetworkFaults> previous;
+        GeneralFaults<kMaxNetworkFaults> current;
+
+#if CHIP_CONFIG_TEST
+        // On Linux Simulation, set following radio faults statically.
+        ReturnOnFailure(previous.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
+        ReturnOnFailure(previous.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
+
+        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
+        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
+        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_CONNECTION_FAILED));
+#endif
+        delegate->OnNetworkFaultsDetected(previous, current);
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Unknow event ID:%d", EventId);
+    }
+}
+
+void PlatformManagerImpl::HandleSoftwareFault(uint32_t EventId)
+{
+    SoftwareDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetSoftwareDiagnosticsDelegate();
+
+    if (delegate != nullptr)
+    {
+        SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type softwareFault;
+        char threadName[kMaxThreadNameLength + 1];
+
+        softwareFault.id = gettid();
+        strncpy(threadName, std::to_string(softwareFault.id).c_str(), kMaxThreadNameLength);
+        threadName[kMaxThreadNameLength] = '\0';
+        softwareFault.name               = CharSpan::fromCharString(threadName);
+        softwareFault.faultRecording     = ByteSpan(Uint8::from_const_char("FaultRecording"), strlen("FaultRecording"));
+
+        delegate->OnSoftwareFaultDetected(softwareFault);
+    }
+}
+
+void PlatformManagerImpl::HandleSwitchEvent(uint32_t EventId)
+{
+    SwitchDeviceControlDelegate * delegate = DeviceControlServer::DeviceControlSvr().GetSwitchDelegate();
+
+    if (delegate == nullptr)
+    {
+        ChipLogError(DeviceLayer, "No delegate registered to handle Switch event");
+        return;
+    }
+
+    if (EventId == Switch::Events::SwitchLatched::Id)
+    {
+        uint8_t newPosition = 0;
+
+#if CHIP_CONFIG_TEST
+        newPosition = 100;
+#endif
+        delegate->OnSwitchLatched(newPosition);
+    }
+    else if (EventId == Switch::Events::InitialPress::Id)
+    {
+        uint8_t newPosition = 0;
+
+#if CHIP_CONFIG_TEST
+        newPosition = 100;
+#endif
+        delegate->OnInitialPressed(newPosition);
+    }
+    else if (EventId == Switch::Events::LongPress::Id)
+    {
+        uint8_t newPosition = 0;
+
+#if CHIP_CONFIG_TEST
+        newPosition = 100;
+#endif
+        delegate->OnLongPressed(newPosition);
+    }
+    else if (EventId == Switch::Events::ShortRelease::Id)
+    {
+        uint8_t previousPosition = 0;
+
+#if CHIP_CONFIG_TEST
+        previousPosition = 50;
+#endif
+        delegate->OnShortReleased(previousPosition);
+    }
+    else if (EventId == Switch::Events::LongRelease::Id)
+    {
+        uint8_t previousPosition = 0;
+
+#if CHIP_CONFIG_TEST
+        previousPosition = 50;
+#endif
+        delegate->OnLongReleased(previousPosition);
+    }
+    else if (EventId == Switch::Events::MultiPressOngoing::Id)
+    {
+        uint8_t newPosition                   = 0;
+        uint8_t currentNumberOfPressesCounted = 0;
+
+#if CHIP_CONFIG_TEST
+        newPosition                   = 10;
+        currentNumberOfPressesCounted = 5;
+#endif
+        delegate->OnMultiPressOngoing(newPosition, currentNumberOfPressesCounted);
+    }
+    else if (EventId == Switch::Events::MultiPressComplete::Id)
+    {
+        uint8_t newPosition                 = 0;
+        uint8_t totalNumberOfPressesCounted = 0;
+
+#if CHIP_CONFIG_TEST
+        newPosition                 = 10;
+        totalNumberOfPressesCounted = 5;
+#endif
+        delegate->OnMultiPressComplete(newPosition, totalNumberOfPressesCounted);
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Unknow event ID:%d", EventId);
+    }
 }
 
 #if CHIP_WITH_GIO

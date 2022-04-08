@@ -37,20 +37,20 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "af-event.h"
+#include <app/util/af-event.h>
 
-#include "af.h"
-#include "attribute-storage.h"
+#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 
 #include <platform/CHIPDeviceLayer.h>
-#include <system/SystemTimer.h>
 
 #define EMBER_MAX_EVENT_CONTROL_DELAY_MS (UINT32_MAX / 2)
 #define EMBER_MAX_EVENT_CONTROL_DELAY_QS (EMBER_MAX_EVENT_CONTROL_DELAY_MS >> 8)
 #define EMBER_MAX_EVENT_CONTROL_DELAY_MINUTES (EMBER_MAX_EVENT_CONTROL_DELAY_MS >> 16)
 
-#include "gen/af-gen-event.h"
-#include "gen/callback.h"
+#include <app-common/zap-generated/callback.h>
+
+#include <zap-generated/af-gen-event.h>
 
 using namespace chip;
 
@@ -84,7 +84,7 @@ const char * emAfEventStrings[] = {
     EMBER_AF_GENERATED_EVENT_STRINGS
 #endif
 
-        NULL,
+    nullptr,
 };
 
 EmberEventData emAfEvents[] = {
@@ -93,22 +93,29 @@ EmberEventData emAfEvents[] = {
     EMBER_AF_GENERATED_EVENTS
 #endif
 
-    { NULL, NULL }
+    { nullptr, nullptr }
 };
 
-void EventControlHandler(chip::System::Layer * systemLayer, void * appState, chip::System::Error error)
+void EventControlHandler(chip::System::Layer * systemLayer, void * appState)
 {
     EmberEventControl * control = reinterpret_cast<EmberEventControl *>(appState);
     if (control->status != EMBER_EVENT_INACTIVE)
     {
-        for (auto & event : emAfEvents)
+        control->status = EMBER_EVENT_INACTIVE;
+
+        if (control->callback != nullptr)
         {
-            if (event.control == control)
-            {
-                control->status = EMBER_EVENT_INACTIVE;
-                event.handler();
-                return;
-            }
+            (control->callback)(control->endpoint);
+            return;
+        }
+
+        for (const EmberEventData & event : emAfEvents)
+        {
+            if (event.control != control)
+                continue;
+            control->status = EMBER_EVENT_INACTIVE;
+            event.handler();
+            break;
         }
     }
 }
@@ -139,19 +146,17 @@ static EmberAfEventContext * findEventContext(EndpointId endpoint, ClusterId clu
         }
     }
 #endif // EMBER_AF_GENERATED_EVENT_CONTEXT
-    return NULL;
+    return nullptr;
 }
 
 EmberStatus emberEventControlSetDelayMS(EmberEventControl * control, uint32_t delayMs)
 {
-    if (delayMs == 0)
-    {
-        emberEventControlSetActive(control);
-    }
-    else if (delayMs <= EMBER_MAX_EVENT_CONTROL_DELAY_MS)
+    if (delayMs <= EMBER_MAX_EVENT_CONTROL_DELAY_MS)
     {
         control->status = EMBER_EVENT_MS_TIME;
-        chip::DeviceLayer::SystemLayer.StartTimer(delayMs, EventControlHandler, control);
+#if !CHIP_DEVICE_LAYER_NONE
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), EventControlHandler, control);
+#endif
     }
     else
     {
@@ -165,7 +170,9 @@ void emberEventControlSetInactive(EmberEventControl * control)
     if (control->status != EMBER_EVENT_INACTIVE)
     {
         control->status = EMBER_EVENT_INACTIVE;
-        chip::DeviceLayer::SystemLayer.CancelTimer(EventControlHandler, control);
+#if !CHIP_DEVICE_LAYER_NONE
+        chip::DeviceLayer::SystemLayer().CancelTimer(EventControlHandler, control);
+#endif
     }
 }
 
@@ -177,7 +184,9 @@ bool emberEventControlGetActive(EmberEventControl * control)
 void emberEventControlSetActive(EmberEventControl * control)
 {
     control->status = EMBER_EVENT_ZERO_DELAY;
-    chip::DeviceLayer::SystemLayer.ScheduleWork(EventControlHandler, control);
+#if !CHIP_DEVICE_LAYER_NONE
+    chip::DeviceLayer::SystemLayer().ScheduleWork(EventControlHandler, control);
+#endif
 }
 
 EmberStatus emberAfEventControlSetDelayQS(EmberEventControl * control, uint32_t delayQs)
@@ -186,10 +195,8 @@ EmberStatus emberAfEventControlSetDelayQS(EmberEventControl * control, uint32_t 
     {
         return emberEventControlSetDelayMS(control, delayQs << 8);
     }
-    else
-    {
-        return EMBER_BAD_ARGUMENT;
-    }
+
+    return EMBER_BAD_ARGUMENT;
 }
 
 EmberStatus emberAfEventControlSetDelayMinutes(EmberEventControl * control, uint16_t delayM)
@@ -198,10 +205,8 @@ EmberStatus emberAfEventControlSetDelayMinutes(EmberEventControl * control, uint
     {
         return emberEventControlSetDelayMS(control, static_cast<uint32_t>(delayM) << 16);
     }
-    else
-    {
-        return EMBER_BAD_ARGUMENT;
-    }
+
+    return EMBER_BAD_ARGUMENT;
 }
 
 EmberStatus emberAfScheduleTickExtended(EndpointId endpoint, ClusterId clusterId, bool isClient, uint32_t delayMs,
@@ -213,7 +218,7 @@ EmberStatus emberAfScheduleTickExtended(EndpointId endpoint, ClusterId clusterId
     // simulation.
     EMBER_TEST_ASSERT(emberAfEndpointIsEnabled(endpoint));
 
-    if (context != NULL && emberAfEndpointIsEnabled(endpoint) &&
+    if (context != nullptr && emberAfEndpointIsEnabled(endpoint) &&
         (emberEventControlSetDelayMS(context->eventControl, delayMs) == EMBER_SUCCESS))
     {
         context->pollControl  = pollControl;
@@ -256,7 +261,7 @@ EmberStatus emberAfScheduleServerTick(EndpointId endpoint, ClusterId clusterId, 
 EmberStatus emberAfDeactivateClusterTick(EndpointId endpoint, ClusterId clusterId, bool isClient)
 {
     EmberAfEventContext * context = findEventContext(endpoint, clusterId, isClient);
-    if (context != NULL)
+    if (context != nullptr)
     {
         emberEventControlSetInactive(context->eventControl);
         return EMBER_SUCCESS;

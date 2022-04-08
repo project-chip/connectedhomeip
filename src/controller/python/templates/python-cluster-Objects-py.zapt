@@ -1,0 +1,179 @@
+'''
+{{> header}}
+'''
+
+# This file contains generated struct, enum, command definition.
+# Users are not expected to import this file, instead, users can use import chip.clusters, which will import all symbols from this file and can get a readable, pretty naming like clusters.OnOff.commands.OnCommand
+
+from dataclasses import dataclass, field
+import typing
+from enum import IntEnum
+from chip import ChipUtility
+
+from chip.tlv import uint, float32
+
+from .ClusterObjects import ClusterObject, ClusterObjectDescriptor, ClusterObjectFieldDescriptor, ClusterCommand, ClusterAttributeDescriptor, Cluster, ClusterEvent
+from .Types import Nullable, NullValue
+
+{{#zcl_clusters}}
+@dataclass
+class {{asUpperCamelCase name}}(Cluster):
+    id: typing.ClassVar[int] = {{asHex code 4}}
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields = [
+{{#zcl_attributes_server}}
+            {{#if entryType}}
+                ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{asMEI manufacturerCode code}}, Type={{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}),
+            {{else}}
+                ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{asMEI manufacturerCode code}}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}}),
+            {{/if}}
+{{/zcl_attributes_server}}
+            ])
+
+{{#zcl_attributes_server}}
+{{#if entryType}}
+    {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}' = None
+{{else}}
+    {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}}' = None
+{{/if}}
+{{/zcl_attributes_server}}
+
+{{#zcl_enums}}
+{{#first}}
+    class Enums:
+{{/first}}
+        class {{asType label}}(IntEnum):
+{{#zcl_enum_items}}
+            k{{asUpperCamelCase label}} = {{asHex value 2}}
+{{/zcl_enum_items}}
+
+{{/zcl_enums}}
+
+{{#zcl_structs}}
+{{#first}}
+    class Structs:
+{{/first}}
+        @dataclass
+        class {{asUpperCamelCase name}}(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                        {{#zcl_struct_items}}
+                            ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{ fieldIdentifier }}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}),
+                        {{/zcl_struct_items}}
+                    ])
+
+            {{#zcl_struct_items}}
+            {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}' = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name)}}
+            {{/zcl_struct_items}}
+
+{{#last}}
+
+{{/last}}
+{{/zcl_structs}}
+
+{{#zcl_commands}}
+{{#first}}
+    class Commands:
+{{/first}}
+        @dataclass
+        class {{asUpperCamelCase name}}(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = {{ asHex parent.code 4 }}
+            command_id: typing.ClassVar[int] = {{ asHex code 4 }}
+{{#if (isServer source)}}
+            is_client: typing.ClassVar[bool] = False
+{{else}}
+            is_client: typing.ClassVar[bool] = True
+{{/if}}       
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                        {{#zcl_command_arguments}}
+                            ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{ index }}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}),
+                        {{/zcl_command_arguments}}
+                    ])
+
+            {{#if mustUseTimedInvoke}}
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
+            {{/if}}
+            {{#zcl_command_arguments}}
+            {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}' = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name)}}
+            {{/zcl_command_arguments}}
+
+{{/zcl_commands}}
+
+{{#zcl_attributes_server}}
+{{#first}}
+    class Attributes:
+{{/first}}
+        @dataclass
+        class {{asUpperCamelCase label}}(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return {{ asHex parent.code 4 }}
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return {{ asMEI manufacturerCode code }}
+
+            {{#if mustUseTimedWrite}}
+            @ChipUtility.classproperty
+            def must_use_timed_write(cls) -> bool:
+                return True
+
+            {{/if}}
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+            {{#if entryType}}
+                return ClusterObjectFieldDescriptor(Type={{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}})
+            {{else}}
+                return ClusterObjectFieldDescriptor(Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}})
+            {{/if}}
+
+            {{#if entryType}}
+            value: '{{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}' = {{getPythonFieldDefault entryType ns=(asUpperCamelCase parent.name)}}
+            {{else}}
+            value: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}}' = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.name)}}
+            {{/if}}
+
+{{/zcl_attributes_server}}
+
+{{#zcl_events}}
+{{#first}}
+    class Events:
+{{/first}}
+        @dataclass
+        class {{asUpperCamelCase name}}(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return {{ asHex parent.code 4 }}
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return {{ asMEI manufacturerCode code }}
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                        {{#zcl_event_fields}}
+                            ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase name }}", Tag={{ fieldIdentifier }}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}),
+                        {{/zcl_event_fields}}
+                    ])
+
+            {{#zcl_event_fields}}
+            {{ asLowerCamelCase name }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}' = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name)}}
+            {{/zcl_event_fields}}
+
+{{/zcl_events}}
+
+{{/zcl_clusters}}

@@ -21,13 +21,18 @@
  *          Provides an implementation of BleConnectionDelegate for Darwin platforms.
  */
 
+#if !__has_feature(objc_arc)
+#error This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
+#endif
+
 #include <ble/BleConfig.h>
 #include <ble/BleError.h>
 #include <ble/BleLayer.h>
 #include <ble/BleUUID.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/Darwin/BleConnectionDelegate.h>
 #include <setup_payload/SetupPayload.h>
-#include <support/logging/CHIPLogging.h>
 
 #import "UUIDHelper.h"
 
@@ -38,10 +43,12 @@ constexpr uint64_t kScanningTimeoutInSeconds = 60;
 @interface BleConnection : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate>
 
 @property (strong, nonatomic) dispatch_queue_t workQueue;
+@property (strong, nonatomic) dispatch_queue_t chipWorkQueue;
 @property (strong, nonatomic) CBCentralManager * centralManager;
 @property (strong, nonatomic) CBPeripheral * peripheral;
 @property (strong, nonatomic) CBUUID * shortServiceUUID;
 @property (nonatomic, readonly, nullable) dispatch_source_t timer;
+@property (unsafe_unretained, nonatomic) bool found;
 @property (unsafe_unretained, nonatomic) uint16_t deviceDiscriminator;
 @property (unsafe_unretained, nonatomic) void * appState;
 @property (unsafe_unretained, nonatomic) BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete;
@@ -68,14 +75,15 @@ namespace DeviceLayer {
             ble.appState = appState;
             ble.onConnectionComplete = OnConnectionComplete;
             ble.onConnectionError = OnConnectionError;
+            ble.centralManager = [ble.centralManager initWithDelegate:ble queue:ble.workQueue];
         }
 
-        BLE_ERROR BleConnectionDelegateImpl::CancelConnection()
+        CHIP_ERROR BleConnectionDelegateImpl::CancelConnection()
         {
             ChipLogProgress(Ble, "%s", __FUNCTION__);
             [ble stop];
             ble = nil;
-            return BLE_NO_ERROR;
+            return CHIP_NO_ERROR;
         }
     } // namespace Internal
 } // namespace DeviceLayer
@@ -93,16 +101,17 @@ namespace DeviceLayer {
         self.shortServiceUUID = [UUIDHelper GetShortestServiceUUID:&chip::Ble::CHIP_BLE_SVC_ID];
         _deviceDiscriminator = deviceDiscriminator;
         _workQueue = dispatch_queue_create("com.chip.ble.work_queue", DISPATCH_QUEUE_SERIAL);
+        _chipWorkQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
         _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _workQueue);
         _centralManager = [CBCentralManager alloc];
-        [_centralManager initWithDelegate:self queue:_workQueue];
+        _found = false;
 
         dispatch_source_set_event_handler(_timer, ^{
             [self stop];
             _onConnectionError(_appState, BLE_ERROR_APP_CLOSED_CONNECTION);
         });
         dispatch_source_set_timer(
-            _timer, dispatch_walltime(NULL, kScanningTimeoutInSeconds * NSEC_PER_SEC), DISPATCH_TIME_FOREVER, 5 * NSEC_PER_SEC);
+            _timer, dispatch_walltime(nullptr, kScanningTimeoutInSeconds * NSEC_PER_SEC), DISPATCH_TIME_FOREVER, 5 * NSEC_PER_SEC);
     }
 
     return self;
@@ -120,6 +129,7 @@ namespace DeviceLayer {
     case CBManagerStatePoweredOff:
         ChipLogDetail(Ble, "CBManagerState: OFF");
         [self stop];
+        _onConnectionError(_appState, BLE_ERROR_APP_CLOSED_CONNECTION);
         break;
     case CBManagerStateUnauthorized:
         ChipLogDetail(Ble, "CBManagerState: Unauthorized");
@@ -149,7 +159,7 @@ namespace DeviceLayer {
                 NSData * serviceData = [servicesData objectForKey:serviceUUID];
 
                 NSUInteger length = [serviceData length];
-                if (length == 7) {
+                if (length >= 7) {
                     const uint8_t * bytes = (const uint8_t *) [serviceData bytes];
                     uint8_t opCode = bytes[0];
                     uint16_t discriminator = (bytes[1] | (bytes[2] << 8)) & 0xfff;
@@ -169,14 +179,15 @@ namespace DeviceLayer {
 
 - (BOOL)checkDiscriminator:(uint16_t)discriminator
 {
-    // If the setup discriminator is only 4 bits, only match the lower 4 from the BLE advertisement
-    constexpr uint16_t kManualSetupDiscriminatorFieldBitMask = (1 << chip::kManualSetupDiscriminatorFieldLengthInBits) - 1;
-    if (_deviceDiscriminator <= kManualSetupDiscriminatorFieldBitMask) {
+    // If the manual setup discriminator was passed in, only match the most significant 4 bits from the BLE advertisement
+    constexpr uint16_t manualSetupDiscriminatorOffsetInBits
+        = chip::kPayloadDiscriminatorFieldLengthInBits - chip::kManualSetupDiscriminatorFieldLengthInBits;
+    constexpr uint16_t maxManualDiscriminatorValue = (1 << chip::kManualSetupDiscriminatorFieldLengthInBits) - 1;
+    constexpr uint16_t kManualSetupDiscriminatorFieldBitMask = maxManualDiscriminatorValue << manualSetupDiscriminatorOffsetInBits;
+    if (_deviceDiscriminator == (_deviceDiscriminator & kManualSetupDiscriminatorFieldBitMask)) {
         return _deviceDiscriminator == (discriminator & kManualSetupDiscriminatorFieldBitMask);
-    } else {
-        // else compare the entire thing
-        return _deviceDiscriminator == discriminator;
-    }
+    } // else compare the entire thing
+    return _deviceDiscriminator == discriminator;
 }
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
@@ -192,29 +203,28 @@ namespace DeviceLayer {
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
 {
     if (nil != error) {
-        ChipLogError(Ble, "BLE:Error finding Chip Service in the device: [%@]", error.localizedDescription);
+        ChipLogError(Ble, "BLE:Error finding Chip Service in the device: [%s]", [error.localizedDescription UTF8String]);
     }
 
-    bool found;
-
     for (CBService * service in peripheral.services) {
-        if ([service.UUID.data isEqualToData:_shortServiceUUID.data]) {
-            found = true;
+        if ([service.UUID.data isEqualToData:_shortServiceUUID.data] && !self.found) {
             [peripheral discoverCharacteristics:nil forService:service];
+            self.found = true;
             break;
         }
     }
 
-    if (!found || error != nil) {
+    if (!self.found || error != nil) {
         ChipLogError(Ble, "Service not found on the device.");
-        _onConnectionError(_appState, BLE_ERROR_INCORRECT_STATE);
+        _onConnectionError(_appState, CHIP_ERROR_INCORRECT_STATE);
     }
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
 {
     if (nil != error) {
-        ChipLogError(Ble, "BLE:Error finding Characteristics in Chip service on the device: [%@]", error.localizedDescription);
+        ChipLogError(
+            Ble, "BLE:Error finding Characteristics in Chip service on the device: [%s]", [error.localizedDescription UTF8String]);
     }
 
     // XXX error ?
@@ -229,10 +239,15 @@ namespace DeviceLayer {
         chip::Ble::ChipBleUUID svcId;
         chip::Ble::ChipBleUUID charId;
         [BleConnection fillServiceWithCharacteristicUuids:characteristic svcId:&svcId charId:&charId];
-        _mBleLayer->HandleWriteConfirmation((__bridge void *) peripheral, &svcId, &charId);
+        dispatch_async(_chipWorkQueue, ^{
+            _mBleLayer->HandleWriteConfirmation((__bridge void *) peripheral, &svcId, &charId);
+        });
     } else {
-        ChipLogError(Ble, "BLE:Error writing Characteristics in Chip service on the device: [%@]", error.localizedDescription);
-        _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_WRITE_FAILED);
+        ChipLogError(
+            Ble, "BLE:Error writing Characteristics in Chip service on the device: [%s]", [error.localizedDescription UTF8String]);
+        dispatch_async(_chipWorkQueue, ^{
+            _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_WRITE_FAILED);
+        });
     }
 }
 
@@ -247,20 +262,25 @@ namespace DeviceLayer {
         chip::Ble::ChipBleUUID charId;
         [BleConnection fillServiceWithCharacteristicUuids:characteristic svcId:&svcId charId:&charId];
 
-        if (isNotifying) {
-            _mBleLayer->HandleSubscribeComplete((__bridge void *) peripheral, &svcId, &charId);
-        } else {
-            _mBleLayer->HandleUnsubscribeComplete((__bridge void *) peripheral, &svcId, &charId);
-        }
+        dispatch_async(_chipWorkQueue, ^{
+            if (isNotifying) {
+                _mBleLayer->HandleSubscribeComplete((__bridge void *) peripheral, &svcId, &charId);
+            } else {
+                _mBleLayer->HandleUnsubscribeComplete((__bridge void *) peripheral, &svcId, &charId);
+            }
+        });
     } else {
-        ChipLogError(Ble, "BLE:Error subscribing/unsubcribing some characteristic on the device: [%@]", error.localizedDescription);
-        if (isNotifying) {
-            // we're still notifying, so we must failed the unsubscription
-            _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_UNSUBSCRIBE_FAILED);
-        } else {
-            // we're not notifying, so we must failed the subscription
-            _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_SUBSCRIBE_FAILED);
-        }
+        ChipLogError(Ble, "BLE:Error subscribing/unsubcribing some characteristic on the device: [%s]",
+            [error.localizedDescription UTF8String]);
+        dispatch_async(_chipWorkQueue, ^{
+            if (isNotifying) {
+                // we're still notifying, so we must failed the unsubscription
+                _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_UNSUBSCRIBE_FAILED);
+            } else {
+                // we're not notifying, so we must failed the subscription
+                _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_SUBSCRIBE_FAILED);
+            }
+        });
     }
 }
 
@@ -274,22 +294,29 @@ namespace DeviceLayer {
         [BleConnection fillServiceWithCharacteristicUuids:characteristic svcId:&svcId charId:&charId];
 
         // build a inet buffer from the rxEv and send to blelayer.
-        chip::System::PacketBufferHandle msgBuf
+        __block chip::System::PacketBufferHandle msgBuf
             = chip::System::PacketBufferHandle::NewWithData(characteristic.value.bytes, characteristic.value.length);
 
         if (!msgBuf.IsNull()) {
-            if (!_mBleLayer->HandleIndicationReceived((__bridge void *) peripheral, &svcId, &charId, std::move(msgBuf))) {
-                // since this error comes from device manager core
-                // we assume it would do the right thing, like closing the connection
-                ChipLogError(Ble, "Failed at handling incoming BLE data");
-            }
+            dispatch_async(_chipWorkQueue, ^{
+                if (!_mBleLayer->HandleIndicationReceived((__bridge void *) peripheral, &svcId, &charId, std::move(msgBuf))) {
+                    // since this error comes from device manager core
+                    // we assume it would do the right thing, like closing the connection
+                    ChipLogError(Ble, "Failed at handling incoming BLE data");
+                }
+            });
         } else {
             ChipLogError(Ble, "Failed at allocating buffer for incoming BLE data");
-            _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_NO_MEMORY);
+            dispatch_async(_chipWorkQueue, ^{
+                _mBleLayer->HandleConnectionError((__bridge void *) peripheral, CHIP_ERROR_NO_MEMORY);
+            });
         }
     } else {
-        ChipLogError(Ble, "BLE:Error receiving indication of Characteristics on the device: [%@]", error.localizedDescription);
-        _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_INDICATE_FAILED);
+        ChipLogError(
+            Ble, "BLE:Error receiving indication of Characteristics on the device: [%s]", [error.localizedDescription UTF8String]);
+        dispatch_async(_chipWorkQueue, ^{
+            _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_INDICATE_FAILED);
+        });
     }
 }
 
@@ -305,6 +332,7 @@ namespace DeviceLayer {
 {
     [self stopScanning];
     [self disconnect];
+    _centralManager.delegate = nil;
     _centralManager = nil;
     _peripheral = nil;
 }
@@ -334,7 +362,6 @@ namespace DeviceLayer {
     }
 
     _peripheral = peripheral;
-    [_peripheral retain];
     [_centralManager connectPeripheral:peripheral options:nil];
 }
 

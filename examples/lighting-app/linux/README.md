@@ -5,11 +5,18 @@ to build and run CHIP Linux Lighting Example on Raspberry Pi. This doc is tested
 on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
 Raspberry Pi Desktop 20.10 (aarch64)**
 
+To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
+**EVK**, see the associated
+[README document](../../../docs/guides/nxp_imx8m_linux_examples.md) for details.
+
 <hr>
 
 -   [CHIP Linux Lighting Example](#chip-linux-lighting-example)
     -   [Building](#building)
+    -   [Commandline Arguments](#command-line-args)
     -   [Running the Complete Example on Raspberry Pi 4](#running-complete-example)
+    -   [Running RPC console](#running-rpc-console)
+    -   [Device Tracing](#device-tracing)
 
 <hr>
 
@@ -34,24 +41,42 @@ Raspberry Pi Desktop 20.10 (aarch64)**
           $ cd ~/connectedhomeip/examples/lighting-app/linux
           $ rm -rf out/
 
+-   Build the example with pigweed RPC
+
+          $ cd ~/connectedhomeip/examples/lighting-app/linux
+          $ git submodule update --init
+          $ source third_party/connectedhomeip/scripts/activate.sh
+          $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
+          $ ninja -C out/debug
+
+<a name="command-line-args"></a>
+
+## Commandline arguments
+
+-   `--wifi`
+
+    Enables WiFi management feature. Required for WiFi commissioning.
+
+-   `--thread`
+
+    Enables Thread management feature, requires ot-br-posix dbus daemon running.
+    Required for Thread commissioning.
+
+-   `--ble-device <interface id>`
+
+    Use specific bluetooth interface for BLE advertisement and connections.
+
+    `interface id`: the number after `hci` when listing BLE interfaces by
+    `hciconfig` command, for example, `--ble-device 1` means using `hci1`
+    interface. Default: `0`.
+
 <a name="running-complete-example"></a>
 
 ## Running the Complete Example on Raspberry Pi 4
 
-> If you want to test ZCL, please disable Rendezvous
+> If you want to test Echo protocol, please enable Echo handler
 >
->     gn gen out/debug --args='chip_bypass_rendezvous=true'
->     ninja -C out/debug
->
-> Note that GN will set chip_bypass_rendezvous for future builds, to enable
-> rendezvous, re-generate using
->
->     gn gen out/debug --args='chip_bypass_rendezvous=false'
-
-> If you want to test Echo protocol, please disable Rendezvous and enable Echo
-> handler
->
->     gn gen out/debug --args='chip_bypass_rendezvous=true chip_app_use_echo=true'
+>     gn gen out/debug --args='chip_app_use_echo=true'
 >     ninja -C out/debug
 
 -   Prerequisites
@@ -96,3 +121,31 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 
         -   Test the device using ChipDeviceController on your laptop /
             workstation etc.
+
+## Running RPC Console
+
+-   As part of building the example with RPCs enabled the chip_rpc python
+    interactive console is installed into your venv. The python wheel files are
+    also created in the output folder: out/debug/chip_rpc_console_wheels. To
+    install the wheel files without rebuilding:
+    `pip3 install out/debug/chip_rpc_console_wheels/*.whl`
+
+-   To use the chip-rpc console after it has been installed run:
+    `chip-console -s localhost:33000 -o /<YourFolder>/pw_log.out`
+
+-   Then you can Get and Set the light using the RPCs:
+    `rpcs.chip.rpc.Lighting.Get()`
+
+    `rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))`
+
+## Device Tracing
+
+Device tracing is available to analyze the device performance. To turn on
+tracing, build with RPC enabled. See [Building with RPC enabled](#building).
+
+Obtain tracing json file.
+
+```
+    $ ./{PIGWEED_REPO}/pw_trace_tokenized/py/pw_trace_tokenized/get_trace.py -s localhost:33000 \
+     -o {OUTPUT_FILE} -t {ELF_FILE} {PIGWEED_REPO}/pw_trace_tokenized/pw_trace_protos/trace_rpc.proto
+```

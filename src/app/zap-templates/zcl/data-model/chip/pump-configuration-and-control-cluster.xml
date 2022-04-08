@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <cluster>
+    <name>Pump Configuration and Control</name>
+    <domain>HVAC</domain>
+    <description>An interface for configuring and controlling pumps.</description>
+    <code>0x0200</code>
+    <define>PUMP_CONFIG_CONTROL_CLUSTER</define>
+    <client tick="false" init="false">true</client>
+    <server tick="false" tickFrequency="half" init="false">true</server>
+    <attribute side="server" code="0x0000" define="MAX_PRESSURE" type="INT16S" min="0x0000" max="0xFFFF" writable="false" optional="false">MaxPressure</attribute>
+    <attribute side="server" code="0x0001" define="MAX_SPEED" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false">MaxSpeed</attribute>
+    <attribute side="server" code="0x0002" define="MAX_FLOW" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false">MaxFlow</attribute>
+    <attribute side="server" code="0x0003" define="MIN_CONST_PRESSURE" type="INT16S" min="0x0000" max="0xFFFF" writable="false" optional="true">MinConstPressure</attribute>
+    <attribute side="server" code="0x0004" define="MAX_CONST_PRESSURE" type="INT16S" min="0x0000" max="0xFFFF" writable="false" optional="true">MaxConstPressure</attribute>
+    <attribute side="server" code="0x0005" define="MIN_COMP_PRESSURE" type="INT16S" min="0x0000" max="0xFFFF" writable="false" optional="true">MinCompPressure</attribute>
+    <attribute side="server" code="0x0006" define="MAX_COMP_PRESSURE" type="INT16S" min="0x0000" max="0xFFFF" writable="false" optional="true">MaxCompPressure</attribute>
+    <attribute side="server" code="0x0007" define="MIN_CONST_SPEED" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="true">MinConstSpeed</attribute>
+    <attribute side="server" code="0x0008" define="MAX_CONST_SPEED" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="true">MaxConstSpeed</attribute>
+    <attribute side="server" code="0x0009" define="MIN_CONST_FLOW" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="true">MinConstFlow</attribute>
+    <attribute side="server" code="0x000A" define="MAX_CONST_FLOW" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="true">MaxConstFlow</attribute>
+    <attribute side="server" code="0x000B" define="MIN_CONST_TEMP" type="INT16S" min="0x0000" max="0xFFFF" writable="false" optional="true">MinConstTemp</attribute>
+    <attribute side="server" code="0x000C" define="MAX_CONST_TEMP" type="INT16S" min="0x0000" max="0x7FFF" writable="false" optional="true">MaxConstTemp</attribute>
+    <attribute side="server" code="0x0010" define="PUMP_STATUS" type="BITMAP16" writable="false" default="0x0000" reportable="true" optional="true">PumpStatus</attribute>
+    <attribute side="server" code="0x0011" define="EFFECTIVE_OPERATION_MODE" type="ENUM8" min="0x00" max="0xFE" writable="false" optional="false">EffectiveOperationMode</attribute>
+    <attribute side="server" code="0x0012" define="EFFECTIVE_CONTROL_MODE" type="ENUM8" min="0x00" max="0xFE" writable="false" optional="false">EffectiveControlMode</attribute>
+    <attribute side="server" code="0x0013" define="CAPACITY" type="INT16S" min="0x0000" max="0x7FFF" writable="false" reportable="true" optional="false">Capacity</attribute>
+    <attribute side="server" code="0x0014" define="SPEED" type="INT16U" min="0x0000" max="0xFFFE" writable="false" optional="true">Speed</attribute>
+    <attribute side="server" code="0x0015" define="LIFETIME_RUNNING_HOURS" type="INT24U" isNullable="true" writable="true" default="0x000000" optional="true">LifetimeRunningHours</attribute>
+    <attribute side="server" code="0x0016" define="PUMP_POWER" type="INT24U" min="0x000000" max="0xFFFFFE" writable="false" optional="true">Power</attribute>
+    <attribute side="server" code="0x0017" define="LIFETIME_ENERGY_CONSUMED" type="INT32U" isNullable="true" writable="true" default="0x00000000" optional="true">LifetimeEnergyConsumed</attribute>
+    <attribute side="server" code="0x0020" define="OPERATION_MODE" type="ENUM8" min="0x00" max="0xFE" writable="true" default="0x00" optional="false">OperationMode</attribute>
+    <attribute side="server" code="0x0021" define="CONTROL_MODE" type="ENUM8" min="0x00" max="0xFE" writable="true" default="0x00" optional="true">ControlMode</attribute>
+    <attribute side="server" code="0x0022" define="PUMP_ALARM_MASK" type="BITMAP16" writable="false" optional="true">AlarmMask</attribute>
+
+    <event side="server" code="0x00" priority="info" name="SupplyVoltageLow">
+      <description>SupplyVoltageLow</description>
+    </event>
+    <event side="server" code="0x01" priority="info" name="SupplyVoltageHigh">
+      <description>SupplyVoltageHigh</description>
+    </event>
+    <event side="server" code="0x02" priority="info" name="PowerMissingPhase">
+      <description>PowerMissingPhase</description>
+    </event>
+    <event side="server" code="0x03" priority="info" name="SystemPressureLow">
+      <description>SystemPressureLow</description>
+    </event>
+    <event side="server" code="0x04" priority="info" name="SystemPressureHigh">
+      <description>SystemPressureHigh</description>
+    </event>
+    <event side="server" code="0x05" priority="critical" name="DryRunning">
+      <description>DryRunning</description>
+    </event>
+    <event side="server" code="0x06" priority="info" name="MotorTemperatureHigh">
+      <description>MotorTemperatureHigh</description>
+    </event>
+    <event side="server" code="0x07" priority="critical" name="PumpMotorFatalFailure">
+      <description>PumpMotorFatalFailure</description>
+    </event>
+    <event side="server" code="0x08" priority="info" name="ElectronicTemperatureHigh">
+      <description>ElectronicTemperatureHigh</description>
+    </event>
+    <event side="server" code="0x09" priority="critical" name="PumpBlocked">
+      <description>PumpBlocked</description>
+    </event>
+    <event side="server" code="0x0A" priority="info" name="SensorFailure">
+      <description>SensorFailure</description>
+    </event>
+    <event side="server" code="0x0B" priority="info" name="ElectronicNonFatalFailure">
+      <description>ElectronicNonFatalFailure</description>
+    </event>
+    <event side="server" code="0x0C" priority="critical" name="ElectronicFatalFailure">
+      <description>ElectronicFatalFailure</description>
+    </event>
+    <event side="server" code="0x0D" priority="info" name="GeneralFault">
+      <description>GeneralFault</description>
+    </event>
+    <event side="server" code="0x0E" priority="info" name="Leakage">
+      <description>Leakage</description>
+    </event>
+    <event side="server" code="0x0F" priority="info" name="AirDetection">
+      <description>AirDetection</description>
+    </event>
+    <event side="server" code="0x10" priority="info" name="TurbineOperation">
+      <description>TurbineOperation</description>
+    </event>
+  </cluster>
+
+  <bitmap name="PumpStatus" type="BITMAP16">
+    <cluster code="0x0200"/>
+    <field name="DeviceFault" mask="0x1"/>
+    <field name="Supplyfault" mask="0x2"/>
+    <field name="SpeedLow" mask="0x4"/>
+    <field name="SpeedHigh" mask="0x8"/>
+    <field name="LocalOverride" mask="0x10"/>
+    <field name="Running" mask="0x20"/>
+    <field name="RemotePressure" mask="0x40"/>
+    <field name="RemoteFlow" mask="0x80"/>
+    <field name="remoteTemperature" mask="0x100"/>
+  </bitmap>
+
+  <enum name="PumpOperationMode" type="ENUM8">
+    <cluster code="0x0200"/>
+    <item name="Normal" value="0x0"/>
+    <item name="Minimum" value="0x1"/>
+    <item name="Maximum" value="0x2"/>
+    <item name="Local" value="0x3"/>
+  </enum>
+
+  <enum name="PumpControlMode" type="ENUM8">
+    <cluster code="0x0200"/>
+    <item name="ConstantSpeed" value="0x0"/>
+    <item name="ConstantPressure" value="0x1"/>
+    <item name="ProportionalPressure" value="0x2"/>
+    <item name="ConstantFlow" value="0x3"/>
+    <item name="ConstantTemperature" value="0x5"/>
+    <item name="Automatic" value="0x7"/>
+  </enum>
+
+</configurator>

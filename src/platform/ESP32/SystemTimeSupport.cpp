@@ -25,88 +25,100 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <support/TimeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/ESP32/SystemTimeSupport.h>
 
 #include <esp_timer.h>
 
 namespace chip {
 namespace System {
-namespace Platform {
-namespace Layer {
+namespace Clock {
 
-uint64_t GetClock_Monotonic(void)
+namespace Internal {
+ClockImpl gClockImpl;
+} // namespace Internal
+
+Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
 {
-    return (uint64_t)::esp_timer_get_time();
+    return Clock::Microseconds64(::esp_timer_get_time());
 }
 
-uint64_t GetClock_MonotonicMS(void)
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 {
-    return (uint64_t)::esp_timer_get_time() / 1000;
+    return std::chrono::duration_cast<Milliseconds64>(GetMonotonicMicroseconds64());
 }
 
-uint64_t GetClock_MonotonicHiRes(void)
-{
-    return (uint64_t)::esp_timer_get_time();
-}
-
-Error GetClock_RealTime(uint64_t & curTime)
+CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & aCurTime)
 {
     struct timeval tv;
-    int res = gettimeofday(&tv, NULL);
-    if (res != 0)
+    if (gettimeofday(&tv, nullptr) != 0)
     {
-        return MapErrorPOSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
     }
     if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
     {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
-    curTime = (tv.tv_sec * UINT64_C(1000000)) + tv.tv_usec;
-    return CHIP_SYSTEM_NO_ERROR;
+    if (tv.tv_usec < 0)
+    {
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
+    }
+    static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
+    aCurTime = Clock::Microseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000000)) + static_cast<uint64_t>(tv.tv_usec));
+    return CHIP_NO_ERROR;
 }
 
-Error GetClock_RealTimeMS(uint64_t & curTime)
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & aCurTime)
 {
     struct timeval tv;
-    int res = gettimeofday(&tv, NULL);
-    if (res != 0)
+    if (gettimeofday(&tv, nullptr) != 0)
     {
-        return MapErrorPOSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
     }
     if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
     {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
-    curTime = (tv.tv_sec * UINT64_C(1000)) + (tv.tv_usec / 1000);
-    return CHIP_SYSTEM_NO_ERROR;
+    if (tv.tv_usec < 0)
+    {
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
+    }
+    static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
+    aCurTime =
+        Clock::Milliseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000)) + (static_cast<uint64_t>(tv.tv_usec) / 1000));
+    return CHIP_NO_ERROR;
 }
 
-Error SetClock_RealTime(uint64_t newCurTime)
+CHIP_ERROR ClockImpl::SetClock_RealTime(Clock::Microseconds64 aNewCurTime)
 {
     struct timeval tv;
-    tv.tv_sec  = static_cast<time_t>(newCurTime / UINT64_C(1000000));
-    tv.tv_usec = static_cast<long>(newCurTime % UINT64_C(1000000));
-    int res    = settimeofday(&tv, NULL);
-    if (res != 0)
+    tv.tv_sec  = static_cast<time_t>(aNewCurTime.count() / UINT64_C(1000000));
+    tv.tv_usec = static_cast<long>(aNewCurTime.count() % UINT64_C(1000000));
+    if (settimeofday(&tv, nullptr) != 0)
     {
-        return (errno == EPERM) ? CHIP_SYSTEM_ERROR_ACCESS_DENIED : MapErrorPOSIX(errno);
+        return (errno == EPERM) ? CHIP_ERROR_ACCESS_DENIED : CHIP_ERROR_POSIX(errno);
     }
 #if CHIP_PROGRESS_LOGGING
     {
-        uint16_t year;
-        uint8_t month, dayOfMonth, hour, minute, second;
-        SecondsSinceEpochToCalendarTime(tv.tv_sec, year, month, dayOfMonth, hour, minute, second);
-        ChipLogProgress(DeviceLayer,
-                        "Real time clock set to %ld (%04" PRId16 "/%02" PRId8 "/%02" PRId8 " %02" PRId8 ":%02" PRId8 ":%02" PRId8
-                        " UTC)",
-                        tv.tv_sec, year, month, dayOfMonth, hour, minute, second);
+        const time_t timep = tv.tv_sec;
+        struct tm calendar;
+        localtime_r(&timep, &calendar);
+        ChipLogProgress(DeviceLayer, "Real time clock set to %ld (%04" PRId16 "/%02d/%02d %02d:%02d:%02d UTC)", tv.tv_sec,
+                        calendar.tm_year, calendar.tm_mon, calendar.tm_mday, calendar.tm_hour, calendar.tm_min, calendar.tm_sec);
     }
 #endif // CHIP_PROGRESS_LOGGING
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-} // namespace Layer
-} // namespace Platform
+CHIP_ERROR InitClock_RealTime()
+{
+    Clock::Microseconds64 curTime =
+        Clock::Microseconds64((static_cast<uint64_t>(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD) * UINT64_C(1000000)));
+    // Use CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD as the initial value of RealTime.
+    // Then the RealTime obtained from GetClock_RealTime will be always valid.
+    return System::SystemClock().SetClock_RealTime(curTime);
+}
+
+} // namespace Clock
 } // namespace System
 } // namespace chip

@@ -24,12 +24,26 @@ TEST_DIR=$REPO_DIR/src/test_driver/linux-cirque
 LOG_DIR=${LOG_DIR:-$(mktemp -d)}
 GITHUB_ACTION_RUN=${GITHUB_ACTION_RUN:-"0"}
 
+# The image build will clone its own ot-br-posix checkout due to limitations of git submodule.
+# Using the same ot-br-posix version as chip
+OPENTHREAD=$REPO_DIR/third_party/openthread/repo
+OPENTHREAD_CHECKOUT=$(cd "$REPO_DIR" && git rev-parse :third_party/openthread/repo)
+
+CIRQUE_CACHE_PATH=${GITHUB_CACHE_PATH:-"/tmp/cirque-cache/"}
+OT_SIMULATION_CACHE="$CIRQUE_CACHE_PATH/ot-simulation-cmake.tgz"
+OT_SIMULATION_CACHE_STAMP_FILE="$CIRQUE_CACHE_PATH/ot-simulation.commit"
+
 # Append test name here to add more tests for run_all_tests
 CIRQUE_TESTS=(
     "EchoTest"
-    "InteractionModelTest"
-    "OnOffClusterTest"
+    "EchoOverTcpTest"
+    "FailsafeTest"
     "MobileDeviceTest"
+    "CommissioningTest"
+    "InteractionModelTest"
+    "SplitCommissioningTest"
+    "CommissioningFailureTest"
+    "CommissioningFailureOnReportTest"
 )
 
 BOLD_GREEN_TEXT="\033[1;32m"
@@ -37,78 +51,78 @@ BOLD_YELLOW_TEXT="\033[1;33m"
 BOLD_RED_TEXT="\033[1;31m"
 RESET_COLOR="\033[0m"
 
-function __kill_grep() {
-    ps aux | grep "$1" | awk '{print $2}' | sort -k2 -rn |
-        while read -r pid; do
-            kill -2 "$pid"
-        done
-}
-
-function __flask_clean() {
-    __kill_grep 'flask run'
-}
-
-function __socat_clean() {
-    __kill_grep 'socat'
-}
-
-function __virtual_thread_clean() {
-    __kill_grep 'ot-ncp-ftd'
-}
-
 function __cirquetest_start_flask() {
     echo 'Start Flask'
     cd "$REPO_DIR"/third_party/cirque/repo
-    FLASK_APP='cirque/restservice/service.py' \
-        PATH="$PATH":"$REPO_DIR"/third_party/openthread/repo/output/simulation/bin/ \
-        python3 -m flask run >"$LOG_DIR/$CURRENT_TEST/flask.log" 2>&1
+    # When running the ManualTests, if Ctrl-C is send to the shell, it will stop flask as well.
+    # This is not expected. Start a new session to prevent it from receiving signals
+    setsid bash -c 'FLASK_APP=cirque/restservice/service.py \
+        PATH="'"$PATH"'":"'"$REPO_DIR"'"/third_party/openthread/repo/build/simulation/examples/apps/ncp/ \
+        python3 -m flask run >"'"$LOG_DIR"'"/"'"$CURRENT_TEST"'"/flask.log 2>&1' &
+    FLASK_PID=$!
+    echo "Flask running in backgroud with pid $FLASK_PID"
 }
 
 function __cirquetest_clean_flask() {
-    echo 'Cleanup Flask'
-    __flask_clean
-    __socat_clean
-    __virtual_thread_clean
+    echo "Cleanup Flask pid $FLASK_PID"
+    kill -SIGTERM -"$FLASK_PID"
+    mv "$LOG_DIR/$CURRENT_TEST"/flask.log "$LOG_DIR/$CURRENT_TEST"/flask.log.old
+    cat "$LOG_DIR/$CURRENT_TEST"/flask.log.old | sed 's/\\n/\n/g' | sed 's/\\t/ /g' >"$LOG_DIR/$CURRENT_TEST"/flask.log
+    rm "$LOG_DIR/$CURRENT_TEST"/flask.log.old
 }
 
 function __cirquetest_build_ot() {
+    echo -e "[$BOLD_YELLOW_TEXT""INFO""$RESET_COLOR] Cache miss, build openthread simulation."
+    script/cmake-build simulation -DOT_THREAD_VERSION=1.2 -DOT_MTD=OFF -DOT_FTD=OFF
+    tar czf "$OT_SIMULATION_CACHE" build
+    echo "$OPENTHREAD_CHECKOUT" >"$OT_SIMULATION_CACHE_STAMP_FILE"
+}
+
+function __cirquetest_build_ot_lazy() {
     pushd .
     cd "$REPO_DIR"/third_party/openthread/repo
-    ./bootstrap
-    make -f examples/Makefile-simulation
+    ([[ -f "$OT_SIMULATION_CACHE_STAMP_FILE" ]] &&
+        [[ "$(cat "$OT_SIMULATION_CACHE_STAMP_FILE")" = "$OPENTHREAD_CHECKOUT" ]] &&
+        [[ -f "$OT_SIMULATION_CACHE" ]] &&
+        tar zxf "$OT_SIMULATION_CACHE") ||
+        __cirquetest_build_ot
     popd
 }
 
+function __cirquetest_self_hash() {
+    shasum "$SOURCE" | awk '{ print $1 }'
+}
+
+function cirquetest_cachekey() {
+    echo "$("$REPO_DIR"/integrations/docker/ci-only-images/chip-cirque-device-base/cachekey.sh).openthread.$OPENTHREAD_CHECKOUT.cirque_test.$(__cirquetest_self_hash)"
+}
+
+function cirquetest_cachekeyhash() {
+    cirquetest_cachekey | shasum | awk '{ print $1 }'
+}
+
 function cirquetest_bootstrap() {
-    set -e
+    set -ex
+
     cd "$REPO_DIR"/third_party/cirque/repo
     pip3 install pycodestyle==2.5.0 wheel
     make NO_GRPC=1 install -j
 
-    if [[ "x$GITHUB_ACTION_RUN" = "x1" ]]; then
-        "$REPO_DIR"/integrations/docker/images/chip-cirque-device-base/build.sh --try-download --latest
-    else
-        "$REPO_DIR"/integrations/docker/images/chip-cirque-device-base/build.sh --try-download
-    fi
+    "$REPO_DIR"/integrations/docker/ci-only-images/chip-cirque-device-base/build.sh
 
-    __cirquetest_build_ot
+    __cirquetest_build_ot_lazy
     pip3 install -r requirements_nogrpc.txt
-
-    # Call activate here so the later tests can be faster
-    # set -e will cause error if activate.sh is sourced twice
-    # this is an expected behavior caused by pigweed/activate.sh
-    source "$REPO_DIR/scripts/bootstrap.sh"
 }
 
 function cirquetest_run_test() {
     # Start Cirque flash server
     export CURRENT_TEST="$1"
     export DEVICE_LOG_DIR="$LOG_DIR/$CURRENT_TEST"/device_logs
+    shift
     mkdir -p "$DEVICE_LOG_DIR"
-    __cirquetest_start_flask &
+    __cirquetest_start_flask
     sleep 5
-    cd "$TEST_DIR"
-    ./"$1.sh"
+    "$TEST_DIR/$CURRENT_TEST.py" "$@"
     exitcode=$?
     __cirquetest_clean_flask
     # TODO: Do docker system prune, we cannot filter which container

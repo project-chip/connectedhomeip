@@ -3,89 +3,93 @@
 #include <cstdint>
 #include <cinttypes>
 
-#include "af-structs.h"
-#include "call-command-handler.h"
-#include "callback.h"
-#include "cluster-id.h"
-#include "command-id.h"
-#include "app/util/util.h"
-
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
+#include <app/util/util.h>
+#include <app/CommandHandler.h>
 #include <app/InteractionModelEngine.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/TypeTraits.h>
 
 // Currently we need some work to keep compatible with ember lib.
-#include <util/ember-compatibility-functions.h>
+#include <app/util/ember-compatibility-functions.h>
 
 namespace chip {
 namespace app {
 
 // Cluster specific command parsing
 
-namespace clusters {
+namespace Clusters {
 
-{{#all_user_clusters}}
-{{#if (user_cluster_has_enabled_command name side)}}
-namespace {{asCamelCased name false}} {
+{{#all_user_clusters_with_incoming_commands}}
+{{#if (isServer clusterSide)}}
+namespace {{asUpperCamelCase clusterName}} {
 
-void Dispatch{{asCamelCased side false}}Command(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
-    {{#if (user_cluster_has_enabled_manufacturer_command name side)}}
-    {{else}}
-    {{/if}}
+    {{#all_incoming_commands_for_cluster clusterName clusterSide}}
+    {{#first}}
+    CHIP_ERROR TLVError = CHIP_NO_ERROR;
+    bool wasHandled = false;
     {
-        switch (commandId)
+        switch (aCommandPath.mCommandId)
         {
-        {{#all_user_cluster_commands}}
-        {{#unless mfgCode}}
-        {{#if (isStrEqual clusterName parent.name)}}
-        {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
-        case ZCL_{{asDelimitedMacro name}}_COMMAND_ID: {
+    {{/first}}
+        case Commands::{{asUpperCamelCase commandName}}::Id: {
         {{> im_command_handler_cluster_commands}}
             break;
         }
-        {{/if}}
-        {{/if}}
-        {{/unless}}
-        {{/all_user_cluster_commands}}
+    {{#last}}
         default: {
             // Unrecognized command ID, error status will apply.
-            // TODO: Encode response for command not found
-            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, commandId, ZCL_{{asDelimitedMacro define}}_ID);
-            break;
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
+            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
+            return;
         }
         }
     }
+
+    if (CHIP_NO_ERROR != TLVError || !wasHandled)
+    {
+      apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
+      ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+    }
+    {{/last}}
+    {{/all_incoming_commands_for_cluster}}
 }
 
 }
 
 {{/if}}
-{{/all_user_clusters}}
+{{/all_user_clusters_with_incoming_commands}}
 
-} // namespace clusters
+} // namespace Clusters
 
-void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                             chip::TLV::TLVReader & aReader, Command * apCommandObj)
+void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {
-    ChipLogDetail(Zcl, "Received Cluster Command: Cluster=%" PRIx16 " Command=%" PRIx8 " Endpoint=%" PRIx8, aClusterId,
-                  aCommandId, aEndPointId);
-    Compatibility::SetupEmberAfObjects(apCommandObj, aClusterId, aCommandId, aEndPointId);
-    switch (aClusterId)
+    Compatibility::SetupEmberAfCommandHandler(apCommandObj, aCommandPath);
+
+    switch (aCommandPath.mClusterId)
     {
-    {{#all_user_clusters}}
+    {{#chip_server_clusters}}
     {{#if (user_cluster_has_enabled_command name side)}}
-    {{#unless (isClient side) }}
-    case ZCL_{{asDelimitedMacro define}}_ID :
-        clusters::{{asCamelCased name false}}::Dispatch{{asCamelCased side false}}Command(apCommandObj, aCommandId, aEndPointId, aReader);
+    case Clusters::{{asUpperCamelCase name}}::Id:
+        Clusters::{{asUpperCamelCase name}}::Dispatch{{asUpperCamelCase side}}Command(apCommandObj, aCommandPath, aReader);
         break;
-    {{/unless}}
     {{/if}}
-    {{/all_user_clusters}}
+    {{/chip_server_clusters}}
     default:
-        // Unrecognized cluster ID, error status will apply.
-        // TODO: Encode response for Cluster not found
-        ChipLogError(Zcl, "Unknown cluster %" PRIx16, aClusterId);
+        ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mClusterId));
+        apCommandObj->AddStatus(
+          aCommandPath,
+          Protocols::InteractionModel::Status::UnsupportedCluster
+        );
         break;
     }
+
     Compatibility::ResetEmberAfObjects();
 }
 

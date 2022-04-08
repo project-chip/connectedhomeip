@@ -24,29 +24,116 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <platform/Darwin/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
+
+// Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
+#include <platform/internal/GenericPlatformManagerImpl.ipp>
+
+#include <CoreFoundation/CoreFoundation.h>
 
 namespace chip {
 namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
-CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
+CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
     CHIP_ERROR err;
 
     // Initialize the configuration system.
     err = Internal::PosixConfig::Init();
     SuccessOrExit(err);
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
+
+    mRunLoopSem = dispatch_semaphore_create(0);
+
+    // Ensure there is a dispatch queue available
+    GetWorkQueue();
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
+    err = Internal::GenericPlatformManagerImpl<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
+
+    mStartTime = System::SystemClock().GetMonotonicTimestamp();
+
+    static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).SetDispatchQueue(GetWorkQueue());
 
 exit:
     return err;
+}
+
+CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
+{
+    if (mIsWorkQueueRunning == false)
+    {
+        mIsWorkQueueRunning = true;
+        dispatch_resume(mWorkQueue);
+    }
+
+    return CHIP_NO_ERROR;
+};
+
+CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
+{
+    if (mIsWorkQueueRunning == true)
+    {
+        mIsWorkQueueRunning = false;
+        if (dispatch_get_current_queue() != mWorkQueue)
+        {
+            // dispatch_sync is used in order to guarantee serialization of the caller with
+            // respect to any tasks that might already be on the queue, or running.
+            dispatch_sync(mWorkQueue, ^{
+                dispatch_suspend(mWorkQueue);
+            });
+        }
+        else
+        {
+            // We are called from a task running on our work queue.  Dispatch async,
+            // so we don't deadlock ourselves.  Note that we do have to dispatch to
+            // guarantee that we don't signal the semaphore until we have ensured
+            // that no more tasks will run on the queue.
+            dispatch_async(mWorkQueue, ^{
+                dispatch_suspend(mWorkQueue);
+                dispatch_semaphore_signal(mRunLoopSem);
+            });
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void PlatformManagerImpl::_RunEventLoop()
+{
+    _StartEventLoopTask();
+
+    //
+    // Block on the semaphore till we're signalled to stop by
+    // _StopEventLoopTask()
+    //
+    dispatch_semaphore_wait(mRunLoopSem, DISPATCH_TIME_FOREVER);
+}
+
+CHIP_ERROR PlatformManagerImpl::_Shutdown()
+{
+    // Call up to the base class _Shutdown() to perform the bulk of the shutdown.
+    return GenericPlatformManagerImpl<ImplClass>::_Shutdown();
+}
+
+CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
+{
+    if (mWorkQueue == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    const ChipDeviceEvent eventCopy = *event;
+    dispatch_async(mWorkQueue, ^{
+        Impl()->DispatchEvent(&eventCopy);
+    });
+    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer

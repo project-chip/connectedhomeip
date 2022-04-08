@@ -357,7 +357,7 @@ public:
     static uint32_t UpdateEpochKeyId(uint32_t keyId, uint32_t epochKeyId);
 
     static bool IsValidKeyId(uint32_t keyId);
-    static bool IsMessageEncryptionKeyId(uint32_t keyId, bool allowLogicalKeys = true);
+    static bool IsMessageSessionId(uint32_t keyId, bool allowLogicalKeys = true);
     static bool IsSameKeyOrGroup(uint32_t keyId1, uint32_t keyId2);
     static const char * DescribeKey(uint32_t keyId);
 };

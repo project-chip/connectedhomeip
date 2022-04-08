@@ -15,13 +15,12 @@
 #    limitations under the License.
 #
 
-# The list of src and include dirs must be in sync with that in persistent-storage/esp32/main/component.mk
-idf_component_register(PRIV_INCLUDE_DIRS 
+idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_CURRENT_LIST_DIR}"
-                      "${CMAKE_SOURCE_DIR}/.."
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/persistent-storage"
                       SRC_DIRS
                       "${CMAKE_CURRENT_LIST_DIR}"
-                      "${CMAKE_SOURCE_DIR}/.."
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/persistent-storage"
                       PRIV_REQUIRES chip nvs_flash)
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 14)

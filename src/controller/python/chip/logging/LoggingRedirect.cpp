@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
+#include <lib/support/logging/CHIPLogging.h>
 #include <stdio.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace {
 
@@ -26,7 +26,7 @@ using PythonLogCallback = void (*)(uint8_t category, const char * module, const 
 
 PythonLogCallback sPythonLogCallback;
 
-void NativeLoggingCallback(const char * module, uint8_t category, const char * msg, va_list args)
+void ENFORCE_FORMAT(3, 0) NativeLoggingCallback(const char * module, uint8_t category, const char * msg, va_list args)
 {
     if (sPythonLogCallback == nullptr)
     {

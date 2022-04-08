@@ -17,8 +17,8 @@
 
 #import "CHIPPersistentStorageDelegate.h"
 
-#import "CHIPError.h"
-#include <core/CHIPPersistentStorageDelegate.h>
+#import "CHIPError_Internal.h"
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -28,23 +28,17 @@ public:
     CHIPPersistentStorageDelegateBridge();
     ~CHIPPersistentStorageDelegateBridge();
 
-    void setFrameworkDelegate(id<CHIPPersistentStorageDelegate> delegate, dispatch_queue_t queue);
+    void setFrameworkDelegate(_Nullable id<CHIPPersistentStorageDelegate> delegate);
 
-    void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override;
+    CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
 
-    CHIP_ERROR SyncGetKeyValue(const char * key, char * value, uint16_t & size) override;
+    CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
 
-    void AsyncSetKeyValue(const char * key, const char * value) override;
-
-    void AsyncDeleteKeyValue(const char * key) override;
+    CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
 
 private:
     id<CHIPPersistentStorageDelegate> mDelegate;
-    dispatch_queue_t mQueue;
 
-    chip::PersistentStorageResultDelegate * mCallback;
-    CHIPSendSetStatus mSetStatusHandler;
-    CHIPSendDeleteStatus mDeleteStatusHandler;
     NSUserDefaults * mDefaultPersistentStorage;
     dispatch_queue_t mWorkQueue;
 };

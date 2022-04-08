@@ -16,89 +16,84 @@
  */
 
 // Import helpers from zap core
-const zapPath      = '../../../../../third_party/zap/repo/src-electron/';
-const queryConfig  = require(zapPath + 'db/query-config.js')
-const queryImpexp  = require(zapPath + 'db/query-impexp.js')
-const templateUtil = require(zapPath + 'generator/template-util.js')
-const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
-const zclQuery     = require(zapPath + 'db/query-zcl.js')
+const zapPath      = '../../../../../third_party/zap/repo/dist/src-electron/';
+const templateUtil = require(zapPath + 'generator/template-util.js');
+const zclHelper    = require(zapPath + 'generator/helper-zcl.js');
+const iteratorUtil = require(zapPath + 'util/iterator-util.js');
 
-const StringHelper    = require('../../common/StringHelper.js');
-const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
+const { asBlocks, ensureClusters } = require('../../common/ClustersHelper.js');
+const StringHelper                 = require('../../common/StringHelper.js');
+const ChipTypesHelper              = require('../../common/ChipTypesHelper.js');
 
-/**
- * This method converts a ZCL type to the length expected for the
- * BufferWriter.Put method.
- * TODO
- * Not all types are supported at the moment, so if there is any unsupported type
- * that we are trying to convert, it will throw an error.
- */
-function asPutLength(zclType)
+function throwErrorIfUndefined(item, errorMsg, conditions)
 {
-  const type = ChipTypesHelper.asBasicType(zclType);
-  switch (type) {
-  case 'int8_t':
-  case 'int16_t':
-  case 'int32_t':
-  case 'int64_t':
-  case 'uint8_t':
-  case 'uint16_t':
-  case 'uint32_t':
-  case 'uint64_t':
-    return type.replace(/[^0-9]/g, '');
-  default:
-    throw error = 'asPutLength: Unhandled type: ' + zclType;
-  }
+  conditions.forEach(condition => {
+    if (condition == undefined) {
+      console.log(item);
+      console.log(errorMsg);
+      throw error;
+    }
+  });
 }
 
-function asPutCastType(zclType)
+function checkIsInsideClusterBlock(context, name)
 {
-  const type = ChipTypesHelper.asBasicType(zclType);
-  switch (type) {
-  case 'int8_t':
-  case 'int16_t':
-  case 'int32_t':
-  case 'int64_t':
-    return 'u' + type;
-  case 'uint8_t':
-  case 'uint16_t':
-  case 'uint32_t':
-  case 'uint64_t':
-    return type;
-  default:
-    throw error = 'asPutCastType: Unhandled type: ' + zclType;
-  }
+  const clusterName = context.name ? context.name : context.clusterName;
+  const clusterSide = context.side ? context.side : context.clusterSide;
+  const errorMsg    = name + ': Not inside a ({#chip_server_clusters}} block.';
+  throwErrorIfUndefined(context, errorMsg, [ clusterName, clusterSide ]);
+
+  return { clusterName, clusterSide };
 }
 
-function getEnabledClustersForSide(clusters, side)
+function checkIsInsideCommandBlock(context, name)
 {
-  clusters = clusters.filter(cluster => cluster.enabled == 1);
+  const clusterName = context.clusterName;
+  const clusterSide = context.clusterSide;
+  const commandId   = context.id;
+  const errorMsg    = name + ': Not inside a ({#chip_cluster_commands}} block.';
 
-  if (side == 'all') {
-    return clusters;
-  }
+  throwErrorIfUndefined(context, errorMsg, [ commandId, clusterName, clusterSide ]);
 
-  return clusters.filter(cluster => cluster.side == side);
+  return commandId;
 }
 
-function getClusters(options, side)
+function checkIsInsideAttributeBlock(context, name)
 {
-  const db        = this.global.db;
-  const sessionId = this.global.sessionId;
+  const code     = context.code;
+  const errorMsg = name + ': Not inside a ({#chip_server_attributes}} block.';
 
-  return queryImpexp.exportendPointTypeIds(db, sessionId)
-      .then(endpointTypes => zclQuery.exportAllClustersDetailsFromEndpointTypes(db, endpointTypes))
-      .then(clusters => getEnabledClustersForSide(clusters, side));
+  throwErrorIfUndefined(context, errorMsg, [ code ]);
 }
 
-function getClustersAsBlocks(options, side)
+function checkIsChipType(context, name)
 {
-  function fn(pkgId)
-  {
-    return getClusters.call(this, options, side).then(clusters => templateUtil.collectBlocks(clusters, options, this))
-  }
+  const type     = context.chipType;
+  const errorMsg = name + ': Could not find chipType';
 
-  return templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
+  throwErrorIfUndefined(context, errorMsg, [ type ]);
+
+  return type;
+}
+
+function getCommands(methodName)
+{
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, methodName);
+  return clusterSide == 'client' ? ensureClusters(this).getClientCommands(clusterName)
+                                 : ensureClusters(this).getServerCommands(clusterName);
+}
+
+function getAttributes(methodName)
+{
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, methodName);
+  return ensureClusters(this).getAttributesByClusterName(clusterName);
+}
+
+function getResponses(methodName)
+{
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, methodName);
+  return clusterSide == 'client' ? ensureClusters(this).getClientResponses(clusterName)
+                                 : ensureClusters(this).getServerResponses(clusterName);
 }
 
 /**
@@ -108,7 +103,7 @@ function getClustersAsBlocks(options, side)
  */
 function chip_server_clusters(options)
 {
-  return getClustersAsBlocks.call(this, options, 'server');
+  return asBlocks.call(this, ensureClusters(this).getServerClusters(), options);
 }
 
 /**
@@ -117,8 +112,7 @@ function chip_server_clusters(options)
  */
 function chip_has_server_clusters(options)
 {
-  let promise = getClusters.call(this, options, 'server').then(clusters => !!clusters.length);
-  return templateUtil.templatePromise(this.global, promise);
+  return ensureClusters(this).getServerClusters().then(clusters => !!clusters.length);
 }
 
 /**
@@ -128,7 +122,7 @@ function chip_has_server_clusters(options)
  */
 function chip_client_clusters(options)
 {
-  return getClustersAsBlocks.call(this, options, 'client');
+  return asBlocks.call(this, ensureClusters(this).getClientClusters(), options);
 }
 
 /**
@@ -137,8 +131,7 @@ function chip_client_clusters(options)
  */
 function chip_has_client_clusters(options)
 {
-  let promise = getClusters.call(this, options, 'client').then(clusters => !!clusters.length);
-  return templateUtil.templatePromise(this.global, promise);
+  return ensureClusters(this).getClientClusters().then(clusters => !!clusters.length);
 }
 
 /**
@@ -148,7 +141,7 @@ function chip_has_client_clusters(options)
  */
 function chip_clusters(options)
 {
-  return getClustersAsBlocks.call(this, options, 'all');
+  return asBlocks.call(this, ensureClusters(this).getClusters(), options);
 }
 
 /**
@@ -157,172 +150,204 @@ function chip_clusters(options)
  */
 function chip_has_clusters(options)
 {
-  let promise = getClusters.call(this, options, 'client').then(clusters => !!clusters.length);
-  return templateUtil.templatePromise(this.global, promise);
+  return ensureClusters(this).getClusters().then(clusters => !!clusters.length);
 }
 
 /**
- * Creates block iterator over the server side cluster command
- * for a given cluster.
+ * Creates block iterator over the server global responses
+ *
+ * @param {*} options
+ */
+function chip_server_global_responses(options)
+{
+  return asBlocks.call(this, getServerGlobalAttributeResponses(this), options);
+}
+
+async function if_basic_global_response(options)
+{
+  const attribute          = this.response.arguments[0];
+  const globalResponses    = await getServerGlobalAttributeResponses(this);
+  const complexType        = attribute.isNullable || attribute.isOptional || attribute.isStruct || attribute.isArray;
+  const responseTypeExists = globalResponses.find(item => item.chipType == attribute.chipType);
+
+  if (!complexType && responseTypeExists) {
+    return options.fn(this);
+  } else {
+    return options.inverse(this);
+  }
+}
+
+function getServerGlobalAttributeResponses(context)
+{
+  const sorter = (a, b) => a.chipCallback.name.localeCompare(b.chipCallback.name, 'en', { numeric : true });
+
+  const reducer = (unique, item) => {
+    const { type, size, isArray, isOptional, isNullable, chipCallback, chipType } = item.response.arguments[0];
+
+    // List-typed elements have a dedicated callback
+    if (isArray) {
+      return unique;
+    }
+
+    if (unique.find(item => item.chipCallback.name == chipCallback.name)) {
+      return unique;
+    }
+
+    return [...unique, { chipCallback, chipType, size, isOptional, isNullable } ];
+  };
+
+  const filter = attributes => attributes.reduce(reducer, []).sort(sorter);
+  return ensureClusters(context).getAttributesByClusterSide('server').then(filter);
+}
+
+/**
+ * Creates block iterator over the cluster commands for a given cluster/side.
+ *
+ * This function is meant to be used inside a {{#chip_*_clusters}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+function chip_cluster_commands(options)
+{
+  const commands = getCommands.call(this, 'chip_cluster_commands');
+
+  return asBlocks.call(this, commands, options);
+}
+
+/**
+ * Creates block iterator over the cluster responses for a given cluster/side.
+ *
+ * This function is meant to be used inside a {{#chip_*_clusters}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+function chip_cluster_responses(options)
+{
+  const responses = getResponses.call(this, 'chip_cluster_responses');
+
+  return asBlocks.call(this, responses, options);
+}
+
+/**
+ * Creates block iterator over the current command arguments for a given cluster/side.
+ *
+ * This function is meant to be used inside a {{#chip_cluster_commands}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+function chip_cluster_command_arguments(options)
+{
+  const commandId = checkIsInsideCommandBlock(this, 'chip_cluster_command_arguments');
+  const commands  = getCommands.call(this.parent, 'chip_cluster_commands_argments');
+
+  const filter = command => command.id == commandId;
+  return asBlocks.call(this, commands.then(items => items.find(filter).arguments), options);
+}
+
+/**
+ * Creates block iterator over the current command arguments for a given cluster/side.
+ *
+ * This function is meant to be used inside a {{#chip_cluster_commands}}
+ * block. It will throw otherwise.
+ *
+ * The arguments list built by this function differs from {{chip_cluster_command_arguments}}.
+ * For example, if a command contains a single struct argument "SomeStruct", with the following type:
+ *
+ * struct SomeStruct {
+ *   uint8_t a;
+ *   uint16_t b;
+ *   uint32_t c;
+ * }
+ *
+ * then that argument will be expanded into 3 arguments (uint8_t a, uint16_t b, uint32_t c).
+ *
+ * @param {*} options
+ */
+function chip_cluster_command_arguments_with_structs_expanded(options)
+{
+  const commandId = checkIsInsideCommandBlock(this, 'chip_cluster_command_arguments');
+  const commands  = getCommands.call(this.parent, 'chip_cluster_command_arguments_with_structs_expanded');
+
+  const filter = command => command.id == commandId;
+  return asBlocks.call(this, commands.then(items => {
+    const item = items.find(filter);
+    if (item === undefined) {
+      return [];
+    }
+    return item.expandedArguments || item.arguments;
+  }),
+      options);
+}
+
+/**
+ * Creates block iterator over the current response arguments for a given cluster/side.
+ *
+ * This function is meant to be used inside a {{#chip_cluster_responses}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+function chip_cluster_response_arguments(options)
+{
+  const commandId = checkIsInsideCommandBlock(this, 'chip_cluster_response_arguments');
+  const responses = getResponses.call(this.parent, 'chip_cluster_responses_argments');
+
+  const filter = command => command.id == commandId;
+  return asBlocks.call(this, responses.then(items => items.find(filter).arguments), options);
+}
+
+/**
+ * Returns if a given server cluster has any attributes of type List[T]
  *
  * This function is meant to be used inside a {{#chip_server_clusters}}
- * block. It will throws otherwise.
+ * block. It will throw otherwise.
  *
  * @param {*} options
  */
-function chip_server_cluster_commands(options)
+function chip_server_has_list_attributes(options)
 {
-  // Retrieve the clusterName and the clusterSide. If any if not available, an error will be thrown.
-  const clusterName = this.name;
-  const clusterSide = this.side;
-  if (clusterName == undefined || clusterSide == undefined) {
-    const error = 'chip_server_cluster_commands: Could not find relevant parent cluster.';
-    console.log(error);
-    throw error;
-  }
+  const { clusterName } = checkIsInsideClusterBlock(this, 'chip_server_has_list_attributes');
+  const attributes      = ensureClusters(this).getServerAttributes(clusterName);
 
-  function filterCommand(cmd)
-  {
-    return cmd.clusterName == clusterName && cmd.clusterSide == 'client' && cmd.name.includes('Response') == false;
-  }
-
-  const db = this.global.db;
-  return queryImpexp.exportendPointTypeIds(db, this.global.sessionId)
-      .then(endpointTypes => zclQuery.exportClustersAndEndpointDetailsFromEndpointTypes(db, endpointTypes))
-      .then(endpointsAndClusters => zclQuery.exportCommandDetailsFromAllEndpointTypesAndClusters(db, endpointsAndClusters))
-      .then(endpointCommands => endpointCommands.filter(filterCommand))
-      .then(endpointCommands => templateUtil.collectBlocks(endpointCommands, options, this))
+  const filter = attribute => attribute.isArray;
+  return attributes.then(items => items.find(filter));
 }
 
 /**
- * Creates block iterator over the server side cluster command arguments
- * for a given command.
+ * Returns if a given client cluster has any attributes of type List[T]
  *
- * This function is meant to be used inside a {{#chip_server_cluster_commands}}
- * block. It will throws otherwise.
+ * This function is meant to be used inside a {{#chip_client_clusters}}
+ * block. It will throw otherwise.
  *
  * @param {*} options
  */
-function chip_server_cluster_command_arguments(options)
+function chip_client_has_list_attributes(options)
 {
-  const db = this.global.db;
+  const { clusterName } = checkIsInsideClusterBlock(this, 'chip_client_has_list_attributes');
+  const attributes      = ensureClusters(this).getClientAttributes(clusterName);
 
-  function collectItem(arg, pkgId)
-  {
-    return zclHelper.isStruct(db, arg.type, pkgId).then(result => {
-      if (result == 'unknown') {
-        return arg;
-      }
-
-      return zclQuery.selectStructByName(db, arg.type, pkgId).then(rec => {
-        return zclQuery.selectAllStructItemsById(db, rec.id).then(items => items.map(item => {
-          item.name = item.label;
-          return item;
-        }));
-      })
-    })
-  }
-
-  function collectItems(args, pkgId)
-  {
-    return Promise.all(args.map(arg => collectItem.call(this, arg, pkgId))).then(items => items.flat()).then(items => {
-      return Promise.all(items.map(item => {
-        if (StringHelper.isString(item.type)) {
-          item.chipType = 'chip::ByteSpan';
-          return item;
-        }
-
-        return zclHelper.asUnderlyingZclType.call(this, item.type, options).then(zclType => {
-          // Enhanced the command argument with 'chipType', 'chipTypePutLength', 'chipTypePutCastType' for conveniences.
-          item.chipType            = zclType;
-          item.chipTypePutLength   = asPutLength(zclType);
-          item.chipTypePutCastType = asPutCastType(zclType);
-          return item;
-        })
-      }));
-    });
-  }
-
-  function fn(pkgId)
-  {
-    return zclQuery.selectCommandArgumentsByCommandId(db, this.id, pkgId)
-        .then(args => collectItems.call(this, args, pkgId))
-        .then(items => templateUtil.collectBlocks(items, options, this));
-  }
-
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
-  return templateUtil.templatePromise(this.global, promise)
+  const filter = attribute => attribute.isArray;
+  return attributes.then(items => items.find(filter));
 }
 
 /**
- * Returns if a given command argument chip type is signed.
+ * Returns if a given server cluster has any reportable attribute
  *
- * This function is meant to be used inside a {{#chip_*}} block.
- * It will throws otherwise.
- *
- * @param {*} options
- */
-function isSignedType()
-{
-  const type = this.chipType;
-  if (!type) {
-    const error = 'isSignedType: Could not find chipType';
-    console.log(error);
-    throw error;
-  }
-
-  switch (type) {
-  case 'int8_t':
-  case 'int16_t':
-  case 'int32_t':
-  case 'int64_t':
-    return true;
-  default:
-    return false;
-  }
-}
-
-/**
- * Returns if a given command argument chip type is discrete.
- *
- * This function is meant to be used inside a {{#chip_*}} block.
- * It will throws otherwise.
+ * This function is meant to be used inside a {{#chip_server_clusters}}
+ * block. It will throw otherwise.
  *
  * @param {*} options
  */
-function isDiscreteType()
+function chip_server_has_reportable_attributes(options)
 {
-  const type = this.chipType;
-  if (!type) {
-    const error = 'isDiscreteType: Could not find chipType';
-    console.log(error);
-    throw error;
-  }
+  const { clusterName } = checkIsInsideClusterBlock(this, 'chip_server_has_reportable_attributes');
+  const attributes      = ensureClusters(this).getServerAttributes(clusterName);
 
-  return this.discrete;
-}
-
-function getAttributes(pkgId, options)
-{
-  const db = this.global.db;
-  return queryConfig.getAllSessionAttributes(db, this.global.sessionId).then(atts => {
-    return Promise.all(atts.map(att => zclQuery.selectAtomicByName(db, att.type, pkgId).then(atomic => {
-      // Enhanced the attribute with 'atomidId', 'discrete', chipType properties for convenience.
-      att.atomicTypeId = atomic.atomicId;
-      att.discrete     = atomic.discrete;
-
-      if (StringHelper.isString(att.type)) {
-        // Enhanced the command argument with 'chipType' for conveniences.
-        att.chipType = 'chip::ByteSpan';
-        return att;
-      }
-
-      return zclHelper.asUnderlyingZclType.call(this, att.type, options).then(zclType => {
-        att.chipType = zclType;
-        return att;
-      });
-    })));
-  })
+  const filter = attribute => attribute.isReportableAttribute;
+  return attributes.then(items => items.find(filter));
 }
 
 /**
@@ -330,321 +355,168 @@ function getAttributes(pkgId, options)
  * for a given cluster.
  *
  * This function is meant to be used inside a {{#chip_server_clusters}}
- * block. It will throws otherwise.
+ * block. It will throw otherwise.
  *
  * @param {*} options
  */
 function chip_server_cluster_attributes(options)
 {
-  // Retrieve the clusterCode and the clusterSide. If any if not available, an error will be thrown.
-  const clusterCode = this.code;
-  const clusterSide = this.side;
-  if (clusterCode == undefined || clusterSide == undefined) {
-    const error = 'chip_server_cluster_attributes: Could not find relevant parent cluster.';
-    console.log(error);
-    throw error;
-  }
+  const { clusterName } = checkIsInsideClusterBlock(this, 'chip_server_cluster_attributes');
+  const attributes      = ensureClusters(this).getServerAttributes(clusterName);
 
-  function fn(pkgId)
-  {
-    return getAttributes.call(this, pkgId, options).then(atts => {
-      atts = atts.filter(att => att.clusterCode == clusterCode && att.side == 'server');
-      atts.forEach(att => {
-        const sameAttributes = atts.filter(att2 => att.name == att2.name);
-        let isWritable       = !!sameAttributes.find(att2 => att2.writable);
-        let isReportable     = !!sameAttributes.find(att2 => att2.reportable.included);
-        if (isWritable || isReportable) {
-          if (!StringHelper.isString(att.type)) {
-            att.chipTypePutLength   = asPutLength(att.chipType);
-            att.chipTypePutCastType = asPutCastType(att.chipType);
-          }
-          att.writable            = isWritable;
-          att.reportable.included = isReportable;
-        }
-      })
-      atts = atts.filter((att, index) => atts.findIndex(att2 => att.name == att2.name) == index);
-      return templateUtil.collectBlocks(atts, options, this);
-    })
-  }
-
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
-  return templateUtil.templatePromise(this.global, promise);
+  return asBlocks.call(this, attributes, options);
 }
 
 /**
- * Returns if a given attribute is writable.
+ * Creates block iterator over the server side cluster attributes
+ * for a given cluster.
  *
- * This function is meant to be used inside a {{#chip_server_cluster_attributes}} block.
- * It will throws otherwise.
+ * This function is meant to be used inside a {{#chip_server_clusters}}
+ * block. It will throw otherwise.
  *
  * @param {*} options
  */
-function isWritableAttribute(options)
+function chip_server_cluster_events(options)
 {
-  if (this.attributeCode == undefined) {
-    const error = 'isWritableAttribute: missing attribute code.';
-    console.log(error);
-    throw error;
-  }
+  const { clusterName } = checkIsInsideClusterBlock(this, 'chip_server_cluster_events');
+  const events          = ensureClusters(this).getServerEvents(clusterName);
 
-  return this.writable == 1;
+  return asBlocks.call(this, events, options);
+}
+
+function chip_attribute_list_entryTypes(options)
+{
+  checkIsInsideAttributeBlock(this, 'chip_attribute_list_entry_types');
+  return templateUtil.collectBlocks(this.items, options, this);
 }
 
 /**
- * Returns if a given attribute is reportable.
+ * Creates block iterator over commands for a given cluster that have the
+ * following properties:
  *
- * This function is meant to be used inside a {{#chip_server_cluster_attributes}} block.
- * It will throws otherwise.
- *
- * @param {*} options
+ * 1) Are not manufacturer-specific (to exclude MfgSpecificPing)
+ * 2) Are available in the isCommandAvailable sense.
  */
-function isReportableAttribute(options)
+function chip_available_cluster_commands(options)
 {
-  if (this.attributeCode == undefined) {
-    const error = 'isReportableAttribute: missing attribute code.';
-    console.log(error);
-    throw error;
-  }
-
-  return this.reportable.included == 1;
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, 'chip_available_cluster_commands');
+  let promise                        = iteratorUtil.all_user_cluster_commands_helper.call(this, options)
+                    .then(endpointCommands => endpointCommands.filter(command => {
+                      return command.clusterName == clusterName
+                          && zclHelper.isCommandAvailable(
+                              clusterSide, command.incoming, command.outgoing, command.commandSource, command.name)
+                          && /* exclude MfgSpecificPing */ !command.mfgCode;
+                    }))
+                    .then(filteredCommands => templateUtil.collectBlocks(filteredCommands, options, this));
+  return promise;
 }
 
 /**
- * Returns if a given command is manufacturer specific
- *
- * This function is meant to be used inside a {{#chip_server_cluster_commands}} block.
- * It will throws otherwise.
- *
- * @param {*} options
+ * Creates block iterator over structures belonging to the current cluster
  */
-function isManufacturerSpecificCommand()
+async function chip_cluster_specific_structs(options)
 {
-  if (this.commandSource == undefined) {
-    const error = 'isManufacturerSpecificCommand: Not inside a ({#chip_server_cluster_commands}} block.';
-    console.log(error);
-    throw error;
-  }
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, 'chip_cluster_specific_structs');
 
-  return !!this.mfgCode;
+  const structs = await ensureClusters(this).getStructuresByClusterName(clusterName);
+
+  return templateUtil.collectBlocks(structs, options, this);
 }
 
-function asPythonType(zclType)
+/**
+ * Creates block iterator over structures that are shared between clusters
+ */
+async function chip_shared_structs(options)
 {
-  const type = ChipTypesHelper.asBasicType(zclType);
-  switch (type) {
-  case 'int8_t':
-  case 'int16_t':
-  case 'int32_t':
-  case 'int64_t':
-  case 'uint8_t':
-  case 'uint16_t':
-  case 'uint32_t':
-  case 'uint64_t':
-    return 'int';
-  case 'char *':
-    return 'str';
-  case 'uint8_t *':
-  case 'chip::ByteSpan':
-    return 'bytes'
-  }
+  const structs = await ensureClusters(this).getSharedStructs();
+  return templateUtil.collectBlocks(structs, options, this);
 }
 
-function asPythonCType(zclType)
+async function chip_endpoints(options)
 {
-  const type = ChipTypesHelper.asBasicType(zclType);
-  switch (type) {
-  case 'int8_t':
-  case 'int16_t':
-  case 'int32_t':
-  case 'int64_t':
-  case 'uint8_t':
-  case 'uint16_t':
-  case 'uint32_t':
-  case 'uint64_t':
-    return 'c_' + type.replace('_t', '');
-  case 'char *':
-  case 'uint8_t *':
-    return 'c_char_p';
-  }
+  const endpoints = await ensureClusters(this).getEndPoints();
+  return templateUtil.collectBlocks(endpoints, options, this);
 }
 
-function hasSpecificResponse(commandName)
+async function chip_endpoint_clusters(options)
 {
-  // Retrieve the clusterName and the clusterSide. If any if not available, an error will be thrown.
-  const clusterName = this.parent.name;
-  const clusterSide = this.parent.side;
-  if (clusterName == undefined || clusterSide == undefined) {
-    const error = 'chip_server_cluster_commands: Could not find relevant parent cluster.';
-    console.log(error);
-    throw error;
-  }
-
-  function filterCommand(cmd)
-  {
-    return cmd.clusterName == clusterName && cmd.name == (commandName + "Response");
-  }
-
-  function fn(pkgId)
-  {
-    const db = this.global.db;
-    return queryImpexp.exportendPointTypeIds(db, this.global.sessionId)
-        .then(endpointTypes => zclQuery.exportClustersAndEndpointDetailsFromEndpointTypes(db, endpointTypes))
-        .then(endpointsAndClusters => zclQuery.exportCommandDetailsFromAllEndpointTypesAndClusters(db, endpointsAndClusters))
-        .then(endpointCommands => endpointCommands.filter(filterCommand).length)
-  }
-
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
-  return templateUtil.templatePromise(this.global, promise);
+  const clusters = this.clusters;
+  return templateUtil.collectBlocks(clusters, options, this);
 }
 
-function asCallbackAttributeType(attributeType)
+/**
+ * Checks whether a type is an enum for purposes of its chipType.  That includes
+ * both spec-defined enum types and types that we map to enum types in our code.
+ */
+async function if_chip_enum(type, options)
 {
-  switch (parseInt(attributeType)) {
-  case 0x00: // nodata / No data
-  case 0x0A: // data24 / 24-bit data
-  case 0x0C: // data40 / 40-bit data
-  case 0x0D: // data48 / 48-bit data
-  case 0x0E: // data56 / 56-bit data
-  case 0x1A: // map24 / 24-bit bitmap
-  case 0x1C: // map40 / 40-bit bitmap
-  case 0x1D: // map48 / 48-bit bitmap
-  case 0x1E: // map56 / 56-bit bitmap
-  case 0x22: // uint24 / Unsigned 24-bit integer
-  case 0x24: // uint40 / Unsigned 40-bit integer
-  case 0x25: // uint48 / Unsigned 48-bit integer
-  case 0x26: // uint56 / Unsigned 56-bit integer
-  case 0x2A: // int24 / Signed 24-bit integer
-  case 0x2C: // int40 / Signed 40-bit integer
-  case 0x2D: // int48 / Signed 48-bit integer
-  case 0x2E: // int56 / Signed 56-bit integer
-  case 0x38: // semi / Semi-precision
-  case 0x39: // single / Single precision
-  case 0x3A: // double / Double precision
-  case 0x48: // array / Array
-  case 0x49: // struct / Structure
-  case 0x50: // set / Set
-  case 0x51: // bag / Bag
-  case 0xE0: // ToD / Time of day
-  case 0xEA: // bacOID / BACnet OID
-  case 0xF1: // key128 / 128-bit security key
-  case 0xFF: // unk / Unknown
-    return 'Unsupported';
-  case 0x41: // octstr / Octet string
-  case 0x42: // string / Character string
-  case 0x43: // octstr16 / Long octet string
-  case 0x44: // string16 / Long character string
-    return 'String';
-  case 0x08: // data8 / 8-bit data
-  case 0x18: // map8 / 8-bit bitmap
-  case 0x20: // uint8 / Unsigned  8-bit integer
-  case 0x30: // enum8 / 8-bit enumeration
-    return 'Int8u';
-  case 0x09: // data16 / 16-bit data
-  case 0x19: // map16 / 16-bit bitmap
-  case 0x21: // uint16 / Unsigned 16-bit integer
-  case 0x31: // enum16 / 16-bit enumeration
-  case 0xE8: // clusterId / Cluster ID
-  case 0xE9: // attribId / Attribute ID
-    return 'Int16u';
-  case 0x0B: // data32 / 32-bit data
-  case 0x1B: // map32 / 32-bit bitmap
-  case 0x23: // uint32 / Unsigned 32-bit integer
-  case 0xE1: // date / Date
-  case 0xE2: // UTC / UTCTime
-    return 'Int32u';
-  case 0x0F: // data64 / 64-bit data
-  case 0x1F: // map64 / 64-bit bitmap
-  case 0x27: // uint64 / Unsigned 64-bit integer
-  case 0xF0: // EUI64 / IEEE address
-    return 'Int64u';
-  case 0x10: // bool / Boolean
-    return 'Boolean';
-  case 0x28: // int8 / Signed 8-bit integer
-    return 'Int8s';
-  case 0x29: // int16 / Signed 16-bit integer
-    return 'Int16s';
-  case 0x2B: // int32 / Signed 32-bit integer
-    return 'Int32s';
-  case 0x2F: // int64 / Signed 64-bit integer
-    return 'Int64s';
-  default:
-    error = 'Unhandled attribute type ' + attributeType;
-    throw error;
+  if (type.toLowerCase() == 'vendor_id') {
+    return options.fn(this);
   }
-}
 
-function asObjectiveCBasicType(type)
-{
-  if (StringHelper.isOctetString(type)) {
-    return 'NSData *';
-  } else if (StringHelper.isCharString(type)) {
-    return 'NSString *';
+  let pkgId       = await templateUtil.ensureZclPackageId(this);
+  let checkResult = await zclHelper.isEnum(this.global.db, type, pkgId);
+  let result;
+  if (checkResult != 'unknown') {
+    result = options.fn(this);
   } else {
-    return ChipTypesHelper.asBasicType(this.chipType);
+    result = options.inverse(this);
   }
+  return templateUtil.templatePromise(this.global, result);
 }
 
-function asObjectiveCNumberType(label, type)
+async function if_chip_complex(options)
 {
-  function fn(pkgId)
-  {
-    const options = { 'hash' : {} };
-    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
-      switch (zclType) {
-      case 'uint8_t':
-        return 'UnsignedChar';
-      case 'uint16_t':
-        return 'UnsignedShort';
-      case 'uint32_t':
-        return 'UnsignedLong';
-      case 'uint64_t':
-        return 'UnsignedLongLong';
-      case 'int8_t':
-        return 'Char';
-      case 'int16_t':
-        return 'Short';
-      case 'int32_t':
-        return 'Long';
-      case 'int64_t':
-        return 'LongLong';
-      default:
-        error = label + ': Unhandled underlying type ' + zclType + ' for original type ' + type;
-        throw error;
-      }
-    })
+  // `zcl_command_arguments` has an `isArray` property and `type`
+  // contains the array element type.
+  if (this.isArray) {
+    return options.fn(this);
   }
 
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
-  return templateUtil.templatePromise(this.global, promise)
-}
+  // zcl_attributes iterators does not expose an `isArray` property
+  // and `entryType` contains the array element type, while `type`
+  // contains the atomic type, which is array in this case.
+  // https://github.com/project-chip/zap/issues/412
+  if (this.type == 'array') {
+    return options.fn(this);
+  }
 
-function isStrEndsWith(str, substr)
-{
-  return str.endsWith(substr);
+  let pkgId       = await templateUtil.ensureZclPackageId(this);
+  let checkResult = await zclHelper.isStruct(this.global.db, this.type, pkgId);
+  let result;
+  if (checkResult != 'unknown') {
+    result = options.fn(this);
+  } else {
+    result = options.inverse(this);
+  }
+  return templateUtil.templatePromise(this.global, result);
 }
 
 //
 // Module exports
 //
-exports.chip_clusters                         = chip_clusters;
-exports.chip_has_clusters                     = chip_has_clusters;
-exports.chip_client_clusters                  = chip_client_clusters;
-exports.chip_has_client_clusters              = chip_has_client_clusters;
-exports.chip_server_clusters                  = chip_server_clusters;
-exports.chip_has_server_clusters              = chip_has_server_clusters;
-exports.chip_server_cluster_commands          = chip_server_cluster_commands;
-exports.chip_server_cluster_command_arguments = chip_server_cluster_command_arguments
-exports.asBasicType                           = ChipTypesHelper.asBasicType;
-exports.asObjectiveCBasicType                 = asObjectiveCBasicType;
-exports.asObjectiveCNumberType                = asObjectiveCNumberType;
-exports.isSignedType                          = isSignedType;
-exports.isDiscreteType                        = isDiscreteType;
-exports.chip_server_cluster_attributes        = chip_server_cluster_attributes;
-exports.isWritableAttribute                   = isWritableAttribute;
-exports.isReportableAttribute                 = isReportableAttribute;
-exports.isManufacturerSpecificCommand         = isManufacturerSpecificCommand;
-exports.asPythonType                          = asPythonType;
-exports.asPythonCType                         = asPythonCType;
-exports.asCallbackAttributeType               = asCallbackAttributeType;
-exports.hasSpecificResponse                   = hasSpecificResponse;
-exports.isStrEndsWith                         = isStrEndsWith;
+exports.chip_clusters                                        = chip_clusters;
+exports.chip_has_clusters                                    = chip_has_clusters;
+exports.chip_client_clusters                                 = chip_client_clusters;
+exports.chip_has_client_clusters                             = chip_has_client_clusters;
+exports.chip_server_clusters                                 = chip_server_clusters;
+exports.chip_has_server_clusters                             = chip_has_server_clusters;
+exports.chip_cluster_commands                                = chip_cluster_commands;
+exports.chip_cluster_command_arguments                       = chip_cluster_command_arguments;
+exports.chip_cluster_command_arguments_with_structs_expanded = chip_cluster_command_arguments_with_structs_expanded;
+exports.chip_server_global_responses                         = chip_server_global_responses;
+exports.chip_cluster_responses                               = chip_cluster_responses;
+exports.chip_cluster_response_arguments                      = chip_cluster_response_arguments
+exports.chip_attribute_list_entryTypes                       = chip_attribute_list_entryTypes;
+exports.chip_server_cluster_attributes                       = chip_server_cluster_attributes;
+exports.chip_server_cluster_events                           = chip_server_cluster_events;
+exports.chip_server_has_list_attributes                      = chip_server_has_list_attributes;
+exports.chip_server_has_reportable_attributes                = chip_server_has_reportable_attributes;
+exports.chip_available_cluster_commands                      = chip_available_cluster_commands;
+exports.chip_endpoints                                       = chip_endpoints;
+exports.chip_endpoint_clusters                               = chip_endpoint_clusters;
+exports.if_chip_enum                                         = if_chip_enum;
+exports.if_chip_complex                                      = if_chip_complex;
+exports.if_basic_global_response                             = if_basic_global_response;
+exports.chip_cluster_specific_structs                        = chip_cluster_specific_structs;
+exports.chip_shared_structs                                  = chip_shared_structs;

@@ -24,8 +24,8 @@
 
 #pragma once
 
+#include <lib/support/CodeUtils.h>
 #include <platform/ConnectivityManager.h>
-#include <support/CodeUtils.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
@@ -54,6 +54,7 @@ public:
     using BLEAdvertisingMode  = ConnectivityManager::BLEAdvertisingMode;
 
     CHIP_ERROR Init();
+    CHIP_ERROR Shutdown();
     CHIPoBLEServiceMode GetCHIPoBLEServiceMode();
     CHIP_ERROR SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool IsAdvertisingEnabled();
@@ -114,6 +115,14 @@ namespace Internal {
 inline CHIP_ERROR BLEManager::Init()
 {
     return static_cast<ImplClass *>(this)->_Init();
+}
+
+inline CHIP_ERROR BLEManager::Shutdown()
+{
+#if CONFIG_NETWORK_LAYER_BLE
+    ReturnErrorOnFailure(GetBleLayer()->Shutdown());
+#endif
+    return static_cast<ImplClass *>(this)->_Shutdown();
 }
 
 inline BLEManager::CHIPoBLEServiceMode BLEManager::GetCHIPoBLEServiceMode()

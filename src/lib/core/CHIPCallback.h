@@ -49,9 +49,7 @@ public:
      */
     Cancelable * mNext;
     Cancelable * mPrev;
-
-    void * mInfoPtr;
-    uint64_t mInfoScalar;
+    alignas(uint64_t) char mInfo[24];
 
     /**
      * @brief when non-null, indicates the Callback is registered with
@@ -120,7 +118,7 @@ public:
     void * mContext;
 
     /**
-     * where to call when the event of interest has occured
+     * where to call when the event of interest has occurred
      */
     T mCall;
 

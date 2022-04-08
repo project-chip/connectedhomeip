@@ -1,0 +1,8 @@
+{{> header}}
+
+#pragma once
+
+#include <app-common/zap-generated/callbacks/PluginCallbacks.h>
+
+#define MATTER_PLUGINS_INIT {{#all_user_clusters}}Matter{{asUpperCamelCase name}}Plugin{{asUpperCamelCase side}}InitCallback(); {{/all_user_clusters}}
+

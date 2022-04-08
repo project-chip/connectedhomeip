@@ -165,7 +165,7 @@ Objective C{plusplus}. Adapt as appropriate for Perl, Python and Shell.
  *                     interpreted and parsed. If 0 or 16, the string may
  *                     be hexadecimal and prefixed with "0x". Otherwise, a 0
  *                     is implied as 10 unless a leading 0 is encountered in
- *                     which 8 is implied.
+ *                     which case 8 is implied.
  *
  * @retval  0 on success.
  * @retval  #EINVAL if the given base contains an unsupported value or if no

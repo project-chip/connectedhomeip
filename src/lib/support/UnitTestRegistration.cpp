@@ -15,13 +15,14 @@
  *    limitations under the License.
  */
 
+#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <stdlib.h>
 #include <string.h>
-#include <support/UnitTestRegistration.h>
 
 namespace chip {
 
-const size_t kTestSuitesMax = 64;
+const size_t kTestSuitesMax = 128;
 
 typedef struct
 {
@@ -45,6 +46,7 @@ CHIP_ERROR RegisterUnitTests(UnitTestTriggerFunction tests)
 {
     if (gs_test_suites.num_test_suites >= kTestSuitesMax)
     {
+        ChipLogError(Support, "Test suits limit reached");
         return CHIP_ERROR_NO_MEMORY;
     }
 

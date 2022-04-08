@@ -33,9 +33,18 @@
 
 #pragma once
 
+// The nlio headers use [inout] instead of [in,out], which makes the clang
+// documentation warning unhappy.  Suppress it for those headers.
+#pragma GCC diagnostic push
+#ifdef __clang__
+#pragma GCC diagnostic ignored "-Wdocumentation"
+#endif // __clang__
+
 #include <nlbyteorder.hpp>
 #include <nlio-byteorder.hpp>
 #include <nlio.hpp>
+
+#pragma GCC diagnostic pop
 
 #include <stdint.h>
 
@@ -192,7 +201,7 @@ inline void Write8(uint8_t *& p, uint8_t v)
  *  </ul>
  *
  *  On little endian host systems no actual byte reordering will
- *  occur. On other systems, byte reordering is peformed as
+ *  occur. On other systems, byte reordering is performed as
  *  appropriate.
  *
  */
@@ -562,7 +571,7 @@ inline void Write64(uint8_t *& p, uint64_t v)
  *  </ul>
  *
  *  On big endian host systems no actual byte reordering will
- *  occur. On other systems, byte reordering is peformed as
+ *  occur. On other systems, byte reordering is performed as
  *  appropriate.
  *
  */

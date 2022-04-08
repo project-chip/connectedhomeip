@@ -31,7 +31,7 @@ ORG=${DOCKER_BUILD_ORG:-connectedhomeip}
 IMAGE=${DOCKER_BUILD_IMAGE:-$(basename "$(pwd)")}
 
 # version
-VERSION=${DOCKER_BUILD_VERSION:-$(cat version)}
+VERSION=${DOCKER_BUILD_VERSION:-$(sed 's/ .*//' version)}
 
 [[ ${*/--help//} != "${*}" ]] && {
     set +x
@@ -44,6 +44,7 @@ VERSION=${DOCKER_BUILD_VERSION:-$(cat version)}
    --latest   update latest to the current built version (\"$VERSION\")
    --push     push image(s) to docker.io (requires docker login for \"$ORG\")
    --help     get this message
+   --squash   squash docker layers before push them to docker.io (requires docker-squash python module)
 
 "
     exit 0
@@ -58,6 +59,8 @@ set -ex
 
 [[ -n $VERSION ]] || die "version cannot be empty"
 
+mb_space_before=$(df -m /var/lib/docker/ | awk 'FNR==2{print $3}')
+
 # go find and build any CHIP images this image is "FROM"
 awk -F/ '/^FROM connectedhomeip/ {print $2}' Dockerfile | while read -r dep; do
     dep=${dep%:*}
@@ -70,9 +73,15 @@ if [[ ${*/--no-cache//} != "${*}" ]]; then
 fi
 
 docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$VERSION" .
+docker image prune --force
 
 [[ ${*/--latest//} != "${*}" ]] && {
     docker tag "$ORG"/"$IMAGE":"$VERSION" "$ORG"/"$IMAGE":latest
+}
+
+[[ ${*/--squash//} != "${*}" ]] && {
+    command -v docker-squash >/dev/null &&
+        docker-squash "$ORG"/"$IMAGE":"$VERSION" -t "$ORG"/"$IMAGE":latest
 }
 
 [[ ${*/--push//} != "${*}" ]] && {
@@ -81,5 +90,10 @@ docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$
         docker push "$ORG"/"$IMAGE":latest
     }
 }
+
+docker images --filter=reference="$ORG/*"
+df -h /var/lib/docker/
+mb_space_after=$(df -m /var/lib/docker/ | awk 'FNR==2{print $3}')
+printf "%'.f MB total used\n" "$((mb_space_before - mb_space_after))"
 
 exit 0

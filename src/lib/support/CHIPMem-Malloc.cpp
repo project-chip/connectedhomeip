@@ -23,8 +23,9 @@
  *
  */
 
-#include <core/CHIPConfig.h>
-#include <support/CHIPMem.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
 
 #include <stdlib.h>
 
@@ -35,7 +36,7 @@
 
 #if CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 #include <dmalloc.h>
-#include <support/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #endif // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 
 #if CHIP_CONFIG_MEMORY_MGMT_MALLOC
@@ -56,32 +57,20 @@ static std::atomic_int memoryInitialized{ 0 };
 
 static void VerifyInitialized(const char * func)
 {
-    if (!memoryInitialized)
-    {
-        fprintf(stderr, "ABORT: chip::Platform::%s() called before chip::Platform::MemoryInit()\n", func);
-        abort();
-    }
+    VerifyOrDieWithMsg(memoryInitialized, Support, "ABORT: chip::Platform::%s() called before chip::Platform::MemoryInit()\n",
+                       func);
 }
 
 #define VERIFY_POINTER(p)                                                                                                          \
-    do                                                                                                                             \
-        if (((p) != nullptr) && (MemoryDebugCheckPointer((p)) == false))                                                           \
-        {                                                                                                                          \
-            fprintf(stderr, "ABORT: chip::Platform::%s() found corruption on %p\n", __func__, (p));                                \
-            abort();                                                                                                               \
-        }                                                                                                                          \
-    while (0)
+    VerifyOrDieWithMsg((p) == nullptr || MemoryDebugCheckPointer((p)), Support,                                                    \
+                       "ABORT: chip::Platform::%s() found corruption on %p\n", __func__, (p))
 
 #endif
 
 CHIP_ERROR MemoryAllocatorInit(void * buf, size_t bufSize)
 {
 #ifndef NDEBUG
-    if (memoryInitialized++ > 0)
-    {
-        fprintf(stderr, "ABORT: chip::Platform::MemoryInit() called twice.\n");
-        abort();
-    }
+    VerifyOrDieWithMsg(memoryInitialized++ == 0, Support, "ABORT: chip::Platform::MemoryInit() called twice.\n");
 #endif
     return CHIP_NO_ERROR;
 }
@@ -89,11 +78,7 @@ CHIP_ERROR MemoryAllocatorInit(void * buf, size_t bufSize)
 void MemoryAllocatorShutdown()
 {
 #ifndef NDEBUG
-    if (--memoryInitialized < 0)
-    {
-        fprintf(stderr, "ABORT: chip::Platform::MemoryShutdown() called twice.\n");
-        abort();
-    }
+    VerifyOrDieWithMsg(--memoryInitialized == 0, Support, "ABORT: chip::Platform::MemoryShutdown() called twice.\n");
 #endif
 #if CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
     dmalloc_shutdown();
@@ -101,12 +86,6 @@ void MemoryAllocatorShutdown()
 }
 
 void * MemoryAlloc(size_t size)
-{
-    VERIFY_INITIALIZED();
-    return MemoryAlloc(size, false);
-}
-
-void * MemoryAlloc(size_t size, bool isLongTermAlloc)
 {
     VERIFY_INITIALIZED();
     return malloc(size);

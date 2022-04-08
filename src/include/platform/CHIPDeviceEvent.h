@@ -23,6 +23,9 @@
  */
 
 #pragma once
+#include <stdint.h>
+
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -158,6 +161,13 @@ enum PublicEventTypes
     kTimeSyncChange,
 
     /**
+     * SED Polling Interval Change
+     *
+     * Signals a change to the sleepy end device polling interval.
+     */
+    kSEDPollingIntervalChange,
+
+    /**
      * Security Session Established
      *
      * Signals that an external entity has established a new security session with the device.
@@ -170,6 +180,13 @@ enum PublicEventTypes
      * Signals that an external entity has established a new CHIPoBLE connection with the device.
      */
     kCHIPoBLEConnectionEstablished,
+
+    /**
+     * CHIPoBLE Connection Closed
+     *
+     * Signals that an external entity has closed existing CHIPoBLE connection with the device.
+     */
+    kCHIPoBLEConnectionClosed,
 
     /**
      * Thread State Change
@@ -197,6 +214,37 @@ enum PublicEventTypes
      * wifi/ethernet interface.
      */
     kInterfaceIpAddressChanged,
+
+    /**
+     * Commissioning has completed by a call to the general commissioning cluster command.
+     */
+    kCommissioningComplete,
+
+    /**
+     * Signals that the fail-safe timer expired before the CommissioningComplete command was
+     * successfully invoked.
+     */
+    kFailSafeTimerExpired,
+
+    /**
+     *
+     */
+    kOperationalNetworkEnabled,
+
+    /**
+     * Signals that DNS-SD platform layer was initialized and is ready to operate.
+     */
+    kDnssdPlatformInitialized,
+
+    /**
+     * Signals that bindings were updated.
+     */
+    kBindingsChangedViaCluster,
+
+    /**
+     * Signals that the state of the OTA engine changed.
+     */
+    kOtaStateChanged,
 };
 
 /**
@@ -210,12 +258,14 @@ enum InternalEventTypes
     kEventTypeNotSet = kRange_Internal,
     kNoOp,
     kCallWorkFunct,
+    kChipLambdaEvent,
     kChipSystemLayerEvent,
     kCHIPoBLESubscribe,
     kCHIPoBLEUnsubscribe,
     kCHIPoBLEWriteReceived,
     kCHIPoBLEIndicateConfirm,
     kCHIPoBLEConnectionError,
+    kCHIPoBLENotifyConfirm
 };
 
 static_assert(kEventTypeNotSet == 0, "kEventTypeNotSet must be defined as 0");
@@ -254,6 +304,11 @@ enum ActivityChange
     kActivity_Stopped  = -1,
 };
 
+enum OtaState
+{
+    kOtaSpaceAvailable = 0,
+};
+
 inline ConnectivityChange GetConnectivityChange(bool prevState, bool newState)
 {
     if (prevState == newState)
@@ -281,6 +336,10 @@ typedef void (*AsyncWorkFunct)(intptr_t arg);
 #endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
 #include <ble/BleConfig.h>
+#include <inet/InetInterface.h>
+#include <lib/support/LambdaBridge.h>
+#include <system/SystemEvent.h>
+#include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -296,12 +355,7 @@ struct ChipDeviceEvent final
     union
     {
         ChipDevicePlatformEvent Platform;
-        struct
-        {
-            ::chip::System::EventType Type;
-            ::chip::System::Object * Target;
-            uintptr_t Argument;
-        } ChipSystemLayerEvent;
+        LambdaBridge LambdaEvent;
         struct
         {
             AsyncWorkFunct WorkFunct;
@@ -357,7 +411,7 @@ struct ChipDeviceEvent final
         {
             uint64_t PeerNodeId;
             uint16_t SessionKeyId;
-            uint8_t EncType;
+            uint8_t SessionType;
             bool IsCommissioner;
         } SessionEstablished;
         struct
@@ -384,6 +438,10 @@ struct ChipDeviceEvent final
         } CHIPoBLEConnectionError;
         struct
         {
+            BLE_CONNECTION_OBJECT ConId;
+        } CHIPoBLENotifyConfirm;
+        struct
+        {
             bool RoleChanged : 1;
             bool AddressChanged : 1;
             bool NetDataChanged : 1;
@@ -401,6 +459,30 @@ struct ChipDeviceEvent final
         {
             InterfaceIpChangeType Type;
         } InterfaceIpAddressChanged;
+
+        struct
+        {
+            uint64_t PeerNodeId;
+            FabricIndex PeerFabricIndex;
+        } CommissioningComplete;
+
+        struct
+        {
+            FabricIndex PeerFabricIndex;
+            bool AddNocCommandHasBeenInvoked;
+            bool UpdateNocCommandHasBeenInvoked;
+        } FailSafeTimerExpired;
+
+        struct
+        {
+            // TODO(cecille): This should just specify wifi or thread since we assume at most 1.
+            int network;
+        } OperationalNetwork;
+
+        struct
+        {
+            OtaState newState;
+        } OtaStateChanged;
     };
 
     void Clear() { memset(this, 0, sizeof(*this)); }

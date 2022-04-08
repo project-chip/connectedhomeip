@@ -18,54 +18,75 @@
  */
 
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
-
-#include <transport/RendezvousSessionDelegate.h>
+#include "lib/support/TypeTraits.h"
 
 namespace chip {
 namespace Controller {
-
-void ScriptDevicePairingDelegate::SetWifiCredential(const char * ssid, const char * password)
-{
-    strncpy(mWifiSSID, ssid, sizeof(mWifiSSID));
-    strncpy(mWifiPassword, password, sizeof(mWifiPassword));
-    mMode = Mode::Wifi;
-}
-
-void ScriptDevicePairingDelegate::SetThreadCredential(uint8_t channel, uint16_t panId,
-                                                      uint8_t (&masterKey)[chip::DeviceLayer::Internal::kThreadMasterKeyLength])
-{
-    mThreadInfo               = {};
-    mThreadInfo.ThreadChannel = channel;
-    mThreadInfo.ThreadPANId   = panId;
-    memcpy(mThreadInfo.ThreadMasterKey, masterKey, sizeof(masterKey));
-    mMode = Mode::Thread;
-}
-
-void ScriptDevicePairingDelegate::OnNetworkCredentialsRequested(RendezvousDeviceCredentialsDelegate * callback)
-{
-    if (mMode == Mode::Wifi)
-        callback->SendNetworkCredentials(mWifiSSID, mWifiPassword);
-    else
-        callback->SendThreadCredentials(mThreadInfo);
-}
-
-void ScriptDevicePairingDelegate::OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
-                                                                    RendezvousDeviceCredentialsDelegate * callback)
-{
-    // TODO: Implement this
-    ChipLogDetail(Controller, "ScriptDevicePairingDelegate::OnOperationalCredentialsRequested\n");
-}
 
 void ScriptDevicePairingDelegate::SetKeyExchangeCallback(DevicePairingDelegate_OnPairingCompleteFunct callback)
 {
     mOnPairingCompleteCallback = callback;
 }
 
+void ScriptDevicePairingDelegate::SetCommissioningCompleteCallback(DevicePairingDelegate_OnCommissioningCompleteFunct callback)
+{
+    mOnCommissioningCompleteCallback = callback;
+}
+
+void ScriptDevicePairingDelegate::SetCommissioningSuccessCallback(DevicePairingDelegate_OnCommissioningSuccessFunct callback)
+{
+    mOnCommissioningSuccessCallback = callback;
+}
+
+void ScriptDevicePairingDelegate::SetCommissioningFailureCallback(DevicePairingDelegate_OnCommissioningFailureFunct callback)
+{
+    mOnCommissioningFailureCallback = callback;
+}
+
+void ScriptDevicePairingDelegate::SetCommissioningStatusUpdateCallback(
+    DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback)
+{
+    mOnCommissioningStatusUpdateCallback = callback;
+}
+
 void ScriptDevicePairingDelegate::OnPairingComplete(CHIP_ERROR error)
 {
     if (mOnPairingCompleteCallback != nullptr)
     {
-        mOnPairingCompleteCallback(error);
+        mOnPairingCompleteCallback(error.AsInteger());
+    }
+}
+
+void ScriptDevicePairingDelegate::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR error)
+{
+    if (mOnCommissioningCompleteCallback != nullptr)
+    {
+        mOnCommissioningCompleteCallback(nodeId, error.AsInteger());
+    }
+}
+
+void ScriptDevicePairingDelegate::OnCommissioningSuccess(PeerId peerId)
+{
+    if (mOnCommissioningSuccessCallback != nullptr)
+    {
+        mOnCommissioningSuccessCallback(peerId);
+    }
+}
+
+void ScriptDevicePairingDelegate::OnCommissioningFailure(PeerId peerId, CHIP_ERROR error, CommissioningStage stageFailed,
+                                                         Optional<Credentials::AttestationVerificationResult> additionalErrorInfo)
+{
+    if (mOnCommissioningFailureCallback != nullptr)
+    {
+        mOnCommissioningFailureCallback(peerId, error, stageFailed, additionalErrorInfo);
+    }
+}
+
+void ScriptDevicePairingDelegate::OnCommissioningStatusUpdate(PeerId peerId, CommissioningStage stageCompleted, CHIP_ERROR error)
+{
+    if (mOnCommissioningStatusUpdateCallback != nullptr)
+    {
+        mOnCommissioningStatusUpdateCallback(peerId, stageCompleted, error);
     }
 }
 

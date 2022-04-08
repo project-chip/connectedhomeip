@@ -25,23 +25,28 @@
 class Commands
 {
 public:
-    using NodeId         = ::chip::NodeId;
     using CommandsVector = ::std::vector<std::unique_ptr<Command>>;
 
     void Register(const char * clusterName, commands_list commandsList);
-    int Run(NodeId localId, NodeId remoteId, int argc, char ** argv);
+    int Run(int argc, char ** argv);
+    int RunInteractive(int argc, char ** argv);
 
 private:
-    CHIP_ERROR RunCommand(PersistentStorage & storage, NodeId localId, NodeId remoteId, int argc, char ** argv);
+    CHIP_ERROR RunCommand(int argc, char ** argv, bool interactive = false);
+
     std::map<std::string, CommandsVector>::iterator GetCluster(std::string clusterName);
     Command * GetCommand(CommandsVector & commands, std::string commandName);
     Command * GetGlobalCommand(CommandsVector & commands, std::string commandName, std::string attributeName);
+    bool IsAttributeCommand(std::string commandName) const;
+    bool IsEventCommand(std::string commandName) const;
     bool IsGlobalCommand(std::string commandName) const;
 
     void ShowClusters(std::string executable);
     void ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands);
     void ShowClusterAttributes(std::string executable, std::string clusterName, std::string commandName, CommandsVector & commands);
+    void ShowClusterEvents(std::string executable, std::string clusterName, std::string commandName, CommandsVector & commands);
     void ShowCommand(std::string executable, std::string clusterName, Command * command);
 
     std::map<std::string, CommandsVector> mClusters;
+    PersistentStorage mStorage;
 };

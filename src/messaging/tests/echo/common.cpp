@@ -25,12 +25,16 @@
 #include <errno.h>
 
 #include "common.h"
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/ErrorStr.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 
-// The ExchangeManager global object.
+chip::FabricTable gFabricTable;
+chip::SessionManager gSessionManager;
 chip::Messaging::ExchangeManager gExchangeManager;
+chip::secure_channel::MessageCounterManager gMessageCounterManager;
+chip::TestPersistentStorageDelegate gStorage;
 
 void InitializeChip(void)
 {
@@ -46,6 +50,10 @@ void InitializeChip(void)
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
+    // Initialize TCP.
+    err = chip::DeviceLayer::TCPEndPointManager()->Init(chip::DeviceLayer::SystemLayer());
+    SuccessOrExit(err);
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -56,6 +64,9 @@ exit:
 
 void ShutdownChip(void)
 {
+    gMessageCounterManager.Shutdown();
     gExchangeManager.Shutdown();
+    gSessionManager.Shutdown();
+    (void) chip::DeviceLayer::TCPEndPointManager()->Shutdown();
     chip::DeviceLayer::PlatformMgr().Shutdown();
 }

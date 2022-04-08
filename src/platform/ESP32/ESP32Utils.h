@@ -30,6 +30,7 @@ class ESP32Utils
 {
 public:
     static CHIP_ERROR IsAPEnabled(bool & apEnabled);
+    static CHIP_ERROR IsStationEnabled(bool & staEnabled);
     static bool IsStationProvisioned(void);
     static CHIP_ERROR IsStationConnected(bool & connected);
     static CHIP_ERROR StartWiFiLayer(void);
@@ -45,7 +46,21 @@ public:
     static CHIP_ERROR GetWiFiStationProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials);
     static CHIP_ERROR SetWiFiStationProvision(const Internal::DeviceNetworkInfo & netInfo);
     static CHIP_ERROR ClearWiFiStationProvision(void);
+
+    static CHIP_ERROR MapError(esp_err_t error);
+    static void RegisterESP32ErrorFormatter();
+    static bool FormatError(char * buf, uint16_t bufSize, CHIP_ERROR err);
 };
+
+#define ReturnMappedErrorOnFailure(expr)                                                                                           \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        esp_err_t __err = (expr);                                                                                                  \
+        if (__err != ESP_OK)                                                                                                       \
+        {                                                                                                                          \
+            return chip::DeviceLayer::Internal::ESP32Utils::MapError(__err);                                                       \
+        }                                                                                                                          \
+    } while (false)
 
 } // namespace Internal
 } // namespace DeviceLayer

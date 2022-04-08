@@ -1,0 +1,36 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+
+import("${build_root}/config/sysroot.gni")
+import("${build_root}/toolchain/gcc_toolchain.gni")
+
+template("tizen_toolchain") {
+  _invoker_toolchain_args = invoker.toolchain_args
+
+  _tizen_toolchain_args = {
+    current_os = "tizen"
+    is_clang = true
+
+    forward_variables_from(_invoker_toolchain_args, "*")
+  }
+
+  gcc_toolchain(target_name) {
+    toolchain_args = _tizen_toolchain_args
+    ar = "$sysroot/bin/arm-linux-gnueabi-ar"
+    cc = "$sysroot/bin/arm-linux-gnueabi-gcc"
+    cxx = "$sysroot/bin/arm-linux-gnueabi-g++"
+  }
+}

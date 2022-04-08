@@ -23,7 +23,6 @@ following features are available:
 
 -   [CHIP ESP32 Pigweed Example Application](#chip-esp32-pigweed-example-application)
     -   [Building the Example Application](#building-the-example-application)
-        -   [To build the application, follow these steps:](#to-build-the-application-follow-these-steps)
     -   [Testing the Example Application](#testing-the-example-application)
 
 ---
@@ -36,50 +35,60 @@ Development Framework and the xtensa-esp32-elf toolchain.
 The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
 
--   Clone the Espressif ESP-IDF and checkout release/v4.2 branch
+-   Clone the Espressif ESP-IDF and checkout
+    [v4.4 release](https://github.com/espressif/esp-idf/releases/tag/v4.4)
 
           $ mkdir ${HOME}/tools
           $ cd ${HOME}/tools
           $ git clone https://github.com/espressif/esp-idf.git
           $ cd esp-idf
-          $ git checkout release/v4.2
+          $ git checkout v4.4
           $ git submodule update --init
-          $ export IDF_PATH=${HOME}/tools/esp-idf
           $ ./install.sh
 
 -   Install ninja-build
 
           $ sudo apt-get install ninja-build
 
-### To build the application, follow these steps:
-
 Currently building in VSCode _and_ deploying from native is not supported, so
 make sure the IDF_PATH has been exported(See the manual setup steps above).
 
--   In the root of the example directory, sync the CHIP tree's submodules and
-    source `idf.sh`. Note: This does not have to be repeated for incremental
-    builds.
+-   Setting up the environment
 
-          $ source idf.sh
+To download and install packages.
+
+        $ cd ${HOME}/tools/esp-idf
+        $ ./install.sh
+        $ . ./export.sh
+        $ cd {path-to-connectedhomeip}
+
+    To download and install packages.
+
+        $ source ./scripts/bootstrap.sh
+        $ source ./scripts/activate.sh
+
+    If packages are already installed then simply activate them.
+
+        $ source ./scripts/activate.sh
+
+-   Target Select
+
+        $ idf.py set-target esp32(or esp32c3)
 
 -   Configuration Options
 
-        To choose from the different configuration options, run menuconfig
+        To choose from the different configuration options, run menuconfig.
 
-          $ idf make menuconfig
+          $ idf.py menuconfig
 
         This example uses UART0 for serial communication. You can change this through
         `PW RPC Example Configuration`. As a result, the console has been shifted to UART1
         You can change this through `Component config` -> `Common ESP-related` ->
         `UART for console output`
 
-        To use the default configuration options, run the default config
+-   To build the demo application.
 
-          $ idf make defconfig
-
--   Run make to build the demo application.
-
-          $ idf make
+          $ idf.py build
 
 -   After building the application, to flash it outside of VSCode, connect your
     device via USB. Then run the following command to flash the demo application
@@ -90,11 +99,29 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
     before flashing. For ESP32-DevKitC devices this is labeled in the
     [functional description diagram](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-devkitc.html#functional-description).
 
-          $ idf make flash ESPPORT=/dev/tty.SLAB_USBtoUART
+          $ idf.py -p /dev/tty.SLAB_USBtoUART build flash
 
     Note: Some users might have to install the
     [VCP driver](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
     before the device shows up on `/dev/tty`.
+
+### Flashing app using script
+
+-   Follow these steps to use `${app_name}.flash.py`.
+
+    -   First set IDF target, run set-target with one of the commands.
+
+            $ idf.py set-target esp32
+            $ idf.py set-target esp32c3
+
+    -   Execute below sequence of commands
+
+```
+        $ export ESPPORT=/dev/tty.SLAB_USBtoUART
+        $ idf.py build
+        $ idf.py flashing_script
+        $ python ${app_name}.flash.py
+```
 
 ## Testing the Example Application
 

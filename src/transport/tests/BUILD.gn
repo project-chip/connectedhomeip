@@ -23,15 +23,19 @@ chip_test_suite("tests") {
   output_name = "libTransportLayerTests"
 
   test_sources = [
-    "TestPASESession.cpp",
+    "TestGroupMessageCounter.cpp",
+    "TestPairingSession.cpp",
     "TestPeerConnections.cpp",
+    "TestPeerMessageCounter.cpp",
     "TestSecureSession.cpp",
-    "TestSecureSessionMgr.cpp",
+    "TestSessionManager.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/credentials/tests:cert_test_vectors",
     "${chip_root}/src/inet/tests:helpers",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",

@@ -19,7 +19,7 @@
 
 #include <functional>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 
 namespace chip {
 namespace python {

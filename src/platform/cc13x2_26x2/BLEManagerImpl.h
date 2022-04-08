@@ -22,33 +22,30 @@
  * Instruments cc13xx_cc26xx platform.
  */
 
-#ifndef BLEManager_IMPL_H
-#define BLEManager_IMPL_H
-
 #pragma once
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include "FreeRTOS.h"
 #include <queue.h>
 #include <task.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <icall.h>
 #include <icall_ble_api.h>
 
 #include "hal_types.h"
 
-#include "chipOBleProfile.h"
 #include "ti_ble_config.h"
 #include "ti_drivers_config.h"
 
 #ifdef __cplusplus
 }
 #endif
+
+#include "chipOBleProfile.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -71,6 +68,10 @@ using namespace chip::Ble;
 #define CHIPOBLE_ADV_SIZE_NO_DEVICE_ID_INFO (4)
 
 #define CHIPOBLE_SCANRES_SIZE_NO_NAME (6)
+
+#define CHIPOBLE_ADV_DATA_MAX_SIZE (GAP_DEVICE_NAME_LEN + CHIPOBLE_SCANRES_SIZE_NO_NAME)
+
+#define CHIPOBLE_DEVICE_DESC_LENGTH (4)
 
 // How often to read current current RPA (in ms)
 #define READ_RPA_EVT_PERIOD 3000
@@ -206,6 +207,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
+    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
     CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);
@@ -262,19 +264,20 @@ private:
     static chipOBleProfileCBs_t CHIPoBLEProfile_CBs;
     static gapBondCBs_t BLEMgr_BondMgrCBs;
 
-    enum
+    enum class Flags : uint16_t
     {
-        kFlag_AdvertisingEnabled       = 0x0001, /* App enabled CHIPoBLE advertising */
-        kFlag_FastAdvertisingEnabled   = 0x0002, /* App enabled Fash CHIPoBLE advertising */
-        kFlag_Advertising              = 0x0004, /* TI BLE stack actively advertising */
-        kFlag_BLEStackInitialized      = 0x0008, /* TI BLE Stack GAP Intilization complete */
-        kFlag_BLEStackGATTNameUpdate   = 0x0010, /* Trigger TI BLE Stack name update, must be performed prior to adv start */
-        kFlag_BLEStackGATTNameSet      = 0x0020, /* Device name has been set externally*/
-        kFlag_AdvertisingRefreshNeeded = 0x0040, /* Advertising settings changed and it should be restarted */
+        kAdvertisingEnabled       = 0x0001, /* App enabled CHIPoBLE advertising */
+        kFastAdvertisingEnabled   = 0x0002, /* App enabled Fash CHIPoBLE advertising */
+        kAdvertising              = 0x0004, /* TI BLE stack actively advertising */
+        kBLEStackInitialized      = 0x0008, /* TI BLE Stack GAP/GATT Intilization complete */
+        kBLEStackAdvInitialized   = 0x0010, /* TI BLE Stack Advertisement Intilization complete */
+        kBLEStackGATTNameUpdate   = 0x0020, /* Trigger TI BLE Stack name update, must be performed prior to adv start */
+        kBLEStackGATTNameSet      = 0x0040, /* Device name has been set externally*/
+        kAdvertisingRefreshNeeded = 0x0080, /* Advertising settings changed and it should be restarted */
 
     };
 
-    uint16_t mFlags;
+    BitFlags<Flags> mFlags;
     CHIPoBLEServiceMode mServiceMode;
     char mDeviceName[GAP_DEVICE_NAME_LEN];
 
@@ -289,13 +292,16 @@ private:
     // Current Random Private Address
     uint8_t rpa[B_ADDR_LEN] = { 0 };
 
+    uint8_t mAdvDatachipOBle[CHIPOBLE_ADV_DATA_MAX_SIZE];
+    uint8_t mScanResDatachipOBle[CHIPOBLE_ADV_DATA_MAX_SIZE];
+
     ClockP_Struct clkRpaRead;
     ClockP_Struct clkAdvTimeout;
     // Memory to pass RPA read event ID to clock handler
     ClockEventData_t argRpaRead = { .event = READ_RPA_EVT };
 
     // ===== Private BLE Stack Helper functions.
-    void AdvInit(void);
+    void ConfigureAdvertisements(void);
     void EventHandler_init(void);
     void InitPHYRSSIArray(void);
     CHIP_ERROR CreateEventHandler(void);
@@ -361,5 +367,3 @@ inline BleLayer * BLEManagerImpl::_GetBleLayer()
 } // namespace chip
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
-#endif // BLEManager_IMPL_H

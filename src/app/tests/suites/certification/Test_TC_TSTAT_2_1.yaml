@@ -1,0 +1,578 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 42.2.1. [TC-TSTAT-2.1] Attributes with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Thermostat"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    #issue  #11524 below disabled steps are for attributes not supported in YAML framework
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT: LocalTemperature"
+      command: "readAttribute"
+      attribute: "local temperature"
+      response:
+          constraints:
+              type: int16
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          AbsMinHeatSetpointLimit"
+      command: "readAttribute"
+      attribute: "abs min heat setpoint limit"
+      response:
+          constraints:
+              type: int16
+              minValue: 700
+              maxValue: 3000
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          AbsMaxHeatSetpointLimit"
+      command: "readAttribute"
+      attribute: "abs max heat setpoint limit"
+      response:
+          constraints:
+              type: int16
+              minValue: 700
+              maxValue: 3000
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          AbsMinCoolSetpointLimit"
+      optional: true
+      command: "readAttribute"
+      attribute: "abs min cool setpoint limit"
+      response:
+          constraints:
+              type: int16
+              minValue: 1600
+              maxValue: 3200
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          AbsMaxCoolSetpointLimit"
+      optional: true
+      command: "readAttribute"
+      attribute: "abs max cool setpoint limit"
+      response:
+          constraints:
+              type: int16
+              minValue: 1600
+              maxValue: 3200
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT: PICoolingDemand"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PICoolingDemand"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 100
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT: PIHeatingDemand"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PIHeatingDemand"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 100
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          OccupiedCoolingSetpoint"
+      optional: true
+      command: "readAttribute"
+      attribute: "occupied cooling setpoint"
+      response:
+          constraints:
+              type: int16
+              minValue: 1600
+              maxValue: 2600
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          OccupiedHeatingSetpoint"
+      command: "readAttribute"
+      attribute: "occupied heating setpoint"
+      response:
+          constraints:
+              type: int16
+              minValue: 700
+              maxValue: 2600
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          UnoccupiedCoolingSetpoint"
+      disabled: true
+      command: "readAttribute"
+      attribute: "UnoccupiedCoolingSetpoint"
+      response:
+          constraints:
+              type: int16
+              minValue: 1600
+              maxValue: 2600
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          UnoccupiedHeatingSetpoint"
+      disabled: true
+      command: "readAttribute"
+      attribute: "UnoccupiedHeatingSetpoint"
+      response:
+          constraints:
+              type: int16
+              minValue: 700
+              maxValue: 2000
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          MinHeatSetpointLimit"
+      command: "readAttribute"
+      attribute: "min heat setpoint limit"
+      response:
+          constraints:
+              type: int16
+              minValue: 700
+              maxValue: 3000
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          MaxHeatSetpointLimit"
+      command: "readAttribute"
+      attribute: "max heat setpoint limit"
+      response:
+          constraints:
+              type: int16
+              minValue: 700
+              maxValue: 3000
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          MinCoolSetpointLimit"
+      optional: true
+      command: "readAttribute"
+      attribute: "min cool setpoint limit"
+      response:
+          constraints:
+              type: int16
+              minValue: 1600
+              maxValue: 3200
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          MaxCoolSetpointLimit"
+      optional: true
+      command: "readAttribute"
+      attribute: "max cool setpoint limit"
+      response:
+          constraints:
+              type: int16
+              minValue: 1600
+              maxValue: 3200
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          ControlSequenceOfOperation"
+      command: "readAttribute"
+      attribute: "control sequence of operation"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 5
+
+    - label: "Reads constraints of mandatory attributes from DUT: SystemMode"
+      command: "readAttribute"
+      attribute: "system mode"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label:
+          "Reads constraints of optional attributes from DUT: OutdoorTemperature"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OutdoorTemperature"
+      response:
+          constraints:
+              type: int16
+
+    - label: "Reads constraints of optional attributes from DUT: Occupancy"
+      disabled: true
+      command: "readAttribute"
+      attribute: "Occupancy"
+      response:
+          constraints:
+              type: map8
+              minValue: 0
+              maxValue: 1
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          HVACSystemTypeConfiguration"
+      disabled: true
+      command: "readAttribute"
+      attribute: "HVACSystemTypeConfiguration"
+      response:
+          constraints:
+              type: map8
+              minValue: 0
+              maxValue: 63
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          LocalTemperatureCalibration"
+      disabled: true
+      command: "readAttribute"
+      attribute: "LocalTemperatureCalibration"
+      response:
+          constraints:
+              type: int8
+              minValue: -25
+              maxValue: 25
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          MinSetpointDeadBand"
+      optional: true
+      command: "readAttribute"
+      attribute: "min setpoint dead band"
+      response:
+          constraints:
+              type: int8
+              minValue: 0
+              maxValue: 25
+
+    - label: "Reads constraints of optional attributes from DUT: RemoteSensing"
+      disabled: true
+      command: "readAttribute"
+      attribute: "RemoteSensing"
+      response:
+          constraints:
+              type: map8
+              minValue: 0
+              maxValue: 7
+
+    - label: "Reads constraints of optional attributes from DUT: AlarmMask"
+      disabled: true
+      command: "readAttribute"
+      attribute: "AlarmMask"
+      response:
+          constraints:
+              type: map8
+              minValue: 0
+              maxValue: 2
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          ThermostatRunningMode"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ThermostatRunningMode"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "Reads constraints of optional attributes from DUT: StartOfWeek"
+      optional: true
+      command: "readAttribute"
+      attribute: "start of week"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 6
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          NumberOfWeeklyTransitions"
+      optional: true
+      command: "readAttribute"
+      attribute: "number of weekly transitions"
+      response:
+          constraints:
+              type: uint8
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          NumberOfDailyTransitions"
+      optional: true
+      command: "readAttribute"
+      attribute: "number of daily transitions"
+      response:
+          constraints:
+              type: uint8
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          TemperatureSetpointHold"
+      disabled: true
+      command: "readAttribute"
+      attribute: "TemperatureSetpointHold"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 1
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          TemperatureSetpointHoldDuration"
+      disabled: true
+      command: "readAttribute"
+      attribute: "TemperatureSetpointHoldDuration"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 1440
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          ThermostatProgrammingOperationMode"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ThermostatProgrammingOperationMode"
+      response:
+          constraints:
+              type: map8
+              minValue: 0
+              maxValue: 2
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          ThermostatRunningState"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ThermostatRunningState"
+      response:
+          constraints:
+              type: map16
+              minValue: 0
+              maxValue: 6
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          SetpointChangeSource"
+      disabled: true
+      command: "readAttribute"
+      attribute: "SetpointChangeSource"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 2
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          SetpointChangeAmount"
+      disabled: true
+      command: "readAttribute"
+      attribute: "SetpointChangeAmount"
+      response:
+          constraints:
+              type: int16
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          SetpointChangeSourceTimestamp"
+      disabled: true
+      command: "readAttribute"
+      attribute: "SetpointChangeSourceTimestamp"
+      response:
+          constraints:
+              type: utc
+
+    - label:
+          "Reads constraints of optional attributes from DUT: OccupiedSetback"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OccupiedSetback"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "Reads constraints of optional attributes from DUT: OccupiedSetbackMin"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OccupiedSetbackMin"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "Reads constraints of optional attributes from DUT: OccupiedSetbackMax"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OccupiedSetbackMax"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "Reads constraints of optional attributes from DUT: UnoccupiedSetback"
+      disabled: true
+      command: "readAttribute"
+      attribute: "UnoccupiedSetback"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          UnoccupiedSetbackMin"
+      disabled: true
+      command: "readAttribute"
+      attribute: "UnoccupiedSetbackMin"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          UnoccupiedSetbackMax"
+      disabled: true
+      command: "readAttribute"
+      attribute: "UnoccupiedSetbackMax"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "Reads constraints of optional attributes from DUT: EmergencyHeatDelta"
+      disabled: true
+      command: "readAttribute"
+      attribute: "EmergencyHeatDelta"
+      response:
+          constraints:
+              type: uint8
+
+    - label: "Reads constraints of optional attributes from DUT: ACType"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ACType"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 4
+
+    - label: "Reads constraints of optional attributes from DUT: ACCapacity"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ACCapacity"
+      response:
+          constraints:
+              type: uint16
+
+    - label:
+          "Reads constraints of optional attributes from DUT: ACRefrigerantType"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ACRefrigerantType"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 3
+
+    - label:
+          "Reads constraints of optional attributes from DUT: ACCompressorType"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ACCompressorType"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 3
+
+    - label: "Reads constraints of optional attributes from DUT: ACErrorCode"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ACErrorCode"
+      response:
+          constraints:
+              type: map32
+
+    - label:
+          "Reads constraints of optional attributes from DUT: ACLouverPosition"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ACLouverPosition"
+      response:
+          constraints:
+              type: enum8
+              minValue: 1
+              maxValue: 5
+
+    - label:
+          "Reads constraints of optional attributes from DUT: ACCoilTemperature"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ACCoilTemperature"
+      response:
+          constraints:
+              type: int16
+
+    - label: "Reads optional attributes from DUT: ACCapacityFormat"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ACCapacityFormat"
+      response:
+          value: 0
+
+    - label:
+          "Reads constraints of optional attributes from DUT: ACCapacityFormat"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ACCapacityFormat"
+      response:
+          constraints:
+              type: enum8

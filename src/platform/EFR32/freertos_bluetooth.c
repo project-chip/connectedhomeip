@@ -47,6 +47,9 @@ static volatile sl_bgapi_handler command_handler_func = NULL;
 static void BluetoothTask(void * p_arg);
 static TaskHandle_t BluetoothTaskHandle = NULL;
 
+StackType_t bluetoothStack[BLUETOOTH_STACK_SIZE / sizeof(StackType_t)];
+StaticTask_t bluetoothTaskStruct;
+
 void sli_bt_cmd_handler_rtos_delegate(uint32_t header, sl_bgapi_handler handler, const void * payload);
 extern void sli_bgapi_cmd_handler_delegate(uint32_t header, sl_bgapi_handler, const void *);
 extern uint32_t sli_bt_can_sleep_ticks();
@@ -57,6 +60,9 @@ extern uint32_t sli_bt_can_sleep_ticks();
 #endif
 static void LinklayerTask(void * p_arg);
 static TaskHandle_t LinklayerTaskHandle = NULL;
+StackType_t linkLayerStack[LINKLAYER_STACK_SIZE / sizeof(StackType_t)];
+StaticTask_t linkLayerTaskStruct;
+StaticSemaphore_t bluetoothMutexStruct;
 //
 #define RTOS_TICK_HZ 1024
 #define BLUETOOTH_TICK_HZ 32768
@@ -71,27 +77,36 @@ sl_status_t bluetooth_start(UBaseType_t ll_priority, UBaseType_t stack_priority,
     bluetooth_event_flags = xEventGroupCreate();
     configASSERT(bluetooth_event_flags);
 
-    BluetoothMutex = xSemaphoreCreateMutex();
+    BluetoothMutex = xSemaphoreCreateMutexStatic(&bluetoothMutexStruct);
 
     err = initialize_bluetooth_stack();
 
     if (err == SL_STATUS_OK)
     {
         // create tasks for Bluetooth host stack
-        xTaskCreate(BluetoothTask,                              /* Function that implements the task. */
-                    "Bluetooth Task",                           /* Text name for the task. */
-                    BLUETOOTH_STACK_SIZE / sizeof(StackType_t), /* Number of indexes in the xStack array. */
-                    NULL,                                       /* Parameter passed into the task. */
-                    stack_priority,                             /* Priority at which the task is created. */
-                    &BluetoothTaskHandle);                      /* Variable to hold the task's data structure. */
+        BluetoothTaskHandle =
+            xTaskCreateStatic(BluetoothTask,                              /* Function that implements the task. */
+                              BLE_STACK_TASK_NAME,                        /* Text name for the task. */
+                              BLUETOOTH_STACK_SIZE / sizeof(StackType_t), /* Number of indexes in the xStack array. */
+                              NULL,                                       /* Parameter passed into the task. */
+                              stack_priority,                             /* Priority at which the task is created. */
+                              bluetoothStack,                             /* Pointer to task heap */
+                              &bluetoothTaskStruct);                      /* Variable that holds the task struct */
 
         // create tasks for Linklayer
-        xTaskCreate(LinklayerTask,                              /* Function that implements the task. */
-                    "Linklayer Task",                           /* Text name for the task. */
-                    LINKLAYER_STACK_SIZE / sizeof(StackType_t), /* Number of indexes in the xStack array. */
-                    NULL,                                       /* Parameter passed into the task. */
-                    ll_priority,                                /* Priority at which the task is created. */
-                    &LinklayerTaskHandle);                      /* Variable to hold the task's data structure. */
+        LinklayerTaskHandle =
+            xTaskCreateStatic(LinklayerTask,                              /* Function that implements the task. */
+                              BLE_LINK_TASK_NAME,                         /* Text name for the task. */
+                              LINKLAYER_STACK_SIZE / sizeof(StackType_t), /* Number of indexes in the xStack array. */
+                              NULL,                                       /* Parameter passed into the task. */
+                              ll_priority,                                /* Priority at which the task is created. */
+                              linkLayerStack,                             /* Pointer to task heap */
+                              &linkLayerTaskStruct);                      /* Variable that holds the task struct */
+
+        if (BluetoothTaskHandle == NULL || LinklayerTaskHandle == NULL)
+        {
+            err = SL_STATUS_FAIL;
+        }
     }
 
     return err;
@@ -127,6 +142,8 @@ void BluetoothTask(void * p)
             vRaiseEventFlagBasedOnContext(bluetooth_event_flags, BLUETOOTH_EVENT_FLAG_RSP_WAITING);
         }
 
+        // Run Bluetooth stack. Pop the next event for application
+        sl_bt_run();
         // Bluetooth stack needs updating, and evt can be used
         if (sl_bt_event_pending() && (flags & BLUETOOTH_EVENT_FLAG_EVT_HANDLED))
         { // update bluetooth & read event
@@ -221,6 +238,8 @@ void vApplicationMallocFailedHook(void)
     internally by FreeRTOS API functions that create tasks, queues, software
     timers, and semaphores.  The size of the FreeRTOS heap is set by the
     configTOTAL_HEAP_SIZE configuration constant in FreeRTOSConfig.h. */
+
+    EFR32_LOG("Failed do a malloc on HEAP. Is it too small ?");
 
     /* Force an assert. */
     configASSERT((volatile void *) NULL);

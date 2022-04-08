@@ -33,32 +33,45 @@ import platform
 import shutil
 
 
-parser = argparse.ArgumentParser(description='build the pip package for chip using chip components generated during the build and python source code')
-parser.add_argument('--package_name', default='chip', help='configure the python package name')
-parser.add_argument('--build_number', default='0.0', help='configure the chip build number')
+parser = argparse.ArgumentParser(
+    description='build the pip package for chip using chip components generated during the build and python source code')
+parser.add_argument('--package_name', default='chip',
+                    help='configure the python package name')
+parser.add_argument('--build_number', default='0.0',
+                    help='configure the chip build number')
 parser.add_argument('--build_dir', help='directory to build in')
 parser.add_argument('--dist_dir', help='directory to place distribution in')
 parser.add_argument('--manifest', help='list of files to package')
-parser.add_argument('--plat-name', help='platform name to embed in generated filenames')
+parser.add_argument(
+    '--plat-name', help='platform name to embed in generated filenames')
+parser.add_argument(
+    '--server', help='build the server variant', default=False, type=bool)
 
 args = parser.parse_args()
+
 
 class InstalledScriptInfo:
     """Information holder about a script that is to be installed."""
 
     def __init__(self, name):
-      self.name = name
-      self.installName = os.path.splitext(name)[0]
+        self.name = name
+        self.installName = os.path.splitext(name)[0]
 
 
-chipDLLName = '_ChipDeviceCtrl.so'
+if args.server:
+    chipDLLName = "_ChipServer.so"
+else:
+    chipDLLName = "_ChipDeviceCtrl.so"
 packageName = args.package_name
 chipPackageVer = args.build_number
 
-installScripts = [
-    InstalledScriptInfo('chip-device-ctrl.py'),
-    InstalledScriptInfo('chip-repl.py'),
-]
+if args.server:
+    installScripts = []
+else:
+    installScripts = [
+        InstalledScriptInfo("chip-device-ctrl.py"),
+        InstalledScriptInfo("chip-repl.py"),
+    ]
 
 # Record the current directory at the start of execution.
 curDir = os.curdir
@@ -69,9 +82,9 @@ distDir = os.path.abspath(args.dist_dir)
 
 # Use a temporary directory within the build directory to assemble the components
 # for the installable package.
-tmpDir = os.path.join(buildDir, 'chip-wheel-components')
+tmpDir = os.path.join(buildDir, "chip-wheel-components")
 
-manifest = json.load(open(manifestFile, 'r'))
+manifest = json.load(open(manifestFile, "r"))
 
 try:
 
@@ -92,14 +105,14 @@ try:
     for entry in manifest['files']:
         srcDir = os.path.join(manifestBase, entry['src_dir'])
         for path in entry['sources']:
-          srcFile = os.path.join(srcDir, path)
-          dstFile = os.path.join(tmpDir, path)
-          os.makedirs(os.path.dirname(dstFile), exist_ok=True)
-          shutil.copyfile(srcFile, dstFile)
+            srcFile = os.path.join(srcDir, path)
+            dstFile = os.path.join(tmpDir, path)
+            os.makedirs(os.path.dirname(dstFile), exist_ok=True)
+            shutil.copyfile(srcFile, dstFile)
 
     for script in installScripts:
-      os.rename(os.path.join(tmpDir, script.name),
-                os.path.join(tmpDir, script.installName))
+        os.rename(os.path.join(tmpDir, script.name),
+                  os.path.join(tmpDir, script.installName))
 
     # Define a custom version of the bdist_wheel command that configures the
     # resultant wheel as platform-specific (i.e. not "pure").
@@ -111,81 +124,113 @@ try:
     requiredPackages = [
         "coloredlogs",
         'construct',
-        'ipython',
+
+        #
+        # IPython 7.30.0 has a bug which results in the use of await ... failing on some platforms (see https://github.com/ipython/ipython/pull/13269)
+        # For now, let's just avoid that version.
+        #
+        # IPython 8.1.0 has a bug which causes issues: https://github.com/ipython/ipython/issues/13554
+        #
+        #
+        'ipython!=8.1.0',
+        'dacite',
+        'rich',
+        'stringcase',
+        'pyyaml',
+        'ipdb',
+        'ipykernel',
+        'deprecation'
     ]
 
-    if platform.system() == 'Darwin':
-        requiredPackages.append('pyobjc-framework-corebluetooth')
+    if platform.system() == "Darwin":
+        requiredPackages.append("pyobjc-framework-corebluetooth")
 
-    if platform.system() == 'Linux':
-        requiredPackages.append('dbus-python')
-        requiredPackages.append('pygobject')
+    if platform.system() == "Linux":
+        requiredPackages.append("dbus-python")
+        requiredPackages.append("pygobject")
 
     #
     # Build the chip package...
     #
-    packages=[
-            'chip',
-            'chip.ble',
-            'chip.ble.commissioning',
-            'chip.configuration',
-            'chip.exceptions',
-            'chip.internal',
-            'chip.logging',
-            'chip.native',
-            'chip.tlv',
-            'chip.clusters',
+    packages = [
+        'chip',
+        'chip.ble',
+        'chip.ble.commissioning',
+        'chip.configuration',
+        'chip.clusters',
+        'chip.discovery',
+        'chip.exceptions',
+        'chip.internal',
+        'chip.interaction_model',
+        'chip.logging',
+        'chip.native',
+        'chip.clusters',
+        'chip.tlv',
+        'chip.setup_payload',
+        'chip.storage',
     ]
+    #print ("Server: {}".format(args.server))
+    if args.server:
+        packages.append('chip.server')
+
+    #print("packages: {}".format(packages))
+
+    print("packageName: {}".format(packageName))
+    print("chipDLLName: {}".format(chipDLLName))
 
     # Invoke the setuptools 'bdist_wheel' command to generate a wheel containing
     # the CHIP python packages, shared libraries and scripts.
     setup(
         name=packageName,
         version=chipPackageVer,
-        description='Python-base APIs and tools for CHIP.',
-        url='https://github.com/project-chip/connectedhomeip',
-        license='Apache',
+        description="Python-base APIs and tools for CHIP.",
+        url="https://github.com/project-chip/connectedhomeip",
+        license="Apache",
         classifiers=[
-            'Intended Audience :: Developers',
-            'License :: OSI Approved :: Apache Software License',
-            'Programming Language :: Python :: 2',
-            'Programming Language :: Python :: 2.7',
-            'Programming Language :: Python :: 3',
+            "Intended Audience :: Developers",
+            "License :: OSI Approved :: Apache Software License",
+            "Programming Language :: Python :: 2",
+            "Programming Language :: Python :: 2.7",
+            "Programming Language :: Python :: 3",
         ],
-        python_requires='>=2.7',
+        python_requires=">=2.7",
         packages=packages,
         package_dir={
-            '':tmpDir,                      # By default, look in the tmp directory for packages/modules to be included.
+            # By default, look in the tmp directory for packages/modules to be included.
+            '': tmpDir,
         },
         package_data={
-            packageName:[
-                chipDLLName                   # Include the wrapper DLL as package data in the "chip" package.
+            packageName: [
+                # Include the wrapper DLL as package data in the "chip" package.
+                chipDLLName
             ]
         },
-        scripts = [name for name in map(
+        scripts=[name for name in map(
             lambda script: os.path.join(tmpDir, script.installName),
             installScripts
         )],
         install_requires=requiredPackages,
         options={
-            'bdist_wheel':{
-                'universal':False,
-                'dist_dir':distDir,         # Place the generated .whl in the dist directory.
-                'py_limited_api':'cp37',
-                'plat_name':args.plat_name,
+            'bdist_wheel': {
+                'universal': False,
+                # Place the generated .whl in the dist directory.
+                'dist_dir': distDir,
+                'py_limited_api': 'cp37',
+                'plat_name': args.plat_name,
             },
-            'egg_info':{
-                'egg_base':tmpDir           # Place the .egg-info subdirectory in the tmp directory.
+            'egg_info': {
+                # Place the .egg-info subdirectory in the tmp directory.
+                'egg_base': tmpDir
             }
         },
         cmdclass={
-            'bdist_wheel':bdist_wheel_override
+            'bdist_wheel': bdist_wheel_override
         },
-        script_args=[ 'clean', '--all', 'bdist_wheel' ]
+        script_args=['clean', '--all', 'bdist_wheel']
     )
 
 finally:
-    
+
     # Switch back to the initial current directory.
     os.chdir(curDir)
 

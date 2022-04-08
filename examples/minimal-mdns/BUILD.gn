@@ -24,22 +24,24 @@ static_library("minimal-mdns-example-common") {
     "PacketReporter.h",
   ]
 
+  cflags = [ "-Wconversion" ]
+
   public_deps = [
     "${chip_root}/src/lib",
-    "${chip_root}/src/lib/mdns/minimal",
+    "${chip_root}/src/lib/dnssd/minimal_mdns",
   ]
 }
 
 executable("minimal-mdns-client") {
   sources = [ "client.cpp" ]
 
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
+  deps = [
     ":minimal-mdns-example-common",
     "${chip_root}/src/lib",
-    "${chip_root}/src/lib/mdns/minimal",
+    "${chip_root}/src/lib/dnssd/minimal_mdns",
   ]
+
+  cflags = [ "-Wconversion" ]
 
   output_dir = root_out_dir
 }
@@ -47,14 +49,14 @@ executable("minimal-mdns-client") {
 executable("minimal-mdns-server") {
   sources = [ "server.cpp" ]
 
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
+  deps = [
     ":minimal-mdns-example-common",
     "${chip_root}/src/lib",
-    "${chip_root}/src/lib/mdns/minimal",
-    "${chip_root}/src/lib/mdns/minimal/responders",
+    "${chip_root}/src/lib/dnssd/minimal_mdns",
+    "${chip_root}/src/lib/dnssd/minimal_mdns/responders",
   ]
+
+  cflags = [ "-Wconversion" ]
 
   output_dir = root_out_dir
 }
@@ -62,13 +64,13 @@ executable("minimal-mdns-server") {
 executable("mdns-advertiser") {
   sources = [ "advertiser.cpp" ]
 
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
+  deps = [
     ":minimal-mdns-example-common",
     "${chip_root}/src/lib",
-    "${chip_root}/src/lib/mdns",
+    "${chip_root}/src/lib/dnssd",
   ]
+
+  cflags = [ "-Wconversion" ]
 
   output_dir = root_out_dir
 }

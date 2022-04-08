@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Project CHIP Authors
+ *   Copyright (c) 2020-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,25 +18,38 @@
 
 #pragma once
 
+#include <app/util/basic-types.h>
 #include <controller/CHIPDeviceController.h>
 #include <inipp/inipp.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 class PersistentStorage : public chip::PersistentStorageDelegate
 {
 public:
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(const char * name = nullptr);
 
     /////////// PersistentStorageDelegate Interface /////////
-    void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override;
-    CHIP_ERROR SyncGetKeyValue(const char * key, char * value, uint16_t & size) override;
-    void AsyncSetKeyValue(const char * key, const char * value) override;
-    void AsyncDeleteKeyValue(const char * key) override;
+    CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
+    CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
+    CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
 
     uint16_t GetListenPort();
     chip::Logging::LogCategory GetLoggingLevel();
 
+    // Return the stored local node id, or the default one if nothing is stored.
+    chip::NodeId GetLocalNodeId();
+
+    // Store local node id.
+    CHIP_ERROR SetLocalNodeId(chip::NodeId nodeId);
+
+    // Return the stored local device (commissioner) CASE Authenticated Tags (CATs).
+    chip::CATValues GetCommissionerCATs();
+
+    // Store local CATs.
+    CHIP_ERROR SetCommissionerCATs(const chip::CATValues & cats);
+
 private:
-    CHIP_ERROR CommitConfig();
+    CHIP_ERROR CommitConfig(const char * name);
     inipp::Ini<char> mConfig;
+    const char * mName;
 };

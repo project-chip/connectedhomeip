@@ -12,7 +12,7 @@
         android:text="@string/scan_qr_code_btn_text" />
 
     <Button
-        android:id="@+id/provisionWifiCredentialsBtn"
+        android:id="@+id/provisionWiFiCredentialsBtn"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_marginStart="8dp"
@@ -28,20 +28,12 @@
         android:text="@string/provision_thread_credentials_btn_text" />
 
     <Button
-        android:id="@+id/otCommissioningBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/commissioner_openthread_commissioning" />
-
-    <Button
-        android:id="@+id/echoClientBtn"
+        android:id="@+id/provisionCustomFlowBtn"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="@string/echo_client_btn_text" />
+        android:text="@string/provision_custom_flow_btn_text" />
 
     <Button
         android:id="@+id/onOffClusterBtn"
@@ -52,6 +44,38 @@
         android:text="@string/on_off_level_btn_text" />
 
     <Button
+        android:id="@+id/sensorClustersBtn"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/sensor_client_btn_text" />
+
+    <Button
+        android:id="@+id/multiAdminClusterBtn"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/multi_admin_client_btn_text" />
+
+    <Button
+        android:id="@+id/opCredClustersBtn"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/op_cred_client_btn_text" />
+
+    <Button
+        android:id="@+id/basicClusterBtn"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/basic_cluster_btn_text" />
+
+    <Button
         android:id="@+id/attestationTestBtn"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
@@ -59,5 +83,21 @@
         android:layout_marginTop="8dp"
         android:visibility="gone"
         android:text="@string/attestation_test_btn_text" />
+
+    <Button
+        android:id="@+id/wildcardBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/wildcard_btn_text" />
+
+    <Button
+        android:id="@+id/clusterInteractionBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/cluster_interaction_tool" />
 
 </LinearLayout>

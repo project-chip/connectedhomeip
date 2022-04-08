@@ -25,7 +25,11 @@ config("config") {
 
 pw_source_set("pw_log_chip") {
   public_configs = [ ":config" ]
-  public_deps = [ "${chip_root}/src/lib/support" ]
+  public_deps = [ ":pw_log_chip.impl" ]
   public = [ "public_overrides/pw_log_backend/log_backend.h" ]
   sources = [ "public/pw_log_chip/log_chip.h" ]
+}
+
+pw_source_set("pw_log_chip.impl") {
+  public_deps = [ "${chip_root}/src/lib/support" ]
 }

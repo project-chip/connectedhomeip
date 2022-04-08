@@ -1,0 +1,55 @@
+{{> header}}
+
+#pragma once
+
+#include <commands/tests/TestCommandBridge.h>
+#include <commands/common/CommandInvoker.h>
+#include <lib/core/Optional.h>
+#include <system/SystemClock.h>
+
+#include <math.h> // For INFINITY
+
+class TestList : public Command
+{
+public:
+    TestList() : Command("list") {};
+    CHIP_ERROR Run() override
+    {
+        {{#chip_tests (getTests)}}printf("{{filename}}\n");{{/chip_tests}}
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class ManualTestList : public Command
+{
+public:
+    ManualTestList() : Command("list-manual") {};
+    CHIP_ERROR Run() override
+    {
+        {{#chip_tests (getManualTests)}}printf("{{filename}}\n");{{/chip_tests}}
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+{{>test_cluster tests=(getTests) credsIssuerConfigArg=false}}
+{{>test_cluster tests=(getManualTests) credsIssuerConfigArg=false}}
+
+void registerCommandsTests(Commands & commands)
+{
+    const char * clusterName = "Tests";
+
+    commands_list clusterCommands = {
+        make_unique<TestList>(),
+        make_unique<ManualTestList>(),
+      {{#chip_tests (getTests)}}
+        make_unique<{{filename}}>(),
+      {{/chip_tests}}
+      {{#chip_tests (getManualTests)}}
+        make_unique<{{filename}}>(),
+      {{/chip_tests}}
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}

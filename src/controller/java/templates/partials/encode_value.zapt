@@ -1,0 +1,61 @@
+{{#if isOptional}}
+  if ({{source}} != nullptr) {
+    jobject optionalValue_{{depth}};
+    chip::JniReferences::GetInstance().GetOptionalValue({{source}}, optionalValue_{{depth}});
+    if (optionalValue_{{depth}} != nullptr) {
+      auto & definedValue_{{depth}} = {{target}}.Emplace();
+      {{>encode_value target=(concat "definedValue_" depth) source=(concat "optionalValue_" depth) cluster=cluster depth=(incrementDepth depth) isOptional=false}}
+    }
+  }
+{{else if isNullable}}
+  if ({{source}} == nullptr) {
+    {{target}}.SetNull();
+  } else {
+    auto & nonNullValue_{{depth}} = {{target}}.SetNonNull();
+    {{>encode_value target=(concat "nonNullValue_" depth) source=source cluster=cluster depth=(incrementDepth depth) isNullable=false}}
+  }
+{{else if isArray}}
+  {
+    using ListType_{{depth}} = std::remove_reference_t<decltype({{target}})>;
+    using ListMemberType_{{depth}} = ListMemberTypeGetter<ListType_{{depth}}>::Type;
+    jint {{source}}Size;
+    chip::JniReferences::GetInstance().GetListSize({{source}}, {{source}}Size);
+    if ({{source}}Size != 0) {
+      auto * listHolder_{{depth}} = new ListHolder<ListMemberType_{{depth}}>({{source}}Size);
+      listFreer.add(listHolder_{{depth}});
+
+      for (size_t i_{{depth}} = 0; i_{{depth}} < static_cast<size_t>({{source}}Size); ++i_{{depth}}) {
+        jobject element_{{depth}};
+        chip::JniReferences::GetInstance().GetListItem({{source}}, i_{{depth}}, element_{{depth}});
+        {{>encode_value target=(concat "listHolder_" depth "->mList[i_" depth "]") source=(concat "element_" depth) cluster=cluster depth=(incrementDepth depth) isArray=false}}
+      }
+      {{target}} = ListType_{{depth}}(listHolder_{{depth}}->mList, {{source}}Size);
+    } else {
+      {{target}} = ListType_{{depth}}();
+    }
+  }
+{{else if (isOctetString type)}}
+  cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>({{source}})));
+  {{target}} = cleanupByteArrays.back()->byteSpan();
+{{else if (isCharString type)}}
+  cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>({{source}})));
+  {{target}} = cleanupStrings.back()->charSpan();
+{{else}}
+  {{#if_is_struct type}}
+    {{#zcl_struct_items_by_struct_name type}}
+    jobject {{../source}}_{{asLowerCamelCase label}}Item_{{../depth}};
+    chip::JniReferences::GetInstance().GetObjectField({{../source}}, "{{asLowerCamelCase label}}", "{{asJniSignature type null ../cluster true}}", {{../source}}_{{asLowerCamelCase label}}Item_{{../depth}});
+    {{>encode_value target=(concat ../target "." (asLowerCamelCase label)) source=(concat ../source "_" (asLowerCamelCase label) "Item_" ../depth) cluster=../cluster depth=(incrementDepth ../depth)}}
+    {{/zcl_struct_items_by_struct_name}}
+  {{else}}
+    {{#if_chip_enum type}}
+      {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>(chip::JniReferences::GetInstance().{{asJavaType type null parent.parent.name forceNotList=true}}ToPrimitive({{source}}));
+    {{else}}
+      {{#if_is_bitmap type}}
+        {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>(chip::JniReferences::GetInstance().{{asJavaType type null parent.parent.name forceNotList=true}}ToPrimitive({{source}}));
+      {{else}}
+        {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>(chip::JniReferences::GetInstance().{{asJavaType type null parent.parent.name forceNotList=true}}ToPrimitive({{source}}));
+      {{/if_is_bitmap}}
+    {{/if_chip_enum}}
+  {{/if_is_struct}}
+{{/if}}

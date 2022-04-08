@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">CHIPTest</string>
+    <string name="test_finished">Test Finished\n</string>
+    <string name="test_failed">Test Failed(%1$d)\n</string>
+</resources>

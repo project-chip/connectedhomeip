@@ -1,22 +1,17 @@
 # nRF Connect platform overview
 
 The nRF Connect platform is a
-[CHIP](https://github.com/project-chip/connectedhomeip) platform that uses
+[Matter](https://github.com/project-chip/connectedhomeip) platform that uses
 Nordic Semiconductor's nRF Connect SDK.
 
-<p align="center">
-  <img src="../../examples/platform/nrfconnect/doc/images/Logo_RGB_H-small.png" alt="Nordic Semiconductor logo">
-  <img src="../../examples/platform/nrfconnect/doc/images/nRFConnect_RGB-small.jpg"/>
-</p>
-
-The following diagram shows a simplified structure of a CHIP application that
+The following diagram shows a simplified structure of a Matter application that
 runs on the nRF Connect platform and uses BLE and Thread stacks for
 communication purposes:
 
-![nrfconnect platform overview](../images/chip_nrfconnect_overview_simplified.svg)
+![nrfconnect platform overview](./images/chip_nrfconnect_overview_simplified.svg)
 
 > **Note**: For readability, the diagram does not show all projects components,
-> only the most important ones for a typical CHIP application.
+> only the most important ones for a typical Matter application.
 
 <hr>
 
@@ -46,9 +41,9 @@ implementation of the Thread stack.
 ## Bluetooth LE and Thread stacks
 
 In the nRF Connect platform applications, the Bluetooth LE interface is used to
-perform pairing and Thread network provisioning operations between the CHIP
-device and the CHIP controller. Afterwards, the fully provisioned device is able
-to communicate with other devices inside the Thread network.
+perform pairing and Thread network provisioning operations between the Matter
+device and the Matter controller. Afterwards, the fully provisioned device is
+able to communicate with other devices inside the Thread network.
 
 For the Bluetooth LE communication purposes, the nRF Connect platform
 application is using the Bluetooth LE stack, in which the Bluetooth LE Host part
@@ -67,18 +62,18 @@ Bluetooth LE and Thread concurrently on the same radio chip.
 
 <hr>
 
-## CHIP integration
+## Matter integration
 
-CHIP is located on the top application layer of the presented model, looking
+Matter is located on the top application layer of the presented model, looking
 from the networking point of view. The Bluetooth LE and Thread stacks provided
-by the nRF Connect SDK and Zephyr must be integrated with the CHIP stack using a
-special intermediate layer.
+by the nRF Connect SDK and Zephyr must be integrated with the Matter stack using
+a special intermediate layer.
 
 In practice, this layer contains platform-specific implementations of abstract
 manager interfaces (such as Bluetooth LE Manager or Thread Stack Manager)
-defined in the CHIP stack. The application is able to use CHIP's platform
+defined in the Matter stack. The application is able to use Matter's platform
 agnostic interfaces and no additional platform-related actions are needed to
-perform communication through the CHIP stack.
+perform communication through the Matter stack.
 
 <hr>
 
@@ -87,11 +82,11 @@ perform communication through the CHIP stack.
 The nRF Connect platform makes use of the following build systems to generate
 ninja build scripts:
 
--   GN - Used by the CHIP project in majority of cases.
+-   GN - Used by the Matter project in majority of cases.
 -   CMake - Used by other components related with the nRF Connect platform,
     namely nRF Connect SDK and Zephyr.
 
-As a result, CHIP's stack and platform modules are built with GN (see the
+As a result, Matter's stack and platform modules are built with GN (see the
 overview diagram) and the output is used to generate the library file. The
-application, nRF Connect SDK, and Zephyr are built with CMake and the CHIP
+application, nRF Connect SDK, and Zephyr are built with CMake and the Matter
 library file is imported during the compilation process.

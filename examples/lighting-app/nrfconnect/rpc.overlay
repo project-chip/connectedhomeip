@@ -15,9 +15,7 @@
 #
 
 # This file should be used as a configuration overlay to build Pigweed RPCs to
-# lighting-app:
-#
-# west build -b nrf52840dk_nrf52840 -- -DOVERLAY_CONFIG=rpc.overlay
+# lighting-app.
 
 # Enable Pigweed RPC
 CONFIG_CHIP_PW_RPC=y
@@ -43,3 +41,6 @@ CONFIG_LOG_MODE_MINIMAL=n
 CONFIG_LOG_MODE_IMMEDIATE=y
 CONFIG_LOG_BACKEND_UART=n
 CONFIG_LOG_BACKEND_RTT=n
+
+# Increase zephyr tty rx buffer
+CONFIG_CONSOLE_GETCHAR_BUFSIZE=128

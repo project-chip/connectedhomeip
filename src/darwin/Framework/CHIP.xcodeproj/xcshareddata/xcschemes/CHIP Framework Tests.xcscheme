@@ -37,6 +37,17 @@
                BlueprintName = "CHIPTests"
                ReferencedContainer = "container:CHIP.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "CHIPDeviceTests">
+               </Test>
+               <Test
+                  Identifier = "CHIPRemoteDeviceSampleTests">
+               </Test>
+               <Test
+                  Identifier = "CHIPXPCListenerSampleTests">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
    </TestAction>

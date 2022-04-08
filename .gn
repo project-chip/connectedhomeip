@@ -25,4 +25,5 @@ script_executable = "python3"
 
 default_args = {
   pw_unit_test_AUTOMATIC_RUNNER = "$dir_pigweed/targets/host/run_test"
+  pw_build_PIP_CONSTRAINTS = ["//scripts/constraints.txt"]
 }

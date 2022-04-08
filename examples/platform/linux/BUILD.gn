@@ -1,0 +1,62 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/lib/lib.gni")
+
+config("app-main-config") {
+  include_dirs = [ "." ]
+}
+
+source_set("app-main") {
+  defines = []
+  sources = [
+    "AppMain.cpp",
+    "AppMain.h",
+    "CommissioneeShellCommands.cpp",
+    "CommissioneeShellCommands.h",
+    "ControllerShellCommands.cpp",
+    "ControllerShellCommands.h",
+    "LinuxCommissionableDataProvider.cpp",
+    "LinuxCommissionableDataProvider.h",
+    "Options.cpp",
+    "Options.h",
+  ]
+
+  defines = []
+
+  if (chip_enable_pw_rpc) {
+    defines += [ "PW_RPC_ENABLED" ]
+  }
+  if (chip_build_libshell) {
+    defines += [ "ENABLE_CHIP_SHELL" ]
+  }
+
+  public_deps = [
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/credentials:default_attestation_verifier",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/shell",
+    "${chip_root}/src/lib/shell:shell_core",
+  ]
+
+  if (chip_enable_transport_trace) {
+    public_deps += [ "${chip_root}/examples/common/tracing:trace_handlers" ]
+  }
+
+  public_configs = [ ":app-main-config" ]
+}

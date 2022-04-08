@@ -20,7 +20,7 @@
  */
 #pragma once
 
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include "pw_preprocessor/arguments.h"
 

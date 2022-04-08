@@ -74,16 +74,16 @@
 #ifdef ZA_GENERATED_HEADER
 #include ZA_GENERATED_HEADER
 #else
-#include "gen/gen_config.h"
+#include <zap-generated/gen_config.h>
 #endif
 
 #ifdef ATTRIBUTE_STORAGE_CONFIGURATION
 #include ATTRIBUTE_STORAGE_CONFIGURATION
 #else
-#include "gen/endpoint_config.h"
+#include <zap-generated/endpoint_config.h>
 #endif
 
-#include "gen/gen_tokens.h" // For GENERATED_TOKEN_LOADER/SAVER macros
+#include <zap-generated/gen_tokens.h> // For GENERATED_TOKEN_LOADER/SAVER macros
 
 // *******************************************************************
 // pre-defined Devices
@@ -125,15 +125,6 @@
 #define ZA_MAX_HOPS 12
 #endif
 
-#ifndef EMBER_AF_SOURCE_ROUTING_RESERVED_PAYLOAD_LENGTH
-#define EMBER_AF_SOURCE_ROUTING_RESERVED_PAYLOAD_LENGTH 0
-#endif
-
-// The maximum APS payload, not including any APS options.  This value is also
-// available from emberMaximumApsPayloadLength() or ezspMaximumPayloadLength().
-// See http://portal.ember.com/faq/payload for more information.
-#define EMBER_AF_MAXIMUM_APS_PAYLOAD_LENGTH 82 - EMBER_AF_SOURCE_ROUTING_RESERVED_PAYLOAD_LENGTH
-
 // Max PHY size = 128
 //   -1 byte for PHY length
 //   -2 bytes for MAC CRC
@@ -157,14 +148,8 @@
 // affects the payloads generated from the CLI and the payloads generated
 // as responses.
 // Maximum payload length.
-// If fragmenation is enabled, and fragmentation length is bigger than default, then use that
-#if defined(EMBER_AF_PLUGIN_FRAGMENTATION) && (EMBER_AF_PLUGIN_FRAGMENTATION_BUFFER_SIZE > EMBER_AF_MAXIMUM_APS_PAYLOAD_LENGTH)
-#define EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH EMBER_AF_PLUGIN_FRAGMENTATION_BUFFER_SIZE
-#define EMBER_AF_INCOMING_BUFFER_LENGTH EMBER_AF_PLUGIN_FRAGMENTATION_BUFFER_SIZE
-#else
-#define EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH EMBER_AF_MAXIMUM_APS_PAYLOAD_LENGTH
-#define EMBER_AF_INCOMING_BUFFER_LENGTH EMBER_AF_MAXIMUM_APS_PAYLOAD_LENGTH
-#endif
+#define EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH 1024
+#define EMBER_AF_INCOMING_BUFFER_LENGTH 1024
 
 // *******************************************************************
 // Application configuration of Flash

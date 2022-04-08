@@ -17,18 +17,18 @@
 
 #include <cstdio>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
-#include <mdns/minimal/QueryBuilder.h>
-#include <mdns/minimal/Server.h>
-#include <mdns/minimal/core/QName.h>
+#include <lib/dnssd/minimal_mdns/QueryBuilder.h>
+#include <lib/dnssd/minimal_mdns/Server.h>
+#include <lib/dnssd/minimal_mdns/core/QName.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CHIPMem.h>
 #include <system/SystemPacketBuffer.h>
-#include <system/SystemTimer.h>
 
 #include "AllInterfaceListener.h"
 #include "PacketReporter.h"
@@ -151,7 +151,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "query-port", kArgumentRequired, kOptionQueryPort },
     { "timeout-ms", kArgumentRequired, kOptionRuntimeMs },
     { "multicast-reply", kNoArgument, kOptionMulticastReplies },
-    nullptr,
+    {},
 };
 
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
@@ -186,7 +186,10 @@ public:
         char addr[32];
         info->SrcAddress.ToString(addr, sizeof(addr));
 
-        printf("QUERY from: %-15s on port %d, via interface %d\n", addr, info->SrcPort, info->Interface);
+        char ifName[64];
+        VerifyOrDie(info->Interface.GetInterfaceName(ifName, sizeof(ifName)) == CHIP_NO_ERROR);
+
+        printf("QUERY from: %-15s on port %d, via interface %s\n", addr, info->SrcPort, ifName);
         Report("QUERY: ", data);
     }
 
@@ -195,7 +198,10 @@ public:
         char addr[32];
         info->SrcAddress.ToString(addr, sizeof(addr));
 
-        printf("RESPONSE from: %-15s on port %d, via interface %d\n", addr, info->SrcPort, info->Interface);
+        char ifName[64];
+        VerifyOrDie(info->Interface.GetInterfaceName(ifName, sizeof(ifName)) == CHIP_NO_ERROR);
+
+        printf("RESPONSE from: %-15s on port %d, via interface %s\n", addr, info->SrcPort, ifName);
         Report("RESPONSE: ", data);
     }
 
@@ -251,12 +257,7 @@ private:
 void BroadcastPacket(mdns::Minimal::ServerBase * server)
 {
     System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
-    if (buffer.IsNull())
-    {
-        printf("Buffer allocation failure.");
-        abort();
-        return;
-    }
+    VerifyOrDie(!buffer.IsNull());
 
     QuerySplitter query;
     query.Split(gOptions.query);
@@ -277,12 +278,25 @@ void BroadcastPacket(mdns::Minimal::ServerBase * server)
         return;
     }
 
-    if (server->BroadcastSend(builder.ReleasePacket(), gOptions.querySendPort) != CHIP_NO_ERROR)
+    if (gOptions.unicastAnswers)
     {
-        printf("Error sending\n");
-        return;
+        if (server->BroadcastUnicastQuery(builder.ReleasePacket(), gOptions.querySendPort) != CHIP_NO_ERROR)
+        {
+            printf("Error sending\n");
+            return;
+        }
+    }
+    else
+    {
+        if (server->BroadcastSend(builder.ReleasePacket(), gOptions.querySendPort) != CHIP_NO_ERROR)
+        {
+            printf("Error sending\n");
+            return;
+        }
     }
 }
+
+mdns::Minimal::Server<20> gMdnsServer;
 
 } // namespace
 
@@ -307,34 +321,39 @@ int main(int argc, char ** args)
 
     printf("Running...\n");
 
-    mdns::Minimal::Server<10> mdnsServer;
     ReportDelegate reporter;
+    CHIP_ERROR err;
 
-    mdnsServer.SetDelegate(&reporter);
+    gMdnsServer.SetDelegate(&reporter);
 
     {
+
         MdnsExample::AllInterfaces allInterfaces(gOptions.enableIpV4);
 
-        if (mdnsServer.Listen(&chip::DeviceLayer::InetLayer, &allInterfaces, gOptions.listenPort) != CHIP_NO_ERROR)
+        err = gMdnsServer.Listen(chip::DeviceLayer::UDPEndPointManager(), &allInterfaces, gOptions.listenPort);
+        if (err != CHIP_NO_ERROR)
         {
-            printf("Server failed to listen on all interfaces\n");
+            printf("Server failed to listen on all interfaces: %s\n", chip::ErrorStr(err));
             return 1;
         }
     }
 
-    BroadcastPacket(&mdnsServer);
+    BroadcastPacket(&gMdnsServer);
 
-    System::Timer * timer = nullptr;
+    err = DeviceLayer::SystemLayer().StartTimer(
+        chip::System::Clock::Milliseconds32(gOptions.runtimeMs),
+        [](System::Layer *, void *) {
+            // Close all sockets BEFORE system layer is shut down, otherwise
+            // attempts to free UDP sockets with system layer down will segfault
+            gMdnsServer.Shutdown();
 
-    if (DeviceLayer::SystemLayer.NewTimer(timer) == CHIP_NO_ERROR)
+            DeviceLayer::PlatformMgr().StopEventLoopTask();
+            DeviceLayer::PlatformMgr().Shutdown();
+        },
+        nullptr);
+    if (err != CHIP_NO_ERROR)
     {
-        timer->Start(
-            gOptions.runtimeMs, [](System::Layer *, void *, System::Error err) { DeviceLayer::PlatformMgr().Shutdown(); }, nullptr);
-    }
-    else
-    {
-
-        printf("Failed to create the shutdown timer. Kill with ^C.\n");
+        printf("Failed to create the shutdown timer. Kill with ^C. %" CHIP_ERROR_FORMAT "\n", err.Format());
     }
 
     DeviceLayer::PlatformMgr().RunEventLoop();

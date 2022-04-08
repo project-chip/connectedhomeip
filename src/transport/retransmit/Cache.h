@@ -20,7 +20,7 @@
 #include <cstddef>
 #include <type_traits>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 
 namespace chip {
 namespace Retransmit {
@@ -50,7 +50,7 @@ struct Lifetime
  * PayloadType MUST provide a way to reference count, as the data will
  * preserved until the cache is freed:
  *
- *    PayloadType chip::Retransmit::Aquire(PayloadType&);
+ *    PayloadType chip::Retransmit::Acquire(PayloadType&);
  *    chip::Retransmit::Release(PayloadType&);
  */
 template <typename KeyType, typename PayloadType, size_t N>

@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <support/ScopedBuffer.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -37,12 +37,6 @@ public:
     {
         mAllocCount++;
         return chip::Platform::MemoryAlloc(size);
-    }
-    static void * MemoryAlloc(size_t size, bool longTerm)
-    {
-
-        mAllocCount++;
-        return chip::Platform::MemoryAlloc(size, longTerm);
     }
     static void * MemoryCalloc(size_t num, size_t size)
     {
@@ -83,8 +77,6 @@ void TestFreeDuringAllocs(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, buffer.Alloc(128));
         NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 1);
         NL_TEST_ASSERT(inSuite, buffer.Alloc(64));
-        NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 1);
-        NL_TEST_ASSERT(inSuite, buffer.LongTermAlloc(256));
         NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 1);
         NL_TEST_ASSERT(inSuite, buffer.Calloc(10));
         NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 1);

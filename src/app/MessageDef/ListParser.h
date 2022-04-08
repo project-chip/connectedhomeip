@@ -15,61 +15,24 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines List parser in CHIP interaction model
- *
- */
 
 #pragma once
 
-#ifndef _CHIP_INTERACTION_MODEL_MESSAGE_DEF_LIST_PARSER_H
-#define _CHIP_INTERACTION_MODEL_MESSAGE_DEF_LIST_PARSER_H
-
-#include "Builder.h"
 #include "Parser.h"
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
-#include <util/basic-types.h>
 
 namespace chip {
 namespace app {
-class ListParser : public chip::app::Parser
+class ListParser : public Parser
 {
-protected:
-    ListParser();
-
 public:
     /**
      *  @brief Initialize the parser object with TLVReader
      *
-     *  @param [in] aReader A pointer to a TLVReader, which should be on the element of the array element
+     *  @param [in] aReader A pointer to a TLVReader, which should be on the element of the list element
      *
      *  @return #CHIP_NO_ERROR on success
      */
-    CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
-
-    /**
-     *  @brief Initialize the parser object with TLVReader if context tag exists
-     *
-     *  @param [in] aReader A pointer to a TLVReader, which should be on the element of the array element
-     *  @param [in] aContextTagToFind A context tag it tries to find
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR InitIfPresent(const chip::TLV::TLVReader & aReader, const uint8_t aContextTagToFind);
-
-    /**
-     *  @brief Iterate to next element
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR Next();
+    CHIP_ERROR Init(const TLV::TLVReader & aReader);
 };
-
-}; // namespace app
-}; // namespace chip
-
-#endif // _CHIP_INTERACTION_MODEL_MESSAGE_DEF_LIST_PARSER_H
+} // namespace app
+} // namespace chip

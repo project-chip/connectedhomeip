@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/UnitTestRegistration.h>
 
 #include <logging/log.h>
 #include <settings/settings.h>
@@ -26,7 +26,7 @@
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-LOG_MODULE_REGISTER(runner);
+LOG_MODULE_REGISTER(runner, CONFIG_MATTER_LOG_LEVEL);
 
 void main(void)
 {

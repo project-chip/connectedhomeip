@@ -48,7 +48,7 @@
 
 #if LWIP_FREERTOS_USE_STATIC_TCPIP_TASK
 static StaticTask_t gTCPIPTask;
-static portSTACK_TYPE gTCPIPTaskStack[TCPIP_THREAD_STACKSIZE];
+static StackType_t gTCPIPTaskStack[TCPIP_THREAD_STACKSIZE / sizeof(StackType_t)];
 #endif
 
 #if LWIP_FREERTOS_USE_STATIC_TCPIP_QUEUE
@@ -265,7 +265,7 @@ sys_thread_t sys_thread_new(const char * name, lwip_thread_fn thread, void * arg
         return NULL;
 
 #if LWIP_FREERTOS_USE_STATIC_TCPIP_TASK
-    taskH = xTaskCreateStatic(thread, name, stacksizeWords, arg, (UBaseType_t) prio, (StackType_t *) gTCPIPTaskStack, &gTCPIPTask);
+    taskH = xTaskCreateStatic(thread, name, stacksizeWords, arg, (UBaseType_t) prio, gTCPIPTaskStack, &gTCPIPTask);
 #else  // LWIP_FREERTOS_USE_STATIC_TCPIP_TASK
     if (xTaskCreate(thread, name, stacksizeWords, arg, (UBaseType_t) prio, &taskH) != pdPASS)
         taskH = NULL;

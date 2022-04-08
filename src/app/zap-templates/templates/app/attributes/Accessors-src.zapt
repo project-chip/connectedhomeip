@@ -1,0 +1,147 @@
+{{>header}}
+
+/**
+ *  @file
+ *    This file contains definitions for accessors around clusters attributes.
+ */
+
+#include <app-common/zap-generated/attributes/Accessors.h>
+
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/util/af.h>
+#include <app/util/attribute-storage-null-handling.h>
+#include <app/util/odd-sized-integers.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+{{#zcl_clusters}}
+{{#zcl_attributes_server}}
+{{#first}}
+namespace {{asUpperCamelCase parent.label}} {
+namespace Attributes {
+
+{{/first}}
+{{#if_is_struct type}}
+{{else if (canHaveSimpleAccessors this)}}
+namespace {{asUpperCamelCase label}} {
+
+{{#*inline "clusterId"}}Clusters::{{asUpperCamelCase parent.label}}::Id{{/inline}}
+{{#*inline "sizingBytes"}}{{#if (isShortString type)}}1{{else}}2{{/if}}{{/inline}}
+
+EmberAfStatus Get(chip::EndpointId endpoint, {{accessorGetterType this}} value)
+{
+    {{~#if (isString type)}}
+    {{~#*inline "lengthType"}}uint{{#if (isShortString type)}}8{{else}}16{{/if}}_t{{/inline}}
+    uint8_t zclString[{{maxLength}} + {{>sizingBytes}}];
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, {{>clusterId}}, Id, zclString, sizeof(zclString));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    size_t length = emberAf{{#if (isLongString type)}}Long{{/if}}StringLength(zclString);
+    if (length == NumericAttributeTraits<{{>lengthType}}>::kNullValue)
+    {
+      {{#if isNullable}}
+      value.SetNull();
+      return EMBER_ZCL_STATUS_SUCCESS;
+      {{else}}
+      return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+      {{/if}}
+    }
+    {{#if isNullable}}
+    auto & span = value.SetNonNull();
+    {{/if}}
+    {{~#*inline "value"}}{{#if isNullable}}span{{else}}value{{/if}}{{/inline}}
+    VerifyOrReturnError({{>value}}.size() == {{maxLength}}, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    memcpy({{>value}}.data(), &zclString[{{>sizingBytes}}], {{maxLength}});
+    {{>value}}.reduce_size(length);
+    return status;
+    {{else}}
+    using Traits = NumericAttributeTraits<{{accessorTraitType type}}>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, {{>clusterId}}, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    {{#if isNullable}}
+    if (Traits::IsNullValue(temp))
+    {
+        value.SetNull();
+    }
+    else
+    {
+        value.SetNonNull() = Traits::StorageToWorking(temp);
+    }
+    {{else}}
+    if (!Traits::CanRepresentValue(/* isNullable = */ {{isNullable}}, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    {{/if}}
+    return status;
+    {{/if}}
+}
+EmberAfStatus Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value)
+{
+    {{~#if (isString type)}}
+    {{~#*inline "lengthType"}}uint{{#if (isShortString type)}}8{{else}}16{{/if}}_t{{/inline}}
+    static_assert({{maxLength}} < NumericAttributeTraits<{{>lengthType}}>::kNullValue,
+                  "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= {{maxLength}}, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    uint8_t zclString[{{maxLength}} + {{>sizingBytes}}];
+    emberAfCopyInt{{#if (isShortString type)}}8{{else}}16{{/if}}u(zclString, 0, static_cast<{{>lengthType}}>(value.size()));
+    memcpy(&zclString[{{>sizingBytes}}], value.data(), value.size());
+    return emberAfWriteServerAttribute(endpoint, {{>clusterId}}, Id, zclString, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE);
+    {{else}}
+    using Traits = NumericAttributeTraits<{{accessorTraitType type}}>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ {{isNullable}}, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, {{>clusterId}}, Id, writable, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE);
+    {{/if}}
+}
+
+{{#if isNullable}}
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    {{#if (isString type)}}
+    uint8_t zclString[{{>sizingBytes}}] = { {{#if (isShortString type)}}0xFF{{else}}0xFF, 0xFF{{/if}} };
+    return emberAfWriteServerAttribute(endpoint, {{>clusterId}}, Id, zclString, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE);
+    {{else}}
+    using Traits = NumericAttributeTraits<{{accessorTraitType type}}>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteServerAttribute(endpoint, {{>clusterId}}, Id, writable, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE);
+    {{/if}}
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} value)
+{
+  if (value.IsNull()) {
+    return SetNull(endpoint);
+  }
+
+  return Set(endpoint, value.Value());
+}
+{{/if}}
+
+} // namespace {{asUpperCamelCase label}}
+
+{{/if_is_struct}}
+{{#last}}
+} // namespace Attributes
+} // {{asUpperCamelCase parent.label}}
+
+{{/last}}
+{{/zcl_attributes_server}}
+{{/zcl_clusters}}
+
+} // Clusters
+} // app
+} // chip

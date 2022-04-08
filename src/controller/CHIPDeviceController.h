@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -28,74 +28,95 @@
 
 #pragma once
 
-#include <controller/CHIPDevice.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPPersistentStorageDelegate.h>
-#include <core/CHIPTLV.h>
+#include <app/AttributeCache.h>
+#include <app/CASEClientPool.h>
+#include <app/CASESessionManager.h>
+#include <app/OperationalDeviceProxy.h>
+#include <app/OperationalDeviceProxyPool.h>
+#include <controller/AbstractDnssdDiscoveryController.h>
+#include <controller/AutoCommissioner.h>
+#include <controller/CHIPCluster.h>
+#include <controller/CHIPDeviceControllerSystemState.h>
+#include <controller/CommissioneeDeviceProxy.h>
+#include <controller/CommissioningDelegate.h>
+#include <controller/DevicePairingDelegate.h>
+#include <controller/OperationalCredentialsDelegate.h>
+#include <controller/SetUpCodePairer.h>
+#include <credentials/FabricTable.h>
+#include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/Pool.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/SerializableIntegerSet.h>
+#include <lib/support/Span.h>
+#include <lib/support/ThreadOperationalDataset.h>
 #include <messaging/ExchangeMgr.h>
-#include <support/DLLUtil.h>
-#include <support/SerializableIntegerSet.h>
-#include <transport/AdminPairingTable.h>
-#include <transport/RendezvousSession.h>
-#include <transport/RendezvousSessionDelegate.h>
-#include <transport/SecureSessionMgr.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
+#include <protocols/secure_channel/RendezvousParameters.h>
+#include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
+
+#include <controller/CHIPDeviceControllerSystemState.h>
+
+#if CONFIG_DEVICE_LAYER
+#include <platform/CHIPDeviceLayer.h>
+#endif
+
+#if CONFIG_NETWORK_LAYER_BLE
+#include <ble/BleLayer.h>
+#endif
+#include <controller/DeviceDiscoveryDelegate.h>
 
 namespace chip {
 
 namespace Controller {
 
-constexpr uint16_t kNumMaxActiveDevices = 64;
+using namespace chip::Protocols::UserDirectedCommissioning;
+
+constexpr uint16_t kNumMaxActiveDevices = CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES;
 constexpr uint16_t kNumMaxPairedDevices = 128;
 
-class DLL_EXPORT DevicePairingDelegate
+// Raw functions for cluster callbacks
+void OnBasicFailure(void * context, CHIP_ERROR err);
+
+struct ControllerInitParams
 {
-public:
-    virtual ~DevicePairingDelegate() {}
+    PersistentStorageDelegate * storageDelegate                     = nullptr;
+    DeviceControllerSystemState * systemState                       = nullptr;
+    DeviceDiscoveryDelegate * deviceDiscoveryDelegate               = nullptr;
+    OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
 
-    /**
-     * @brief
-     *   Called when the pairing reaches a certain stage.
-     *
-     * @param status Current status of pairing
-     */
-    virtual void OnStatusUpdate(RendezvousSessionDelegate::Status status) {}
+    /* The following keypair must correspond to the public key used for generating
+       controllerNOC. It's used by controller to establish CASE sessions with devices */
+    Crypto::P256Keypair * operationalKeypair = nullptr;
 
-    /**
-     * @brief
-     *   Called when the network credentials are needed for the remote device
-     *
-     * @param callback Callback delegate that provisions the network credentials
-     */
-    virtual void OnNetworkCredentialsRequested(RendezvousDeviceCredentialsDelegate * callback) = 0;
+    /* The following certificates must be in x509 DER format */
+    ByteSpan controllerNOC;
+    ByteSpan controllerICAC;
+    ByteSpan controllerRCAC;
 
-    /**
-     * @brief
-     *   Called when the operational credentials are needed for the remote device
-     *
-     * @param csr Certificate signing request from the device
-     * @param csr_length The length of CSR
-     * @param callback Callback delegate that provisions the operational credentials
-     */
-    virtual void OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
-                                                   RendezvousDeviceCredentialsDelegate * callback) = 0;
+    //
+    // Controls enabling server cluster interactions on a controller. This in turn
+    // causes the following to get enabled:
+    //
+    //  - Advertisement of active controller operational identities.
+    //
+    bool enableServerInteractions = false;
 
-    /**
-     * @brief
-     *   Called when the pairing is complete (with success or error)
-     *
-     * @param error Error cause, if any
-     */
-    virtual void OnPairingComplete(CHIP_ERROR error) {}
+    uint16_t controllerVendorId;
+};
 
-    /**
-     * @brief
-     *   Called when the pairing is deleted (with success or error)
-     *
-     * @param error Error cause, if any
-     */
-    virtual void OnPairingDeleted(CHIP_ERROR error) {}
+struct CommissionerInitParams : public ControllerInitParams
+{
+    DevicePairingDelegate * pairingDelegate     = nullptr;
+    CommissioningDelegate * defaultCommissioner = nullptr;
 };
 
 /**
@@ -106,67 +127,116 @@ public:
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public SecureSessionMgrDelegate, public PersistentStorageResultDelegate
+class DLL_EXPORT DeviceController : public SessionRecoveryDelegate, public AbstractDnssdDiscoveryController
 {
 public:
     DeviceController();
-    virtual ~DeviceController() {}
+    ~DeviceController() override {}
+
+    CHIP_ERROR Init(ControllerInitParams params);
 
     /**
-     * Init function to be used when there exists a device layer that takes care of initializing
-     * System::Layer and InetLayer.
+     * @brief
+     *  Tears down the entirety of the stack, including destructing key objects in the system.
+     *  This expects to be called with external thread synchronization, and will not internally
+     *  grab the CHIP stack lock.
+     *
+     *  This will also not stop the CHIP event queue / thread (if one exists).  Consumers are expected to
+     *  ensure this happened before calling this method.
      */
-    CHIP_ERROR Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate = nullptr,
-                    System::Layer * systemLayer = nullptr, Inet::InetLayer * inetLayer = nullptr);
-
     virtual CHIP_ERROR Shutdown();
 
-    /**
-     * @brief
-     *   This function deserializes the provided deviceInfo object, and initializes and outputs the
-     *   corresponding Device object. The lifetime of the output object is tied to that of the DeviceController
-     *   object. The caller must not use the Device object If they free the DeviceController object, or
-     *   after they call ReleaseDevice() on the returned device object.
-     *
-     * @param[in] deviceId   Node ID for the CHIP device
-     * @param[in] deviceInfo Serialized device info for the device
-     * @param[out] device    The output device object
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
-     */
-    CHIP_ERROR GetDevice(NodeId deviceId, const SerializedDevice & deviceInfo, Device ** device);
+    CHIP_ERROR GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port);
 
     /**
-     * @brief
-     *   This function is similar to the other GetDevice object, except it reads the serialized object from
-     *   the persistent storage.
-     *
-     * @param[in] deviceId   Node ID for the CHIP device
-     * @param[out] device    The output device object
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     *   This function returns true if the device corresponding to `deviceId` has previously been commissioned
+     *   on the fabric.
      */
-    CHIP_ERROR GetDevice(NodeId deviceId, Device ** device);
+    bool DoesDevicePairingExist(const PeerId & deviceId);
 
-    CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
-
-    virtual void ReleaseDevice(Device * device);
-
-    // ----- IO -----
     /**
-     * @brief
-     * Start the event loop task within the CHIP stack
-     * @return CHIP_ERROR   The return status
+     *   This function finds the device corresponding to deviceId, and establishes a secure connection with it.
+     *   Once the connection is successfully establishes (or if it's already connected), it calls `onConnectedDevice`
+     *   callback. If it fails to establish the connection, it calls `onError` callback.
      */
-    CHIP_ERROR ServiceEvents();
+    CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                  chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+    {
+        VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        return mSystemState->CASESessionMgr()->FindOrEstablishSession(mFabricInfo->GetPeerIdForNode(deviceId), onConnection,
+                                                                      onFailure);
+    }
+
+    /**
+     * DEPRECATED - to be removed
+     *
+     * Forces a DNSSD lookup for the specified device. It finds the corresponding session
+     * for the given nodeID and initiates a DNSSD lookup to find/update the node address
+     */
+    CHIP_ERROR UpdateDevice(NodeId deviceId);
 
     /**
      * @brief
-     *   Allow the CHIP Stack to process any pending events
-     *   This can be called in an event handler loop to tigger callbacks within the CHIP stack
-     * @return CHIP_ERROR   The return status
+     *   Compute a PASE verifier and passcode ID for the desired setup pincode.
+     *
+     *   This can be used to open a commissioning window on the device for
+     *   additional administrator commissioning.
+     *
+     * @param[in] iterations      The number of iterations to use when generating the verifier
+     * @param[in] setupPincode    The desired PIN code to use
+     * @param[in] salt            The 16-byte salt for verifier computation
+     * @param[out] outVerifier    The Spake2pVerifier to be populated on success
+     *
+     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR ServiceEventSignal();
+    CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt,
+                                   Spake2pVerifier & outVerifier);
+
+    void RegisterDeviceDiscoveryDelegate(DeviceDiscoveryDelegate * delegate) { mDeviceDiscoveryDelegate = delegate; }
+
+    /**
+     * @brief Get the Compressed Fabric ID assigned to the device.
+     */
+    uint64_t GetCompressedFabricId() const { return mLocalId.GetCompressedFabricId(); }
+
+    /**
+     * @brief Get the raw Fabric ID assigned to the device.
+     */
+    uint64_t GetFabricId() const { return mFabricId; }
+
+    /**
+     * @brief Get the Node ID of this instance.
+     */
+    NodeId GetNodeId() const { return mLocalId.GetNodeId(); }
+
+    CHIP_ERROR GetFabricIndex(FabricIndex * value)
+    {
+        VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr && value != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        *value = mFabricInfo->GetFabricIndex();
+        return CHIP_NO_ERROR;
+    }
+
+    FabricInfo * GetFabricInfo() { return mFabricInfo; }
+
+    void ReleaseOperationalDevice(NodeId remoteDeviceId);
+
+    OperationalCredentialsDelegate * GetOperationalCredentialsDelegate() { return mOperationalCredentialsDelegate; }
+
+    /**
+     * TEMPORARY - DO NOT USE or if you use please request review on why/how to
+     * officially support such an API.
+     *
+     * This was added to support the 'reuse session' logic in cirque integration
+     * tests however since that is the only client, the correct update is to
+     * use 'ConnectDevice' and wait for connect success/failure inside the CI
+     * logic. The current code does not do that because python was not set up
+     * to wait for timeouts on success/fail, hence this temporary method.
+     *
+     * TODO(andy31415): update cirque test and remove this method.
+     *
+     * Returns success if a session with the given peer does not exist yet.
+     */
+    CHIP_ERROR DisconnectDevice(NodeId nodeId);
 
 protected:
     enum class State
@@ -177,69 +247,40 @@ protected:
 
     State mState;
 
-    /* A list of device objects that can be used for communicating with corresponding
-       CHIP devices. The list does not contain all the paired devices, but only the ones
-       which the controller application is currently accessing.
-    */
-    Device mActiveDevices[kNumMaxActiveDevices];
-
     SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
     bool mPairedDevicesInitialized;
 
-    NodeId mLocalDeviceId;
-    DeviceTransportMgr * mTransportMgr;
-    SecureSessionMgr * mSessionManager;
-    Messaging::ExchangeManager * mExchangeManager;
-    PersistentStorageDelegate * mStorageDelegate;
-    Inet::InetLayer * mInetLayer;
+    PeerId mLocalId          = PeerId();
+    FabricId mFabricId       = kUndefinedFabricId;
+    FabricInfo * mFabricInfo = nullptr;
 
-    uint16_t mListenPort;
-    uint16_t GetInactiveDeviceIndex();
-    uint16_t FindDeviceIndex(SecureSessionHandle session);
-    uint16_t FindDeviceIndex(NodeId id);
-    void ReleaseDevice(uint16_t index);
-    void ReleaseDeviceById(NodeId remoteDeviceId);
+    PersistentStorageDelegate * mStorageDelegate = nullptr;
+    // TODO(cecille): Make this configuarable.
+    static constexpr int kMaxCommissionableNodes = 10;
+    Dnssd::DiscoveredNodeData mCommissionableNodes[kMaxCommissionableNodes];
+    DeviceControllerSystemState * mSystemState = nullptr;
+
     CHIP_ERROR InitializePairedDeviceList();
-    CHIP_ERROR SetPairedDeviceList(const char * pairedDeviceSerializedSet);
+    CHIP_ERROR SetPairedDeviceList(ByteSpan pairedDeviceSerializedSet);
+    ControllerDeviceInitParams GetControllerDeviceInitParams();
 
-    Transport::AdminId mAdminId = 0;
-    Transport::AdminPairingTable mAdmins;
+    OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
+
+    uint16_t mVendorId;
+
+    /// Fetches the session to use for the current device. Allows overriding
+    /// in case subclasses want to create the session if it does not yet exist
+    virtual OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId);
+
+    //////////// SessionRecoveryDelegate Implementation ///////////////
+    void OnFirstMessageDeliveryFailed(const SessionHandle & session) override;
+
+    DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
 
 private:
-    //////////// SecureSessionMgrDelegate Implementation ///////////////
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr) override;
+    void ReleaseOperationalDevice(OperationalDeviceProxy * device);
 
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override;
-    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
-
-    //////////// PersistentStorageResultDelegate Implementation ///////////////
-    void OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR err) override;
-
-    void ReleaseAllDevices();
-
-    System::Layer * mSystemLayer;
-};
-
-/**
- * @brief
- *   The commissioner applications doesn't advertise itself as an available device for rendezvous
- *   process. This delegate class provides no-op functions for the advertisement delegate.
- */
-class DeviceCommissionerRendezvousAdvertisementDelegate : public RendezvousAdvertisementDelegate
-{
-public:
-    /**
-     * @brief
-     *   Starts advertisement of the device for rendezvous availability.
-     */
-    CHIP_ERROR StartAdvertisement() const override { return CHIP_NO_ERROR; }
-
-    /**
-     * @brief
-     *   Stops advertisement of the device for rendezvous availability.
-     */
-    CHIP_ERROR StopAdvertisement() const override { return CHIP_NO_ERROR; }
+    CHIP_ERROR ProcessControllerNOCChain(const ControllerInitParams & params);
 };
 
 /**
@@ -248,25 +289,55 @@ public:
  *   required to provide write access to the persistent storage, where the paired device information
  *   will be stored.
  */
-class DLL_EXPORT DeviceCommissioner : public DeviceController, public RendezvousSessionDelegate
+class DLL_EXPORT DeviceCommissioner : public DeviceController,
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
+                                      public Protocols::UserDirectedCommissioning::InstanceNameResolver,
+#endif
+                                      public SessionEstablishmentDelegate,
+                                      public app::AttributeCache::Callback
 {
 public:
     DeviceCommissioner();
-    ~DeviceCommissioner() {}
+    ~DeviceCommissioner() override {}
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
+    /**
+     * Set port for User Directed Commissioning
+     */
+    CHIP_ERROR SetUdcListenPort(uint16_t listenPort);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     /**
-     * Init function to be used when there exists a device layer that takes care of initializing
-     * System::Layer and InetLayer.
+     * Commissioner-specific initialization, includes parameters such as the pairing delegate.
      */
-    CHIP_ERROR Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate = nullptr,
-                    DevicePairingDelegate * pairingDelegate = nullptr, System::Layer * systemLayer = nullptr,
-                    Inet::InetLayer * inetLayer = nullptr);
+    CHIP_ERROR Init(CommissionerInitParams params);
 
-    void SetDevicePairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
-
+    /**
+     * @brief
+     *  Tears down the entirety of the stack, including destructing key objects in the system.
+     *  This is not a thread-safe API, and should be called with external synchronization.
+     *
+     *  Please see implementation for more details.
+     */
     CHIP_ERROR Shutdown() override;
 
     // ----- Connection Management -----
+    /**
+     * @brief
+     *   Pair a CHIP device with the provided code. The code can be either a QRCode
+     *   or a Manual Setup Code.
+     *   Use registered DevicePairingDelegate object to receive notifications on
+     *   pairing status updates.
+     *
+     *   Note: Pairing process requires that the caller has registered PersistentStorageDelegate
+     *         in the Init() call.
+     *
+     * @param[in] remoteDeviceId        The remote device Id.
+     * @param[in] setUpCode             The setup code for connecting to the device
+     */
+    CHIP_ERROR PairDevice(NodeId remoteDeviceId, const char * setUpCode);
+    CHIP_ERROR PairDevice(NodeId remoteDeviceId, const char * setUpCode, const CommissioningParameters & CommissioningParameters);
+
     /**
      * @brief
      *   Pair a CHIP device with the provided Rendezvous connection parameters.
@@ -277,12 +348,97 @@ public:
      *         in the Init() call.
      *
      * @param[in] remoteDeviceId        The remote device Id.
+     * @param[in] rendezvousParams      The Rendezvous connection parameters
+     */
+    CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & rendezvousParams);
+    /**
+     * @overload
+     * @param[in] remoteDeviceId        The remote device Id.
+     * @param[in] rendezvousParams      The Rendezvous connection parameters
+     * @param[in] commissioningParams    The commissioning parameters (uses default if not supplied)
+     */
+    CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & rendezvousParams,
+                          CommissioningParameters & commissioningParams);
+
+    /**
+     * @brief
+     *   Start establishing a PASE connection with a node for the purposes of commissioning.
+     *   Commissioners that wish to use the auto-commissioning functions should use the
+     *   supplied "PairDevice" functions above to automatically establish a connection then
+     *   perform commissioning. This function is intended to be use by commissioners that
+     *   are not using the supplied auto-commissioner.
+     *
+     *   This function is non-blocking. PASE is established once the DevicePairingDelegate
+     *   receives the OnPairingComplete call.
+     *
+     *   PASE connections can only be established with nodes that have their commissioning
+     *   window open. The PASE connection will fail if this window is not open and the
+     *   OnPairingComplete will be called with an error.
+     *
+     * @param[in] remoteDeviceId        The remote device Id.
      * @param[in] params                The Rendezvous connection parameters
      */
-    CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & params);
+    CHIP_ERROR EstablishPASEConnection(NodeId remoteDeviceId, RendezvousParameters & params);
 
-    [[deprecated("Available until Rendezvous is implemented")]] CHIP_ERROR
-    PairTestDeviceWithoutSecurity(NodeId remoteDeviceId, const Transport::PeerAddress & peerAddress, SerializedDevice & serialized);
+    /**
+     * @brief
+     *   Start establishing a PASE connection with a node for the purposes of commissioning.
+     *   Commissioners that wish to use the auto-commissioning functions should use the
+     *   supplied "PairDevice" functions above to automatically establish a connection then
+     *   perform commissioning. This function is intended to be used by commissioners that
+     *   are not using the supplied auto-commissioner.
+     *
+     *   This function is non-blocking. PASE is established once the DevicePairingDelegate
+     *   receives the OnPairingComplete call.
+     *
+     *   PASE connections can only be established with nodes that have their commissioning
+     *   window open. The PASE connection will fail if this window is not open and in that case
+     *   OnPairingComplete will be called with an error.
+     *
+     * @param[in] remoteDeviceId        The remote device Id.
+     * @param[in] setUpCode             The setup code for connecting to the device
+     */
+    CHIP_ERROR EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode);
+
+    /**
+     * @brief
+     *   Start the auto-commissioning process on a node after establishing a PASE connection.
+     *   This function is intended to be used in conjunction with the EstablishPASEConnection
+     *   function. It can be called either before or after the DevicePairingDelegate receives
+     *   the OnPairingComplete call. Commissioners that want to perform simple auto-commissioning
+     *   should use the supplied "PairDevice" functions above, which will establish the PASE
+     *   connection and commission automatically.
+     *
+     * @param[in] remoteDeviceId        The remote device Id.
+     * @param[in] params                The commissioning parameters
+     */
+    CHIP_ERROR Commission(NodeId remoteDeviceId, CommissioningParameters & params);
+    CHIP_ERROR Commission(NodeId remoteDeviceId);
+
+    /**
+     * @brief
+     *   This function instructs the commissioner to proceed to the next stage of commissioning after
+     *   attestation failure is reported to an installed attestation delegate.
+     *
+     * @param[in] device                The device being commissioned.
+     * @param[in] attestationResult     The attestation result to use instead of whatever the device
+     *                                  attestation verifier came up with. May be a success or an error result.
+     */
+    CHIP_ERROR
+    ContinueCommissioningAfterDeviceAttestationFailure(DeviceProxy * device,
+                                                       Credentials::AttestationVerificationResult attestationResult);
+
+    CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
+
+    /**
+     * @brief
+     *   This function returns the attestation challenge for the secure session of the device being commissioned.
+     *
+     * @param[out] attestationChallenge The output for the attestationChallenge
+     *
+     * @return CHIP_ERROR               CHIP_NO_ERROR on success, or CHIP_ERROR_INVALID_ARGUMENT if no secure session is active
+     */
+    CHIP_ERROR GetAttestationChallenge(ByteSpan & attestationChallenge);
 
     /**
      * @brief
@@ -305,44 +461,331 @@ public:
      */
     CHIP_ERROR UnpairDevice(NodeId remoteDeviceId);
 
-    //////////// RendezvousSessionDelegate Implementation ///////////////
-    void OnRendezvousError(CHIP_ERROR err) override;
-    void OnRendezvousComplete() override;
-    void OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err) override;
+    //////////// SessionEstablishmentDelegate Implementation ///////////////
+    void OnSessionEstablishmentError(CHIP_ERROR error) override;
+    void OnSessionEstablished() override;
 
     void RendezvousCleanup(CHIP_ERROR status);
 
-    void ReleaseDevice(Device * device) override;
+    void PerformCommissioningStep(DeviceProxy * device, CommissioningStage step, CommissioningParameters & params,
+                                  CommissioningDelegate * delegate, EndpointId endpoint, Optional<System::Clock::Timeout> timeout);
+
+    /**
+     * @brief
+     *   This function validates the Attestation Information sent by the device.
+     *
+     * @param[in] info Structure contatining all the required information for validating the device attestation.
+     */
+    CHIP_ERROR ValidateAttestationInfo(const Credentials::DeviceAttestationVerifier::AttestationInfo & info);
+
+    /**
+     * @brief
+     * Sends CommissioningStepComplete report to the commissioning delegate. Function will fill in current step.
+     * @params[in] err      error from the current step
+     * @params[in] report   report to send. Current step will be filled in automatically
+     */
+    void
+    CommissioningStageComplete(CHIP_ERROR err,
+                               CommissioningDelegate::CommissioningReport report = CommissioningDelegate::CommissioningReport());
+
+#if CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    /**
+     * @brief
+     *   Prior to commissioning, the Controller should make sure the BleLayer transport
+     *   is set to the Commissioner transport and not the Server transport.
+     */
+    void ConnectBleTransportToSelf();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+    /**
+     * @brief
+     *   Once we have finished all commissioning work, the Controller should close the BLE
+     *   connection to the device and establish CASE session / another PASE session to the device
+     *   if needed.
+     * @return CHIP_ERROR   The return status
+     */
+    CHIP_ERROR CloseBleConnection();
+#endif
+    /**
+     * @brief
+     *   Discover all devices advertising as commissionable.
+     *   Should be called on main loop thread.
+     * * @param[in] filter  Browse filter - controller will look for only the specified subtype.
+     * @return CHIP_ERROR   The return status
+     */
+    CHIP_ERROR DiscoverCommissionableNodes(Dnssd::DiscoveryFilter filter);
+
+    /**
+     * @brief
+     *   Returns information about discovered devices.
+     *   Should be called on main loop thread.
+     * @return const DiscoveredNodeData* info about the selected device. May be nullptr if no information has been returned yet.
+     */
+    const Dnssd::DiscoveredNodeData * GetDiscoveredDevice(int idx);
+
+    /**
+     * @brief
+     *   Returns the max number of commissionable nodes this commissioner can track mdns information for.
+     * @return int  The max number of commissionable nodes supported
+     */
+    int GetMaxCommissionableNodesSupported() { return kMaxCommissionableNodes; }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
+    /**
+     * @brief
+     *   Called when a UDC message is received specifying the given instanceName
+     * This method indicates that UDC Server needs the Commissionable Node corresponding to
+     * the given instance name to be found. UDC Server will wait for OnCommissionableNodeFound.
+     *
+     * @param instanceName DNS-SD instance name for the client requesting commissioning
+     *
+     */
+    void FindCommissionableNode(char * instanceName) override;
+
+    /**
+     * @brief
+     *   Return the UDC Server instance
+     *
+     */
+    UserDirectedCommissioningServer * GetUserDirectedCommissioningServer() { return mUdcServer; }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
+    /**
+     * @brief
+     *   Overrides method from AbstractDnssdDiscoveryController
+     *
+     * @param nodeData DNS-SD node information
+     *
+     */
+    void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
+
+    void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
+    DevicePairingDelegate * GetPairingDelegate() const { return mPairingDelegate; }
+
+    // AttributeCache::Callback impl
+    void OnDone() override;
+
+    // Commissioner will establish new device connections after PASE.
+    OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId) override;
 
 private:
     DevicePairingDelegate * mPairingDelegate;
-    RendezvousSession * mRendezvousSession;
 
-    /* This field is an index in mActiveDevices list. The object at this index in the list
-       contains the device object that's tracking the state of the device that's being paired.
-       If no device is currently being paired, this value will be kNumMaxPairedDevices.  */
-    uint16_t mDeviceBeingPaired;
-
-    /* TODO: BLE rendezvous and IP rendezvous should share the same procedure, so this is just a
-       workaround-like flag and should be removed in the future.
-       When using IP rendezvous, we need to disable network provisioning. In the future, network
-       provisioning will no longer be a part of rendezvous procedure. */
-    bool mIsIPRendezvous;
+    DeviceProxy * mDeviceBeingCommissioned               = nullptr;
+    CommissioneeDeviceProxy * mDeviceInPASEEstablishment = nullptr;
 
     /* This field is true when device pairing information changes, e.g. a new device is paired, or
        the pairing for a device is removed. The DeviceCommissioner uses this to decide when to
        persist the device list */
     bool mPairedDevicesUpdated;
 
-    DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
+    CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
+    bool mRunCommissioningAfterConnection  = false;
 
-    void PersistDeviceList();
+    ObjectPool<CommissioneeDeviceProxy, kNumMaxActiveDevices> mCommissioneeDevicePool;
 
-    void FreeRendezvousSession();
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
+    UserDirectedCommissioningServer * mUdcServer = nullptr;
+    // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
+    DeviceIPTransportMgr * mUdcTransportMgr = nullptr;
+    uint16_t mUdcListenPort                 = CHIP_UDC_PORT;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
 
-    uint16_t mNextKeyId = 0;
+    void OnSessionEstablishmentTimeout();
+
+    static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState);
+
+    /* This function sends a Device Attestation Certificate chain request to the device.
+       The function does not hold a reference to the device object.
+     */
+    CHIP_ERROR SendCertificateChainRequestCommand(DeviceProxy * device, Credentials::CertificateType certificateType);
+    /* This function sends an Attestation request to the device.
+       The function does not hold a reference to the device object.
+     */
+    CHIP_ERROR SendAttestationRequestCommand(DeviceProxy * device, const ByteSpan & attestationNonce);
+    /* This function sends an CSR request to the device.
+       The function does not hold a reference to the device object.
+     */
+    CHIP_ERROR SendOperationalCertificateSigningRequestCommand(DeviceProxy * device, const ByteSpan & csrNonce);
+    /* This function sends the operational credentials to the device.
+       The function does not hold a reference to the device object.
+     */
+    CHIP_ERROR SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf, const Optional<ByteSpan> & icaCertBuf,
+                                          AesCcm128KeySpan ipk, NodeId adminSubject);
+    /* This function sends the trusted root certificate to the device.
+       The function does not hold a reference to the device object.
+     */
+    CHIP_ERROR SendTrustedRootCertificate(DeviceProxy * device, const ByteSpan & rcac);
+
+    /* This function is called by the commissioner code when the device completes
+       the operational credential provisioning process.
+       The function does not hold a reference to the device object.
+       */
+    CHIP_ERROR OnOperationalCredentialsProvisioningCompletion(DeviceProxy * device);
+
+    /* Callback when the previously sent CSR request results in failure */
+    static void OnCSRFailureResponse(void * context, CHIP_ERROR error);
+
+    void ExtendArmFailSafeForFailedDeviceAttestation(Credentials::AttestationVerificationResult result);
+    static void OnCertificateChainFailureResponse(void * context, CHIP_ERROR error);
+    static void OnCertificateChainResponse(
+        void * context, const app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & response);
+
+    static void OnAttestationFailureResponse(void * context, CHIP_ERROR error);
+    static void
+    OnAttestationResponse(void * context,
+                          const app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType & data);
+
+    /**
+     * @brief
+     *   This function is called by the IM layer when the commissioner receives the CSR from the device.
+     *   (Reference: Specifications section 11.18.5.6. NOCSR Elements)
+     *
+     * @param[in] context               The context provided while registering the callback.
+     * @param[in] data                  The response struct containing the following fields:
+     *                                    NOCSRElements: CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
+     *                                    AttestationSignature: Cryptographic signature generated for the fields in the response
+     * message.
+     */
+    static void OnOperationalCertificateSigningRequest(
+        void * context, const app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType & data);
+
+    /* Callback when adding operational certs to device results in failure */
+    static void OnAddNOCFailureResponse(void * context, CHIP_ERROR errro);
+    /* Callback when the device confirms that it has added the operational certificates */
+    static void
+    OnOperationalCertificateAddResponse(void * context,
+                                        const app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & data);
+
+    /* Callback when the device confirms that it has added the root certificate */
+    static void OnRootCertSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &);
+    /* Callback called when adding root cert to device results in failure */
+    static void OnRootCertFailureResponse(void * context, CHIP_ERROR error);
+
+    static void OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device);
+    static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
+
+    static void OnDeviceAttestationInformationVerification(void * context, Credentials::AttestationVerificationResult result);
+
+    static void OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
+                                           const ByteSpan & rcac, Optional<AesCcm128KeySpan> ipk, Optional<NodeId> adminSubject);
+    static void OnArmFailSafe(void * context,
+                              const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
+    static void OnSetRegulatoryConfigResponse(
+        void * context,
+        const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data);
+    static void
+    OnNetworkConfigResponse(void * context,
+                            const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
+    static void OnConnectNetworkResponse(
+        void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data);
+    static void OnCommissioningCompleteResponse(
+        void * context,
+        const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
+    static void OnDisarmFailsafe(void * context,
+                                 const app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
+    static void OnDisarmFailsafeFailure(void * context, CHIP_ERROR error);
+    void DisarmDone();
+    static void OnArmFailSafeExtendedForFailedDeviceAttestation(
+        void * context, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
+    static void OnFailedToExtendedArmFailSafeFailedDeviceAttestation(void * context, CHIP_ERROR error);
+
+    /**
+     * @brief
+     *   This function processes the CSR sent by the device.
+     *   (Reference: Specifications section 11.18.5.6. NOCSR Elements)
+     *
+     * @param[in] proxy           device proxy
+     * @param[in] NOCSRElements   CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
+     * @param[in] AttestationSignature       Cryptographic signature generated for all the above fields.
+     * @param[in] dac               device attestation certificate
+     * @param[in] pai               Product Attestation Intermediate certificate
+     * @param[in] csrNonce          certificate signing request nonce
+     */
+    CHIP_ERROR ProcessCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature,
+                          const ByteSpan & dac, const ByteSpan & pai, const ByteSpan & csrNonce);
+
+    /**
+     * @brief
+     *   This function validates the CSR information from the device.
+     *   (Reference: Specifications section 11.18.5.6. NOCSR Elements)
+     *
+     * @param[in] proxy           device proxy
+     * @param[in] NOCSRElements   CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
+     * @param[in] AttestationSignature       Cryptographic signature generated for all the above fields.
+     * @param[in] dac               device attestation certificate
+     * @param[in] csrNonce          certificate signing request nonce
+     */
+    CHIP_ERROR ValidateCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature,
+                           const ByteSpan & dac, const ByteSpan & csrNonce);
+
+    /**
+     * @brief
+     *   This function processes the DAC or PAI certificate sent by the device.
+     */
+    CHIP_ERROR ProcessCertificateChain(const ByteSpan & certificate);
+
+    void HandleAttestationResult(CHIP_ERROR err);
+
+    CommissioneeDeviceProxy * FindCommissioneeDevice(const SessionHandle & session);
+    CommissioneeDeviceProxy * FindCommissioneeDevice(NodeId id);
+    CommissioneeDeviceProxy * FindCommissioneeDevice(const Transport::PeerAddress & peerAddress);
+    void ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device);
+
+    template <typename ClusterObjectT, typename RequestObjectT>
+    CHIP_ERROR SendCommand(DeviceProxy * device, const RequestObjectT & request,
+                           CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
+                           CommandResponseFailureCallback failureCb)
+    {
+        return SendCommand<ClusterObjectT>(device, request, successCb, failureCb, 0, NullOptional);
+    }
+
+    template <typename ClusterObjectT, typename RequestObjectT>
+    CHIP_ERROR SendCommand(DeviceProxy * device, const RequestObjectT & request,
+                           CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
+                           CommandResponseFailureCallback failureCb, EndpointId endpoint, Optional<System::Clock::Timeout> timeout)
+    {
+        ClusterObjectT cluster;
+        cluster.Associate(device, endpoint);
+        cluster.SetCommandTimeout(timeout);
+
+        return cluster.InvokeCommand(request, this, successCb, failureCb);
+    }
+
+    static CHIP_ERROR ConvertFromOperationalCertStatus(chip::app::Clusters::OperationalCredentials::OperationalCertStatus err);
+
+    // Sends commissioning complete callbacks to the delegate depending on the status. Sends
+    // OnCommissioningComplete and either OnCommissioningSuccess or OnCommissioningFailure depending on the given completion status.
+    void SendCommissioningCompleteCallbacks(NodeId nodeId, const CompletionStatus & completionStatus);
+
+    // Cleans up and resets failsafe as appropriate depending on the error and the failed stage.
+    // For success, sends completion report with the CommissioningDelegate and sends callbacks to the PairingDelegate
+    // For failures after AddNOC succeeds, sends completion report with the CommissioningDelegate and sends callbacks to the
+    // PairingDelegate. In this case, it does not disarm the failsafe or close the pase connection. For failures up through AddNOC,
+    // sends a command to immediately expire the failsafe, then sends completion report with the CommissioningDelegate and callbacks
+    // to the PairingDelegate upon arm failsafe command completion.
+    void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus);
+
+    chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+
+    chip::Callback::Callback<Credentials::OnAttestationInformationVerification> mDeviceAttestationInformationVerificationCallback;
+
+    chip::Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
+    SetUpCodePairer mSetUpCodePairer;
+    AutoCommissioner mAutoCommissioner;
+    CommissioningDelegate * mDefaultCommissioner =
+        nullptr; // Commissioning delegate to call when PairDevice / Commission functions are used
+    CommissioningDelegate * mCommissioningDelegate =
+        nullptr; // Commissioning delegate that issued the PerformCommissioningStep command
+    CompletionStatus commissioningCompletionStatus;
+
+    Platform::UniquePtr<app::AttributeCache> mAttributeCache;
+    Platform::UniquePtr<app::ReadClient> mReadClient;
+    Credentials::AttestationVerificationResult mAttestationResult;
 };
 
 } // namespace Controller

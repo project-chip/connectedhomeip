@@ -17,70 +17,44 @@
  */
 
 #include "AppTask.h"
+
+#include <system/SystemError.h>
+
+#include <logging/log.h>
+
+#ifdef CONFIG_CHIP_PW_RPC
 #include "Rpc.h"
-
-#include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPMem.h>
-
-#include <kernel.h>
-
-LOG_MODULE_REGISTER(app);
-
-using namespace ::chip;
-using namespace ::chip::Inet;
-using namespace ::chip::DeviceLayer;
-
-int main(void)
-{
-#if CONFIG_CHIP_PW_RPC
-    chip::rpc::Init();
 #endif
 
-    int ret = 0;
+#ifdef CONFIG_USB_DEVICE_STACK
+#include <usb/usb_device.h>
+#endif
 
-    k_thread_priority_set(k_current_get(), K_PRIO_COOP(CONFIG_NUM_COOP_PRIORITIES - 1));
+LOG_MODULE_REGISTER(app, CONFIG_MATTER_LOG_LEVEL);
 
-    ret = chip::Platform::MemoryInit();
-    if (ret != CHIP_NO_ERROR)
+using namespace ::chip;
+
+int main()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+#ifdef CONFIG_CHIP_PW_RPC
+    rpc::Init();
+#endif
+
+#ifdef CONFIG_USB_DEVICE_STACK
+    err = System::MapErrorZephyr(usb_enable(nullptr));
+    if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("Platform::MemoryInit() failed");
-        goto exit;
+        LOG_ERR("Failed to initialize USB device");
+    }
+#endif
+
+    if (err == CHIP_NO_ERROR)
+    {
+        err = GetAppTask().StartApp();
     }
 
-    LOG_INF("Init CHIP stack");
-    ret = PlatformMgr().InitChipStack();
-    if (ret != CHIP_NO_ERROR)
-    {
-        LOG_ERR("PlatformMgr().InitChipStack() failed");
-        goto exit;
-    }
-
-    LOG_INF("Starting CHIP task");
-    ret = PlatformMgr().StartEventLoopTask();
-    if (ret != CHIP_NO_ERROR)
-    {
-        LOG_ERR("PlatformMgr().StartEventLoopTask() failed");
-        goto exit;
-    }
-
-    LOG_INF("Init Thread stack");
-    ret = ThreadStackMgr().InitThreadStack();
-    if (ret != CHIP_NO_ERROR)
-    {
-        LOG_ERR("ThreadStackMgr().InitThreadStack() failed");
-        goto exit;
-    }
-
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
-    if (ret != CHIP_NO_ERROR)
-    {
-        LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed");
-        goto exit;
-    }
-
-    ret = GetAppTask().StartApp();
-
-exit:
-    LOG_ERR("Exited with code %d", ret);
-    return ret;
+    LOG_ERR("Exited with code %" CHIP_ERROR_FORMAT, err.Format());
+    return err == CHIP_NO_ERROR ? EXIT_SUCCESS : EXIT_FAILURE;
 }

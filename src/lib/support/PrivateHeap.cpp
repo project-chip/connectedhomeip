@@ -18,8 +18,10 @@
 
 #include "PrivateHeap.h"
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <string.h>
+
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace {
 
@@ -267,6 +269,43 @@ extern "C" void PrivateHeapFree(void * ptr)
     }
 }
 
+void * PrivateHeapRealloc(void * heap, void * ptr, size_t size)
+{
+    if (ptr == nullptr)
+    {
+        return PrivateHeapAlloc(heap, size);
+    }
+
+    if (size == 0)
+    {
+        PrivateHeapFree(ptr);
+        return nullptr;
+    }
+
+    PrivateHeapBlockHeader * header =
+        reinterpret_cast<PrivateHeapBlockHeader *>(static_cast<char *>(ptr) - sizeof(PrivateHeapBlockHeader));
+
+    ValidateHeader(header);
+
+    if (header->nextBytes >= size)
+    {
+        return ptr; // no reallocation needed
+    }
+
+    void * largerCopy = PrivateHeapAlloc(heap, size);
+    if (largerCopy == nullptr)
+    {
+        // NOTE: original is left untouched (not freed) to match realloc() libc
+        // functionality
+        return nullptr;
+    }
+
+    memcpy(largerCopy, ptr, header->nextBytes);
+    PrivateHeapFree(ptr);
+
+    return largerCopy;
+}
+
 extern "C" void PrivateHeapDump(void * top)
 {
     PrivateHeapBlockHeader * header = reinterpret_cast<PrivateHeapBlockHeader *>(top);
@@ -274,9 +313,8 @@ extern "C" void PrivateHeapDump(void * top)
     ChipLogProgress(Support, "========= HEAP ===========");
     while (header->nextBytes != kInvalidHeapBlockSize)
     {
-        intptr_t offset = reinterpret_cast<char *>(header) - reinterpret_cast<char *>(top);
-        ChipLogProgress(Support, "    %ld: size: %d, state: %d", static_cast<long>(offset), static_cast<int>(header->nextBytes),
-                        static_cast<int>(header->state));
+        ChipLogProgress(Support, "    %td: size: %d, state: %d", reinterpret_cast<char *>(header) - reinterpret_cast<char *>(top),
+                        static_cast<int>(header->nextBytes), static_cast<int>(header->state));
 
         header = NextHeader(header);
     }

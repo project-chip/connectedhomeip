@@ -3,17 +3,17 @@
 ## Building and Developing
 
 -   Documentation about building from the command line can be found in
-    [the build guide](./BUILDING.md)
+    [the build guide](guides/BUILDING.md)
 -   Documentation about running [cirque](https://github.com/openweave/cirque)
     tests can be found in
-    [the cirque test guide](src/test_driver/linux-cirque/README.md)
+    [the cirque test guide](../src/test_driver/linux-cirque/README.md)
 -   Documentation about standard build & development flows using
     [Visual Studio Code](https://code.visualstudio.com/) can be found in
     [the development guide](./VSCODE_DEVELOPMENT.md)
 
 ## Project Flow
 
--   Documentation about general CHIP usage of GitHub, and project tools is
+-   Documentation about general project usage of GitHub, and project tools is
     documented in [the project flow](./PROJECT_FLOW.md)
 
 ## Style Guide

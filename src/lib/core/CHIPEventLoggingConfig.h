@@ -60,17 +60,6 @@
 #endif
 
 /**
- * @def CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE
- *
- * @brief
- *   The default importance of events to be logged.  It is used
- *   to initialize the chip LoggingConfiguration.
- */
-#ifndef CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE
-#define CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE chip::Profiles::DataManagement::Production
-#endif
-
-/**
  * @def CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
  *
  * @brief

@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP" />
+  <cluster>
+    <domain>CHIP</domain>
+    <name>Switch</name>
+    <code>0x003b</code>
+    <define>SWITCH_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.
+Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
+Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade.</description>
+
+    <globalAttribute side="server" code="0xFFFC" value="0" />
+    <globalAttribute side="server" code="0xFFFD" value="1" />
+
+    <attribute side="server" code="0x0000" define="NUMBER_OF_POSITIONS" type="INT8U" writable="false" optional="false" default="2" min="2">number of positions</attribute>
+    <attribute side="server" code="0x0001" define="CURRENT_POSITION" type="INT8U" writable="false" reportable="true" optional="false">current position</attribute>
+    <attribute side="server" code="0x0002" define="MULTI_PRESS_MAX" type="INT8U" writable="false" optional="false" default="2" min="2">multi press max</attribute>
+    <event side="server" code="0x00" priority="info" name="SwitchLatched" optional="true">
+      <description>Switch Latched</description>
+      <field id="0" name="NewPosition" type="INT8U" />
+    </event>
+    <event side="server" code="0x01" priority="info" name="InitialPress" optional="true">
+      <description>Initial Press</description>
+      <field id="0" name="NewPosition" type="INT8U" />
+    </event>
+    <event side="server" code="0x02" priority="info" name="LongPress" optional="true">
+      <description>Long Press</description>
+      <field id="0" name="NewPosition" type="INT8U" />
+    </event>
+    <event side="server" code="0x03" priority="info" name="ShortRelease" optional="true">
+      <description>Short Release</description>
+      <field id="0" name="PreviousPosition" type="INT8U" />
+    </event>
+    <event side="server" code="0x04" priority="info" name="LongRelease" optional="true">
+      <description>Long Release</description>
+      <field id="0" name="PreviousPosition" type="INT8U" />
+    </event>
+    <event side="server" code="0x05" priority="info" name="MultiPressOngoing" optional="true">
+      <description>MultiPress Ongoing</description>
+      <field id="0" name="NewPosition" type="INT8U" />
+      <field id="1" name="CurrentNumberOfPressesCounted" type="INT8U" />
+    </event>
+    <event side="server" code="0x06" priority="info" name="MultiPressComplete" optional="true">
+      <description>MultiPress Complete</description>
+      <field id="0" name="NewPosition" type="INT8U" />
+      <field id="1" name="TotalNumberOfPressesCounted" type="INT8U" />
+    </event>
+
+  </cluster>
+
+  <bitmap name="SwitchFeature" type="BITMAP32">
+    <field name="LatchingSwitch" mask="0x1" />
+    <field name="MomentarySwitch" mask="0x2" />
+    <field name="MomentarySwitchRelease" mask="0x4" />
+    <field name="MomentarySwitchLongPress" mask="0x8" />
+    <field name="MomentarySwitchMultiPress" mask="0x10" />
+  </bitmap>
+
+</configurator>

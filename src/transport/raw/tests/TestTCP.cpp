@@ -23,13 +23,13 @@
 
 #include "NetworkTestHelpers.h"
 
-#include <core/CHIPCore.h>
-#include <core/CHIPEncoding.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/UnitTestUtils.h>
 #include <system/SystemLayer.h>
-#include <system/SystemObject.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/TCP.h>
 
@@ -67,7 +67,7 @@ using TCPImpl = Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPacke
 
 constexpr NodeId kSourceNodeId      = 123654;
 constexpr NodeId kDestinationNodeId = 111222333;
-constexpr uint32_t kMessageId       = 18;
+constexpr uint32_t kMessageCounter  = 18;
 
 using TestContext = chip::Test::IOContext;
 TestContext sContext;
@@ -89,12 +89,12 @@ public:
         mCallback     = callback;
         mCallbackData = callback_data;
     }
-    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                           System::PacketBufferHandle msgBuf) override
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override
     {
-        NL_TEST_ASSERT(mSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
-        NL_TEST_ASSERT(mSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
-        NL_TEST_ASSERT(mSuite, header.GetMessageId() == kMessageId);
+        PacketHeader packetHeader;
+
+        CHIP_ERROR error = packetHeader.DecodeAndConsume(msgBuf);
+        NL_TEST_ASSERT(mSuite, error == CHIP_NO_ERROR);
 
         if (mCallback)
         {
@@ -107,11 +107,31 @@ public:
 
     void InitializeMessageTest(TCPImpl & tcp, const IPAddress & addr)
     {
-        CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(&mContext.GetInetLayer()).SetAddressType(addr.Type()));
+        CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(mContext.GetTCPEndPointManager()).SetAddressType(addr.Type()));
+
+        // retry a few times in case the port is somehow in use.
+        // this is a WORKAROUND for flaky testing if we run tests very fast after each other.
+        // in that case, a port could be in a WAIT state.
+        //
+        // What may be happening:
+        //   - We call InitializeMessageTest several times in this unit test
+        //   - closing sockets takes a while (FIN-wait or similar)
+        //   - trying InitializeMessageTest to take the same port right after may fail
+        //
+        // The tests may be run with a 0 port (to self select an active port) however I have not
+        // validated that this works and we need a followup for it
+        //
+        // TODO: stop using fixed ports.
+        for (int i = 0; (i < 50) && (err != CHIP_NO_ERROR); i++)
+        {
+            ChipLogProgress(NotSpecified, "RETRYING tcp initialization");
+            chip::test_utils::SleepMillis(100);
+            err = tcp.Init(Transport::TcpListenParameters(mContext.GetTCPEndPointManager()).SetAddressType(addr.Type()));
+        }
+
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
 
-        mTransportMgrBase.SetSecureSessionMgr(this);
-        mTransportMgrBase.SetRendezvousSession(this);
+        mTransportMgrBase.SetSessionManager(this);
         mTransportMgrBase.Init(&tcp);
 
         mReceiveHandlerCallCount = 0;
@@ -123,24 +143,19 @@ public:
         NL_TEST_ASSERT(mSuite, !buffer.IsNull());
 
         PacketHeader header;
-        header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
+        header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageCounter(kMessageCounter);
 
         SetCallback([](const uint8_t * message, size_t length, int count, void * data) { return memcmp(message, data, length); },
                     const_cast<void *>(static_cast<const void *>(PAYLOAD)));
 
-        // Should be able to send a message to itself by just calling send.
-        CHIP_ERROR err = tcp.SendMessage(header, Transport::PeerAddress::TCP(addr), std::move(buffer));
-        if (err == System::MapErrorPOSIX(EADDRNOTAVAIL))
-        {
-            // TODO(#2698): the underlying system does not support IPV6. This early return
-            // should be removed and error should be made fatal.
-            printf("%s:%u: System does NOT support IPV6.\n", __FILE__, __LINE__);
-            return;
-        }
-
+        CHIP_ERROR err = header.EncodeBeforeData(buffer);
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
 
-        mContext.DriveIOUntil(5000 /* ms */, [this]() { return mReceiveHandlerCallCount != 0; });
+        // Should be able to send a message to itself by just calling send.
+        err = tcp.SendMessage(Transport::PeerAddress::TCP(addr), std::move(buffer));
+        NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
+
+        mContext.DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mReceiveHandlerCallCount != 0; });
         NL_TEST_ASSERT(mSuite, mReceiveHandlerCallCount == 1);
 
         SetCallback(nullptr);
@@ -150,7 +165,7 @@ public:
     {
         // Disconnect and wait for seeing peer close
         tcp.Disconnect(Transport::PeerAddress::TCP(addr));
-        mContext.DriveIOUntil(5000 /* ms */, [&tcp]() { return !tcp.HasActiveConnections(); });
+        mContext.DriveIOUntil(chip::System::Clock::Seconds16(5), [&tcp]() { return !tcp.HasActiveConnections(); });
     }
 
     int mReceiveHandlerCallCount = 0;
@@ -171,7 +186,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddres
 
     TCPImpl tcp;
 
-    CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(&ctx.GetInetLayer()).SetAddressType(type));
+    CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(ctx.GetTCPEndPointManager()).SetAddressType(type));
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
@@ -179,13 +194,13 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddres
 #if INET_CONFIG_ENABLE_IPV4
 void CheckSimpleInitTest4(nlTestSuite * inSuite, void * inContext)
 {
-    CheckSimpleInitTest(inSuite, inContext, kIPAddressType_IPv4);
+    CheckSimpleInitTest(inSuite, inContext, IPAddressType::kIPv4);
 }
 #endif
 
 void CheckSimpleInitTest6(nlTestSuite * inSuite, void * inContext)
 {
-    CheckSimpleInitTest(inSuite, inContext, kIPAddressType_IPv6);
+    CheckSimpleInitTest(inSuite, inContext, IPAddressType::kIPv6);
 }
 
 /////////////////////////// Messaging test
@@ -201,12 +216,14 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
     gMockTransportMgrDelegate.FinalizeMessageTest(tcp, addr);
 }
 
+#if INET_CONFIG_ENABLE_IPV4
 void CheckMessageTest4(nlTestSuite * inSuite, void * inContext)
 {
     IPAddress addr;
     IPAddress::FromString("127.0.0.1", addr);
     CheckMessageTest(inSuite, inContext, addr);
 }
+#endif // INET_CONFIG_ENABLE_IPV4
 
 void CheckMessageTest6(nlTestSuite * inSuite, void * inContext)
 {
@@ -221,7 +238,7 @@ struct TestData
     // `sizes[]` is a zero-terminated sequence of packet buffer sizes.
     // If total length supplied is not large enough for at least the PacketHeader and length field,
     // the last buffer will be made larger.
-    TestData() : mHandle(), mPayload(nullptr), mTotalLength(0), mMessageLength(0), mMessageOffset(0) {}
+    TestData() : mPayload(nullptr), mTotalLength(0), mMessageLength(0), mMessageOffset(0) {}
     ~TestData() { Free(); }
     bool Init(const uint16_t sizes[]);
     void Free();
@@ -239,7 +256,7 @@ bool TestData::Init(const uint16_t sizes[])
     Free();
 
     PacketHeader header;
-    header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
+    header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageCounter(kMessageCounter);
     const size_t headerLength = header.EncodeSizeBytes();
 
     // Determine the total length.
@@ -398,7 +415,7 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite,
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 1);
 
-    // Test a message in a chain of three packet buffers. The message length is split accross buffers.
+    // Test a message in a chain of three packet buffers. The message length is split across buffers.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
     NL_TEST_ASSERT(inSuite, testData[0].Init((const uint16_t[]){ 1, 122, 123, 0 }));
     err = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
@@ -471,7 +488,7 @@ static nlTestSuite sSuite =
  */
 static int Initialize(void * aContext)
 {
-    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Init(&sSuite);
+    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Init();
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }
 

@@ -23,10 +23,12 @@
 
 #pragma once
 
+#include <atomic>
 #include <limits>
 #include <stdlib.h>
 
-#include <support/CHIPMem.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 
@@ -45,15 +47,13 @@ template <class Subclass, class Deletor = DeleteDeletor<Subclass>, int kInitRefC
 class ReferenceCounted
 {
 public:
-    typedef uint32_t count_type;
+    using count_type = uint32_t;
 
     /** Adds one to the usage count of this class */
     Subclass * Retain()
     {
-        if (mRefCount == std::numeric_limits<count_type>::max())
-        {
-            abort();
-        }
+        VerifyOrDie(!kInitRefCount || mRefCount > 0);
+        VerifyOrDie(mRefCount < std::numeric_limits<count_type>::max());
         ++mRefCount;
 
         return static_cast<Subclass *>(this);
@@ -62,10 +62,7 @@ public:
     /** Release usage of this class */
     void Release()
     {
-        if (mRefCount == 0)
-        {
-            abort();
-        }
+        VerifyOrDie(mRefCount != 0);
 
         if (--mRefCount == 0)
         {

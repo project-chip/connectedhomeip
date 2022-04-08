@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.google.chip.chiptool">
 
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -28,19 +29,20 @@
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="ch" /><!-- Process CHIP URIs -->
+                <data android:scheme="mt" /><!-- Process Matter URIs -->
             </intent-filter>
-        </activity>
-        <activity
-            android:name="com.google.chip.chiptool.commissioner.CommissionerActivity"
-            android:label="@string/commissioner_name"
-            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="mt" android:host="modelinfo" /> <!-- Process Redirect URIs -->
+            </intent-filter>
         </activity>
     </application>
 
     <queries>
         <intent>
-            <action android:name="chip.intent.action.ATTESTATION"/>
+            <action android:name="chip.intent.action.ATTESTATION" />
         </intent>
     </queries>
 

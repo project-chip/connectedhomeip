@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,116 +16,178 @@
  */
 
 /**
- *    @file
- *      This file defines the CHIP Secure Session object that provides
- *      APIs for encrypting/decryting data using cryptographic keys.
- *
+ * @brief Defines state relevant for an active connection to a peer.
  */
 
 #pragma once
 
-#include <core/CHIPCore.h>
-#include <crypto/CHIPCryptoPAL.h>
+#include <app/util/basic-types.h>
+#include <credentials/CHIPCert.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
+#include <transport/CryptoContext.h>
+#include <transport/Session.h>
+#include <transport/SessionMessageCounter.h>
+#include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>
+#include <transport/raw/PeerAddress.h>
 
 namespace chip {
+namespace Transport {
 
-class DLL_EXPORT SecureSession
+static constexpr uint32_t kUndefinedMessageIndex = UINT32_MAX;
+
+/**
+ * Defines state of a peer connection at a transport layer.
+ *
+ * Information contained within the state:
+ *   - SecureSessionType represents CASE or PASE session
+ *   - PeerAddress represents how to talk to the peer
+ *   - PeerNodeId is the unique ID of the peer
+ *   - PeerCATs represents CASE Authenticated Tags
+ *   - SendMessageIndex is an ever increasing index for sending messages
+ *   - LastActivityTime is a monotonic timestamp of when this connection was
+ *     last used. Inactive connections can expire.
+ *   - CryptoContext contains the encryption context of a connection
+ */
+class SecureSession : public Session
 {
 public:
-    SecureSession();
-    SecureSession(SecureSession &&)      = default;
-    SecureSession(const SecureSession &) = default;
-    SecureSession & operator=(const SecureSession &) = default;
-    SecureSession & operator=(SecureSession &&) = default;
+    /**
+     *  @brief
+     *    Defines SecureSession Type. Currently supported types are PASE and CASE.
+     */
+    enum class Type : uint8_t
+    {
+        kUndefined = 0,
+        kPASE      = 1,
+        kCASE      = 2,
+        // kPending denotes a secure session object that is internally
+        // reserved by the stack before and during session establishment.
+        //
+        // Although the stack can tolerate eviction of these (releasing one
+        // out from under the holder would exhibit as CHIP_ERROR_INCORRECT_STATE
+        // during CASE or PASE), intent is that we should not and would leave
+        // these untouched until CASE or PASE complete.
+        kPending = 3,
+    };
+
+    SecureSession(Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId,
+                  FabricIndex fabric, const ReliableMessageProtocolConfig & config) :
+        mSecureSessionType(secureSessionType),
+        mPeerNodeId(peerNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId),
+        mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
+    {
+        SetFabricIndex(fabric);
+    }
 
     /**
      * @brief
-     *   Derive a shared key. The derived key will be used for encryting/decrypting
-     *   data exchanged on the secure channel.
-     *
-     * @param local_keypair      A pointer to local ECP keypair
-     * @param remote_public_key  A pointer to peer's public key
-     * @param salt               A pointer to the initial salt used for deriving the keys
-     * @param salt_length        Length of the initial salt
-     * @param info               A pointer to the initial info
-     * @param info_length        Length of the initial info
-     * @return CHIP_ERROR        The result of key derivation
+     *   Construct a secure session object to associate with a pending secure
+     *   session establishment attempt.  The object for the pending session
+     *   receives a local session ID, but no other state.
      */
-    CHIP_ERROR Init(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
-                    const uint8_t * salt, size_t salt_length, const uint8_t * info, size_t info_length);
+    SecureSession(uint16_t localSessionId) :
+        SecureSession(Type::kPending, localSessionId, kUndefinedNodeId, CATValues{}, 0, kUndefinedFabricIndex, GetLocalMRPConfig())
+    {}
 
     /**
      * @brief
-     *   Derive a shared key. The derived key will be used for encryting/decrypting
-     *   data exchanged on the secure channel.
-     *
-     * @param secret             A pointer to the shared secret
-     * @param secret_length      Length of the shared secret
-     * @param salt               A pointer to the initial salt used for deriving the keys
-     * @param salt_length        Length of the initial salt
-     * @param info               A pointer to the initial info
-     * @param info_length        Length of the initial info
-     * @return CHIP_ERROR        The result of key derivation
+     *   Activate a pending Secure Session that had been reserved during CASE or
+     *   PASE, setting internal state according to the parameters used and
+     *   discovered during session establishment.
      */
-    CHIP_ERROR InitFromSecret(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length,
-                              const uint8_t * info, size_t info_length);
+    void Activate(Type secureSessionType, NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric,
+                  const ReliableMessageProtocolConfig & config)
+    {
+        mSecureSessionType = secureSessionType;
+        mPeerNodeId        = peerNodeId;
+        mPeerCATs          = peerCATs;
+        mPeerSessionId     = peerSessionId;
+        mMRPConfig         = config;
+        SetFabricIndex(fabric);
+    }
+    ~SecureSession() override { NotifySessionReleased(); }
 
-    /**
-     * @brief
-     *   Encrypt the input data using keys established in the secure channel
-     *
-     * @param input Unencrypted input data
-     * @param input_length Length of the input data
-     * @param output Output buffer for encrypted data
-     * @param header message header structure. Encryption type will be set on the header.
-     * @param mac - output the resulting mac
-     *
-     * @return CHIP_ERROR The result of encryption
-     */
-    CHIP_ERROR Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
-                       MessageAuthenticationCode & mac) const;
+    SecureSession(SecureSession &&)      = delete;
+    SecureSession(const SecureSession &) = delete;
+    SecureSession & operator=(const SecureSession &) = delete;
+    SecureSession & operator=(SecureSession &&) = delete;
 
-    /**
-     * @brief
-     *   Decrypt the input data using keys established in the secure channel
-     *
-     * @param input Encrypted input data
-     * @param input_length Length of the input data
-     * @param output Output buffer for decrypted data
-     * @param header message header structure
-     * @return CHIP_ERROR The result of decryption
-     * @param mac Input mac
-     */
-    CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
-                       const MessageAuthenticationCode & mac) const;
+    Session::SessionType GetSessionType() const override { return Session::SessionType::kSecure; }
+#if CHIP_PROGRESS_LOGGING
+    const char * GetSessionTypeString() const override { return "secure"; };
+#endif
 
-    /**
-     * @brief
-     *   Memory overhead of encrypting data. The overhead is indepedent of size of
-     *   the data being encrypted. The extra space is used for storing the common header.
-     *
-     * @return number of bytes.
-     */
-    size_t EncryptionOverhead();
+    ScopedNodeId GetPeer() const override;
+    Access::SubjectDescriptor GetSubjectDescriptor() const override;
 
-    /**
-     * Clears the internal state of secure session back to the state of a new object.
-     */
-    void Reset();
+    bool RequireMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }
+
+    System::Clock::Milliseconds32 GetAckTimeout() const override
+    {
+        switch (mPeerAddress.GetTransportType())
+        {
+        case Transport::Type::kUdp:
+            return GetMRPConfig().mIdleRetransTimeout * (CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1);
+        case Transport::Type::kTcp:
+            return System::Clock::Seconds16(30);
+        default:
+            break;
+        }
+        return System::Clock::Timeout();
+    }
+
+    const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
+    void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
+
+    Type GetSecureSessionType() const { return mSecureSessionType; }
+    NodeId GetPeerNodeId() const { return mPeerNodeId; }
+    CATValues GetPeerCATs() const { return mPeerCATs; }
+
+    void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
+
+    const ReliableMessageProtocolConfig & GetMRPConfig() const override { return mMRPConfig; }
+
+    uint16_t GetLocalSessionId() const { return mLocalSessionId; }
+    uint16_t GetPeerSessionId() const { return mPeerSessionId; }
+
+    // Should only be called for PASE sessions, which start with undefined fabric,
+    // to migrate to a newly commissioned fabric after successful
+    // OperationalCredentialsCluster::AddNOC
+    CHIP_ERROR NewFabric(FabricIndex fabricIndex)
+    {
+#if 0
+        // TODO(#13711): this check won't work until the issue is addressed
+        if (mSecureSessionType == Type::kPASE)
+        {
+            SetFabricIndex(fabricIndex);
+        }
+#else
+        SetFabricIndex(fabricIndex);
+#endif
+        return CHIP_NO_ERROR;
+    }
+
+    System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
+    void MarkActive() { mLastActivityTime = System::SystemClock().GetMonotonicTimestamp(); }
+
+    CryptoContext & GetCryptoContext() { return mCryptoContext; }
+
+    SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
 private:
-    static constexpr size_t kAES_CCM128_Key_Length = 16;
+    Type mSecureSessionType;
+    NodeId mPeerNodeId;
+    CATValues mPeerCATs;
+    const uint16_t mLocalSessionId;
+    uint16_t mPeerSessionId;
 
-    bool mKeyAvailable;
-    uint8_t mKey[kAES_CCM128_Key_Length];
-
-    static CHIP_ERROR GetIV(const PacketHeader & header, uint8_t * iv, size_t len);
-
-    // Use unencrypted header as additional authenticated data (AAD) during encryption and decryption.
-    // The encryption operations includes AAD when message authentication tag is generated. This tag
-    // is used at the time of decryption to integrity check the received data.
-    static CHIP_ERROR GetAdditionalAuthData(const PacketHeader & header, uint8_t * aad, uint16_t & len);
+    PeerAddress mPeerAddress;
+    System::Clock::Timestamp mLastActivityTime;
+    ReliableMessageProtocolConfig mMRPConfig;
+    CryptoContext mCryptoContext;
+    SessionMessageCounter mSessionMessageCounter;
 };
 
+} // namespace Transport
 } // namespace chip

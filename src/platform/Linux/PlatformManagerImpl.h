@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <memory>
+#include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
 
 #if CHIP_WITH_GIO
@@ -54,16 +54,25 @@ public:
     GDBusConnection * GetGDBusConnection();
 #endif
 
+    System::Clock::Timestamp GetStartTime() { return mStartTime; }
+
+    void HandleGeneralFault(uint32_t EventId);
+    void HandleSoftwareFault(uint32_t EventId);
+    void HandleSwitchEvent(uint32_t EventId);
+
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR _InitChipStack();
+    CHIP_ERROR _Shutdown();
 
     // ===== Members for internal use by the following friends.
 
     friend PlatformManager & PlatformMgr();
     friend PlatformManagerImpl & PlatformMgrImpl();
     friend class Internal::BLEManagerImpl;
+
+    System::Clock::Timestamp mStartTime = System::Clock::kZero;
 
     static PlatformManagerImpl sInstance;
 
@@ -96,7 +105,7 @@ inline PlatformManager & PlatformMgr()
  * Returns the platform-specific implementation of the PlatformManager singleton object.
  *
  * chip applications can use this to gain access to features of the PlatformManager
- * that are specific to the ESP32 platform.
+ * that are specific to the platform.
  */
 inline PlatformManagerImpl & PlatformMgrImpl()
 {

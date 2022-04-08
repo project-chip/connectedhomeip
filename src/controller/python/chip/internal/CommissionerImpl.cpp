@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,34 +17,43 @@
 #include <memory>
 
 #include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceControllerFactory.h>
+#include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <credentials/GroupDataProviderImpl.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/FileAttestationTrustStore.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/TestGroupData.h>
+#include <lib/support/ThreadOperationalDataset.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
-#include <support/logging/CHIPLogging.h>
 
 #include "ChipThreadWork.h"
 
+using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
+
 namespace {
+
+const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStore(const char * paaTrustStorePath)
+{
+    static chip::Credentials::FileAttestationTrustStore attestationTrustStore{ paaTrustStorePath };
+
+    return &attestationTrustStore;
+}
 
 class ServerStorageDelegate : public chip::PersistentStorageDelegate
 {
 public:
-    void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override { mAsyncDelegate = delegate; }
-
-    void AsyncSetKeyValue(const char * key, const char * value) override
-    {
-
-        CHIP_ERROR err = SyncSetKeyValue(key, value, strlen(value));
-
-        if (err != CHIP_NO_ERROR)
-        {
-            mAsyncDelegate->OnPersistentStorageStatus(key, chip::PersistentStorageResultDelegate::Operation::kSET, err);
-        }
-    }
-
     CHIP_ERROR
     SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
-        return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
+        size_t bytesRead = 0;
+        CHIP_ERROR err   = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead);
+        size             = static_cast<uint16_t>(bytesRead);
+        return err;
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
@@ -52,45 +61,19 @@ public:
         return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
     }
 
-    void AsyncDeleteKeyValue(const char * key) override { chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key); }
-
-private:
-    chip::PersistentStorageResultDelegate * mAsyncDelegate = nullptr;
+    CHIP_ERROR SyncDeleteKeyValue(const char * key) override
+    {
+        return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
+    }
 };
 
 // FIXME: implement this class
 class ScriptDevicePairingDelegate final : public chip::Controller::DevicePairingDelegate
 {
 public:
-    using OnNetworkCredentialsRequestedCallback     = void (*)();
-    using OnOperationalCredentialsRequestedCallback = void (*)(const char * csr, size_t length);
-    using OnPairingCompleteCallback                 = void (*)(CHIP_ERROR err);
+    using OnPairingCompleteCallback = void (*)(CHIP_ERROR err);
 
     ~ScriptDevicePairingDelegate() = default;
-
-    void OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback) override
-    {
-        mCredentialsDelegate = callback;
-        if (mNetworkCredentialsRequested == nullptr)
-        {
-            ChipLogError(Controller, "Callback for network credentials is not defined.");
-            return;
-        }
-        mNetworkCredentialsRequested();
-    }
-
-    void OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
-                                           chip::RendezvousDeviceCredentialsDelegate * callback) override
-    {
-        mCredentialsDelegate = callback;
-        if (mOperationalCredentialsRequested == nullptr)
-        {
-            ChipLogError(Controller, "Callback for operational credentials is not defined.");
-            return;
-        }
-
-        mOperationalCredentialsRequested(csr, csr_length);
-    }
 
     void OnPairingComplete(CHIP_ERROR error) override
     {
@@ -102,103 +85,18 @@ public:
         mPairingComplete(error);
     }
 
-    void SetNetworkCredentialsRequestedCallback(OnNetworkCredentialsRequestedCallback callback)
-    {
-        mNetworkCredentialsRequested = callback;
-    }
-
-    void SetOperatioonalCredentialsRequestedCallback(OnOperationalCredentialsRequestedCallback callback)
-    {
-        mOperationalCredentialsRequested = callback;
-    }
-
     void SetPairingCompleteCallback(OnPairingCompleteCallback callback) { mPairingComplete = callback; }
 
-    void SetWifiCredentials(const char * ssid, const char * password)
-    {
-        if (mCredentialsDelegate == nullptr)
-        {
-            ChipLogError(Controller, "Wifi credentials received before delegate available.");
-            return;
-        }
-
-        mCredentialsDelegate->SendNetworkCredentials(ssid, password);
-    }
-
-    void SetThreadCredentials(const chip::DeviceLayer::Internal::DeviceNetworkInfo & threadData)
-    {
-        if (mCredentialsDelegate == nullptr)
-        {
-            ChipLogError(Controller, "Thread credentials received before delegate available.");
-            return;
-        }
-
-        mCredentialsDelegate->SendThreadCredentials(threadData);
-    }
-
 private:
-    OnNetworkCredentialsRequestedCallback mNetworkCredentialsRequested         = nullptr;
-    OnOperationalCredentialsRequestedCallback mOperationalCredentialsRequested = nullptr;
-    OnPairingCompleteCallback mPairingComplete                                 = nullptr;
-
-    /// Delegate is set during request callbacks
-    chip::RendezvousDeviceCredentialsDelegate * mCredentialsDelegate = nullptr;
+    OnPairingCompleteCallback mPairingComplete = nullptr;
 };
 
 ServerStorageDelegate gServerStorage;
 ScriptDevicePairingDelegate gPairingDelegate;
+chip::Credentials::GroupDataProviderImpl gGroupDataProvider;
+chip::Controller::ExampleOperationalCredentialsIssuer gOperationalCredentialsIssuer;
 
 } // namespace
-
-extern "C" void pychip_internal_PairingDelegate_SetWifiCredentials(const char * ssid, const char * password)
-{
-    chip::python::ChipMainThreadScheduleAndWait([&]() { gPairingDelegate.SetWifiCredentials(ssid, password); });
-}
-
-extern "C" CHIP_ERROR pychip_internal_PairingDelegate_SetThreadCredentials(const void * data, uint32_t length)
-{
-
-    // Openthread is OPAQUE by the spec, however current CHIP stack does not have any
-    // validation/support for opaque blobs. As a result, we try to do some
-    // pre-validation here
-
-    // TODO: there should be uniform 'BLOBL' support within the thread stack
-    if (length != sizeof(chip::DeviceLayer::Internal::DeviceNetworkInfo))
-    {
-        ChipLogError(Controller, "Received invalid thread credential blob. Expected size %u and got %u bytes instead",
-                     sizeof(chip::DeviceLayer::Internal::DeviceNetworkInfo), length);
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    // unsure about alignment so copy into a properly aligned item
-    chip::DeviceLayer::Internal::DeviceNetworkInfo threadInfo;
-    memcpy(&threadInfo, data, sizeof(threadInfo));
-
-    // TODO: figure out a proper way to validate this or remove validation once
-    // thread credentials are assumed opaque throughout
-    if ((threadInfo.ThreadChannel != chip::DeviceLayer::Internal::kThreadChannel_NotSpecified) &&
-        ((threadInfo.ThreadChannel < 11) || (threadInfo.ThreadChannel > 26)))
-    {
-        ChipLogError(Controller, "Failed to validate thread info: channel %d is not valid", threadInfo.ThreadChannel);
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    chip::python::ChipMainThreadScheduleAndWait([&]() { gPairingDelegate.SetThreadCredentials(threadInfo); });
-
-    return CHIP_NO_ERROR;
-}
-
-extern "C" void pychip_internal_PairingDelegate_SetNetworkCredentialsRequestedCallback(
-    ScriptDevicePairingDelegate::OnNetworkCredentialsRequestedCallback callback)
-{
-    gPairingDelegate.SetNetworkCredentialsRequestedCallback(callback);
-}
-
-extern "C" void pychip_internal_PairingDelegate_SetOperationalCredentialsRequestedCallback(
-    ScriptDevicePairingDelegate::OnOperationalCredentialsRequestedCallback callback)
-{
-    gPairingDelegate.SetOperatioonalCredentialsRequestedCallback(callback);
-}
 
 extern "C" void
 pychip_internal_PairingDelegate_SetPairingCompleteCallback(ScriptDevicePairingDelegate::OnPairingCompleteCallback callback)
@@ -206,7 +104,8 @@ pychip_internal_PairingDelegate_SetPairingCompleteCallback(ScriptDevicePairingDe
     gPairingDelegate.SetPairingCompleteCallback(callback);
 }
 
-extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_New(uint64_t localDeviceId)
+extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_New(uint64_t localDeviceId,
+                                                                                   uint32_t localCommissionerCAT)
 {
     std::unique_ptr<chip::Controller::DeviceCommissioner> result;
     CHIP_ERROR err;
@@ -216,8 +115,82 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
 
         // System and Inet layers explicitly passed to indicate that the CHIP stack is
         // already assumed initialized
-        err = result->Init(localDeviceId, &gServerStorage, &gPairingDelegate, &chip::DeviceLayer::SystemLayer,
-                           &chip::DeviceLayer::InetLayer);
+        chip::Controller::SetupParams commissionerParams;
+        chip::Controller::FactoryInitParams factoryParams;
+        chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
+        chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
+        chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
+        chip::Crypto::P256Keypair ephemeralKey;
+
+        // Initialize device attestation verifier
+        // TODO: add option to pass in custom PAA Trust Store path to the python controller app
+        const chip::Credentials::AttestationTrustStore * testingRootStore =
+            GetTestFileAttestationTrustStore("./credentials/development/paa-root-certs");
+        chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
+
+        factoryParams.fabricIndependentStorage = &gServerStorage;
+
+        // Initialize group data provider for local group key state and IPKs
+        gGroupDataProvider.SetStorageDelegate(&gServerStorage);
+        err = gGroupDataProvider.Init();
+        SuccessOrExit(err);
+        factoryParams.groupDataProvider = &gGroupDataProvider;
+
+        commissionerParams.pairingDelegate = &gPairingDelegate;
+        commissionerParams.storageDelegate = &gServerStorage;
+
+        err = ephemeralKey.Initialize();
+        SuccessOrExit(err);
+
+        err = gOperationalCredentialsIssuer.Initialize(gServerStorage);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Operational credentials issuer initialization failed: %s", chip::ErrorStr(err));
+            ExitNow();
+        }
+
+        VerifyOrExit(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrExit(icac.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrExit(rcac.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);
+
+        {
+            chip::FabricInfo * fabricInfo                = nullptr;
+            uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
+            chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
+            chip::ByteSpan defaultIpk;
+
+            chip::MutableByteSpan nocSpan(noc.Get(), chip::Controller::kMaxCHIPDERCertLength);
+            chip::MutableByteSpan icacSpan(icac.Get(), chip::Controller::kMaxCHIPDERCertLength);
+            chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
+
+            err = gOperationalCredentialsIssuer.GenerateNOCChainAfterValidation(
+                localDeviceId, /* fabricId = */ 1, { { localCommissionerCAT, chip::kUndefinedCAT, chip::kUndefinedCAT } },
+                ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
+            SuccessOrExit(err);
+
+            commissionerParams.operationalCredentialsDelegate = &gOperationalCredentialsIssuer;
+            commissionerParams.operationalKeypair             = &ephemeralKey;
+            commissionerParams.controllerRCAC                 = rcacSpan;
+            commissionerParams.controllerICAC                 = icacSpan;
+            commissionerParams.controllerNOC                  = nocSpan;
+
+            SuccessOrExit(DeviceControllerFactory::GetInstance().Init(factoryParams));
+            err = DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, *result);
+
+            fabricInfo = result->GetFabricInfo();
+            VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_INTERNAL);
+
+            SuccessOrExit(fabricInfo->GetCompressedId(compressedFabricIdSpan));
+            ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
+                            static_cast<unsigned>(fabricInfo->GetFabricIndex()));
+            ChipLogByteSpan(Support, compressedFabricIdSpan);
+
+            defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+            SuccessOrExit(chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, fabricInfo->GetFabricIndex(), defaultIpk,
+                                                                  compressedFabricIdSpan));
+        }
+    exit:
+        ChipLogProgress(Controller, "Commissioner initialization status: %s", chip::ErrorStr(err));
     });
 
     if (err != CHIP_NO_ERROR)
@@ -229,20 +202,22 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
     return result.release();
 }
 
+static_assert(std::is_same<uint32_t, chip::ChipError::StorageType>::value, "python assumes CHIP_ERROR maps to c_uint32");
+
 /// Returns CHIP_ERROR corresponding to an UnpairDevice call
-extern "C" uint32_t pychip_internal_Commissioner_Unpair(chip::Controller::DeviceCommissioner * commissioner,
-                                                        uint64_t remoteDeviceId)
+extern "C" chip::ChipError::StorageType pychip_internal_Commissioner_Unpair(chip::Controller::DeviceCommissioner * commissioner,
+                                                                            uint64_t remoteDeviceId)
 {
     CHIP_ERROR err;
 
     chip::python::ChipMainThreadScheduleAndWait([&]() { err = commissioner->UnpairDevice(remoteDeviceId); });
 
-    return err;
+    return err.AsInteger();
 }
 
-extern "C" uint32_t pychip_internal_Commissioner_BleConnectForPairing(chip::Controller::DeviceCommissioner * commissioner,
-                                                                      uint64_t remoteNodeId, uint32_t pinCode,
-                                                                      uint16_t discriminator)
+extern "C" chip::ChipError::StorageType
+pychip_internal_Commissioner_BleConnectForPairing(chip::Controller::DeviceCommissioner * commissioner, uint64_t remoteNodeId,
+                                                  uint32_t pinCode, uint16_t discriminator)
 {
 
     CHIP_ERROR err;
@@ -250,7 +225,7 @@ extern "C" uint32_t pychip_internal_Commissioner_BleConnectForPairing(chip::Cont
     chip::python::ChipMainThreadScheduleAndWait([&]() {
         chip::RendezvousParameters params;
 
-        params.SetDiscriminator(discriminator).SetSetupPINCode(pinCode).SetRemoteNodeId(remoteNodeId);
+        params.SetDiscriminator(discriminator).SetSetupPINCode(pinCode);
 #if CONFIG_NETWORK_LAYER_BLE
         params.SetBleLayer(chip::DeviceLayer::ConnectivityMgr().GetBleLayer()).SetPeerAddress(chip::Transport::PeerAddress::BLE());
 #endif
@@ -258,5 +233,5 @@ extern "C" uint32_t pychip_internal_Commissioner_BleConnectForPairing(chip::Cont
         err = commissioner->PairDevice(remoteNodeId, params);
     });
 
-    return err;
+    return err.AsInteger();
 }

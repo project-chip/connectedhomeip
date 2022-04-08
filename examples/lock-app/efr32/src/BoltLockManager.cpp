@@ -27,7 +27,7 @@ BoltLockManager BoltLockManager::sLock;
 
 TimerHandle_t sLockTimer;
 
-int BoltLockManager::Init()
+CHIP_ERROR BoltLockManager::Init()
 {
     // Create FreeRTOS sw timer for lock timer.
     sLockTimer = xTimerCreate("lockTmr",        // Just a text name, not used by the RTOS kernel
@@ -40,7 +40,7 @@ int BoltLockManager::Init()
     if (sLockTimer == NULL)
     {
         EFR32_LOG("sLockTimer timer create failed");
-        appError(CHIP_ERROR_MAX);
+        appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
     mState              = kState_LockingCompleted;
@@ -135,7 +135,7 @@ void BoltLockManager::StartTimer(uint32_t aTimeoutMs)
     if (xTimerChangePeriod(sLockTimer, (aTimeoutMs / portTICK_PERIOD_MS), 100) != pdPASS)
     {
         EFR32_LOG("sLockTimer timer start() failed");
-        appError(CHIP_ERROR_MAX);
+        appError(APP_ERROR_START_TIMER_FAILED);
     }
 }
 
@@ -144,7 +144,7 @@ void BoltLockManager::CancelTimer(void)
     if (xTimerStop(sLockTimer, 0) == pdFAIL)
     {
         EFR32_LOG("Lock timer timer stop() failed");
-        appError(CHIP_ERROR_MAX);
+        appError(APP_ERROR_STOP_TIMER_FAILED);
     }
 }
 

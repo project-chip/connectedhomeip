@@ -26,7 +26,7 @@ pulls:
 
 issues:
   # Number of days of inactivity before a issue becomes stale
-  daysUntilStale: 365
+  daysUntilStale: 180
 
   # Number of days of inactivity before a stale issue is closed
   daysUntilClose: 7

@@ -16,7 +16,7 @@
  */
 
 #import "CHIPDevicePairingDelegateBridge.h"
-#import "CHIPError.h"
+#import "CHIPError_Internal.h"
 
 CHIPDevicePairingDelegateBridge::CHIPDevicePairingDelegateBridge(void)
     : mDelegate(nil)
@@ -36,27 +36,21 @@ void CHIPDevicePairingDelegateBridge::setDelegate(id<CHIPDevicePairingDelegate> 
     }
 }
 
-CHIPPairingStatus CHIPDevicePairingDelegateBridge::MapStatus(chip::RendezvousSessionDelegate::Status status)
+CHIPPairingStatus CHIPDevicePairingDelegateBridge::MapStatus(chip::Controller::DevicePairingDelegate::Status status)
 {
     CHIPPairingStatus rv = kUnknownStatus;
     switch (status) {
-    case chip::RendezvousSessionDelegate::Status::SecurePairingSuccess:
+    case chip::Controller::DevicePairingDelegate::Status::SecurePairingSuccess:
         rv = kSecurePairingSuccess;
         break;
-    case chip::RendezvousSessionDelegate::Status::SecurePairingFailed:
+    case chip::Controller::DevicePairingDelegate::Status::SecurePairingFailed:
         rv = kSecurePairingFailed;
-        break;
-    case chip::RendezvousSessionDelegate::Status::NetworkProvisioningSuccess:
-        rv = kNetworkProvisioningSuccess;
-        break;
-    case chip::RendezvousSessionDelegate::Status::NetworkProvisioningFailed:
-        rv = kNetworkProvisioningFailed;
         break;
     }
     return rv;
 }
 
-void CHIPDevicePairingDelegateBridge::OnStatusUpdate(chip::RendezvousSessionDelegate::Status status)
+void CHIPDevicePairingDelegateBridge::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)
 {
     NSLog(@"DevicePairingDelegate status updated: %d", status);
 
@@ -71,43 +65,9 @@ void CHIPDevicePairingDelegateBridge::OnStatusUpdate(chip::RendezvousSessionDele
     }
 }
 
-void CHIPDevicePairingDelegateBridge::OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback)
-{
-    NSLog(@"DevicePairingDelegate Requesting network credentials");
-
-    mCallback = callback;
-
-    id<CHIPDevicePairingDelegate> strongDelegate = mDelegate;
-    if (strongDelegate && mQueue) {
-        dispatch_async(mQueue, ^{
-            [strongDelegate onNetworkCredentialsRequested:kNetworkCredentialTypeWiFi];
-        });
-    }
-}
-
-void CHIPDevicePairingDelegateBridge::SendWiFiCredentials(NSString * ssid, NSString * password)
-{
-    if (mCallback) {
-        mCallback->SendNetworkCredentials([ssid UTF8String], [password UTF8String]);
-    } else {
-        NSLog(@"Couldn't Send WiFi Credentials, are you sure pairing is in progress?");
-    }
-}
-
-void CHIPDevicePairingDelegateBridge::SendThreadCredentials(NSData * threadDataSet)
-{
-    NSLog(@"Thread Provisioning is still a WIP, pairing will timeout...");
-}
-
-void CHIPDevicePairingDelegateBridge::OnOperationalCredentialsRequested(
-    const char * csr, size_t csr_length, chip::RendezvousDeviceCredentialsDelegate * callback)
-{
-    NSLog(@"DevicePairingDelegate Requesting operational credentials");
-}
-
 void CHIPDevicePairingDelegateBridge::OnPairingComplete(CHIP_ERROR error)
 {
-    NSLog(@"DevicePairingDelegate Pairing complete. Status %d", error);
+    NSLog(@"DevicePairingDelegate Pairing complete. Status %s", chip::ErrorStr(error));
 
     id<CHIPDevicePairingDelegate> strongDelegate = mDelegate;
     if ([strongDelegate respondsToSelector:@selector(onPairingComplete:)]) {
@@ -122,7 +82,7 @@ void CHIPDevicePairingDelegateBridge::OnPairingComplete(CHIP_ERROR error)
 
 void CHIPDevicePairingDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
 {
-    NSLog(@"DevicePairingDelegate Pairing deleted. Status %d", error);
+    NSLog(@"DevicePairingDelegate Pairing deleted. Status %s", chip::ErrorStr(error));
 
     id<CHIPDevicePairingDelegate> strongDelegate = mDelegate;
     if ([strongDelegate respondsToSelector:@selector(onPairingDeleted:)]) {
@@ -130,6 +90,21 @@ void CHIPDevicePairingDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
             dispatch_async(mQueue, ^{
                 NSError * nsError = [CHIPError errorForCHIPErrorCode:error];
                 [strongDelegate onPairingDeleted:nsError];
+            });
+        }
+    }
+}
+
+void CHIPDevicePairingDelegateBridge::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR error)
+{
+    NSLog(@"DevicePairingDelegate Commissioning complete. NodeId %llu Status %s", nodeId, chip::ErrorStr(error));
+
+    id<CHIPDevicePairingDelegate> strongDelegate = mDelegate;
+    if ([strongDelegate respondsToSelector:@selector(onCommissioningComplete:)]) {
+        if (strongDelegate && mQueue) {
+            dispatch_async(mQueue, ^{
+                NSError * nsError = [CHIPError errorForCHIPErrorCode:error];
+                [strongDelegate onCommissioningComplete:nsError];
             });
         }
     }

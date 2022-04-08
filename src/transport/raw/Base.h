@@ -23,9 +23,9 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
 #include <inet/IPAddress.h>
 #include <inet/UDPEndPoint.h>
+#include <lib/core/CHIPError.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -37,8 +37,7 @@ class RawTransportDelegate
 {
 public:
     virtual ~RawTransportDelegate() {}
-    virtual void HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                       System::PacketBufferHandle msg) = 0;
+    virtual void HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg) = 0;
 };
 
 /**
@@ -64,7 +63,7 @@ public:
      *
      * On connection-oriented transports, sending a message implies connecting to the target first.
      */
-    virtual CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) = 0;
+    virtual CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) = 0;
 
     /**
      * Determine if this transport can SendMessage to the specified peer address.
@@ -74,23 +73,33 @@ public:
     virtual bool CanSendToPeer(const PeerAddress & address) = 0;
 
     /**
+     * Determine if this transport can Listen to IPV6 Multicast.
+     */
+    virtual bool CanListenMulticast() { return false; }
+
+    /**
      * Handle disconnection from the specified peer if currently connected to it.
      */
     virtual void Disconnect(const PeerAddress & address) {}
 
     /**
+     * Enable Listening for multicast messages ( IPV6 UDP only)
+     */
+    virtual CHIP_ERROR MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join) { return CHIP_ERROR_INTERNAL; }
+
+    /**
      * Close the open endpoint without destroying the object
      */
-    virtual void Close(){};
+    virtual void Close() {}
 
 protected:
     /**
      * Method used by subclasses to notify that a packet has been received after
      * any associated headers have been decoded.
      */
-    void HandleMessageReceived(const PacketHeader & header, const PeerAddress & source, System::PacketBufferHandle && buffer)
+    void HandleMessageReceived(const PeerAddress & source, System::PacketBufferHandle && buffer)
     {
-        mDelegate->HandleMessageReceived(header, source, std::move(buffer));
+        mDelegate->HandleMessageReceived(source, std::move(buffer));
     }
 
     RawTransportDelegate * mDelegate;

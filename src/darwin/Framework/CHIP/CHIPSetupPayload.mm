@@ -15,8 +15,9 @@
  *    limitations under the License.
  */
 
-#import "CHIPSetupPayload.h"
 #import "CHIPError.h"
+#import "CHIPError_Internal.h"
+#import "CHIPSetupPayload_Internal.h"
 #import <setup_payload/SetupPayload.h>
 
 @implementation CHIPOptionalQRCodeInfo
@@ -26,30 +27,32 @@
     chip::SetupPayload _chipSetupPayload;
 }
 
-- (RendezvousInformationFlags)valueOf:(chip::RendezvousInformationFlags)value
+- (CHIPRendezvousInformationFlags)convertRendezvousFlags:(chip::RendezvousInformationFlags)value
 {
-    RendezvousInformationFlags rv = kRendezvousInformationNone;
-    switch (value) {
-    case chip::RendezvousInformationFlags::kNone:
-        rv = kRendezvousInformationNone;
-        break;
-    case chip::RendezvousInformationFlags::kWiFi:
-        rv = kRendezvousInformationWiFi;
-        break;
-    case chip::RendezvousInformationFlags::kBLE:
-        rv = kRendezvousInformationBLE;
-        break;
-    case chip::RendezvousInformationFlags::kThread:
-        rv = kRendezvousInformationThread;
-        break;
-    case chip::RendezvousInformationFlags::kEthernet:
-        rv = kRendezvousInformationEthernet;
-        break;
-    case chip::RendezvousInformationFlags::kAllMask:
-        rv = kRendezvousInformationAllMask;
-        break;
+    if (value.Has(chip::RendezvousInformationFlag::kBLE)) {
+        return kRendezvousInformationBLE;
     }
-    return rv;
+    if (value.Has(chip::RendezvousInformationFlag::kSoftAP)) {
+        return kRendezvousInformationSoftAP;
+    }
+    if (value.Has(chip::RendezvousInformationFlag::kOnNetwork)) {
+        return kRendezvousInformationOnNetwork;
+    }
+    return kRendezvousInformationNone;
+}
+
+- (CHIPCommissioningFlow)convertCommissioningFlow:(chip::CommissioningFlow)value
+{
+    if (value == chip::CommissioningFlow::kStandard) {
+        return kCommissioningFlowStandard;
+    }
+    if (value == chip::CommissioningFlow::kUserActionRequired) {
+        return kCommissioningFlowUserActionRequired;
+    }
+    if (value == chip::CommissioningFlow::kCustom) {
+        return kCommissioningFlowCustom;
+    }
+    return kCommissioningFlowInvalid;
 }
 
 - (id)initWithSetupPayload:(chip::SetupPayload)setupPayload
@@ -59,10 +62,10 @@
         _version = [NSNumber numberWithUnsignedChar:setupPayload.version];
         _vendorID = [NSNumber numberWithUnsignedShort:setupPayload.vendorID];
         _productID = [NSNumber numberWithUnsignedShort:setupPayload.productID];
-        _requiresCustomFlow = setupPayload.requiresCustomFlow == 1;
-        _rendezvousInformation = [self valueOf:setupPayload.rendezvousInformation];
+        _commissioningFlow = [self convertCommissioningFlow:setupPayload.commissioningFlow];
+        _rendezvousInformation = [self convertRendezvousFlags:setupPayload.rendezvousInformation];
         _discriminator = [NSNumber numberWithUnsignedShort:setupPayload.discriminator];
-        _setUpPINCode = [NSNumber numberWithUnsignedLong:setupPayload.setUpPINCode];
+        _setUpPINCode = [NSNumber numberWithUnsignedInt:setupPayload.setUpPINCode];
 
         [self getSerialNumber:setupPayload];
     }

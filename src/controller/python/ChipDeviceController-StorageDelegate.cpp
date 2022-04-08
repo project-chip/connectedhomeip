@@ -23,23 +23,18 @@
 #include <map>
 #include <string>
 
-#include <core/CHIPPersistentStorageDelegate.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace Controller {
 
-void PythonPersistentStorageDelegate::SetStorageDelegate(PersistentStorageResultDelegate * delegate)
-{
-    mDelegate = delegate;
-}
-
-CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, char * value, uint16_t & size)
+CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
 {
     auto val = mStorage.find(key);
     if (val == mStorage.end())
     {
-        return CHIP_ERROR_KEY_NOT_FOUND;
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
 
     if (value == nullptr)
@@ -47,38 +42,94 @@ CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, ch
         size = 0;
     }
 
-    uint16_t neededSize = val->second.size() + 1;
+    uint16_t neededSize = val->second.size();
     if (size == 0)
     {
         size = neededSize;
-        return CHIP_ERROR_NO_MEMORY;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
     if (size < neededSize)
     {
-        memcpy(value, val->second.c_str(), size - 1);
-        value[size - 1] = '\0';
-        size            = neededSize;
-        return CHIP_ERROR_NO_MEMORY;
+        memcpy(value, val->second.data(), size);
+        size = neededSize;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
-    memcpy(value, val->second.c_str(), neededSize);
+    memcpy(value, val->second.data(), neededSize);
     size = neededSize;
     return CHIP_NO_ERROR;
 }
 
-void PythonPersistentStorageDelegate::AsyncSetKeyValue(const char * key, const char * value)
+CHIP_ERROR PythonPersistentStorageDelegate::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
 {
-    mStorage[key] = value;
-    ChipLogDetail(Controller, "AsyncSetKeyValue: %s=%s", key, value);
-    mDelegate->OnPersistentStorageStatus(key, PersistentStorageResultDelegate::Operation::kSET, CHIP_NO_ERROR);
+    mStorage[key] = std::string(static_cast<const char *>(value), size);
+    ChipLogDetail(Controller, "SyncSetKeyValue on %s", key);
+
+    return CHIP_NO_ERROR;
 }
 
-void PythonPersistentStorageDelegate::AsyncDeleteKeyValue(const char * key)
+CHIP_ERROR PythonPersistentStorageDelegate::SyncDeleteKeyValue(const char * key)
 {
+    auto val = mStorage.find(key);
+    if (val == mStorage.end())
+    {
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    }
+
     mStorage.erase(key);
-    mDelegate->OnPersistentStorageStatus(key, PersistentStorageResultDelegate::Operation::kDELETE, CHIP_NO_ERROR);
+    return CHIP_NO_ERROR;
 }
 
+namespace Python {
+
+CHIP_ERROR StorageAdapter::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
+{
+    ChipLogDetail(Controller, "StorageAdapter::GetKeyValue: Key = %s, Value = %p (%u)", key, value, size);
+
+    uint16_t tmpSize = size;
+
+    mGetKeyCb(mContext, key, (char *) value, &tmpSize);
+
+    if (tmpSize == 0)
+    {
+        ChipLogDetail(Controller, "Key Not Found\n");
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    }
+    if (size < tmpSize)
+    {
+        ChipLogDetail(Controller, "Buf not big enough\n");
+        size = tmpSize;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    ChipLogDetail(Controller, "Key Found %d\n", tmpSize);
+    size = tmpSize;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR StorageAdapter::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
+{
+    ChipLogDetail(Controller, "StorageAdapter::SetKeyValue: Key = %s, Value = %p (%u)", key, value, size);
+    mStorage[key] = std::string(static_cast<const char *>(value), size);
+    mSetKeyCb(mContext, key, value, size);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR StorageAdapter::SyncDeleteKeyValue(const char * key)
+{
+    uint8_t val[1];
+    uint16_t size  = 0;
+    CHIP_ERROR err = SyncGetKeyValue(key, val, size);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return err;
+    }
+
+    mDeleteKeyCb(mContext, key);
+    return CHIP_NO_ERROR;
+}
+
+} // namespace Python
 } // namespace Controller
 } // namespace chip

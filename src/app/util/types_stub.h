@@ -45,13 +45,14 @@
 
 #include <app/chip-zcl-zpro-codec.h> // For EmberApsFrame
 
-#include "basic-types.h"
+#include <app/util/basic-types.h>
+#include <lib/core/Optional.h>
 
 #include <transport/raw/MessageHeader.h>
 static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");
 
-#include "gen/endpoint_config.h"
-#include "gen/gen_config.h"
+#include <zap-generated/endpoint_config.h>
+#include <zap-generated/gen_config.h>
 
 /**
  * @brief Defines binding types.
@@ -365,36 +366,6 @@ enum
     EMBER_INCOMING_BROADCAST_LOOPBACK
 };
 
-/**
- * @brief Defines the possible outgoing message types.
- */
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberOutgoingMessageType
-#else
-typedef uint8_t EmberOutgoingMessageType;
-enum
-#endif
-{
-    /** Unicast sent directly to an EmberNodeId. */
-    EMBER_OUTGOING_DIRECT,
-    /** Unicast sent using an entry in the address table. */
-    EMBER_OUTGOING_VIA_ADDRESS_TABLE,
-    /** Unicast sent using an entry in the binding table. */
-    EMBER_OUTGOING_VIA_BINDING,
-    /** Multicast message.  This value is passed to emberMessageSentHandler() only.
-     * It may not be passed to emberSendUnicast(). */
-    EMBER_OUTGOING_MULTICAST,
-    /** An aliased multicast message.  This value is passed to emberMessageSentHandler() only.
-     * It may not be passed to emberSendUnicast(). */
-    EMBER_OUTGOING_MULTICAST_WITH_ALIAS,
-    /** An aliased Broadcast message.  This value is passed to emberMessageSentHandler() only.
-     * It may not be passed to emberSendUnicast(). */
-    EMBER_OUTGOING_BROADCAST_WITH_ALIAS,
-    /** A broadcast message.  This value is passed to emberMessageSentHandler() only.
-     * It may not be passed to emberSendUnicast(). */
-    EMBER_OUTGOING_BROADCAST
-};
-
 /** @brief Endpoint information (a ZigBee Simple Descriptor).
  *
  * This is a ZigBee Simple Descriptor and contains information
@@ -525,8 +496,40 @@ enum
  */
 struct EmberBindingTableEntry
 {
+    EmberBindingTableEntry() = default;
+
+    static EmberBindingTableEntry ForNode(chip::FabricIndex fabric, chip::NodeId node, chip::EndpointId localEndpoint,
+                                          chip::EndpointId remoteEndpoint, chip::Optional<chip::ClusterId> cluster)
+    {
+        EmberBindingTableEntry entry = {
+            .type        = EMBER_UNICAST_BINDING,
+            .fabricIndex = fabric,
+            .local       = localEndpoint,
+            .clusterId   = cluster,
+            .remote      = remoteEndpoint,
+            .nodeId      = node,
+        };
+        return entry;
+    }
+
+    static EmberBindingTableEntry ForGroup(chip::FabricIndex fabric, chip::GroupId group, chip::EndpointId localEndpoint,
+                                           chip::Optional<chip::ClusterId> cluster)
+    {
+        EmberBindingTableEntry entry = {
+            .type        = EMBER_MULTICAST_BINDING,
+            .fabricIndex = fabric,
+            .local       = localEndpoint,
+            .clusterId   = cluster,
+            .remote      = 0,
+            .groupId     = group,
+        };
+        return entry;
+    }
+
     /** The type of binding. */
-    EmberBindingType type;
+    EmberBindingType type = EMBER_UNUSED_BINDING;
+
+    chip::FabricIndex fabricIndex;
     /** The endpoint on the local node. */
     chip::EndpointId local;
     /** A cluster ID that matches one from the local endpoint's simple descriptor.
@@ -536,7 +539,7 @@ struct EmberBindingTableEntry
      * that a binding can be used to to send messages with any cluster ID, not
      * just that listed in the binding.
      */
-    chip::ClusterId clusterId;
+    chip::Optional<chip::ClusterId> clusterId;
     /** The endpoint on the remote node (specified by \c identifier). */
     chip::EndpointId remote;
     /** A 64-bit destination identifier.  This is either:
@@ -549,8 +552,6 @@ struct EmberBindingTableEntry
         chip::NodeId nodeId;
         chip::GroupId groupId;
     };
-    /** The index of the network the binding belongs to. */
-    uint8_t networkIndex;
 
     bool operator==(EmberBindingTableEntry const & other) const
     {
@@ -564,12 +565,12 @@ struct EmberBindingTableEntry
             return false;
         }
 
-        if (type == EMBER_UNICAST_BINDING && nodeId != other.nodeId)
+        if (type == EMBER_UNICAST_BINDING && (nodeId != other.nodeId || remote != other.remote))
         {
             return false;
         }
 
-        return local == other.local && clusterId == other.clusterId && remote == other.remote && networkIndex == other.networkIndex;
+        return fabricIndex == other.fabricIndex && local == other.local && clusterId == other.clusterId;
     }
 };
 
@@ -1197,31 +1198,13 @@ enum
     /**
      * @brief Drop frame.
      */
-    EMBER_DROP_FRAME = 0x79,
-    /**
-     * @brief
-     */
+    EMBER_DROP_FRAME       = 0x79,
     EMBER_PASS_UNPROCESSED = 0x7A,
-    /**
-     * @brief
-     */
-    EMBER_TX_THEN_DROP = 0x7B,
-    /**
-     * @brief
-     */
-    EMBER_NO_SECURITY = 0x7C,
-    /**
-     * @brief
-     */
-    EMBER_COUNTER_FAILURE = 0x7D,
-    /**
-     * @brief
-     */
-    EMBER_AUTH_FAILURE = 0x7E,
-    /**
-     * @brief
-     */
-    EMBER_UNPROCESSED = 0x7F,
+    EMBER_TX_THEN_DROP     = 0x7B,
+    EMBER_NO_SECURITY      = 0x7C,
+    EMBER_COUNTER_FAILURE  = 0x7D,
+    EMBER_AUTH_FAILURE     = 0x7E,
+    EMBER_UNPROCESSED      = 0x7F,
 
     //@}
     //
@@ -1679,22 +1662,25 @@ enum
     EMBER_APPLICATION_ERROR_15 = 0xFF,
 };
 
+/**
+ * @brief Function pointer for timer callback
+ */
+typedef void (*TimerCallback)(chip::EndpointId);
+
 /** @brief The control structure for events.
  *
- * This structure should not be accessed directly.
  * It holds the event status (one of the @e EMBER_EVENT_ values)
- * and the time left before the event fires.
+ * and the callback and it's parameters
  */
 typedef struct
 {
     /** The event's status, either inactive or the units for timeToExecute. */
     EmberEventUnits status;
-    /** The ID of the task this event belongs to. */
-    EmberTaskId taskid;
-    /** Indicates how long before the event fires.
-     *  Units are milliseconds.
-     */
-    uint32_t timeToExecute;
+
+    /* Callback information */
+    TimerCallback callback;
+    chip::EndpointId endpoint;
+
 } EmberEventControl;
 
 /**
@@ -1740,7 +1726,7 @@ typedef struct
 /**
  * @brief The broadcast endpoint, as defined in the ZigBee spec.
  */
-#define EMBER_BROADCAST_ENDPOINT 0xFF
+#define EMBER_BROADCAST_ENDPOINT (chip::kInvalidEndpointId)
 
 /**
  * @brief Useful to reference a single bit of a byte.

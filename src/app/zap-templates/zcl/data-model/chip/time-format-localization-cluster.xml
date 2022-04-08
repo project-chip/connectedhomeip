@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP" />
+  <enum name="HourFormat" type="ENUM8">
+    <cluster code="0x002c"/>
+    <item name="12hr" value="0x00"/>
+    <item name="24hr" value="0x01"/>
+  </enum>
+  <enum name="CalendarType" type="ENUM8">
+    <cluster code="0x002c"/>
+    <item name="Buddhist" value="0x00"/>
+    <item name="Chinese" value="0x01"/>
+    <item name="Coptic" value="0x02"/>
+    <item name="Ethiopian" value="0x03"/>
+    <item name="Gregorian" value="0x04"/>
+    <item name="Hebrew" value="0x05"/> 
+    <item name="Indian" value="0x06"/>
+    <item name="Islamic" value="0x07"/>  
+    <item name="Japanese" value="0x08"/>
+    <item name="Korean" value="0x09"/>  
+    <item name="Persian" value="0x0A"/>
+    <item name="Taiwanese" value="0x0B"/>                   
+  </enum>
+  <cluster>
+    <domain>General</domain>
+    <name>Time Format Localization</name>
+    <code>0x002c</code>
+    <define>TIME_FORMAT_LOCALIZATION_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing preferences for how dates and times are conveyed. As such, Nodes that visually
+      or audibly convey time information need a mechanism by which they can be configured to use a
+      user’s preferred format.</description>
+    <!-- Base data types -->
+    <attribute side="server" code="0x00" define="HOUR_FORMAT" type="HourFormat" min="0x00" max="0x01" writable="true" optional="false">HourFormat</attribute>
+    <attribute side="server" code="0x01" define="CALENDAR_TYPE" type="CalendarType" writable="true" optional="true">ActiveCalendarType</attribute>
+    <attribute side="server" code="0x02" define="SUPPORTED_CALENDAR_TYPES" type="ARRAY" entryType="CalendarType" writable="false" optional="true">SupportedCalendarTypes</attribute>  
+  </cluster>
+</configurator>

@@ -22,8 +22,16 @@
  */
 
 #pragma once
+#include <memory>
 
-#include <support/CodeUtils.h>
+#include <app/AttributeAccessInterface.h>
+#include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceEvent.h>
+
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/util/basic-types.h>
 
 namespace chip {
 
@@ -43,7 +51,24 @@ template <class>
 class GenericPlatformManagerImpl_POSIX;
 } // namespace Internal
 
+class ConnectivityManager;
 class ConnectivityManagerImpl;
+
+/**
+ * Defines the delegate class of Connectivity Manager to notify connectivity updates.
+ */
+class ConnectivityManagerDelegate
+{
+public:
+    virtual ~ConnectivityManagerDelegate() {}
+
+    /**
+     * @brief
+     *   Called when any network interface on the Node is changed
+     *
+     */
+    virtual void OnNetworkInfoChanged() {}
+};
 
 /**
  * Provides control of network connectivity for a chip device.
@@ -121,7 +146,16 @@ public:
         kSlowAdvertising = 1,
     };
 
-    struct ThreadPollingConfig;
+    enum class SEDPollingMode
+    {
+        Idle   = 0,
+        Active = 1,
+    };
+
+    struct SEDPollingConfig;
+
+    void SetDelegate(ConnectivityManagerDelegate * delegate) { mDelegate = delegate; }
+    ConnectivityManagerDelegate * GetDelegate() const { return mDelegate; }
 
     // WiFi station methods
     WiFiStationMode GetWiFiStationMode();
@@ -129,11 +163,11 @@ public:
     bool IsWiFiStationEnabled();
     bool IsWiFiStationApplicationControlled();
     bool IsWiFiStationConnected();
-    uint32_t GetWiFiStationReconnectIntervalMS();
-    CHIP_ERROR SetWiFiStationReconnectIntervalMS(uint32_t val);
+    System::Clock::Timeout GetWiFiStationReconnectInterval();
+    CHIP_ERROR SetWiFiStationReconnectInterval(System::Clock::Timeout val);
     bool IsWiFiStationProvisioned();
     void ClearWiFiStationProvision();
-    CHIP_ERROR GetAndLogWifiStatsCounters();
+    CHIP_ERROR GetAndLogWiFiStatsCounters();
 
     // WiFi AP methods
     WiFiAPMode GetWiFiAPMode();
@@ -143,8 +177,8 @@ public:
     void DemandStartWiFiAP();
     void StopOnDemandWiFiAP();
     void MaintainOnDemandWiFiAP();
-    uint32_t GetWiFiAPIdleTimeoutMS();
-    void SetWiFiAPIdleTimeoutMS(uint32_t val);
+    System::Clock::Timeout GetWiFiAPIdleTimeout();
+    void SetWiFiAPIdleTimeout(System::Clock::Timeout val);
 
     // Thread Methods
     ThreadMode GetThreadMode();
@@ -153,19 +187,33 @@ public:
     bool IsThreadApplicationControlled();
     ThreadDeviceType GetThreadDeviceType();
     CHIP_ERROR SetThreadDeviceType(ThreadDeviceType deviceType);
-    void GetThreadPollingConfig(ThreadPollingConfig & pollingConfig);
-    CHIP_ERROR SetThreadPollingConfig(const ThreadPollingConfig & pollingConfig);
     bool IsThreadAttached();
     bool IsThreadProvisioned();
     void ErasePersistentInfo();
-    bool HaveServiceConnectivityViaThread();
+    void ResetThreadNetworkDiagnosticsCounts();
+    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
-    // Internet connectivity methods
-    bool HaveIPv4InternetConnectivity();
-    bool HaveIPv6InternetConnectivity();
+// Sleepy end device methods
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    CHIP_ERROR GetSEDPollingConfig(SEDPollingConfig & pollingConfig);
 
-    // Service connectivity methods
-    bool HaveServiceConnectivity();
+    /**
+     * Sets Sleepy End Device polling configuration and posts kSEDPollingIntervalChange event to inform other software
+     * modules about the change.
+     *
+     * @param[in]  pollingConfig  polling intervals configuration to be set
+     */
+    CHIP_ERROR SetSEDPollingConfig(const SEDPollingConfig & pollingConfig);
+
+    /**
+     * Requests setting Sleepy End Device fast polling interval on or off.
+     * Every method call with onOff parameter set to true or false results in incrementing or decrementing the fast polling
+     * consumers counter. Fast polling mode is set if the consumers counter is bigger than 0.
+     *
+     * @param[in]  onOff  true if fast polling should be enabled and false otherwise.
+     */
+    CHIP_ERROR RequestSEDFastPollingMode(bool onOff);
+#endif
 
     // CHIPoBLE service methods
     Ble::BleLayer * GetBleLayer();
@@ -193,6 +241,8 @@ public:
     static const char * CHIPoBLEServiceModeToStr(CHIPoBLEServiceMode mode);
 
 private:
+    ConnectivityManagerDelegate * mDelegate = nullptr;
+
     // ===== Members for internal use by the following friends.
 
     friend class PlatformManagerImpl;
@@ -221,19 +271,17 @@ protected:
 };
 
 /**
- * Information describing the desired Thread polling behavior of a device.
+ * Information describing the desired polling behavior of a sleepy end device (SED).
  */
-struct ConnectivityManager::ThreadPollingConfig
+struct ConnectivityManager::SEDPollingConfig
 {
-    uint32_t ActivePollingIntervalMS; /**< Interval at which the device polls its parent Thread router when
-                                           when there are active chip exchanges in progress. Only meaningful
-                                           when the device is acting as a sleepy end node. */
+    /** Interval at which the device polls its parent when there are active chip exchanges in progress. Only meaningful when the
+     * device is acting as a sleepy end node.  */
+    System::Clock::Milliseconds32 FastPollingIntervalMS;
 
-    uint32_t InactivePollingIntervalMS; /**< Interval at which the device polls its parent Thread router when
-                                             when there are NO active chip exchanges in progress. Only meaningful
-                                             when the device is acting as a sleepy end node. */
-
-    void Clear() { memset(this, 0, sizeof(*this)); }
+    /** Interval at which the device polls its parent when there are NO active chip exchanges in progress. Only meaningful when the
+     * device is acting as a sleepy end node. */
+    System::Clock::Milliseconds32 SlowPollingIntervalMS;
 };
 
 /**
@@ -293,14 +341,14 @@ inline bool ConnectivityManager::IsWiFiStationConnected()
     return static_cast<ImplClass *>(this)->_IsWiFiStationConnected();
 }
 
-inline uint32_t ConnectivityManager::GetWiFiStationReconnectIntervalMS()
+inline System::Clock::Timeout ConnectivityManager::GetWiFiStationReconnectInterval()
 {
-    return static_cast<ImplClass *>(this)->_GetWiFiStationReconnectIntervalMS();
+    return static_cast<ImplClass *>(this)->_GetWiFiStationReconnectInterval();
 }
 
-inline CHIP_ERROR ConnectivityManager::SetWiFiStationReconnectIntervalMS(uint32_t val)
+inline CHIP_ERROR ConnectivityManager::SetWiFiStationReconnectInterval(System::Clock::Timeout val)
 {
-    return static_cast<ImplClass *>(this)->_SetWiFiStationReconnectIntervalMS(val);
+    return static_cast<ImplClass *>(this)->_SetWiFiStationReconnectInterval(val);
 }
 
 inline bool ConnectivityManager::IsWiFiStationProvisioned()
@@ -348,34 +396,19 @@ inline void ConnectivityManager::MaintainOnDemandWiFiAP()
     static_cast<ImplClass *>(this)->_MaintainOnDemandWiFiAP();
 }
 
-inline uint32_t ConnectivityManager::GetWiFiAPIdleTimeoutMS()
+inline System::Clock::Timeout ConnectivityManager::GetWiFiAPIdleTimeout()
 {
-    return static_cast<ImplClass *>(this)->_GetWiFiAPIdleTimeoutMS();
+    return static_cast<ImplClass *>(this)->_GetWiFiAPIdleTimeout();
 }
 
-inline void ConnectivityManager::SetWiFiAPIdleTimeoutMS(uint32_t val)
+inline void ConnectivityManager::SetWiFiAPIdleTimeout(System::Clock::Timeout val)
 {
-    static_cast<ImplClass *>(this)->_SetWiFiAPIdleTimeoutMS(val);
+    static_cast<ImplClass *>(this)->_SetWiFiAPIdleTimeout(val);
 }
 
-inline CHIP_ERROR ConnectivityManager::GetAndLogWifiStatsCounters()
+inline CHIP_ERROR ConnectivityManager::GetAndLogWiFiStatsCounters()
 {
-    return static_cast<ImplClass *>(this)->_GetAndLogWifiStatsCounters();
-}
-
-inline bool ConnectivityManager::HaveIPv4InternetConnectivity()
-{
-    return static_cast<ImplClass *>(this)->_HaveIPv4InternetConnectivity();
-}
-
-inline bool ConnectivityManager::HaveIPv6InternetConnectivity()
-{
-    return static_cast<ImplClass *>(this)->_HaveIPv6InternetConnectivity();
-}
-
-inline bool ConnectivityManager::HaveServiceConnectivity()
-{
-    return static_cast<ImplClass *>(this)->_HaveServiceConnectivity();
+    return static_cast<ImplClass *>(this)->_GetAndLogWiFiStatsCounters();
 }
 
 inline ConnectivityManager::ThreadMode ConnectivityManager::GetThreadMode()
@@ -408,15 +441,22 @@ inline CHIP_ERROR ConnectivityManager::SetThreadDeviceType(ThreadDeviceType devi
     return static_cast<ImplClass *>(this)->_SetThreadDeviceType(deviceType);
 }
 
-inline void ConnectivityManager::GetThreadPollingConfig(ThreadPollingConfig & pollingConfig)
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+inline CHIP_ERROR ConnectivityManager::GetSEDPollingConfig(SEDPollingConfig & pollingConfig)
 {
-    return static_cast<ImplClass *>(this)->_GetThreadPollingConfig(pollingConfig);
+    return static_cast<ImplClass *>(this)->_GetSEDPollingConfig(pollingConfig);
 }
 
-inline CHIP_ERROR ConnectivityManager::SetThreadPollingConfig(const ThreadPollingConfig & pollingConfig)
+inline CHIP_ERROR ConnectivityManager::SetSEDPollingConfig(const SEDPollingConfig & pollingConfig)
 {
-    return static_cast<ImplClass *>(this)->_SetThreadPollingConfig(pollingConfig);
+    return static_cast<ImplClass *>(this)->_SetSEDPollingConfig(pollingConfig);
 }
+
+inline CHIP_ERROR ConnectivityManager::RequestSEDFastPollingMode(bool onOff)
+{
+    return static_cast<ImplClass *>(this)->_RequestSEDFastPollingMode(onOff);
+}
+#endif
 
 inline bool ConnectivityManager::IsThreadAttached()
 {
@@ -433,9 +473,28 @@ inline void ConnectivityManager::ErasePersistentInfo()
     static_cast<ImplClass *>(this)->_ErasePersistentInfo();
 }
 
-inline bool ConnectivityManager::HaveServiceConnectivityViaThread()
+inline void ConnectivityManager::ResetThreadNetworkDiagnosticsCounts()
 {
-    return static_cast<ImplClass *>(this)->_HaveServiceConnectivityViaThread();
+    static_cast<ImplClass *>(this)->_ResetThreadNetworkDiagnosticsCounts();
+}
+
+/*
+ * @brief Get runtime value from the thread network based on the given attribute ID.
+ *        The info is encoded via the AttributeValueEncoder.
+ *
+ * @param attributeId Id of the attribute for the requested info.
+ * @param aEncoder Encoder to encode the attribute value.
+ *
+ * @return CHIP_NO_ERROR = Succes.
+ *         CHIP_ERROR_NOT_IMPLEMENTED = Runtime value for this attribute to yet available to send as reply
+ *                                      Use standard read.
+ *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE = Is not a Runtime readable attribute. Use standard read
+ *         All other errors should be treated as a read error and reported as such.
+ */
+inline CHIP_ERROR ConnectivityManager::WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
+                                                                                  app::AttributeValueEncoder & encoder)
+{
+    return static_cast<ImplClass *>(this)->_WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, encoder);
 }
 
 inline Ble::BleLayer * ConnectivityManager::GetBleLayer()

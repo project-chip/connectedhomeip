@@ -33,6 +33,6 @@ gcc_toolchain("esp32") {
     current_os = "freertos"
     current_cpu = esp32_cpu
     is_clang = false
-    import("${chip_root}/src/platform/ESP32/args.gni")
+    import("${chip_root}/config/esp32/args.gni")
   }
 }

@@ -1,0 +1,204 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Test Cluster Complex Types Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Test Cluster"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Send Test Command with optional arg set to null."
+      # Not in TestCluster.yaml for now because this test depends on
+      # distinguishing "null" and "not sent" for a nullable+optional
+      # field and some of the TestCluster consumers don't do
+      # that... and it's not clear that it's ever needed outside of
+      # tests.
+      command: "testNullableOptionalRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: null
+      response:
+          values:
+              - name: "wasPresent"
+                value: true
+              - name: "wasNull"
+                value: true
+              - name: "originalValue"
+                value: null
+
+    # The timed invoke tests are not in TestCluster.yaml for now because Darwin
+    # SDK APIs have not been updated to do timed invoke properly yet.
+
+    - label: "Send command that needs timed invoke without a timeout value"
+      command: "timedInvokeRequest"
+      response:
+          # No timed interaction timeout provided, so not doing a timed interaction.
+          error: NEEDS_TIMED_INTERACTION
+
+    - label: "Send command that needs timed invoke with a long timeout value"
+      # Expecting a success response here.
+      command: "timedInvokeRequest"
+      timedInteractionTimeoutMs: 10000
+
+    - label:
+          "Send command that needs timed invoke with a too-short timeout value"
+      command: "timedInvokeRequest"
+      timedInteractionTimeoutMs: 1
+      # Try to ensure that we are unresponsive for long enough that the timeout
+      # expires.
+      busyWaitMs: 100
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Send command that does not need timed invoke with a long timeout
+          value"
+      # Expecting a success response here.
+      command: "test"
+      timedInteractionTimeoutMs: 10000
+
+    - label:
+          "Send command that does not need timed invoke with a too-short timeout
+          value"
+      command: "test"
+      timedInteractionTimeoutMs: 1
+      # Try to ensure that we are unresponsive for long enough that the timeout
+      # expires.
+      busyWaitMs: 100
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    # The timed write tests are not in TestCluster.yaml for now because Darwin
+    # SDK APIs have not been updated to do timed invoke properly yet.
+
+    - label: "Read attribute that needs timed write initial state"
+      command: "readAttribute"
+      attribute: "timed_write_boolean"
+      response:
+          value: false
+
+    - label: "Write attribute that needs timed write without a timeout value"
+      command: "writeAttribute"
+      attribute: "timed_write_boolean"
+      arguments:
+          value: true
+      response:
+          # No timed interaction timeout provided, so not doing a timed interaction.
+          error: NEEDS_TIMED_INTERACTION
+
+    - label: "Read attribute that needs timed write state unchanged 1"
+      command: "readAttribute"
+      attribute: "timed_write_boolean"
+      response:
+          value: false
+
+    - label:
+          "Write attribute that needs timed write with a too-short timeout value"
+      command: "writeAttribute"
+      attribute: "timed_write_boolean"
+      arguments:
+          value: true
+      timedInteractionTimeoutMs: 1
+      # Try to ensure that we are unresponsive for long enough that the timeout
+      # expires.
+      busyWaitMs: 100
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label: "Read attribute that needs timed write state unchanged 2"
+      command: "readAttribute"
+      attribute: "timed_write_boolean"
+      response:
+          value: false
+
+    - label: "Write attribute that needs timed write with a long timeout value"
+      # Expecting a success response here.
+      command: "writeAttribute"
+      attribute: "timed_write_boolean"
+      arguments:
+          value: true
+      timedInteractionTimeoutMs: 10000
+
+    - label: "Read attribute that needs timed write state changed"
+      command: "readAttribute"
+      attribute: "timed_write_boolean"
+      response:
+          value: true
+
+    - label: "Write attribute that needs timed write reset to default"
+      # Expecting a success response here.
+      command: "writeAttribute"
+      attribute: "timed_write_boolean"
+      arguments:
+          value: false
+      timedInteractionTimeoutMs: 10000
+
+    - label: "Read attribute that does not need timed write initial value"
+      command: "readAttribute"
+      attribute: "boolean"
+      response:
+          value: false
+
+    - label:
+          "Write attribute that does not need timed write with a too-short
+          timeout value"
+      command: "writeAttribute"
+      attribute: "boolean"
+      arguments:
+          value: true
+      timedInteractionTimeoutMs: 1
+      # Try to ensure that we are unresponsive for long enough that the timeout
+      # expires.
+      busyWaitMs: 100
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label: "Read attribute that does not need timed write unchanged value"
+      command: "readAttribute"
+      attribute: "boolean"
+      response:
+          value: false
+
+    - label:
+          "Write attribute that does not need timed write with a long timeout
+          value"
+      # Expecting a success response here.
+      command: "writeAttribute"
+      attribute: "boolean"
+      arguments:
+          value: true
+      timedInteractionTimeoutMs: 10000
+
+    - label: "Read attribute that does not need timed write changed value"
+      command: "readAttribute"
+      attribute: "boolean"
+      response:
+          value: true
+
+    - label: "Write attribute that does not need timed write reset to default"
+      command: "writeAttribute"
+      attribute: "boolean"
+      arguments:
+          value: false

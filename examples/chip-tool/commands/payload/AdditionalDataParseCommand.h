@@ -24,7 +24,7 @@ class AdditionalDataParseCommand : public Command
 {
 public:
     AdditionalDataParseCommand() : Command("parse-additional-data-payload") { AddArgument("payload", &mPayload); }
-    CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
+    CHIP_ERROR Run() override;
 
 private:
     char * mPayload;

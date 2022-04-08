@@ -13,5 +13,6 @@
 # limitations under the License.
 
 declare_args() {
+  # Root directory for ot-br-posix.
   ot_br_posix_root = "//third_party/connectedhomeip/third_party/ot-br-posix"
 }

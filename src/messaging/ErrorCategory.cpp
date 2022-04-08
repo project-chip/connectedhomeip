@@ -37,7 +37,7 @@ bool IsIgnoredMulticastSendError(CHIP_ERROR err)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         err == System::MapErrorLwIP(ERR_RTE)
 #else
-        err == System::MapErrorPOSIX(ENETUNREACH) || err == System::MapErrorPOSIX(EADDRNOTAVAIL)
+        err == CHIP_ERROR_POSIX(ENETUNREACH) || err == CHIP_ERROR_POSIX(EADDRNOTAVAIL)
 #endif
         ;
 }
@@ -57,7 +57,7 @@ CHIP_ERROR FilterUDPSendError(CHIP_ERROR err, bool isMulticast)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-        if (err == System::MapErrorPOSIX(ENETUNREACH) || err == System::MapErrorPOSIX(EADDRNOTAVAIL))
+        if (err == CHIP_ERROR_POSIX(ENETUNREACH) || err == CHIP_ERROR_POSIX(EADDRNOTAVAIL))
         {
             err = CHIP_NO_ERROR;
         }
@@ -77,8 +77,8 @@ CHIP_ERROR FilterUDPSendError(CHIP_ERROR err, bool isMulticast)
  */
 bool IsSendErrorNonCritical(CHIP_ERROR err)
 {
-    return (err == INET_ERROR_NOT_IMPLEMENTED || err == INET_ERROR_OUTBOUND_MESSAGE_TRUNCATED ||
-            err == INET_ERROR_MESSAGE_TOO_LONG || err == INET_ERROR_NO_MEMORY || CHIP_CONFIG_IsPlatformErrorNonCritical(err));
+    return (err == CHIP_ERROR_NOT_IMPLEMENTED || err == CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG || err == CHIP_ERROR_MESSAGE_TOO_LONG ||
+            err == CHIP_ERROR_NO_MEMORY || CHIP_CONFIG_IsPlatformErrorNonCritical(err));
 }
 
 } // namespace Messaging

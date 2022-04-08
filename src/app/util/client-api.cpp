@@ -38,21 +38,21 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "client-api.h"
 #include "app/util/common.h"
-#include "util.h"
+#include <app/util/client-api.h>
+#include <app/util/util.h>
 #include <stdarg.h>
 
 using namespace chip;
 
-uint8_t * emAfZclBuffer   = NULL;
+uint8_t * emAfZclBuffer   = nullptr;
 uint16_t emAfZclBufferLen = 0;
 
 // Pointer to where this API should put the length
-uint16_t * emAfResponseLengthPtr = NULL;
+uint16_t * emAfResponseLengthPtr = nullptr;
 
 // Pointer to where the API should put the cluster ID
-EmberApsFrame * emAfCommandApsFrame = NULL;
+EmberApsFrame * emAfCommandApsFrame = nullptr;
 
 /////////////////
 
@@ -62,7 +62,7 @@ EmberApsFrame * emAfCommandApsFrame = NULL;
 static uint16_t vFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameControl, uint16_t manufacturerCode,
                             CommandId commandId, const char * format, va_list argPointer)
 {
-    uint32_t value;
+    uint64_t value;
     uint8_t valueLen;
     uint8_t * data;
     uint16_t dataLen;
@@ -89,7 +89,10 @@ static uint16_t vFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameC
         buffer[bytes++] = EMBER_HIGH_BYTE(manufacturerCode);
     }
     buffer[bytes++] = emberAfNextSequence();
-    buffer[bytes++] = commandId;
+    buffer[bytes++] = EMBER_BYTE_0(commandId);
+    buffer[bytes++] = EMBER_BYTE_1(commandId);
+    buffer[bytes++] = EMBER_BYTE_2(commandId);
+    buffer[bytes++] = EMBER_BYTE_3(commandId);
 
     // Each argument comes in as an integer value, a pointer to a buffer, or a
     // pointer to a buffer followed by an integer length.
@@ -98,7 +101,7 @@ static uint16_t vFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameC
         char cmd;
         value    = 0;
         valueLen = 0;
-        data     = 0;
+        data     = nullptr;
         cmd      = format[i];
         if (cmd <= 's')
         {
@@ -160,8 +163,8 @@ static uint16_t vFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameC
         }
         else
         {
-            // u, v, x, and w are one-, two-, three-, or four-byte integers.  u and v
-            // must be extracted as an int while x and w come through as an uint32_t.
+            // u, v, x, w, and y are one-, two-, three-, four-byte or eight-byte integers.  u and v
+            // must be extracted as an int while x and w come through as an uint32_t, y as a uint64_t.
             // In all cases, the value is copied to the destination buffer in little-
             // endian format.
             dataLen = 0;
@@ -181,12 +184,27 @@ static uint16_t vFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameC
             {
                 valueLen = 4;
             }
+            else if (cmd == 'y')
+            {
+                valueLen = 8;
+            }
             else
             {
                 emberAfDebugPrintln("ERR: Unknown format '%c'", cmd);
                 return 0;
             }
-            value = valueLen <= 2 ? static_cast<uint32_t>(va_arg(argPointer, int)) : va_arg(argPointer, uint32_t);
+            if (valueLen <= 2)
+            {
+                value = static_cast<uint64_t>(va_arg(argPointer, int));
+            }
+            else if (valueLen <= 4)
+            {
+                value = static_cast<uint64_t>(va_arg(argPointer, uint32_t));
+            }
+            else
+            {
+                value = va_arg(argPointer, uint64_t);
+            }
         }
 
         // The destination buffer must be at least as large as the running total
@@ -213,7 +231,7 @@ static uint16_t vFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameC
         // explicit check.
         if (dataLen != 0)
         {
-            if (data == NULL)
+            if (data == nullptr)
             {
                 emberAfDebugPrintln("ERR: Missing data for %d bytes for format '%c'", dataLen, cmd);
                 return 0;
@@ -236,21 +254,6 @@ void emberAfSetExternalBuffer(uint8_t * buffer, uint16_t bufferLen, uint16_t * l
     emAfCommandApsFrame   = apsFrame;
 }
 
-uint16_t emberAfFillExternalManufacturerSpecificBuffer(uint8_t frameControl, ClusterId clusterId, uint16_t manufacturerCode,
-                                                       CommandId commandId, const char * format, ...)
-{
-    uint16_t returnValue;
-    va_list argPointer;
-
-    va_start(argPointer, format);
-    returnValue = vFillBuffer(emAfZclBuffer, emAfZclBufferLen, frameControl, manufacturerCode, commandId, format, argPointer);
-    va_end(argPointer);
-    *emAfResponseLengthPtr         = returnValue;
-    emAfCommandApsFrame->clusterId = clusterId;
-    emAfCommandApsFrame->options   = EMBER_AF_DEFAULT_APS_OPTIONS;
-    return returnValue;
-}
-
 uint16_t emberAfFillExternalBuffer(uint8_t frameControl, ClusterId clusterId, CommandId commandId, const char * format, ...)
 {
     uint16_t returnValue;
@@ -265,97 +268,6 @@ uint16_t emberAfFillExternalBuffer(uint8_t frameControl, ClusterId clusterId, Co
     emAfCommandApsFrame->options   = EMBER_AF_DEFAULT_APS_OPTIONS;
     return returnValue;
 }
-
-uint16_t emberAfFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameControl, CommandId commandId, const char * format,
-                           ...)
-{
-    uint16_t returnValue;
-    va_list argPointer;
-    va_start(argPointer, format);
-    returnValue = vFillBuffer(buffer, bufferLen, frameControl, EMBER_AF_NULL_MANUFACTURER_CODE, commandId, format, argPointer);
-    va_end(argPointer);
-    return returnValue;
-}
-
-EmberStatus emberAfSendCommandUnicastToBindingsWithCallback(EmberAfMessageSentFunction callback)
-{
-    return emberAfSendUnicastToBindingsWithCallback(emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, callback);
-}
-
-EmberStatus emberAfSendCommandUnicastToBindings(void)
-{
-    return emberAfSendCommandUnicastToBindingsWithCallback(NULL);
-}
-
-// EmberStatus emberAfSendCommandMulticastWithCallback(GroupId multicastId, EmberAfMessageSentFunction callback)
-// {
-//     return emberAfSendMulticastWithCallback(multicastId, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, callback);
-// }
-
-// EmberStatus emberAfSendCommandMulticastWithAliasWithCallback(GroupId multicastId, EmberNodeId alias, uint8_t sequence,
-//                                                              EmberAfMessageSentFunction callback)
-// {
-//     return emberAfSendMulticastWithAliasWithCallback(multicastId, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer,
-//     alias,
-//                                                      sequence, callback);
-// }
-
-// EmberStatus emberAfSendCommandMulticast(GroupId multicastId)
-// {
-//     return emberAfSendCommandMulticastWithCallback(multicastId, NULL);
-// }
-
-// EmberStatus emberAfSendCommandMulticastWithAlias(GroupId multicastId, EmberNodeId alias, uint8_t sequence)
-// {
-//     return emberAfSendCommandMulticastWithAliasWithCallback(multicastId, alias, sequence, NULL);
-// }
-
-EmberStatus emberAfSendCommandMulticastToBindings(void)
-{
-    return emberAfSendMulticastToBindings(emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer);
-}
-
-// EmberStatus emberAfSendCommandUnicastWithCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination,
-//                                                   EmberAfMessageSentFunction callback)
-// {
-//     return emberAfSendUnicastWithCallback(type, indexOrDestination, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer,
-//                                           callback);
-// }
-
-// EmberStatus emberAfSendCommandUnicast(EmberOutgoingMessageType type, uint16_t indexOrDestination)
-// {
-//     return emberAfSendCommandUnicastWithCallback(type, indexOrDestination, NULL);
-// }
-
-// EmberStatus emberAfSendCommandBroadcastWithCallback(EmberNodeId destination, EmberAfMessageSentFunction callback)
-// {
-//     return emberAfSendBroadcastWithCallback(destination, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, callback);
-// }
-
-// EmberStatus emberAfSendCommandBroadcastWithAliasWithCallback(EmberNodeId destination, EmberNodeId alias, uint8_t sequence,
-//                                                              EmberAfMessageSentFunction callback)
-// {
-//     return emberAfSendBroadcastWithAliasWithCallback(destination, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer,
-//     alias,
-//                                                      sequence, callback);
-// }
-
-// EmberStatus emberAfSendCommandBroadcastWithAlias(EmberNodeId destination, EmberNodeId alias, uint8_t sequence)
-// {
-//     return emberAfSendCommandBroadcastWithAliasWithCallback(destination, alias, sequence, NULL);
-// }
-
-// EmberStatus emberAfSendCommandBroadcast(EmberNodeId destination)
-// {
-//     return emberAfSendCommandBroadcastWithCallback(destination, NULL);
-// }
-
-// EmberStatus emberAfSendCommandInterPan(EmberPanId panId, const EmberEUI64 destinationLongId, EmberNodeId destinationShortId,
-//                                        GroupId multicastId)
-// {
-//     return emberAfSendInterPan(panId, destinationLongId, destinationShortId, multicastId, emAfCommandApsFrame->clusterId,
-//                                *emAfResponseLengthPtr, emAfZclBuffer);
-// }
 
 EmberApsFrame * emberAfGetCommandApsFrame(void)
 {

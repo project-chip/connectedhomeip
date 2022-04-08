@@ -34,7 +34,6 @@ static_library("helpers") {
     "TestInetCommonOptions.cpp",
     "TestInetCommonOptions.h",
     "TestInetCommonPosix.cpp",
-    "TestInetLayer.cpp",
     "TestInetLayerCommon.cpp",
     "TestSetupFaultInjection.h",
     "TestSetupFaultInjectionPosix.cpp",
@@ -42,11 +41,16 @@ static_library("helpers") {
     "TestSetupSignallingPosix.cpp",
   ]
 
+  if (current_os != "mbed") {
+    sources += [ "TestInetLayer.cpp" ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/platform",
     "${nlunit_test_root}:nlunit-test",
   ]
 }
@@ -76,30 +80,9 @@ chip_test_suite("tests") {
   # This fails on Raspberry Pi (Linux arm64), so only enable on Linux
   # x64.
   if (current_os != "mac" && current_os != "zephyr" &&
-      chip_device_platform != "esp32" && current_cpu == "x64") {
-    test_sources += [ "TestInetLayerDNS.cpp" ]
-
+      chip_device_platform != "esp32" && current_cpu == "x64" &&
+      chip_device_platform != "ameba") {
     # TODO: This test does not seem executed
     sources += [ "TestLwIPDNS.cpp" ]
-  }
-}
-
-if (chip_enable_happy_tests) {
-  # The following binaries should be executed by happy.
-  chip_test_suite("happy_tests") {
-    output_name = "libHappyTestInetCommon"
-
-    sources = [ "TestInetLayerMulticast.cpp" ]
-
-    public_configs = [ ":tests_config" ]
-
-    public_deps = [
-      ":tests_lib",
-      "${chip_root}/src/inet",
-      "${chip_root}/src/lib/core",
-      "${nlunit_test_root}:nlunit-test",
-    ]
-
-    tests = [ "TestInetLayerMulticast" ]
   }
 }

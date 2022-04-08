@@ -2,6 +2,30 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Build specific example",
+            "type": "shell",
+            "command": "scripts/run_in_build_env.sh",
+            "args": [
+                "./scripts/build/build_examples.py --target ${input:exampleTarget} build"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc"
+            }
+        },
+        {
+            "label": "Build examples (glob)",
+            "type": "shell",
+            "command": "scripts/run_in_build_env.sh",
+            "args": [
+                "./scripts/build/build_examples.py --target-glob \"${input:exampleGlob}\" build"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc"
+            }
+        },
+        {
             "label": "Main Build",
             "type": "shell",
             "command": "scripts/build/default.sh",
@@ -79,81 +103,6 @@
             "problemMatcher": ["$gcc"]
         },
         {
-            "label": "Build Shell",
-            "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/shell out/shell",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": ["relative", "${workspaceFolder}/out/shell/"]
-            }
-        },
-        {
-            "label": "Build Chip Tool",
-            "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/chip-tool out/chip_tool",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/out/chip_tool/"
-                ]
-            }
-        },
-        {
-            "label": "Build Lighting App (Linux)",
-            "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/lighting-app/linux out/lighting-app",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/out/lighting-app/"
-                ]
-            }
-        },
-        {
-            "label": "Build QPG6100 Lock Example",
-            "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/lock-app/qpg6100 out/qpg6100_lock_app",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/out/qpg6100_lock_app/"
-                ]
-            }
-        },
-        {
-            "label": "Build EFR32 Lock Example",
-            "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/lock-app/efr32 out/efr32_lock_app",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/out/efr32_lock_app/"
-                ]
-            }
-        },
-        {
-            "label": "Build EFR32 Light Example",
-            "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/lighting-app/efr32 out/efr32_lighting_app",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/out/efr32_lighting/"
-                ]
-            }
-        },
-        {
             "label": "Build Minimal MDNS Example",
             "type": "shell",
             "command": "scripts/examples/gn_build_example.sh examples/minimal-mdns out/minimal_mdns 'chip_build_tools=false is_debug=false optimize_for_size=true'",
@@ -167,57 +116,10 @@
             }
         },
         {
-            "label": "Build ESP32 all-clusters-app Example",
+            "label": "QEMU: run esp32-qemu unit tests",
             "type": "shell",
-            "command": "scripts/examples/build-all-clusters-app.py",
-            "group": "build",
-            "problemMatcher": ["$gcc"]
-        },
-        {
-            "label": "Build Android App",
-            "type": "shell",
-            "command": "TARGET_CPU=arm64 scripts/examples/android_app.sh",
-            "group": "build",
-            "problemMatcher": ["$gcc"]
-        },
-        {
-            "label": "Build nRF Connect Lock Example (nRF52840)",
-            "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lock-app nrf52840dk_nrf52840",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/examples/lock-app/nrfconnect/build/nrf52840dk_nrf52840"
-                ]
-            }
-        },
-        {
-            "label": "Build nRF Connect Lighting Example (nRF52840)",
-            "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lighting-app nrf52840dk_nrf52840",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/examples/lighting-app/nrfconnect/build/nrf52840dk_nrf52840"
-                ]
-            }
-        },
-        {
-            "label": "Build nRF Connect Shell Example (nRF52840)",
-            "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh shell nrf52840dk_nrf52840",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/examples/shell/nrfconnect/build/nrf52840dk_nrf52840"
-                ]
-            }
+            "command": "scripts/tests/esp32_qemu_tests.sh /tmp/test_logs",
+            "problemMatcher": []
         },
         {
             "label": "Build nRF Connect Pigweed Example (nRF52840)",
@@ -233,43 +135,247 @@
             }
         },
         {
-            "label": "Build nRF Connect Lock Example (nRF5340)",
+            "label": "Build i.MX Linux examples",
             "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lock-app nrf5340dk_nrf5340_cpuapp",
+            "command": "./scripts/examples/imxlinux_example.sh ${input:imxExampleTarget} out/aarch64",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": ["relative", "${workspaceFolder}/out/aarch64/"]
+            }
+        },
+        {
+            "label": "Run Mbed Application",
+            "type": "shell",
+            "command": "scripts/examples/mbed_example.sh",
+            "args": [
+                "-c=${input:mbedCommand}",
+                "-a=${input:mbedApp}",
+                "-b=${input:mbedTarget}",
+                "-p=${input:mbedProfile}",
+                "-T=${input:mbedAppType}"
+            ],
             "group": "build",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
                     "relative",
-                    "${workspaceFolder}/examples/lock-app/nrfconnect/build/nrf5340dk_nrf5340_cpuapp"
+                    "${workspaceFolder}/examples/${input:mbedApp}/mbed/build"
                 ]
             }
         },
         {
-            "label": "Build nRF Connect Lighting Example (nRF5340)",
+            "label": "Run Mbed Unit Tests",
             "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lighting-app nrf5340dk_nrf5340_cpuapp",
+            "command": "scripts/tests/mbed/mbed_unit_tests.sh",
+            "args": [
+                "-c=${input:mbedCommand}",
+                "-b=${input:mbedTarget}",
+                "-p=${input:mbedProfile}"
+            ],
             "group": "build",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
                     "relative",
-                    "${workspaceFolder}/examples/lighting-app/nrfconnect/build/nrf5340dk_nrf5340_cpuapp"
+                    "${workspaceFolder}/src/test_driver/mbed/unit_tests/build"
                 ]
             }
         },
         {
-            "label": "Build nRF Connect Shell Example (nRF5340)",
+            "label": "Flash EFR32 board",
             "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh shell nrf5340dk_nrf5340_cpuapp",
-            "group": "build",
+            "command": "python3",
+            "args": [
+                "${workspaceFolder}/out/${input:exampleTarget}/chip-efr32-*.flash.py"
+            ],
             "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/examples/shell/nrfconnect/build/nrf5340dk_nrf5340_cpuapp"
-                ]
+                "base": "$gcc"
             }
+        }
+    ],
+    "inputs": [
+        {
+            "type": "pickString",
+            "id": "mbedCommand",
+            "description": "What do you want to do?",
+            "options": ["build", "flash", "build-flash"],
+            "default": "build"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedApp",
+            "description": "What mbed application do you want to use?",
+            "options": [
+                "lock-app",
+                "lighting-app",
+                "pigweed-app",
+                "all-clusters-app",
+                "shell",
+                "ota-requestor-app"
+            ],
+            "default": "lock-app"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedTarget",
+            "description": "What mbed target do you want to use?",
+            "options": ["CY8CPROTO_062_4343W"],
+            "default": "CY8CPROTO_062_4343W"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedProfile",
+            "description": "What mbed profile do you want to use?",
+            "options": ["release", "develop", "debug"],
+            "default": "release"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedAppType",
+            "description": "What mbed application type do you want to use?",
+            "options": ["simple", "boot", "upgrade"],
+            "default": "simple"
+        },
+        {
+            "type": "promptString",
+            "id": "exampleGlob",
+            "description": "What applications to build (e.g. '*m5stack*' or 'esp32-*')"
+        },
+        {
+            "type": "pickString",
+            "id": "imxExampleTarget",
+            "description": "What example application type do you want to build?",
+            "options": [
+                "examples/chip-tool",
+                "examples/lighting-app/linux",
+                "examples/thermostat/linux"
+            ],
+            "default": "examples/chip-tool"
+        },
+        {
+            "type": "pickString",
+            "id": "exampleTarget",
+            "description": "What target to build",
+            "options": [
+                "ameba-amebad-all-clusters",
+                "android-androidstudio-arm-chip-tool",
+                "android-androidstudio-arm64-chip-tool",
+                "android-androidstudio-x64-chip-tool",
+                "android-androidstudio-x86-chip-tool",
+                "android-arm-chip-tool",
+                "android-arm64-chip-test",
+                "android-arm64-chip-tool",
+                "android-arm64-chip-tvserver",
+                "android-x64-chip-tool",
+                "android-x86-chip-tool",
+                "efr32-brd4161a-light",
+                "efr32-brd4163a-light",
+                "efr32-brd4164a-light",
+                "efr32-brd4166a-light",
+                "efr32-brd4170a-light",
+                "efr32-brd4186a-light",
+                "efr32-brd4187a-light",
+                "efr32-brd4304a-light",
+                "efr32-brd4161a-light-rpc",
+                "efr32-brd4163a-light-rpc",
+                "efr32-brd4164a-light-rpc",
+                "efr32-brd4166a-light-rpc",
+                "efr32-brd4170a-light-rpc",
+                "efr32-brd4186a-light-rpc",
+                "efr32-brd4187a-light-rpc",
+                "efr32-brd4304a-light-rpc",
+                "efr32-brd4161a-lock",
+                "efr32-brd4163a-lock",
+                "efr32-brd4164a-lock",
+                "efr32-brd4166a-lock",
+                "efr32-brd4170a-lock",
+                "efr32-brd4186a-lock",
+                "efr32-brd4187a-lock",
+                "efr32-brd4304a-lock",
+                "efr32-brd4161a-unit-test",
+                "efr32-brd4163a-unit-test",
+                "efr32-brd4164a-unit-test",
+                "efr32-brd4166a-unit-test",
+                "efr32-brd4170a-unit-test",
+                "efr32-brd4186a-unit-test",
+                "efr32-brd4187a-unit-test",
+                "efr32-brd4304a-unit-test",
+                "efr32-brd4161a-switch",
+                "efr32-brd4163a-switch",
+                "efr32-brd4164a-switch",
+                "efr32-brd4166a-switch",
+                "efr32-brd4170a-switch",
+                "efr32-brd4186a-switch",
+                "efr32-brd4187a-switch",
+                "efr32-brd4304a-switch",
+                "efr32-brd4161a-window-covering",
+                "efr32-brd4163a-window-covering",
+                "efr32-brd4164a-window-covering",
+                "efr32-brd4166a-window-covering",
+                "efr32-brd4170a-window-covering",
+                "efr32-brd4186a-window-covering",
+                "efr32-brd4187a-window-covering",
+                "efr32-brd4304a-window-covering",
+                "esp32-c3devkit-all-clusters",
+                "esp32-devkitc-all-clusters",
+                "esp32-devkitc-all-clusters-ipv6only",
+                "esp32-devkitc-bridge",
+                "esp32-devkitc-lock",
+                "esp32-devkitc-shell",
+                "esp32-devkitc-temperature-measurement",
+                "esp32-m5stack-all-clusters",
+                "esp32-m5stack-all-clusters-ipv6only",
+                "esp32-m5stack-all-clusters-rpc",
+                "esp32-m5stack-all-clusters-rpc-ipv6only",
+                "infineon-p6-all-clusters",
+                "infineon-p6-lock",
+                "infineon-p6-light",
+                "linux-arm64-all-clusters",
+                "linux-arm64-all-clusters-ipv6only",
+                "linux-arm64-chip-tool",
+                "linux-arm64-chip-tool-ipv6only",
+                "linux-arm64-rpc-console",
+                "linux-arm64-thermostat",
+                "linux-arm64-thermostat-ipv6only",
+                "linux-x64-all-clusters",
+                "linux-x64-all-clusters-ipv6only",
+                "linux-x64-chip-tool",
+                "linux-x64-chip-tool-ipv6only",
+                "linux-x64-rpc-console",
+                "linux-x64-thermostat",
+                "linux-x64-thermostat-ipv6only",
+                "mbed-CY8CPROTO_062_4343W-all-clusters-debug",
+                "mbed-CY8CPROTO_062_4343W-all-clusters-develop",
+                "mbed-CY8CPROTO_062_4343W-all-clusters-release",
+                "mbed-CY8CPROTO_062_4343W-light-debug",
+                "mbed-CY8CPROTO_062_4343W-light-develop",
+                "mbed-CY8CPROTO_062_4343W-light-release",
+                "mbed-CY8CPROTO_062_4343W-lock-debug",
+                "mbed-CY8CPROTO_062_4343W-lock-develop",
+                "mbed-CY8CPROTO_062_4343W-lock-release",
+                "mbed-CY8CPROTO_062_4343W-pigweed-debug",
+                "mbed-CY8CPROTO_062_4343W-pigweed-develop",
+                "mbed-CY8CPROTO_062_4343W-pigweed-release",
+                "mbed-CY8CPROTO_062_4343W-shell-debug",
+                "mbed-CY8CPROTO_062_4343W-shell-develop",
+                "mbed-CY8CPROTO_062_4343W-shell-release",
+                "nrf-nrf52840-light",
+                "nrf-nrf52840-light-rpc",
+                "nrf-nrf52840-lock",
+                "nrf-nrf52840-pump",
+                "nrf-nrf52840-pump-controller",
+                "nrf-nrf52840-shell",
+                "nrf-nrf5340-light",
+                "nrf-nrf5340-light-rpc",
+                "nrf-nrf5340-lock",
+                "nrf-nrf5340-pump",
+                "nrf-nrf5340-pump-controller",
+                "nrf-nrf5340-shell",
+                "qpg-qpg6100-lock",
+                "telink-tlsr9518adk80d-light",
+                "tizen-arm-light"
+            ]
         }
     ]
 }

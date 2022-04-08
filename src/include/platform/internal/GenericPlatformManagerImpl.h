@@ -55,12 +55,13 @@ protected:
     CHIP_ERROR _Shutdown();
     CHIP_ERROR _AddEventHandler(PlatformManager::EventHandlerFunct handler, intptr_t arg);
     void _RemoveEventHandler(PlatformManager::EventHandlerFunct handler, intptr_t arg);
+    void _HandleServerStarted();
+    void _HandleServerShuttingDown();
     void _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg);
     void _DispatchEvent(const ChipDeviceEvent * event);
 
     // ===== Support methods that can be overridden by the implementation subclass.
 
-    void DispatchEventToSystemLayer(const ChipDeviceEvent * event);
     void DispatchEventToDeviceLayer(const ChipDeviceEvent * event);
     void DispatchEventToApplication(const ChipDeviceEvent * event);
     static void HandleMessageLayerActivityChanged(bool messageLayerIsActive);

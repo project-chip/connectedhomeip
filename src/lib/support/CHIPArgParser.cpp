@@ -39,15 +39,17 @@
 #include <errno.h>
 #include <getopt.h>
 #include <inttypes.h>
+#include <lib/support/SafeInt.h>
 #include <limits.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <string.h>
 #include <strings.h>
-#include <support/SafeInt.h>
 
-#include <support/CHIPMem.h>
-#include <support/CHIPMemString.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/EnforceFormat.h>
+#include <lib/support/logging/Constants.h>
 
 /*
  * TODO: Revisit these if and when fabric ID and node ID support has
@@ -56,10 +58,6 @@
 #ifndef CHIP_ARG_PARSER_PARSE_FABRIC_ID
 #define CHIP_ARG_PARSER_PARSE_FABRIC_ID 0
 #endif // CHIP_ARG_PARSER_PARSE_FABRIC_ID
-
-#ifndef CHIP_ARG_PARSER_PARSE_NODE_ID
-#define CHIP_ARG_PARSER_PARSE_NODE_ID 0
-#endif // CHIP_ARG_PARSER_PARSE_NODE_ID
 
 namespace chip {
 namespace ArgParser {
@@ -77,11 +75,11 @@ static void FindOptionById(OptionSet ** optSets, int optId, OptionSet *& optSet,
 static const char ** MakeUniqueHelpGroupNamesList(OptionSet * optSets[]);
 static void PutStringWithNewLine(FILE * s, const char * str);
 static void PutStringWithBlankLine(FILE * s, const char * str);
-#if CHIP_CONFIG_ENABLE_ARG_PARSER_SANTIY_CHECK
+#if CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
 static bool SanityCheckOptions(OptionSet * optSets[]);
 static bool HelpTextContainsLongOption(const char * optName, const char * helpText);
 static bool HelpTextContainsShortOption(char optChar, const char * helpText);
-#endif // CHIP_CONFIG_ENABLE_ARG_PARSER_SANTIY_CHECK
+#endif // CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
 
 static inline bool IsShortOptionChar(int ch)
 {
@@ -315,7 +313,7 @@ bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSe
     // Set gActiveOptionSets to the current option set list.
     gActiveOptionSets = optSets;
 
-#if CHIP_CONFIG_ENABLE_ARG_PARSER_SANTIY_CHECK
+#if CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
     if (!SanityCheckOptions(optSets))
         goto done;
 #endif
@@ -626,7 +624,7 @@ void PrintOptionHelp(OptionSet * optSets[], FILE * s)
  * Applications should call through the PrintArgError function pointer, rather
  * than calling this function directly.
  */
-void DefaultPrintArgError(const char * msg, ...)
+void ENFORCE_FORMAT(1, 2) DefaultPrintArgError(const char * msg, ...)
 {
     va_list ap;
 
@@ -758,6 +756,64 @@ bool ParseInt(const char * str, int32_t & output, int base)
 }
 
 /**
+ * Parse and attempt to convert a string to a 16-bit unsigned integer,
+ * applying the appropriate interpretation based on the base parameter.
+ *
+ * @param[in]  str    A pointer to a NULL-terminated C string representing
+ *                    the integer to parse.
+ * @param[out] output A reference to storage for a 16-bit unsigned integer
+ *                    to which the parsed value will be stored on success.
+ * @param[in]  base   The base according to which the string should be
+ *                    interpreted and parsed. If 0 or 16, the string may
+ *                    be hexadecimal and prefixed with "0x". Otherwise, a 0
+ *                    is implied as 10 unless a leading 0 is encountered in
+ *                    which 8 is implied.
+ *
+ * @return true on success; otherwise, false on failure.
+ */
+bool ParseInt(const char * str, uint16_t & output, int base)
+{
+    uint32_t v;
+
+    if (!ParseInt(str, v, base) || !CanCastTo<uint16_t>(v))
+    {
+        return false;
+    }
+    output = static_cast<uint16_t>(v);
+
+    return true;
+}
+
+/**
+ * Parse and attempt to convert a string to a 8-bit unsigned integer,
+ * applying the appropriate interpretation based on the base parameter.
+ *
+ * @param[in]  str    A pointer to a NULL-terminated C string representing
+ *                    the integer to parse.
+ * @param[out] output A reference to storage for a 8-bit unsigned integer
+ *                    to which the parsed value will be stored on success.
+ * @param[in]  base   The base according to which the string should be
+ *                    interpreted and parsed. If 0 or 16, the string may
+ *                    be hexadecimal and prefixed with "0x". Otherwise, a 0
+ *                    is implied as 10 unless a leading 0 is encountered in
+ *                    which 8 is implied.
+ *
+ * @return true on success; otherwise, false on failure.
+ */
+bool ParseInt(const char * str, uint8_t & output, int base)
+{
+    uint32_t v;
+
+    if (!ParseInt(str, v, base) || !CanCastTo<uint8_t>(v))
+    {
+        return false;
+    }
+    output = static_cast<uint8_t>(v);
+
+    return true;
+}
+
+/**
  * Parse and attempt to convert a string interpreted as a decimal
  * value to a 64-bit unsigned integer, applying the appropriate
  * interpretation based on the base parameter.
@@ -857,9 +913,9 @@ bool ParseInt(const char * str, int16_t & output)
     const int base   = 10;
     int32_t output32 = 0;
 
-    if ((ParseInt(str, output32, base)) && (output32 <= SHRT_MAX))
+    if ((ParseInt(str, output32, base)) && (output32 <= SHRT_MAX && output32 >= SHRT_MIN))
     {
-        output = static_cast<int16_t>(UINT16_MAX & output32);
+        output = static_cast<int16_t>(output32);
         return true;
     }
 
@@ -891,38 +947,6 @@ bool ParseInt(const char * str, uint8_t & output)
 
     return false;
 }
-
-#if CHIP_ARG_PARSER_PARSE_NODE_ID
-/**
- * Parse a CHIP node id in text form.
- *
- * @param[in]  str    A pointer to a NULL-terminated C string containing
- *                    the node id to parse.
- * @param[out] output A reference to an uint64_t lvalue in which the parsed
- *                    value will be stored on success.
- *
- * @return true if the value was successfully parsed; false if not.
- *
- * @details
- * The ParseNodeId() function accepts either a 64-bit node id given in hex
- * format (with or without a leading '0x'), or the words 'any' or 'all' which
- * are interpreted as meaning the Any node id (0xFFFFFFFFFFFFFFFF).
- */
-bool ParseNodeId(const char * str, uint64_t & nodeId)
-{
-    char * parseEnd;
-
-    if (strcasecmp(str, "any") == 0 || strcasecmp(str, "all") == 0)
-    {
-        nodeId = kAnyNodeId;
-        return true;
-    }
-
-    errno  = 0;
-    nodeId = strtoull(str, &parseEnd, 16);
-    return parseEnd > str && *parseEnd == 0 && (nodeId != ULLONG_MAX || errno == 0);
-}
-#endif // CHIP_ARG_PARSER_PARSE_NODE_ID
 
 #if CHIP_ARG_PARSER_PARSE_FABRIC_ID
 /**
@@ -1117,7 +1141,7 @@ HelpOptions::HelpOptions(const char * appName, const char * appUsage, const char
 /**
  * Print a short description of the command's usage followed by instructions on how to get more help.
  */
-void HelpOptions::PrintBriefUsage(FILE * s)
+void HelpOptions::PrintBriefUsage(FILE * s) const
 {
     PutStringWithNewLine(s, AppUsage);
     fprintf(s, "Try `%s --help' for more information.\n", AppName);
@@ -1126,7 +1150,7 @@ void HelpOptions::PrintBriefUsage(FILE * s)
 /**
  * Print the full usage information, including information on all available options.
  */
-void HelpOptions::PrintLongUsage(OptionSet ** optSets, FILE * s)
+void HelpOptions::PrintLongUsage(OptionSet ** optSets, FILE * s) const
 {
     PutStringWithBlankLine(s, AppUsage);
     if (AppDesc != nullptr)
@@ -1136,7 +1160,7 @@ void HelpOptions::PrintLongUsage(OptionSet ** optSets, FILE * s)
     PrintOptionHelp(optSets, s);
 }
 
-void HelpOptions::PrintVersion(FILE * s)
+void HelpOptions::PrintVersion(FILE * s) const
 {
     fprintf(s, "%s ", AppName);
     PutStringWithNewLine(s, (AppVersion != nullptr) ? AppVersion : "(unknown version)");
@@ -1450,7 +1474,7 @@ static void PutStringWithBlankLine(FILE * s, const char * str)
         fputs("\n", s);
 }
 
-#if CHIP_CONFIG_ENABLE_ARG_PARSER_SANTIY_CHECK
+#if CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
 
 static bool SanityCheckOptions(OptionSet * optSets[])
 {
@@ -1534,7 +1558,7 @@ static bool HelpTextContainsShortOption(char optChar, const char * helpText)
     return false;
 }
 
-#endif // CHIP_CONFIG_ENABLE_ARG_PARSER_SANTIY_CHECK
+#endif // CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
 
 } // namespace ArgParser
 } // namespace chip

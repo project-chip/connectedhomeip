@@ -21,6 +21,7 @@ import("${chip_root}/examples/platform/efr32/args.gni")
 
 efr32_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
-enable_pw_rpc = true
+chip_enable_pw_rpc = true
 chip_enable_openthread = true
-default_configs_std = [ "${chip_root}/config/efr32/lib/pw_rpc:std_cpp17" ]
+
+cpp_standard = "gnu++17"

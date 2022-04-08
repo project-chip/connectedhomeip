@@ -1,0 +1,194 @@
+/*
+ *
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020 Texas Instruments Incorporated
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+
+/* Modules */
+var AESCCM      = scripting.addModule("/ti/drivers/AESCCM");
+var AESECB      = scripting.addModule("/ti/drivers/AESECB");
+var Button      = scripting.addModule("/ti/drivers/apps/Button");
+var ECJPAKE     = scripting.addModule("/ti/drivers/ECJPAKE");
+var LED         = scripting.addModule("/ti/drivers/apps/LED");
+var NVS         = scripting.addModule("/ti/drivers/NVS");
+var RF          = scripting.addModule("/ti/drivers/RF");
+var RFDesign    = scripting.addModule("ti/devices/radioconfig/rfdesign");
+var RTOS        = scripting.addModule("/ti/drivers/RTOS");
+var TRNG        = scripting.addModule("/ti/drivers/TRNG");
+var Thread      = scripting.addModule("/ti/thread/thread");
+var SHA2        = scripting.addModule("/ti/drivers/SHA2");
+var UART        = scripting.addModule("/ti/drivers/UART");
+var ble         = scripting.addModule("/ti/ble5stack/ble");
+var dmm         = scripting.addModule("/ti/dmm/dmm");
+var AESCTRDRBG  = scripting.addModule("/ti/drivers/AESCTRDRBG");
+var ECDH        = scripting.addModule("/ti/drivers/ECDH");
+
+/* Instances */
+var AESCCM1     = AESCCM.addInstance();
+var AESECB1     = AESECB.addInstance();
+var AESECB2     = AESECB.addInstance();
+var Button1     = Button.addInstance();
+var Button2     = Button.addInstance();
+var ECJPAKE     = ECJPAKE.addInstance();
+var NVS1        = NVS.addInstance();
+var SHA21       = SHA2.addInstance();
+var LED1        = LED.addInstance();
+var LED2        = LED.addInstance();
+var TRNG1       = TRNG.addInstance();
+var TRNG2       = TRNG.addInstance();
+var TRNG3       = TRNG.addInstance();
+var UART1       = UART.addInstance();
+var AESCTRDRBG1 = AESCTRDRBG.addInstance();
+var ECDH1       = ECDH.addInstance();
+
+AESCTRDRBG1.$name              = "CONFIG_AESCTRDRBG_0";
+AESCTRDRBG1.aesctrObject.$name = "CONFIG_AESCTR_0";
+
+AESCCM1.$name = "CONFIG_AESCCM0";
+
+AESECB1.$name = "CONFIG_AESECB0";
+AESECB2.$name = "CONFIG_AESECB_1";
+
+ECDH1.$name = "CONFIG_ECDH0";
+
+/* RTOS */
+RTOS.name = "FreeRTOS";
+
+/* Left Button */
+Button1.$name                       = "CONFIG_BTN_LEFT";
+Button1.$hardware                   = system.deviceData.board.components["BTN-1"];
+Button1.gpioPin.$name               = "CONFIG_GPIO_BTN1";
+Button1.gpioPin.pull                = "Pull Up";
+Button1.gpioPin.interruptTrigger    = "Falling Edge";
+
+/* Left Button */
+Button2.$name                       = "CONFIG_BTN_RIGHT";
+Button2.$hardware                   = system.deviceData.board.components["BTN-2"];
+Button2.gpioPin.$name               = "CONFIG_GPIO_BTN2";
+Button2.gpioPin.pull                = "Pull Up";
+Button2.gpioPin.interruptTrigger    = "Falling Edge";
+
+/* ======== CCFG ======== */
+var CCFG  = scripting.addModule("/ti/devices/CCFG");
+const deviceName = system.getScript("/ti/ti154stack/ti154stack_common.js").getLaunchPadFromDevice();
+const ccfgSettings = system.getScript("/ti/common/lprf_ccfg_settings.js").ccfgSettings;
+for(var setting in ccfgSettings)
+{
+    CCFG[setting] = ccfgSettings[setting];
+}
+
+// Update LF Clock Source for CC2652RB devices
+if(deviceName.includes("RB"))
+{
+    CCFG.srcClkLF = "Derived from HF XOSC";
+}
+/* NVS */
+NVS1.$name                      = "CONFIG_NVSINTERNAL";
+NVS1.internalFlash.regionBase = 0xAA000;
+NVS1.internalFlash.regionSize = 0x4000;
+
+/* RF */
+/* if an antenna component exists, assign it to the rf instance */
+if (system.deviceData.board && system.deviceData.board.components.RF) {
+    RF.$hardware = system.deviceData.board.components.RF;
+}
+
+const rfDesignSettings = system.getScript("/ti/common/lprf_rf_design_settings.js").rfDesignSettings;
+for(var setting in rfDesignSettings)
+{
+    RFDesign[setting] = rfDesignSettings[setting];
+}
+
+/* Red LED */
+LED1.$name                      = "CONFIG_LED_RED";
+LED1.$hardware                  = system.deviceData.board.components.LED_RED;
+LED1.gpioPin.$name              = "CONFIG_GPIO_RLED";
+LED1.gpioPin.mode               = "Output";
+LED1.gpioPin.callbackFunction   = "";
+
+/* Green LED */
+LED2.$name                      = "CONFIG_LED_GREEN";
+LED2.$hardware                  = system.deviceData.board.components.LED_GREEN;
+LED2.gpioPin.$name              = "CONFIG_GPIO_GLED";
+LED2.gpioPin.mode               = "Output";
+LED2.gpioPin.callbackFunction   = "";
+
+/* Debug UART  */
+UART1.$hardware     = system.deviceData.board.components.XDS110UART;
+UART1.$name         = "CONFIG_UART_DEBUG";
+
+/* TRNG */
+TRNG1.$name     = "CONFIG_TRNG_0";
+TRNG2.$name     = "CONFIG_TRNG_1";
+TRNG3.$name     = "CONFIG_TRNG_APP";
+
+RTOS.name = "FreeRTOS";
+
+/* BLE */
+ble.addressMode                                           = "ADDRMODE_RP_WITH_PUBLIC_ID";
+ble.maxConnNum                                            = 1;
+ble.numOfAdvSets                                          = 1;
+ble.lockProject                                           = true;
+ble.oneLibSizeOpt                                         = true;
+ble.maxPDUSize                                            = 255;
+ble.radioConfig.codeExportConfig.$name                    = "ti_devices_radioconfig_code_export_param1";
+ble.connUpdateParamsPeripheral.$name                      = "ti_ble5stack_general_ble_conn_update_params0";
+ble.connUpdateParamsPeripheral.reqMinConnInt               = 30;
+ble.connUpdateParamsPeripheral.reqMaxConnInt               = 50;
+
+ble.advSet1.$name                                         = "ti_ble5stack_broadcaster_advertisement_set0";
+ble.advSet1.advParam1.$name                               = "ti_ble5stack_broadcaster_advertisement_params0";
+ble.advSet1.advParam1.primIntMin                    = 100;
+ble.advSet1.advParam1.primIntMax                    = 200;
+
+/* DMM */
+dmm.project                                          = "ti_thread_thermostat_remote_display";
+dmm.stackRoles                                       = ["blePeripheral","threadFTD"];
+dmm.lockStackRoles                                   = true;
+dmm.numApplicationStates                             = 10;
+dmm.applicationState0                                = "ANY";
+dmm.applicationState1                                = "DMMPOLICY_BLE_IDLE";
+dmm.applicationState2                                = "DMMPOLICY_BLE_ADV";
+dmm.applicationState3                                = "DMMPOLICY_BLE_CONNECTING";
+dmm.applicationState4                                = "DMMPOLICY_BLE_HIGH_BANDWIDTH";
+dmm.applicationState5                                = "DMMPOLICY_BLE_CONNECTED";
+dmm.applicationState6                                = "DMMPOLICY_BLE_OAD";
+dmm.applicationState7                                = "DMMPOLICY_THREAD_IDLE";
+dmm.applicationState8                                = "DMMPOLICY_THREAD_LINK_EST";
+dmm.applicationState9                                = "DMMPOLICY_THREAD_DATA";
+dmm.policyArray.create(4);
+dmm.policyArray[0].$name                             = "ti_dmm_policy_dmm_policy0";
+dmm.policyArray[0].blePeripheral.$name               = "ti_dmm_policy_stack_dmm_stack_ble0";
+dmm.policyArray[0].blePeripheral.applicationStates   = ["applicationState6"];
+dmm.policyArray[0].threadFTD.$name                   = "ti_dmm_policy_stack_dmm_stack_thread0";
+dmm.policyArray[0].threadFTD.pause                   = "DMMPOLICY_PAUSED";
+dmm.policyArray[1].$name                             = "ti_dmm_policy_dmm_policy1";
+dmm.policyArray[1].blePeripheral.$name               = "ti_dmm_policy_stack_dmm_stack_ble1";
+dmm.policyArray[1].blePeripheral.applicationStates   = ["applicationState3","applicationState4"];
+dmm.policyArray[1].blePeripheral.weight              = 25;
+dmm.policyArray[1].blePeripheral.appliedActivity     = ["DMMPOLICY_APPLIED_ACTIVITY_BLE_CONNECTION"];
+dmm.policyArray[1].threadFTD.$name                   = "ti_dmm_policy_stack_dmm_stack_thread1";
+dmm.policyArray[2].$name                             = "ti_dmm_policy_dmm_policy2";
+dmm.policyArray[2].blePeripheral.$name               = "ti_dmm_policy_stack_dmm_stack_ble2";
+dmm.policyArray[2].threadFTD.$name                   = "ti_dmm_policy_stack_dmm_stack_thread2";
+dmm.policyArray[2].threadFTD.weight                  = 30;
+dmm.policyArray[2].threadFTD.applicationStates       = ["applicationState8"];
+dmm.policyArray[2].threadFTD.appliedActivity         = ["DMMPOLICY_APPLIED_ACTIVITY_ALL"];
+dmm.policyArray[3].$name                             = "ti_dmm_policy_dmm_policy3";
+dmm.policyArray[3].blePeripheral.$name               = "ti_dmm_policy_stack_dmm_stack_ble3";
+dmm.policyArray[3].threadFTD.$name                   = "ti_dmm_policy_stack_dmm_stack_thread3";
+dmm.policyArray[3].threadFTD.weight                  = 1;

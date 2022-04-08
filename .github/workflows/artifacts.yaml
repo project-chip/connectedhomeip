@@ -3,6 +3,10 @@ on:
   schedule:
     - cron: '0 * * * *' # every hour
 
+concurrency:
+    group: ${{ github.workflow }}
+    cancel-in-progress: true
+  
 jobs:
   delete-artifacts:
     runs-on: ubuntu-latest

@@ -1,0 +1,64 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/platform/device.gni")
+
+source_set("commands") {
+  sources = [
+    "Base64.cpp",
+    "Help.cpp",
+    "Help.h",
+    "Meta.cpp",
+  ]
+
+  public_deps = [ "${chip_root}/src/lib/shell:shell_core" ]
+
+  if (chip_device_platform != "none") {
+    sources += [
+      "Config.cpp",
+      "Device.cpp",
+      "OnboardingCodes.cpp",
+    ]
+  }
+
+  if (chip_enable_wifi) {
+    sources += [ "WiFi.cpp" ]
+  }
+
+  if (chip_enable_ble && chip_device_platform != "none") {
+    sources += [ "BLE.cpp" ]
+  }
+
+  if (chip_enable_nfc && chip_device_platform != "none") {
+    sources += [ "NFC.cpp" ]
+  }
+
+  if (chip_device_platform != "none") {
+    sources += [ "Dns.cpp" ]
+  }
+
+  if (chip_enable_ota_requestor && chip_device_platform != "none" &&
+      chip_device_platform != "linux" && chip_device_platform != "darwin") {
+    #TODO: the ota commands in shell should use the interfaces in /src/app/clusters/ota-requestor
+    sources += [ "Ota.cpp" ]
+    configs += [ "${chip_root}/src/controller:config" ]
+  }
+
+  if (chip_device_platform != "none") {
+    public_deps += [ "${chip_root}/src/app/server" ]
+  }
+}

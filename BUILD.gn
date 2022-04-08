@@ -30,11 +30,14 @@ assert(chip_root == "//")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/build/chip/tools.gni")
 
-if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
+import("//src/crypto/crypto.gni")
+
+if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   declare_args() {
     chip_enable_python_modules =
         (current_os == "mac" || current_os == "linux") &&
-        (host_cpu == "x64" || host_cpu == "arm64")
+        (host_cpu == "x64" || host_cpu == "arm64" || host_cpu == "arm")
+    enable_pylib = false
   }
 
   # Python packages for supporting specific targets.
@@ -44,16 +47,19 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       "$dir_pw_doctor/py",
       "$dir_pw_env_setup/py",
       "$dir_pw_hdlc/py",
+      "$dir_pw_log:protos.python",
       "$dir_pw_module/py",
       "$dir_pw_protobuf/py",
       "$dir_pw_protobuf_compiler/py",
       "$dir_pw_rpc/py",
       "$dir_pw_status/py",
       "$dir_pw_toolchain/py",
+      "$dir_pw_trace/py",
+      "$dir_pw_trace_tokenized/py",
       "$dir_pw_unit_test/py",
       "$dir_pw_watch/py",
       "integrations/mobly:chip_mobly",
-      "third_party/happy",
+      "scripts:requirements",
     ]
   }
 
@@ -64,12 +70,12 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       "${chip_root}/src/ble",
       "${chip_root}/src/controller",
       "${chip_root}/src/credentials",
+      "${chip_root}/src/credentials:default_attestation_verifier",
       "${chip_root}/src/crypto",
       "${chip_root}/src/inet",
       "${chip_root}/src/lib",
       "${chip_root}/src/lib/asn1",
       "${chip_root}/src/lib/core",
-      "${chip_root}/src/lib/shell",
       "${chip_root}/src/lib/support",
       "${chip_root}/src/messaging",
       "${chip_root}/src/protocols",
@@ -88,10 +94,13 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
     if (chip_build_tests) {
       deps += [ "//src:tests" ]
+      if (current_os == "android") {
+        deps += [ "${chip_root}/build/chip/java/tests:java_build_test" ]
+      }
     }
 
     if (chip_with_lwip) {
-      deps += [ "${chip_root}/src/lwip:all" ]
+      deps += [ "${chip_root}/src/lwip" ]
     }
 
     if (chip_build_tools) {
@@ -100,19 +109,29 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
         "${chip_root}/examples/shell/standalone:chip-shell",
         "${chip_root}/src/app/tests/integration:chip-im-initiator",
         "${chip_root}/src/app/tests/integration:chip-im-responder",
+        "${chip_root}/src/lib/address_resolve:address-resolve-tool",
         "${chip_root}/src/messaging/tests/echo:chip-echo-requester",
         "${chip_root}/src/messaging/tests/echo:chip-echo-responder",
         "${chip_root}/src/qrcodetool",
         "${chip_root}/src/setup_payload",
+        "${chip_root}/src/tools/spake2p",
       ]
+      if (chip_crypto == "openssl") {
+        deps += [ "${chip_root}/src/tools/chip-cert" ]
+      }
       if (chip_enable_python_modules) {
+        if (enable_pylib) {
+          deps += [ "${chip_root}/src/pybindings/pycontroller" ]
+        }
         deps += [ "${chip_root}/src/controller/python" ]
       }
     }
 
     if (current_os == "android") {
       deps += [
+        "${chip_root}/src/app/server/java",
         "${chip_root}/src/controller/java",
+        "${chip_root}/src/platform/android:java",
         "${chip_root}/src/setup_payload/java",
       ]
     }
@@ -123,6 +142,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       data_deps = [ "${chip_root}/examples/chip-tool" ]
 
       if (chip_enable_python_modules) {
+        if (enable_pylib) {
+          data_deps += [ "${chip_root}/src/pybindings/pycontroller" ]
+        }
         data_deps += [ "${chip_root}/src/controller/python" ]
       }
 
@@ -130,18 +152,20 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
   }
 
-  group("check") {
+  group("fake_platform_tests") {
     if (chip_link_tests) {
-      deps = [ "//src:tests_run" ]
+      deps = [ "//src:fake_platform_tests_run" ]
     }
   }
 
-  # We don't always want to run happy tests, make them a seperate group.
-  if (chip_enable_happy_tests) {
-    group("happy_tests") {
-      if (chip_link_tests) {
-        deps = [ "//src:happy_tests" ]
-      }
+  group("check") {
+    if (chip_link_tests) {
+      deps = [
+        "//:fake_platform_tests",
+        "//scripts/build:build_examples.tests",
+        "//scripts/idl:idl.tests",
+        "//src:tests_run",
+      ]
     }
   }
 } else {
@@ -160,11 +184,17 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     # Set this to true to enable efr32 builds by default.
     enable_efr32_builds = false
 
-    # Set this to true to enable qpg6100 builds by default.
-    enable_qpg6100_builds = false
+    # Set this to true to enable p6 builds by default.
+    enable_p6_builds = false
+
+    # Set this to true to enable Qorvo qpg builds by default.
+    enable_qpg_builds = false
 
     # Set this to true to enable k32w builds by default.
     enable_k32w_builds = false
+
+    # Set this to true to enable bl602 builds by default.
+    enable_bl602_builds = false
   }
 
   declare_args() {
@@ -176,6 +206,10 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
     # Enable building chip with gcc & mbedtls.
     enable_host_gcc_mbedtls_build = enable_default_builds && host_os != "win"
+
+    # Build the chip-cert tool.
+    enable_standalone_chip_cert_build =
+        enable_default_builds && host_os != "win" && chip_crypto == "openssl"
 
     # Build the chip-tool example.
     enable_standalone_chip_tool_build =
@@ -192,6 +226,14 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     enable_linux_all_clusters_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
 
+    # Build the Linux tv app example.
+    enable_linux_tv_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux tv casting app example.
+    enable_linux_tv_casting_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
     # Build the Linux bridge app example.
     enable_linux_bridge_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
@@ -200,20 +242,45 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     enable_linux_lighting_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
 
+    # Build the Linux thermostat app example.
+    enable_linux_thermostat_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux door lock app example.
+    enable_linux_door_lock_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
     # Build the cc13x2x7_26x2x7 lock app example.
     enable_cc13x2x7_26x2x7_lock_app_build = enable_ti_simplelink_builds
 
     # Build the efr32 lock app example.
     enable_efr32_lock_app_build = enable_efr32_builds
 
-    # Build the qpg6100 lock app example.
-    enable_qpg6100_lock_app_build = enable_qpg6100_builds
+    # Build the p6 lock app example.
+    enable_p6_lock_app_build = enable_p6_builds
+
+    # Build the qpgxxxx lock app example.
+    enable_qpg_lock_app_build = enable_qpg_builds && !is_debug
 
     # Build the efr32 lighting app example.
     enable_efr32_lighting_app_build = enable_efr32_builds
 
+    # Build the efr32 window app example.
+    enable_efr32_window_app_build = enable_efr32_builds
+
+    # Build the k32w lighting app example.
+    enable_k32w_lighting_app_build = enable_k32w_builds
+
     # Build the k32w lock app example.
     enable_k32w_lock_app_build = enable_k32w_builds
+
+    # Build the k32w shell app example.
+    enable_k32w_shell_app_build = enable_k32w_builds
+
+    # Build the bl602 lighting app example.
+    enable_bl602_lighting_app_build = enable_bl602_builds
+
+    enable_fake_tests = enable_default_builds && host_os == "linux"
   }
 
   if (enable_host_clang_build) {
@@ -252,8 +319,20 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
   }
 
+  if (enable_fake_tests) {
+    chip_build("fake_platform") {
+      toolchain = "${build_root}/toolchain/fake:fake_${host_cpu}_gcc"
+    }
+  }
+
   standalone_toolchain = "${chip_root}/config/standalone/toolchain:standalone"
   not_needed([ "standalone_toolchain" ])  # Might not be needed.
+
+  if (enable_standalone_chip_cert_build) {
+    group("standalone_chip_cert") {
+      deps = [ "${chip_root}/src/tools/chip-cert(${standalone_toolchain})" ]
+    }
+  }
 
   if (enable_standalone_chip_tool_build) {
     group("standalone_chip_tool") {
@@ -289,6 +368,27 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
   }
 
+  if (enable_linux_thermostat_app_build) {
+    group("linux_thermostat_app") {
+      deps =
+          [ "${chip_root}/examples/thermostat/linux(${standalone_toolchain})" ]
+    }
+  }
+
+  if (enable_linux_tv_app_build) {
+    group("linux_tv_app") {
+      deps = [ "${chip_root}/examples/tv-app/linux(${standalone_toolchain})" ]
+    }
+  }
+
+  if (enable_linux_tv_casting_app_build) {
+    group("linux_tv_casting_app") {
+      deps = [
+        "${chip_root}/examples/tv-casting-app/linux(${standalone_toolchain})",
+      ]
+    }
+  }
+
   if (enable_linux_bridge_app_build) {
     group("linux_bridge_app") {
       deps =
@@ -304,15 +404,29 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
   }
 
+  if (enable_linux_door_lock_app_build) {
+    group("linux_door_lock_app") {
+      deps = [
+        "${chip_root}/examples/door-lock-app/linux(${standalone_toolchain})",
+      ]
+    }
+  }
+
   if (enable_efr32_lock_app_build) {
     group("efr32_lock_app") {
       deps = [ "${chip_root}/examples/lock-app/efr32(${chip_root}/config/efr32/toolchain:efr32_lock_app)" ]
     }
   }
 
-  if (enable_qpg6100_lock_app_build) {
-    group("qpg6100_lock_app") {
-      deps = [ "${chip_root}/examples/lock-app/qpg6100(${chip_root}/config/qpg6100/toolchain:qpg6100_lock_app)" ]
+  if (enable_p6_lock_app_build) {
+    group("p6_lock_app") {
+      deps = [ "${chip_root}/examples/lock-app/p6(${chip_root}/config/p6/toolchain:p6_lock_app)" ]
+    }
+  }
+
+  if (enable_qpg_lock_app_build) {
+    group("qpg_lock_app") {
+      deps = [ "${chip_root}/examples/lock-app/qpg(${chip_root}/config/qpg/toolchain:qpg_lock_app)" ]
     }
   }
 
@@ -322,9 +436,27 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
   }
 
+  if (enable_efr32_window_app_build) {
+    group("efr32_window_app") {
+      deps = [ "${chip_root}/examples/window-app/efr32(${chip_root}/config/efr32/toolchain:efr32_window_app)" ]
+    }
+  }
+
+  if (enable_k32w_lighting_app_build) {
+    group("k32w_lighting_app") {
+      deps = [ "${chip_root}/examples/lighting-app/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_lighting_app)" ]
+    }
+  }
+
   if (enable_k32w_lock_app_build) {
     group("k32w_lock_app") {
-      deps = [ "${chip_root}/examples/lock-app/k32w(${chip_root}/config/k32w/toolchain:k32w_lock_app)" ]
+      deps = [ "${chip_root}/examples/lock-app/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_lock_app)" ]
+    }
+  }
+
+  if (enable_k32w_shell_app_build) {
+    group("k32w_shell_app") {
+      deps = [ "${chip_root}/examples/shell/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_shell_app)" ]
     }
   }
 
@@ -347,6 +479,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
         ":android_x86",
       ]
     }
+    if (enable_standalone_chip_cert_build) {
+      deps += [ ":standalone_chip_cert" ]
+    }
     if (enable_standalone_chip_tool_build) {
       deps += [ ":standalone_chip_tool" ]
     }
@@ -359,11 +494,23 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     if (enable_linux_all_clusters_app_build) {
       deps += [ ":linux_all_clusters_app" ]
     }
+    if (enable_linux_thermostat_app_build) {
+      deps += [ ":linux_thermostat_app" ]
+    }
+    if (enable_linux_tv_app_build) {
+      deps += [ ":linux_tv_app" ]
+    }
+    if (enable_linux_tv_casting_app_build) {
+      deps += [ ":linux_tv_casting_app" ]
+    }
     if (enable_linux_bridge_app_build) {
       deps += [ ":linux_bridge_app" ]
     }
     if (enable_linux_lighting_app_build) {
       deps += [ ":linux_lighting_app" ]
+    }
+    if (enable_linux_door_lock_app_build) {
+      deps += [ ":linux_door_lock_app" ]
     }
     if (enable_efr32_lock_app_build) {
       deps += [ ":efr32_lock_app" ]
@@ -371,11 +518,23 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     if (enable_efr32_lighting_app_build) {
       deps += [ ":efr32_lighting_app" ]
     }
+    if (enable_efr32_window_app_build) {
+      deps += [ ":efr32_window_app" ]
+    }
+    if (enable_p6_lock_app_build) {
+      deps += [ ":p6_lock_app" ]
+    }
+    if (enable_k32w_lighting_app_build) {
+      deps += [ ":k32w_lighting_app" ]
+    }
     if (enable_k32w_lock_app_build) {
       deps += [ ":k32w_lock_app" ]
     }
-    if (enable_qpg6100_lock_app_build) {
-      deps += [ ":qpg6100_lock_app" ]
+    if (enable_k32w_shell_app_build) {
+      deps += [ ":k32w_shell_app" ]
+    }
+    if (enable_qpg_lock_app_build) {
+      deps += [ ":qpg_lock_app" ]
     }
     if (enable_cc13x2x7_26x2x7_lock_app_build) {
       deps += [ ":cc13x2x7_26x2x7_lock_app" ]
@@ -392,6 +551,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
     if (enable_host_gcc_mbedtls_build) {
       deps += [ ":check_host_gcc_mbedtls" ]
+    }
+    if (enable_fake_tests) {
+      deps += [ ":check_fake_platform" ]
     }
   }
 }

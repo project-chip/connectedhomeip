@@ -25,12 +25,11 @@ class SetupPayloadParseCommand : public Command
 {
 public:
     SetupPayloadParseCommand() : Command("parse-setup-payload") { AddArgument("payload", &mCode); }
-    CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
+    CHIP_ERROR Run() override;
+    static bool IsQRCode(std::string codeString);
 
 private:
     char * mCode;
     CHIP_ERROR Parse(std::string codeString, chip::SetupPayload & payload);
     CHIP_ERROR Print(chip::SetupPayload payload);
-    bool IsQRCode(std::string codeString);
-    const std::string QRCODE_PREFIX = "CH:";
 };

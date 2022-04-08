@@ -29,13 +29,12 @@
 
 #include "common.h"
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/echo/Echo.h>
-#include <support/ErrorStr.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/PASESession.h>
-#include <transport/SecureSessionMgr.h>
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
 
@@ -50,25 +49,21 @@ namespace {
 // Max value for the number of EchoRequests sent.
 constexpr size_t kMaxEchoCount = 3;
 
-// The CHIP Echo interval time in milliseconds.
-constexpr int32_t gEchoInterval = 1000;
+// The CHIP Echo interval time.
+constexpr chip::System::Clock::Timeout gEchoInterval = chip::System::Clock::Seconds16(1);
 
-constexpr chip::Transport::AdminId gAdminId = 0;
+constexpr chip::FabricIndex gFabricIndex = 0;
 
 // The EchoClient object.
 chip::Protocols::Echo::EchoClient gEchoClient;
 
 chip::TransportMgr<chip::Transport::UDP> gUDPManager;
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
-chip::SecureSessionMgr gSessionManager;
 chip::Inet::IPAddress gDestAddr;
+chip::SessionHolder gSession;
 
 // The last time a CHIP Echo was attempted to be sent.
-uint64_t gLastEchoTime = 0;
-
-// True, if the EchoClient is waiting for an EchoResponse
-// after sending an EchoRequest, false otherwise.
-bool gWaitingForEchoResp = false;
+chip::System::Clock::Timestamp gLastEchoTime = chip::System::Clock::kZero;
 
 // Count of the number of EchoRequests sent.
 uint64_t gEchoCount = 0;
@@ -78,20 +73,48 @@ uint64_t gEchoRespCount = 0;
 
 bool gUseTCP = false;
 
-bool EchoIntervalExpired(void)
-{
-    uint64_t now = chip::System::Timer::GetCurrentEpoch();
+CHIP_ERROR SendEchoRequest();
+void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState);
 
-    return (now >= gLastEchoTime + gEchoInterval);
+void Shutdown()
+{
+    chip::DeviceLayer::SystemLayer().CancelTimer(EchoTimerHandler, nullptr);
+    gEchoClient.Shutdown();
+    ShutdownChip();
 }
 
-CHIP_ERROR SendEchoRequest(void)
+void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState)
+{
+    if (gEchoRespCount != gEchoCount)
+    {
+        printf("No response received\n");
+
+        // Set gEchoRespCount to gEchoCount to start next ping if there is any.
+        gEchoRespCount = gEchoCount;
+    }
+
+    if (gEchoCount < kMaxEchoCount)
+    {
+        CHIP_ERROR err = SendEchoRequest();
+        if (err != CHIP_NO_ERROR)
+        {
+            printf("Send request failed: %s\n", chip::ErrorStr(err));
+            chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        }
+    }
+    else
+    {
+        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+    }
+}
+
+CHIP_ERROR SendEchoRequest()
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     const char kRequestFormat[] = "Echo Message %" PRIu64 "\n";
     char requestData[(sizeof kRequestFormat) + 20 /* uint64_t decimal digits */];
     snprintf(requestData, sizeof requestData, kRequestFormat, gEchoCount);
-    chip::System::PacketBufferHandle payloadBuf = chip::MessagePacketBuffer::NewWithData(requestData, strlen(requestData));
+    chip::System::PacketBufferHandle && payloadBuf = chip::MessagePacketBuffer::NewWithData(requestData, strlen(requestData));
 
     if (payloadBuf.IsNull())
     {
@@ -99,20 +122,27 @@ CHIP_ERROR SendEchoRequest(void)
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    gLastEchoTime = chip::System::Timer::GetCurrentEpoch();
+    gLastEchoTime = chip::System::SystemClock().GetMonotonicTimestamp();
+
+    err = chip::DeviceLayer::SystemLayer().StartTimer(gEchoInterval, EchoTimerHandler, nullptr);
+    if (err != CHIP_NO_ERROR)
+    {
+        printf("Unable to schedule timer\n");
+        return CHIP_ERROR_INTERNAL;
+    }
 
     printf("\nSend echo request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = gEchoClient.SendEchoRequest(std::move(payloadBuf), chip::Messaging::SendFlags(chip::Messaging::SendMessageFlags::kNone));
+    err = gEchoClient.SendEchoRequest(std::move(payloadBuf));
 
     if (err == CHIP_NO_ERROR)
     {
-        gWaitingForEchoResp = true;
         gEchoCount++;
     }
     else
     {
         printf("Send echo request failed, err: %s\n", chip::ErrorStr(err));
+        chip::DeviceLayer::SystemLayer().CancelTimer(EchoTimerHandler, nullptr);
     }
 
     return err;
@@ -125,6 +155,7 @@ CHIP_ERROR EstablishSecureSession()
     chip::Optional<chip::Transport::PeerAddress> peerAddr;
     chip::SecurePairingUsingTestSecret * testSecurePairingSecret = chip::Platform::New<chip::SecurePairingUsingTestSecret>();
     VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    testSecurePairingSecret->Init(gSessionManager);
 
     if (gUseTCP)
     {
@@ -133,66 +164,41 @@ CHIP_ERROR EstablishSecureSession()
     else
     {
         peerAddr = chip::Optional<chip::Transport::PeerAddress>::Value(
-            chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, INET_NULL_INTERFACEID));
+            chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, chip::Inet::InterfaceId::Null()));
     }
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret,
-                                     chip::SecureSessionMgr::PairingDirection::kInitiator, gAdminId);
+    err = gSessionManager.NewPairing(gSession, peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret,
+                                     chip::CryptoContext::SessionRole::kInitiator, gFabricIndex);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         printf("Establish secure session failed, err: %s\n", chip::ErrorStr(err));
-        gLastEchoTime = chip::System::Timer::GetCurrentEpoch();
+        gLastEchoTime = chip::System::SystemClock().GetMonotonicTimestamp();
     }
     else
     {
         printf("Establish secure session succeeded\n");
     }
+    if (testSecurePairingSecret)
+    {
+        chip::Platform::Delete(testSecurePairingSecret);
+    }
 
     return err;
 }
 
-void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle payload)
+void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
 {
-    uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
-    uint32_t transitTime = respTime - gLastEchoTime;
+    chip::System::Clock::Timestamp respTime  = chip::System::SystemClock().GetMonotonicTimestamp();
+    chip::System::Clock::Timeout transitTime = respTime - gLastEchoTime;
 
-    gWaitingForEchoResp = false;
     gEchoRespCount++;
 
-    printf("Echo Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", gEchoRespCount, gEchoCount,
-           static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(), static_cast<double>(transitTime) / 1000);
-}
-
-void RunPinging()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // Connection has been established. Now send the EchoRequests.
-    for (unsigned int i = 0; i < kMaxEchoCount; i++)
-    {
-        err = SendEchoRequest();
-        if (err != CHIP_NO_ERROR)
-        {
-            printf("Send request failed: %s\n", chip::ErrorStr(err));
-            break;
-        }
-
-        // Wait for response until the Echo interval.
-        while (!EchoIntervalExpired())
-        {
-            sleep(1);
-        }
-
-        // Check if expected response was received.
-        if (gWaitingForEchoResp)
-        {
-            printf("No response received\n");
-            gWaitingForEchoResp = false;
-        }
-    }
+    printf("Echo Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fs\n", gEchoRespCount, gEchoCount,
+           static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(),
+           static_cast<double>(chip::System::Clock::Milliseconds32(transitTime).count()) / 1000);
 }
 
 } // namespace
@@ -200,9 +206,6 @@ void RunPinging()
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    chip::Transport::AdminPairingTable admins;
-    chip::Transport::AdminPairingInfo * adminInfo = nullptr;
 
     if (argc <= 1)
     {
@@ -229,51 +232,57 @@ int main(int argc, char * argv[])
 
     InitializeChip();
 
-    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
-
-    adminInfo = admins.AssignAdminId(gAdminId, chip::kTestControllerNodeId);
-    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    err = gFabricTable.Init(&gStorage);
+    SuccessOrExit(err);
 
     if (gUseTCP)
     {
-        err = gTCPManager.Init(chip::Transport::TcpListenParameters(&chip::DeviceLayer::InetLayer)
-                                   .SetAddressType(chip::Inet::kIPAddressType_IPv4)
+        err = gTCPManager.Init(chip::Transport::TcpListenParameters(chip::DeviceLayer::TCPEndPointManager())
+                                   .SetAddressType(chip::Inet::IPAddressType::kIPv6)
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTCPManager, &admins);
+        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager, &gStorage,
+                                   &gFabricTable);
         SuccessOrExit(err);
     }
     else
     {
-        err = gUDPManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer)
-                                   .SetAddressType(chip::Inet::kIPAddressType_IPv4)
+        err = gUDPManager.Init(chip::Transport::UdpListenParameters(chip::DeviceLayer::UDPEndPointManager())
+                                   .SetAddressType(chip::Inet::IPAddressType::kIPv6)
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gUDPManager, &admins);
+        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager, &gStorage,
+                                   &gFabricTable);
         SuccessOrExit(err);
     }
 
     err = gExchangeManager.Init(&gSessionManager);
     SuccessOrExit(err);
 
+    err = gMessageCounterManager.Init(&gExchangeManager);
+    SuccessOrExit(err);
+
     // Start the CHIP connection to the CHIP echo responder.
     err = EstablishSecureSession();
     SuccessOrExit(err);
 
-    // TODO: temprary create a SecureSessionHandle from node id to unblock end-to-end test. Complete solution is tracked in PR:4451
-    err = gEchoClient.Init(&gExchangeManager, { chip::kTestDeviceNodeId, 0, gAdminId });
+    err = gEchoClient.Init(&gExchangeManager, gSession.Get());
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Response is received.
     gEchoClient.SetEchoResponseReceived(HandleEchoResponseReceived);
 
-    RunPinging();
+    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::kZero, EchoTimerHandler, nullptr);
+    SuccessOrExit(err);
 
-    gEchoClient.Shutdown();
+    chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
-    ShutdownChip();
+    gUDPManager.Close();
+    gTCPManager.Close();
+
+    Shutdown();
 
 exit:
     if ((err != CHIP_NO_ERROR) || (gEchoRespCount != kMaxEchoCount))

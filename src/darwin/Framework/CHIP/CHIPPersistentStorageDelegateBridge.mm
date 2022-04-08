@@ -17,6 +17,40 @@
 
 #import "CHIPPersistentStorageDelegateBridge.h"
 
+#include <algorithm>
+#include <lib/support/Base64.h>
+#include <memory>
+#include <string>
+
+namespace {
+
+std::string StringToBase64(const std::string & value)
+{
+    std::unique_ptr<char[]> buffer(new char[BASE64_ENCODED_LEN(value.length())]);
+
+    uint32_t len = chip::Base64Encode32(
+        reinterpret_cast<const uint8_t *>(value.data()), static_cast<uint32_t>(value.length()), buffer.get());
+    if (len == UINT32_MAX) {
+        return "";
+    }
+
+    return std::string(buffer.get(), len);
+}
+
+std::string Base64ToString(const std::string & b64Value)
+{
+    std::unique_ptr<uint8_t[]> buffer(new uint8_t[BASE64_MAX_DECODED_LEN(b64Value.length())]);
+
+    uint32_t len = chip::Base64Decode32(b64Value.data(), static_cast<uint32_t>(b64Value.length()), buffer.get());
+    if (len == UINT32_MAX) {
+        return "";
+    }
+
+    return std::string(reinterpret_cast<const char *>(buffer.get()), len);
+}
+
+} // namespace
+
 CHIPPersistentStorageDelegateBridge::CHIPPersistentStorageDelegateBridge(void)
     : mDelegate(nil)
 {
@@ -26,56 +60,22 @@ CHIPPersistentStorageDelegateBridge::CHIPPersistentStorageDelegateBridge(void)
 
 CHIPPersistentStorageDelegateBridge::~CHIPPersistentStorageDelegateBridge(void) {}
 
-void CHIPPersistentStorageDelegateBridge::setFrameworkDelegate(id<CHIPPersistentStorageDelegate> delegate, dispatch_queue_t queue)
-{
-    dispatch_async(mWorkQueue, ^{
-        if (delegate && queue) {
-            mDelegate = delegate;
-            mQueue = queue;
-        } else {
-            mDelegate = nil;
-            mQueue = nil;
-        }
-    });
-}
-
-void CHIPPersistentStorageDelegateBridge::SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate)
+void CHIPPersistentStorageDelegateBridge::setFrameworkDelegate(_Nullable id<CHIPPersistentStorageDelegate> delegate)
 {
     dispatch_async(mWorkQueue, ^{
         if (delegate) {
-            mCallback = delegate;
-
-            mSetStatusHandler = ^(NSString * key, NSError * status) {
-                chip::PersistentStorageResultDelegate * callback = mCallback;
-                if (callback) {
-                    dispatch_async(mWorkQueue, ^{
-                        callback->OnPersistentStorageStatus([key UTF8String],
-                            chip::PersistentStorageResultDelegate::Operation::kSET, [CHIPError errorToCHIPErrorCode:status]);
-                    });
-                }
-            };
-
-            mDeleteStatusHandler = ^(NSString * key, NSError * status) {
-                chip::PersistentStorageResultDelegate * callback = mCallback;
-                if (callback) {
-                    dispatch_async(mWorkQueue, ^{
-                        callback->OnPersistentStorageStatus([key UTF8String],
-                            chip::PersistentStorageResultDelegate::Operation::kDELETE, [CHIPError errorToCHIPErrorCode:status]);
-                    });
-                }
-            };
+            mDelegate = delegate;
         } else {
-            mCallback = nil;
-            mSetStatusHandler = nil;
-            mDeleteStatusHandler = nil;
+            mDelegate = nil;
         }
     });
 }
 
-CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncGetKeyValue(const char * key, char * value, uint16_t & size)
+CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncGetKeyValue(const char * key, void * buffer, uint16_t & size)
 {
     __block CHIP_ERROR error = CHIP_NO_ERROR;
     NSString * keyString = [NSString stringWithUTF8String:key];
+
     dispatch_sync(mWorkQueue, ^{
         NSLog(@"PersistentStorageDelegate Sync Get Value for Key: %@", keyString);
 
@@ -89,65 +89,71 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncGetKeyValue(const char * key
         }
 
         if (valueString != nil) {
-            if (([valueString lengthOfBytesUsingEncoding:NSUTF8StringEncoding] + 1) > UINT16_MAX) {
+            std::string decoded = Base64ToString([valueString UTF8String]);
+
+            if (decoded.length() > UINT16_MAX) {
                 error = CHIP_ERROR_BUFFER_TOO_SMALL;
+                size = 0;
             } else {
-                if (value != nullptr) {
-                    size = (uint16_t) strlcpy(value, [valueString UTF8String], size);
-                    if (size < [valueString lengthOfBytesUsingEncoding:NSUTF8StringEncoding]) {
-                        error = CHIP_ERROR_NO_MEMORY;
+                if (buffer != nullptr) {
+                    memcpy(buffer, decoded.data(), std::min<size_t>(decoded.length(), size));
+                    if (size < decoded.length()) {
+                        error = CHIP_ERROR_BUFFER_TOO_SMALL;
                     }
                 } else {
-                    size = (uint16_t) [valueString lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
                     error = CHIP_ERROR_NO_MEMORY;
                 }
-                // Increment size to account for null termination
-                size += 1;
+                size = static_cast<uint16_t>(decoded.length());
             }
         } else {
-            error = CHIP_ERROR_KEY_NOT_FOUND;
+            error = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
         }
     });
     return error;
 }
 
-void CHIPPersistentStorageDelegateBridge::AsyncSetKeyValue(const char * key, const char * value)
+CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
 {
+    std::string base64Value = StringToBase64(std::string(static_cast<const char *>(value), size));
+
     NSString * keyString = [NSString stringWithUTF8String:key];
-    NSString * valueString = [NSString stringWithUTF8String:value];
-    dispatch_async(mWorkQueue, ^{
-        NSLog(@"PersistentStorageDelegate Set Key %@, Value %@", keyString, valueString);
+    NSString * valueString = [NSString stringWithUTF8String:base64Value.c_str()];
+
+    dispatch_sync(mWorkQueue, ^{
+        NSLog(@"PersistentStorageDelegate Set Key %@", keyString);
 
         id<CHIPPersistentStorageDelegate> strongDelegate = mDelegate;
-        if (strongDelegate && mQueue) {
-            dispatch_async(mQueue, ^{
-                [strongDelegate CHIPSetKeyValue:keyString value:valueString handler:mSetStatusHandler];
-            });
+        if (strongDelegate) {
+            [strongDelegate CHIPSetKeyValue:keyString value:valueString];
         } else {
             [mDefaultPersistentStorage setObject:valueString forKey:keyString];
-            if (mSetStatusHandler) {
-                mSetStatusHandler(keyString, [CHIPError errorForCHIPErrorCode:0]);
-            }
         }
     });
+
+    // TODO: ideally the error from the dispatch should be returned
+    // however we expect to replace the storage delegate with KVS so for now
+    // we return no error (return used to be void due to async dispatch anyway)
+
+    return CHIP_NO_ERROR;
 }
 
-void CHIPPersistentStorageDelegateBridge::AsyncDeleteKeyValue(const char * key)
+CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncDeleteKeyValue(const char * key)
 {
     NSString * keyString = [NSString stringWithUTF8String:key];
-    dispatch_async(mWorkQueue, ^{
+    dispatch_sync(mWorkQueue, ^{
         NSLog(@"PersistentStorageDelegate Delete Key: %@", keyString);
 
         id<CHIPPersistentStorageDelegate> strongDelegate = mDelegate;
-        if (strongDelegate && mQueue) {
-            dispatch_async(mQueue, ^{
-                [strongDelegate CHIPDeleteKeyValue:keyString handler:mDeleteStatusHandler];
-            });
+        if (strongDelegate) {
+            [strongDelegate CHIPDeleteKeyValue:keyString];
         } else {
             [mDefaultPersistentStorage removeObjectForKey:keyString];
-            if (mDeleteStatusHandler) {
-                mDeleteStatusHandler(keyString, [CHIPError errorForCHIPErrorCode:0]);
-            }
         }
     });
+
+    // TODO: ideally the error from the dispatch should be returned
+    // however we expect to replace the storage delegate with KVS so for now
+    // we return no error (return used to be void due to async dispatch anyway)
+
+    return CHIP_NO_ERROR;
 }

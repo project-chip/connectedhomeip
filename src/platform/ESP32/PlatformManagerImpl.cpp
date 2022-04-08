@@ -25,9 +25,13 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <app-common/zap-generated/enums.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <platform/ESP32/DiagnosticDataProviderImpl.h>
+#include <platform/ESP32/ESP32Utils.h>
+#include <platform/ESP32/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 #include "esp_event.h"
 #include "esp_heap_caps_init.h"
@@ -55,60 +59,99 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
-    CHIP_ERROR err;
-    wifi_init_config_t cfg;
-    uint8_t ap_mac[6];
-    wifi_mode_t mode;
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
+
+    esp_err_t err;
+    // Arrange for CHIP-encapsulated ESP32 errors to be translated to text
+    Internal::ESP32Utils::RegisterESP32ErrorFormatter();
 
     // Make sure the LwIP core lock has been initialized
-    err = Internal::InitLwIPCoreLock();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(Internal::InitLwIPCoreLock());
 
     err = esp_netif_init();
-    SuccessOrExit(err);
+    if (err != ESP_OK)
+    {
+        goto exit;
+    }
 
     // Arrange for the ESP event loop to deliver events into the CHIP Device layer.
     err = esp_event_loop_create_default();
-    SuccessOrExit(err);
-
-    esp_netif_create_default_wifi_ap();
-    esp_netif_create_default_wifi_sta();
-
-    esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
-    SuccessOrExit(err);
-    esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
-    SuccessOrExit(err);
-
-    // Initialize the ESP WiFi layer.
-    cfg = WIFI_INIT_CONFIG_DEFAULT();
-    err = esp_wifi_init(&cfg);
-    SuccessOrExit(err);
-
-    esp_wifi_get_mode(&mode);
-    if ((mode == WIFI_MODE_AP) || (mode == WIFI_MODE_APSTA))
+    if (err != ESP_OK)
     {
-        esp_fill_random(ap_mac, sizeof(ap_mac));
-        /* Bit 0 of the first octet of MAC Address should always be 0 */
-        ap_mac[0] &= (uint8_t) ~0x01;
-        err = esp_wifi_set_mac(ESP_IF_WIFI_AP, ap_mac);
-        SuccessOrExit(err);
+        goto exit;
     }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    {
+        wifi_init_config_t cfg;
+        uint8_t ap_mac[6];
+        wifi_mode_t mode;
+
+        esp_netif_create_default_wifi_ap();
+        esp_netif_create_default_wifi_sta();
+
+        esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
+        esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
+        mStartTime = System::SystemClock().GetMonotonicTimestamp();
+
+        // Initialize the ESP WiFi layer.
+        cfg = WIFI_INIT_CONFIG_DEFAULT();
+        err = esp_wifi_init(&cfg);
+        if (err != ESP_OK)
+        {
+            goto exit;
+        }
+
+        esp_wifi_get_mode(&mode);
+        if ((mode == WIFI_MODE_AP) || (mode == WIFI_MODE_APSTA))
+        {
+            esp_fill_random(ap_mac, sizeof(ap_mac));
+            /* Bit 0 of the first octet of MAC Address should always be 0 */
+            ap_mac[0] &= (uint8_t) ~0x01;
+            err = esp_wifi_set_mac(WIFI_IF_AP, ap_mac);
+            if (err != ESP_OK)
+            {
+                goto exit;
+            }
+        }
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+    ReturnErrorOnFailure(chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16));
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack());
 
-    err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16);
-    SuccessOrExit(err);
-
+    ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 exit:
-    return err;
+    return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
 }
 
-CHIP_ERROR PlatformManagerImpl::InitLwIPCoreLock(void)
+CHIP_ERROR PlatformManagerImpl::_Shutdown()
 {
-    return Internal::InitLwIPCoreLock();
+    uint64_t upTime = 0;
+
+    if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
+    {
+        uint32_t totalOperationalHours = 0;
+
+        if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
+        {
+            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
+        }
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
+    }
+
+    return Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
 
 void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t eventBase, int32_t eventId, void * eventData)
@@ -141,47 +184,47 @@ void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t even
         switch (eventId)
         {
         case WIFI_EVENT_SCAN_DONE:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WifiStaScanDone, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WifiStaScanDone));
+            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiStaScanDone, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiStaScanDone));
             break;
         case WIFI_EVENT_STA_CONNECTED:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WifiStaConnected, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WifiStaConnected));
+            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiStaConnected, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiStaConnected));
             break;
         case WIFI_EVENT_STA_DISCONNECTED:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WifiStaDisconnected, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WifiStaDisconnected));
+            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiStaDisconnected, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiStaDisconnected));
             break;
         case WIFI_EVENT_STA_AUTHMODE_CHANGE:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WifiStaAuthModeChange, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WifiStaAuthModeChange));
+            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiStaAuthModeChange, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiStaAuthModeChange));
             break;
         case WIFI_EVENT_STA_WPS_ER_PIN:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WifiStaWpsErPin, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WifiStaWpsErPin));
+            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiStaWpsErPin, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiStaWpsErPin));
             break;
         case WIFI_EVENT_STA_WPS_ER_FAILED:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WifiStaWpsErFailed, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WifiStaWpsErFailed));
+            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiStaWpsErFailed, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiStaWpsErFailed));
             break;
         case WIFI_EVENT_AP_STACONNECTED:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WifiApStaConnected, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WifiApStaConnected));
+            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiApStaConnected, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiApStaConnected));
             break;
         case WIFI_EVENT_AP_STADISCONNECTED:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WifiApStaDisconnected, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WifiApStaDisconnected));
+            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiApStaDisconnected, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiApStaDisconnected));
             break;
         case WIFI_EVENT_AP_PROBEREQRECVED:
-            memcpy(&event.Platform.ESPSystemEvent.Data.WifiApProbeReqRecved, eventData,
-                   sizeof(event.Platform.ESPSystemEvent.Data.WifiApProbeReqRecved));
+            memcpy(&event.Platform.ESPSystemEvent.Data.WiFiApProbeReqRecved, eventData,
+                   sizeof(event.Platform.ESPSystemEvent.Data.WiFiApProbeReqRecved));
             break;
         default:
             break;
         }
     }
 
-    sInstance.PostEvent(&event);
+    sInstance.PostEventOrDie(&event);
 }
 
 } // namespace DeviceLayer

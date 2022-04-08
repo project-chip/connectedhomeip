@@ -19,9 +19,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include <errno.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <pthread.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -122,7 +122,9 @@ CHIP_ERROR MainLoop::EnsureStarted()
     }
 
     int pthreadErr = pthread_create(&mThread, nullptr, &MainLoop::Thread, reinterpret_cast<void *>(this));
-    int tmpErrno   = errno;
+#if CHIP_ERROR_LOGGING
+    int tmpErrno = errno;
+#endif // CHIP_ERROR_LOGGING
     if (pthreadErr != 0)
     {
         ChipLogError(DeviceLayer, "FAIL: pthread_create (%s) in %s", strerror(tmpErrno), __func__);

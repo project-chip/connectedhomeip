@@ -16,9 +16,10 @@
 # limitations under the License.
 #
 set -x
-env
+
+branch_name=$(git branch | grep "^*" | awk '{print $2}')
 
 git remote add upstream https://github.com/project-chip/connectedhomeip.git
-git fetch upstream pull/"$1"/head
+git fetch upstream restyled/"$branch_name"
 git merge --ff-only FETCH_HEAD
 git push

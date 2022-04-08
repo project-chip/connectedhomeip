@@ -46,7 +46,7 @@ template("chip_test_group") {
       deps += [ get_label_info(_test, "label_no_toolchain") + "_lib" ]
     }
 
-    if (_build_monolithic_library) {
+    if (_build_monolithic_library && chip_build_test_static_libraries) {
       complete_static_lib = true
     }
   }

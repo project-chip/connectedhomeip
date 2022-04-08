@@ -1,0 +1,51 @@
+{{> header}}
+
+#pragma once
+
+#include <app/util/basic-types.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+namespace Globals {
+namespace Attributes {
+
+{{#zcl_attributes_server}}
+{{#unless clusterRef}}
+namespace {{asUpperCamelCase label}} {
+static constexpr AttributeId Id = {{asMEI manufacturerCode code}};
+} // namespace {{asUpperCamelCase label}}
+
+{{/unless}}
+{{/zcl_attributes_server}}
+} // namespace Attributes
+} // namespace Globals
+
+
+{{#zcl_clusters}}
+{{#zcl_attributes_server}}
+{{#first}}
+namespace {{asUpperCamelCase parent.label}} {
+namespace Attributes {
+
+{{/first}}
+namespace {{asUpperCamelCase label}} {
+{{#if clusterRef}}
+static constexpr AttributeId Id = {{asMEI manufacturerCode code}};
+{{else}}
+static constexpr AttributeId Id = Globals::Attributes::{{asUpperCamelCase label}}::Id;
+{{/if}}
+} // namespace {{asUpperCamelCase label}}
+
+{{#last}}
+} // namespace Attributes
+} // namespace {{asUpperCamelCase parent.label}}
+
+{{/last}}
+{{/zcl_attributes_server}}
+{{/zcl_clusters}}
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip

@@ -14,7 +14,7 @@
 #    limitations under the License.
 #
 
-from ctypes import CFUNCTYPE, py_object, c_char_p, c_uint8
+from ctypes import CFUNCTYPE, c_char_p, c_uint8
 
 # Log callback: void(category, module, message)
 LogRedirectCallback_t = CFUNCTYPE(None, c_uint8, c_char_p, c_char_p)
