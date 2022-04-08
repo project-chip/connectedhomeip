@@ -1369,9 +1369,10 @@ inline bool IsTimeGreaterThanEqual(const mbedtls_x509_time * const timeA, const 
     RETURN_STRICTLY_GREATER_IF_DIFFERENT(day);
     RETURN_STRICTLY_GREATER_IF_DIFFERENT(hour);
     RETURN_STRICTLY_GREATER_IF_DIFFERENT(min);
+    RETURN_STRICTLY_GREATER_IF_DIFFERENT(sec);
 
     // all above are equal
-    return timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(sec) >= timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(sec);
+    return true;
 }
 
 CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & referenceCertificate, const ByteSpan & toBeEvaluatedCertificate)
