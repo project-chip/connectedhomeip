@@ -620,6 +620,8 @@ IlluminanceMeasurement
 IM
 imager
 imagetool
+ImageURI
+imageUri
 img
 Impl
 ImplClass

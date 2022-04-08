@@ -67,7 +67,12 @@ CHIP_ERROR MakeURI(NodeId nodeId, CharSpan fileDesignator, MutableCharSpan & uri
     char nodeIdHex[sizeof(NodeId) * 2];
     ReturnErrorOnFailure(Encoding::BytesToUppercaseHexBuffer(nodeIdBytes, sizeof(nodeIdBytes), nodeIdHex, sizeof(nodeIdHex)));
 
-    Encoding::BufferWriter writer(Uint8::from_char(uri.data()), uri.size());
+    char * buffer     = uri.data();
+    size_t bufferSize = uri.size();
+    memset(buffer, 0, bufferSize);
+
+    // Reduce the buffer writer size by one to reserve the last byte for the null-terminator
+    Encoding::BufferWriter writer(Uint8::from_char(buffer), bufferSize - 1);
     writer.Put(kScheme, kSchemeLen);
     writer.Put(nodeIdHex, sizeof(nodeIdHex));
     writer.Put("/");
