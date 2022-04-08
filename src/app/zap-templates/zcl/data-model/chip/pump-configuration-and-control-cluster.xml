@@ -54,8 +54,16 @@ limitations under the License.
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0020" define="OPERATION_MODE" type="PumpOperationMode" min="0x00" max="0x03" writable="true" default="0x00" optional="false">OperationMode</attribute>
-    <attribute side="server" code="0x0021" define="CONTROL_MODE" type="PumpControlMode" min="0x00" max="0x07" writable="true" default="0x00" optional="true">ControlMode</attribute>
+    <attribute side="server" code="0x0020" define="OPERATION_MODE" type="PumpOperationMode" min="0x00" max="0x03" writable="true" default="0x00" optional="false">
+      <description>OperationMode</description>
+      <access op="read" privilege="view"/>
+      <access op="write" privilege="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0021" define="CONTROL_MODE" type="PumpControlMode" min="0x00" max="0x07" writable="true" default="0x00" optional="true">
+      <description>ControlMode</description>
+      <access op="read" privilege="view"/>
+      <access op="write" privilege="manage"/>
+    </attribute>
     <attribute side="server" code="0x0022" define="PUMP_ALARM_MASK" type="BITMAP16" writable="false" default="0x0000" optional="true">AlarmMask</attribute>
 
     <event side="server" code="0x00" priority="info" name="SupplyVoltageLow">
