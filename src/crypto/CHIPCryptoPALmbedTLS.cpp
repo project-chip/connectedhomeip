@@ -1351,27 +1351,28 @@ exit:
 
 inline bool IsTimeGreaterThanEqual(const mbedtls_x509_time * const timeA, const mbedtls_x509_time * const timeB)
 {
-    return timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(year) > timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(year) ||
-        (timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(year) == timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(year) &&
-         timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(mon) > timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(mon)) ||
-        (timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(year) == timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(year) &&
-         timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(mon) == timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(mon) &&
-         timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(day) > timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(day)) ||
-        (timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(year) == timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(year) &&
-         timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(mon) == timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(mon) &&
-         timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(day) == timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(day) &&
-         timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(hour) > timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(hour)) ||
-        (timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(year) == timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(year) &&
-         timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(mon) == timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(mon) &&
-         timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(day) == timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(day) &&
-         timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(hour) == timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(hour) &&
-         timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(min) > timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(min)) ||
-        (timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(year) == timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(year) &&
-         timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(mon) == timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(mon) &&
-         timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(day) == timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(day) &&
-         timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(hour) == timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(hour) &&
-         timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(min) == timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(min) &&
-         timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(sec) >= timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(sec));
+
+    // checks if two values are different and if yes, then returns first > second.
+#define RETURN_STRICTLY_GREATER_IF_DIFFERENT(component)                                                                            \
+    {                                                                                                                              \
+        auto valueA = timeA->CHIP_CRYPTO_PAL_PRIVATE_X509(component);                                                              \
+        auto valueB = timeB->CHIP_CRYPTO_PAL_PRIVATE_X509(component);                                                              \
+                                                                                                                                   \
+        if (valueA != valueB)                                                                                                      \
+        {                                                                                                                          \
+            return valueA > valueB;                                                                                                \
+        }                                                                                                                          \
+    }
+
+    RETURN_STRICTLY_GREATER_IF_DIFFERENT(year);
+    RETURN_STRICTLY_GREATER_IF_DIFFERENT(mon);
+    RETURN_STRICTLY_GREATER_IF_DIFFERENT(day);
+    RETURN_STRICTLY_GREATER_IF_DIFFERENT(hour);
+    RETURN_STRICTLY_GREATER_IF_DIFFERENT(min);
+    RETURN_STRICTLY_GREATER_IF_DIFFERENT(sec);
+
+    // all above are equal
+    return true;
 }
 
 CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & referenceCertificate, const ByteSpan & toBeEvaluatedCertificate)
