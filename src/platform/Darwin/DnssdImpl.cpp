@@ -383,9 +383,19 @@ CHIP_ERROR Browse(void * context, DnssdBrowseCallback callback, uint32_t interfa
     std::string regtype(type);
     std::string subtypeDelimiter = "._sub.";
     size_t position              = regtype.find(subtypeDelimiter);
+    // if we have more in the string (a subtype) then append it to the end
     if (position != std::string::npos)
     {
-        regtype = regtype.substr(position + subtypeDelimiter.size()) + "," + regtype.substr(0, position);
+        if (regtype.rfind("_", position) == 0)
+        {
+            regtype = regtype.substr(position + subtypeDelimiter.size()) + "," + regtype.substr(0, position);
+        }
+        else
+        {
+            // if it doesn't start with "_" then don't include the instance name
+            regtype = regtype.substr(position + subtypeDelimiter.size());
+            ChipLogProgress(Controller, "Browse instance removed, type=%s regtype=%s", type, regtype.c_str());
+        }
     }
 
     sdCtx = chip::Platform::New<BrowseContext>(context, callback, protocol);
