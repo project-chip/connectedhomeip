@@ -102,6 +102,11 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
  */
 - (void)shutdown;
 
+/**
+ * Converts a given X.509v3 certificate into a Matter certificate.
+ */
+- (NSData *)convertX509CertToMatterCert:(NSData *) x509Cert;
+
 @end
 
 NS_ASSUME_NONNULL_END
