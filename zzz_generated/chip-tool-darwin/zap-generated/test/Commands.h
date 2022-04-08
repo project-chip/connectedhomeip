@@ -30653,36 +30653,76 @@ public:
             err = TestWrite1ToTheControlModeAttributeToDut_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Write 2 to the ControlMode attribute to DUT\n");
-            if (ShouldSkip("A_CONTROLMODE")) {
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Reads the attribute: EffectiveControlMode\n");
+            if (ShouldSkip("A_EFFECTIVECONTROLMODE")) {
                 NextTest();
                 return;
             }
-            err = TestWrite2ToTheControlModeAttributeToDut_6();
+            err = TestReadsTheAttributeEffectiveControlMode_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Write 3 to the ControlMode attribute to DUT\n");
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Write 2 to the ControlMode attribute to DUT\n");
             if (ShouldSkip("A_CONTROLMODE")) {
                 NextTest();
                 return;
             }
-            err = TestWrite3ToTheControlModeAttributeToDut_7();
+            err = TestWrite2ToTheControlModeAttributeToDut_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Write 5 to the ControlMode attribute to DUT\n");
-            if (ShouldSkip("A_CONTROLMODE")) {
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Reads the attribute: EffectiveControlMode\n");
+            if (ShouldSkip("A_EFFECTIVECONTROLMODE")) {
                 NextTest();
                 return;
             }
-            err = TestWrite5ToTheControlModeAttributeToDut_8();
+            err = TestReadsTheAttributeEffectiveControlMode_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Write 7 to the ControlMode attribute to DUT\n");
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Write 3 to the ControlMode attribute to DUT\n");
             if (ShouldSkip("A_CONTROLMODE")) {
                 NextTest();
                 return;
             }
-            err = TestWrite7ToTheControlModeAttributeToDut_9();
+            err = TestWrite3ToTheControlModeAttributeToDut_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Reads the attribute: EffectiveControlMode\n");
+            if (ShouldSkip("A_EFFECTIVECONTROLMODE")) {
+                NextTest();
+                return;
+            }
+            err = TestReadsTheAttributeEffectiveControlMode_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Write 5 to the ControlMode attribute to DUT\n");
+            if (ShouldSkip("A_CONTROLMODE")) {
+                NextTest();
+                return;
+            }
+            err = TestWrite5ToTheControlModeAttributeToDut_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Reads the attribute: EffectiveControlMode\n");
+            if (ShouldSkip("A_EFFECTIVECONTROLMODE")) {
+                NextTest();
+                return;
+            }
+            err = TestReadsTheAttributeEffectiveControlMode_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Write 7 to the ControlMode attribute to DUT\n");
+            if (ShouldSkip("A_CONTROLMODE")) {
+                NextTest();
+                return;
+            }
+            err = TestWrite7ToTheControlModeAttributeToDut_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Reads the attribute: EffectiveControlMode\n");
+            if (ShouldSkip("A_EFFECTIVECONTROLMODE")) {
+                NextTest();
+                return;
+            }
+            err = TestReadsTheAttributeEffectiveControlMode_14();
             break;
         }
 
@@ -30699,7 +30739,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 10;
+    const uint16_t mTestCount = 15;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -30826,7 +30866,31 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWrite2ToTheControlModeAttributeToDut_6()
+    CHIP_ERROR TestReadsTheAttributeEffectiveControlMode_6()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEffectiveControlModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads the attribute: EffectiveControlMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("EffectiveControlMode", actualValue, 1));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWrite2ToTheControlModeAttributeToDut_7()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
@@ -30848,7 +30912,31 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWrite3ToTheControlModeAttributeToDut_7()
+    CHIP_ERROR TestReadsTheAttributeEffectiveControlMode_8()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEffectiveControlModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads the attribute: EffectiveControlMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("EffectiveControlMode", actualValue, 2));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWrite3ToTheControlModeAttributeToDut_9()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
@@ -30870,7 +30958,31 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWrite5ToTheControlModeAttributeToDut_8()
+    CHIP_ERROR TestReadsTheAttributeEffectiveControlMode_10()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEffectiveControlModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads the attribute: EffectiveControlMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("EffectiveControlMode", actualValue, 3));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWrite5ToTheControlModeAttributeToDut_11()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
@@ -30892,7 +31004,31 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWrite7ToTheControlModeAttributeToDut_9()
+    CHIP_ERROR TestReadsTheAttributeEffectiveControlMode_12()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEffectiveControlModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads the attribute: EffectiveControlMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("EffectiveControlMode", actualValue, 5));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWrite7ToTheControlModeAttributeToDut_13()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
@@ -30910,6 +31046,30 @@ private:
 
                                       NextTest();
                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsTheAttributeEffectiveControlMode_14()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEffectiveControlModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads the attribute: EffectiveControlMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("EffectiveControlMode", actualValue, 7));
+            }
+
+            NextTest();
+        }];
 
         return CHIP_NO_ERROR;
     }
