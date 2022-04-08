@@ -37,14 +37,6 @@ typedef DataModel::Nullable<Percent> NPercent;
 typedef DataModel::Nullable<Percent100ths> NPercent100ths;
 typedef DataModel::Nullable<uint16_t> NAbsolute;
 
-struct Mode
-{
-    uint8_t motorDirReversed : 1; // bit 0
-    uint8_t calibrationMode : 1;  // bit 1
-    uint8_t maintenanceMode : 1;  // bit 2
-    uint8_t ledDisplay : 1;       // bit 3
-};
-static_assert(sizeof(Mode) == sizeof(uint8_t), "Mode Size is not correct");
 // Match directly with OperationalStatus 2 bits Fields
 enum class OperationalState : uint8_t
 {
@@ -120,8 +112,9 @@ Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths
 void EndProductTypeSet(chip::EndpointId endpoint, EndProductType type);
 EndProductType EndProductTypeGet(chip::EndpointId endpoint);
 
-void ModeSet(chip::EndpointId endpoint, const Mode & mode);
-const Mode ModeGet(chip::EndpointId endpoint);
+void ModePrint(const chip::BitFlags<Mode> & mode);
+void ModeSet(chip::EndpointId endpoint, chip::BitFlags<Mode> & mode);
+chip::BitFlags<Mode> ModeGet(chip::EndpointId endpoint);
 
 void SafetyStatusSet(chip::EndpointId endpoint, SafetyStatus & status);
 const SafetyStatus SafetyStatusGet(chip::EndpointId endpoint);

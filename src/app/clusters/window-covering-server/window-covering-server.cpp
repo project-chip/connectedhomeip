@@ -264,23 +264,50 @@ EndProductType EndProductTypeGet(chip::EndpointId endpoint)
     return value;
 }
 
-void ModeSet(chip::EndpointId endpoint, const Mode & mode)
+
+
+
+void ModePrint(const chip::BitFlags<Mode> & mode)
 {
-    uint8_t value = (mode.motorDirReversed ? 0x01 : 0) | (mode.calibrationMode ? 0x02 : 0) | (mode.maintenanceMode ? 0x04 : 0) |
-        (mode.ledDisplay ? 0x08 : 0);
-    Attributes::Mode::Set(endpoint, value);
+    emberAfWindowCoveringClusterPrint("Mode 0x%02X MotorDirReversed=%u LedFeedback=%u Maintenance=%u Calibration=%u",
+        mode.Raw(),
+        mode.Has(Mode::kMotorDirectionReversed),
+        mode.Has(Mode::kLedFeedback),
+        mode.Has(Mode::kMaintenanceMode),
+        mode.Has(Mode::kCalibrationMode));
 }
 
-const Mode ModeGet(chip::EndpointId endpoint)
+void ModeSet(chip::EndpointId endpoint, chip::BitFlags<Mode> & newMode)
 {
-    uint8_t value = 0;
-    Mode mode;
+    chip::BitFlags<ConfigStatus> newStatus;
 
-    Attributes::Mode::Get(endpoint, &value);
-    mode.motorDirReversed = (value & 0x01) ? 1 : 0;
-    mode.calibrationMode  = (value & 0x02) ? 1 : 0;
-    mode.maintenanceMode  = (value & 0x04) ? 1 : 0;
-    mode.ledDisplay       = (value & 0x08) ? 1 : 0;
+    chip::BitFlags<ConfigStatus> oldStatus = ConfigStatusGet(endpoint);
+    chip::BitFlags<Mode> oldMode = ModeGet(endpoint);
+
+    newStatus = oldStatus;
+
+    // Attribute: ConfigStatus reflects the following current mode flags
+    newStatus.Set(ConfigStatus::kOperational, !newMode.HasAny(Mode::kMaintenanceMode, Mode::kCalibrationMode));
+    newStatus.Set(ConfigStatus::kLiftMovementReversed, newMode.Has(Mode::kMotorDirectionReversed));
+
+    // Verify only one mode supported at once and maintenance lock goes over calibration
+    if (newMode.HasAll(Mode::kMaintenanceMode, Mode::kCalibrationMode))
+    {
+        newMode.Clear(Mode::kCalibrationMode);
+    }
+
+    if (oldMode != newMode)
+        Attributes::Mode::Set(endpoint, newMode);
+
+    if (oldStatus != newStatus)
+        ConfigStatusSet(endpoint, newStatus);
+}
+
+chip::BitFlags<Mode> ModeGet(chip::EndpointId endpoint)
+{
+    chip::BitFlags<Mode> mode;
+
+    Attributes::Mode::Get(endpoint, &mode);
     return mode;
 }
 
@@ -580,6 +607,7 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
 {
     // all-cluster-app: simulation for the CI testing
     // otherwise it is defined for manufacturer specific implementation */
+    BitFlags<Mode> mode;
     BitFlags<ConfigStatus> configStatus;
     NPercent100ths current, target;
     OperationalStatus prevOpStatus = OperationalStatusGet(endpoint);
@@ -625,6 +653,12 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
         Attributes::TargetPositionTiltPercent100ths::Get(endpoint, target);
         Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, current);
         opStatus.tilt = ComputeOperationalState(target, current);
+        break;
+    /* Mode change is either internal from the application or external from a write request */
+    case Attributes::Mode::Id:
+        mode = ModeGet(endpoint);
+        ModePrint(mode);
+        ModeSet(endpoint, mode); //refilter mode if needed
         break;
     case Attributes::ConfigStatus::Id:
         configStatus = ConfigStatusGet(endpoint);
