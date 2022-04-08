@@ -15608,8 +15608,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::AcRefrigerantType::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, acRefrigerantType));
         break;
-    case Attributes::AcCompressor::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acCompressor));
+    case Attributes::AcCompressorType::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acCompressorType));
         break;
     case Attributes::AcErrorCode::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, acErrorCode));

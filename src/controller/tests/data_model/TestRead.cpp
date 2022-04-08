@@ -212,7 +212,6 @@ private:
     // of reads in parallel and wait for them all to succeed.
     static void SubscribeThenReadHelper(nlTestSuite * apSuite, TestContext & aCtx, size_t aSubscribeCount, size_t aReadCount);
 
-private:
     bool mEmitSubscriptionError      = false;
     int32_t mNumActiveSubscriptions  = 0;
     bool mAlterSubscriptionIntervals = false;

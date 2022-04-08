@@ -157,12 +157,12 @@ private:
     // ProcessGroupAttributeDataIBs.
     CHIP_ERROR DeliverFinalListWriteEndForGroupWrite(bool writeWasSuccessful);
 
-private: // ExchangeDelegate
+private:
+    // ExchangeDelegate
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
-private:
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     WriteResponseMessage::Builder mWriteResponseBuilder;
     State mState           = State::Uninitialized;

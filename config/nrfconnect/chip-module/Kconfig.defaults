@@ -329,4 +329,25 @@ config FLASH_SHELL
     bool
     default n
 
+# SoC series related configuration
+
+if SOC_SERIES_NRF52X
+
+# Increase maximum data length of PDU supported in the Controller
+config BT_CTLR_DATA_LENGTH_MAX
+    int
+    default 251
+
+endif # SOC_SERIES_NRF52X
+
+if SOC_SERIES_NRF53X
+
+# Generate random numbers using Xoroshiro algorithm instead of direct calls
+# to the cryptocell library to workaround firmware hangs.
+choice RNG_GENERATOR_CHOICE
+    default XOROSHIRO_RANDOM_GENERATOR
+endchoice
+
+endif # SOC_SERIES_NRF53X
+
 endif

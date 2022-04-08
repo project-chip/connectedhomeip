@@ -238,7 +238,7 @@ struct TestData
     // `sizes[]` is a zero-terminated sequence of packet buffer sizes.
     // If total length supplied is not large enough for at least the PacketHeader and length field,
     // the last buffer will be made larger.
-    TestData() : mHandle(), mPayload(nullptr), mTotalLength(0), mMessageLength(0), mMessageOffset(0) {}
+    TestData() : mPayload(nullptr), mTotalLength(0), mMessageLength(0), mMessageOffset(0) {}
     ~TestData() { Free(); }
     bool Init(const uint16_t sizes[]);
     void Free();

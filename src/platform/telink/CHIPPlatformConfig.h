@@ -30,11 +30,6 @@
 #define CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE const char *
 #define CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH 2
 
-#define CHIP_CONFIG_TIME_ENABLE_CLIENT 1
-#define CHIP_CONFIG_TIME_ENABLE_SERVER 0
-
-#define CHIP_CONFIG_ERROR_CLASS 1
-
 /**
  *  @def CHIP_CONFIG_MAX_FABRICS
  *
@@ -50,10 +45,6 @@
 // ==================== Security Adaptations ====================
 
 // ==================== General Configuration Overrides ====================
-
-#ifndef CHIP_CONFIG_MAX_PEER_NODES
-#define CHIP_CONFIG_MAX_PEER_NODES 16
-#endif // CHIP_CONFIG_MAX_PEER_NODES
 
 #ifndef CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
 #define CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS 16

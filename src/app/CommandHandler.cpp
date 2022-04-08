@@ -413,7 +413,9 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
             err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
             if (err != CHIP_NO_ERROR)
             {
-                // TODO: handle errors that aren't CHIP_ERROR_ACCESS_DENIED, etc.
+                // NOTE: an expected error is CHIP_ERROR_ACCESS_DENIED, but there could be other unexpected errors;
+                // therefore, keep processing subsequent commands, and if any errors continue, those subsequent
+                // commands will likewise fail.
                 continue;
             }
         }

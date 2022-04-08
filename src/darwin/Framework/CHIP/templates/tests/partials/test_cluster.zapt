@@ -24,7 +24,12 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
 
 {{#if (isTestOnlyCluster cluster)}}
     dispatch_queue_t queue = dispatch_get_main_queue();
-    {{command}}(expectation, queue{{#chip_tests_item_parameters}}, {{#if (isString type)}}@"{{/if}}{{> defined_value}}{{#if (isString type)}}"{{/if}}{{/chip_tests_item_parameters}});
+    {{#if (isStrEqual command "UserPrompt")}}
+      {{! We only support the first arg, and our impl is a no-op anyway. }}
+      {{command}}(expectation, queue{{#chip_tests_item_parameters}}{{#first}}, {{#if (isString type)}}@"{{/if}}{{> defined_value}}{{#if (isString type)}}"{{/if}}{{/first}}{{/chip_tests_item_parameters}});
+    {{else}}
+      {{command}}(expectation, queue{{#chip_tests_item_parameters}}, {{#if (isString type)}}@"{{/if}}{{> defined_value}}{{#if (isString type)}}"{{/if}}{{/chip_tests_item_parameters}});
+    {{/if}}
 {{else}}
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
