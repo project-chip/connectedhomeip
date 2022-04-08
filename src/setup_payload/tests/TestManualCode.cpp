@@ -128,7 +128,7 @@ void TestDecimalRepresentation_AllZeros(nlTestSuite * inSuite, void * inContext)
     payload.setUpPINCode  = 0;
     payload.discriminator = 0;
 
-    std::string expectedResult = "";
+    std::string expectedResult;
 
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
 }

@@ -65,7 +65,9 @@
 #include <app/data-model/Encode.h>
 
 #include <limits>
-
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#include <app/server/Server.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 extern "C" void otSysProcessDrivers(otInstance * aInstance);
 
 #if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
@@ -215,6 +217,32 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
 
 #endif // CHIP_DETAIL_LOGGING
 
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+        if (event->ThreadStateChange.RoleChanged || event->ThreadStateChange.AddressChanged)
+        {
+            bool isInterfaceUp;
+            isInterfaceUp = GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadInterfaceUpNoLock();
+            // Post an event signaling the change in Thread interface connectivity state.
+            {
+                ChipDeviceEvent event;
+                event.Clear();
+                event.Type                            = DeviceEventType::kThreadConnectivityChange;
+                event.ThreadConnectivityChange.Result = (isInterfaceUp) ? kConnectivity_Established : kConnectivity_Lost;
+                CHIP_ERROR status                     = PlatformMgr().PostEvent(&event);
+                if (status != CHIP_NO_ERROR)
+                {
+                    ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
+                }
+            }
+
+            // Refresh Multicast listening
+            if (GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadAttachedNoLock())
+            {
+                ChipLogDetail(DeviceLayer, "Thread Attached updating Multicast address");
+                Server::GetInstance().RejoinExistingMulticastGroups();
+            }
+        }
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
         Impl()->UnlockThreadStack();
     }
 }
@@ -304,7 +332,7 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadProvisioned(v
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadProvision(ByteSpan & netInfo)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadProvision(Thread::OperationalDataset & dataset)
 {
     VerifyOrReturnError(Impl()->IsThreadProvisioned(), CHIP_ERROR_INCORRECT_STATE);
     otOperationalDatasetTlvs datasetTlv;
@@ -317,8 +345,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadProvis
         return MapOpenThreadError(otErr);
     }
 
-    ReturnErrorOnFailure(mActiveDataset.Init(ByteSpan(datasetTlv.mTlvs, datasetTlv.mLength)));
-    netInfo = mActiveDataset.AsByteSpan();
+    ReturnErrorOnFailure(dataset.Init(ByteSpan(datasetTlv.mTlvs, datasetTlv.mLength)));
 
     return CHIP_NO_ERROR;
 }
@@ -1853,24 +1880,23 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_UpdateNetworkStatus()
 
     ByteSpan datasetTLV;
     Thread::OperationalDataset dataset;
-    uint8_t extpanid[chip::Thread::kSizeExtendedPanId];
+    ByteSpan extpanid;
 
     // If we have not provisioned any Thread network, return the status from last network scan,
     // If we have provisioned a network, we assume the ot-br-posix is activitely connecting to that network.
-    ReturnOnFailure(ThreadStackMgrImpl().GetThreadProvision(datasetTLV));
-    ReturnOnFailure(dataset.Init(datasetTLV));
+    ReturnOnFailure(ThreadStackMgrImpl().GetThreadProvision(dataset));
     // The Thread network is not enabled, but has a different extended pan id.
-    ReturnOnFailure(dataset.GetExtendedPanId(extpanid));
+    ReturnOnFailure(dataset.GetExtendedPanIdAsByteSpan(extpanid));
     // If we don't have a valid dataset, we are not attempting to connect the network.
 
     // We have already connected to the network, thus return success.
     if (ThreadStackMgrImpl().IsThreadAttached())
     {
-        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(ByteSpan(extpanid)), NullOptional);
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(extpanid), NullOptional);
     }
     else
     {
-        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kNetworkNotFound, MakeOptional(ByteSpan(extpanid)),
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kNetworkNotFound, MakeOptional(extpanid),
                                                          MakeOptional(static_cast<int32_t>(OT_ERROR_DETACHED)));
     }
 }

@@ -32,7 +32,6 @@
 
 // Security and Authentication enabled for release build.
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
-#define CHIP_CONFIG_REQUIRE_AUTH 1
 
 #else // development build
 
@@ -42,7 +41,6 @@
 // WARNING: These options make it possible to circumvent basic CHIP security functionality,
 // including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
-#define CHIP_CONFIG_REQUIRE_AUTH 0
 
 // Use a default pairing code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021

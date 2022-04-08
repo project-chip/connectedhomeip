@@ -628,9 +628,6 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     err = Server::GetInstance().GetFabricTable().AddNewFabric(gFabricBeingCommissioned, &fabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-    err = Server::GetInstance().GetFabricTable().Store(fabricIndex);
-    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
-
     // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
     // Index just allocated.
     err = failSafeContext.SetAddNocCommandInvoked(fabricIndex);

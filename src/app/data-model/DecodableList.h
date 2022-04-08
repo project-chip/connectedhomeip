@@ -33,6 +33,18 @@ namespace DataModel {
  * This class provides an iteratable decoder of list items within TLV payloads
  * such that no memory has to be provided ahead of time to store the entirety of the decoded
  * list contents.
+ *
+ * Typical use of a DecodableList looks like this:
+ *
+ *    auto iter = list.begin();
+ *    while (iter.Next()) {
+ *        auto & entry = iter.GetValue();
+ *        // Do whatever with entry
+ *    }
+ *    CHIP_ERROR err = iter.GetStatus();
+ *    // If err is failure, decoding failed somewhere along the way.  Some valid
+ *    // entries may have been processed already.
+ *
  */
 template <typename T>
 class DecodableList

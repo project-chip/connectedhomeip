@@ -133,7 +133,7 @@ static CHIP_ERROR ConfigSetSetupDiscriminator(char * argv)
 {
     CHIP_ERROR error;
     streamer_t * sout           = streamer_get();
-    uint16_t setupDiscriminator = strtoull(argv, NULL, 10);
+    uint16_t setupDiscriminator = strtoull(argv, nullptr, 10);
 
     VerifyOrReturnError(setupDiscriminator != 0 && setupDiscriminator < chip::kMaxDiscriminatorValue, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -211,7 +211,6 @@ void RegisterConfigCommands()
 
     // Register the root `config` command with the top-level shell.
     Engine::Root().RegisterCommands(&sConfigComand, 1);
-    return;
 }
 
 } // namespace Shell

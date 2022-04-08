@@ -5866,6 +5866,15 @@ public class ChipClusters {
       clearCredential(chipClusterPtr, callback, credential, timedInvokeTimeoutMs);
     }
 
+    public void clearHolidaySchedule(DefaultClusterCallback callback, Integer holidayIndex) {
+      clearHolidaySchedule(chipClusterPtr, callback, holidayIndex, null);
+    }
+
+    public void clearHolidaySchedule(
+        DefaultClusterCallback callback, Integer holidayIndex, int timedInvokeTimeoutMs) {
+      clearHolidaySchedule(chipClusterPtr, callback, holidayIndex, timedInvokeTimeoutMs);
+    }
+
     public void clearUser(
         DefaultClusterCallback callback, Integer userIndex, int timedInvokeTimeoutMs) {
       clearUser(chipClusterPtr, callback, userIndex, timedInvokeTimeoutMs);
@@ -5908,6 +5917,18 @@ public class ChipClusters {
         ChipStructs.DoorLockClusterDlCredential credential,
         int timedInvokeTimeoutMs) {
       getCredentialStatus(chipClusterPtr, callback, credential, timedInvokeTimeoutMs);
+    }
+
+    public void getHolidaySchedule(
+        GetHolidayScheduleResponseCallback callback, Integer holidayIndex) {
+      getHolidaySchedule(chipClusterPtr, callback, holidayIndex, null);
+    }
+
+    public void getHolidaySchedule(
+        GetHolidayScheduleResponseCallback callback,
+        Integer holidayIndex,
+        int timedInvokeTimeoutMs) {
+      getHolidaySchedule(chipClusterPtr, callback, holidayIndex, timedInvokeTimeoutMs);
     }
 
     public void getUser(GetUserResponseCallback callback, Integer userIndex) {
@@ -5968,6 +5989,39 @@ public class ChipClusters {
           userIndex,
           userStatus,
           userType,
+          timedInvokeTimeoutMs);
+    }
+
+    public void setHolidaySchedule(
+        DefaultClusterCallback callback,
+        Integer holidayIndex,
+        Long localStartTime,
+        Long localEndTime,
+        Integer operatingMode) {
+      setHolidaySchedule(
+          chipClusterPtr,
+          callback,
+          holidayIndex,
+          localStartTime,
+          localEndTime,
+          operatingMode,
+          null);
+    }
+
+    public void setHolidaySchedule(
+        DefaultClusterCallback callback,
+        Integer holidayIndex,
+        Long localStartTime,
+        Long localEndTime,
+        Integer operatingMode,
+        int timedInvokeTimeoutMs) {
+      setHolidaySchedule(
+          chipClusterPtr,
+          callback,
+          holidayIndex,
+          localStartTime,
+          localEndTime,
+          operatingMode,
           timedInvokeTimeoutMs);
     }
 
@@ -6085,6 +6139,12 @@ public class ChipClusters {
         @Nullable ChipStructs.DoorLockClusterDlCredential credential,
         @Nullable Integer timedInvokeTimeoutMs);
 
+    private native void clearHolidaySchedule(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        Integer holidayIndex,
+        @Nullable Integer timedInvokeTimeoutMs);
+
     private native void clearUser(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
@@ -6109,6 +6169,12 @@ public class ChipClusters {
         long chipClusterPtr,
         GetCredentialStatusResponseCallback Callback,
         ChipStructs.DoorLockClusterDlCredential credential,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void getHolidaySchedule(
+        long chipClusterPtr,
+        GetHolidayScheduleResponseCallback Callback,
+        Integer holidayIndex,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void getUser(
@@ -6146,6 +6212,15 @@ public class ChipClusters {
         @Nullable Integer userIndex,
         @Nullable Integer userStatus,
         @Nullable Integer userType,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void setHolidaySchedule(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        Integer holidayIndex,
+        Long localStartTime,
+        Long localEndTime,
+        Integer operatingMode,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void setUser(
@@ -6199,6 +6274,17 @@ public class ChipClusters {
           Boolean credentialExists,
           @Nullable Integer userIndex,
           @Nullable Integer nextCredentialIndex);
+
+      void onError(Exception error);
+    }
+
+    public interface GetHolidayScheduleResponseCallback {
+      void onSuccess(
+          Integer holidayIndex,
+          Integer status,
+          Optional<Long> localStartTime,
+          Optional<Long> localEndTime,
+          Optional<Integer> operatingMode);
 
       void onError(Exception error);
     }
@@ -11415,13 +11501,15 @@ public class ChipClusters {
     }
 
     public void scanNetworks(
-        ScanNetworksResponseCallback callback, byte[] ssid, Optional<Long> breadcrumb) {
+        ScanNetworksResponseCallback callback,
+        @Nullable Optional<byte[]> ssid,
+        Optional<Long> breadcrumb) {
       scanNetworks(chipClusterPtr, callback, ssid, breadcrumb, null);
     }
 
     public void scanNetworks(
         ScanNetworksResponseCallback callback,
-        byte[] ssid,
+        @Nullable Optional<byte[]> ssid,
         Optional<Long> breadcrumb,
         int timedInvokeTimeoutMs) {
       scanNetworks(chipClusterPtr, callback, ssid, breadcrumb, timedInvokeTimeoutMs);
@@ -11467,12 +11555,13 @@ public class ChipClusters {
     private native void scanNetworks(
         long chipClusterPtr,
         ScanNetworksResponseCallback Callback,
-        byte[] ssid,
+        @Nullable Optional<byte[]> ssid,
         Optional<Long> breadcrumb,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface ConnectNetworkResponseCallback {
-      void onSuccess(Integer networkingStatus, String debugText, Long errorValue);
+      void onSuccess(
+          Integer networkingStatus, Optional<String> debugText, @Nullable Long errorValue);
 
       void onError(Exception error);
     }
@@ -11487,7 +11576,7 @@ public class ChipClusters {
     public interface ScanNetworksResponseCallback {
       void onSuccess(
           Integer networkingStatus,
-          String debugText,
+          Optional<String> debugText,
           Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
               wiFiScanResults,
           Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>

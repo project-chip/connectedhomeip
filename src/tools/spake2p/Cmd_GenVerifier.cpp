@@ -209,7 +209,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
 
 bool Cmd_GenVerifier(int argc, char * argv[])
 {
-    FILE * outFile = NULL;
+    FILE * outFile = nullptr;
 
     if (argc == 1)
     {
@@ -250,7 +250,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
     if (strcmp(gOutFileName, "-") != 0)
     {
         outFile = fopen(gOutFileName, "w+b");
-        if (outFile == NULL)
+        if (outFile == nullptr)
         {
             fprintf(stderr, "Unable to create file %s\n%s\n", gOutFileName, strerror(errno));
             return false;
