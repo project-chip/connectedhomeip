@@ -90,7 +90,7 @@ server cluster AccessControl = 31 {
   //
   // access(read: view, write: operate)
   //
-  // These defaults can be overriden to any of view/operate/manage/administer roles.
+  // These defaults can be overridden to any of view/operate/manage/administer roles.
   attribute access(read: manage, write: administer) int32u customAcl = 3;
 
   // attributes may be read-only as well
