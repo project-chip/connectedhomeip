@@ -155,26 +155,26 @@ class TestParser(unittest.TestCase):
                     attributes=[
                         Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
                             data_type=DataType(name="int8s"), code=1, name="attr1"),
-                            readacl = AccessPrivilege.VIEW,
-                            writeacl = AccessPrivilege.OPERATE
+                            readacl=AccessPrivilege.VIEW,
+                            writeacl=AccessPrivilege.OPERATE
                         ),
                         Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
                             data_type=DataType(name="int8s"), code=2, name="attr2"),
-                            readacl = AccessPrivilege.VIEW,
-                            writeacl = AccessPrivilege.OPERATE
-                            ),
+                            readacl=AccessPrivilege.VIEW,
+                            writeacl=AccessPrivilege.OPERATE
+                        ),
                         Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
                             data_type=DataType(name="int8s"), code=3, name="attr3"),
-                            readacl = AccessPrivilege.MANAGE
+                            readacl=AccessPrivilege.MANAGE
                         ),
                         Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
                             data_type=DataType(name="int8s"), code=4, name="attr4"),
-                            writeacl = AccessPrivilege.ADMINISTER
+                            writeacl=AccessPrivilege.ADMINISTER
                         ),
                         Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
                             data_type=DataType(name="int8s"), code=5, name="attr5"),
-                            readacl = AccessPrivilege.OPERATE,
-                            writeacl = AccessPrivilege.MANAGE
+                            readacl=AccessPrivilege.OPERATE,
+                            writeacl=AccessPrivilege.MANAGE
                         ),
                     ]
                     )])

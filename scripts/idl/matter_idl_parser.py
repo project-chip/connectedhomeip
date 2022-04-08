@@ -197,12 +197,11 @@ class MatterIdlTransformer(Transformer):
 
         return (args[-1], acl)
 
-
     def attribute(self, args):
         # Input arguments are:
         #   -  tags (0 or more)
         #   -  attribute_with_access (i.e. pair of definition and acl arguments)
-        tags       = set(args[:-1])
+        tags = set(args[:-1])
         (definition, acl) = args[-1]
 
         # until we support write only (and need a bit of a reshuffle)
@@ -211,7 +210,6 @@ class MatterIdlTransformer(Transformer):
         if AttributeTag.READABLE not in tags:
             tags.add(AttributeTag.READABLE)
             tags.add(AttributeTag.WRITABLE)
-
 
         return Attribute(definition=definition, tags=tags, **acl)
 

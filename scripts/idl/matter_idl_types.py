@@ -39,15 +39,18 @@ class EndpointContentType(enum.Enum):
     SERVER_CLUSTER = enum.auto()
     CLIENT_BINDING = enum.auto()
 
+
 class AccessPrivilege(enum.Enum):
     VIEW = enum.auto()
     OPERATE = enum.auto()
     MANAGE = enum.auto()
     ADMINISTER = enum.auto()
 
+
 class AttributeOperation(enum.Enum):
     READ = enum.auto()
     WRITE = enum.auto()
+
 
 @dataclass
 class DataType:

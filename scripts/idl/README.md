@@ -74,7 +74,7 @@ server cluster AccessControl = 31 {
   critical event StartUp = 0 {
        INT32U softwareVersion = 0;
   }
-  
+
   // no-data events are supported
   info event Leave = 2 {
   }
@@ -87,7 +87,7 @@ server cluster AccessControl = 31 {
   attribute ExtensionEntry extension[] = 1;  // and require a (spec defined) number
 
   // Access control privileges on attributes defaults to:
-  // 
+  //
   // access(read: view, write: operate)
   //
   // These defaults can be overriden to any of view/operate/manage/administer roles.
