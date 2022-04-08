@@ -80,7 +80,7 @@ server cluster AccessControl = 31 {
   }
 
   // events default to 'view' privilege however this can be modified
-  info event access(read: manage) Leave = 2 {
+  info event access(read: manage) RestrictedEvent = 3 {
   }
 
   attribute AccessControlEntry acl[] = 0;    // attributes are read-write by default
@@ -114,7 +114,7 @@ server cluster AccessControl = 31 {
 
   // command invokation default to "operate" privilege, however these
   // can be updated as well
-  command access(invoke: administer) Off(): DefaultSuccess = 3;
+  command access(invoke: administer) Off(): DefaultSuccess = 4;
 }
 
 // A client cluster represents something that is used by an app
