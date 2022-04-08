@@ -6444,7 +6444,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMaxPressureAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMaxPressureAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster.MaxPressureAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMaxPressureCommandParams);
@@ -6457,7 +6459,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMaxSpeedAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMaxSpeedAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster.MaxSpeedAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMaxSpeedCommandParams);
@@ -6469,7 +6473,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMaxFlowAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMaxFlowAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster.MaxFlowAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMaxFlowCommandParams);
@@ -6481,7 +6487,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMinConstPressureAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMinConstPressureAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .MinConstPressureAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMinConstPressureCommandParams);
@@ -6494,7 +6503,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMaxConstPressureAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMaxConstPressureAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .MaxConstPressureAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMaxConstPressureCommandParams);
@@ -6507,7 +6519,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMinCompPressureAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMinCompPressureAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .MinCompPressureAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMinCompPressureCommandParams);
@@ -6520,7 +6535,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMaxCompPressureAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMaxCompPressureAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .MaxCompPressureAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMaxCompPressureCommandParams);
@@ -6533,7 +6551,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMinConstSpeedAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMinConstSpeedAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .MinConstSpeedAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMinConstSpeedCommandParams);
@@ -6546,7 +6567,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMaxConstSpeedAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMaxConstSpeedAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .MaxConstSpeedAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMaxConstSpeedCommandParams);
@@ -6559,7 +6583,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMinConstFlowAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMinConstFlowAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .MinConstFlowAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMinConstFlowCommandParams);
@@ -6572,7 +6599,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMaxConstFlowAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMaxConstFlowAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .MaxConstFlowAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMaxConstFlowCommandParams);
@@ -6585,7 +6615,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMinConstTempAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMinConstTempAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .MinConstTempAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMinConstTempCommandParams);
@@ -6598,7 +6631,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMaxConstTempAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMaxConstTempAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .MaxConstTempAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMaxConstTempCommandParams);
@@ -6654,7 +6690,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readCapacityAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readCapacityAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster.CapacityAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlCapacityCommandParams);
@@ -6666,7 +6704,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readSpeedAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readSpeedAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster.SpeedAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlSpeedCommandParams);
@@ -6679,10 +6719,7 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readLifetimeRunningHoursAttribute(
-                      (ChipClusters.PumpConfigurationAndControlCluster
-                              .LifetimeRunningHoursAttributeCallback)
-                          callback);
+                  .readLifetimeRunningHoursAttribute((ChipClusters.LongAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readPumpConfigurationAndControlLifetimeRunningHoursCommandParams);
@@ -6695,7 +6732,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readPowerAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readPowerAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster.PowerAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readPumpConfigurationAndControlPowerCommandParams);
@@ -6709,9 +6748,7 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
                   .readLifetimeEnergyConsumedAttribute(
-                      (ChipClusters.PumpConfigurationAndControlCluster
-                              .LifetimeEnergyConsumedAttributeCallback)
-                          callback);
+                      (ChipClusters.LongAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readPumpConfigurationAndControlLifetimeEnergyConsumedCommandParams);

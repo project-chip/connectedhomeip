@@ -9256,7 +9256,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLifetimeRunningHoursWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
-- (void)writeAttributeLifetimeRunningHoursWithValue:(NSNumber * _Nullable)value
+- (void)writeAttributeLifetimeRunningHoursWithValue:(NSNumber * _Nonnull)value
                                   completionHandler:(StatusCompletion)completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
@@ -9292,7 +9292,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLifetimeEnergyConsumedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
-- (void)writeAttributeLifetimeEnergyConsumedWithValue:(NSNumber * _Nullable)value
+- (void)writeAttributeLifetimeEnergyConsumedWithValue:(NSNumber * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the

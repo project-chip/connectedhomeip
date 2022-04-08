@@ -46904,7 +46904,7 @@ public:
                                                                                                       queue:callbackQueue];
         CHIP_ERROR __block chipError = CHIP_NO_ERROR;
 
-        NSNumber * _Nullable value = [NSNumber numberWithUnsignedInt:mValue];
+        NSNumber * _Nonnull value = [NSNumber numberWithUnsignedInt:mValue];
 
         [cluster writeAttributeLifetimeRunningHoursWithValue:value
                                            completionHandler:^(NSError * _Nullable error) {
@@ -47104,7 +47104,7 @@ public:
                                                                                                       queue:callbackQueue];
         CHIP_ERROR __block chipError = CHIP_NO_ERROR;
 
-        NSNumber * _Nullable value = [NSNumber numberWithUnsignedInt:mValue];
+        NSNumber * _Nonnull value = [NSNumber numberWithUnsignedInt:mValue];
 
         [cluster
             writeAttributeLifetimeEnergyConsumedWithValue:value

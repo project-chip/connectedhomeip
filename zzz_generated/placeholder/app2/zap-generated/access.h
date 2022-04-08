@@ -41,6 +41,10 @@
     49, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: view */ \
@@ -67,6 +71,10 @@
     6, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     7, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: view */ \
@@ -93,6 +101,10 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: view */ \
@@ -116,6 +128,10 @@
     48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     6, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
+    512, /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: manage */ \
+    512, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
+    512, /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: manage */ \
+    512, /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: manage */ \
@@ -137,6 +153,10 @@
     0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     4, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     16387, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
+    21, /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: manage */ \
+    23, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
+    32, /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: manage */ \
+    33, /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: manage */ \
     21, /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: manage */ \
     22, /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: manage */ \
     23, /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: manage */ \
@@ -158,6 +178,10 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: manage */ \

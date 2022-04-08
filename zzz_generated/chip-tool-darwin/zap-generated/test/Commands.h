@@ -29797,7 +29797,6 @@ private:
 
             {
                 id actualValue = value;
-                VerifyOrReturn(CheckValueNonNull("LifetimeRunningHours", actualValue));
                 VerifyOrReturn(CheckValue("LifetimeRunningHours", actualValue, 0UL));
             }
 
@@ -29877,7 +29876,6 @@ private:
 
             {
                 id actualValue = value;
-                VerifyOrReturn(CheckValueNonNull("LifetimeEnergyConsumed", actualValue));
                 VerifyOrReturn(CheckValue("LifetimeEnergyConsumed", actualValue, 0UL));
             }
 
@@ -30297,7 +30295,6 @@ private:
 
             {
                 id actualValue = value;
-                VerifyOrReturn(CheckValueNonNull("LifetimeRunningHours", actualValue));
                 VerifyOrReturn(CheckValue("LifetimeRunningHours", actualValue, 0UL));
             }
 
@@ -30377,7 +30374,6 @@ private:
 
             {
                 id actualValue = value;
-                VerifyOrReturn(CheckValueNonNull("LifetimeEnergyConsumed", actualValue));
                 VerifyOrReturn(CheckValue("LifetimeEnergyConsumed", actualValue, 0UL));
             }
 
@@ -31064,7 +31060,6 @@ private:
 
             {
                 id actualValue = value;
-                VerifyOrReturn(CheckValueNonNull("LifetimeRunningHours", actualValue));
                 VerifyOrReturn(CheckValue("LifetimeRunningHours", actualValue, 1UL));
             }
 
@@ -31111,7 +31106,6 @@ private:
 
             {
                 id actualValue = value;
-                VerifyOrReturn(CheckValueNonNull("LifetimeRunningHours", actualValue));
                 VerifyOrReturn(CheckValue("LifetimeRunningHours", actualValue, 2UL));
             }
 
@@ -31158,7 +31152,6 @@ private:
 
             {
                 id actualValue = value;
-                VerifyOrReturn(CheckValueNonNull("LifetimeRunningHours", actualValue));
                 VerifyOrReturn(CheckValue("LifetimeRunningHours", actualValue, 3UL));
             }
 
@@ -31227,7 +31220,6 @@ private:
 
             {
                 id actualValue = value;
-                VerifyOrReturn(CheckValueNonNull("LifetimeEnergyConsumed", actualValue));
                 VerifyOrReturn(CheckValue("LifetimeEnergyConsumed", actualValue, 2UL));
             }
 
@@ -31274,7 +31266,6 @@ private:
 
             {
                 id actualValue = value;
-                VerifyOrReturn(CheckValueNonNull("LifetimeEnergyConsumed", actualValue));
                 VerifyOrReturn(CheckValue("LifetimeEnergyConsumed", actualValue, 3UL));
             }
 
