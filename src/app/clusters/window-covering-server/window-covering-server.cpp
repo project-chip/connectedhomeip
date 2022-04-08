@@ -264,9 +264,6 @@ EndProductType EndProductTypeGet(chip::EndpointId endpoint)
     return value;
 }
 
-
-
-
 void ModePrint(const chip::BitFlags<Mode> & mode)
 {
     emberAfWindowCoveringClusterPrint("Mode 0x%02X MotorDirReversed=%u LedFeedback=%u Maintenance=%u Calibration=%u",
@@ -673,6 +670,30 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
         OperationalStatusSetWithGlobalUpdated(endpoint, opStatus);
 }
 
+EmberAfStatus GetMotionLockStatus(chip::EndpointId endpoint)
+{
+    BitFlags<Mode> mode = ModeGet(endpoint);
+    BitFlags<ConfigStatus> configStatus = ConfigStatus(endpoint);
+
+    // Does the device is locked ?
+    if (!configStatus.Has(ConfigStatus::kOperational))
+    {
+        if (mode.Has(Mode::kMaintenanceMode))
+        {
+            // Mainterance Mode
+            return EMBER_ZCL_STATUS_BUSY;
+        }
+
+        if (mode.Has(Mode::kCalibrationMode))
+        {
+            // Calibration Mode
+            return EMBER_ZCL_STATUS_FAILURE;
+        }
+    }
+
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
 } // namespace WindowCovering
 } // namespace Clusters
 } // namespace app
@@ -704,6 +725,15 @@ bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandO
     EndpointId endpoint = commandPath.mEndpointId;
 
     emberAfWindowCoveringClusterPrint("UpOrOpen command received");
+
+    EmberAfStatus status = GetMotionLockStatus(endpoint);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        emberAfWindowCoveringClusterPrint("Err device locked");
+        emberAfSendImmediateDefaultResponse(status);
+        return true;
+    }
+
     if (HasFeature(endpoint, WcFeature::kLift))
     {
         Attributes::TargetPositionLiftPercent100ths::Set(endpoint, WC_PERCENT100THS_MIN_OPEN);
@@ -725,6 +755,15 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
     EndpointId endpoint = commandPath.mEndpointId;
 
     emberAfWindowCoveringClusterPrint("DownOrClose command received");
+
+    EmberAfStatus status = GetMotionLockStatus(endpoint);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        emberAfWindowCoveringClusterPrint("Err device locked");
+        emberAfSendImmediateDefaultResponse(status);
+        return true;
+    }
+
     if (HasFeature(endpoint, WcFeature::kLift))
     {
         Attributes::TargetPositionLiftPercent100ths::Set(endpoint, WC_PERCENT100THS_MAX_CLOSED);
@@ -743,9 +782,18 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
 bool emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                     const Commands::StopMotion::DecodableType & fields)
 {
-    emberAfWindowCoveringClusterPrint("StopMotion command received");
     app::DataModel::Nullable<Percent100ths> current;
     chip::EndpointId endpoint = commandPath.mEndpointId;
+
+    emberAfWindowCoveringClusterPrint("StopMotion command received");
+
+    EmberAfStatus status = GetMotionLockStatus(endpoint);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        emberAfWindowCoveringClusterPrint("Err device locked");
+        emberAfSendImmediateDefaultResponse(status);
+        return true;
+    }
 
     if (HasFeaturePaLift(endpoint))
     {
@@ -773,7 +821,16 @@ bool emberAfWindowCoveringClusterGoToLiftValueCallback(app::CommandHandler * com
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("GoToLiftValue Value command received");
+    emberAfWindowCoveringClusterPrint("GoToLiftValue %u command received", liftValue);
+
+    EmberAfStatus status = GetMotionLockStatus(endpoint);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        emberAfWindowCoveringClusterPrint("Err device locked");
+        emberAfSendImmediateDefaultResponse(status);
+        return true;
+    }
+
     if (HasFeature(endpoint, WcFeature::kAbsolutePosition) && HasFeaturePaLift(endpoint))
     {
         Attributes::TargetPositionLiftPercent100ths::Set(endpoint, LiftToPercent100ths(endpoint, liftValue));
@@ -796,15 +853,25 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
 {
     auto & liftPercentageValue    = commandData.liftPercentageValue;
     auto & liftPercent100thsValue = commandData.liftPercent100thsValue;
+    Percent100ths liftPercent100ths = liftPercent100thsValue.ValueOr(static_cast<Percent100ths>(liftPercentageValue * WC_PERCENT100THS_COEF));
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("GoToLiftPercentage %u%% %u command received", liftPercentageValue, liftPercent100thsValue);
+    emberAfWindowCoveringClusterPrint("GoToLiftPercentage %u%% %u command received", liftPercentageValue, liftPercent100ths);
+
+    EmberAfStatus status = GetMotionLockStatus(endpoint);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        emberAfWindowCoveringClusterPrint("Err device locked");
+        emberAfSendImmediateDefaultResponse(status);
+        return true;
+    }
+
     if (HasFeaturePaLift(endpoint))
     {
-        if (IsPercent100thsValid(liftPercent100thsValue))
+        if (IsPercent100thsValid(liftPercent100ths))
         {
-            Attributes::TargetPositionLiftPercent100ths::Set(endpoint, liftPercent100thsValue);
+            Attributes::TargetPositionLiftPercent100ths::Set(endpoint, liftPercent100ths);
             emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
         }
         else
@@ -831,7 +898,16 @@ bool emberAfWindowCoveringClusterGoToTiltValueCallback(app::CommandHandler * com
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("GoToTiltValue command received");
+    emberAfWindowCoveringClusterPrint("GoToTiltValue %u command received", tiltValue);
+
+    EmberAfStatus status = GetMotionLockStatus(endpoint);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        emberAfWindowCoveringClusterPrint("Err device locked");
+        emberAfSendImmediateDefaultResponse(status);
+        return true;
+    }
+
     if (HasFeature(endpoint, WcFeature::kAbsolutePosition) && HasFeaturePaTilt(endpoint))
     {
         Attributes::TargetPositionTiltPercent100ths::Set(endpoint, TiltToPercent100ths(endpoint, tiltValue));
@@ -854,15 +930,25 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
 {
     auto & tiltPercentageValue    = commandData.tiltPercentageValue;
     auto & tiltPercent100thsValue = commandData.tiltPercent100thsValue;
+    Percent100ths tiltPercent100ths = tiltPercent100thsValue.ValueOr(static_cast<Percent100ths>(tiltPercentageValue * WC_PERCENT100THS_COEF));
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("GoToTiltPercentage %u%% %u command received", tiltPercentageValue, tiltPercent100thsValue);
+    emberAfWindowCoveringClusterPrint("GoToTiltPercentage %u%% %u command received", tiltPercentageValue, tiltPercent100ths);
+
+    EmberAfStatus status = GetMotionLockStatus(endpoint);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        emberAfWindowCoveringClusterPrint("Err device locked");
+        emberAfSendImmediateDefaultResponse(status);
+        return true;
+    }
+
     if (HasFeaturePaTilt(endpoint))
     {
-        if (IsPercent100thsValid(tiltPercent100thsValue))
+        if (IsPercent100thsValid(tiltPercent100ths))
         {
-            Attributes::TargetPositionTiltPercent100ths::Set(endpoint, tiltPercent100thsValue);
+            Attributes::TargetPositionTiltPercent100ths::Set(endpoint, tiltPercent100ths);
             emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
         }
         else
