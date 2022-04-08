@@ -47,8 +47,8 @@ public:
 private:
     static constexpr uint8_t mMaxEntryCount = 1 + /* For the global message counter */
         1 +                                       /* For the admin key count */
-        CHIP_CONFIG_MAX_FABRICS + 1 +             /* For the session key count */
-        CHIP_CONFIG_MAX_SESSION_KEYS;
+        CHIP_CONFIG_MAX_FABRICS + 1               /* For the session key count */
+        ;
 
     struct KeyEntry
     {
