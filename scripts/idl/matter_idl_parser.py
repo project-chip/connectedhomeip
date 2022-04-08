@@ -142,6 +142,21 @@ class MatterIdlTransformer(Transformer):
     def client_cluster(self, _):
         return ClusterSide.CLIENT
 
+    def command_access(self, privilege):
+        return privilege[0]
+
+    def command_with_access(self, args):
+        # Arguments
+        #   - optional access for invoke
+        #   - event identifier (name)
+        init_args = {
+            "name": args[-1]
+        }
+        if len(args) > 1:
+            init_args["invokeacl"] = args[0]
+
+        return init_args
+
     def command(self, args):
         # A command has 4 arguments if no input or
         # 5 arguments if input parameter is available
@@ -150,7 +165,7 @@ class MatterIdlTransformer(Transformer):
             param_in = args[2]
 
         return Command(
-            attributes=args[0], name=args[1], input_param=param_in, output_param=args[-2], code=args[-1])
+            attributes=args[0], input_param=param_in, output_param=args[-2], code=args[-1], **args[1])
 
     def event_access(self, privilege):
         return privilege[0]

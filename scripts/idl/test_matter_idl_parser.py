@@ -215,6 +215,43 @@ class TestParser(unittest.TestCase):
                     )])
         self.assertEqual(actual, expected)
 
+    def test_cluster_command_access(self):
+        actual = parseText("""
+            server cluster WithCommands = 1 {
+                request struct InParam {}
+                response struct OutParam {}
+
+                command WithoutArg(): DefaultSuccess = 1;
+                timed command access(invoke: manage) TimedCommand(InParam): OutParam = 2;
+                command access(invoke: administer) OutOnly(): OutParam = 3;
+            }
+        """)
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.SERVER,
+                    name="WithCommands",
+                    code=1,
+                    structs=[
+                        Struct(name="InParam", fields=[],
+                               tag=StructTag.REQUEST),
+                        Struct(name="OutParam", fields=[],
+                               tag=StructTag.RESPONSE),
+                    ],
+                    commands=[
+                        Command(name="WithoutArg", code=1,
+                                invokeacl=AccessPrivilege.OPERATE,
+                                input_param=None, output_param="DefaultSuccess"),
+                        Command(name="TimedCommand", code=2,
+                                input_param="InParam", output_param="OutParam",
+                                invokeacl=AccessPrivilege.MANAGE,
+                                attributes=set([CommandAttribute.TIMED_INVOKE])),
+                        Command(name="OutOnly", code=3,
+                                input_param=None, output_param="OutParam",
+                                invokeacl=AccessPrivilege.ADMINISTER,
+                                ),
+                    ],
+                    )])
+        self.assertEqual(actual, expected)
+
     def test_cluster_enum(self):
         actual = parseText("""
             client cluster WithEnums = 0xab {

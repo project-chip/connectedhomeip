@@ -140,6 +140,7 @@ class Command:
     input_param: Optional[str]
     output_param: str
     attributes: Set[CommandAttribute] = field(default_factory=set)
+    invokeacl: AccessPrivilege = AccessPrivilege.OPERATE
 
     @property
     def is_timed_invoke(self):
