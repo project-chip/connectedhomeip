@@ -26,7 +26,8 @@
 #include "Rpc.h"
 #endif
 
-#ifdef CONFIG_USB_DEVICE_STACK
+#if DT_NODE_HAS_COMPAT(DT_CHOSEN(zephyr_console), zephyr_cdc_acm_uart)
+#include <drivers/uart.h>
 #include <usb/usb_device.h>
 #endif
 
@@ -42,19 +43,28 @@ int main()
     rpc::Init();
 #endif
 
-#ifdef CONFIG_USB_DEVICE_STACK
+#if DT_NODE_HAS_COMPAT(DT_CHOSEN(zephyr_console), zephyr_cdc_acm_uart)
+    const struct device * dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
+    uint32_t dtr              = 0;
+
     err = System::MapErrorZephyr(usb_enable(nullptr));
+
     if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("Failed to initialize USB device");
+        goto exit;
+    }
+
+    while (!dtr)
+    {
+        uart_line_ctrl_get(dev, UART_LINE_CTRL_DTR, &dtr);
+        k_sleep(K_MSEC(100));
     }
 #endif
 
-    if (err == CHIP_NO_ERROR)
-    {
-        err = GetAppTask().StartApp();
-    }
+    err = GetAppTask().StartApp();
 
+exit:
     LOG_ERR("Exited with code %" CHIP_ERROR_FORMAT, err.Format());
     return err == CHIP_NO_ERROR ? EXIT_SUCCESS : EXIT_FAILURE;
 }
