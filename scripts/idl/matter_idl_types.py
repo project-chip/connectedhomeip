@@ -110,6 +110,7 @@ class Event:
     name: str
     code: int
     fields: List[Field]
+    readacl: AccessPrivilege = AccessPrivilege.VIEW
 
 
 @dataclass

@@ -2,12 +2,6 @@ struct: "struct"i id "{" struct_field* "}"
 enum: "enum"i id ":" type "{" constant_entry* "}"
 bitmap: "bitmap"i id ":" type "{" constant_entry* "}"
 
-event: event_priority "event"i id "=" number "{" struct_field* "}"
-
-?event_priority: "critical"i -> critical_priority
-               | "info"i     -> info_priority
-               | "debug"i    -> debug_priority
-
 ?access_privilege: "view"i       -> view_privilege
                  | "operate"i    -> operate_privilege
                  | "manage"i     -> manage_privilege
@@ -15,6 +9,16 @@ event: event_priority "event"i id "=" number "{" struct_field* "}"
 
 ?attribute_access_type: "read"i  -> read_access
                       | "write"i -> write_access
+
+event_access: "access" "(" ("read" ":" access_privilege)? ")"
+
+event_with_access: "event" event_access? id
+
+event: event_priority event_with_access "=" number "{" struct_field* "}"
+
+?event_priority: "critical"i -> critical_priority
+               | "info"i     -> info_priority
+               | "debug"i    -> debug_priority
 
 attribute_access_entry: attribute_access_type ":" access_privilege
 

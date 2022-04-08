@@ -152,8 +152,23 @@ class MatterIdlTransformer(Transformer):
         return Command(
             attributes=args[0], name=args[1], input_param=param_in, output_param=args[-2], code=args[-1])
 
+    def event_access(self, privilege):
+        return privilege[0]
+
+    def event_with_access(self, args):
+        # Arguments
+        #   - optional access for read
+        #   - event identifier (name)
+        init_args = {
+            "name": args[-1]
+        }
+        if len(args) > 1:
+            init_args["readacl"] = args[0]
+
+        return init_args
+
     def event(self, args):
-        return Event(priority=args[0], name=args[1], code=args[2], fields=args[3:], )
+        return Event(priority=args[0], code=args[2], fields=args[3:], **args[1])
 
     def view_privilege(self, args):
         return AccessPrivilege.VIEW
