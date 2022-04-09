@@ -83,15 +83,16 @@ private:
         return mCallback.OnDeallocatePaths(std::move(aReadPrepareParams));
     }
 
-    uint32_t OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                           const Span<AttributePathParams> & aAttributePaths) override
+    virtual CHIP_ERROR OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                                     const Span<AttributePathParams> & aAttributePaths,
+                                                     bool & aHasEncodeDataVersionList) override
     {
-        return mCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths);
+        return mCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aHasEncodeDataVersionList);
     }
 
-    virtual void OnAddWildcardAttributePath(const AttributePathParams & aAttributePathParams) override
+    virtual void OnReadingWildcardAttributePath(const AttributePathParams & aAttributePathParams) override
     {
-        mCallback.OnAddWildcardAttributePath(aAttributePathParams);
+        mCallback.OnReadingWildcardAttributePath(aAttributePathParams);
     }
     virtual void OnClearWildcardAttributePath(const ReadClient * apReadClient) override
     {
