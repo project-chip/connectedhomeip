@@ -155,7 +155,7 @@ void ReadClient::Close(CHIP_ERROR aError)
     {
         StopResubscription();
     }
-    mpCallback.OnClearWildcardAttributePath(this);
+
     mpCallback.OnDone();
 }
 
@@ -212,10 +212,6 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
     Span<EventPathParams> eventPaths(aReadPrepareParams.mpEventPathParamsList, aReadPrepareParams.mEventPathParamsListSize);
     Span<DataVersionFilter> dataVersionFilters(aReadPrepareParams.mpDataVersionFilterList,
                                                aReadPrepareParams.mDataVersionFilterListSize);
-    for (auto & attribute : attributePaths)
-    {
-        attribute.mpReadClient = this;
-    }
 
     System::PacketBufferHandle msgBuf;
     ReadRequestMessage::Builder request;
@@ -856,10 +852,6 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     Span<EventPathParams> eventPaths(aReadPrepareParams.mpEventPathParamsList, aReadPrepareParams.mEventPathParamsListSize);
     Span<DataVersionFilter> dataVersionFilters(aReadPrepareParams.mpDataVersionFilterList,
                                                aReadPrepareParams.mDataVersionFilterListSize);
-    for (auto & attribute : attributePaths)
-    {
-        attribute.mpReadClient = this;
-    }
 
     VerifyOrReturnError(aReadPrepareParams.mMinIntervalFloorSeconds <= aReadPrepareParams.mMaxIntervalCeilingSeconds,
                         err = CHIP_ERROR_INVALID_ARGUMENT);
