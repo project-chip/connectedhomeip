@@ -24,6 +24,7 @@
 
 namespace chip {
 namespace app {
+
 /**
  * A representation of a concrete attribute path. This does not convey any list index specifiers.
  *

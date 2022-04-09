@@ -167,21 +167,23 @@ public:
         virtual void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) {}
 
         /**
-         * This function is invoked when constructing read/subscribeRequest, where the ReadClient would use cached cluster data
-         * version to construct data version filter list. When the particular cached cluster data version does not intersect with
-         * user provided attribute paths, that cached one would be skipped. When encoded cluster data version filters exceeds the
-         * packet buffer size limitation, it would roll back to last successful encodedd data version filter. This function would
-         * return the number of successful encoded data version filters.
+         * This function is invoked when constructing a read/subscribeRequest that does not have data
+         * version filters specified, to give the callback a chance to provide some.
+         *
+         * This function is expected to encode as many complete data version filters as will fit into
+         * the buffer, rolling back any partially-encoded filters if it runs out of space, and return
+         * the boolean to show if it has successfully encode at least one data version filter.
          */
-        virtual uint32_t OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                                       const Span<AttributePathParams> & aAttributePaths)
+        virtual CHIP_ERROR OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                                         const Span<AttributePathParams> & aAttributePaths,
+                                                         bool & aHasEncodeDataVersionList)
         {
-            return 0;
+            return CHIP_NO_ERROR;
         }
 
-        // This function is invoked when clients tries to add the wildcard attribute Paths in AttributeCaches when generating
-        // read/subscribe requests
-        virtual void OnAddWildcardAttributePath(const AttributePathParams & aAttributePathParams) {}
+        // This function is invoked for each read/subscribe path that has a wildcard attribute when
+        // a client is generating a request.
+        virtual void OnReadingWildcardAttributePath(const AttributePathParams & aAttributePathParams) {}
 
         // This function is invoked when Read/Subscribe is closed, and tries to clear up the corresponding wildcard attribute paths
         // in AttributeCaches.
@@ -325,9 +327,13 @@ private:
     CHIP_ERROR GenerateEventPaths(EventPathIBs::Builder & aEventPathsBuilder, const Span<EventPathParams> & aEventPaths);
     CHIP_ERROR GenerateAttributePaths(AttributePathIBs::Builder & aAttributePathIBsBuilder,
                                       const Span<AttributePathParams> & aAttributePaths);
+
     CHIP_ERROR GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                              const Span<AttributePathParams> & aAttributePaths,
-                                             const Span<DataVersionFilter> & aDataVersionFilters, uint32_t & aNumber);
+                                             const Span<DataVersionFilter> & aDataVersionFilters, bool & aHasEncodeDataVersionList);
+    CHIP_ERROR BuildDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                          const Span<AttributePathParams> & aAttributePaths,
+                                          const Span<DataVersionFilter> & aDataVersionFilters, bool & aHasEncodeDataVersionList);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 
