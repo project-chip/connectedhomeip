@@ -74,11 +74,14 @@ CHIP_ERROR AttributeCache::UpdateCache(const ConcreteDataAttributePath & aPath, 
                 }
                 else
                 {
-                    //commit the version since we moved on from a given cluster to a different cluster
-                    if (mCache[mLastConcreteClusterPath.mEndpointId][mLastConcreteClusterPath.mClusterId].mPendingDataVersion.HasValue())
+                    // commit the version since we moved on from a given cluster to a different cluster
+                    if (mCache[mLastConcreteClusterPath.mEndpointId][mLastConcreteClusterPath.mClusterId]
+                            .mPendingDataVersion.HasValue())
                     {
-                        mCache[mLastConcreteClusterPath.mEndpointId][mLastConcreteClusterPath.mClusterId].mCommittedDataVersion = mCache[mLastConcreteClusterPath.mEndpointId][mLastConcreteClusterPath.mClusterId].mPendingDataVersion;
-                        mCache[mLastConcreteClusterPath.mEndpointId][mLastConcreteClusterPath.mClusterId].mPendingDataVersion.ClearValue();
+                        mCache[mLastConcreteClusterPath.mEndpointId][mLastConcreteClusterPath.mClusterId].mCommittedDataVersion =
+                            mCache[mLastConcreteClusterPath.mEndpointId][mLastConcreteClusterPath.mClusterId].mPendingDataVersion;
+                        mCache[mLastConcreteClusterPath.mEndpointId][mLastConcreteClusterPath.mClusterId]
+                            .mPendingDataVersion.ClearValue();
                     }
                 }
                 mLastConcreteClusterPath = currentClusterPath;
@@ -108,7 +111,8 @@ void AttributeCache::OnReportEnd()
 {
     if (mLastConcreteClusterPath.IsValidConcreteClusterPath())
     {
-        mCache[mLastConcreteClusterPath.mEndpointId][mLastConcreteClusterPath.mClusterId].mCommittedDataVersion = mCache[mLastConcreteClusterPath.mEndpointId][mLastConcreteClusterPath.mClusterId].mPendingDataVersion;
+        mCache[mLastConcreteClusterPath.mEndpointId][mLastConcreteClusterPath.mClusterId].mCommittedDataVersion =
+            mCache[mLastConcreteClusterPath.mEndpointId][mLastConcreteClusterPath.mClusterId].mPendingDataVersion;
         mCache[mLastConcreteClusterPath.mEndpointId][mLastConcreteClusterPath.mClusterId].mPendingDataVersion.ClearValue();
     }
 
@@ -317,9 +321,10 @@ void AttributeCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter, s
 }
 
 CHIP_ERROR AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                                       const Span<AttributePathParams> & aAttributePaths, bool & aHasEncodeDataVersionList)
+                                                         const Span<AttributePathParams> & aAttributePaths,
+                                                         bool & aHasEncodeDataVersionList)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVWriter backup;
 
     std::vector<std::pair<DataVersionFilter, size_t>> filterVector;

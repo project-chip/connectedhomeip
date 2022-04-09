@@ -38,8 +38,7 @@ struct DataVersionFilter
 
     bool operator==(const DataVersionFilter & aOther) const
     {
-        return mEndpointId == aOther.mEndpointId && mClusterId == aOther.mClusterId &&
-            mDataVersion == aOther.mDataVersion;
+        return mEndpointId == aOther.mEndpointId && mClusterId == aOther.mClusterId && mDataVersion == aOther.mDataVersion;
     }
 
     ClusterId mClusterId = kInvalidClusterId;    // uint32

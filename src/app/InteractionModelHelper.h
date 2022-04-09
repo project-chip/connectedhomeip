@@ -33,8 +33,7 @@ static CHIP_ERROR ReserveBuffer(System::PacketBufferTLVWriter & aWriter, uint32_
         reservedSize = static_cast<uint16_t>(msgBuf->AvailableDataLength() - kMaxSecureSduLengthBytes);
     }
 
-    reservedSize =
-            static_cast<uint16_t>(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES + aReserveSpace);
+    reservedSize = static_cast<uint16_t>(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES + aReserveSpace);
     aWriter.Init(std::move(msgBuf));
     ReturnErrorOnFailure(aWriter.ReserveBuffer(reservedSize));
     return CHIP_NO_ERROR;

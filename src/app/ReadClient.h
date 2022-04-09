@@ -175,7 +175,8 @@ public:
          * the boolean to show if it has successfully encode at least one data version filter.
          */
         virtual CHIP_ERROR OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                                       const Span<AttributePathParams> & aAttributePaths, bool & aHasEncodeDataVersionList)
+                                                         const Span<AttributePathParams> & aAttributePaths,
+                                                         bool & aHasEncodeDataVersionList)
         {
             return CHIP_NO_ERROR;
         }
@@ -331,8 +332,8 @@ private:
                                              const Span<AttributePathParams> & aAttributePaths,
                                              const Span<DataVersionFilter> & aDataVersionFilters, bool & aHasEncodeDataVersionList);
     CHIP_ERROR BuildDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                             const Span<AttributePathParams> & aAttributePaths,
-                                             const Span<DataVersionFilter> & aDataVersionFilters, bool & aHasEncodeDataVersionList);
+                                          const Span<AttributePathParams> & aAttributePaths,
+                                          const Span<DataVersionFilter> & aDataVersionFilters, bool & aHasEncodeDataVersionList);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 

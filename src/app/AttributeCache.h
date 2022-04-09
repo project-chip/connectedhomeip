@@ -368,7 +368,8 @@ private:
     }
 
     virtual CHIP_ERROR OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                           const Span<AttributePathParams> & aAttributePaths, bool & aHasEncodeDataVersionList) override;
+                                                     const Span<AttributePathParams> & aAttributePaths,
+                                                     bool & aHasEncodeDataVersionList) override;
     virtual void OnReadingWildcardAttributePath(const AttributePathParams & aAttributePathParams) override;
 
     virtual void OnClearWildcardAttributePath(const ReadClient * apReadClient) override;

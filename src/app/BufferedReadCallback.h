@@ -84,7 +84,8 @@ private:
     }
 
     virtual CHIP_ERROR OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                           const Span<AttributePathParams> & aAttributePaths, bool & aHasEncodeDataVersionList) override
+                                                     const Span<AttributePathParams> & aAttributePaths,
+                                                     bool & aHasEncodeDataVersionList) override
     {
         return mCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aHasEncodeDataVersionList);
     }
