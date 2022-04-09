@@ -184,10 +184,6 @@ public:
         // This function is invoked for each read/subscribe path that has a wildcard attribute when
         // a client is generating a request.
         virtual void OnReadingWildcardAttributePath(const AttributePathParams & aAttributePathParams) {}
-
-        // This function is invoked when Read/Subscribe is closed, and tries to clear up the corresponding wildcard attribute paths
-        // in AttributeCaches.
-        virtual void OnClearWildcardAttributePath(const ReadClient * apReadClient){};
     };
 
     enum class InteractionType : uint8_t

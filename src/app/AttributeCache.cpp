@@ -29,16 +29,12 @@ CHIP_ERROR AttributeCache::UpdateCache(const ConcreteDataAttributePath & aPath, 
     AttributeState state;
     System::PacketBufferHandle handle;
     System::PacketBufferTLVWriter writer;
-
+    bool findNewEndpoint = false;
     ConcreteClusterPath currentClusterPath(aPath.mEndpointId, aPath.mClusterId);
 
-    //
-    // if the endpoint didn't exist previously, let's track the insertion
-    // so that we can inform our callback of a new endpoint being added appropriately.
-    //
     if (mCache.find(aPath.mEndpointId) == mCache.end())
     {
-        mAddedEndpoints.push_back(aPath.mEndpointId);
+        findNewEndpoint = true;
     }
 
     if (apData)
@@ -92,6 +88,15 @@ CHIP_ERROR AttributeCache::UpdateCache(const ConcreteDataAttributePath & aPath, 
     else
     {
         state.Set<StatusIB>(aStatus);
+    }
+
+    //
+    // if the endpoint didn't exist previously, let's track the insertion
+    // so that we can inform our callback of a new endpoint being added appropriately.
+    //
+    if (findNewEndpoint)
+    {
+        mAddedEndpoints.push_back(aPath.mEndpointId);
     }
 
     mCache[aPath.mEndpointId][aPath.mClusterId].mAttributes[aPath.mAttributeId] = std::move(state);
@@ -269,11 +274,6 @@ CHIP_ERROR AttributeCache::GetStatus(const ConcreteAttributePath & path, StatusI
     return CHIP_NO_ERROR;
 }
 
-bool vector_compare(const std::pair<DataVersionFilter, size_t> & x, const std::pair<DataVersionFilter, size_t> & y)
-{
-    return x.second > y.second;
-}
-
 void AttributeCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter, size_t>> & aVector)
 {
     for (auto const & endpointIter : mCache)
@@ -317,7 +317,10 @@ void AttributeCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter, s
             aVector.push_back(std::make_pair(filter, clusterSize));
         }
     }
-    std::sort(aVector.begin(), aVector.end(), vector_compare);
+    std::sort(aVector.begin(), aVector.end(),
+              [](const std::pair<DataVersionFilter, size_t> & x, const std::pair<DataVersionFilter, size_t> & y) {
+                  return x.second > y.second;
+              });
 }
 
 CHIP_ERROR AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
@@ -378,19 +381,5 @@ void AttributeCache::OnReadingWildcardAttributePath(const AttributePathParams & 
     mRequestPathSet.insert(aAttributePathParams);
 }
 
-void AttributeCache::OnClearWildcardAttributePath(const ReadClient * apReadClient)
-{
-    for (auto it = mRequestPathSet.begin(); it != mRequestPathSet.end();)
-    {
-        if (it->mpReadClient == apReadClient)
-        {
-            it = mRequestPathSet.erase(it);
-        }
-        else
-        {
-            ++it;
-        }
-    }
-}
 } // namespace app
 } // namespace chip
