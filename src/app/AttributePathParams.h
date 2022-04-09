@@ -104,16 +104,10 @@ struct AttributePathParams
         return IncludesAttributesInCluster(aOther) && HasWildcardAttributeId();
     }
 
-    bool operator<(const AttributePathParams & aOther) const
-    {
-        return mpReadClient < aOther.mpReadClient || mEndpointId < aOther.mEndpointId || mClusterId < aOther.mClusterId;
-    }
-
-    ClusterId mClusterId      = kInvalidClusterId;   // uint32
-    AttributeId mAttributeId  = kInvalidAttributeId; // uint32
-    EndpointId mEndpointId    = kInvalidEndpointId;  // uint16
-    ListIndex mListIndex      = kInvalidListIndex;   // uint16
-    ReadClient * mpReadClient = nullptr;
+    ClusterId mClusterId     = kInvalidClusterId;   // uint32
+    AttributeId mAttributeId = kInvalidAttributeId; // uint32
+    EndpointId mEndpointId   = kInvalidEndpointId;  // uint16
+    ListIndex mListIndex     = kInvalidListIndex;   // uint16
 };
 
 } // namespace app
