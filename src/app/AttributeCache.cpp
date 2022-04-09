@@ -269,11 +269,6 @@ CHIP_ERROR AttributeCache::GetStatus(const ConcreteAttributePath & path, StatusI
     return CHIP_NO_ERROR;
 }
 
-bool vector_compare(const std::pair<DataVersionFilter, size_t> & x, const std::pair<DataVersionFilter, size_t> & y)
-{
-    return x.second > y.second;
-}
-
 void AttributeCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter, size_t>> & aVector)
 {
     for (auto const & endpointIter : mCache)
@@ -317,7 +312,9 @@ void AttributeCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter, s
             aVector.push_back(std::make_pair(filter, clusterSize));
         }
     }
-    std::sort(aVector.begin(), aVector.end(), vector_compare);
+    std::sort(aVector.begin(), aVector.end(),[](const std::pair<DataVersionFilter, size_t> &x, const std::pair<DataVersionFilter, size_t> &y) {
+        return x.second > y.second;
+    });
 }
 
 CHIP_ERROR AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,

@@ -313,8 +313,9 @@ public:
 
 private:
     using AttributeState = Variant<System::PacketBufferHandle, StatusIB>;
-    // mPendingDataVersion is set when mRequestPathSet is intersecting with received attribute report
-    // mCommittedDataVersion is set when client receives the last reports and mPendingDataVersion has valid value.
+    // mPendingDataVersion is set when client receives attribute data for a given cluster that is intersecting with mRequestPathSet and current cluste path is same as the previous one or this is the initial cluster path
+    // mPendingDataVersion is cleared when client applies the pending data version to committed data version
+    // mCommittedDataVersion is clear out when client receives attribute data for a given cluster and set when client moved on from a given cluster to a different cluster and the receive data is that is intersecting with mRequestPathSet
     struct ClusterState
     {
         std::map<AttributeId, AttributeState> mAttributes;
@@ -324,6 +325,9 @@ private:
     using EndpointState = std::map<ClusterId, ClusterState>;
     using NodeState     = std::map<EndpointId, EndpointState>;
 
+    struct Comparator {
+        bool operator()(const AttributePathParams& x, const AttributePathParams& y) const { return x.mpReadClient < y.mpReadClient || x.mEndpointId < y.mEndpointId || x.mClusterId < y.mClusterId; }
+    };
     /*
      * These functions provide a way to index into the cached state with different sub-sets of a path, returning
      * appropriate slices of the data as requested.
@@ -378,7 +382,7 @@ private:
     Callback & mCallback;
     NodeState mCache;
     std::set<ConcreteAttributePath> mChangedAttributeSet;
-    std::set<AttributePathParams> mRequestPathSet; // wildcard attribute request path only
+    std::set<AttributePathParams, Comparator> mRequestPathSet; // wildcard attribute request path only
     std::vector<EndpointId> mAddedEndpoints;
     BufferedReadCallback mBufferedReader;
     ConcreteClusterPath mLastConcreteClusterPath = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
