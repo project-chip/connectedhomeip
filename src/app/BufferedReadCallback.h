@@ -94,10 +94,6 @@ private:
     {
         mCallback.OnReadingWildcardAttributePath(aAttributePathParams);
     }
-    virtual void OnClearWildcardAttributePath(const ReadClient * apReadClient) override
-    {
-        mCallback.OnClearWildcardAttributePath(apReadClient);
-    };
 
     /*
      * Given a reader positioned at a list element, allocate a packet buffer, copy the list item where

@@ -56,7 +56,9 @@ namespace app {
  * through to a registered callback. In addition, it provides its own enhancements to the base ReadClient::Callback
  * to make it easier to know what has changed in the cache.
  *
- * **NOTE** This already includes the BufferedReadCallback, so there is no need to add that to the ReadClient callback chain.
+ * **NOTE**
+ * 1. This already includes the BufferedReadCallback, so there is no need to add that to the ReadClient callback chain.
+ * 2. The same cache cannot be used by multiple subscribe/read interaction.
  *
  */
 class AttributeCache : protected ReadClient::Callback
@@ -313,8 +315,11 @@ public:
 
 private:
     using AttributeState = Variant<System::PacketBufferHandle, StatusIB>;
-    // mPendingDataVersion is set when mRequestPathSet is intersecting with received attribute report
-    // mCommittedDataVersion is set when client receives the last reports and mPendingDataVersion has valid value.
+    // mPendingDataVersion is set when client receives attribute data for a given cluster that is intersecting with mRequestPathSet
+    // and current cluste path is same as the previous one or this is the initial cluster path mPendingDataVersion is cleared when
+    // client applies the pending data version to committed data version mCommittedDataVersion is clear out when client receives
+    // attribute data for a given cluster and set when client moved on from a given cluster to a different cluster and the receive
+    // data is that is intersecting with mRequestPathSet
     struct ClusterState
     {
         std::map<AttributeId, AttributeState> mAttributes;
@@ -324,6 +329,13 @@ private:
     using EndpointState = std::map<ClusterId, ClusterState>;
     using NodeState     = std::map<EndpointId, EndpointState>;
 
+    struct Comparator
+    {
+        bool operator()(const AttributePathParams & x, const AttributePathParams & y) const
+        {
+            return x.mEndpointId < y.mEndpointId || x.mClusterId < y.mClusterId;
+        }
+    };
     /*
      * These functions provide a way to index into the cached state with different sub-sets of a path, returning
      * appropriate slices of the data as requested.
@@ -359,7 +371,12 @@ private:
         mCallback.OnEventData(aEventHeader, apData, apStatus);
     }
 
-    void OnDone() override { return mCallback.OnDone(); }
+    void OnDone() override
+    {
+        mRequestPathSet.clear();
+        return mCallback.OnDone();
+    }
+
     void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mCallback.OnSubscriptionEstablished(aSubscriptionId); }
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
@@ -372,13 +389,12 @@ private:
                                                      bool & aHasEncodeDataVersionList) override;
     virtual void OnReadingWildcardAttributePath(const AttributePathParams & aAttributePathParams) override;
 
-    virtual void OnClearWildcardAttributePath(const ReadClient * apReadClient) override;
     void GetSortedFilters(std::vector<std::pair<DataVersionFilter, size_t>> & aVector);
 
     Callback & mCallback;
     NodeState mCache;
     std::set<ConcreteAttributePath> mChangedAttributeSet;
-    std::set<AttributePathParams> mRequestPathSet; // wildcard attribute request path only
+    std::set<AttributePathParams, Comparator> mRequestPathSet; // wildcard attribute request path only
     std::vector<EndpointId> mAddedEndpoints;
     BufferedReadCallback mBufferedReader;
     ConcreteClusterPath mLastConcreteClusterPath = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
