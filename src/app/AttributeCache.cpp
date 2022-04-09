@@ -30,6 +30,8 @@ CHIP_ERROR AttributeCache::UpdateCache(const ConcreteDataAttributePath & aPath, 
     System::PacketBufferHandle handle;
     System::PacketBufferTLVWriter writer;
 
+    ConcreteClusterPath currentClusterPath(aPath.mEndpointId, aPath.mClusterId);
+
     //
     // if the endpoint didn't exist previously, let's track the insertion
     // so that we can inform our callback of a new endpoint being added appropriately.
@@ -56,14 +58,31 @@ CHIP_ERROR AttributeCache::UpdateCache(const ConcreteDataAttributePath & aPath, 
 
         state.Set<System::PacketBufferHandle>(std::move(handle));
 
-        AttributePathParams cluster(aPath.mEndpointId, aPath.mClusterId);
-        mCache[aPath.mEndpointId][aPath.mClusterId].mCommittedDataVersion.ClearValue();
+        //
+        // Clear out the committed data version and only set it again once we have received all data for this cluster.
+        // Otherwise, we may have incomplete data that looks like it's complete since it has a valid data version.
+        //
+        mCache[currentClusterPath.mEndpointId][currentClusterPath.mClusterId].mCommittedDataVersion.ClearValue();
 
         for (auto path : mRequestPathSet)
         {
-            if (cluster.IsWildcardRequest(path))
+            if (path.IncludesAllAttributesInCluster(currentClusterPath))
             {
-                mCache[aPath.mEndpointId][aPath.mClusterId].mPendingDataVersion = aPath.mDataVersion;
+                if (!mLastConcreteClusterPath.IsValidConcreteClusterPath() || mLastConcreteClusterPath == currentClusterPath)
+                {
+                    mCache[currentClusterPath.mEndpointId][currentClusterPath.mClusterId].mPendingDataVersion = aPath.mDataVersion;
+                }
+                else
+                {
+                    //commit the version since we moved on from a given cluster to a different cluster
+                    if (mCache[mLastConcreteClusterPath.mEndpointId][mLastConcreteClusterPath.mClusterId].mPendingDataVersion.HasValue())
+                    {
+                        mCache[mLastConcreteClusterPath.mEndpointId][mLastConcreteClusterPath.mClusterId].mCommittedDataVersion = mCache[mLastConcreteClusterPath.mEndpointId][mLastConcreteClusterPath.mClusterId].mPendingDataVersion;
+                        mCache[mLastConcreteClusterPath.mEndpointId][mLastConcreteClusterPath.mClusterId].mPendingDataVersion.ClearValue();
+                    }
+                }
+                mLastConcreteClusterPath = currentClusterPath;
+                break;
             }
         }
     }
@@ -72,13 +91,14 @@ CHIP_ERROR AttributeCache::UpdateCache(const ConcreteDataAttributePath & aPath, 
         state.Set<StatusIB>(aStatus);
     }
 
-    mCache[aPath.mEndpointId][aPath.mClusterId].mState[aPath.mAttributeId] = std::move(state);
+    mCache[aPath.mEndpointId][aPath.mClusterId].mAttributes[aPath.mAttributeId] = std::move(state);
     mChangedAttributeSet.insert(aPath);
     return CHIP_NO_ERROR;
 }
 
 void AttributeCache::OnReportBegin()
 {
+    mLastConcreteClusterPath = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
     mChangedAttributeSet.clear();
     mAddedEndpoints.clear();
     mCallback.OnReportBegin();
@@ -86,19 +106,13 @@ void AttributeCache::OnReportBegin()
 
 void AttributeCache::OnReportEnd()
 {
-    std::set<std::tuple<EndpointId, ClusterId>> changedClusters;
-
-    for (auto & endpointIter : mCache)
+    if (mLastConcreteClusterPath.IsValidConcreteClusterPath())
     {
-        for (auto & clusterIter : endpointIter.second)
-        {
-            if (clusterIter.second.mPendingDataVersion.HasValue())
-            {
-                clusterIter.second.mCommittedDataVersion = clusterIter.second.mPendingDataVersion;
-                clusterIter.second.mPendingDataVersion.ClearValue();
-            }
-        }
+        mCache[mLastConcreteClusterPath.mEndpointId][mLastConcreteClusterPath.mClusterId].mCommittedDataVersion = mCache[mLastConcreteClusterPath.mEndpointId][mLastConcreteClusterPath.mClusterId].mPendingDataVersion;
+        mCache[mLastConcreteClusterPath.mEndpointId][mLastConcreteClusterPath.mClusterId].mPendingDataVersion.ClearValue();
     }
+
+    std::set<std::tuple<EndpointId, ClusterId>> changedClusters;
 
     //
     // Add the EndpointId and ClusterId into a set so that we only
@@ -224,8 +238,8 @@ AttributeCache::AttributeState * AttributeCache::GetAttributeState(EndpointId en
         return nullptr;
     }
 
-    auto attributeState = clusterState->mState.find(attributeId);
-    if (attributeState == clusterState->mState.end())
+    auto attributeState = clusterState->mAttributes.find(attributeId);
+    if (attributeState == clusterState->mAttributes.end())
     {
         err = CHIP_ERROR_KEY_NOT_FOUND;
         return nullptr;
@@ -263,32 +277,30 @@ void AttributeCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter, s
         EndpointId endpointId = endpointIter.first;
         for (auto const & clusterIter : endpointIter.second)
         {
-            DataVersion dataVersion = 0;
-            uint32_t clusterSize    = 0;
-            ClusterId clusterId     = clusterIter.first;
-            if (clusterIter.second.mCommittedDataVersion.HasValue())
-            {
-                dataVersion = clusterIter.second.mCommittedDataVersion.Value();
-            }
-            else
+            if (!clusterIter.second.mCommittedDataVersion.HasValue())
             {
                 continue;
             }
-            for (auto const & attributeIter : clusterIter.second.mState)
+            DataVersion dataVersion = clusterIter.second.mCommittedDataVersion.Value();
+            uint32_t clusterSize    = 0;
+            ClusterId clusterId     = clusterIter.first;
+
+            for (auto const & attributeIter : clusterIter.second.mAttributes)
             {
-                if (!attributeIter.second.Is<StatusIB>())
+                if (attributeIter.second.Is<StatusIB>())
                 {
-                    TLV::TLVReader reader;
+                    clusterSize += 2; // Status + ClusterStatus = 2 bytes
+                }
+                else
+                {
                     System::PacketBufferTLVReader bufReader;
                     bufReader.Init(attributeIter.second.Get<System::PacketBufferHandle>().Retain());
                     ReturnOnFailure(bufReader.Next());
-
-                    reader.Init(bufReader);
                     // Skip to the end of the element.
-                    ReturnOnFailure(reader.Skip());
+                    ReturnOnFailure(bufReader.Skip());
 
                     // Compute the amount of value data
-                    clusterSize += reader.GetLengthRead();
+                    clusterSize += bufReader.GetLengthRead();
                 }
             }
             if (clusterSize == 0)
@@ -304,10 +316,9 @@ void AttributeCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter, s
     std::sort(aVector.begin(), aVector.end(), vector_compare);
 }
 
-uint32_t AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                                       const Span<AttributePathParams> & aAttributePaths)
+CHIP_ERROR AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                                       const Span<AttributePathParams> & aAttributePaths, bool & aHasEncodeDataVersionList)
 {
-    uint32_t number = 0;
     CHIP_ERROR err  = CHIP_NO_ERROR;
     TLV::TLVWriter backup;
 
@@ -322,7 +333,7 @@ uint32_t AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Bui
         // if the particular cached cluster does not intersect with user provided attribute paths, skip the cached one
         for (auto & attribute : aAttributePaths)
         {
-            if (attribute.IsAttributePathIntersect(filter.first))
+            if (attribute.IncludesAttributesInCluster(filter.first))
             {
                 intersected = true;
                 break;
@@ -344,19 +355,20 @@ uint32_t AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Bui
                         "Update DataVersionFilter: Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Version=%" PRIu32,
                         filter.first.mEndpointId, ChipLogValueMEI(filter.first.mClusterId), filter.first.mDataVersion.Value());
 
-        number++;
+        aHasEncodeDataVersionList = true;
     }
 
 exit:
-    if (err != CHIP_NO_ERROR)
+    if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
     {
-        ChipLogProgress(DataManagement, "OnUpdateDataVersionFilterList rollbacks");
+        ChipLogProgress(DataManagement, "OnUpdateDataVersionFilterList ut of space; rolling back");
         aDataVersionFilterIBsBuilder.Rollback(backup);
+        err = CHIP_NO_ERROR;
     }
-    return number;
+    return err;
 }
 
-void AttributeCache::OnAddWildcardAttributePath(const AttributePathParams & aAttributePathParams)
+void AttributeCache::OnReadingWildcardAttributePath(const AttributePathParams & aAttributePathParams)
 {
     mRequestPathSet.insert(aAttributePathParams);
 }

@@ -24,6 +24,7 @@
 
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
+#include <app/InteractionModelHelper.h>
 #include <app/ReadClient.h>
 #include <app/StatusResponse.h>
 #include <assert.h>
@@ -201,128 +202,87 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 {
     // TODO: SendRequest parameter is too long, need to have the structure to represent it
     CHIP_ERROR err = CHIP_NO_ERROR;
-    System::PacketBufferHandle msgBuf;
+
     ChipLogDetail(DataManagement, "%s ReadClient[%p]: Sending Read Request", __func__, this);
 
     VerifyOrReturnError(ClientState::Idle == mState, err = CHIP_ERROR_INCORRECT_STATE);
 
-    Span<AttributePathParams> attributePaths(aReadPrepareParams.mpAttributePathParamsList,
-                                             aReadPrepareParams.mAttributePathParamsListSize);
-    Span<EventPathParams> eventPaths(aReadPrepareParams.mpEventPathParamsList, aReadPrepareParams.mEventPathParamsListSize);
-    Span<DataVersionFilter> dataVersionFilters(aReadPrepareParams.mpDataVersionFilterList,
-                                               aReadPrepareParams.mDataVersionFilterListSize);
-    for (auto & attribute : attributePaths)
-    {
+    Span <AttributePathParams> attributePaths(aReadPrepareParams.mpAttributePathParamsList,
+                                              aReadPrepareParams.mAttributePathParamsListSize);
+    Span <EventPathParams> eventPaths(aReadPrepareParams.mpEventPathParamsList,
+                                      aReadPrepareParams.mEventPathParamsListSize);
+    Span <DataVersionFilter> dataVersionFilters(aReadPrepareParams.mpDataVersionFilterList,
+                                                aReadPrepareParams.mDataVersionFilterListSize);
+    for (auto &attribute : attributePaths) {
         attribute.mpReadClient = this;
     }
 
-    {
-        System::PacketBufferTLVWriter writer;
-        ReadRequestMessage::Builder request;
+    System::PacketBufferHandle msgBuf;
+    ReadRequestMessage::Builder request;
+    System::PacketBufferTLVWriter writer;
 
-        msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
-        VerifyOrReturnError(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+    ReserveBuffer(writer, kReservedSizeForTLVEncodingOverhead);
+    ReturnErrorOnFailure(request.Init(&writer));
 
-        uint16_t reservedSize = 0;
-
-        if (msgBuf->AvailableDataLength() > kMaxSecureSduLengthBytes)
-        {
-            reservedSize = static_cast<uint16_t>(msgBuf->AvailableDataLength() - kMaxSecureSduLengthBytes);
-        }
-
-        reservedSize =
-            static_cast<uint16_t>(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES + kReservedSizeForTLVEncodingOverhead);
-
-        writer.Init(std::move(msgBuf));
-
-        ReturnErrorOnFailure(writer.ReserveBuffer(reservedSize));
-
-        ReturnErrorOnFailure(request.Init(&writer));
-
-        if (!attributePaths.empty())
-        {
-            AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributeRequests();
-            ReturnErrorOnFailure(err = request.GetError());
-            ReturnErrorOnFailure(GenerateAttributePaths(attributePathListBuilder, attributePaths));
-        }
-
-        if (!eventPaths.empty())
-        {
-            EventPathIBs::Builder & eventPathListBuilder = request.CreateEventRequests();
-            ReturnErrorOnFailure(err = request.GetError());
-
-            ReturnErrorOnFailure(GenerateEventPaths(eventPathListBuilder, eventPaths));
-
-            if (aReadPrepareParams.mEventNumber != 0)
-            {
-                // EventFilter is optional
-                EventFilterIBs::Builder & eventFilters = request.CreateEventFilters();
-                ReturnErrorOnFailure(request.GetError());
-
-                EventFilterIB::Builder & eventFilter = eventFilters.CreateEventFilter();
-                ReturnErrorOnFailure(eventFilters.GetError());
-                ReturnErrorOnFailure(eventFilter.EventMin(aReadPrepareParams.mEventNumber).EndOfEventFilterIB().GetError());
-                ReturnErrorOnFailure(eventFilters.EndOfEventFilters().GetError());
-            }
-        }
-
-        ReturnErrorOnFailure(request.IsFabricFiltered(aReadPrepareParams.mIsFabricFiltered).GetError());
-
-        bool hasEncodeDataVersionList = false;
-        if (!attributePaths.empty())
-        {
-            uint32_t number = 0;
-            TLV::TLVWriter backup;
-            request.Checkpoint(backup);
-            if (!dataVersionFilters.empty())
-            {
-                DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
-                ReturnErrorOnFailure(request.GetError());
-                ReturnErrorOnFailure(
-                    GenerateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths, dataVersionFilters, number));
-                if (number == 0)
-                {
-                    request.Rollback(backup);
-                }
-                else
-                {
-                    hasEncodeDataVersionList = true;
-                }
-            }
-            else
-            {
-                DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
-                ReturnErrorOnFailure(request.GetError());
-                if (mpCallback.OnUpdateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths) == 0)
-                {
-                    request.Rollback(backup);
-                }
-                else
-                {
-                    ReturnErrorOnFailure(writer.UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
-                    ReturnErrorOnFailure(dataVersionFilterListBuilder.EndOfDataVersionFilterIBs().GetError());
-                    hasEncodeDataVersionList = true;
-                }
-            }
-        }
-
-        if (!hasEncodeDataVersionList)
-        {
-            ReturnErrorOnFailure(writer.UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
-        }
-        ReturnErrorOnFailure(request.EndOfReadRequestMessage().GetError());
-        ReturnErrorOnFailure(writer.Finalize(&msgBuf));
+    if (!attributePaths.empty()) {
+        AttributePathIBs::Builder &attributePathListBuilder = request.CreateAttributeRequests();
+        ReturnErrorOnFailure(err = request.GetError());
+        ReturnErrorOnFailure(GenerateAttributePaths(attributePathListBuilder, attributePaths));
     }
+
+    if (!eventPaths.empty()) {
+        EventPathIBs::Builder &eventPathListBuilder = request.CreateEventRequests();
+        ReturnErrorOnFailure(err = request.GetError());
+
+        ReturnErrorOnFailure(GenerateEventPaths(eventPathListBuilder, eventPaths));
+
+        if (aReadPrepareParams.mEventNumber != 0) {
+            // EventFilter is optional
+            EventFilterIBs::Builder &eventFilters = request.CreateEventFilters();
+            ReturnErrorOnFailure(request.GetError());
+
+            EventFilterIB::Builder &eventFilter = eventFilters.CreateEventFilter();
+            ReturnErrorOnFailure(eventFilters.GetError());
+            ReturnErrorOnFailure(
+                    eventFilter.EventMin(aReadPrepareParams.mEventNumber).EndOfEventFilterIB().GetError());
+            ReturnErrorOnFailure(eventFilters.EndOfEventFilters().GetError());
+        }
+    }
+
+    ReturnErrorOnFailure(request.IsFabricFiltered(aReadPrepareParams.mIsFabricFiltered).GetError());
+
+    bool hasEncodeDataVersionList = false;
+    TLV::TLVWriter backup;
+    request.Checkpoint(backup);
+    DataVersionFilterIBs::Builder &dataVersionFilterListBuilder = request.CreateDataVersionFilters();
+    ReturnErrorOnFailure(request.GetError());
+    if (!attributePaths.empty())
+    {
+        ReturnErrorOnFailure(GenerateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths, dataVersionFilters, hasEncodeDataVersionList));
+    }
+    ReturnErrorOnFailure(dataVersionFilterListBuilder.GetWriter()->UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
+    if (hasEncodeDataVersionList)
+    {
+        ReturnErrorOnFailure(dataVersionFilterListBuilder.EndOfDataVersionFilterIBs().GetError());
+    }
+    else
+    {
+        request.Rollback(backup);
+    }
+
+    ReturnErrorOnFailure(request.EndOfReadRequestMessage().GetError());
+    ReturnErrorOnFailure(writer.Finalize(&msgBuf));
 
     mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHolder.Get(), this);
     VerifyOrReturnError(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     mpExchangeCtx->SetResponseTimeout(aReadPrepareParams.mTimeout);
 
-    ReturnErrorOnFailure(mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
-                                                    Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
+    ReturnErrorOnFailure(
+            mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
+                                       Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
 
-    mPeerNodeId  = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetPeerNodeId();
+    mPeerNodeId = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetPeerNodeId();
     mFabricIndex = aReadPrepareParams.mSessionHolder->GetFabricIndex();
 
     MoveToState(ClientState::AwaitingInitialReport);
@@ -355,7 +315,7 @@ CHIP_ERROR ReadClient::GenerateAttributePaths(AttributePathIBs::Builder & aAttri
         ReturnErrorOnFailure(path.Encode(attribute));
         if (attribute.HasAttributeWildcard())
         {
-            mpCallback.OnAddWildcardAttributePath(attribute);
+            mpCallback.OnReadingWildcardAttributePath(attribute);
         }
     }
 
@@ -363,19 +323,19 @@ CHIP_ERROR ReadClient::GenerateAttributePaths(AttributePathIBs::Builder & aAttri
     return aAttributePathIBsBuilder.GetError();
 }
 
-CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                                      const Span<AttributePathParams> & aAttributePaths,
-                                                     const Span<DataVersionFilter> & aDataVersionFilters, uint32_t & aNumber)
+                                                     const Span<DataVersionFilter> & aDataVersionFilters, bool & aHasEncodeDataVersionList)
 {
     for (auto & filter : aDataVersionFilters)
     {
         VerifyOrReturnError(filter.IsValidDataVersionFilter(), CHIP_ERROR_INVALID_ARGUMENT);
 
-        // if data version filter does not intersect with attribute path requests asks for, discard this filter
+        // If data version filter is for some cluster none of whose attributes are included in our paths, discard this filter.
         bool intersected = false;
         for (auto & path : aAttributePaths)
         {
-            if (path.IsAttributePathIntersect(filter))
+            if (path.IncludesAttributesInCluster(filter))
             {
                 intersected = true;
                 break;
@@ -393,11 +353,26 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
         ReturnErrorOnFailure(path.Endpoint(filter.mEndpointId).Cluster(filter.mClusterId).EndOfClusterPathIB().GetError());
         VerifyOrReturnError(filter.mDataVersion.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(filterIB.DataVersion(filter.mDataVersion.Value()).EndOfDataVersionFilterIB().GetError());
-        aNumber++;
+        aHasEncodeDataVersionList = true;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                                     const Span<AttributePathParams> & aAttributePaths,
+                                                     const Span<DataVersionFilter> & aDataVersionFilters, bool & aHasEncodeDataVersionList)
+{
+    if (!aDataVersionFilters.empty())
+    {
+        ReturnErrorOnFailure(BuildDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aDataVersionFilters,
+                                                        aHasEncodeDataVersionList));
+    }
+    else
+    {
+        ReturnErrorOnFailure(mpCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aHasEncodeDataVersionList));
     }
 
-    ReturnErrorOnFailure(aDataVersionFilterIBsBuilder.GetWriter()->UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
-    return aDataVersionFilterIBsBuilder.EndOfDataVersionFilterIBs().GetError();
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
@@ -867,9 +842,6 @@ CHIP_ERROR ReadClient::SendAutoResubscribeRequest(ReadPrepareParams && aReadPrep
 CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    System::PacketBufferHandle msgBuf;
-    System::PacketBufferTLVWriter writer;
-    SubscribeRequestMessage::Builder request;
 
     VerifyOrReturnError(ClientState::Idle == mState, err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -884,24 +856,13 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
         attribute.mpReadClient = this;
     }
 
-    msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
-    VerifyOrReturnError(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-
     VerifyOrReturnError(aReadPrepareParams.mMinIntervalFloorSeconds <= aReadPrepareParams.mMaxIntervalCeilingSeconds,
                         err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    uint16_t reservedSize = 0;
-
-    if (msgBuf->AvailableDataLength() > kMaxSecureSduLengthBytes)
-    {
-        reservedSize = static_cast<uint16_t>(msgBuf->AvailableDataLength() - kMaxSecureSduLengthBytes);
-    }
-
-    reservedSize =
-        static_cast<uint16_t>(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES + kReservedSizeForTLVEncodingOverhead);
-
-    writer.Init(std::move(msgBuf));
-    ReturnErrorOnFailure(writer.ReserveBuffer(reservedSize));
+    System::PacketBufferHandle msgBuf;
+    System::PacketBufferTLVWriter writer;
+    SubscribeRequestMessage::Builder request;
+    ReserveBuffer(writer, kReservedSizeForTLVEncodingOverhead);
 
     ReturnErrorOnFailure(request.Init(&writer));
 
@@ -940,48 +901,24 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     ReturnErrorOnFailure(err = request.IsFabricFiltered(aReadPrepareParams.mIsFabricFiltered).GetError());
 
     bool hasEncodeDataVersionList = false;
+    TLV::TLVWriter backup;
+    request.Checkpoint(backup);
+    DataVersionFilterIBs::Builder &dataVersionFilterListBuilder = request.CreateDataVersionFilters();
+    ReturnErrorOnFailure(request.GetError());
     if (!attributePaths.empty())
     {
-        uint32_t number = 0;
-        TLV::TLVWriter backup;
-        request.Checkpoint(backup);
-        if (!dataVersionFilters.empty())
-        {
-            DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
-            ReturnErrorOnFailure(request.GetError());
-            ReturnErrorOnFailure(
-                GenerateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths, dataVersionFilters, number));
-            if (number == 0)
-            {
-                request.Rollback(backup);
-            }
-            else
-            {
-                hasEncodeDataVersionList = true;
-            }
-        }
-        else
-        {
-            DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
-            ReturnErrorOnFailure(request.GetError());
-
-            if (mpCallback.OnUpdateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths) == 0)
-            {
-                request.Rollback(backup);
-            }
-            else
-            {
-                ReturnErrorOnFailure(writer.UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
-                ReturnErrorOnFailure(dataVersionFilterListBuilder.EndOfDataVersionFilterIBs().GetError());
-                hasEncodeDataVersionList = true;
-            }
-        }
+        ReturnErrorOnFailure(GenerateDataVersionFilterList(dataVersionFilterListBuilder, attributePaths, dataVersionFilters, hasEncodeDataVersionList));
     }
-
-    if (!hasEncodeDataVersionList)
+    ReturnErrorOnFailure(dataVersionFilterListBuilder.GetWriter()->UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
+    if (hasEncodeDataVersionList)
     {
-        ReturnErrorOnFailure(writer.UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
+        ReturnErrorOnFailure(dataVersionFilterListBuilder.EndOfDataVersionFilterIBs().GetError());
     }
+    else
+    {
+        request.Rollback(backup);
+    }
+
     ReturnErrorOnFailure(err = request.EndOfSubscribeRequestMessage().GetError());
     ReturnErrorOnFailure(writer.Finalize(&msgBuf));
 
@@ -1004,8 +941,8 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void 
 {
     ReadClient * const _this = reinterpret_cast<ReadClient *>(apAppState);
     assert(_this != nullptr);
-    _this->mNumRetries++;
     _this->SendSubscribeRequest(_this->mReadPrepareParams);
+    _this->mNumRetries++;
 }
 
 bool ReadClient::ResubscribeIfNeeded()

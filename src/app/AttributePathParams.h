@@ -83,7 +83,7 @@ struct AttributePathParams
         return true;
     }
 
-    bool IsAttributePathIntersect(const DataVersionFilter & other) const
+    bool IncludesAttributesInCluster(const DataVersionFilter & other) const
     {
         VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
         VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
@@ -91,7 +91,7 @@ struct AttributePathParams
         return true;
     }
 
-    bool IsAttributePathIntersect(const ConcreteClusterPath & other) const
+    bool IncludesAttributesInCluster(const ConcreteClusterPath & other) const
     {
         VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
         VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
@@ -99,21 +99,9 @@ struct AttributePathParams
         return true;
     }
 
-    bool IsWildcardRequest(const AttributePathParams & aOther) const
+    bool IncludesAllAttributesInCluster(const ConcreteClusterPath & aOther) const
     {
-        if (HasWildcardEndpointId())
-        {
-            return true;
-        }
-        if (HasWildcardClusterId())
-        {
-            return true;
-        }
-        if (mEndpointId == aOther.mEndpointId && mClusterId == aOther.mClusterId && HasWildcardAttributeId())
-        {
-            return true;
-        }
-        return false;
+        return IncludesAttributesInCluster(aOther) && HasWildcardAttributeId();
     }
 
     bool operator<(const AttributePathParams & aOther) const

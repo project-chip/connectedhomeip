@@ -218,8 +218,6 @@ public:
 
     CHIP_ERROR GetVersion(EndpointId mEndpointId, ClusterId mClusterId, Optional<DataVersion> & aVersion);
 
-    static void SortFilterMap(std::map<DataVersionFilter, size_t> & aMap,
-                              std::vector<std::pair<DataVersionFilter, size_t>> & aVector);
     /*
      * Execute an iterator function that is called for every attribute
      * in a given endpoint and cluster. The function when invoked is provided a concrete attribute path
@@ -244,7 +242,7 @@ public:
         auto clusterState = GetClusterState(endpointId, clusterId, err);
         ReturnErrorOnFailure(err);
 
-        for (auto & attributeIter : clusterState->mState)
+        for (auto & attributeIter : clusterState->mAttributes)
         {
             const ConcreteAttributePath path(endpointId, clusterId, attributeIter.first);
             ReturnErrorOnFailure(func(path));
@@ -275,7 +273,7 @@ public:
             {
                 if (clusterIter.first == clusterId)
                 {
-                    for (auto & attributeIter : clusterIter.second.mState)
+                    for (auto & attributeIter : clusterIter.second.mAttributes)
                     {
                         const ConcreteAttributePath path(endpointIter.first, clusterId, attributeIter.first);
                         ReturnErrorOnFailure(func(path));
@@ -319,7 +317,7 @@ private:
     // mCommittedDataVersion is set when client receives the last reports and mPendingDataVersion has valid value.
     struct ClusterState
     {
-        std::map<AttributeId, AttributeState> mState;
+        std::map<AttributeId, AttributeState> mAttributes;
         Optional<DataVersion> mPendingDataVersion;
         Optional<DataVersion> mCommittedDataVersion;
     };
@@ -369,19 +367,20 @@ private:
         mCallback.OnDeallocatePaths(std::move(aReadPrepareParams));
     }
 
-    uint32_t OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                           const Span<AttributePathParams> & aAttributePaths) override;
-    virtual void OnAddWildcardAttributePath(const AttributePathParams & aAttributePathParams) override;
+    virtual CHIP_ERROR OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                           const Span<AttributePathParams> & aAttributePaths, bool & aHasEncodeDataVersionList) override;
+    virtual void OnReadingWildcardAttributePath(const AttributePathParams & aAttributePathParams) override;
 
     virtual void OnClearWildcardAttributePath(const ReadClient * apReadClient) override;
     void GetSortedFilters(std::vector<std::pair<DataVersionFilter, size_t>> & aVector);
 
     Callback & mCallback;
     NodeState mCache;
-    std::set<ConcreteDataAttributePath> mChangedAttributeSet;
+    std::set<ConcreteAttributePath> mChangedAttributeSet;
     std::set<AttributePathParams> mRequestPathSet; // wildcard attribute request path only
     std::vector<EndpointId> mAddedEndpoints;
     BufferedReadCallback mBufferedReader;
+    ConcreteClusterPath mLastConcreteClusterPath = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
 };
 
 }; // namespace app
