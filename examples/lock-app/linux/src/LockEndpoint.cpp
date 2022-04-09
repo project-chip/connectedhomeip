@@ -289,9 +289,10 @@ bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::Byte
 {
     if (!pin.HasValue())
     {
-        ChipLogDetail(Zcl, "Door Lock App: PIN code is not specified, not setting door lock state to \"%s\" [endpointId=%d]",
+        ChipLogDetail(Zcl, "Lock App: PIN code is not specified, setting door lock state to \"%s\" [endpointId=%d]",
                       lockStateToString(lockState), mEndpointId);
-        return false;
+        mLockState = lockState;
+        return true;
     }
 
     // Check the PIN code

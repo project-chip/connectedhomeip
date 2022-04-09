@@ -2848,6 +2848,20 @@ public class ClusterReadMapping {
     readDoorLockInteractionInfo.put(
         "readNumberOfYearDaySchedulesSupportedPerUserAttribute",
         readDoorLockNumberOfYearDaySchedulesSupportedPerUserAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readDoorLockNumberOfHolidaySchedulesSupportedCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readDoorLockNumberOfHolidaySchedulesSupportedAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .readNumberOfHolidaySchedulesSupportedAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readDoorLockNumberOfHolidaySchedulesSupportedCommandParams);
+    readDoorLockInteractionInfo.put(
+        "readNumberOfHolidaySchedulesSupportedAttribute",
+        readDoorLockNumberOfHolidaySchedulesSupportedAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readDoorLockMaxPINCodeLengthCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readDoorLockMaxPINCodeLengthAttributeInteractionInfo =
@@ -3000,6 +3014,34 @@ public class ClusterReadMapping {
     readDoorLockInteractionInfo.put(
         "readWrongCodeEntryLimitAttribute",
         readDoorLockWrongCodeEntryLimitAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readDoorLockUserCodeTemporaryDisableTimeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readDoorLockUserCodeTemporaryDisableTimeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .readUserCodeTemporaryDisableTimeAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readDoorLockUserCodeTemporaryDisableTimeCommandParams);
+    readDoorLockInteractionInfo.put(
+        "readUserCodeTemporaryDisableTimeAttribute",
+        readDoorLockUserCodeTemporaryDisableTimeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readDoorLockRequirePINforRemoteOperationCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readDoorLockRequirePINforRemoteOperationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .readRequirePINforRemoteOperationAttribute(
+                      (ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readDoorLockRequirePINforRemoteOperationCommandParams);
+    readDoorLockInteractionInfo.put(
+        "readRequirePINforRemoteOperationAttribute",
+        readDoorLockRequirePINforRemoteOperationAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readDoorLockGeneratedCommandListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readDoorLockGeneratedCommandListAttributeInteractionInfo =

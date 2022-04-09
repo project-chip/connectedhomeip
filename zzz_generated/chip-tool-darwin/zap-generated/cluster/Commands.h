@@ -21212,6 +21212,89 @@ private:
 };
 
 /*
+ * Attribute NumberOfHolidaySchedulesSupported
+ */
+class ReadDoorLockNumberOfHolidaySchedulesSupported : public ModelCommand {
+public:
+    ReadDoorLockNumberOfHolidaySchedulesSupported()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "number-of-holiday-schedules-supported");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockNumberOfHolidaySchedulesSupported() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x00000016) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeNumberOfHolidaySchedulesSupportedWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"DoorLock.NumberOfHolidaySchedulesSupported response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "DoorLock NumberOfHolidaySchedulesSupported Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeDoorLockNumberOfHolidaySchedulesSupported : public ModelCommand {
+public:
+    SubscribeAttributeDoorLockNumberOfHolidaySchedulesSupported()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "number-of-holiday-schedules-supported");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeDoorLockNumberOfHolidaySchedulesSupported() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000016) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeNumberOfHolidaySchedulesSupportedWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                        params:params
+                                                       subscriptionEstablished:nullptr
+                                                                 reportHandler:^(
+                                                                     NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                                     NSLog(
+                                                                         @"DoorLock.NumberOfHolidaySchedulesSupported response %@",
+                                                                         [value description]);
+                                                                     if (error || !mWait) {
+                                                                         SetCommandExitStatus(
+                                                                             [CHIPError errorToCHIPErrorCode:error]);
+                                                                     }
+                                                                 }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
  * Attribute MaxPINCodeLength
  */
 class ReadDoorLockMaxPINCodeLength : public ModelCommand {
@@ -22381,6 +22464,189 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*
+ * Attribute UserCodeTemporaryDisableTime
+ */
+class ReadDoorLockUserCodeTemporaryDisableTime : public ModelCommand {
+public:
+    ReadDoorLockUserCodeTemporaryDisableTime()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "user-code-temporary-disable-time");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockUserCodeTemporaryDisableTime() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x00000031) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeUserCodeTemporaryDisableTimeWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"DoorLock.UserCodeTemporaryDisableTime response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "DoorLock UserCodeTemporaryDisableTime Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class WriteDoorLockUserCodeTemporaryDisableTime : public ModelCommand {
+public:
+    WriteDoorLockUserCodeTemporaryDisableTime()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "user-code-temporary-disable-time");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteDoorLockUserCodeTemporaryDisableTime() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) WriteAttribute (0x00000031) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block chipError = CHIP_NO_ERROR;
+
+        NSNumber * _Nonnull value = [NSNumber numberWithUnsignedChar:mValue];
+
+        [cluster writeAttributeUserCodeTemporaryDisableTimeWithValue:value
+                                                   completionHandler:^(NSError * _Nullable error) {
+                                                       chipError = [CHIPError errorToCHIPErrorCode:error];
+                                                       ChipLogError(chipTool, "DoorLock UserCodeTemporaryDisableTime Error: %s",
+                                                           chip::ErrorStr(chipError));
+                                                       SetCommandExitStatus(chipError);
+                                                   }];
+        return chipError;
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class SubscribeAttributeDoorLockUserCodeTemporaryDisableTime : public ModelCommand {
+public:
+    SubscribeAttributeDoorLockUserCodeTemporaryDisableTime()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "user-code-temporary-disable-time");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeDoorLockUserCodeTemporaryDisableTime() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000031) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeUserCodeTemporaryDisableTimeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                   params:params
+                                                  subscriptionEstablished:nullptr
+                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                                NSLog(@"DoorLock.UserCodeTemporaryDisableTime response %@",
+                                                                    [value description]);
+                                                                if (error || !mWait) {
+                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                }
+                                                            }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute RequirePINforRemoteOperation
+ */
+class ReadDoorLockRequirePINforRemoteOperation : public ModelCommand {
+public:
+    ReadDoorLockRequirePINforRemoteOperation()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "require-pinfor-remote-operation");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockRequirePINforRemoteOperation() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReadAttribute (0x00000033) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeRequirePINforRemoteOperationWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"DoorLock.RequirePINforRemoteOperation response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "DoorLock RequirePINforRemoteOperation Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class WriteDoorLockRequirePINforRemoteOperation : public ModelCommand {
+public:
+    WriteDoorLockRequirePINforRemoteOperation()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "require-pinfor-remote-operation");
+        AddArgument("attr-value", 0, 1, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteDoorLockRequirePINforRemoteOperation() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) WriteAttribute (0x00000033) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block chipError = CHIP_NO_ERROR;
+
+        NSNumber * _Nonnull value = [NSNumber numberWithBool:mValue];
+
+        [cluster writeAttributeRequirePINforRemoteOperationWithValue:value
+                                                   completionHandler:^(NSError * _Nullable error) {
+                                                       chipError = [CHIPError errorToCHIPErrorCode:error];
+                                                       ChipLogError(chipTool, "DoorLock RequirePINforRemoteOperation Error: %s",
+                                                           chip::ErrorStr(chipError));
+                                                       SetCommandExitStatus(chipError);
+                                                   }];
+        return chipError;
+    }
+
+private:
+    bool mValue;
 };
 
 /*
@@ -78488,6 +78754,8 @@ void registerClusterDoorLock(Commands & commands)
         make_unique<SubscribeAttributeDoorLockNumberOfWeekDaySchedulesSupportedPerUser>(), //
         make_unique<ReadDoorLockNumberOfYearDaySchedulesSupportedPerUser>(), //
         make_unique<SubscribeAttributeDoorLockNumberOfYearDaySchedulesSupportedPerUser>(), //
+        make_unique<ReadDoorLockNumberOfHolidaySchedulesSupported>(), //
+        make_unique<SubscribeAttributeDoorLockNumberOfHolidaySchedulesSupported>(), //
         make_unique<ReadDoorLockMaxPINCodeLength>(), //
         make_unique<SubscribeAttributeDoorLockMaxPINCodeLength>(), //
         make_unique<ReadDoorLockMinPINCodeLength>(), //
@@ -78519,6 +78787,11 @@ void registerClusterDoorLock(Commands & commands)
         make_unique<ReadDoorLockWrongCodeEntryLimit>(), //
         make_unique<WriteDoorLockWrongCodeEntryLimit>(), //
         make_unique<SubscribeAttributeDoorLockWrongCodeEntryLimit>(), //
+        make_unique<ReadDoorLockUserCodeTemporaryDisableTime>(), //
+        make_unique<WriteDoorLockUserCodeTemporaryDisableTime>(), //
+        make_unique<SubscribeAttributeDoorLockUserCodeTemporaryDisableTime>(), //
+        make_unique<ReadDoorLockRequirePINforRemoteOperation>(), //
+        make_unique<WriteDoorLockRequirePINforRemoteOperation>(), //
         make_unique<ReadDoorLockGeneratedCommandList>(), //
         make_unique<SubscribeAttributeDoorLockGeneratedCommandList>(), //
         make_unique<ReadDoorLockAcceptedCommandList>(), //
