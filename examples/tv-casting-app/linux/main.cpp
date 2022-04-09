@@ -328,21 +328,14 @@ public:
             .clientPool               = &gCASEClientPool,
         };
 
-        PeerId peerID           = fabric->GetPeerIdForNode(nodeId);
-        mOperationalDeviceProxy = chip::Platform::New<chip::OperationalDeviceProxy>(initParams, peerID);
+        PeerId peerID = fabric->GetPeerIdForNode(nodeId);
 
-        // TODO: figure out why this doesn't work so that we can remove OperationalDeviceProxy creation above,
-        // and remove the FindSecureSessionForNode and SetConnectedSession calls below
-        // mOperationalDeviceProxy = server->GetCASESessionManager()->FindExistingSession(nodeId);
+        mOperationalDeviceProxy = server->GetCASESessionManager()->FindExistingSession(peerID);
         if (mOperationalDeviceProxy == nullptr)
         {
-            ChipLogError(AppServer, "Failed in creating an instance of OperationalDeviceProxy");
+            ChipLogError(AppServer, "Failed to find an existing instance of OperationalDeviceProxy to the peer");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        ChipLogError(AppServer, "Created an instance of OperationalDeviceProxy");
-
-        SessionHandle handle = server->GetSecureSessionManager().FindSecureSessionForNode(nodeId);
-        mOperationalDeviceProxy->SetConnectedSession(handle);
 
         mInitialized = true;
         return CHIP_NO_ERROR;
