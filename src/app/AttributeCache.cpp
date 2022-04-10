@@ -312,9 +312,10 @@ void AttributeCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter, s
             aVector.push_back(std::make_pair(filter, clusterSize));
         }
     }
-    std::sort(aVector.begin(), aVector.end(),[](const std::pair<DataVersionFilter, size_t> &x, const std::pair<DataVersionFilter, size_t> &y) {
-        return x.second > y.second;
-    });
+    std::sort(aVector.begin(), aVector.end(),
+              [](const std::pair<DataVersionFilter, size_t> & x, const std::pair<DataVersionFilter, size_t> & y) {
+                  return x.second > y.second;
+              });
 }
 
 CHIP_ERROR AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
