@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <app/server/Dnssd.h>
+#include <app/server/Server.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 
@@ -25,3 +27,4 @@ CHIP_ERROR DiscoverCommissioners();
 CHIP_ERROR RequestCommissioning(int index);
 void ReadServerClustersForNode(chip::NodeId nodeId);
 CHIP_ERROR ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr);
+CHIP_ERROR SendUDC(chip::Transport::PeerAddress commissioner);

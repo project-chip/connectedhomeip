@@ -41,7 +41,8 @@ static CHIP_ERROR PrintAllCommands()
     streamer_printf(sout, "  discover             Discover commissioners. Usage: cast discover\r\n");
     streamer_printf(sout, "  request <index>      Request commissioning from discovered commissioner with [index]. Usage: cast request 0\r\n");
     streamer_printf(sout, "  launch <url> <display>   Launch content. Usage: cast launc https://www.yahoo.com Hello\r\n");
-    streamer_printf(sout, "  access <node>        Read and display clusters on each endpoint for <node>. Usage: access 0xFFFFFFEFFFFFFFFF\r\n");
+    streamer_printf(sout, "  access <node>        Read and display clusters on each endpoint for <node>. Usage: cast access 0xFFFFFFEFFFFFFFFF\r\n");
+    streamer_printf(sout, "  sendudc <address> <port> Send UDC message to address. Usage: cast sendudc ::1 5543\r\n");
     streamer_printf(sout, "\r\n");
 
     return CHIP_NO_ERROR;
@@ -94,6 +95,14 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         chip::NodeId node = (chip::NodeId) strtoull(argv[1], &eptr, 0);
         ReadServerClustersForNode(node);
         return error;
+    }
+    else if (strcmp(argv[0], "sendudc") == 0)
+    {
+        char * eptr;
+        chip::Inet::IPAddress commissioner;
+        chip::Inet::IPAddress::FromString(argv[1], commissioner);
+        uint16_t port = (uint16_t) strtol(argv[2], &eptr, 10);
+        return SendUDC(chip::Transport::PeerAddress::UDP(commissioner, port));
     }
     else
     {

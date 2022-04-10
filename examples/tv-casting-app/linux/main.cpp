@@ -190,27 +190,11 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 }
 
-/**
- * Accepts user input of selected commissioner and calls PrepareForCommissioning with
- * the selected commissioner
- */
-/*
-void RequestUserDirectedCommissioning(System::SocketEvents events, intptr_t data)
+CHIP_ERROR SendUDC(chip::Transport::PeerAddress commissioner)
 {
-    // Accept user selection for commissioner to request commissioning from.
-    // Assuming kernel has line buffering, this will unblock on '\n' character
-    // on stdin i.e. when user hits 'Enter'
-    int selectedCommissionerNumber = CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES;
-    scanf("%d", &selectedCommissionerNumber);
-    printf("%d\n", selectedCommissionerNumber);
-    chip::DeviceLayer::SystemLayerSockets().StopWatchingSocket(&gToken);
-
-    const Dnssd::DiscoveredNodeData * selectedCommissioner =
-        gCommissionableNodeController.GetDiscoveredCommissioner(selectedCommissionerNumber - 1);
-    VerifyOrReturn(selectedCommissioner != nullptr, ChipLogError(AppServer, "No such commissioner!"));
-    PrepareForCommissioning(selectedCommissioner);
+    PrepareForCommissioning();
+    return Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner);
 }
-*/
 
 void InitCommissioningFlow(intptr_t commandArg)
 {
@@ -247,11 +231,9 @@ CHIP_ERROR DiscoverCommissioners()
     ReturnErrorOnFailure(gCommissionableNodeController.DiscoverCommissioners(gDiscoveryFilter));
 
     // Give commissioners some time to respond and then ScheduleWork to initiate commissioning
-    DeviceLayer::SystemLayer().StartTimer(
+    return DeviceLayer::SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(kCommissionerDiscoveryTimeoutInMs),
         [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR RequestCommissioning(int index)
@@ -260,7 +242,7 @@ CHIP_ERROR RequestCommissioning(int index)
         gCommissionableNodeController.GetDiscoveredCommissioner(index);
     if (selectedCommissioner == nullptr)
     {
-        ChipLogError(AppServer, "No such commissioner!");
+        ChipLogError(AppServer, "No such commissioner with index %d exists", index);
         return CHIP_ERROR_INVALID_ARGUMENT;
     } 
     PrepareForCommissioning(selectedCommissioner);
@@ -574,8 +556,7 @@ CHIP_ERROR ContentLauncherLaunchURL(const char * contentUrl, const char * conten
     LaunchURL::Type request;
     request.contentURL          = chip::CharSpan::fromCharString(contentUrl);
     request.displayString       = Optional<CharSpan>(chip::CharSpan::fromCharString(contentDisplayStr));
-    request.brandingInformation = Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type>(
-            chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type());
+    request.brandingInformation = MakeOptional(chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type());
     cluster.InvokeCommand(request, nullptr, OnContentLauncherSuccessResponse, OnContentLauncherFailureResponse);
     return CHIP_NO_ERROR;
 }
