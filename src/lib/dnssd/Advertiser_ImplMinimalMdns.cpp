@@ -206,9 +206,9 @@ private:
     struct CommonTxtEntryStorage
     {
         // +2 for all to account for '=' and terminating nullchar
-        char mrpRetryIntervalIdleBuf[KeySize(TxtFieldKey::kMrpRetryIntervalIdle) + ValSize(TxtFieldKey::kMrpRetryIntervalIdle) + 2];
-        char mrpRetryIntervalActiveBuf[KeySize(TxtFieldKey::kMrpRetryIntervalActive) +
-                                       ValSize(TxtFieldKey::kMrpRetryIntervalActive) + 2];
+        char mrpRetryIntervalIdleBuf[KeySize(TxtFieldKey::kSleepyIdleInterval) + ValSize(TxtFieldKey::kSleepyIdleInterval) + 2];
+        char mrpRetryIntervalActiveBuf[KeySize(TxtFieldKey::kSleepyActiveInterval) +
+                                       ValSize(TxtFieldKey::kSleepyActiveInterval) + 2];
         char tcpSupportedBuf[KeySize(TxtFieldKey::kTcpSupported) + ValSize(TxtFieldKey::kTcpSupported) + 2];
     };
     template <class Derived>
