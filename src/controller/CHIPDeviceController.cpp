@@ -413,7 +413,6 @@ DeviceCommissioner::DeviceCommissioner() :
     mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
 {
     mPairingDelegate           = nullptr;
-    mPairedDevicesUpdated      = false;
     mDeviceBeingCommissioned   = nullptr;
     mDeviceInPASEEstablishment = nullptr;
 }
@@ -1371,7 +1370,6 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(De
     mSystemState->SystemLayer()->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
 
     mPairedDevices.Insert(device->GetDeviceId());
-    mPairedDevicesUpdated = true;
 
     if (mPairingDelegate != nullptr)
     {

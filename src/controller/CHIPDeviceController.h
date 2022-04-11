@@ -569,11 +569,6 @@ private:
     DeviceProxy * mDeviceBeingCommissioned               = nullptr;
     CommissioneeDeviceProxy * mDeviceInPASEEstablishment = nullptr;
 
-    /* This field is true when device pairing information changes, e.g. a new device is paired, or
-       the pairing for a device is removed. The DeviceCommissioner uses this to decide when to
-       persist the device list */
-    bool mPairedDevicesUpdated;
-
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
     bool mRunCommissioningAfterConnection  = false;
 
