@@ -148,6 +148,13 @@ config("abi_default") {
 
   asmflags = cflags
   ldflags = cflags
+
+  # Delete unreferenced sections. Helpful with -ffunction-sections.
+  if (current_os == "mac" || current_os == "ios") {
+    ldflags += [ "-Wl,-dead_strip" ]
+  } else {
+    ldflags += [ "-Wl,--gc-sections" ]
+  }
 }
 
 config("target_default") {
