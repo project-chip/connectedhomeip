@@ -21,6 +21,7 @@ from .builder import Builder
 
 
 class NrfApp(Enum):
+    ALL_CLUSTERS = auto()
     LIGHT = auto()
     LOCK = auto()
     SHELL = auto()
@@ -29,7 +30,9 @@ class NrfApp(Enum):
     UNIT_TESTS = auto()
 
     def AppPath(self):
-        if self == NrfApp.LIGHT:
+        if self == NrfApp.ALL_CLUSTERS:
+            return 'examples/all-clusters-app'
+        elif self == NrfApp.LIGHT:
             return 'examples/lighting-app'
         elif self == NrfApp.LOCK:
             return 'examples/lock-app'
@@ -45,7 +48,9 @@ class NrfApp(Enum):
             raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
-        if self == NrfApp.LIGHT:
+        if self == NrfApp.ALL_CLUSTERS:
+            return 'chip-nrf-all-clusters-example'
+        elif self == NrfApp.LIGHT:
             return 'chip-nrf-lighting-example'
         elif self == NrfApp.LOCK:
             return 'chip-nrf-lock-example'
@@ -61,7 +66,9 @@ class NrfApp(Enum):
             raise Exception('Unknown app type: %r' % self)
 
     def _FlashBundlePrefix(self):
-        if self == NrfApp.LIGHT:
+        if self == NrfApp.ALL_CLUSTERS:
+            return 'chip-nrfconnect-all-clusters-example'
+        elif self == NrfApp.LIGHT:
             return 'chip-nrfconnect-lighting-example'
         elif self == NrfApp.LOCK:
             return 'chip-nrfconnect-lock-example'
@@ -148,7 +155,7 @@ class NrfConnectBuilder(Builder):
             if self.enable_rpcs:
                 flags.append("-DOVERLAY_CONFIG=rpc.overlay")
 
-            if self.board == NrfBoard.NRF52840DONGLE:
+            if self.board == NrfBoard.NRF52840DONGLE and self.app != NrfApp.ALL_CLUSTERS:
                 flags.append("-DCONF_FILE=prj_no_dfu.conf")
 
             build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""

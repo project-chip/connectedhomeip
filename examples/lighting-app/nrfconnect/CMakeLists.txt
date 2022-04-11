@@ -78,7 +78,7 @@ if(CONFIG_MCUMGR_SMP_BT)
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUOverSMP.cpp)
 endif()
 
-if (BOARD STREQUAL "nrf52840dongle_nrf52840")
+if (CONFIG_SHELL AND BOARD STREQUAL "nrf52840dongle_nrf52840")
   target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUTrigger.cpp)
 endif()
 
