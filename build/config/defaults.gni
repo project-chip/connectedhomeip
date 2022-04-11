@@ -83,7 +83,8 @@ declare_args() {
   default_configs_target = [ "${build_root}/config/compiler:target_default" ]
 
   # Default configs for dead code elimination.
-  default_configs_dead_code = [ "${build_root}/config/compiler:dead_code_elimination_default" ]
+  default_configs_dead_code =
+      [ "${build_root}/config/compiler:dead_code_elimination_default" ]
 
   # Extra default configs.
   default_configs_extra = []
