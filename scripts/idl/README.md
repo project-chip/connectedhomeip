@@ -113,7 +113,7 @@ server cluster AccessControl = 31 {
   command Off(): DefaultSuccess = 3;
 
   // command invocation default to "operate" privilege, however these
-  // can be updated as well
+  // can be modified as well
   command access(invoke: administer) Off(): DefaultSuccess = 4;
 }
 
