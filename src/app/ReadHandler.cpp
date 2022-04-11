@@ -41,12 +41,13 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
                          InteractionType aInteractionType) :
     mManagementCallback(apCallback)
 {
-    mpExchangeMgr           = apExchangeContext->GetExchangeMgr();
-    mpExchangeCtx           = apExchangeContext;
-    mInteractionType        = aInteractionType;
-    mInitiatorNodeId        = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId();
-    mSubjectDescriptor      = apExchangeContext->GetSessionHandle()->GetSubjectDescriptor();
-    mLastWrittenEventsBytes = 0;
+    mpExchangeMgr               = apExchangeContext->GetExchangeMgr();
+    mpExchangeCtx               = apExchangeContext;
+    mInteractionType            = aInteractionType;
+    mInitiatorNodeId            = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId();
+    mSubjectDescriptor          = apExchangeContext->GetSessionHandle()->GetSubjectDescriptor();
+    mLastWrittenEventsBytes     = 0;
+    mSubscriptionStartTimestamp = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
     if (apExchangeContext != nullptr)
     {
         apExchangeContext->SetDelegate(this);
@@ -375,6 +376,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     }
     ReturnErrorOnFailure(err);
 
+    // Ensure the read transaction don't exceed the resources dedicated to read transactions.
     VerifyOrReturnError(InteractionModelEngine::GetInstance()->CanEstablishReadTransaction(this), CHIP_ERROR_NO_MEMORY);
 
     ReturnErrorOnFailure(readRequestParser.GetIsFabricFiltered(&mIsFabricFiltered));
@@ -710,12 +712,6 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
         }
     }
     ReturnErrorOnFailure(err);
-
-    if (!InteractionModelEngine::GetInstance()->CanEstablishSubscribeTransaction(this))
-    {
-        ChipLogProgress(DataManagement, "Cannot establish more subscriptions on this fabric");
-        return CHIP_IM_GLOBAL_STATUS(PathsExhausted);
-    }
 
     ReturnErrorOnFailure(subscribeRequestParser.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
     ReturnErrorOnFailure(subscribeRequestParser.GetMaxIntervalCeilingSeconds(&mMaxIntervalCeilingSeconds));

@@ -243,11 +243,6 @@ public:
     bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath);
 
     /**
-     * Checks if the given read handler will exceed the limitations for the fabric accessed.
-     */
-    bool CanEstablishSubscribeTransaction(const ReadHandler * apReadHandler);
-
-    /**
      * We only allow one active read transactions per fabric, we only allow 3 attribute paths, 3 event paths and 3 data version
      * filters per fabric. This function will check if the given ReadHandler will exceed the limitations for the fabric accessed.
      */
@@ -257,7 +252,7 @@ public:
      * If there is a new fabric added after the subscriptions are established, we need to check if the existing subscriptions on
      * each fabric will exceed the new limit of resource usage per fabric.
      */
-    void CheckAndAbortExceededSubscriptions(FabricIndex aFabricIndex);
+    bool CheckResourceAndEvictOneSubscription(FabricIndex aFabricIndex, bool aForceEvict);
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     //
@@ -369,6 +364,23 @@ private:
 
     CHIP_ERROR ShutdownExistingSubscriptionsIfNeeded(Messaging::ExchangeContext * apExchangeContext,
                                                      System::PacketBufferHandle && aPayload);
+
+    /**
+     * Verify and ensure (by killing oldest read handlers that makes the resource used by chrrent fabric exceeds the fabric quota)
+     * the incoming subscription with the required resources request can be handled.
+     * - If the subscription uses resources within the per subscription limit, this function will always success by evicting
+     * existing subscriptions.
+     * - If the subscription uses more than per subscription limit, this function will return PATHS_EXHAUSTED if we are running out
+     * of paths.
+     *
+     * After the checks above, we will try to ensure we have a free Readhandler for processing the subscription.
+     *
+     * @retval true when we have enough resources for the incoming subscription, false if not.
+     */
+    bool EnsureResourceForSubscription(FabricIndex aFabricIndex, size_t aRequestedAttributePathCount,
+                                       size_t aRequestedEventPathCount);
+
+    void EvictOneReadHandlerWithExceededResources(FabricIndex aFabricIndex);
 
     template <typename T, size_t N>
     void ReleasePool(ObjectList<T> *& aObjectList, ObjectPool<ObjectList<T>, N> & aObjectPool);

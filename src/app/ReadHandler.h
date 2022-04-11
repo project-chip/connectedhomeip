@@ -255,6 +255,8 @@ private:
 
     const SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
 
+    auto GetSubscriptionStartTimestamp() const { return mSubscriptionStartTimestamp; }
+
     void UnblockUrgentEventDelivery()
     {
         mHoldReport = false;
@@ -418,6 +420,8 @@ private:
      * For read handler, if mDirtyGeneration > mPreviousReportsBeginGeneration, then we regard it as a dirty read handler, and it
      * should generate report on timeout reached.
      */
+
+    uint64_t mSubscriptionStartTimestamp = 0;
 
     uint32_t mLastWrittenEventsBytes = 0;
 
