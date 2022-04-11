@@ -190,11 +190,13 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 CHIP_ERROR SendUDC(chip::Transport::PeerAddress commissioner)
 {
     PrepareForCommissioning();
     return Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner);
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
 void InitCommissioningFlow(intptr_t commandArg)
 {

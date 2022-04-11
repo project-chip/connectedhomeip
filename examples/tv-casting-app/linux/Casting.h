@@ -27,4 +27,6 @@ CHIP_ERROR DiscoverCommissioners();
 CHIP_ERROR RequestCommissioning(int index);
 void ReadServerClustersForNode(chip::NodeId nodeId);
 CHIP_ERROR ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr);
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 CHIP_ERROR SendUDC(chip::Transport::PeerAddress commissioner);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
