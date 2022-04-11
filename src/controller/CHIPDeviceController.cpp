@@ -105,9 +105,7 @@ constexpr uint32_t kSessionEstablishmentTimeout = 40 * kMillisecondsPerSecond;
 
 DeviceController::DeviceController()
 {
-    mState                    = State::NotInitialized;
-    mStorageDelegate          = nullptr;
-    mPairedDevicesInitialized = false;
+    mState = State::NotInitialized;
 }
 
 CHIP_ERROR DeviceController::Init(ControllerInitParams params)
@@ -118,7 +116,6 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     VerifyOrReturnError(params.systemState->SystemLayer() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(params.systemState->UDPEndPointManager() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mStorageDelegate = params.storageDelegate;
 #if CONFIG_NETWORK_LAYER_BLE
     VerifyOrReturnError(params.systemState->BleLayer() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 #endif
@@ -231,8 +228,6 @@ CHIP_ERROR DeviceController::Shutdown()
         mSystemState->SessionMgr()->ExpireAllPairingsForFabric(mFabricInfo->GetFabricIndex());
     }
 
-    mStorageDelegate = nullptr;
-
     if (mFabricInfo != nullptr)
     {
         mFabricInfo->Reset();
@@ -244,16 +239,6 @@ CHIP_ERROR DeviceController::Shutdown()
     mDeviceDiscoveryDelegate = nullptr;
 
     return CHIP_NO_ERROR;
-}
-
-bool DeviceController::DoesDevicePairingExist(const PeerId & deviceId)
-{
-    if (InitializePairedDeviceList() == CHIP_NO_ERROR)
-    {
-        return mPairedDevices.Contains(deviceId.GetNodeId());
-    }
-
-    return false;
 }
 
 void DeviceController::ReleaseOperationalDevice(NodeId remoteDeviceId)
@@ -329,64 +314,6 @@ void DeviceController::OnFirstMessageDeliveryFailed(const SessionHandle & sessio
     }
 }
 
-CHIP_ERROR DeviceController::InitializePairedDeviceList()
-{
-    CHIP_ERROR err   = CHIP_NO_ERROR;
-    uint8_t * buffer = nullptr;
-
-    VerifyOrExit(mStorageDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    if (!mPairedDevicesInitialized)
-    {
-        constexpr uint16_t max_size = sizeof(uint64_t) * kNumMaxPairedDevices;
-        buffer                      = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(max_size, 1));
-        uint16_t size               = max_size;
-
-        VerifyOrExit(buffer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-        CHIP_ERROR lookupError = CHIP_NO_ERROR;
-        PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kPairedDeviceListKeyPrefix, key,
-                          lookupError = mStorageDelegate->SyncGetKeyValue(key, buffer, size));
-
-        // It's ok to not have an entry for the Paired Device list. We treat it the same as having an empty list.
-        if (lookupError != CHIP_ERROR_KEY_NOT_FOUND)
-        {
-            VerifyOrExit(size <= max_size, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
-            err = SetPairedDeviceList(ByteSpan(buffer, size));
-            SuccessOrExit(err);
-        }
-    }
-
-exit:
-    if (buffer != nullptr)
-    {
-        chip::Platform::MemoryFree(buffer);
-    }
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Failed to initialize the device list with error: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-
-    return err;
-}
-
-CHIP_ERROR DeviceController::SetPairedDeviceList(ByteSpan serialized)
-{
-    CHIP_ERROR err = mPairedDevices.Deserialize(serialized);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Failed to recreate the device list with buffer %.*s\n", static_cast<int>(serialized.size()),
-                     serialized.data());
-    }
-    else
-    {
-        mPairedDevicesInitialized = true;
-    }
-
-    return err;
-}
-
 CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
@@ -412,7 +339,6 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
         .sessionManager     = mSystemState->SessionMgr(),
         .exchangeMgr        = mSystemState->ExchangeMgr(),
         .udpEndPointManager = mSystemState->UDPEndPointManager(),
-        .storageDelegate    = mStorageDelegate,
         .fabricsTable       = mSystemState->Fabrics(),
     };
 }
@@ -423,7 +349,6 @@ DeviceCommissioner::DeviceCommissioner() :
     mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
 {
     mPairingDelegate           = nullptr;
-    mPairedDevicesUpdated      = false;
     mDeviceBeingCommissioned   = nullptr;
     mDeviceInPASEEstablishment = nullptr;
 }
@@ -631,10 +556,6 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceInPASEEstablishment == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    // This will initialize the commissionee device pool if it has not already been initialized.
-    err = InitializePairedDeviceList();
-    SuccessOrExit(err);
 
     // TODO(#13940): We need to specify the peer address for BLE transport in bindings.
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle ||
@@ -1379,9 +1300,6 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(De
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mSystemState->SystemLayer()->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
-
-    mPairedDevices.Insert(device->GetDeviceId());
-    mPairedDevicesUpdated = true;
 
     if (mPairingDelegate != nullptr)
     {
