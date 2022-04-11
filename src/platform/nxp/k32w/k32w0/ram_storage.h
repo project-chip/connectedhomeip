@@ -42,16 +42,16 @@ typedef enum
 
 typedef struct
 {
-    uint16_t *ramBufferLen;
+    uint16_t * ramBufferLen;
     uint16_t ramBufferMaxLen;
-    uint8_t *pRamBuffer;
+    uint8_t * pRamBuffer;
 } ramBufferDescriptor;
 
-rsError ramStorageGet(const ramBufferDescriptor *pBuffer, uint16_t aKey, int aIndex, uint8_t *aValue, uint16_t *aValueLength);
+rsError ramStorageGet(const ramBufferDescriptor * pBuffer, uint16_t aKey, int aIndex, uint8_t * aValue, uint16_t * aValueLength);
 
-rsError ramStorageSet(ramBufferDescriptor *pBuffer, uint16_t aKey, const uint8_t *aValue, uint16_t aValueLength);
+rsError ramStorageSet(ramBufferDescriptor * pBuffer, uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength);
 
-rsError ramStorageDelete(ramBufferDescriptor *pBuffer, uint16_t aKey, int aIndex);
+rsError ramStorageDelete(ramBufferDescriptor * pBuffer, uint16_t aKey, int aIndex);
 
 #ifdef __cplusplus
 } // extern "C"

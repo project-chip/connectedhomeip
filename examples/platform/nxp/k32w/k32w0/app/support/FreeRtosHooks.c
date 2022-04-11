@@ -27,10 +27,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "PDM.h"
 #include "PWR_Interface.h"
 #include "TimersManager.h"
 #include "board.h"
-#include "PDM.h"
 
 /* Bluetooth Low Energy */
 #include "ble_config.h"
@@ -240,14 +240,13 @@ void vApplicationIdleHook(void)
     PDM_vIdleTask(PDM_MAX_WRITES_INFINITE);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-            OTA_TransactionResume();
+    OTA_TransactionResume();
 
-            if (shouldReset)
-            {
-                ResetMCU();
-            }
+    if (shouldReset)
+    {
+        ResetMCU();
+    }
 #endif
-
 
     BOARD_ActionOnIdle();
 }
