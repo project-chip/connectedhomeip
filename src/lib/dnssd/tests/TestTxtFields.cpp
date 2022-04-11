@@ -68,11 +68,11 @@ void TestGetTxtFieldKey(nlTestSuite * inSuite, void * inContext)
     strcpy(key, "PH");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kPairingHint);
 
-    strcpy(key, "CRI");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kMrpRetryIntervalIdle);
+    strcpy(key, "SII");
+    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kSleepyIdleInterval);
 
-    strcpy(key, "CRA");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kMrpRetryIntervalActive);
+    strcpy(key, "SAI");
+    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kSleepyActiveInterval);
 
     strcpy(key, "T");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kTcpSupported);
@@ -413,14 +413,14 @@ void TxtFieldMrpRetryIntervalIdle(nlTestSuite * inSuite, void * inContext)
     NodeData nodeData;
 
     // Minimum
-    strcpy(key, "CRI");
+    strcpy(key, "SII");
     strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().HasValue());
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().Value() == 1_ms32);
 
     // Maximum
-    strcpy(key, "CRI");
+    strcpy(key, "SII");
     strcpy(val, "3600000");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().HasValue());
@@ -431,37 +431,37 @@ void TxtFieldMrpRetryIntervalIdle(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
 
     // Invalid CRI - negative value
-    strcpy(key, "CRI");
+    strcpy(key, "SII");
     strcpy(val, "-1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
 
     // Invalid CRI - greater than maximum
-    strcpy(key, "CRI");
+    strcpy(key, "SII");
     strcpy(val, "3600001");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
 
     // Invalid CRI - much greater than maximum
-    strcpy(key, "CRI");
+    strcpy(key, "SII");
     strcpy(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
 
     // Invalid CRI - hexadecimal value
-    strcpy(key, "CRI");
+    strcpy(key, "SII");
     strcpy(val, "0x20");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
 
     // Invalid CRI - leading zeros
-    strcpy(key, "CRI");
+    strcpy(key, "SII");
     strcpy(val, "0700");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
 
     // Invalid CRI - text at the end
-    strcpy(key, "CRI");
+    strcpy(key, "SII");
     strcpy(val, "123abc");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
@@ -476,14 +476,14 @@ void TxtFieldMrpRetryIntervalActive(nlTestSuite * inSuite, void * inContext)
     NodeData nodeData;
 
     // Minimum
-    strcpy(key, "CRA");
+    strcpy(key, "SAI");
     strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().HasValue());
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().Value() == 1_ms32);
 
     // Maximum
-    strcpy(key, "CRA");
+    strcpy(key, "SAI");
     strcpy(val, "3600000");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().HasValue());
@@ -494,37 +494,37 @@ void TxtFieldMrpRetryIntervalActive(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
 
     // Invalid CRA - negative value
-    strcpy(key, "CRA");
+    strcpy(key, "SAI");
     strcpy(val, "-1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
 
     // Invalid CRA - greater than maximum
-    strcpy(key, "CRA");
+    strcpy(key, "SAI");
     strcpy(val, "3600001");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
 
     // Invalid CRA - much greater than maximum
-    strcpy(key, "CRA");
+    strcpy(key, "SAI");
     strcpy(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
 
     // Invalid CRA - hexadecimal value
-    strcpy(key, "CRA");
+    strcpy(key, "SAI");
     strcpy(val, "0x20");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
 
     // Invalid CRA - leading zeros
-    strcpy(key, "CRA");
+    strcpy(key, "SAI");
     strcpy(val, "0700");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
 
     // Invalid CRA - text at the end
-    strcpy(key, "CRA");
+    strcpy(key, "SAI");
     strcpy(val, "123abc");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
@@ -575,13 +575,13 @@ void TestIsDeviceSleepyIdle(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is the default value, the device is not sleepy
-    strcpy(key, "CRI");
+    strcpy(key, "SII");
     sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL.count()));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is greater than the default value, the device is sleepy
-    sprintf(key, "CRI");
+    sprintf(key, "SII");
     sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL.count() + 1));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
@@ -601,13 +601,13 @@ void TestIsDeviceSleepyActive(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is the default value, the device is not sleepy
-    sprintf(key, "CRA");
+    sprintf(key, "SAI");
     sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL.count()));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is greater than the default value, the device is sleepy
-    strcpy(key, "CRA");
+    strcpy(key, "SAI");
     sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL.count() + 1));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
