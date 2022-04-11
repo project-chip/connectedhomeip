@@ -579,3 +579,25 @@ To learn more about the tool, how to build it, use its commands and advanced
 features, read the following guide:
 
 -   [Working with the CHIP Tool](https://github.com/project-chip/connectedhomeip/tree/master/docs/guides/chip_tool_guide.md)
+
+## Using the Client via PASE
+
+For testing chip-tool can stop after setting up a PASE session. Model commands
+can be issues via PASE as well.
+
+```bash
+# Start chip-tool interactively
+./out/debug/chip-tool interactive start
+
+# Pair PASE only
+pairing qrcode-paseonly 7676777 MT:6FCJ142C00X50648G00
+
+# Issue a command via PASE
+onoff toggle 7676777 1 --via-pase 1
+
+# Also uses PASE
+onoff toggle 7676777 1
+
+# Switch back to CASE (fails if paseonly)
+onoff toggle 7676777 1 --via-pase 1
+```

@@ -66,6 +66,7 @@ public:
         AddArgument("trace_log", 0, 1, &mTraceLog);
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("ble-adapter", 0, UINT64_MAX, &mBleAdapterId);
+        AddArgument("via-pase", 0, 1, &mViaPase);
     }
 
     /////////// Command Interface /////////
@@ -105,6 +106,9 @@ protected:
     // The default commissioner instance name is "alpha", but it can be overridden by passing
     // --identity "instance name" when running a command.
     ChipDeviceCommissioner & CurrentCommissioner();
+
+protected:
+    chip::Optional<uint16_t> mViaPase;
 
 private:
     CHIP_ERROR MaybeSetUpStack();

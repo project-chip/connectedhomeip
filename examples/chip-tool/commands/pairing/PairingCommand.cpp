@@ -89,7 +89,17 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 
 CHIP_ERROR PairingCommand::PaseWithCode(NodeId remoteId)
 {
-    return CurrentCommissioner().EstablishPASEConnection(remoteId, mOnboardingPayload);
+    chip::SetupPayload payload;
+
+    QRCodeSetupPayloadParser(mOnboardingPayload).populatePayload(payload);
+    mSetupPINCode = payload.setUpPINCode;
+    mDiscriminator = payload.discriminator;
+
+    RendezvousParameters rendezvousParams = RendezvousParameters()
+                                                .SetSetupPINCode(mSetupPINCode)
+                                                .SetDiscriminator(mDiscriminator)
+                                                .SetPeerAddress(PeerAddress::BLE());
+    return CurrentCommissioner().EstablishPASEConnection(remoteId, rendezvousParams);
 }
 
 CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)

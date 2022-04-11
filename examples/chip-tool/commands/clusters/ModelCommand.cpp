@@ -35,11 +35,17 @@ CHIP_ERROR ModelCommand::RunCommand()
         return SendGroupCommand(GroupIdFromNodeId(mNodeId), fabricIndex);
     }
 
-    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
-    return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    if (mViaPase.ValueOr(0) == 1) {
+        ChipLogProgress(chipTool, "Sending command via PASE to node 0x%" PRIx64, mNodeId);
+        CommissioneeDeviceProxy * device = CurrentCommissioner().FindCommissioneeDevice(mNodeId);
+        return this->SendCommand(device, this->mEndPointId);
+    } else {
+        ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
+        return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    }
 }
 
-void ModelCommand::OnDeviceConnectedFn(void * context, ChipDevice * device)
+void ModelCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
 {
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectedFn: context is null"));

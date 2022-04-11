@@ -25,7 +25,7 @@
 class ModelCommand : public CHIPCommand
 {
 public:
-    using ChipDevice = ::chip::OperationalDeviceProxy;
+    using ChipDevice = ::chip::DeviceProxy;
 
     ModelCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
         CHIPCommand(commandName, credsIssuerConfig), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
@@ -56,7 +56,7 @@ private:
     chip::NodeId mNodeId;
     std::vector<chip::EndpointId> mEndPointId;
 
-    static void OnDeviceConnectedFn(void * context, ChipDevice * device);
+    static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
     static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
