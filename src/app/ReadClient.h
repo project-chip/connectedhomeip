@@ -171,13 +171,16 @@ public:
          * version filters specified, to give the callback a chance to provide some.
          *
          * This function is expected to encode as many complete data version filters as will fit into
-         * the buffer, rolling back any partially-encoded filters if it runs out of space, and return
-         * the boolean to show if it has successfully encode at least one data version filter.
+         * the buffer, rolling back any partially-encoded filters if it runs out of space, and set the
+         * aEncodedDataVersionList boolean to true if it has successfully encoded at least one data version filter.
+         *
+         * Otherwise aEncodedDataVersionList will be set to false.
          */
         virtual CHIP_ERROR OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                                          const Span<AttributePathParams> & aAttributePaths,
-                                                         bool & aHasEncodeDataVersionList)
+                                                         bool & aEncodedDataVersionList)
         {
+            aEncodedDataVersionList = false;
             return CHIP_NO_ERROR;
         }
 
@@ -326,10 +329,10 @@ private:
 
     CHIP_ERROR GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                              const Span<AttributePathParams> & aAttributePaths,
-                                             const Span<DataVersionFilter> & aDataVersionFilters, bool & aHasEncodeDataVersionList);
+                                             const Span<DataVersionFilter> & aDataVersionFilters, bool & aEncodedDataVersionList);
     CHIP_ERROR BuildDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                           const Span<AttributePathParams> & aAttributePaths,
-                                          const Span<DataVersionFilter> & aDataVersionFilters, bool & aHasEncodeDataVersionList);
+                                          const Span<DataVersionFilter> & aDataVersionFilters, bool & aEncodedDataVersionList);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 

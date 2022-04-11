@@ -56,7 +56,7 @@ private:
      *  2. The path provided in aPath is similar to what is buffered but we've hit the end of the report.
      *
      */
-    CHIP_ERROR DispatchBufferedData(const ConcreteDataAttributePath & aPath, const StatusIB & aStatus, bool aEndOfReport = false);
+    CHIP_ERROR DispatchBufferedData(const ConcreteAttributePath & aPath, const StatusIB & aStatus, bool aEndOfReport = false);
 
     /*
      * Buffer up list data as they arrive.
@@ -85,9 +85,9 @@ private:
 
     virtual CHIP_ERROR OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                                      const Span<AttributePathParams> & aAttributePaths,
-                                                     bool & aHasEncodeDataVersionList) override
+                                                     bool & aEncodedDataVersionList) override
     {
-        return mCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aHasEncodeDataVersionList);
+        return mCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aEncodedDataVersionList);
     }
 
     virtual void OnReadingWildcardAttributePath(const AttributePathParams & aAttributePathParams) override
