@@ -38,7 +38,7 @@
 #include <ti/drivers/SHA2.h>
 
 #include <bget.h>
-#define TOTAL_ICALL_HEAP_SIZE (58800)
+#define TOTAL_ICALL_HEAP_SIZE (58000)
 
 using namespace ::chip;
 using namespace ::chip::Inet;
