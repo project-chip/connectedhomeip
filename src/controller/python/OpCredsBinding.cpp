@@ -98,7 +98,6 @@ private:
 } // namespace chip
 
 extern chip::Controller::Python::StorageAdapter * pychip_Storage_GetStorageAdapter();
-extern chip::Controller::Python::StorageAdapter * sStorageAdapter;
 extern chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 extern chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 
@@ -362,7 +361,6 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     Controller::SetupParams initParams;
-    initParams.storageDelegate                = sStorageAdapter;
     initParams.pairingDelegate                = &sPairingDelegate;
     initParams.operationalCredentialsDelegate = context->mAdapter.get();
     initParams.operationalKeypair             = &ephemeralKey;

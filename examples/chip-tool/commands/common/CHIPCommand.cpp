@@ -334,7 +334,6 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
         commissionerParams.controllerNOC      = nocSpan;
     }
 
-    commissionerParams.storageDelegate = &mCommissionerStorage;
     // TODO: Initialize IPK epoch key in ExampleOperationalCredentials issuer rather than relying on DefaultIpkValue
     commissionerParams.operationalCredentialsDelegate = mCredIssuerCmds->GetCredentialIssuer();
     commissionerParams.controllerVendorId             = chip::VendorId::TestVendor1;
