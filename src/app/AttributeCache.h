@@ -389,7 +389,8 @@ private:
                                                      bool & aEncodedDataVersionList) override;
     virtual void OnReadingWildcardAttributePath(const AttributePathParams & aAttributePathParams) override;
 
-    // Committed the last wildcard attribute path's data version into the Cache if the related attribute path is valid and pending version has value.
+    // Committed the last wildcard attribute path's data version into the Cache if the related attribute path is valid and pending
+    // version has value.
     void CommitLastWildcardAttributePathVersion();
 
     // Calculates the TLV playload size for clusters stored in the AttributeCache, and set sorted data version filter results

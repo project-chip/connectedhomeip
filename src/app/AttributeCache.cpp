@@ -72,7 +72,8 @@ CHIP_ERROR AttributeCache::UpdateCache(const ConcreteDataAttributePath & aPath, 
             }
             else
             {
-                // commit the version since we moved on from a given wildcard attribute path to a different wildcard attributePath when it has data.
+                // commit the version since we moved on from a given wildcard attribute path to a different wildcard attributePath
+                // when it has data.
                 CommitLastWildcardAttributePathVersion();
             }
             mLastWildcardAttributePath = aPath;
@@ -292,7 +293,8 @@ void AttributeCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter, s
             {
                 if (attributeIter.second.Is<StatusIB>())
                 {
-                    clusterSize += 4; // At least it has control byte +Status + ClusterStatus + end of container = 1 + 1 + 1 + 1 bytes
+                    clusterSize +=
+                        4; // At least it has control byte +Status + ClusterStatus + end of container = 1 + 1 + 1 + 1 bytes
                 }
                 else
                 {
