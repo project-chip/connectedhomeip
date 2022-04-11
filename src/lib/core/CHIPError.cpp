@@ -680,6 +680,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_MAX_RETRY_EXCEEDED.AsInteger():
         desc = "The maximum retry limit has been exceeded";
         break;
+    case CHIP_ERROR_PROVIDER_LIST_EXHAUSTED.AsInteger():
+        desc = "The provider list has been exhausted";
+        break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 

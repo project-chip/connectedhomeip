@@ -481,7 +481,7 @@ CHIP_ERROR DefaultOTARequestorDriver::ScheduleQueryRetry(bool trySameProvider)
         // start to end, until an OTA is successfully completed.
         if ((GetNextProviderLocation(providerLocation, listExhausted) != true) || (listExhausted == true))
         {
-            return CHIP_ERROR_MAX_RETRY_EXCEEDED;
+            return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
         }
         else
         {

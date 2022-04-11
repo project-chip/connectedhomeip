@@ -2381,6 +2381,14 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_MAX_RETRY_EXCEEDED   CHIP_CORE_ERROR(0xdc)
 
 /**
+ * @def CHIP_ERROR_PROVIDER_LIST_EXHAUSTED
+ *
+ * @brief
+ *   The provider list has been exhausted.
+ */
+#define CHIP_ERROR_PROVIDER_LIST_EXHAUSTED   CHIP_CORE_ERROR(0xdd)
+
+/**
  *  @}
  */
 
