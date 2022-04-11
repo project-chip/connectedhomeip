@@ -482,7 +482,7 @@ To make them persistent, save the configuration options in the `prj.conf` file.
 
 The example uses different configuration files depending on the supported
 features. Configuration files are provided for different build types and they
-are located in the `configuration/build-target` directory.
+are located in the application root directory.
 
 The `prj.conf` file represents a debug build type. Other build types are covered
 by dedicated files with the build type added as a suffix to the prj part, as per
