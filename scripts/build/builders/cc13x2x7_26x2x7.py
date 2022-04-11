@@ -30,6 +30,8 @@ class cc13x2x7_26x2x7App(Enum):
             return 'pump-app'
         elif self == cc13x2x7_26x2x7App.PUMP_CONTROLLER:
             return 'pump-controller-app'
+        elif self == cc13x2x7_26x2x7App.ALL_CLUSTERS:
+            return 'all-clusters-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -40,6 +42,8 @@ class cc13x2x7_26x2x7App(Enum):
             return 'chip-LP_CC2652R7-pump-example'
         elif self == cc13x2x7_26x2x7App.PUMP_CONTROLLER:
             return 'chip-LP_CC2652R7-pump-controller-example'
+        elif self == cc13x2x7_26x2x7App.ALL_CLUSTERS:
+            return 'chip-LP_CC2652R7-all-clusters-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
