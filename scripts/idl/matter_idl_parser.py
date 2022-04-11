@@ -142,6 +142,21 @@ class MatterIdlTransformer(Transformer):
     def client_cluster(self, _):
         return ClusterSide.CLIENT
 
+    def command_access(self, privilege):
+        return privilege[0]
+
+    def command_with_access(self, args):
+        # Arguments
+        #   - optional access for invoke
+        #   - event identifier (name)
+        init_args = {
+            "name": args[-1]
+        }
+        if len(args) > 1:
+            init_args["invokeacl"] = args[0]
+
+        return init_args
+
     def command(self, args):
         # A command has 4 arguments if no input or
         # 5 arguments if input parameter is available
@@ -150,13 +165,75 @@ class MatterIdlTransformer(Transformer):
             param_in = args[2]
 
         return Command(
-            attributes=args[0], name=args[1], input_param=param_in, output_param=args[-2], code=args[-1])
+            attributes=args[0], input_param=param_in, output_param=args[-2], code=args[-1], **args[1])
+
+    def event_access(self, privilege):
+        return privilege[0]
+
+    def event_with_access(self, args):
+        # Arguments
+        #   - optional access for read
+        #   - event identifier (name)
+        init_args = {
+            "name": args[-1]
+        }
+        if len(args) > 1:
+            init_args["readacl"] = args[0]
+
+        return init_args
 
     def event(self, args):
-        return Event(priority=args[0], name=args[1], code=args[2], fields=args[3:], )
+        return Event(priority=args[0], code=args[2], fields=args[3:], **args[1])
+
+    def view_privilege(self, args):
+        return AccessPrivilege.VIEW
+
+    def operate_privilege(self, args):
+        return AccessPrivilege.OPERATE
+
+    def manage_privilege(self, args):
+        return AccessPrivilege.MANAGE
+
+    def administer_privilege(self, args):
+        return AccessPrivilege.ADMINISTER
+
+    def read_access(self, args):
+        return AttributeOperation.READ
+
+    def write_access(self, args):
+        return AttributeOperation.WRITE
+
+    @v_args(inline=True)
+    def attribute_access_entry(self, operation, access):
+        return (operation, access)
+
+    def attribute_access(self, value):
+        # return value as-is to not need to deal with trees in `attribute_with_access`
+        return value
+
+    def attribute_with_access(self, args):
+        # Input arguments are:
+        #   - acl (optional list of pairs operation + access)
+        #   - field definition
+        acl = {}
+        if len(args) > 1:
+            for operation, access in args[0]:
+                if operation == AttributeOperation.READ:
+                    acl['readacl'] = access
+                elif operation == AttributeOperation.WRITE:
+                    acl['writeacl'] = access
+                else:
+                    raise Exception("Unknown attribute operation: %r" % operation)
+
+        return (args[-1], acl)
 
     def attribute(self, args):
+        # Input arguments are:
+        #   -  tags (0 or more)
+        #   -  attribute_with_access (i.e. pair of definition and acl arguments)
         tags = set(args[:-1])
+        (definition, acl) = args[-1]
+
         # until we support write only (and need a bit of a reshuffle)
         # if the 'attr_readonly == READABLE' is not in the list, we make things
         # read/write
@@ -164,7 +241,7 @@ class MatterIdlTransformer(Transformer):
             tags.add(AttributeTag.READABLE)
             tags.add(AttributeTag.WRITABLE)
 
-        return Attribute(definition=args[-1], tags=tags)
+        return Attribute(definition=definition, tags=tags, **acl)
 
     @v_args(inline=True)
     def struct(self, id, *fields):
