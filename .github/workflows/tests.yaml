@@ -53,10 +53,11 @@ jobs:
               with:
                   action: actions/checkout@v3
                   with: |
-                      submodules: true
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform linux
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -136,10 +137,11 @@ jobs:
               with:
                   action: actions/checkout@v3
                   with: |
-                      submodules: true
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform darwin
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install openssl pkg-config coreutils
@@ -240,8 +242,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-              with:
-                  submodules: true
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform linux
             - name:
                   Try to ensure the directories for core dumping exist and we
                   can write them.
@@ -311,8 +313,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-              with:
-                  submodules: true
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform darwin
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install openssl pkg-config coreutils
