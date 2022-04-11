@@ -143,11 +143,11 @@ CHIP_ERROR InitBindingHandlers()
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 void HandleUDCSendExpiration(System::Layer * aSystemLayer, void * context)
 {
-    Dnssd::DiscoveredNodeData * selectedCommissioner = (Dnssd::DiscoveredNodeData *)context;
-    
+    Dnssd::DiscoveredNodeData * selectedCommissioner = (Dnssd::DiscoveredNodeData *) context;
+
     // Send User Directed commissioning request
     ReturnOnFailure(Server::GetInstance().SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
-            selectedCommissioner->ipAddress[0], selectedCommissioner->port, selectedCommissioner->interfaceId)));
+        selectedCommissioner->ipAddress[0], selectedCommissioner->port, selectedCommissioner->interfaceId)));
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
@@ -179,9 +179,8 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
         // Send User Directed commissioning request
         // Wait 1 second to allow our commissionee DNS records to publish (needed on Mac)
         int32_t expiration = 1;
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(expiration),
-                                                 HandleUDCSendExpiration, (void*)selectedCommissioner);
-
+        ReturnOnFailure(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(expiration), HandleUDCSendExpiration,
+                                                              (void *) selectedCommissioner));
     }
     else
     {
@@ -240,13 +239,12 @@ CHIP_ERROR DiscoverCommissioners()
 
 CHIP_ERROR RequestCommissioning(int index)
 {
-    const Dnssd::DiscoveredNodeData * selectedCommissioner =
-        gCommissionableNodeController.GetDiscoveredCommissioner(index);
+    const Dnssd::DiscoveredNodeData * selectedCommissioner = gCommissionableNodeController.GetDiscoveredCommissioner(index);
     if (selectedCommissioner == nullptr)
     {
         ChipLogError(AppServer, "No such commissioner with index %d exists", index);
         return CHIP_ERROR_INVALID_ARGUMENT;
-    } 
+    }
     PrepareForCommissioning(selectedCommissioner);
     return CHIP_NO_ERROR;
 }
@@ -512,8 +510,7 @@ void ReadServerClusters(EndpointId endpointId)
 
 void ReadServerClustersForNode(NodeId nodeId)
 {
-    ChipLogProgress(NotSpecified,
-                        "ReadServerClustersForNode nodeId=0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
+    ChipLogProgress(NotSpecified, "ReadServerClustersForNode nodeId=0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
     for (const auto & binding : BindingTable::GetInstance())
     {
         ChipLogProgress(NotSpecified,

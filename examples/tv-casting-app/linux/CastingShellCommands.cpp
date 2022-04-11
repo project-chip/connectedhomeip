@@ -39,9 +39,12 @@ static CHIP_ERROR PrintAllCommands()
     streamer_t * sout = streamer_get();
     streamer_printf(sout, "  help                 Usage: app <subcommand>\r\n");
     streamer_printf(sout, "  discover             Discover commissioners. Usage: cast discover\r\n");
-    streamer_printf(sout, "  request <index>      Request commissioning from discovered commissioner with [index]. Usage: cast request 0\r\n");
+    streamer_printf(
+        sout, "  request <index>      Request commissioning from discovered commissioner with [index]. Usage: cast request 0\r\n");
     streamer_printf(sout, "  launch <url> <display>   Launch content. Usage: cast launc https://www.yahoo.com Hello\r\n");
-    streamer_printf(sout, "  access <node>        Read and display clusters on each endpoint for <node>. Usage: cast access 0xFFFFFFEFFFFFFFFF\r\n");
+    streamer_printf(
+        sout,
+        "  access <node>        Read and display clusters on each endpoint for <node>. Usage: cast access 0xFFFFFFEFFFFFFFFF\r\n");
     streamer_printf(sout, "  sendudc <address> <port> Send UDC message to address. Usage: cast sendudc ::1 5543\r\n");
     streamer_printf(sout, "\r\n");
 
@@ -78,7 +81,7 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         {
             return PrintAllCommands();
         }
-        char * url = argv[1];
+        char * url     = argv[1];
         char * display = argv[2];
         return ContentLauncherLaunchURL(url, display);
     }
