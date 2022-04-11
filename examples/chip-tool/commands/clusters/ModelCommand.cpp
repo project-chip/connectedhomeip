@@ -35,11 +35,14 @@ CHIP_ERROR ModelCommand::RunCommand()
         return SendGroupCommand(GroupIdFromNodeId(mNodeId), fabricIndex);
     }
 
-    if (mViaPase.ValueOr(0) == 1) {
+    if (mViaPase.ValueOr(0) == 1)
+    {
         ChipLogProgress(chipTool, "Sending command via PASE to node 0x%" PRIx64, mNodeId);
         CommissioneeDeviceProxy * device = CurrentCommissioner().FindCommissioneeDevice(mNodeId);
         return this->SendCommand(device, this->mEndPointId);
-    } else {
+    }
+    else
+    {
         ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
         return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
     }
