@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -52,13 +52,13 @@ using GDBusObjectManagerUniquePtr = std::unique_ptr<GDBusObjectManager, GObjectU
 
 } // namespace
 
-ChipDeviceScanner::ChipDeviceScanner(LSHandle *handle, ChipDeviceScannerDelegate * delegate) : 
+ChipDeviceScanner::ChipDeviceScanner(LSHandle *handle, ChipDeviceScannerDelegate * delegate) :
     mLSHandle(handle),
     mDelegate(delegate)
 {
 }
 
-ChipDeviceScanner::ChipDeviceScanner(ChipDeviceScannerDelegate * delegate) : 
+ChipDeviceScanner::ChipDeviceScanner(ChipDeviceScannerDelegate * delegate) :
     mDelegate(delegate)
 {
 }
@@ -102,7 +102,7 @@ void ChipDeviceScanner::printFoundChipDevice(const jvalue_ref& scanRecord, const
      int scanRecordLength = jarray_size(scanRecord);
 
 
-	printf("printFoundChipDevice start : scanRecoredLength : %d \n", scanRecordLength);	
+	printf("printFoundChipDevice start : scanRecoredLength : %d \n", scanRecordLength);
     while (j < scanRecordLength) {
         int32_t l = -1;
         int32_t t = -1;
@@ -192,7 +192,7 @@ bool ChipDeviceScanner::deviceGetstatusCb(LSHandle *sh, LSMessage *message, void
 
                 if (jobject_get_exists(manufacturerDataObj, J_CSTR_TO_BUF("scanRecord"), &scanRecordObj))
                 {
-                    int scanRecordLength = jarray_size(scanRecordObj);  
+                    int scanRecordLength = jarray_size(scanRecordObj);
 
                     int j = 0;
                     while (j < scanRecordLength)
@@ -219,7 +219,7 @@ bool ChipDeviceScanner::deviceGetstatusCb(LSHandle *sh, LSMessage *message, void
 
                             if (firstByte == 3 && secondByte == 246 && thirdByte == 255)
                             {
-                                jvalue_ref addressObj = {0};    
+                                jvalue_ref addressObj = {0};
                                 if (jobject_get_exists(devicesElementObj, J_CSTR_TO_BUF("address"), &addressObj))
                                 {
                                     raw_buffer address_buf = jstring_get(addressObj);
@@ -232,7 +232,7 @@ bool ChipDeviceScanner::deviceGetstatusCb(LSHandle *sh, LSMessage *message, void
 
                                 }
 
-                                jvalue_ref nameObj = {0}; 
+                                jvalue_ref nameObj = {0};
                                 if (jobject_get_exists(devicesElementObj, J_CSTR_TO_BUF("name"), &nameObj))
                                 {
                                     raw_buffer name_buf = jstring_get(nameObj);
@@ -252,7 +252,7 @@ bool ChipDeviceScanner::deviceGetstatusCb(LSHandle *sh, LSMessage *message, void
 
                         j = j + scanRecordElement + 1;
                     }
-                } 
+                }
             }
             i = i + 1;
         }

@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for CHIP on
- *          Linux platforms.
+ *          webOS platforms.
  */
 
 #pragma once

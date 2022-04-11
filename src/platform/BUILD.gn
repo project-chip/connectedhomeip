@@ -233,7 +233,7 @@ if (chip_device_platform != "none") {
     } else if (chip_device_platform == "webos") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_WEBOS=1",
-        "CHIP_DEVICE_LAYER_TARGET=Linux",
+        "CHIP_DEVICE_LAYER_TARGET=webos",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
       defines -=

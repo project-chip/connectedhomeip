@@ -37,7 +37,7 @@ if (chip_mdns != "none") {
   }
 }
 
-static_library("Linux") {
+static_library("webos") {
   if(enable_syslog) {
     print("### enable syslog logging ###")
     defines = [ "USE_SYSLOG=1" ]

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Provides an implementation of the BLEManager singleton object
- *          for the Linux platforms.
+ *          for the webOS platforms.
  */
 
 #pragma once
@@ -61,7 +61,7 @@ struct BLEScanConfig
 };
 
 /**
- * Concrete implementation of the BLEManagerImpl singleton object for the Linux platforms.
+ * Concrete implementation of the BLEManagerImpl singleton object for the webOS platforms.
  */
 class BLEManagerImpl final : public BLEManager,
                              private Ble::BleLayer,
