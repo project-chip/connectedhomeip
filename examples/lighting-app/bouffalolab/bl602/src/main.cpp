@@ -68,16 +68,6 @@ app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::BLWiFiDriver::GetInstance()));
 } // namespace
 
-static void InitServer(intptr_t context)
-{
-    chip::Server::GetInstance().Init();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
-    sWiFiNetworkCommissioningInstance.Init();
-}
-
 extern "C" int main()
 {
     InitPlatform();
