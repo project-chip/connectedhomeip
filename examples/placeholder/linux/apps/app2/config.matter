@@ -1,6 +1,41 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+server cluster AdministratorCommissioning = 60 {
+  enum CommissioningWindowStatus : ENUM8 {
+    kWindowNotOpen = 0;
+    kEnhancedWindowOpen = 1;
+    kBasicWindowOpen = 2;
+  }
+
+  enum StatusCode : ENUM8 {
+    kBusy = 1;
+    kPAKEParameterError = 2;
+    kWindowNotOpen = 3;
+  }
+
+  readonly attribute int8u windowStatus = 0;
+  readonly attribute fabric_idx adminFabricIndex = 1;
+  readonly attribute int16u adminVendorId = 2;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct OpenCommissioningWindowRequest {
+    INT16U commissioningTimeout = 0;
+    OCTET_STRING PAKEVerifier = 1;
+    INT16U discriminator = 2;
+    INT32U iterations = 3;
+    OCTET_STRING salt = 4;
+  }
+
+  request struct OpenBasicCommissioningWindowRequest {
+    INT16U commissioningTimeout = 0;
+  }
+
+  timed command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
+  timed command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
+  timed command RevokeCommissioning(): DefaultSuccess = 2;
+}
+
 client cluster ApplicationBasic = 1293 {
   enum ApplicationStatusEnum : ENUM8 {
     kStopped = 0;
@@ -89,6 +124,94 @@ server cluster Basic = 40 {
   attribute boolean localConfigDisabled = 16;
   readonly attribute boolean reachable = 17;
   readonly attribute char_string<32> uniqueID = 18;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+server cluster BooleanState = 69 {
+  info event StateChange = 0 {
+    boolean stateValue = 0;
+  }
+
+  readonly attribute boolean stateValue = 0;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+server cluster BridgedActions = 37 {
+  enum ActionErrorEnum : ENUM8 {
+    kUnknown = 0;
+    kInterrupted = 1;
+  }
+
+  enum ActionStateEnum : ENUM8 {
+    kInactive = 0;
+    kActive = 1;
+    kPaused = 2;
+    kDisabled = 3;
+  }
+
+  enum ActionTypeEnum : ENUM8 {
+    kOther = 0;
+    kScene = 1;
+    kSequence = 2;
+    kAutomation = 3;
+    kException = 4;
+    kNotification = 5;
+    kAlarm = 6;
+  }
+
+  enum EndpointListTypeEnum : ENUM8 {
+    kOther = 0;
+    kRoom = 1;
+    kZone = 2;
+  }
+
+  bitmap CommandBits : BITMAP16 {
+    kInstantAction = 0x1;
+    kInstantActionWithTransition = 0x2;
+    kStartAction = 0x4;
+    kStartActionWithDuration = 0x8;
+    kStopAction = 0x10;
+    kPauseAction = 0x20;
+    kPauseActionWithDuration = 0x40;
+    kResumeAction = 0x80;
+    kEnableAction = 0x100;
+    kEnableActionWithDuration = 0x200;
+    kDisableAction = 0x400;
+    kDisableActionWithDuration = 0x800;
+  }
+
+  struct ActionStruct {
+    INT16U actionID = 0;
+    CHAR_STRING<32> name = 1;
+    ActionTypeEnum type = 2;
+    INT16U endpointListID = 3;
+    INT16U supportedCommands = 4;
+    ActionStateEnum status = 5;
+  }
+
+  struct EndpointListStruct {
+    INT16U endpointListID = 0;
+    CHAR_STRING<32> name = 1;
+    EndpointListTypeEnum type = 2;
+    ENDPOINT_NO endpoints[] = 3;
+  }
+
+  info event StateChanged = 0 {
+    INT16U actionID = 0;
+    INT32U invokeID = 1;
+    ActionStateEnum newState = 2;
+  }
+
+  info event ActionFailed = 1 {
+    INT16U actionID = 0;
+    INT32U invokeID = 1;
+    ActionStateEnum newState = 2;
+    ActionErrorEnum error = 3;
+  }
+
+  readonly attribute ActionStruct actionList[] = 0;
+  readonly attribute EndpointListStruct endpointList[] = 1;
+  readonly attribute long_char_string<512> setupUrl = 2;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -414,6 +537,43 @@ server cluster Descriptor = 29 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+server cluster EthernetNetworkDiagnostics = 55 {
+  enum PHYRateType : ENUM8 {
+    k10m = 0;
+    k100m = 1;
+    k1000m = 2;
+    k25g = 3;
+    k5g = 4;
+    k10g = 5;
+    k40g = 6;
+    k100g = 7;
+    k200g = 8;
+    k400g = 9;
+  }
+
+  readonly attribute nullable PHYRateType PHYRate = 0;
+  readonly attribute nullable boolean fullDuplex = 1;
+  readonly attribute int64u packetRxCount = 2;
+  readonly attribute int64u packetTxCount = 3;
+  readonly attribute int64u txErrCount = 4;
+  readonly attribute int64u collisionCount = 5;
+  readonly attribute int64u overrunCount = 6;
+  readonly attribute nullable boolean carrierDetect = 7;
+  readonly attribute int64u timeSinceReset = 8;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  command ResetCounts(): DefaultSuccess = 0;
+}
+
+server cluster FlowMeasurement = 1028 {
+  readonly attribute nullable int16u measuredValue = 0;
+  readonly attribute nullable int16u minMeasuredValue = 1;
+  readonly attribute nullable int16u maxMeasuredValue = 2;
+  readonly attribute int16u tolerance = 3;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 client cluster GeneralCommissioning = 48 {
   enum CommissioningError : ENUM8 {
     kOk = 0;
@@ -704,6 +864,20 @@ server cluster Identify = 3 {
 
   command Identify(IdentifyRequest): DefaultSuccess = 0;
   command IdentifyQuery(): IdentifyQueryResponse = 1;
+}
+
+server cluster IlluminanceMeasurement = 1024 {
+  enum LightSensorType : ENUM8 {
+    kPhotodiode = 0;
+    kCmos = 1;
+  }
+
+  readonly attribute nullable int16u measuredValue = 0;
+  readonly attribute nullable int16u minMeasuredValue = 1;
+  readonly attribute nullable int16u maxMeasuredValue = 2;
+  readonly attribute int16u tolerance = 3;
+  readonly attribute nullable enum8 lightSensorType = 4;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster KeypadInput = 1289 {
@@ -1505,6 +1679,129 @@ server cluster OperationalCredentials = 62 {
   command RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
 }
 
+server cluster PowerSource = 47 {
+  enum BatChargeFaultType : ENUM8 {
+    kUnspecfied = 0;
+    kAmbientTooHot = 1;
+    kAmbientTooCold = 2;
+    kBatteryTooHot = 3;
+    kBatteryTooCold = 4;
+    kBatteryAbsent = 5;
+    kBatteryOverVoltage = 6;
+    kBatteryUnderVoltage = 7;
+    kChargerOverVoltage = 8;
+    kChargerUnderVoltage = 9;
+    kSafetyTimeout = 10;
+  }
+
+  enum BatChargeLevel : ENUM8 {
+    kOk = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum BatChargeState : ENUM8 {
+    kUnknown = 0;
+    kIsCharging = 1;
+    kIsAtFullCharge = 2;
+    kIsNotCharging = 3;
+  }
+
+  enum BatFaultType : ENUM8 {
+    kUnspecfied = 0;
+    kOverTemp = 1;
+    kUnderTemp = 2;
+  }
+
+  enum BatReplaceability : ENUM8 {
+    kUnspecified = 0;
+    kNotReplaceable = 1;
+    kUserReplaceable = 2;
+    kFactoryReplaceable = 3;
+  }
+
+  enum PowerSourceStatus : ENUM8 {
+    kUnspecfied = 0;
+    kActive = 1;
+    kStandby = 2;
+    kUnavailable = 3;
+  }
+
+  enum WiredCurrentType : ENUM8 {
+    kAc = 0;
+    kDc = 1;
+  }
+
+  enum WiredFaultType : ENUM8 {
+    kUnspecfied = 0;
+    kOverVoltage = 1;
+    kUnderVoltage = 2;
+  }
+
+  bitmap PowerSourceFeature : BITMAP32 {
+    kWired = 0x1;
+    kBattery = 0x2;
+    kRechargeable = 0x4;
+    kReplaceable = 0x8;
+  }
+
+  readonly attribute enum8 status = 0;
+  readonly attribute int8u order = 1;
+  readonly attribute char_string<60> description = 2;
+  readonly attribute int32u wiredAssessedInputVoltage = 3;
+  readonly attribute int16u wiredAssessedInputFrequency = 4;
+  readonly attribute enum8 wiredCurrentType = 5;
+  readonly attribute int32u wiredAssessedCurrent = 6;
+  readonly attribute int32u wiredNominalVoltage = 7;
+  readonly attribute int32u wiredMaximumCurrent = 8;
+  readonly attribute boolean wiredPresent = 9;
+  readonly attribute ENUM8 activeWiredFaults[] = 10;
+  readonly attribute int32u batteryVoltage = 11;
+  readonly attribute int8u batteryPercentRemaining = 12;
+  readonly attribute int32u batteryTimeRemaining = 13;
+  readonly attribute enum8 batteryChargeLevel = 14;
+  readonly attribute boolean batteryReplacementNeeded = 15;
+  readonly attribute enum8 batteryReplaceability = 16;
+  readonly attribute boolean batteryPresent = 17;
+  readonly attribute ENUM8 activeBatteryFaults[] = 18;
+  readonly attribute char_string<60> batteryReplacementDescription = 19;
+  readonly attribute int32u batteryCommonDesignation = 20;
+  readonly attribute char_string<20> batteryANSIDesignation = 21;
+  readonly attribute char_string<20> batteryIECDesignation = 22;
+  readonly attribute int32u batteryApprovedChemistry = 23;
+  readonly attribute int32u batteryCapacity = 24;
+  readonly attribute int8u batteryQuantity = 25;
+  readonly attribute enum8 batteryChargeState = 26;
+  readonly attribute int32u batteryTimeToFullCharge = 27;
+  readonly attribute boolean batteryFunctionalWhileCharging = 28;
+  readonly attribute int32u batteryChargingCurrent = 29;
+  readonly attribute ENUM8 activeBatteryChargeFaults[] = 30;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+server cluster PowerSourceConfiguration = 46 {
+  readonly attribute INT8U sources[] = 0;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+server cluster PressureMeasurement = 1027 {
+  bitmap PressureFeature : BITMAP32 {
+    kExt = 0x1;
+  }
+
+  readonly attribute nullable int16s measuredValue = 0;
+  readonly attribute nullable int16s minMeasuredValue = 1;
+  readonly attribute nullable int16s maxMeasuredValue = 2;
+  readonly attribute int16u tolerance = 3;
+  readonly attribute nullable int16s scaledValue = 16;
+  readonly attribute nullable int16s minScaledValue = 17;
+  readonly attribute nullable int16s maxScaledValue = 18;
+  readonly attribute int16u scaledTolerance = 19;
+  readonly attribute int8s scale = 20;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 server cluster PumpConfigurationAndControl = 512 {
   enum PumpControlMode : ENUM8 {
     kConstantSpeed = 0;
@@ -1737,6 +2034,29 @@ server cluster Scenes = 5 {
   command StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
   command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
   command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
+}
+
+server cluster SoftwareDiagnostics = 52 {
+  struct ThreadMetrics {
+    INT64U id = 0;
+    CHAR_STRING<8> name = 1;
+    INT32U stackFreeCurrent = 2;
+    INT32U stackFreeMinimum = 3;
+    INT32U stackSize = 4;
+  }
+
+  info event SoftwareFault = 0 {
+    SoftwareFaultStruct softwareFault = 0;
+  }
+
+  readonly attribute ThreadMetrics threadMetrics[] = 0;
+  readonly attribute int64u currentHeapFree = 1;
+  readonly attribute int64u currentHeapUsed = 2;
+  readonly attribute int64u currentHeapHighWatermark = 3;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  command ResetWatermarks(): DefaultSuccess = 0;
 }
 
 client cluster Switch = 59 {
@@ -1998,6 +2318,69 @@ server cluster ThermostatUserInterfaceConfiguration = 516 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+server cluster WiFiNetworkDiagnostics = 54 {
+  enum AssociationFailureCause : ENUM8 {
+    kUnknown = 0;
+    kAssociationFailed = 1;
+    kAuthenticationFailed = 2;
+    kSsidNotFound = 3;
+  }
+
+  enum SecurityType : ENUM8 {
+    kUnspecified = 0;
+    kNone = 1;
+    kWep = 2;
+    kWpa = 3;
+    kWpa2 = 4;
+    kWpa3 = 5;
+  }
+
+  enum WiFiConnectionStatus : ENUM8 {
+    kConnected = 0;
+    kNotConnected = 1;
+  }
+
+  enum WiFiVersionType : ENUM8 {
+    k80211a = 0;
+    k80211b = 1;
+    k80211g = 2;
+    k80211n = 3;
+    k80211ac = 4;
+    k80211ax = 5;
+  }
+
+  info event Disconnection = 0 {
+    INT16U reasonCode = 0;
+  }
+
+  info event AssociationFailure = 1 {
+    AssociationFailureCause associationFailure = 0;
+    INT16U status = 1;
+  }
+
+  info event ConnectionStatus = 2 {
+    WiFiConnectionStatus connectionStatus = 0;
+  }
+
+  readonly attribute nullable octet_string<6> bssid = 0;
+  readonly attribute nullable SecurityType securityType = 1;
+  readonly attribute nullable WiFiVersionType wiFiVersion = 2;
+  readonly attribute nullable int16u channelNumber = 3;
+  readonly attribute nullable int8s rssi = 4;
+  readonly attribute int32u beaconLostCount = 5;
+  readonly attribute int32u beaconRxCount = 6;
+  readonly attribute int32u packetMulticastRxCount = 7;
+  readonly attribute int32u packetMulticastTxCount = 8;
+  readonly attribute int32u packetUnicastRxCount = 9;
+  readonly attribute int32u packetUnicastTxCount = 10;
+  readonly attribute int64u currentMaxRate = 11;
+  readonly attribute int64u overrunCount = 12;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  command ResetCounts(): DefaultSuccess = 0;
+}
+
 server cluster WindowCovering = 258 {
   enum EndProductType : ENUM8 {
     kRollerShade = 0;
@@ -2137,15 +2520,21 @@ server cluster WindowCovering = 258 {
 
 
 endpoint 0 {
+  server  cluster AdministratorCommissioning;
   binding cluster ApplicationBasic;
   server  cluster ApplicationBasic;
   server  cluster Basic;
+  server  cluster BooleanState;
+  server  cluster BridgedActions;
   binding cluster ContentLauncher;
   server  cluster ContentLauncher;
   server  cluster Descriptor;
+  server  cluster EthernetNetworkDiagnostics;
+  server  cluster FlowMeasurement;
   binding cluster GeneralCommissioning;
   server  cluster GeneralCommissioning;
   server  cluster GeneralDiagnostics;
+  server  cluster IlluminanceMeasurement;
   binding cluster KeypadInput;
   server  cluster KeypadInput;
   binding cluster ModeSelect;
@@ -2155,9 +2544,13 @@ endpoint 0 {
   server  cluster OnOff;
   binding cluster OperationalCredentials;
   server  cluster OperationalCredentials;
+  server  cluster PowerSource;
+  server  cluster PowerSourceConfiguration;
+  server  cluster PressureMeasurement;
   server  cluster PumpConfigurationAndControl;
   binding cluster RelativeHumidityMeasurement;
   server  cluster RelativeHumidityMeasurement;
+  server  cluster SoftwareDiagnostics;
   binding cluster Switch;
   server  cluster Switch;
   binding cluster TargetNavigator;
@@ -2167,6 +2560,7 @@ endpoint 0 {
   server  cluster Thermostat;
   binding cluster ThermostatUserInterfaceConfiguration;
   server  cluster ThermostatUserInterfaceConfiguration;
+  server  cluster WiFiNetworkDiagnostics;
   server  cluster WindowCovering;
 }
 
