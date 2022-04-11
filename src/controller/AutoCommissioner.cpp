@@ -169,18 +169,16 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             {
                 return CommissioningStage::kThreadNetworkSetup;
             }
-            else
-            {
-                ChipLogError(Controller, "Required network information not provided in commissioning parameters");
-                ChipLogError(Controller, "Parameters supplied: wifi (%s) thread (%s)",
-                             mParams.GetWiFiCredentials().HasValue() ? "yes" : "no",
-                             mParams.GetThreadOperationalDataset().HasValue() ? "yes" : "no");
-                ChipLogError(Controller, "Device supports: wifi (%s) thread(%s)",
-                             mDeviceCommissioningInfo.network.wifi.endpoint == kInvalidEndpointId ? "no" : "yes",
-                             mDeviceCommissioningInfo.network.thread.endpoint == kInvalidEndpointId ? "no" : "yes");
-                lastErr = CHIP_ERROR_INVALID_ARGUMENT;
-                return CommissioningStage::kCleanup;
-            }
+
+            ChipLogError(Controller, "Required network information not provided in commissioning parameters");
+            ChipLogError(Controller, "Parameters supplied: wifi (%s) thread (%s)",
+                         mParams.GetWiFiCredentials().HasValue() ? "yes" : "no",
+                         mParams.GetThreadOperationalDataset().HasValue() ? "yes" : "no");
+            ChipLogError(Controller, "Device supports: wifi (%s) thread(%s)",
+                         mDeviceCommissioningInfo.network.wifi.endpoint == kInvalidEndpointId ? "no" : "yes",
+                         mDeviceCommissioningInfo.network.thread.endpoint == kInvalidEndpointId ? "no" : "yes");
+            lastErr = CHIP_ERROR_INVALID_ARGUMENT;
+            return CommissioningStage::kCleanup;
         }
         else
         {

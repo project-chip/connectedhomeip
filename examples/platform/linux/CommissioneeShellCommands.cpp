@@ -79,8 +79,6 @@ static CHIP_ERROR PrintAllCommands()
 
 static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
     if (argc == 0 || strcmp(argv[0], "help") == 0)
     {
         return PrintAllCommands();
@@ -92,10 +90,10 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
         chip::Inet::IPAddress commissioner;
         chip::Inet::IPAddress::FromString(argv[1], commissioner);
         uint16_t port = (uint16_t) strtol(argv[2], &eptr, 10);
-        return error  = SendUDC(true, chip::Transport::PeerAddress::UDP(commissioner, port));
+        return SendUDC(true, chip::Transport::PeerAddress::UDP(commissioner, port));
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    else if (strcmp(argv[0], "setdiscoverytimeout") == 0)
+    if (strcmp(argv[0], "setdiscoverytimeout") == 0)
     {
         char * eptr;
         int16_t timeout = (int16_t) strtol(argv[1], &eptr, 10);
@@ -111,7 +109,7 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
         return CHIP_NO_ERROR;
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    else if (strcmp(argv[0], "restartmdns") == 0)
+    if (strcmp(argv[0], "restartmdns") == 0)
     {
         if (argc < 2)
         {
@@ -127,18 +125,15 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
             chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kEnabledBasic);
             return CHIP_NO_ERROR;
         }
-        else if (strcmp(argv[1], "enabled_enhanced") == 0)
+        if (strcmp(argv[1], "enabled_enhanced") == 0)
         {
             chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kEnabledEnhanced);
             return CHIP_NO_ERROR;
         }
         return PrintAllCommands();
     }
-    else
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    return error;
+
+    return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
 void RegisterCommissioneeCommands()

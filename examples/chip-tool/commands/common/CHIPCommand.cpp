@@ -49,10 +49,8 @@ const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStor
     {
         return &attestationTrustStore;
     }
-    else
-    {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 } // namespace
 

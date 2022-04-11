@@ -69,3 +69,7 @@ chip_configure_data_model(app
 if(CONFIG_CHIP_OTA_REQUESTOR)
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/OTAUtil.cpp)
 endif()
+
+if (CONFIG_SHELL AND BOARD STREQUAL "nrf52840dongle_nrf52840")
+  target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUTrigger.cpp)
+endif()

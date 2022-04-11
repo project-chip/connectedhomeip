@@ -508,7 +508,7 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(chip::FabricIndex fa
             index = i;
             break;
         }
-        else if (index == EMBER_AF_SCENE_TABLE_NULL_INDEX && entry.endpoint == EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID)
+        if (index == EMBER_AF_SCENE_TABLE_NULL_INDEX && entry.endpoint == EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID)
         {
             index = i;
         }
@@ -622,130 +622,126 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::FabricIndex fab
     {
         return EMBER_ZCL_STATUS_INVALID_FIELD;
     }
-    else
+
+    uint8_t i;
+    for (i = 0; i < EMBER_AF_PLUGIN_SCENES_TABLE_SIZE; i++)
     {
-        uint8_t i;
-        for (i = 0; i < EMBER_AF_PLUGIN_SCENES_TABLE_SIZE; i++)
+        EmberAfSceneTableEntry entry;
+        emberAfPluginScenesServerRetrieveSceneEntry(entry, i);
+        if (entry.endpoint == endpoint && entry.groupId == groupId && entry.sceneId == sceneId)
         {
-            EmberAfSceneTableEntry entry;
-            emberAfPluginScenesServerRetrieveSceneEntry(entry, i);
-            if (entry.endpoint == endpoint && entry.groupId == groupId && entry.sceneId == sceneId)
-            {
 #ifdef ZCL_USING_ON_OFF_CLUSTER_SERVER
-                if (entry.hasOnOffValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, "on/off",
-                                         (uint8_t *) &entry.onOffValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
-                }
+            if (entry.hasOnOffValue)
+            {
+                writeServerAttribute(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, "on/off",
+                                     (uint8_t *) &entry.onOffValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+            }
 #endif
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER
-                if (entry.hasCurrentLevelValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, "current level",
-                                         (uint8_t *) &entry.currentLevelValue, ZCL_INT8U_ATTRIBUTE_TYPE);
-                }
+            if (entry.hasCurrentLevelValue)
+            {
+                writeServerAttribute(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, "current level",
+                                     (uint8_t *) &entry.currentLevelValue, ZCL_INT8U_ATTRIBUTE_TYPE);
+            }
 #endif
 #ifdef ZCL_USING_THERMOSTAT_CLUSTER_SERVER
-                if (entry.hasOccupiedCoolingSetpointValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_THERMOSTAT_CLUSTER_ID, ZCL_OCCUPIED_COOLING_SETPOINT_ATTRIBUTE_ID,
-                                         "occupied cooling setpoint", (uint8_t *) &entry.occupiedCoolingSetpointValue,
-                                         ZCL_INT16S_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasOccupiedHeatingSetpointValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_THERMOSTAT_CLUSTER_ID, ZCL_OCCUPIED_HEATING_SETPOINT_ATTRIBUTE_ID,
-                                         "occupied heating setpoint", (uint8_t *) &entry.occupiedHeatingSetpointValue,
-                                         ZCL_INT16S_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasSystemModeValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_THERMOSTAT_CLUSTER_ID, ZCL_SYSTEM_MODE_ATTRIBUTE_ID, "system mode",
-                                         (uint8_t *) &entry.systemModeValue, ZCL_INT8U_ATTRIBUTE_TYPE);
-                }
+            if (entry.hasOccupiedCoolingSetpointValue)
+            {
+                writeServerAttribute(endpoint, ZCL_THERMOSTAT_CLUSTER_ID, ZCL_OCCUPIED_COOLING_SETPOINT_ATTRIBUTE_ID,
+                                     "occupied cooling setpoint", (uint8_t *) &entry.occupiedCoolingSetpointValue,
+                                     ZCL_INT16S_ATTRIBUTE_TYPE);
+            }
+            if (entry.hasOccupiedHeatingSetpointValue)
+            {
+                writeServerAttribute(endpoint, ZCL_THERMOSTAT_CLUSTER_ID, ZCL_OCCUPIED_HEATING_SETPOINT_ATTRIBUTE_ID,
+                                     "occupied heating setpoint", (uint8_t *) &entry.occupiedHeatingSetpointValue,
+                                     ZCL_INT16S_ATTRIBUTE_TYPE);
+            }
+            if (entry.hasSystemModeValue)
+            {
+                writeServerAttribute(endpoint, ZCL_THERMOSTAT_CLUSTER_ID, ZCL_SYSTEM_MODE_ATTRIBUTE_ID, "system mode",
+                                     (uint8_t *) &entry.systemModeValue, ZCL_INT8U_ATTRIBUTE_TYPE);
+            }
 #endif
 #ifdef ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
-                if (entry.hasCurrentXValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID,
-                                         "current x", (uint8_t *) &entry.currentXValue, ZCL_INT16U_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasCurrentYValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID,
-                                         "current y", (uint8_t *) &entry.currentYValue, ZCL_INT16U_ATTRIBUTE_TYPE);
-                }
+            if (entry.hasCurrentXValue)
+            {
+                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID, "current x",
+                                     (uint8_t *) &entry.currentXValue, ZCL_INT16U_ATTRIBUTE_TYPE);
+            }
+            if (entry.hasCurrentYValue)
+            {
+                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID, "current y",
+                                     (uint8_t *) &entry.currentYValue, ZCL_INT16U_ATTRIBUTE_TYPE);
+            }
 
-                if (entry.hasEnhancedCurrentHueValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID,
-                                         ZCL_COLOR_CONTROL_ENHANCED_CURRENT_HUE_ATTRIBUTE_ID, "enhanced current hue",
-                                         (uint8_t *) &entry.enhancedCurrentHueValue, ZCL_INT16U_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasCurrentSaturationValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
-                                         "current saturation", (uint8_t *) &entry.currentSaturationValue, ZCL_INT8U_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasColorLoopActiveValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_ACTIVE_ATTRIBUTE_ID,
-                                         "color loop active", (uint8_t *) &entry.colorLoopActiveValue, ZCL_INT8U_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasColorLoopDirectionValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID,
-                                         ZCL_COLOR_CONTROL_COLOR_LOOP_DIRECTION_ATTRIBUTE_ID, "color loop direction",
-                                         (uint8_t *) &entry.colorLoopDirectionValue, ZCL_INT8U_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasColorLoopTimeValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_TIME_ATTRIBUTE_ID,
-                                         "color loop time", (uint8_t *) &entry.colorLoopTimeValue, ZCL_INT16U_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasColorTemperatureMiredsValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID,
-                                         "color temp mireds", (uint8_t *) &entry.colorTemperatureMiredsValue,
-                                         ZCL_INT16U_ATTRIBUTE_TYPE);
-                }
+            if (entry.hasEnhancedCurrentHueValue)
+            {
+                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_ENHANCED_CURRENT_HUE_ATTRIBUTE_ID,
+                                     "enhanced current hue", (uint8_t *) &entry.enhancedCurrentHueValue, ZCL_INT16U_ATTRIBUTE_TYPE);
+            }
+            if (entry.hasCurrentSaturationValue)
+            {
+                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
+                                     "current saturation", (uint8_t *) &entry.currentSaturationValue, ZCL_INT8U_ATTRIBUTE_TYPE);
+            }
+            if (entry.hasColorLoopActiveValue)
+            {
+                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_ACTIVE_ATTRIBUTE_ID,
+                                     "color loop active", (uint8_t *) &entry.colorLoopActiveValue, ZCL_INT8U_ATTRIBUTE_TYPE);
+            }
+            if (entry.hasColorLoopDirectionValue)
+            {
+                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_DIRECTION_ATTRIBUTE_ID,
+                                     "color loop direction", (uint8_t *) &entry.colorLoopDirectionValue, ZCL_INT8U_ATTRIBUTE_TYPE);
+            }
+            if (entry.hasColorLoopTimeValue)
+            {
+                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_TIME_ATTRIBUTE_ID,
+                                     "color loop time", (uint8_t *) &entry.colorLoopTimeValue, ZCL_INT16U_ATTRIBUTE_TYPE);
+            }
+            if (entry.hasColorTemperatureMiredsValue)
+            {
+                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID,
+                                     "color temp mireds", (uint8_t *) &entry.colorTemperatureMiredsValue,
+                                     ZCL_INT16U_ATTRIBUTE_TYPE);
+            }
 #endif // ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
 #ifdef ZCL_USING_DOOR_LOCK_CLUSTER_SERVER
-                if (entry.hasLockStateValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_LOCK_STATE_ATTRIBUTE_ID, "lock state",
-                                         (uint8_t *) &entry.lockStateValue, ZCL_INT8U_ATTRIBUTE_TYPE);
-                }
+            if (entry.hasLockStateValue)
+            {
+                writeServerAttribute(endpoint, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_LOCK_STATE_ATTRIBUTE_ID, "lock state",
+                                     (uint8_t *) &entry.lockStateValue, ZCL_INT8U_ATTRIBUTE_TYPE);
+            }
 #endif
 #ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
-                if (entry.hasCurrentPositionLiftPercentageValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID,
-                                         ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID, "CurrentPositionLiftPercentage",
-                                         (uint8_t *) &entry.currentPositionLiftPercentageValue, ZCL_INT8U_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasCurrentPositionTiltPercentageValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID,
-                                         ZCL_WC_CURRENT_POSITION_TILT_PERCENTAGE_ATTRIBUTE_ID, "CurrentPositionTiltPercentage",
-                                         (uint8_t *) &entry.currentPositionTiltPercentageValue, ZCL_INT8U_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasTargetPositionLiftPercent100thsValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID,
-                                         ZCL_WC_TARGET_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID, "TargetPositionLiftPercent100ths",
-                                         (uint8_t *) &entry.targetPositionLiftPercent100thsValue, ZCL_INT16U_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasTargetPositionTiltPercent100thsValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID,
-                                         ZCL_WC_TARGET_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID, "TargetPositionTiltPercent100ths",
-                                         (uint8_t *) &entry.targetPositionTiltPercent100thsValue, ZCL_INT16U_ATTRIBUTE_TYPE);
-                }
-#endif
-                emberAfScenesMakeValid(endpoint, sceneId, groupId);
-                return EMBER_ZCL_STATUS_SUCCESS;
+            if (entry.hasCurrentPositionLiftPercentageValue)
+            {
+                writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID,
+                                     "CurrentPositionLiftPercentage", (uint8_t *) &entry.currentPositionLiftPercentageValue,
+                                     ZCL_INT8U_ATTRIBUTE_TYPE);
             }
+            if (entry.hasCurrentPositionTiltPercentageValue)
+            {
+                writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_CURRENT_POSITION_TILT_PERCENTAGE_ATTRIBUTE_ID,
+                                     "CurrentPositionTiltPercentage", (uint8_t *) &entry.currentPositionTiltPercentageValue,
+                                     ZCL_INT8U_ATTRIBUTE_TYPE);
+            }
+            if (entry.hasTargetPositionLiftPercent100thsValue)
+            {
+                writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID,
+                                     ZCL_WC_TARGET_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID, "TargetPositionLiftPercent100ths",
+                                     (uint8_t *) &entry.targetPositionLiftPercent100thsValue, ZCL_INT16U_ATTRIBUTE_TYPE);
+            }
+            if (entry.hasTargetPositionTiltPercent100thsValue)
+            {
+                writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID,
+                                     ZCL_WC_TARGET_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID, "TargetPositionTiltPercent100ths",
+                                     (uint8_t *) &entry.targetPositionTiltPercent100thsValue, ZCL_INT16U_ATTRIBUTE_TYPE);
+            }
+#endif
+            emberAfScenesMakeValid(endpoint, sceneId, groupId);
+            return EMBER_ZCL_STATUS_SUCCESS;
         }
     }
 
@@ -785,7 +781,7 @@ bool emberAfPluginScenesServerParseAddScene(
             index = i;
             break;
         }
-        else if (index == EMBER_AF_SCENE_TABLE_NULL_INDEX && entry.endpoint == EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID)
+        if (index == EMBER_AF_SCENE_TABLE_NULL_INDEX && entry.endpoint == EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID)
         {
             index = i;
         }
