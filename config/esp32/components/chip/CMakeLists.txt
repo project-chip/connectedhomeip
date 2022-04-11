@@ -129,6 +129,10 @@ if (CONFIG_CHIP_ENABLE_EXTERNAL_PLATFORM)
     chip_gn_arg_append("chip_platform_target"   "\"${CONFIG_CHIP_EXTERNAL_PLATFORM_TARGET}\"")
 endif()
 
+if (CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER)
+    chip_gn_arg_append("chip_use_transitional_commissionable_data_provider" "false")
+endif()
+
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
 

@@ -844,6 +844,7 @@ mydir
 MyPASSWORD
 MySSID
 NAMESERVER
+NAMESPACE
 namespacing
 nano
 natively
@@ -881,6 +882,7 @@ nullable
 nullptr
 NUM
 NVM
+NVS
 nwk
 NXP
 objcopy

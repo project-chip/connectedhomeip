@@ -620,6 +620,13 @@ menu "CHIP Device Layer"
             bool "Enable Rotating Device Identifier Support"
             default n
 
+        config ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER
+            bool "Use ESP32 Commissionable Data Provider"
+            default n
+            help
+                Use commissionable data provider implementation for ESP32.
+                Default is test-mode CommissionableDataProvider in GenericConfigurationManagerImpl.
+
     endmenu
 
 
