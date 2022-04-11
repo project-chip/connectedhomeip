@@ -119,43 +119,6 @@ bool DefaultOTARequestorDriver::ProviderLocationsEqual(const ProviderLocationTyp
     return false;
 }
 
-void DefaultOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR error)
-{
-    if (error == CHIP_NO_ERROR)
-    {
-        return;
-    }
-
-    switch (state)
-    {
-    case UpdateFailureState::kUnknown:
-        // Retry with next provider in the list
-        ScheduleQueryRetry(false);
-        break;
-    case UpdateFailureState::kQuerying:
-        if (error != CHIP_ERROR_BUFFER_TOO_SMALL)
-        {
-            // Retry with same provider
-            ScheduleQueryRetry(true);
-        }
-        break;
-    case UpdateFailureState::kDownloading:
-        // Retry with same provider
-        ScheduleQueryRetry(true);
-        break;
-    case UpdateFailureState::kApplying:
-        // Retry with same provider
-        ScheduleQueryRetry(true);
-        break;
-    case UpdateFailureState::kNotifying:
-        // No need for retry.  Just wait for the next Query.
-        break;
-    case UpdateFailureState::kDelayedOnUserConsent:
-        // No need for retry.  Just wait for the next Query.
-        break;
-    }
-}
-
 void DefaultOTARequestorDriver::HandleIdleStateExit()
 {
     // Start watchdog timer to monitor new Query Image session

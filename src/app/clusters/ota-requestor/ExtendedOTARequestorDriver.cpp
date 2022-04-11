@@ -48,7 +48,6 @@ void ExtendedOTARequestorDriver::UpdateAvailable(const UpdateDescription & updat
         CHIP_ERROR err = GetUserConsentSubject(subject, update);
         if (err != CHIP_NO_ERROR)
         {
-            HandleError(UpdateFailureState::kDelayedOnUserConsent, err);
             ChipLogError(SoftwareUpdate, "Failed to get user consent subject");
             return;
         }
