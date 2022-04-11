@@ -104,10 +104,10 @@ struct AttributePathParams
         return IncludesAttributesInCluster(aOther) && HasWildcardAttributeId();
     }
 
-    ClusterId mClusterId      = kInvalidClusterId;   // uint32
-    AttributeId mAttributeId  = kInvalidAttributeId; // uint32
-    EndpointId mEndpointId    = kInvalidEndpointId;  // uint16
-    ListIndex mListIndex      = kInvalidListIndex;   // uint16
+    ClusterId mClusterId     = kInvalidClusterId;   // uint32
+    AttributeId mAttributeId = kInvalidAttributeId; // uint32
+    EndpointId mEndpointId   = kInvalidEndpointId;  // uint16
+    ListIndex mListIndex     = kInvalidListIndex;   // uint16
 };
 
 } // namespace app
