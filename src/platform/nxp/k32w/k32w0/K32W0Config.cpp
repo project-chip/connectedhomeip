@@ -267,7 +267,7 @@ CHIP_ERROR K32WConfig::WriteConfigValueStr(Key key, const char * str, size_t str
         status = AddToRamStorage(&ramDescr, key, (uint8_t *) str, strLen);
         SuccessOrExit(err = MapRamStorageStatus(status));
 
-        pdmStatus = PDM_eSaveRecordDataInIdleTask((uint16_t) NVM_ID_CHIP_CONFIG_DATA, chipConfigRamStruct, 
+        pdmStatus = PDM_eSaveRecordDataInIdleTask((uint16_t) NVM_ID_CHIP_CONFIG_DATA, chipConfigRamStruct,
                                                    chipConfigRamStruct->chipConfigRamBufferLen + sizeof(uint16_t));
         SuccessOrExit(err = MapPdmStatus(pdmStatus));
     }
