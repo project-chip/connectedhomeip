@@ -24,6 +24,8 @@ static_library("ESP32") {
     "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
+    "CommissionableDataProviderImpl.cpp",
+    "CommissionableDataProviderImpl.h",
     "ConfigurationManagerImpl.cpp",
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",

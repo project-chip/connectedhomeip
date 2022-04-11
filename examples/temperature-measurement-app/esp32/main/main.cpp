@@ -38,6 +38,10 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 
+#if CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER
+#include <platform/ESP32/CommissionableDataProviderImpl.h>
+#endif // CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER
+
 #include <lib/support/ErrorStr.h>
 
 #if CONFIG_ENABLE_PW_RPC
@@ -57,6 +61,10 @@ namespace {
 
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+
+#if CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER
+CommissionableDataProviderImpl sCommissionableDataProviderImpl;
+#endif // CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER
 
 static void InitServer(intptr_t context)
 {
@@ -96,6 +104,10 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
         return;
     }
+
+#if CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER
+    SetCommissionableDataProvider(&sCommissionableDataProviderImpl);
+#endif // CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
