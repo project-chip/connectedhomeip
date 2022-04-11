@@ -116,14 +116,15 @@ CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelLength(EndpointId endpoint, size_
 {
     DefaultStorageKeyAllocator keyAlloc;
 
-    return PersistedStorage::KeyValueStoreMgr().Put(keyAlloc.UserLabelLengthKey(endpoint), val);
+    return mStorage->SyncSetKeyValue(keyAlloc.UserLabelLengthKey(endpoint), &val, static_cast<uint16_t>(sizeof(val)));
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::GetUserLabelLength(EndpointId endpoint, size_t & val)
 {
     DefaultStorageKeyAllocator keyAlloc;
+    uint16_t len = static_cast<uint16_t>(sizeof(val));
 
-    return PersistedStorage::KeyValueStoreMgr().Get(keyAlloc.UserLabelLengthKey(endpoint), &val);
+    return mStorage->SyncGetKeyValue(keyAlloc.UserLabelLengthKey(endpoint), &val, len);
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel)
@@ -139,7 +140,8 @@ CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t in
     ReturnErrorOnFailure(writer.PutString(kLabelValueTag, userLabel.value));
     ReturnErrorOnFailure(writer.EndContainer(outerType));
 
-    return PersistedStorage::KeyValueStoreMgr().Put(keyAlloc.UserLabelIndexKey(endpoint, index), buf, writer.GetLengthWritten());
+    return mStorage->SyncSetKeyValue(keyAlloc.UserLabelIndexKey(endpoint, index), buf,
+                                     static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
 DeviceInfoProvider::UserLabelIterator * DeviceInfoProviderImpl::IterateUserLabel(EndpointId endpoint)
@@ -165,8 +167,9 @@ bool DeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
 
     DefaultStorageKeyAllocator keyAlloc;
     uint8_t buf[UserLabelTLVMaxSize()];
-    size_t outLen;
-    err = PersistedStorage::KeyValueStoreMgr().Get(keyAlloc.UserLabelIndexKey(mEndpoint, mIndex), buf, sizeof(buf), &outLen);
+    uint16_t len = static_cast<uint16_t>(UserLabelTLVMaxSize());
+
+    err = mProvider.mStorage->SyncGetKeyValue(keyAlloc.UserLabelIndexKey(mEndpoint, mIndex), buf, len);
     VerifyOrReturnError(err == CHIP_NO_ERROR, false);
 
     TLV::ContiguousBufferTLVReader reader;
