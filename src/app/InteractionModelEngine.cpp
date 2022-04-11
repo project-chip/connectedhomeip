@@ -371,8 +371,8 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
     }
 #endif
 
-    // We have already reserved enough resoure for read requests, and have granted enough resources for current subscription, so
-    // when we should be able to allcate resources requested by this request.
+    // We have already reserved enough resources for read requests, and have granted enough resources for current subscriptions, so
+    // we should be able to allocate resources requested by this request.
     ReadHandler * handler = mReadHandlers.CreateObject(*this, apExchangeContext, aInteractionType);
     if (handler)
     {
@@ -538,7 +538,7 @@ void InteractionModelEngine::AddReadClient(ReadClient * apReadClient)
     mpActiveReadClientList = apReadClient;
 }
 
-bool InteractionModelEngine::CheckResourceAndEvictOneSubscription(FabricIndex aFabricIndex, bool aForceEvict)
+bool InteractionModelEngine::CheckResourceAndEvictExceededSubscription(FabricIndex aFabricIndex, bool aForceEvict)
 {
     uint8_t fabricCount                            = mpFabricTable->FabricCount();
     size_t attributePathsSubscribedByCurrentFabric = 0;
@@ -570,7 +570,7 @@ bool InteractionModelEngine::CheckResourceAndEvictOneSubscription(FabricIndex aF
         {
             candicate = handler;
         }
-        // This handler uses more resources
+        // This handler uses more resources than the one we picked before.
         else if ((attributePathsUsed > maxNumberOfPathsCanBeUsed || eventPathsUsed > maxNumberOfPathsCanBeUsed) &&
                  (candicateAttributePathUsed <= maxNumberOfPathsCanBeUsed && candicateEventPathUsed <= maxNumberOfPathsCanBeUsed))
         {
@@ -578,7 +578,7 @@ bool InteractionModelEngine::CheckResourceAndEvictOneSubscription(FabricIndex aF
             candicateAttributePathUsed = attributePathsUsed;
             candicateEventPathUsed     = eventPathsUsed;
         }
-        // This handler is older
+        // This handler is older than the one we picked before.
         else if (handler->GetSubscriptionStartTimestamp() < candicate->GetSubscriptionStartTimestamp() &&
                  // And the level of resource usage is the same (both exceed or neither exceed)
                  ((attributePathsUsed > maxNumberOfPathsCanBeUsed || eventPathsUsed > maxNumberOfPathsCanBeUsed) ==
@@ -642,14 +642,14 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
          usedAttributePaths + aRequestedAttributePathCount > attributePathCap) ||
         (aRequestedEventPathCount > kMinSupportedPathPerSubscription && usedEventPaths + aRequestedEventPathCount > eventPathCap))
     {
-        // We cannot offer enough resource, and the subscription is requesting more than the spec limit.
+        // We cannot offer enough resources, and the subscription is requesting more than the spec limit.
         return false;
     }
 
     bool hasEvictedHandlers = true;
 
     const auto evictAndUpdateResourceUsage = [&](FabricIndex fabricIndex, bool forceEvict) {
-        bool ret           = CheckResourceAndEvictOneSubscription(fabricIndex, forceEvict);
+        bool ret           = CheckResourceAndEvictExceededSubscription(fabricIndex, forceEvict);
         usedAttributePaths = mAttributePathPool.Allocated();
         usedEventPaths     = mEventPathPool.Allocated();
         usedReadHandlers   = mReadHandlers.Allocated();
@@ -681,6 +681,14 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
            hasEvictedHandlers)
     {
         hasEvictedHandlers = evictAndUpdateResourceUsage(aFabricIndex, true);
+    }
+
+    if (!hasEvictedHandlers)
+    {
+        // This should never happen, since we should always be able to serve the request after evicting all subscriptions on the
+        // current fabric.
+        ChipLogError(DataManagement, "Failed to get required resources by evicting existing subscriptions.");
+        return false;
     }
 
     // We have ensured enough resources by the logic above.

@@ -77,10 +77,10 @@
 //
 // Default of 8 ECs is not sufficient for some of the unit tests
 // that try to validate multiple simultaneous interactions.
-// In tests like TestReadHandler_MultipleSubscriptions, we are trying to issue as many as read / subscription requests as possible
-// in parallel. Since the default config says we supports 16 fabrics, and we will have 4 read handlers for each fabric (3
-// subscriptions + 1 reserved for read) that is read transactions in parallel. Since the report handlers is allocating on the heap,
-// we will issue 65 requests in total and that is 130 EC. Round this up to 150 EC
+// In tests like TestReadHandler_MultipleSubscriptions, we are trying to issue as many read / subscription requests as possible in
+// parallel. Since the default config says we support 16 fabrics, and we will have 4 read handlers for each fabric (3 subscriptions
+// + 1 reserved for read) that is read transactions in parallel. Since the report handlers are allocated on the heap, we will issue
+// 65 requests in total and that is 130 ECs. Round this up to 150 ECs
 //
 #define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS 150
 
@@ -91,12 +91,12 @@
 #define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE (2 * CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS)
 
 //
-// Default of 4 parallel reports is too small for some unit tests that try to validate multiple simultaneous interactions and will
-// be very slow. In tests like TestReadHandler_MultipleSubscriptions, we are trying to issue as many as read / subscription requests
-// as possible in parallel. Since the default config says we supports 16 fabrics, and we will have 4 read handlers for each fabric
-// (3 subscriptions + 1 reserved for read) that is read transactions in parallel. Since the report handlers is allocating on the
-// heap, we will sending 64 transactions in total, and that is 16 iterations. However, the DrainAndServiceIO cannot handle
-// Enging::ScheduleRun correctly (it will stop when it finds that no messages are sent in one loop) We simplily set it to
+// 4 parallel reports by default are too small for some unit tests that try to validate multiple simultaneous interactions and will
+// be very slow. In tests like TestReadHandler_MultipleSubscriptions, we are trying to issue as many read / subscription requests as
+// possible in parallel. Since the default config says we support 16 fabrics, and we will have 4 read handlers for each fabric (3
+// subscriptions + 1 reserved for read) that is read transactions in parallel. Since the report handlers are allocated on the heap,
+// we will send 64 transactions in total, and that is 16 iterations. However, the DrainAndServiceIO cannot handle
+// Engine::ScheduleRun correctly (it will stop when it finds that no messages are sent in one loop). We simply set it to
 // CHIP_IM_MAX_NUM_READ_HANDLER for unlimited parallel reports.
 //
 #define CHIP_IM_MAX_REPORTS_IN_FLIGHT CHIP_IM_MAX_NUM_READ_HANDLER

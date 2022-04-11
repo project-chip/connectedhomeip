@@ -249,10 +249,11 @@ public:
     bool CanEstablishReadTransaction(const ReadHandler * apReadHandler);
 
     /**
-     * If there is a new fabric added after the subscriptions are established, we need to check if the existing subscriptions on
-     * each fabric will exceed the new limit of resource usage per fabric.
+     * Select the oldest (and the one that exceeds the per subscription resource minimum if there are any) read handlers on the
+     * fabric with the given fabric index. Evict it when the fabric uses more resources than the per fabric quota or aForceEvict is
+     * true.
      */
-    bool CheckResourceAndEvictOneSubscription(FabricIndex aFabricIndex, bool aForceEvict);
+    bool CheckResourceAndEvictExceededSubscription(FabricIndex aFabricIndex, bool aForceEvict);
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     //
@@ -379,8 +380,6 @@ private:
      */
     bool EnsureResourceForSubscription(FabricIndex aFabricIndex, size_t aRequestedAttributePathCount,
                                        size_t aRequestedEventPathCount);
-
-    void EvictOneReadHandlerWithExceededResources(FabricIndex aFabricIndex);
 
     template <typename T, size_t N>
     void ReleasePool(ObjectList<T> *& aObjectList, ObjectPool<ObjectList<T>, N> & aObjectPool);
