@@ -306,8 +306,7 @@ via 2002::2
 ## Device Tracing
 
 Device tracing is available to analyze the device performance. To turn on
-tracing, build with RPC enabled. See
-Build the example with pigweed RPC.
+tracing, build with RPC enabled. See Build the example with pigweed RPC.
 
 Obtain tracing json file.
 
