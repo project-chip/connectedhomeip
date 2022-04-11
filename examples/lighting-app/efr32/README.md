@@ -13,6 +13,7 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
     -   [Running RPC console](#running-rpc-console)
+    -   [Device Tracing](#device-tracing)
     -   [Memory settings](#memory-settings)
     -   [OTA Software Update](#ota-software-update)
 
@@ -109,7 +110,7 @@ Silicon Labs platform.
 
           $ gn gen out/debug '--args=efr32_board="BRD4161A" enable_sleepy_device=true chip_openthread_ftd=false'
 
-*   Build the example with pigweed RCP
+*   Build the example with pigweed RPC
 
           $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/lighting_app_rpc BRD4161A 'import("//with_pw_rpc.gni")'
 
@@ -301,6 +302,19 @@ via 2002::2
     `rpcs.chip.rpc.Lighting.Get()`
 
     `rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))`
+
+## Device Tracing
+
+Device tracing is available to analyze the device performance. To turn on
+tracing, build with RPC enabled. See
+Build the example with pigweed RPC.
+
+Obtain tracing json file.
+
+```
+    $ ./{PIGWEED_REPO}/pw_trace_tokenized/py/pw_trace_tokenized/get_trace.py -d {PORT} -o {OUTPUT_FILE} \
+    -t {ELF_FILE} {PIGWEED_REPO}/pw_trace_tokenized/pw_trace_protos/trace_rpc.proto
+```
 
 ## Memory settings
 
