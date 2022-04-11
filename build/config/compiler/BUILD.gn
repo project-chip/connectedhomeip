@@ -148,12 +148,14 @@ config("abi_default") {
 
   asmflags = cflags
   ldflags = cflags
+}
 
+config("dead_code_elimination_default") {
   # Delete unreferenced sections. Helpful with -ffunction-sections.
   if (current_os == "mac" || current_os == "ios") {
-    ldflags += [ "-Wl,-dead_strip" ]
+    ldflags = [ "-Wl,-dead_strip" ]
   } else {
-    ldflags += [ "-Wl,--gc-sections" ]
+    ldflags = [ "-Wl,--gc-sections" ]
   }
 }
 
