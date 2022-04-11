@@ -81,7 +81,6 @@ namespace Controller {
 using namespace chip::Protocols::UserDirectedCommissioning;
 
 constexpr uint16_t kNumMaxActiveDevices = CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES;
-constexpr uint16_t kNumMaxPairedDevices = 128;
 
 // Raw functions for cluster callbacks
 void OnBasicFailure(void * context, CHIP_ERROR err);
@@ -241,9 +240,6 @@ protected:
 
     State mState;
 
-    SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
-    bool mPairedDevicesInitialized;
-
     PeerId mLocalId          = PeerId();
     FabricId mFabricId       = kUndefinedFabricId;
     FabricInfo * mFabricInfo = nullptr;
@@ -254,8 +250,6 @@ protected:
     Dnssd::DiscoveredNodeData mCommissionableNodes[kMaxCommissionableNodes];
     DeviceControllerSystemState * mSystemState = nullptr;
 
-    CHIP_ERROR InitializePairedDeviceList();
-    CHIP_ERROR SetPairedDeviceList(ByteSpan pairedDeviceSerializedSet);
     ControllerDeviceInitParams GetControllerDeviceInitParams();
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
