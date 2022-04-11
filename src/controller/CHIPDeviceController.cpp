@@ -246,16 +246,6 @@ CHIP_ERROR DeviceController::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-bool DeviceController::DoesDevicePairingExist(const PeerId & deviceId)
-{
-    if (InitializePairedDeviceList() == CHIP_NO_ERROR)
-    {
-        return mPairedDevices.Contains(deviceId.GetNodeId());
-    }
-
-    return false;
-}
-
 void DeviceController::ReleaseOperationalDevice(NodeId remoteDeviceId)
 {
     VerifyOrReturn(mState == State::Initialized && mFabricInfo != nullptr,

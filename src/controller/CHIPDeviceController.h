@@ -149,12 +149,6 @@ public:
     CHIP_ERROR GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port);
 
     /**
-     *   This function returns true if the device corresponding to `deviceId` has previously been commissioned
-     *   on the fabric.
-     */
-    bool DoesDevicePairingExist(const PeerId & deviceId);
-
-    /**
      *   This function finds the device corresponding to deviceId, and establishes a secure connection with it.
      *   Once the connection is successfully establishes (or if it's already connected), it calls `onConnectedDevice`
      *   callback. If it fails to establish the connection, it calls `onError` callback.
