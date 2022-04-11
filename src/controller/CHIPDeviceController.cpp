@@ -105,8 +105,7 @@ constexpr uint32_t kSessionEstablishmentTimeout = 40 * kMillisecondsPerSecond;
 
 DeviceController::DeviceController()
 {
-    mState           = State::NotInitialized;
-    mStorageDelegate = nullptr;
+    mState = State::NotInitialized;
 }
 
 CHIP_ERROR DeviceController::Init(ControllerInitParams params)
@@ -117,7 +116,6 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     VerifyOrReturnError(params.systemState->SystemLayer() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(params.systemState->UDPEndPointManager() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mStorageDelegate = params.storageDelegate;
 #if CONFIG_NETWORK_LAYER_BLE
     VerifyOrReturnError(params.systemState->BleLayer() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 #endif
@@ -230,8 +228,6 @@ CHIP_ERROR DeviceController::Shutdown()
         mSystemState->SessionMgr()->ExpireAllPairingsForFabric(mFabricInfo->GetFabricIndex());
     }
 
-    mStorageDelegate = nullptr;
-
     if (mFabricInfo != nullptr)
     {
         mFabricInfo->Reset();
@@ -343,7 +339,6 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
         .sessionManager     = mSystemState->SessionMgr(),
         .exchangeMgr        = mSystemState->ExchangeMgr(),
         .udpEndPointManager = mSystemState->UDPEndPointManager(),
-        .storageDelegate    = mStorageDelegate,
         .fabricsTable       = mSystemState->Fabrics(),
     };
 }

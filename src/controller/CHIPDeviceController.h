@@ -244,7 +244,6 @@ protected:
     FabricId mFabricId       = kUndefinedFabricId;
     FabricInfo * mFabricInfo = nullptr;
 
-    PersistentStorageDelegate * mStorageDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
     Dnssd::DiscoveredNodeData mCommissionableNodes[kMaxCommissionableNodes];
