@@ -22,7 +22,7 @@
 namespace chip {
 namespace app {
 
-static CHIP_ERROR ReserveBuffer(System::PacketBufferTLVWriter & aWriter, uint32_t aReserveSpace)
+static CHIP_ERROR InitWriterWithSpaceReserved(System::PacketBufferTLVWriter & aWriter, uint32_t aReserveSpace)
 {
     System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_NO_MEMORY);

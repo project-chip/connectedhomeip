@@ -58,7 +58,7 @@ namespace app {
  *
  * **NOTE**
  * 1. This already includes the BufferedReadCallback, so there is no need to add that to the ReadClient callback chain.
- * 2. The same cache cannot be used by multiple subscribe/read interaction.
+ * 2. The same cache cannot be used by multiple subscribe/read interactions at the same time.
  *
  */
 class AttributeCache : protected ReadClient::Callback
@@ -315,11 +315,11 @@ public:
 
 private:
     using AttributeState = Variant<System::PacketBufferHandle, StatusIB>;
-    // mPendingDataVersion is set when client receives attribute data for a given cluster that is intersecting with mRequestPathSet
-    // and current cluste path is same as the previous one or this is the initial cluster path mPendingDataVersion is cleared when
-    // client applies the pending data version to committed data version mCommittedDataVersion is clear out when client receives
-    // attribute data for a given cluster and set when client moved on from a given cluster to a different cluster and the receive
-    // data is that is intersecting with mRequestPathSet
+    // mPendingDataVersion represents a tentative data version for a cluster that we have gotten some reports for.
+    //
+    // mCurrentDataVersion represents a known data version for a cluster.  In order for this to have a
+    // value the cluster must be included in a path in mRequestPathSet that has a wildcard attribute
+    // and we must not be in the middle of receiving reports for that cluster.
     struct ClusterState
     {
         std::map<AttributeId, AttributeState> mAttributes;
@@ -386,9 +386,15 @@ private:
 
     virtual CHIP_ERROR OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                                      const Span<AttributePathParams> & aAttributePaths,
-                                                     bool & aHasEncodeDataVersionList) override;
+                                                     bool & aEncodedDataVersionList) override;
     virtual void OnReadingWildcardAttributePath(const AttributePathParams & aAttributePathParams) override;
 
+    // Committed the last wildcard attribute path's data version into the Cache if the related attribute path is valid and pending version has value.
+    void CommitLastWildcardAttributePathVersion();
+
+    // Calculates the TLV playload size for clusters stored in the AttributeCache, and set sorted data version filter results
+    // in the vector from the largest to the smallest by cluster size.
+    //
     void GetSortedFilters(std::vector<std::pair<DataVersionFilter, size_t>> & aVector);
 
     Callback & mCallback;
@@ -397,7 +403,7 @@ private:
     std::set<AttributePathParams, Comparator> mRequestPathSet; // wildcard attribute request path only
     std::vector<EndpointId> mAddedEndpoints;
     BufferedReadCallback mBufferedReader;
-    ConcreteClusterPath mLastConcreteClusterPath = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
+    ConcreteClusterPath mLastWildcardAttributePath = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
 };
 
 }; // namespace app
