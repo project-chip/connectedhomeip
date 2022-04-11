@@ -68,7 +68,7 @@ def module_matches_platforms(module: Module, platforms: set) -> bool:
 
 
 def checkout_modules(modules: list, shallow: bool) -> None:
-    names = [module.name.removeprefix('submodule "').removesuffix('"') for module in modules]
+    names = [module.name.replace('submodule "', '').replace('"', '') for module in modules]
     names = ', '.join(names)
     sys.stderr.write(f'Checking out: {names}\n')
 
