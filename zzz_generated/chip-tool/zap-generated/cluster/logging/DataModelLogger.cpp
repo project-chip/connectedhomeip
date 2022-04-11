@@ -8107,7 +8107,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Speed", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::LifetimeRunningHours::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LifetimeRunningHours", 1, value);
         }
@@ -8117,7 +8117,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Power", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LifetimeEnergyConsumed", 1, value);
         }

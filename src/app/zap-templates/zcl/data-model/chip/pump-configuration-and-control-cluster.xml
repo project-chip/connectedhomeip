@@ -43,13 +43,13 @@ limitations under the License.
     <attribute side="server" code="0x0012" define="EFFECTIVE_CONTROL_MODE" type="PumpControlMode" min="0x00" max="0x07" writable="false" optional="false">EffectiveControlMode</attribute>
     <attribute side="server" code="0x0013" define="CAPACITY" type="INT16S" isNullable="true" min="0x0000" max="0x7FFF" writable="false" reportable="true" optional="false">Capacity</attribute>
     <attribute side="server" code="0x0014" define="SPEED" type="INT16U" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="true">Speed</attribute>
-    <attribute side="server" code="0x0015" define="LIFETIME_RUNNING_HOURS" type="INT24U" writable="true" default="0x000000" optional="true">
+    <attribute side="server" code="0x0015" define="LIFETIME_RUNNING_HOURS" type="INT24U" isNullable="true" writable="true" default="0x000000" optional="true">
       <description>LifetimeRunningHours</description>
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
     <attribute side="server" code="0x0016" define="PUMP_POWER" type="INT24U" isNullable="true" writable="false" optional="true">Power</attribute>
-    <attribute side="server" code="0x0017" define="LIFETIME_ENERGY_CONSUMED" type="INT32U" writable="true" default="0x00000000" optional="true">
+    <attribute side="server" code="0x0017" define="LIFETIME_ENERGY_CONSUMED" type="INT32U" isNullable="true" writable="true" default="0x00000000" optional="true">
       <description>LifetimeEnergyConsumed</description>
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>

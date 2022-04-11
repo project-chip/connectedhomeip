@@ -21236,6 +21236,7 @@ NSNumber * _Nonnull OccupancyValue;
 
         {
             id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedIntValue], 0UL);
         }
 
@@ -21319,6 +21320,7 @@ NSNumber * _Nonnull OccupancyValue;
 
         {
             id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedIntValue], 0UL);
         }
 
@@ -21770,6 +21772,7 @@ NSNumber * _Nonnull OccupancyValue;
 
         {
             id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedIntValue], 0UL);
         }
 
@@ -21853,6 +21856,7 @@ NSNumber * _Nonnull OccupancyValue;
 
         {
             id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedIntValue], 0UL);
         }
 
@@ -22251,6 +22255,7 @@ NSNumber * _Nonnull OccupancyValue;
 
         {
             id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedIntValue], 1UL);
         }
 
@@ -22301,6 +22306,7 @@ NSNumber * _Nonnull OccupancyValue;
 
         {
             id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedIntValue], 2UL);
         }
 
@@ -22351,6 +22357,7 @@ NSNumber * _Nonnull OccupancyValue;
 
         {
             id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedIntValue], 3UL);
         }
 
@@ -22425,6 +22432,7 @@ NSNumber * _Nonnull OccupancyValue;
 
         {
             id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedIntValue], 2UL);
         }
 
@@ -22475,6 +22483,7 @@ NSNumber * _Nonnull OccupancyValue;
 
         {
             id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedIntValue], 3UL);
         }
 

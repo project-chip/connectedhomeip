@@ -9760,7 +9760,7 @@ public:
     }
 
 private:
-    uint32_t mValue;
+    chip::app::DataModel::Nullable<uint32_t> mValue;
 };
 
 class WritePumpConfigurationAndControlLifetimeEnergyConsumed : public WriteAttribute
@@ -9787,7 +9787,7 @@ public:
     }
 
 private:
-    uint32_t mValue;
+    chip::app::DataModel::Nullable<uint32_t> mValue;
 };
 
 class WritePumpConfigurationAndControlOperationMode : public WriteAttribute

@@ -6719,7 +6719,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readLifetimeRunningHoursAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readLifetimeRunningHoursAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .LifetimeRunningHoursAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readPumpConfigurationAndControlLifetimeRunningHoursCommandParams);
@@ -6748,7 +6751,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
                   .readLifetimeEnergyConsumedAttribute(
-                      (ChipClusters.LongAttributeCallback) callback);
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .LifetimeEnergyConsumedAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readPumpConfigurationAndControlLifetimeEnergyConsumedCommandParams);
