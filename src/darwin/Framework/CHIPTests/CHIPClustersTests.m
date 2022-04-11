@@ -14759,7 +14759,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
         {
             id actualValue = value;
             XCTAssertFalse(actualValue == nil);
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
+            XCTAssertEqual([actualValue unsignedCharValue], 50);
         }
 
         [expectation fulfill];

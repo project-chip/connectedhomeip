@@ -132,7 +132,7 @@ tests:
       command: "readAttribute"
       attribute: "default move rate"
       response:
-          value: 0
+          value: 50
           constraints:
               type: uint8
 
