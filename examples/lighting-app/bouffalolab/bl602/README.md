@@ -2,8 +2,8 @@ CHIP BL602 Lighting Example
 
 ## Supported Devices
 
-The CHIP demo application is intended to work on three categories of BL602 devices.
-See [Demo board](https://dev.bouffalolab.com/product)
+The CHIP demo application is intended to work on three categories of BL602
+devices. See [Demo board](https://dev.bouffalolab.com/product)
 
 ## Build
 
@@ -18,7 +18,7 @@ $ reboot
 
 ```
 
-- Install packets
+-   Install packets
 
 ```
 $ cd {path-to-connectedhomeip}
@@ -51,17 +51,17 @@ general background on build prerequisites.
 
 Building the example:
 
-- Set up python controller.
+-   Set up python controller.
 
-      $ cd examples/chip-tool
-      
-      $ rm -rf out
-      
-      $ gn gen out/debug
-      
-      $ ninja -C out/debug
+        $ cd examples/chip-tool
 
-​       which puts the binary at `out/debug/chip-tool`
+        $ rm -rf out
+
+        $ gn gen out/debug
+
+        $ ninja -C out/debug
+
+​ which puts the binary at `out/debug/chip-tool`
 
 ### Commission a device using chip-tool
 
@@ -94,8 +94,7 @@ $ ./out/debug/chip-tool pairing ble-wifi 123456 ${SSID} ${PASSWORD} 20202021 390
     the device to be On or Off.
 
     `$ ./out/debug/chip-tool onoff on 123456 1`
-    
--   Use ColorControl cluster command to control the color attributes:
-    
-    `$ ./out/debug/chip-tool colorcontrol move-to-hue-and-saturation 240 100 0 0 0 12345 1`
 
+-   Use ColorControl cluster command to control the color attributes:
+
+    `$ ./out/debug/chip-tool colorcontrol move-to-hue-and-saturation 240 100 0 0 0 12345 1`
