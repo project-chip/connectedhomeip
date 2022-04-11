@@ -137,7 +137,7 @@ public:
     static void PrintHandle(const char * tag, const PacketBuffer * buffer)
     {
         printf("%s %p ref=%u len=%-4u next=%p\n", tag, buffer, buffer ? buffer->ref : 0, buffer ? buffer->len : 0,
-               buffer ? buffer->next : 0);
+               buffer ? buffer->next : nullptr);
     }
     static void PrintHandle(const char * tag, const PacketBufferHandle & handle) { PrintHandle(tag, handle.mBuffer); }
 

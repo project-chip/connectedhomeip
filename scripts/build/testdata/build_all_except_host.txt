@@ -826,7 +826,7 @@ west build --cmake-only -d {out}/nrf-nrf52840dk-light -b nrf52840dk_nrf52840 {ro
 # Generating nrf-nrf52840dk-light-rpc
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf52840dk-light-rpc -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=../../rpc.overlay'
+west build --cmake-only -d {out}/nrf-nrf52840dk-light-rpc -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=rpc.overlay'
 
 # Generating nrf-nrf52840dk-lock
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
@@ -851,7 +851,7 @@ west build --cmake-only -d {out}/nrf-nrf52840dk-shell -b nrf52840dk_nrf52840 {ro
 # Generating nrf-nrf52840dongle-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf52840dongle-light -b nrf52840dongle_nrf52840 {root}/examples/lighting-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf52840dongle-light -b nrf52840dongle_nrf52840 {root}/examples/lighting-app/nrfconnect -- -DCONF_FILE=prj_no_dfu.conf'
 
 # Generating nrf-nrf5340dk-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
@@ -861,7 +861,7 @@ west build --cmake-only -d {out}/nrf-nrf5340dk-light -b nrf5340dk_nrf5340_cpuapp
 # Generating nrf-nrf5340dk-light-rpc
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf5340dk-light-rpc -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=../../rpc.overlay'
+west build --cmake-only -d {out}/nrf-nrf5340dk-light-rpc -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=rpc.overlay'
 
 # Generating nrf-nrf5340dk-lock
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";

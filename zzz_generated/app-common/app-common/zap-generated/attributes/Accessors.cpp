@@ -18712,7 +18712,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 
 } // namespace AcRefrigerantType
 
-namespace AcCompressor {
+namespace AcCompressorType {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
 {
@@ -18741,7 +18741,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
-} // namespace AcCompressor
+} // namespace AcCompressorType
 
 namespace AcErrorCode {
 

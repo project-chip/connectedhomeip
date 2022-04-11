@@ -18,6 +18,7 @@
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <platform/Linux/DeviceInfoProviderImpl.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -26,6 +27,16 @@
 
 namespace chip {
 namespace DeviceLayer {
+
+namespace {
+constexpr TLV::Tag kLabelNameTag  = TLV::ContextTag(0);
+constexpr TLV::Tag kLabelValueTag = TLV::ContextTag(1);
+} // anonymous namespace
+
+CHIP_ERROR DeviceInfoProviderImpl::Init()
+{
+    return mStorage.Init(CHIP_DEVICE_INFO_PATH);
+}
 
 DeviceInfoProviderImpl & DeviceInfoProviderImpl::GetDefaultInstance()
 {
@@ -99,31 +110,41 @@ bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & outpu
 
         return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelLength(EndpointId endpoint, size_t val)
 {
-    // TODO:: store the user label count.
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    DefaultStorageKeyAllocator keyAlloc;
+
+    ReturnErrorOnFailure(mStorage.WriteValue(keyAlloc.UserLabelLengthKey(endpoint), val));
+
+    return mStorage.Commit();
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::GetUserLabelLength(EndpointId endpoint, size_t & val)
 {
-    // TODO:: read the user label count. temporarily return the size of hardcoded labelList.
-    val = 4;
+    DefaultStorageKeyAllocator keyAlloc;
 
-    return CHIP_NO_ERROR;
+    return mStorage.ReadValue(keyAlloc.UserLabelLengthKey(endpoint), val);
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel)
 {
-    // TODO:: store the user labelList, and read back stored user labelList if it has been set.
-    // Add yaml test to verify this.
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    DefaultStorageKeyAllocator keyAlloc;
+    uint8_t buf[UserLabelTLVMaxSize()];
+    TLV::TLVWriter writer;
+    writer.Init(buf);
+
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+    ReturnErrorOnFailure(writer.PutString(kLabelNameTag, userLabel.label));
+    ReturnErrorOnFailure(writer.PutString(kLabelValueTag, userLabel.value));
+    ReturnErrorOnFailure(writer.EndContainer(outerType));
+    ReturnErrorOnFailure(mStorage.WriteValueBin(keyAlloc.UserLabelIndexKey(endpoint, index), buf, writer.GetLengthWritten()));
+
+    return mStorage.Commit();
 }
 
 DeviceInfoProvider::UserLabelIterator * DeviceInfoProviderImpl::IterateUserLabel(EndpointId endpoint)
@@ -143,57 +164,45 @@ DeviceInfoProviderImpl::UserLabelIteratorImpl::UserLabelIteratorImpl(DeviceInfoP
 
 bool DeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
 {
-    // TODO:: get the user labelList from persistent storage, temporarily, use the following
-    // hardcoded labelList on all endpoints.
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    const char * labelPtr = nullptr;
-    const char * valuePtr = nullptr;
 
     VerifyOrReturnError(mIndex < mTotal, false);
 
-    switch (mIndex)
-    {
-    case 0:
-        labelPtr = "room";
-        valuePtr = "bedroom 2";
-        break;
-    case 1:
-        labelPtr = "orientation";
-        valuePtr = "North";
-        break;
-    case 2:
-        labelPtr = "floor";
-        valuePtr = "2";
-        break;
-    case 3:
-        labelPtr = "direction";
-        valuePtr = "up";
-        break;
-    default:
-        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-        break;
-    }
+    DefaultStorageKeyAllocator keyAlloc;
+    uint8_t buf[UserLabelTLVMaxSize()];
+    size_t outLen;
+    err = mProvider.mStorage.ReadValueBin(keyAlloc.UserLabelIndexKey(mEndpoint, mIndex), buf, sizeof(buf), outLen);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, false);
 
-    if (err == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(std::strlen(labelPtr) <= kMaxLabelNameLength, false);
-        VerifyOrReturnError(std::strlen(valuePtr) <= kMaxLabelValueLength, false);
+    TLV::ContiguousBufferTLVReader reader;
+    reader.Init(buf);
+    err = reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag());
+    VerifyOrReturnError(err == CHIP_NO_ERROR, false);
 
-        Platform::CopyString(mUserLabelNameBuf, kMaxLabelNameLength + 1, labelPtr);
-        Platform::CopyString(mUserLabelValueBuf, kMaxLabelValueLength + 1, valuePtr);
+    TLV::TLVType containerType;
+    VerifyOrReturnError(reader.EnterContainer(containerType) == CHIP_NO_ERROR, false);
 
-        output.label = CharSpan::fromCharString(mUserLabelNameBuf);
-        output.value = CharSpan::fromCharString(mUserLabelValueBuf);
+    chip::CharSpan label;
+    chip::CharSpan value;
 
-        mIndex++;
+    VerifyOrReturnError(reader.Next(kLabelNameTag) == CHIP_NO_ERROR, false);
+    VerifyOrReturnError(reader.Get(label) == CHIP_NO_ERROR, false);
 
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    VerifyOrReturnError(reader.Next(kLabelValueTag) == CHIP_NO_ERROR, false);
+    VerifyOrReturnError(reader.Get(value) == CHIP_NO_ERROR, false);
+
+    VerifyOrReturnError(reader.VerifyEndOfContainer() == CHIP_NO_ERROR, false);
+    VerifyOrReturnError(reader.ExitContainer(containerType) == CHIP_NO_ERROR, false);
+
+    Platform::CopyString(mUserLabelNameBuf, label);
+    Platform::CopyString(mUserLabelValueBuf, value);
+
+    output.label = CharSpan::fromCharString(mUserLabelNameBuf);
+    output.value = CharSpan::fromCharString(mUserLabelValueBuf);
+
+    mIndex++;
+
+    return true;
 }
 
 DeviceInfoProvider::SupportedLocalesIterator * DeviceInfoProviderImpl::IterateSupportedLocales()
@@ -261,10 +270,8 @@ bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & outpu
 
         return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 DeviceInfoProvider::SupportedCalendarTypesIterator * DeviceInfoProviderImpl::IterateSupportedCalendarTypes()
@@ -336,10 +343,8 @@ bool DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarTy
         mIndex++;
         return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 } // namespace DeviceLayer

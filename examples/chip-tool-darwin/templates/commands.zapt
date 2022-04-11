@@ -228,7 +228,7 @@ public:
         [cluster subscribe{{>attribute}}WithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval] 
                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval] 
                                             params:params
-                                subscriptionEstablished: NULL reportHandler:^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
+                                subscriptionEstablished: nullptr reportHandler:^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
         NSLog(@"{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response %@", [value description]);
         if (error || !mWait){
             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);

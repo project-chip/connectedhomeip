@@ -50,7 +50,8 @@ public:
     const char * FabricOpKey(FabricIndex fabric) { return Format("f/%x/o", fabric); }
 
     // FailSafeContext
-    const char * FailSafeContextKey() { return Format("g/fsc"); }
+    const char * FailSafeContextKey() { return Format("g/fs/c"); }
+    static const char * FailSafeNetworkConfig() { return "g/fs/n"; }
 
     // Session resumption
     const char * FabricSession(FabricIndex fabric, NodeId nodeId)
@@ -75,6 +76,10 @@ public:
     // Group Message Counters
     const char * GroupDataCounter() { return Format("g/gdc"); }
     const char * GroupControlCounter() { return Format("g/gcc"); }
+
+    // Device Information Provider
+    const char * UserLabelLengthKey(EndpointId endpoint) { return Format("g/userlbl/%x", endpoint); }
+    const char * UserLabelIndexKey(EndpointId endpoint, uint32_t index) { return Format("g/userlbl/%x/%" PRIx32, endpoint, index); }
 
     // Group Data Provider
 

@@ -405,7 +405,7 @@ host computer. To build the example with the RPC server, run the following
 command with _build-target_ replaced with the build target name of the Nordic
 Semiconductor's kit you own:
 
-    $ west build -b build-target -- -DOVERLAY_CONFIG=../../rpc.overlay
+    $ west build -b build-target -- -DOVERLAY_CONFIG=rpc.overlay
 
 ### Building with Device Firmware Upgrade support
 
@@ -437,11 +437,8 @@ Semiconductor kit you are using (for example `nrf52840dk_nrf52840`):
 
 #### Changing bootloader configuration
 
-To change the default MCUboot configuration, edit the `mcuboot.conf` or
-`mcuboot_release.conf` overlay files depending on whether you build the target
-with debug or release configuration. The files are located in the
-`configuration/build-target/child_image` directory (_build-target_ is your board
-name, for example `nrf52840dk_nrf52840`).
+To change the default MCUboot configuration, edit the `prj.conf` file located in
+the `child_image/mcuboot` directory.
 
 Make sure to keep the configuration consistent with changes made to the
 application configuration. This is necessary for the configuration to work, as
@@ -500,12 +497,15 @@ depending on the selected board:
 
 -   debug -- Debug version of the application - can be used to enable additional
     features for verifying the application behavior, such as logs or
-    command-line shell.
+    command-line shell. It can be used only for the nRF52840 DK and nRF5340 DK,
+    as those platforms have DFU enabled by default.
 -   release -- Release version of the application - can be used to enable only
-    the necessary application functionalities to optimize its performance.
+    the necessary application functionalities to optimize its performance. It
+    can be used only for the nRF52840 DK and nRF5340 DK, as those platforms have
+    DFU enabled by default.
 -   no_dfu -- Debug version of the application without Device Firmware Upgrade
-    feature support - can be used only for the nRF52840 DK and nRF5340 DK, as
-    those platforms have DFU enabled by default.
+    feature support - can be used for the nRF52840 DK, nRF5340 DK and nRF52840
+    Dongle.
 
 For more information, see the
 [Configuring nRF Connect SDK examples](../../../docs/guides/nrfconnect_examples_configuration.md)

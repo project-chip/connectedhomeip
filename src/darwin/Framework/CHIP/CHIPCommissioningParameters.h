@@ -19,6 +19,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol CHIPDeviceAttestationDelegate;
+
 /**
  * The class definition for the CHIPCommissioningParameters
  *
@@ -45,6 +47,14 @@ NS_ASSUME_NONNULL_BEGIN
  *  The Thread operational dataset
  */
 @property (nonatomic, nullable, copy, readwrite) NSData * threadOperationalDataset;
+/**
+ *  The Device Attestation status delegate
+ */
+@property (nonatomic, nullable, strong, readwrite) id<CHIPDeviceAttestationDelegate> deviceAttestationDelegate;
+/**
+ *  The timeout in secs to set for fail-safe when attestation fails
+ */
+@property (nonatomic, nullable, copy, readwrite) NSNumber * failSafeExpiryTimeoutSecs;
 
 @end
 

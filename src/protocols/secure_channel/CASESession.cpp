@@ -108,7 +108,7 @@ void CASESession::Clear()
     PairingSession::Clear();
 
     mState = kInitialized;
-    Crypto::ClearSecretData(&mIPK[0], sizeof(mIPK));
+    Crypto::ClearSecretData(mIPK);
 
     AbortExchange();
 }
@@ -277,7 +277,7 @@ CHIP_ERROR CASESession::RecoverInitiatorIpk()
         ChipLogError(SecureChannel, "Failed to obtain IPK for initiating: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
-    else if ((ipkKeySet.num_keys_used == 0) || (ipkKeySet.num_keys_used > Credentials::GroupDataProvider::KeySet::kEpochKeysMax))
+    if ((ipkKeySet.num_keys_used == 0) || (ipkKeySet.num_keys_used > Credentials::GroupDataProvider::KeySet::kEpochKeysMax))
     {
         ChipLogError(SecureChannel, "Found invalid IPK keyset for initiator.");
         return CHIP_ERROR_INTERNAL;

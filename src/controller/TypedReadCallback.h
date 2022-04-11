@@ -108,15 +108,12 @@ private:
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
     {
-        if (aReadPrepareParams.mpAttributePathParamsList != nullptr)
-        {
-            VerifyOrDie(aReadPrepareParams.mAttributePathParamsListSize == 1);
-            chip::Platform::Delete<app::AttributePathParams>(aReadPrepareParams.mpAttributePathParamsList);
-        }
+        VerifyOrDie(aReadPrepareParams.mAttributePathParamsListSize == 1 &&
+                    aReadPrepareParams.mpAttributePathParamsList != nullptr);
+        chip::Platform::Delete<app::AttributePathParams>(aReadPrepareParams.mpAttributePathParamsList);
 
-        if (aReadPrepareParams.mpDataVersionFilterList != nullptr)
+        if (aReadPrepareParams.mDataVersionFilterListSize == 1 && aReadPrepareParams.mpDataVersionFilterList != nullptr)
         {
-            VerifyOrDie(aReadPrepareParams.mDataVersionFilterListSize == 1);
             chip::Platform::Delete<app::DataVersionFilter>(aReadPrepareParams.mpDataVersionFilterList);
         }
     }

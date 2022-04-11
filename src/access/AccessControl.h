@@ -213,7 +213,6 @@ public:
          */
         CHIP_ERROR RemoveTarget(size_t index) { return mDelegate->RemoveTarget(index); }
 
-    public:
         const Delegate & GetDelegate() const { return *mDelegate; }
 
         Delegate & GetDelegate() { return *mDelegate; }
@@ -267,7 +266,6 @@ public:
 
         CHIP_ERROR Next(Entry & entry) { return mDelegate->Next(entry); }
 
-    public:
         const Delegate & GetDelegate() const { return *mDelegate; }
 
         Delegate & GetDelegate() { return *mDelegate; }

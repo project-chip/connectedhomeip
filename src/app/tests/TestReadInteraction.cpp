@@ -265,10 +265,8 @@ bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath,
     {
         return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)

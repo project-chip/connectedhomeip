@@ -56,6 +56,7 @@
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
+#include <app/util/attribute-metadata.h>
 #include <app/util/basic-types.h>
 
 namespace chip {
@@ -452,6 +453,13 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState);
 
 /**
+ *  Get the registered attribute access override. nullptr when attribute access override is not found.
+ *
+ * TODO(#16806): This function and registerAttributeAccessOverride can be member functions of InteractionModelEngine.
+ */
+AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, ClusterId aClusterId);
+
+/**
  * TODO: Document.
  */
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor,
@@ -467,6 +475,13 @@ bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath,
  * Returns true if device type is on endpoint, false otherwise.
  */
 bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint);
+
+/**
+ * Returns the metadata of the attribute for the given path.
+ *
+ * @retval The metadata of the attribute, will return null if the given attribute does not exists.
+ */
+const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath);
 
 } // namespace app
 } // namespace chip

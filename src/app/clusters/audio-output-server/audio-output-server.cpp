@@ -50,7 +50,7 @@ Delegate * gDelegateTable[kAudioOutputDelegateTableSize] = { nullptr };
 Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::AudioOutput::Id);
-    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+    return (ep == 0xFFFF ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)

@@ -128,7 +128,7 @@ static void InitServer(intptr_t context)
     if (otaImageLen > 0)
     {
         otaProvider.SetQueryImageStatus(OTAQueryStatus::kUpdateAvailable);
-        otaProvider.SetOTAFilePath(otaFilename);
+        otaProvider.SetOTAFilePath(otaImagePath);
     }
 
     chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &otaProvider);

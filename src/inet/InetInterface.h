@@ -91,7 +91,6 @@ public:
     static constexpr size_t kMaxIfNameLength = Z_DEVICE_MAX_NAME_LEN;
 #endif
 
-public:
     ~InterfaceId() = default;
 
     constexpr InterfaceId() : mPlatformInterface(kPlatformNull) {}

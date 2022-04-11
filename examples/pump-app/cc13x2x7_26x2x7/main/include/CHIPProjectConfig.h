@@ -30,7 +30,6 @@
 
 // Security and Authentication always enabled
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
-#define CHIP_CONFIG_REQUIRE_AUTH 1
 
 #if BUILD_RELEASE // release build
 // Note: Default Pairing/PIN/Serial Numbers being used. These should not be enabled for production builds
