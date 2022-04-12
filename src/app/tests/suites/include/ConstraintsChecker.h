@@ -208,6 +208,18 @@ protected:
     }
 
     template <typename T, typename U>
+    bool CheckConstraintMinValue(const char * itemName, chip::BitFlags<T> current, U expected)
+    {
+        if (current.Raw() < expected)
+        {
+            Exit(std::string(itemName) + " value < minValue: " + std::to_string(current.Raw()) + " < " + std::to_string(expected));
+            return false;
+        }
+
+        return true;
+    }
+
+    template <typename T, typename U>
     bool CheckConstraintMinValue(const char * itemName, const chip::app::DataModel::Nullable<T> & current, U expected)
     {
         if (current.IsNull())
@@ -233,6 +245,18 @@ protected:
     bool CheckConstraintMaxValue(const char * itemName, T current, U expected)
     {
         return CheckConstraintMaxValue(itemName, chip::to_underlying(current), expected);
+    }
+
+    template <typename T, typename U>
+    bool CheckConstraintMaxValue(const char * itemName, chip::BitFlags<T> current, U expected)
+    {
+        if (current.Raw() > expected)
+        {
+            Exit(std::string(itemName) + " value > maxValue: " + std::to_string(current.Raw()) + " > " + std::to_string(expected));
+            return false;
+        }
+
+        return true;
     }
 
     template <typename T, typename U>
