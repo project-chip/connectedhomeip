@@ -40039,235 +40039,219 @@ public:
             err = Test3bReadsBackTheRoMandatoryAttributeType_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : 2: read the RO mandatory attribute default: ConfigStatus\n");
-            err = Test2ReadTheRoMandatoryAttributeDefaultConfigStatus_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : 3a: write a value into the RO mandatory attribute: ConfigStatus\n");
+            err = Test3aWriteAValueIntoTheRoMandatoryAttributeConfigStatus_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : 3a: write a value into the RO mandatory attribute: ConfigStatus\n");
-            err = Test3aWriteAValueIntoTheRoMandatoryAttributeConfigStatus_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : 2: read the RO mandatory attribute default: OperationalStatus\n");
+            err = Test2ReadTheRoMandatoryAttributeDefaultOperationalStatus_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : 3b: reads back the RO mandatory attribute: ConfigStatus\n");
-            err = Test3bReadsBackTheRoMandatoryAttributeConfigStatus_6();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 6 : 3a: write a value into the RO mandatory attribute: OperationalStatus\n");
+            err = Test3aWriteAValueIntoTheRoMandatoryAttributeOperationalStatus_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : 2: read the RO mandatory attribute default: OperationalStatus\n");
-            err = Test2ReadTheRoMandatoryAttributeDefaultOperationalStatus_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : 3b: reads back the RO mandatory attribute: OperationalStatus\n");
+            err = Test3bReadsBackTheRoMandatoryAttributeOperationalStatus_7();
             break;
         case 8:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 8 : 3a: write a value into the RO mandatory attribute: OperationalStatus\n");
-            err = Test3aWriteAValueIntoTheRoMandatoryAttributeOperationalStatus_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : 2: read the RO mandatory attribute default: EndProductType\n");
+            err = Test2ReadTheRoMandatoryAttributeDefaultEndProductType_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : 3b: reads back the RO mandatory attribute: OperationalStatus\n");
-            err = Test3bReadsBackTheRoMandatoryAttributeOperationalStatus_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : 3a: write a value into the RO mandatory attribute: EndProductType\n");
+            err = Test3aWriteAValueIntoTheRoMandatoryAttributeEndProductType_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : 2: read the RO mandatory attribute default: EndProductType\n");
-            err = Test2ReadTheRoMandatoryAttributeDefaultEndProductType_10();
+            ChipLogProgress(chipTool, " ***** Test Step 10 : 3b: reads back the RO mandatory attribute: EndProductType\n");
+            err = Test3bReadsBackTheRoMandatoryAttributeEndProductType_10();
             break;
         case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : 3a: write a value into the RO mandatory attribute: EndProductType\n");
-            err = Test3aWriteAValueIntoTheRoMandatoryAttributeEndProductType_11();
+            ChipLogProgress(chipTool, " ***** Test Step 11 : 3a: write a value into the RW mandatory attribute:: Mode\n");
+            err = Test3aWriteAValueIntoTheRwMandatoryAttributeMode_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : 3b: reads back the RO mandatory attribute: EndProductType\n");
-            err = Test3bReadsBackTheRoMandatoryAttributeEndProductType_12();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 12 : 2: read the RO optional attribute default: TargetPositionLiftPercent100ths\n");
+            err = Test2ReadTheRoOptionalAttributeDefaultTargetPositionLiftPercent100ths_12();
             break;
         case 13:
-            ChipLogProgress(chipTool, " ***** Test Step 13 : 2: read the RW mandatory attribute default: Mode\n");
-            err = Test2ReadTheRwMandatoryAttributeDefaultMode_13();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 13 : 3a: write a value into the RO optional attribute: TargetPositionLiftPercent100ths\n");
+            err = Test3aWriteAValueIntoTheRoOptionalAttributeTargetPositionLiftPercent100ths_13();
             break;
         case 14:
-            ChipLogProgress(chipTool, " ***** Test Step 14 : 3a: write a value into the RW mandatory attribute:: Mode\n");
-            err = Test3aWriteAValueIntoTheRwMandatoryAttributeMode_14();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 14 : 3b: reads back the RO optional attribute: TargetPositionLiftPercent100ths\n");
+            err = Test3bReadsBackTheRoOptionalAttributeTargetPositionLiftPercent100ths_14();
             break;
         case 15:
-            ChipLogProgress(chipTool, " ***** Test Step 15 : 3b: reads back the RW mandatory attribute: Mode\n");
-            err = Test3bReadsBackTheRwMandatoryAttributeMode_15();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 15 : 2: read the RO optional attribute default: TargetPositionTiltPercent100ths\n");
+            err = Test2ReadTheRoOptionalAttributeDefaultTargetPositionTiltPercent100ths_15();
             break;
         case 16:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 16 : 2: read the RO optional attribute default: TargetPositionLiftPercent100ths\n");
-            err = Test2ReadTheRoOptionalAttributeDefaultTargetPositionLiftPercent100ths_16();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 16 : 3a: write a value into the RO optional attribute: TargetPositionTiltPercent100ths\n");
+            err = Test3aWriteAValueIntoTheRoOptionalAttributeTargetPositionTiltPercent100ths_16();
             break;
         case 17:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 17 : 3a: write a value into the RO optional attribute: TargetPositionLiftPercent100ths\n");
-            err = Test3aWriteAValueIntoTheRoOptionalAttributeTargetPositionLiftPercent100ths_17();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 17 : 3b: reads back the RO optional attribute: TargetPositionTiltPercent100ths\n");
+            err = Test3bReadsBackTheRoOptionalAttributeTargetPositionTiltPercent100ths_17();
             break;
         case 18:
             ChipLogProgress(
-                chipTool, " ***** Test Step 18 : 3b: reads back the RO optional attribute: TargetPositionLiftPercent100ths\n");
-            err = Test3bReadsBackTheRoOptionalAttributeTargetPositionLiftPercent100ths_18();
+                chipTool, " ***** Test Step 18 : 2: read the RO optional attribute default: CurrentPositionLiftPercent100ths\n");
+            err = Test2ReadTheRoOptionalAttributeDefaultCurrentPositionLiftPercent100ths_18();
             break;
         case 19:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 19 : 2: read the RO optional attribute default: TargetPositionTiltPercent100ths\n");
-            err = Test2ReadTheRoOptionalAttributeDefaultTargetPositionTiltPercent100ths_19();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 19 : 3a: write a value into the RO optional attribute: CurrentPositionLiftPercent100ths\n");
+            err = Test3aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLiftPercent100ths_19();
             break;
         case 20:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 20 : 3a: write a value into the RO optional attribute: TargetPositionTiltPercent100ths\n");
-            err = Test3aWriteAValueIntoTheRoOptionalAttributeTargetPositionTiltPercent100ths_20();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 20 : 3b: reads back the RO optional attribute: CurrentPositionLiftPercent100ths\n");
+            err = Test3bReadsBackTheRoOptionalAttributeCurrentPositionLiftPercent100ths_20();
             break;
         case 21:
             ChipLogProgress(
-                chipTool, " ***** Test Step 21 : 3b: reads back the RO optional attribute: TargetPositionTiltPercent100ths\n");
-            err = Test3bReadsBackTheRoOptionalAttributeTargetPositionTiltPercent100ths_21();
+                chipTool, " ***** Test Step 21 : 2: read the RO optional attribute default: CurrentPositionTiltPercent100ths\n");
+            err = Test2ReadTheRoOptionalAttributeDefaultCurrentPositionTiltPercent100ths_21();
             break;
         case 22:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 22 : 2: read the RO optional attribute default: CurrentPositionLiftPercent100ths\n");
-            err = Test2ReadTheRoOptionalAttributeDefaultCurrentPositionLiftPercent100ths_22();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 22 : 3a: write a value into the RO optional attribute: CurrentPositionTiltPercent100ths\n");
+            err = Test3aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTiltPercent100ths_22();
             break;
         case 23:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 23 : 3a: write a value into the RO optional attribute: CurrentPositionLiftPercent100ths\n");
-            err = Test3aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLiftPercent100ths_23();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 23 : 3b: reads back the RO optional attribute: CurrentPositionTiltPercent100ths\n");
+            err = Test3bReadsBackTheRoOptionalAttributeCurrentPositionTiltPercent100ths_23();
             break;
         case 24:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 24 : 3b: reads back the RO optional attribute: CurrentPositionLiftPercent100ths\n");
-            err = Test3bReadsBackTheRoOptionalAttributeCurrentPositionLiftPercent100ths_24();
+            ChipLogProgress(chipTool, " ***** Test Step 24 : 2: read the RO optional attribute default: InstalledOpenLimitLift\n");
+            err = Test2ReadTheRoOptionalAttributeDefaultInstalledOpenLimitLift_24();
             break;
         case 25:
             ChipLogProgress(
-                chipTool, " ***** Test Step 25 : 2: read the RO optional attribute default: CurrentPositionTiltPercent100ths\n");
-            err = Test2ReadTheRoOptionalAttributeDefaultCurrentPositionTiltPercent100ths_25();
+                chipTool, " ***** Test Step 25 : 3a: write a value into the RO optional attribute: InstalledOpenLimitLift\n");
+            err = Test3aWriteAValueIntoTheRoOptionalAttributeInstalledOpenLimitLift_25();
             break;
         case 26:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 26 : 3a: write a value into the RO optional attribute: CurrentPositionTiltPercent100ths\n");
-            err = Test3aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTiltPercent100ths_26();
+            ChipLogProgress(chipTool, " ***** Test Step 26 : 3b: reads back the RO optional attribute: InstalledOpenLimitLift\n");
+            err = Test3bReadsBackTheRoOptionalAttributeInstalledOpenLimitLift_26();
             break;
         case 27:
             ChipLogProgress(
-                chipTool, " ***** Test Step 27 : 3b: reads back the RO optional attribute: CurrentPositionTiltPercent100ths\n");
-            err = Test3bReadsBackTheRoOptionalAttributeCurrentPositionTiltPercent100ths_27();
+                chipTool, " ***** Test Step 27 : 2: read the RO optional attribute default: InstalledClosedLimitLift\n");
+            err = Test2ReadTheRoOptionalAttributeDefaultInstalledClosedLimitLift_27();
             break;
         case 28:
-            ChipLogProgress(chipTool, " ***** Test Step 28 : 2: read the RO optional attribute default: InstalledOpenLimitLift\n");
-            err = Test2ReadTheRoOptionalAttributeDefaultInstalledOpenLimitLift_28();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 28 : 3a: write a value into the RO optional attribute: InstalledClosedLimitLift\n");
+            err = Test3aWriteAValueIntoTheRoOptionalAttributeInstalledClosedLimitLift_28();
             break;
         case 29:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 29 : 3a: write a value into the RO optional attribute: InstalledOpenLimitLift\n");
-            err = Test3aWriteAValueIntoTheRoOptionalAttributeInstalledOpenLimitLift_29();
+            ChipLogProgress(chipTool, " ***** Test Step 29 : 3b: reads back the RO optional attribute: InstalledClosedLimitLift\n");
+            err = Test3bReadsBackTheRoOptionalAttributeInstalledClosedLimitLift_29();
             break;
         case 30:
-            ChipLogProgress(chipTool, " ***** Test Step 30 : 3b: reads back the RO optional attribute: InstalledOpenLimitLift\n");
-            err = Test3bReadsBackTheRoOptionalAttributeInstalledOpenLimitLift_30();
+            ChipLogProgress(chipTool, " ***** Test Step 30 : 2: read the RO optional attribute default: InstalledOpenLimitTilt\n");
+            err = Test2ReadTheRoOptionalAttributeDefaultInstalledOpenLimitTilt_30();
             break;
         case 31:
             ChipLogProgress(
-                chipTool, " ***** Test Step 31 : 2: read the RO optional attribute default: InstalledClosedLimitLift\n");
-            err = Test2ReadTheRoOptionalAttributeDefaultInstalledClosedLimitLift_31();
+                chipTool, " ***** Test Step 31 : 3a: write a value into the RO optional attribute: InstalledOpenLimitTilt\n");
+            err = Test3aWriteAValueIntoTheRoOptionalAttributeInstalledOpenLimitTilt_31();
             break;
         case 32:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 32 : 3a: write a value into the RO optional attribute: InstalledClosedLimitLift\n");
-            err = Test3aWriteAValueIntoTheRoOptionalAttributeInstalledClosedLimitLift_32();
+            ChipLogProgress(chipTool, " ***** Test Step 32 : 3b: reads back the RO optional attribute: InstalledOpenLimitTilt\n");
+            err = Test3bReadsBackTheRoOptionalAttributeInstalledOpenLimitTilt_32();
             break;
         case 33:
-            ChipLogProgress(chipTool, " ***** Test Step 33 : 3b: reads back the RO optional attribute: InstalledClosedLimitLift\n");
-            err = Test3bReadsBackTheRoOptionalAttributeInstalledClosedLimitLift_33();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 33 : 2: read the RO optional attribute default: InstalledClosedLimitTilt\n");
+            err = Test2ReadTheRoOptionalAttributeDefaultInstalledClosedLimitTilt_33();
             break;
         case 34:
-            ChipLogProgress(chipTool, " ***** Test Step 34 : 2: read the RO optional attribute default: InstalledOpenLimitTilt\n");
-            err = Test2ReadTheRoOptionalAttributeDefaultInstalledOpenLimitTilt_34();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 34 : 3a: write a value into the RO optional attribute: InstalledClosedLimitTilt\n");
+            err = Test3aWriteAValueIntoTheRoOptionalAttributeInstalledClosedLimitTilt_34();
             break;
         case 35:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 35 : 3a: write a value into the RO optional attribute: InstalledOpenLimitTilt\n");
-            err = Test3aWriteAValueIntoTheRoOptionalAttributeInstalledOpenLimitTilt_35();
+            ChipLogProgress(chipTool, " ***** Test Step 35 : 3b: reads back the RO optional attribute: InstalledClosedLimitTilt\n");
+            err = Test3bReadsBackTheRoOptionalAttributeInstalledClosedLimitTilt_35();
             break;
         case 36:
-            ChipLogProgress(chipTool, " ***** Test Step 36 : 3b: reads back the RO optional attribute: InstalledOpenLimitTilt\n");
-            err = Test3bReadsBackTheRoOptionalAttributeInstalledOpenLimitTilt_36();
+            ChipLogProgress(chipTool, " ***** Test Step 36 : 4: read the RO mandatory attribute default: SafetyStatus\n");
+            err = Test4ReadTheRoMandatoryAttributeDefaultSafetyStatus_36();
             break;
         case 37:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 37 : 2: read the RO optional attribute default: InstalledClosedLimitTilt\n");
-            err = Test2ReadTheRoOptionalAttributeDefaultInstalledClosedLimitTilt_37();
+            ChipLogProgress(chipTool, " ***** Test Step 37 : 5a: write a value into the RO mandatory attribute: SafetyStatus\n");
+            err = Test5aWriteAValueIntoTheRoMandatoryAttributeSafetyStatus_37();
             break;
         case 38:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 38 : 3a: write a value into the RO optional attribute: InstalledClosedLimitTilt\n");
-            err = Test3aWriteAValueIntoTheRoOptionalAttributeInstalledClosedLimitTilt_38();
+            ChipLogProgress(chipTool, " ***** Test Step 38 : 5b: reads back the RO mandatory attribute: SafetyStatus\n");
+            err = Test5bReadsBackTheRoMandatoryAttributeSafetyStatus_38();
             break;
         case 39:
-            ChipLogProgress(chipTool, " ***** Test Step 39 : 3b: reads back the RO optional attribute: InstalledClosedLimitTilt\n");
-            err = Test3bReadsBackTheRoOptionalAttributeInstalledClosedLimitTilt_39();
+            ChipLogProgress(chipTool, " ***** Test Step 39 : 4: read the RO optional attribute default: CurrentPositionLift\n");
+            err = Test4ReadTheRoOptionalAttributeDefaultCurrentPositionLift_39();
             break;
         case 40:
-            ChipLogProgress(chipTool, " ***** Test Step 40 : 4: read the RO mandatory attribute default: SafetyStatus\n");
-            err = Test4ReadTheRoMandatoryAttributeDefaultSafetyStatus_40();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 40 : 5a: write a value into the RO optional attribute: CurrentPositionLift\n");
+            err = Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLift_40();
             break;
         case 41:
-            ChipLogProgress(chipTool, " ***** Test Step 41 : 5a: write a value into the RO mandatory attribute: SafetyStatus\n");
-            err = Test5aWriteAValueIntoTheRoMandatoryAttributeSafetyStatus_41();
+            ChipLogProgress(chipTool, " ***** Test Step 41 : 5b: reads back the RO optional attribute: CurrentPositionLift\n");
+            err = Test5bReadsBackTheRoOptionalAttributeCurrentPositionLift_41();
             break;
         case 42:
-            ChipLogProgress(chipTool, " ***** Test Step 42 : 5b: reads back the RO mandatory attribute: SafetyStatus\n");
-            err = Test5bReadsBackTheRoMandatoryAttributeSafetyStatus_42();
+            ChipLogProgress(chipTool, " ***** Test Step 42 : 4: read the RO optional attribute default: CurrentPositionTilt\n");
+            err = Test4ReadTheRoOptionalAttributeDefaultCurrentPositionTilt_42();
             break;
         case 43:
-            ChipLogProgress(chipTool, " ***** Test Step 43 : 4: read the RO optional attribute default: CurrentPositionLift\n");
-            err = Test4ReadTheRoOptionalAttributeDefaultCurrentPositionLift_43();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 43 : 5a: write a value into the RO optional attribute: CurrentPositionTilt\n");
+            err = Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTilt_43();
             break;
         case 44:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 44 : 5a: write a value into the RO optional attribute: CurrentPositionLift\n");
-            err = Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLift_44();
+            ChipLogProgress(chipTool, " ***** Test Step 44 : 5b: reads back the RO optional attribute: CurrentPositionTilt\n");
+            err = Test5bReadsBackTheRoOptionalAttributeCurrentPositionTilt_44();
             break;
         case 45:
-            ChipLogProgress(chipTool, " ***** Test Step 45 : 5b: reads back the RO optional attribute: CurrentPositionLift\n");
-            err = Test5bReadsBackTheRoOptionalAttributeCurrentPositionLift_45();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 45 : 4: read the RO optional attribute default: CurrentPositionLiftPercentage\n");
+            err = Test4ReadTheRoOptionalAttributeDefaultCurrentPositionLiftPercentage_45();
             break;
         case 46:
-            ChipLogProgress(chipTool, " ***** Test Step 46 : 4: read the RO optional attribute default: CurrentPositionTilt\n");
-            err = Test4ReadTheRoOptionalAttributeDefaultCurrentPositionTilt_46();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 46 : 5a: write a value into the RO optional attribute: CurrentPositionLiftPercentage\n");
+            err = Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLiftPercentage_46();
             break;
         case 47:
             ChipLogProgress(
-                chipTool, " ***** Test Step 47 : 5a: write a value into the RO optional attribute: CurrentPositionTilt\n");
-            err = Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTilt_47();
+                chipTool, " ***** Test Step 47 : 5b: reads back the RO optional attribute: CurrentPositionLiftPercentage\n");
+            err = Test5bReadsBackTheRoOptionalAttributeCurrentPositionLiftPercentage_47();
             break;
         case 48:
-            ChipLogProgress(chipTool, " ***** Test Step 48 : 5b: reads back the RO optional attribute: CurrentPositionTilt\n");
-            err = Test5bReadsBackTheRoOptionalAttributeCurrentPositionTilt_48();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 48 : 4: read the RO optional attribute default: CurrentPositionTiltPercentage\n");
+            err = Test4ReadTheRoOptionalAttributeDefaultCurrentPositionTiltPercentage_48();
             break;
         case 49:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 49 : 4: read the RO optional attribute default: CurrentPositionLiftPercentage\n");
-            err = Test4ReadTheRoOptionalAttributeDefaultCurrentPositionLiftPercentage_49();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 49 : 5a: write a value into the RO optional attribute: CurrentPositionTiltPercentage\n");
+            err = Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTiltPercentage_49();
             break;
         case 50:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 50 : 5a: write a value into the RO optional attribute: CurrentPositionLiftPercentage\n");
-            err = Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLiftPercentage_50();
-            break;
-        case 51:
             ChipLogProgress(
-                chipTool, " ***** Test Step 51 : 5b: reads back the RO optional attribute: CurrentPositionLiftPercentage\n");
-            err = Test5bReadsBackTheRoOptionalAttributeCurrentPositionLiftPercentage_51();
-            break;
-        case 52:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 52 : 4: read the RO optional attribute default: CurrentPositionTiltPercentage\n");
-            err = Test4ReadTheRoOptionalAttributeDefaultCurrentPositionTiltPercentage_52();
-            break;
-        case 53:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 53 : 5a: write a value into the RO optional attribute: CurrentPositionTiltPercentage\n");
-            err = Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTiltPercentage_53();
-            break;
-        case 54:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 54 : 5b: reads back the RO optional attribute: CurrentPositionTiltPercentage\n");
-            err = Test5bReadsBackTheRoOptionalAttributeCurrentPositionTiltPercentage_54();
+                chipTool, " ***** Test Step 50 : 5b: reads back the RO optional attribute: CurrentPositionTiltPercentage\n");
+            err = Test5bReadsBackTheRoOptionalAttributeCurrentPositionTiltPercentage_50();
             break;
         }
 
@@ -40284,7 +40268,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 55;
+    const uint16_t mTestCount = 51;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -40363,32 +40347,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test2ReadTheRoMandatoryAttributeDefaultConfigStatus_4()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeConfigStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"2: read the RO mandatory attribute default: ConfigStatus Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            VerifyOrReturn(CheckConstraintType("configStatus", "", "map8"));
-            if (value != nil) {
-                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("configStatus", [value unsignedCharValue], 0));
-            }
-            if (value != nil) {
-                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("configStatus", [value unsignedCharValue], 63));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR Test3aWriteAValueIntoTheRoMandatoryAttributeConfigStatus_5()
+    CHIP_ERROR Test3aWriteAValueIntoTheRoMandatoryAttributeConfigStatus_4()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40407,29 +40366,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3bReadsBackTheRoMandatoryAttributeConfigStatus_6()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeConfigStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"3b: reads back the RO mandatory attribute: ConfigStatus Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            VerifyOrReturn(CheckConstraintType("configStatus", "", "map8"));
-            if (value != nil) {
-                VerifyOrReturn(CheckConstraintNotValue("configStatus", value, 128));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR Test2ReadTheRoMandatoryAttributeDefaultOperationalStatus_7()
+    CHIP_ERROR Test2ReadTheRoMandatoryAttributeDefaultOperationalStatus_5()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40454,7 +40391,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3aWriteAValueIntoTheRoMandatoryAttributeOperationalStatus_8()
+    CHIP_ERROR Test3aWriteAValueIntoTheRoMandatoryAttributeOperationalStatus_6()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40474,7 +40411,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3bReadsBackTheRoMandatoryAttributeOperationalStatus_9()
+    CHIP_ERROR Test3bReadsBackTheRoMandatoryAttributeOperationalStatus_7()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40496,7 +40433,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test2ReadTheRoMandatoryAttributeDefaultEndProductType_10()
+    CHIP_ERROR Test2ReadTheRoMandatoryAttributeDefaultEndProductType_8()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40521,7 +40458,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3aWriteAValueIntoTheRoMandatoryAttributeEndProductType_11()
+    CHIP_ERROR Test3aWriteAValueIntoTheRoMandatoryAttributeEndProductType_9()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40540,7 +40477,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3bReadsBackTheRoMandatoryAttributeEndProductType_12()
+    CHIP_ERROR Test3bReadsBackTheRoMandatoryAttributeEndProductType_10()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40562,32 +40499,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test2ReadTheRwMandatoryAttributeDefaultMode_13()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"2: read the RW mandatory attribute default: Mode Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            VerifyOrReturn(CheckConstraintType("mode", "", "map8"));
-            if (value != nil) {
-                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("mode", [value unsignedCharValue], 0));
-            }
-            if (value != nil) {
-                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("mode", [value unsignedCharValue], 15));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR Test3aWriteAValueIntoTheRwMandatoryAttributeMode_14()
+    CHIP_ERROR Test3aWriteAValueIntoTheRwMandatoryAttributeMode_11()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40607,29 +40519,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3bReadsBackTheRwMandatoryAttributeMode_15()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"3b: reads back the RW mandatory attribute: Mode Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("Mode", actualValue, 8));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultTargetPositionLiftPercent100ths_16()
+    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultTargetPositionLiftPercent100ths_12()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40657,7 +40547,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeTargetPositionLiftPercent100ths_17()
+    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeTargetPositionLiftPercent100ths_13()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40679,7 +40569,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeTargetPositionLiftPercent100ths_18()
+    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeTargetPositionLiftPercent100ths_14()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40702,7 +40592,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultTargetPositionTiltPercent100ths_19()
+    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultTargetPositionTiltPercent100ths_15()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40730,7 +40620,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeTargetPositionTiltPercent100ths_20()
+    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeTargetPositionTiltPercent100ths_16()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40752,7 +40642,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeTargetPositionTiltPercent100ths_21()
+    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeTargetPositionTiltPercent100ths_17()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40775,7 +40665,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultCurrentPositionLiftPercent100ths_22()
+    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultCurrentPositionLiftPercent100ths_18()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40803,7 +40693,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLiftPercent100ths_23()
+    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLiftPercent100ths_19()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40825,7 +40715,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeCurrentPositionLiftPercent100ths_24()
+    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeCurrentPositionLiftPercent100ths_20()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40848,7 +40738,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultCurrentPositionTiltPercent100ths_25()
+    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultCurrentPositionTiltPercent100ths_21()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40876,7 +40766,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTiltPercent100ths_26()
+    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTiltPercent100ths_22()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40898,7 +40788,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeCurrentPositionTiltPercent100ths_27()
+    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeCurrentPositionTiltPercent100ths_23()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40921,7 +40811,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultInstalledOpenLimitLift_28()
+    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultInstalledOpenLimitLift_24()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40946,7 +40836,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeInstalledOpenLimitLift_29()
+    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeInstalledOpenLimitLift_25()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40967,7 +40857,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeInstalledOpenLimitLift_30()
+    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeInstalledOpenLimitLift_26()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -40992,7 +40882,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultInstalledClosedLimitLift_31()
+    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultInstalledClosedLimitLift_27()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41017,7 +40907,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeInstalledClosedLimitLift_32()
+    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeInstalledClosedLimitLift_28()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41038,7 +40928,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeInstalledClosedLimitLift_33()
+    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeInstalledClosedLimitLift_29()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41063,7 +40953,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultInstalledOpenLimitTilt_34()
+    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultInstalledOpenLimitTilt_30()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41088,7 +40978,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeInstalledOpenLimitTilt_35()
+    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeInstalledOpenLimitTilt_31()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41109,7 +40999,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeInstalledOpenLimitTilt_36()
+    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeInstalledOpenLimitTilt_32()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41134,7 +41024,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultInstalledClosedLimitTilt_37()
+    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultInstalledClosedLimitTilt_33()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41159,7 +41049,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeInstalledClosedLimitTilt_38()
+    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeInstalledClosedLimitTilt_34()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41180,7 +41070,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeInstalledClosedLimitTilt_39()
+    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeInstalledClosedLimitTilt_35()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41205,7 +41095,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test4ReadTheRoMandatoryAttributeDefaultSafetyStatus_40()
+    CHIP_ERROR Test4ReadTheRoMandatoryAttributeDefaultSafetyStatus_36()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41230,7 +41120,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test5aWriteAValueIntoTheRoMandatoryAttributeSafetyStatus_41()
+    CHIP_ERROR Test5aWriteAValueIntoTheRoMandatoryAttributeSafetyStatus_37()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41249,7 +41139,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test5bReadsBackTheRoMandatoryAttributeSafetyStatus_42()
+    CHIP_ERROR Test5bReadsBackTheRoMandatoryAttributeSafetyStatus_38()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41271,7 +41161,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test4ReadTheRoOptionalAttributeDefaultCurrentPositionLift_43()
+    CHIP_ERROR Test4ReadTheRoOptionalAttributeDefaultCurrentPositionLift_39()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41296,7 +41186,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLift_44()
+    CHIP_ERROR Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLift_40()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41317,7 +41207,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test5bReadsBackTheRoOptionalAttributeCurrentPositionLift_45()
+    CHIP_ERROR Test5bReadsBackTheRoOptionalAttributeCurrentPositionLift_41()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41342,7 +41232,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test4ReadTheRoOptionalAttributeDefaultCurrentPositionTilt_46()
+    CHIP_ERROR Test4ReadTheRoOptionalAttributeDefaultCurrentPositionTilt_42()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41367,7 +41257,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTilt_47()
+    CHIP_ERROR Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTilt_43()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41388,7 +41278,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test5bReadsBackTheRoOptionalAttributeCurrentPositionTilt_48()
+    CHIP_ERROR Test5bReadsBackTheRoOptionalAttributeCurrentPositionTilt_44()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41413,7 +41303,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test4ReadTheRoOptionalAttributeDefaultCurrentPositionLiftPercentage_49()
+    CHIP_ERROR Test4ReadTheRoOptionalAttributeDefaultCurrentPositionLiftPercentage_45()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41441,7 +41331,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLiftPercentage_50()
+    CHIP_ERROR Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLiftPercentage_46()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41463,7 +41353,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test5bReadsBackTheRoOptionalAttributeCurrentPositionLiftPercentage_51()
+    CHIP_ERROR Test5bReadsBackTheRoOptionalAttributeCurrentPositionLiftPercentage_47()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41486,7 +41376,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test4ReadTheRoOptionalAttributeDefaultCurrentPositionTiltPercentage_52()
+    CHIP_ERROR Test4ReadTheRoOptionalAttributeDefaultCurrentPositionTiltPercentage_48()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41514,7 +41404,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTiltPercentage_53()
+    CHIP_ERROR Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTiltPercentage_49()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -41536,7 +41426,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Test5bReadsBackTheRoOptionalAttributeCurrentPositionTiltPercentage_54()
+    CHIP_ERROR Test5bReadsBackTheRoOptionalAttributeCurrentPositionTiltPercentage_50()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];

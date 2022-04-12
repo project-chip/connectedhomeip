@@ -156,6 +156,7 @@ tests:
           value: 8
 
     - label: "3b: reads back the RW mandatory attribute: Mode"
+      disabled: true
       command: "readAttribute"
       attribute: "Mode"
       response:

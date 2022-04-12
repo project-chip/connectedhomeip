@@ -29363,39 +29363,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000004_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"2: read the RO mandatory attribute default: ConfigStatus"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeConfigStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"2: read the RO mandatory attribute default: ConfigStatus Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
-            }
-        }
-        {
-            id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 63);
-            }
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_2_1_000005_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000004_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3a: write a value into the RO mandatory attribute: ConfigStatus"];
@@ -29417,33 +29385,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000006_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"3b: reads back the RO mandatory attribute: ConfigStatus"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeConfigStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"3b: reads back the RO mandatory attribute: ConfigStatus Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqual([actualValue unsignedCharValue], 128);
-            }
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_2_1_000007_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000005_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"2: read the RO mandatory attribute default: OperationalStatus"];
@@ -29476,7 +29418,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000008_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000006_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3a: write a value into the RO mandatory attribute: OperationalStatus"];
@@ -29499,7 +29441,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000009_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000007_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3b: reads back the RO mandatory attribute: OperationalStatus"];
@@ -29526,7 +29468,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000010_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000008_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"2: read the RO mandatory attribute default: EndProductType"];
@@ -29559,7 +29501,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000011_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000009_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3a: write a value into the RO mandatory attribute: EndProductType"];
@@ -29582,7 +29524,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000012_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000010_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3b: reads back the RO mandatory attribute: EndProductType"];
@@ -29609,39 +29551,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000013_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"2: read the RW mandatory attribute default: Mode"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"2: read the RW mandatory attribute default: Mode Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
-            }
-        }
-        {
-            id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 15);
-            }
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_2_1_000014_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000011_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"3a: write a value into the RW mandatory attribute:: Mode"];
 
@@ -29663,31 +29573,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000015_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"3b: reads back the RW mandatory attribute: Mode"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"3b: reads back the RW mandatory attribute: Mode Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 8);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_2_1_000016_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000012_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"2: read the RO optional attribute default: TargetPositionLiftPercent100ths"];
@@ -29721,7 +29607,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000017_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000013_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3a: write a value into the RO optional attribute: TargetPositionLiftPercent100ths"];
@@ -29746,7 +29632,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000018_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000014_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3b: reads back the RO optional attribute: TargetPositionLiftPercent100ths"];
@@ -29774,7 +29660,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000019_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000015_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"2: read the RO optional attribute default: TargetPositionTiltPercent100ths"];
@@ -29808,7 +29694,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000020_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000016_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3a: write a value into the RO optional attribute: TargetPositionTiltPercent100ths"];
@@ -29833,7 +29719,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000021_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000017_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3b: reads back the RO optional attribute: TargetPositionTiltPercent100ths"];
@@ -29861,7 +29747,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000022_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000018_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"2: read the RO optional attribute default: CurrentPositionLiftPercent100ths"];
@@ -29895,7 +29781,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000023_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000019_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3a: write a value into the RO optional attribute: CurrentPositionLiftPercent100ths"];
@@ -29920,7 +29806,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000024_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000020_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3b: reads back the RO optional attribute: CurrentPositionLiftPercent100ths"];
@@ -29948,7 +29834,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000025_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000021_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"2: read the RO optional attribute default: CurrentPositionTiltPercent100ths"];
@@ -29982,7 +29868,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000026_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000022_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3a: write a value into the RO optional attribute: CurrentPositionTiltPercent100ths"];
@@ -30007,7 +29893,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000027_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000023_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3b: reads back the RO optional attribute: CurrentPositionTiltPercent100ths"];
@@ -30035,7 +29921,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000028_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000024_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"2: read the RO optional attribute default: InstalledOpenLimitLift"];
@@ -30068,7 +29954,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000029_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000025_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3a: write a value into the RO optional attribute: InstalledOpenLimitLift"];
@@ -30093,7 +29979,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000030_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000026_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3b: reads back the RO optional attribute: InstalledOpenLimitLift"];
@@ -30126,7 +30012,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000031_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000027_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"2: read the RO optional attribute default: InstalledClosedLimitLift"];
@@ -30159,7 +30045,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000032_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000028_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3a: write a value into the RO optional attribute: InstalledClosedLimitLift"];
@@ -30184,7 +30070,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000033_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000029_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3b: reads back the RO optional attribute: InstalledClosedLimitLift"];
@@ -30217,7 +30103,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000034_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000030_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"2: read the RO optional attribute default: InstalledOpenLimitTilt"];
@@ -30250,7 +30136,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000035_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000031_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3a: write a value into the RO optional attribute: InstalledOpenLimitTilt"];
@@ -30275,7 +30161,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000036_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000032_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3b: reads back the RO optional attribute: InstalledOpenLimitTilt"];
@@ -30308,7 +30194,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000037_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000033_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"2: read the RO optional attribute default: InstalledClosedLimitTilt"];
@@ -30341,7 +30227,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000038_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000034_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3a: write a value into the RO optional attribute: InstalledClosedLimitTilt"];
@@ -30366,7 +30252,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000039_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000035_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3b: reads back the RO optional attribute: InstalledClosedLimitTilt"];
@@ -30399,7 +30285,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000040_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000036_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"4: read the RO mandatory attribute default: SafetyStatus"];
 
@@ -30431,7 +30317,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000041_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000037_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"5a: write a value into the RO mandatory attribute: SafetyStatus"];
@@ -30453,7 +30339,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000042_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000038_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"5b: reads back the RO mandatory attribute: SafetyStatus"];
 
@@ -30479,7 +30365,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000043_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000039_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"4: read the RO optional attribute default: CurrentPositionLift"];
@@ -30512,7 +30398,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000044_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000040_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"5a: write a value into the RO optional attribute: CurrentPositionLift"];
@@ -30536,7 +30422,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000045_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000041_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"5b: reads back the RO optional attribute: CurrentPositionLift"];
@@ -30569,7 +30455,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000046_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000042_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"4: read the RO optional attribute default: CurrentPositionTilt"];
@@ -30602,7 +30488,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000047_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000043_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"5a: write a value into the RO optional attribute: CurrentPositionTilt"];
@@ -30626,7 +30512,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000048_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000044_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"5b: reads back the RO optional attribute: CurrentPositionTilt"];
@@ -30659,7 +30545,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000049_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000045_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"4: read the RO optional attribute default: CurrentPositionLiftPercentage"];
@@ -30693,7 +30579,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000050_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000046_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"5a: write a value into the RO optional attribute: CurrentPositionLiftPercentage"];
@@ -30718,7 +30604,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000051_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000047_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"5b: reads back the RO optional attribute: CurrentPositionLiftPercentage"];
@@ -30746,7 +30632,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000052_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000048_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"4: read the RO optional attribute default: CurrentPositionTiltPercentage"];
@@ -30780,7 +30666,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000053_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000049_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"5a: write a value into the RO optional attribute: CurrentPositionTiltPercentage"];
@@ -30805,7 +30691,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000054_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000050_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"5b: reads back the RO optional attribute: CurrentPositionTiltPercentage"];
