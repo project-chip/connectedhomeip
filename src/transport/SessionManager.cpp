@@ -556,7 +556,7 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & packetH
     unsecuredSession->SetPeerAddress(peerAddress);
     SessionMessageDelegate::DuplicateMessage isDuplicate = SessionMessageDelegate::DuplicateMessage::No;
 
-    unsecuredSession->MarkActive();
+    unsecuredSession->MarkActiveRx();
 
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
@@ -640,7 +640,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
         return;
     }
 
-    secureSession->MarkActive();
+    secureSession->MarkActiveRx();
 
     if (isDuplicate == SessionMessageDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
     {

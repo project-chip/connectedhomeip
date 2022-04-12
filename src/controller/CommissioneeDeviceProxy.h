@@ -67,7 +67,6 @@ struct ControllerDeviceInitParams
     SessionManager * sessionManager                               = nullptr;
     Messaging::ExchangeManager * exchangeMgr                      = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
-    PersistentStorageDelegate * storageDelegate                   = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
@@ -168,8 +167,6 @@ public:
      *   Update data of the device.
      *
      *   This function will set new IP address, port and MRP retransmission intervals of the device.
-     *   Since the device settings might have been moved from RAM to the persistent storage, the function
-     *   will load the device settings first, before making the changes.
      *
      * @param[in] addr   Address of the device to be set.
      * @param[in] config MRP parameters
@@ -190,7 +187,7 @@ public:
      * @brief
      * Called to indicate this proxy has been paired successfully.
      *
-     * This causes the secure session parameters to be loaded and stores the session details in the session manager.
+     * This stores the session details in the session manager.
      */
     CHIP_ERROR SetConnected();
 

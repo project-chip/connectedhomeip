@@ -307,6 +307,7 @@ ctypes
 CurrentHue
 CurrentLevel
 CurrentSaturation
+customAcl
 customizations
 cvfJ
 cxx
@@ -417,8 +418,8 @@ DoorLock
 doru
 DOTBR
 DOVERLAY
-DownloadProtocolEnum
 downcasting
+DownloadProtocolEnum
 Doxygen
 dpkg
 dropdown
@@ -923,8 +924,8 @@ OTAProviderIpAddress
 OTAProviderNodeId
 OTAProviderSerialPort
 OTARequesterImpl
-OTARequestorInterface
 OTARequestorDriver
+OTARequestorInterface
 OTARequestorSerialPort
 OTARequestorStorage
 OtaSoftwareUpdateProvider
@@ -1073,6 +1074,7 @@ RequestorCanConsent
 Requestor's
 Requestors
 responder
+RestrictedEvent
 retargeting
 reusability
 reviwed

@@ -531,9 +531,10 @@ static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t inter
     GetAddrInfo(sdCtx->context, sdCtx->callback, interfaceId, sdCtx->addressType, sdCtx->name, hostname, ntohs(port), txtLen,
                 txtRecord);
 
-    // TODO: If flags & kDNSServiceFlagsMoreComing should we keep waiting to see
-    // what else we resolve instead of calling Remove() here?
-    MdnsContexts::GetInstance().Remove(sdCtx);
+    if (!(flags & kDNSServiceFlagsMoreComing))
+    {
+        MdnsContexts::GetInstance().Remove(sdCtx);
+    }
 }
 
 static CHIP_ERROR Resolve(void * context, DnssdResolveCallback callback, uint32_t interfaceId,

@@ -137,6 +137,49 @@ class TestParser(unittest.TestCase):
                     )])
         self.assertEqual(actual, expected)
 
+    def test_attribute_access(self):
+        actual = parseText("""
+            server cluster MyCluster = 1 {
+                attribute                                      int8s attr1 = 1;
+                attribute access()                             int8s attr2 = 2;
+                attribute access(read: manage)                 int8s attr3 = 3;
+                attribute access(write: administer)            int8s attr4 = 4;
+                attribute access(read: operate, write: manage) int8s attr5 = 5;
+            }
+        """)
+
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.SERVER,
+                    name="MyCluster",
+                    code=1,
+                    attributes=[
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="int8s"), code=1, name="attr1"),
+                            readacl=AccessPrivilege.VIEW,
+                            writeacl=AccessPrivilege.OPERATE
+                        ),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="int8s"), code=2, name="attr2"),
+                            readacl=AccessPrivilege.VIEW,
+                            writeacl=AccessPrivilege.OPERATE
+                        ),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="int8s"), code=3, name="attr3"),
+                            readacl=AccessPrivilege.MANAGE
+                        ),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="int8s"), code=4, name="attr4"),
+                            writeacl=AccessPrivilege.ADMINISTER
+                        ),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="int8s"), code=5, name="attr5"),
+                            readacl=AccessPrivilege.OPERATE,
+                            writeacl=AccessPrivilege.MANAGE
+                        ),
+                    ]
+                    )])
+        self.assertEqual(actual, expected)
+
     def test_cluster_commands(self):
         actual = parseText("""
             server cluster WithCommands = 1 {
@@ -168,6 +211,43 @@ class TestParser(unittest.TestCase):
                         Command(name="TimedCommand", code=0xab,
                                 input_param="InParam", output_param="DefaultSuccess",
                                 attributes=set([CommandAttribute.TIMED_INVOKE])),
+                    ],
+                    )])
+        self.assertEqual(actual, expected)
+
+    def test_cluster_command_access(self):
+        actual = parseText("""
+            server cluster WithCommands = 1 {
+                request struct InParam {}
+                response struct OutParam {}
+
+                command WithoutArg(): DefaultSuccess = 1;
+                timed command access(invoke: manage) TimedCommand(InParam): OutParam = 2;
+                command access(invoke: administer) OutOnly(): OutParam = 3;
+            }
+        """)
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.SERVER,
+                    name="WithCommands",
+                    code=1,
+                    structs=[
+                        Struct(name="InParam", fields=[],
+                               tag=StructTag.REQUEST),
+                        Struct(name="OutParam", fields=[],
+                               tag=StructTag.RESPONSE),
+                    ],
+                    commands=[
+                        Command(name="WithoutArg", code=1,
+                                invokeacl=AccessPrivilege.OPERATE,
+                                input_param=None, output_param="DefaultSuccess"),
+                        Command(name="TimedCommand", code=2,
+                                input_param="InParam", output_param="OutParam",
+                                invokeacl=AccessPrivilege.MANAGE,
+                                attributes=set([CommandAttribute.TIMED_INVOKE])),
+                        Command(name="OutOnly", code=3,
+                                input_param=None, output_param="OutParam",
+                                invokeacl=AccessPrivilege.ADMINISTER,
+                                ),
                     ],
                     )])
         self.assertEqual(actual, expected)
@@ -239,6 +319,28 @@ class TestParser(unittest.TestCase):
                               name="Hello", code=1, fields=[]),
                         Event(priority=EventPriority.DEBUG,
                               name="GoodBye", code=2, fields=[]),
+                    ])])
+        self.assertEqual(actual, expected)
+
+    def test_cluster_event_acl(self):
+        actual = parseText("""
+            client cluster EventTester = 0x123 {
+               info event Hello = 1 {}
+               debug event access(read: manage) GoodBye = 2 {}
+               debug event access(read: administer) AdminEvent = 3 {}
+            }
+        """)
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.CLIENT,
+                    name="EventTester",
+                    code=0x123,
+                    events=[
+                        Event(priority=EventPriority.INFO, readacl=AccessPrivilege.VIEW,
+                              name="Hello", code=1, fields=[]),
+                        Event(priority=EventPriority.DEBUG, readacl=AccessPrivilege.MANAGE,
+                              name="GoodBye", code=2, fields=[]),
+                        Event(priority=EventPriority.DEBUG, readacl=AccessPrivilege.ADMINISTER,
+                              name="AdminEvent", code=3, fields=[]),
                     ])])
         self.assertEqual(actual, expected)
 

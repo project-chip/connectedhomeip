@@ -27,9 +27,6 @@
 
 namespace chip {
 
-constexpr const char kPairedDeviceListKeyPrefix[] = "ListPairedDevices";
-constexpr const char kPairedDeviceKeyPrefix[]     = "PairedDevice";
-
 // This macro generates a key for storage using a node ID and a key prefix, and performs the given action
 // on that key.
 #define PERSISTENT_KEY_OP(node, keyPrefix, key, action)                                                                            \
