@@ -58,7 +58,7 @@ size_t DeviceInfoProviderImpl::FixedLabelIteratorImpl::Count()
 
 bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & output)
 {
-    // In Linux Simulation, use the following hardcoded labelList on all endpoints.
+    // In Darwin Simulation, use the following hardcoded labelList on all endpoints.
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     const char * labelPtr = nullptr;
