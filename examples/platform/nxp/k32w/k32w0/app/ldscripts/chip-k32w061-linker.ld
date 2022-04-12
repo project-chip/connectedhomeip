@@ -64,7 +64,7 @@ MEMORY
 {
   Flash640 (rx)     : ORIGIN = m_app_start, LENGTH = m_app_size
   
-  SCRATCH_RAM(rwx)  : ORIGIN = 0x4000000, LENGTH = 0x400   /* 1K bytes (alias SCRATCH_RAM) */
+  SCRATCH_RAM(rwx)  : ORIGIN = 0x4000000, LENGTH = 0x400        /* 1K bytes (alias SCRATCH_RAM) */
   RAM0 (rwx)        : ORIGIN = 0x4000400,  LENGTH = 0x0015c00   /* 87K bytes (alias RAM) */
   RAM1 (rwx)        : ORIGIN = 0x4020000,  LENGTH = 0x10000     /* 64K bytes (alias RAM2) */
 }
