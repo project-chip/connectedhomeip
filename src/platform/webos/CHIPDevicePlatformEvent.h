@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Defines platform-specific event types and data for the chip
- *          Device Layer on Linux platforms.
+ *          Device Layer on webOS platforms.
  */
 
 #pragma once
@@ -32,7 +32,7 @@ namespace DeviceLayer {
 namespace DeviceEventType {
 
 /**
- * Enumerates Linux platform-specific event types that are visible to the application.
+ * Enumerates webOS platform-specific event types that are visible to the application.
  */
 enum PublicPlatformSpecificEventTypes
 {
@@ -40,28 +40,28 @@ enum PublicPlatformSpecificEventTypes
 };
 
 /**
- * Enumerates Linux platform-specific event types that are internal to the chip Device Layer.
+ * Enumerates webOS platform-specific event types that are internal to the chip Device Layer.
  */
 enum InternalPlatformSpecificEventTypes
 {
-    kPlatformLinuxEvent = kRange_InternalPlatformSpecific,
-    kPlatformLinuxBLECentralConnected,
-    kPlatformLinuxBLECentralConnectFailed,
-    kPlatformLinuxBLEWriteComplete,
-    kPlatformLinuxBLESubscribeOpComplete,
-    kPlatformLinuxBLEIndicationReceived,
-    kPlatformLinuxBLEC1WriteEvent,
-    kPlatformLinuxBLEOutOfBuffersEvent,
-    kPlatformLinuxBLEPeripheralRegisterAppComplete,
-    kPlatformLinuxBLEPeripheralAdvConfiguredComplete,
-    kPlatformLinuxBLEPeripheralAdvStartComplete,
-    kPlatformLinuxBLEPeripheralAdvStopComplete
+    kPlatformWebOSEvent = kRange_InternalPlatformSpecific,
+    kPlatformWebOSBLECentralConnected,
+    kPlatformWebOSBLECentralConnectFailed,
+    kPlatformWebOSBLEWriteComplete,
+    kPlatformWebOSBLESubscribeOpComplete,
+    kPlatformWebOSBLEIndicationReceived,
+    kPlatformWebOSBLEC1WriteEvent,
+    kPlatformWebOSBLEOutOfBuffersEvent,
+    kPlatformWebOSBLEPeripheralRegisterAppComplete,
+    kPlatformWebOSBLEPeripheralAdvConfiguredComplete,
+    kPlatformWebOSBLEPeripheralAdvStartComplete,
+    kPlatformWebOSBLEPeripheralAdvStopComplete
 };
 
 } // namespace DeviceEventType
 
 /**
- * Represents platform-specific event information for Linux platforms.
+ * Represents platform-specific event information for webOS platforms.
  */
 struct ChipDevicePlatformEvent
 {

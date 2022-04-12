@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,7 +45,7 @@
 #include <mutex>
 #endif
 
-#include <platform/Linux/NetworkCommissioningDriver.h>
+#include <platform/webos/NetworkCommissioningDriver.h>
 #include <platform/NetworkCommissioning.h>
 #include <vector>
 
@@ -87,7 +87,7 @@ struct GDBusWpaSupplicant
 #endif
 
 /**
- * Concrete implementation of the ConnectivityManager singleton object for Linux platforms.
+ * Concrete implementation of the ConnectivityManager singleton object for webOS platforms.
  */
 class ConnectivityManagerImpl final : public ConnectivityManager,
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

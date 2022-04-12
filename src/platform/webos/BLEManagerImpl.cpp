@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@
 /**
  *    @file
  *          Provides an implementation of the BLEManager singleton object
- *          for Linux platforms.
+ *          for webOS platforms.
  */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -117,7 +117,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     ret = MainLoop::Instance().Init(_BleInitialize);
     VerifyOrExit(ret != false, err = CHIP_ERROR_INTERNAL);
-    
+
     ret = MainLoop::Instance().StartLSMainLoop();
     VerifyOrExit(ret != false, err = CHIP_ERROR_INTERNAL);
 
@@ -306,7 +306,7 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
     ChipLogDetail(DeviceLayer, "HandlePlatformSpecificBLEEvent %d", apEvent->Type);
     switch (apEvent->Type)
     {
-    case DeviceEventType::kPlatformLinuxBLECentralConnected:
+    case DeviceEventType::kPlatformWebOSBLECentralConnected:
         if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
         {
             BleConnectionDelegate::OnConnectionComplete(mBLEScanConfig.mAppState,
@@ -314,17 +314,17 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
             CleanScanConfig();
         }
         break;
-    case DeviceEventType::kPlatformLinuxBLECentralConnectFailed:
+    case DeviceEventType::kPlatformWebOSBLECentralConnectFailed:
         if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
         {
             BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, apEvent->Platform.BLECentralConnectFailed.mError);
             CleanScanConfig();
         }
         break;
-    case DeviceEventType::kPlatformLinuxBLEWriteComplete:
+    case DeviceEventType::kPlatformWebOSBLEWriteComplete:
         HandleWriteConfirmation(apEvent->Platform.BLEWriteComplete.mConnection, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX);
         break;
-    case DeviceEventType::kPlatformLinuxBLESubscribeOpComplete:
+    case DeviceEventType::kPlatformWebOSBLESubscribeOpComplete:
         if (apEvent->Platform.BLESubscribeOpComplete.mIsSubscribed)
             HandleSubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &CHIP_BLE_SVC_ID,
                                     &ChipUUID_CHIPoBLEChar_TX);
@@ -332,17 +332,17 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
             HandleUnsubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &CHIP_BLE_SVC_ID,
                                       &ChipUUID_CHIPoBLEChar_TX);
         break;
-    case DeviceEventType::kPlatformLinuxBLEIndicationReceived:
+    case DeviceEventType::kPlatformWebOSBLEIndicationReceived:
         HandleIndicationReceived(apEvent->Platform.BLEIndicationReceived.mConnection, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX,
                                  PacketBufferHandle::Adopt(apEvent->Platform.BLEIndicationReceived.mData));
         break;
-    case DeviceEventType::kPlatformLinuxBLEPeripheralAdvConfiguredComplete:
+    case DeviceEventType::kPlatformWebOSBLEPeripheralAdvConfiguredComplete:
         VerifyOrExit(apEvent->Platform.BLEPeripheralAdvConfiguredComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
         sInstance.mFlags.Set(Flags::kAdvertisingConfigured).Clear(Flags::kControlOpInProgress);
         controlOpComplete = true;
         ChipLogProgress(DeviceLayer, "CHIPoBLE advertising config complete");
         break;
-    case DeviceEventType::kPlatformLinuxBLEPeripheralAdvStartComplete:
+    case DeviceEventType::kPlatformWebOSBLEPeripheralAdvStartComplete:
         VerifyOrExit(apEvent->Platform.BLEPeripheralAdvStartComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
         sInstance.mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
 
@@ -352,7 +352,7 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         }
 
         break;
-    case DeviceEventType::kPlatformLinuxBLEPeripheralAdvStopComplete:
+    case DeviceEventType::kPlatformWebOSBLEPeripheralAdvStopComplete:
         VerifyOrExit(apEvent->Platform.BLEPeripheralAdvStopComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
 
         sInstance.mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
@@ -364,7 +364,7 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
             ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
         }
         break;
-    case DeviceEventType::kPlatformLinuxBLEPeripheralRegisterAppComplete:
+    case DeviceEventType::kPlatformWebOSBLEPeripheralRegisterAppComplete:
         VerifyOrExit(apEvent->Platform.BLEPeripheralRegisterAppComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
         mFlags.Set(Flags::kAppRegistered);
         controlOpComplete = true;
@@ -420,7 +420,7 @@ bool BLEManagerImpl::gattMonitorCharateristicsCb(LSHandle *sh, LSMessage *messag
     {
         ChipLogProgress(DeviceLayer, "gattMonitorCharateristicsCb payload returnValue is %d", jvalue["returnValue"].asBool());
 
-        if (jvalue["changed"]["value"].hasKey("bytes") == true) 
+        if (jvalue["changed"]["value"].hasKey("bytes") == true)
         {
             ChipLogProgress(DeviceLayer, "received read value is %s", jvalue["changed"]["value"].stringify().c_str());
 
@@ -469,12 +469,12 @@ bool BLEManagerImpl::gattWriteDescriptorValueCb(LSHandle *sh, LSMessage *message
 bool BLEManagerImpl::SubscribeCharacteristicToWebOS(void *bleConnObj, const uint8_t *svcId, const uint8_t *charId)
 {
     pbnjson::JValue valueForMonitor = pbnjson::JObject();
- 
+
     valueForMonitor.put("clientId", std::string(mClientId));
     valueForMonitor.put("service", std::string(CHIP_BLE_GATT_SERVICE));
     pbnjson::JValue bytesJArray = pbnjson::JArray();
     bytesJArray.append(std::string(CHIP_BLE_GATT_CHAR_READ));
-   
+
     valueForMonitor.put("characteristics", bytesJArray);
     valueForMonitor.put("subscribe", true);
 
@@ -515,7 +515,7 @@ bool BLEManagerImpl::SubscribeCharacteristicToWebOS(void *bleConnObj, const uint
     ChipLogProgress(Ble, "SubscribeCharacteristicToWebOS Param : valueForDescriptor  %s", valueForDescriptor.stringify().c_str());
 
     ret = LSCall(mLSHandle, "luna://com.webos.service.bluetooth2/gatt/writeDescriptorValue", valueForDescriptor.stringify().c_str(), gattWriteDescriptorValueCb,  bleConnObj, NULL, NULL);
- 
+
     if (ret != 1)
         return false;
 
@@ -710,7 +710,7 @@ void BLEManagerImpl::HandleNewConnection(BLE_CONNECTION_OBJECT conId)
     if (sInstance.mIsCentral)
     {
         ChipDeviceEvent event;
-        event.Type                                     = DeviceEventType::kPlatformLinuxBLECentralConnected;
+        event.Type                                     = DeviceEventType::kPlatformWebOSBLECentralConnected;
         event.Platform.BLECentralConnected.mConnection = conId;
         PlatformMgr().PostEventOrDie(&event);
     }
@@ -721,7 +721,7 @@ void BLEManagerImpl::HandleConnectFailed(CHIP_ERROR error)
     if (sInstance.mIsCentral)
     {
         ChipDeviceEvent event;
-        event.Type                                    = DeviceEventType::kPlatformLinuxBLECentralConnectFailed;
+        event.Type                                    = DeviceEventType::kPlatformWebOSBLECentralConnectFailed;
         event.Platform.BLECentralConnectFailed.mError = error;
         PlatformMgr().PostEventOrDie(&event);
     }
@@ -730,7 +730,7 @@ void BLEManagerImpl::HandleConnectFailed(CHIP_ERROR error)
 void BLEManagerImpl::HandleWriteComplete(BLE_CONNECTION_OBJECT conId)
 {
     ChipDeviceEvent event;
-    event.Type                                  = DeviceEventType::kPlatformLinuxBLEWriteComplete;
+    event.Type                                  = DeviceEventType::kPlatformWebOSBLEWriteComplete;
     event.Platform.BLEWriteComplete.mConnection = conId;
     PlatformMgr().PostEventOrDie(&event);
 }
@@ -738,7 +738,7 @@ void BLEManagerImpl::HandleWriteComplete(BLE_CONNECTION_OBJECT conId)
 void BLEManagerImpl::HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool subscribed)
 {
     ChipDeviceEvent event;
-    event.Type                                          = DeviceEventType::kPlatformLinuxBLESubscribeOpComplete;
+    event.Type                                          = DeviceEventType::kPlatformWebOSBLESubscribeOpComplete;
     event.Platform.BLESubscribeOpComplete.mConnection   = conId;
     event.Platform.BLESubscribeOpComplete.mIsSubscribed = subscribed;
     PlatformMgr().PostEventOrDie(&event);
@@ -754,7 +754,7 @@ void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint
     VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     ChipDeviceEvent event;
-    event.Type                                       = DeviceEventType::kPlatformLinuxBLEIndicationReceived;
+    event.Type                                       = DeviceEventType::kPlatformWebOSBLEIndicationReceived;
     event.Platform.BLEIndicationReceived.mConnection = conId;
     event.Platform.BLEIndicationReceived.mData       = std::move(buf).UnsafeRelease();
     PlatformMgr().PostEventOrDie(&event);
@@ -913,7 +913,7 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
 void BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, void * apAppstate)
 {
     ChipDeviceEvent event;
-    event.Type                                                 = DeviceEventType::kPlatformLinuxBLEPeripheralRegisterAppComplete;
+    event.Type                                                 = DeviceEventType::kPlatformWebOSBLEPeripheralRegisterAppComplete;
     event.Platform.BLEPeripheralRegisterAppComplete.mIsSuccess = aIsSuccess;
     event.Platform.BLEPeripheralRegisterAppComplete.mpAppstate = apAppstate;
     PlatformMgr().PostEventOrDie(&event);
@@ -922,7 +922,7 @@ void BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, voi
 void BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(bool aIsSuccess, void * apAppstate)
 {
     ChipDeviceEvent event;
-    event.Type = DeviceEventType::kPlatformLinuxBLEPeripheralAdvConfiguredComplete;
+    event.Type = DeviceEventType::kPlatformWebOSBLEPeripheralAdvConfiguredComplete;
     event.Platform.BLEPeripheralAdvConfiguredComplete.mIsSuccess = aIsSuccess;
     event.Platform.BLEPeripheralAdvConfiguredComplete.mpAppstate = apAppstate;
     PlatformMgr().PostEventOrDie(&event);
@@ -931,7 +931,7 @@ void BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(bool aIsSuccess, v
 void BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(bool aIsSuccess, void * apAppstate)
 {
     ChipDeviceEvent event;
-    event.Type                                              = DeviceEventType::kPlatformLinuxBLEPeripheralAdvStartComplete;
+    event.Type                                              = DeviceEventType::kPlatformWebOSBLEPeripheralAdvStartComplete;
     event.Platform.BLEPeripheralAdvStartComplete.mIsSuccess = aIsSuccess;
     event.Platform.BLEPeripheralAdvStartComplete.mpAppstate = apAppstate;
     PlatformMgr().PostEventOrDie(&event);
@@ -940,7 +940,7 @@ void BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(bool aIsSuccess, void *
 void BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess, void * apAppstate)
 {
     ChipDeviceEvent event;
-    event.Type                                             = DeviceEventType::kPlatformLinuxBLEPeripheralAdvStopComplete;
+    event.Type                                             = DeviceEventType::kPlatformWebOSBLEPeripheralAdvStopComplete;
     event.Platform.BLEPeripheralAdvStopComplete.mIsSuccess = aIsSuccess;
     event.Platform.BLEPeripheralAdvStopComplete.mpAppstate = apAppstate;
     PlatformMgr().PostEventOrDie(&event);
@@ -1039,7 +1039,7 @@ bool BLEManagerImpl::gattConnectCb(LSHandle *sh, LSMessage *message, void *userD
         g_free(clientId);
     }
 
-    jvalue_ref addressObj = {0};    
+    jvalue_ref addressObj = {0};
     if (jobject_get_exists(parsedObj, J_CSTR_TO_BUF("address"), &addressObj))
     {
         raw_buffer address_buf = jstring_get(addressObj);
@@ -1068,7 +1068,7 @@ bool BLEManagerImpl::gattConnectCb(LSHandle *sh, LSMessage *message, void *userD
     snprintf(ls2Param, 100, "{\"address\":\"%s\"}",sInstance.mRemoteAddress);
 
     ChipLogProgress(DeviceLayer, "getService: Addr [%s]", sInstance.mRemoteAddress);
-    
+
     int ret = 0;
 
     ret = LSCall(sInstance.mLSHandle, "luna://com.webos.service.bluetooth2/gatt/getServices", ls2Param, gattGetServiceCb, NULL, NULL, NULL);
