@@ -34,6 +34,8 @@
     MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
     MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
+    MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \
+    MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();                                                                    \
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
     MatterPowerSourcePluginServerInitCallback();                                                                                   \
     MatterPowerSourceConfigurationPluginServerInitCallback();                                                                      \
