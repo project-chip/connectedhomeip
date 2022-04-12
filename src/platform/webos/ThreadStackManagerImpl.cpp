@@ -21,7 +21,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/Linux/NetworkCommissioningDriver.h>
+#include <platform/webos/NetworkCommissioningDriver.h>
 #include <platform/PlatformManager.h>
 #include <platform/ThreadStackManager.h>
 
@@ -94,6 +94,8 @@ void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorde
             if (key == nullptr || value == nullptr)
                 continue;
             // ownership of key and value is still holding by the iter
+            DeviceLayer::SystemLayer().ScheduleLambda([me]() { me->_UpdateNetworkStatus(); });
+
             if (strcmp(key, kPropertyDeviceRole) == 0)
             {
                 const gchar * value_str = g_variant_get_string(value, nullptr);
@@ -238,18 +240,45 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(ByteSpan & netInfo)
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
 
     {
-        // TODO: The following code does not works actually, since otbr-posix does not emit signals for properties changes. Which is
-        // required for gdbus to caching properties.
-        std::unique_ptr<GVariant, GVariantDeleter> value(
-            openthread_io_openthread_border_router_dup_active_dataset_tlvs(mProxy.get()));
+        std::unique_ptr<GError, GErrorDeleter> err;
+
+        std::unique_ptr<GVariant, GVariantDeleter> response(
+            g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
+                                   g_variant_new("(ss)", "io.openthread.BorderRouter", "ActiveDatasetTlvs"), G_DBUS_CALL_FLAGS_NONE,
+                                   -1, nullptr, &MakeUniquePointerReceiver(err).Get()));
+
+        if (err)
+        {
+            ChipLogError(DeviceLayer, "openthread: failed to read ActiveDatasetTlvs property: %s", err->message);
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        // Note: The actual value is wrapped by a GVariant container, wrapped in another GVariant with tuple type.
+
+        if (response == nullptr)
+        {
+            netInfo = ByteSpan();
+            return CHIP_ERROR_KEY_NOT_FOUND;
+        }
+
+        std::unique_ptr<GVariant, GVariantDeleter> tupleContent(g_variant_get_child_value(response.get(), 0));
+
+        if (tupleContent == nullptr)
+        {
+            netInfo = ByteSpan();
+            return CHIP_ERROR_KEY_NOT_FOUND;
+        }
+
+        std::unique_ptr<GVariant, GVariantDeleter> value(g_variant_get_variant(tupleContent.get()));
+
         if (value == nullptr)
         {
             netInfo = ByteSpan();
             return CHIP_ERROR_KEY_NOT_FOUND;
         }
-        GBytes * bytes = g_variant_get_data_as_bytes(value.get());
+
         gsize size;
-        const uint8_t * data = reinterpret_cast<const uint8_t *>(g_bytes_get_data(bytes, &size));
+        const uint8_t * data = reinterpret_cast<const uint8_t *>(g_variant_get_fixed_array(value.get(), &size, sizeof(guchar)));
         ReturnErrorOnFailure(mDataset.Init(ByteSpan(data, size)));
     }
 
@@ -270,16 +299,51 @@ void ThreadStackManagerImpl::_ErasePersistentInfo()
 
 bool ThreadStackManagerImpl::_IsThreadEnabled()
 {
-    if (!mProxy)
+    VerifyOrReturnError(mProxy, false);
+
+    std::unique_ptr<GError, GErrorDeleter> err;
+
+    std::unique_ptr<GVariant, GVariantDeleter> response(
+        g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
+                               g_variant_new("(ss)", "io.openthread.BorderRouter", "DeviceRole"), G_DBUS_CALL_FLAGS_NONE, -1,
+                               nullptr, &MakeUniquePointerReceiver(err).Get()));
+
+    if (err)
+    {
+        ChipLogError(DeviceLayer, "openthread: failed to read DeviceRole property: %s", err->message);
+        return false;
+    }
+
+    if (response == nullptr)
     {
         return false;
     }
 
-    std::unique_ptr<gchar, GFree> role(openthread_io_openthread_border_router_dup_device_role(mProxy.get()));
-    return (strcmp(role.get(), kOpenthreadDeviceRoleDisabled) != 0);
+    std::unique_ptr<GVariant, GVariantDeleter> tupleContent(g_variant_get_child_value(response.get(), 0));
+
+    if (tupleContent == nullptr)
+    {
+        return false;
+    }
+
+    std::unique_ptr<GVariant, GVariantDeleter> value(g_variant_get_variant(tupleContent.get()));
+
+    if (value == nullptr)
+    {
+        return false;
+    }
+
+    const gchar * role = g_variant_get_string(value.get(), nullptr);
+
+    if (role == nullptr)
+    {
+        return false;
+    }
+
+    return (strcmp(role, kOpenthreadDeviceRoleDisabled) != 0);
 }
 
-bool ThreadStackManagerImpl::_IsThreadAttached()
+bool ThreadStackManagerImpl::_IsThreadAttached() const
 {
     return mAttached;
 }
@@ -362,7 +426,7 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
     {
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
     }
-    else if (strcmp(role.get(), kOpenthreadDeviceRoleChild) == 0)
+    if (strcmp(role.get(), kOpenthreadDeviceRoleChild) == 0)
     {
         std::unique_ptr<GVariant, GVariantDeleter> linkMode(openthread_io_openthread_border_router_dup_link_mode(mProxy.get()));
         if (!linkMode)
@@ -382,15 +446,13 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
         }
         return type;
     }
-    else if (strcmp(role.get(), kOpenthreadDeviceRoleLeader) == 0 || strcmp(role.get(), kOpenthreadDeviceRoleRouter) == 0)
+    if (strcmp(role.get(), kOpenthreadDeviceRoleLeader) == 0 || strcmp(role.get(), kOpenthreadDeviceRoleRouter) == 0)
     {
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_Router;
     }
-    else
-    {
-        ChipLogError(DeviceLayer, "Unknown Thread role: %s", role.get());
-        return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
-    }
+
+    ChipLogError(DeviceLayer, "Unknown Thread role: %s", role.get());
+    return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType)
@@ -647,6 +709,39 @@ ThreadStackManagerImpl::_AttachToThreadNetwork(ByteSpan netInfo,
     ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(true));
     mpConnectCallback = callback;
     return CHIP_NO_ERROR;
+}
+
+void ThreadStackManagerImpl::_UpdateNetworkStatus()
+{
+    // Thread is not enabled, then we are not trying to connect to the network.
+    VerifyOrReturn(IsThreadEnabled() && mpStatusChangeCallback != nullptr);
+
+    ByteSpan datasetTLV;
+    Thread::OperationalDataset dataset;
+    uint8_t extpanid[Thread::kSizeExtendedPanId];
+
+    // If we have not provisioned any Thread network, return the status from last network scan,
+    // If we have provisioned a network, we assume the ot-br-posix is activitely connecting to that network.
+    CHIP_ERROR err = ThreadStackMgrImpl().GetThreadProvision(datasetTLV);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to get configured network when updating network status: %s", err.AsString());
+        return;
+    }
+
+    VerifyOrReturn(dataset.Init(datasetTLV) == CHIP_NO_ERROR);
+    // The Thread network is not enabled, but has a different extended pan id.
+    VerifyOrReturn(dataset.GetExtendedPanId(extpanid) == CHIP_NO_ERROR);
+
+    // We have already connected to the network, thus return success.
+    if (ThreadStackMgrImpl().IsThreadAttached())
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(ByteSpan(extpanid)), NullOptional);
+    }
+    else
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kNetworkNotFound, MakeOptional(ByteSpan(extpanid)), NullOptional);
+    }
 }
 
 ThreadStackManager & ThreadStackMgr()

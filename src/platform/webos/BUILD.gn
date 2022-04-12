@@ -89,6 +89,9 @@ static_library("webos") {
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
     "Logging.cpp",
+    "NetworkCommissioningDriver.h",
+    "NetworkCommissioningThreadDriver.cpp",
+    "NetworkCommissioningWiFiDriver.cpp",
     "SystemPlatformConfig.h",
     "MainLoop.cpp",
     "MainLoop.h",
@@ -119,6 +122,16 @@ static_library("webos") {
       ":glib",
       ":luna-service",
     ]
+  }
+
+  if (chip_enable_openthread) {
+    sources += [
+      "GlibTypeDeleter.h",
+      "ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.h",
+    ]
+
+    public_deps += [ "dbus/openthread" ]
   }
 
   if (chip_enable_wifi) {

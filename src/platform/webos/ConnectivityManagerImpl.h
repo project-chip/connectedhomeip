@@ -45,7 +45,7 @@
 #include <mutex>
 #endif
 
-#include <platform/Linux/NetworkCommissioningDriver.h>
+#include <platform/webos/NetworkCommissioningDriver.h>
 #include <platform/NetworkCommissioning.h>
 #include <vector>
 
