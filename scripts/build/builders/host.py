@@ -34,6 +34,7 @@ class HostApp(Enum):
     OTA_PROVIDER = auto()
     OTA_REQUESTOR = auto()
     PYTHON_BINDINGS = auto()
+    NL_TEST_RUNNER = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -58,6 +59,8 @@ class HostApp(Enum):
             return 'ota-requestor-app/linux'
         elif self in [HostApp.ADDRESS_RESOLVE, HostApp.TESTS, HostApp.PYTHON_BINDINGS, HostApp.CERT_TOOL]:
             return '../'
+        elif self == HostApp.NL_TEST_RUNNER:
+            return '../src/test_driver/efr32'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -105,6 +108,8 @@ class HostApp(Enum):
             yield 'chip-ota-requestor-app.map'
         elif self == HostApp.PYTHON_BINDINGS:
             yield 'controller/python'  # Directory containing WHL files
+        elif self == HostApp.NL_TEST_RUNNER:
+            yield 'chip_nl_test_runner_wheels'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -200,6 +205,9 @@ class HostBuilder(GnBuilder):
         if app == HostApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')
             self.build_command = 'check'
+
+        if app == HostApp.NL_TEST_RUNNER:
+            self.build_command = 'runner'
 
         if app == HostApp.CERT_TOOL:
             # Certification only built for openssl

@@ -233,6 +233,8 @@ def HostTargets():
         target_native.Extend('rpc-console', app=HostApp.RPC_CONSOLE))
     app_targets.append(
         target_native.Extend('tv-app', app=HostApp.TV_APP))
+    app_targets.append(
+        target_native.Extend('nl-test-runner', app=HostApp.NL_TEST_RUNNER))
 
     for target in targets:
         app_targets.append(target.Extend(
@@ -271,7 +273,7 @@ def HostTargets():
     builder.WhitelistVariantNameForGlob('ipv6only')
 
     for target in app_targets:
-        if ('-rpc-console' in target.name) or ('-python-bindings' in target.name):
+        if ('-rpc-console' in target.name) or ('-python-bindings' in target.name) or ('nl-test-runner' in target.name):
             # Single-variant builds
             yield target
         else:
