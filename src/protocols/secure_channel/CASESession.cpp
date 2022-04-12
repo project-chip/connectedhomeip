@@ -44,8 +44,7 @@
 #include <transport/PairingSession.h>
 #include <transport/SessionManager.h>
 
-namespace
-{
+namespace {
 
 enum
 {
@@ -57,27 +56,27 @@ enum
 
 enum
 {
-  kTag_Sigma1_InitiatorRandom    = 1,
-  kTag_Sigma1_InitiatorSessionId = 2,
-  kTag_Sigma1_DestinationId      = 3,
-  kTag_Sigma1_InitiatorEphPubKey = 4,
-  kTag_Sigma1_InitiatorMRPParams = 5,
-  kTag_Sigma1_ResumptionID       = 6,
-  kTag_Sigma1_InitiatorResumeMIC = 7,
+    kTag_Sigma1_InitiatorRandom    = 1,
+    kTag_Sigma1_InitiatorSessionId = 2,
+    kTag_Sigma1_DestinationId      = 3,
+    kTag_Sigma1_InitiatorEphPubKey = 4,
+    kTag_Sigma1_InitiatorMRPParams = 5,
+    kTag_Sigma1_ResumptionID       = 6,
+    kTag_Sigma1_InitiatorResumeMIC = 7,
 };
 
 enum
 {
-  kTag_Sigma2_ResponderRandom    = 1,
-  kTag_Sigma2_ResponderSessionId = 2,
-  kTag_Sigma2_ResponderEphPubKey = 3,
-  kTag_Sigma2_Encrypted2         = 4,
-  kTag_Sigma2_ResponderMRPParams = 5,
+    kTag_Sigma2_ResponderRandom    = 1,
+    kTag_Sigma2_ResponderSessionId = 2,
+    kTag_Sigma2_ResponderEphPubKey = 3,
+    kTag_Sigma2_Encrypted2         = 4,
+    kTag_Sigma2_ResponderMRPParams = 5,
 };
 
 enum
 {
-  kTag_Sigma3_Encrypted3  = 1,
+    kTag_Sigma3_Encrypted3 = 1,
 };
 
 } // namespace
@@ -935,10 +934,9 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     // Generate decrypted data
     SuccessOrExit(err = tlvReader.Next(TLV::kTLVType_ByteString, TLV::ContextTag(kTag_Sigma2_Encrypted2)));
 
-    max_msg_r2_signed_enc_len = TLV::EstimateStructOverhead(Credentials::kMaxCHIPCertLength, Credentials::kMaxCHIPCertLength,
-                                                            tbsData2Signature.Length(),
-                                                            SessionResumptionStorage::kResumptionIdSize,
-                                                            kCaseOverheadForFutureTbeData);
+    max_msg_r2_signed_enc_len =
+        TLV::EstimateStructOverhead(Credentials::kMaxCHIPCertLength, Credentials::kMaxCHIPCertLength, tbsData2Signature.Length(),
+                                    SessionResumptionStorage::kResumptionIdSize, kCaseOverheadForFutureTbeData);
     msg_r2_encrypted_len_with_tag = tlvReader.GetLength();
 
     // Validate we did not receive a buffer larger than legal
@@ -1190,8 +1188,7 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
 
     // Fetch encrypted data
     max_msg_r3_signed_enc_len = TLV::EstimateStructOverhead(Credentials::kMaxCHIPCertLength, Credentials::kMaxCHIPCertLength,
-                                                            tbsData3Signature.Length(),
-                                                            kCaseOverheadForFutureTbeData);
+                                                            tbsData3Signature.Length(), kCaseOverheadForFutureTbeData);
 
     SuccessOrExit(err = tlvReader.Next(TLV::kTLVType_ByteString, TLV::ContextTag(kTag_Sigma3_Encrypted3)));
 
