@@ -20,6 +20,7 @@ import os
 import subprocess
 from pathlib import Path
 from sys import platform
+import yaml
 
 global commandQueue
 commandQueue = ""
@@ -48,6 +49,30 @@ def printc(strInput):
     color = TermColors.STRCYAN
     print(color + strInput + TermColors.STRRESET)
 
+def loadConfig(paths):
+    config = dict()
+    config["nrfconnect"] = dict()
+    config["esp32"] = dict()
+
+    configFile = paths["scriptFolder"] + "/config.yaml"
+    if (os.path.exists(configFile)):
+        configStream = open(configFile, 'r')
+        config = yaml.load(configStream, Loader=yaml.SafeLoader)
+        configStream.close()
+    else:
+        print("Running for the first time and configuring config.yaml. " +
+              "Change this configuration file to include correct configuration " +
+              "for the vendor's SDK")
+        configStream = open(configFile, 'w')
+        config["nrfconnect"]["ZEPHYR_BASE"] = os.environ.get('ZEPHYR_BASE')
+        config["nrfconnect"]["TTY"] = None
+        config["esp32"]["IDF_PATH"] = os.environ.get('IDF_PATH')
+        config["esp32"]["TTY"] = None
+        print(yaml.dump(config))
+        yaml.dump(config, configStream)
+        configStream.close()
+
+    return config
 
 def definePaths():
     paths = dict()
@@ -56,9 +81,6 @@ def definePaths():
     paths["rootSampleFolder"] = paths["scriptFolder"]
     paths["genFolder"] = paths["rootSampleFolder"] + "/zap-generated"
     paths["devices"] = []
-
-    paths["ZEPHYR_BASE"] = os.environ.get('ZEPHYR_BASE')
-    paths["IDF_PATH"] = os.environ.get('IDF_PATH')
 
     for filepath in Path(f"{paths['rootSampleFolder']}/devices").rglob('*.zap'):
         paths["devices"].append(
@@ -107,16 +129,11 @@ def hexInputToInt(valIn):
         valOut = valIn
     return valOut
 
-def checkTty(tty):
-    if tty == None:
-        print("One or more operations require that you provide a tty interface \
-        for your device. Use the -y <path> argument. See the help for more \
-        information.")
-        exit(1)
-
 def main(argv):
     checkPythonVersion()
     paths = definePaths()
+    config = loadConfig(paths)
+
     global myEnv
     myEnv = os.environ.copy()
 
@@ -205,19 +222,19 @@ Notes:
     queuePrint(f"Target is set to {options.sampleDeviceTypeName}")
     queuePrint("Setting up environment...")
     if options.buildTarget == "esp32":
-        if paths["IDF_PATH"] is None:
-            print('Path for esp32 SDK was not found. Make sure IDF_PATH is set on your shell environment')
+        if config['esp32']['IDF_PATH'] is None:
+            print('Path for esp32 SDK was not found. Make sure esp32.IDF_PATH is set on your config.yaml file')
             exit(1)
         paths["platFolder"] = os.path.normpath(
             paths["rootSampleFolder"] + "/esp32")
-        queueCommand(f'source {paths["IDF_PATH"]}/export.sh')
+        queueCommand(f'source {config["esp32"]["IDF_PATH"]}/export.sh')
     elif options.buildTarget == "nrfconnect":
-        if paths["ZEPHYR_BASE"] is None:
-            print('Path for nrfconnect SDK was not found. Make sure ZEPHYR_BASE is set on your shell environment')
+        if config['nrfconnect']['ZEPHYR_BASE'] is None:
+            print('Path for nrfconnect SDK was not found. Make sure nrfconnect.ZEPHYR_BASE is set on your config.yaml file')
             exit(1)
         paths["platFolder"] = os.path.normpath(
             paths["rootSampleFolder"] + "/nrfconnect")
-        queueCommand(f'source {paths["ZEPHYR_BASE"]}/zephyr-env.sh')
+        queueCommand(f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/zephyr-env.sh')
         queueCommand("export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb")
     elif options.buildTarget == "linux":
         pass
@@ -332,9 +349,10 @@ true''')
         elif options.buildTarget == "nrfconnect":
             queueCommand(f"cd {paths['rootSampleFolder']}/nrfconnect")
             if options.doClean:
-                queueCommand(f"west build -b {options.buildTarget} -c")
+                queueCommand(f"rm -rf {paths['rootSampleFolder']}/build")
+                queueCommand(f"west build -b nrf52840dk_nrf52840")
             else:
-                queueCommand(f"west build -b {options.buildTarget}")
+                queueCommand(f"west build -b nrf52840dk_nrf52840")
         elif options.buildTarget == "linux":
             queueCommand(f"cd {paths['rootSampleFolder']}/linux")
             queueCommand(f'''
@@ -366,12 +384,14 @@ true''')
     if options.doFlash:
         queuePrint("Flashing target")
         if options.buildTarget == "esp32":
+            if config['esp32']['TTY'] is None:
+                print('The path for the serial enumeration for esp32 is not set. Make sure esp32.TTY is set on your config.yaml file')
+                exit(1)
             queueCommand(f"cd {paths['rootSampleFolder']}/esp32")
             if options.doErase:
-                checkTty(options.tty)
                 queueCommand(
-                    f"idf.py -p {options.tty} erase_flash")
-            queueCommand(f"idf.py -p {options.tty} flash")
+                    f"idf.py -p {config['esp32']['TTY']} erase-flash")
+            queueCommand(f"idf.py -p {config['esp32']['TTY']} flash")
         elif options.buildTarget == "nrfconnect":
             queueCommand(f"cd {paths['rootSampleFolder']}/nrfconnect")
             if options.doErase:
@@ -386,11 +406,17 @@ true''')
     if options.doInteract:
         queuePrint("Starting terminal...")
         if options.buildTarget == "esp32":
+            if config['esp32']['TTY'] is None:
+                print('The path for the serial enumeration for esp32 is not set. Make sure esp32.TTY is set on your config.yaml file')
+                exit(1)
             queueCommand(f"cd {paths['rootSampleFolder']}/esp32")
-            queueCommand(f"idf.py -p {options.tty} monitor")
+            queueCommand(f"idf.py -p {config['esp32']['TTY']} monitor")
         elif options.buildTarget == "nrfconnect":
+            if config['nrfconnect']['TTY'] is None:
+                print('The path for the serial enumeration for nordic is not set. Make sure nrfconnect.TTY is set on your config.yaml file')
+                exit(1)
             queueCommand("killall screen")
-            queueCommand(f"screen {options.tty} 115200")
+            queueCommand(f"screen {config['nrfconnect']['TTY']} 115200")
         elif options.buildTarget == "linux":
             queuePrint(
                 f"{paths['rootSampleFolder']}/linux/out/{options.sampleDeviceTypeName}")
@@ -402,7 +428,7 @@ true''')
     #
     if options.doRPC_CONSOLE:
         queueCommand(
-            f"python3 -m chip_rpc.console --device {options.tty}")
+            f"python3 -m chip_rpc.console --device {config['esp32']['TTY']}")
 
     queuePrint("Done")
 
