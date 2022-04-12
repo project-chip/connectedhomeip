@@ -18,13 +18,13 @@
 import argparse
 from collections import namedtuple
 import configparser
+import logging
 import subprocess
 import os
-import sys
 
 CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
-ALL_PLATFORMS = [
+ALL_PLATFORMS = set([
     'ameba',
     'android',
     'bl602',
@@ -42,7 +42,7 @@ ALL_PLATFORMS = [
     'telink',
     'tizen',
     'webos',
-]
+])
 
 Module = namedtuple('Module', 'name path platforms')
 
@@ -51,12 +51,12 @@ def load_module_info() -> list:
     config = configparser.ConfigParser()
     config.read(os.path.join(CHIP_ROOT, '.gitmodules'))
 
-    def make_module_info(name, module):
-        platforms = module.get('platforms', '').split(',')
-        platforms = set(filter(None, platforms))
-        return Module(name=name, path=module['path'], platforms=platforms)
-
-    return [make_module_info(name, module) for name, module in config.items() if name != 'DEFAULT']
+    for name, module in config.items():
+        if name != 'DEFAULT':
+            platforms = module.get('platforms', '').split(',')
+            platforms = set(filter(None, platforms))
+            assert not (platforms - ALL_PLATFORMS), "Submodule's platform not contained in ALL_PLATFORMS"
+            yield Module(name=name, path=module['path'], platforms=platforms)
 
 
 def module_matches_platforms(module: Module, platforms: set) -> bool:
@@ -70,7 +70,7 @@ def module_matches_platforms(module: Module, platforms: set) -> bool:
 def checkout_modules(modules: list, shallow: bool) -> None:
     names = [module.name.replace('submodule "', '').replace('"', '') for module in modules]
     names = ', '.join(names)
-    sys.stderr.write(f'Checking out: {names}\n')
+    logging.info(f'Checking out: {names}')
 
     cmd = ['git', '-C', CHIP_ROOT, 'submodule', 'update', '--init']
     cmd += ['--depth', '1'] if shallow else []
@@ -80,6 +80,8 @@ def checkout_modules(modules: list, shallow: bool) -> None:
 
 
 def main():
+    logging.basicConfig(format='%(message)s', level=logging.INFO)
+
     parser = argparse.ArgumentParser(description='Checkout or update relevant git submodules')
     parser.add_argument('--shallow', action='store_true', help='Fetch submodules without history')
     parser.add_argument('--platform', nargs='+', choices=ALL_PLATFORMS, default=[],
