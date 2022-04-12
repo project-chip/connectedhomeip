@@ -383,29 +383,9 @@ CHIP_ERROR Browse(void * context, DnssdBrowseCallback callback, uint32_t interfa
     std::string regtype(type);
     std::string subtypeDelimiter = "._sub.";
     size_t position              = regtype.find(subtypeDelimiter);
-    // if we have more in the string (a subtype) then append it to the end
     if (position != std::string::npos)
     {
-        // DNSServiceBrowse allows searching by type, and by subtype (PTR records).
-        //  (ex. _matterc._udp.local. or _CM._sub._matterc._udp.local.)
-        //
-        // It does not include support for searching by instance name (SRV records).
-        //  (ex. DD200C20D25AE5F7._matterc._udp.local.)
-        //
-        // As a result, we need to detect type strings that use an instance name
-        // and not append instance name to the end of regtype.
-        //
-        // Since all of the Matter subtypes begin with "_" we will use that to determine whether this is
-        // an instance name search, so that we only append subtypes after the comma in regtype.
-        if (regtype.rfind("_", position) == 0)
-        {
-            regtype = regtype.substr(position + subtypeDelimiter.size()) + "," + regtype.substr(0, position);
-        }
-        else
-        {
-            regtype = regtype.substr(position + subtypeDelimiter.size());
-            ChipLogProgress(Controller, "Browse instance removed, type=%s regtype=%s", type, regtype.c_str());
-        }
+        regtype = regtype.substr(position + subtypeDelimiter.size()) + "," + regtype.substr(0, position);
     }
 
     sdCtx = chip::Platform::New<BrowseContext>(context, callback, protocol);
@@ -564,6 +544,8 @@ static CHIP_ERROR Resolve(void * context, DnssdResolveCallback callback, uint32_
     DNSServiceErrorType err;
     DNSServiceRef sdRef;
     ResolveContext * sdCtx;
+
+    ChipLogProgress(Controller, "Resolve type=%s name=%s", type, name);
 
     sdCtx = chip::Platform::New<ResolveContext>(context, callback, name, addressType);
     err   = DNSServiceResolve(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDot, OnResolve, sdCtx);
