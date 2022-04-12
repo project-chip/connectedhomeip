@@ -35,7 +35,6 @@ tests:
       command: "readAttribute"
       attribute: "ConfigStatus"
       PICS: "WNCV_REVERSAL"
-      disabled: true
       response:
           constraints:
               minValue: 0x04
@@ -54,7 +53,6 @@ tests:
       command: "readAttribute"
       attribute: "ConfigStatus"
       PICS: "WNCV_REVERSAL"
-      disabled: true
       response:
           constraints:
               minValue: 0x00
@@ -75,7 +73,6 @@ tests:
       command: "readAttribute"
       attribute: "ConfigStatus"
       PICS: "WNCV_CALIBRATION"
-      disabled: true
       response:
           saveAs: configStatusValA
           constraints:
@@ -102,7 +99,6 @@ tests:
       command: "readAttribute"
       attribute: "ConfigStatus"
       PICS: "WNCV_CALIBRATION"
-      disabled: true
       response:
           constraints:
               minValue: 0x01
@@ -138,7 +134,6 @@ tests:
       command: "readAttribute"
       PICS: "WNCV_MAINTENANCE"
       attribute: "ConfigStatus"
-      disabled: true
       response:
           saveAs: configStatusValB
           constraints:
@@ -165,7 +160,6 @@ tests:
       command: "readAttribute"
       attribute: "ConfigStatus"
       PICS: "WNCV_MAINTENANCE"
-      disabled: true
       response:
           constraints:
               minValue: 0x01
