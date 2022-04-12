@@ -74,7 +74,7 @@ CHIP_ERROR AttributeCache::UpdateCache(const ConcreteDataAttributePath & aPath, 
             {
                 // commit the version since we moved on from a given wildcard attribute path to a different wildcard attributePath
                 // when it has data.
-                CommitLastWildcardAttributePathVersion();
+                CommitPendingDataVersion();
             }
             mLastWildcardAttributePath = aPath;
             break;
@@ -107,10 +107,15 @@ void AttributeCache::OnReportBegin()
     mCallback.OnReportBegin();
 }
 
-void AttributeCache::CommitLastWildcardAttributePathVersion()
+void AttributeCache::CommitPendingDataVersion()
 {
+    if (!mLastWildcardAttributePath.IsValidConcreteClusterPath())
+    {
+        return;
+    }
+
     auto & lastClusterInfo = mCache[mLastWildcardAttributePath.mEndpointId][mLastWildcardAttributePath.mClusterId];
-    if (mLastWildcardAttributePath.IsValidConcreteClusterPath() && lastClusterInfo.mPendingDataVersion.HasValue())
+    if (lastClusterInfo.mPendingDataVersion.HasValue())
     {
         lastClusterInfo.mCommittedDataVersion = lastClusterInfo.mPendingDataVersion;
         lastClusterInfo.mPendingDataVersion.ClearValue();
@@ -119,7 +124,7 @@ void AttributeCache::CommitLastWildcardAttributePathVersion()
 
 void AttributeCache::OnReportEnd()
 {
-    CommitLastWildcardAttributePathVersion();
+    CommitPendingDataVersion();
     mLastWildcardAttributePath = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
     std::set<std::tuple<EndpointId, ClusterId>> changedClusters;
 
@@ -294,7 +299,11 @@ void AttributeCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter, s
                 if (attributeIter.second.Is<StatusIB>())
                 {
                     clusterSize +=
-                        4; // At least it has control byte +Status + ClusterStatus + end of container = 1 + 1 + 1 + 1 bytes
+                        5; // 1 byte: anonymous tag control byte for struct. 1 byte: control byte for uint8 value. 1 byte: context-specific tag for uint8 value.1 byte: the uint8 value. 1 byte: end of container.
+                    if (attributeIter.second.Get<StatusIB>().mClusterStatus.HasValue())
+                    {
+                        clusterSize += 3; // 1 byte: control byte for uint8 value. 1 byte: context-specific tag for uint8 value. 1 byte: the uint8 value.
+                    }
                 }
                 else
                 {
@@ -334,6 +343,7 @@ CHIP_ERROR AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::B
     std::vector<std::pair<DataVersionFilter, size_t>> filterVector;
     GetSortedFilters(filterVector);
 
+    aEncodedDataVersionList = false;
     for (auto & filter : filterVector)
     {
         bool intersected = false;
