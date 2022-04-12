@@ -11,25 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     3.4.8. [TC-WNCV-7.1] GoToPercentage Commands Verification with client as DUT
+
 config:
-    nodeId: "0x12344321"
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
+
 tests:
-    - label: "Test Step"
-      verification: |
-          Chip-Tool Verification Steps
-      disabled: true
     - label: "Check GoToLiftPercentage command 50%"
-      verification: |4+
+      verification: |
 
       disabled: true
+
     - label:
           "If (PA_LF & LF) DUT sends GoToLiftPercentage command with 50% to DUT"
-      verification: |+
+      verification: |
           On TestHarnes (all-cluster-app) a received GoToLift for WindowCovering looks like this
 
           [1646297766.073468][361158:361158] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:12638616 on exchange 3757r
@@ -62,15 +62,16 @@ tests:
           [1646297766.074647][361158:361158] CHIP:DMG: },
           [1646297766.074705][361158:361158] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0102 e=1 p=o
           [1646297766.074745][361158:361158] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0102 Command=0x0000_0005
-
       disabled: true
+
     - label: "Check GoToTiltPercentage command 50%"
-      verification: |4+
+      verification: |
 
       disabled: true
+
     - label:
           "If (PA_TL & TL) DUT sends GoToTiltPercentage command with 50% to DUT"
-      verification: |+
+      verification: |
           On TestHarnes (all-cluster-app) a received GoToTilt for WindowCovering looks like this
 
           [1646298060.215062][361158:361158] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:13675126 on exchange 583r
@@ -103,5 +104,4 @@ tests:
           [1646298060.219930][361158:361158] CHIP:DMG: },
           [1646298060.220021][361158:361158] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0102 e=1 p=o
           [1646298060.220264][361158:361158] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0102 Command=0x0000_0008
-
       disabled: true

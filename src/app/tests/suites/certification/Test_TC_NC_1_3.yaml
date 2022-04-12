@@ -11,27 +11,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     3.3. [TC-NC-1.3] Verification on Ethernet connection and attributes check
     [DUT - Commissionee]
+
 config:
-    nodeId: "0x12344321"
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
+
 tests:
-    - label: "Test Step"
-      verification: |
-          Chip-Tool Verification Steps
-      disabled: true
     - label: "Factory reset the DUT"
-      verification: |4+
+      verification: |
 
       disabled: true
+
     - label: "TH1 is commissioned with DUT"
-      verification: |4+
+      verification: |
 
       disabled: true
+
     - label:
           "TH1 reads Descriptor Cluster from the DUT with EP0 TH1 reads
           ServerList from the DUT"
@@ -71,6 +72,7 @@ tests:
           [1646226258.252745][2446:2451] CHIP:TOO:     [25]: 1029
           [1646226258.255517][2446:2451] CHIP:EM: Sending Standalone Ack for MessageCounter:10627940 on exchange 21443i
       disabled: true
+
     - label: "TH1 reads FeatureMap attribute from the DUT"
       verification: |
           ubuntu@ubuntu:~/apps$ sudo ./chip-tool networkcommissioning read feature-map 1 0
@@ -83,6 +85,7 @@ tests:
           [1646226326.736250][2460:2465] CHIP:TOO:   FeatureMap: 2
           [1646226326.736362][2460:2465] CHIP:EM: Sending Standalone Ack for MessageCounter:9135736 on exchange 51231i
       disabled: true
+
     - label: "TH1 reads the MaxNetworks attribute from the DUT"
       verification: |
           ubuntu@ubuntu:~/apps$ sudo ./chip-tool networkcommissioning read max-networks 1 0
@@ -94,6 +97,7 @@ tests:
           [1646226441.816191][2475:2480] CHIP:TOO:   MaxNetworks: 1
           [1646226441.816288][2475:2480] CHIP:EM: Sending Standalone Ack for MessageCounter:14864333 on exchange 39473i
       disabled: true
+
     - label: "TH1 reads the Networks attribute list from the DUT"
       verification: |
           ubuntu@ubuntu:~/apps$ sudo ./chip-tool networkcommissioning read networks 1 0
@@ -106,6 +110,7 @@ tests:
           [1646226488.740409][2488:2493] CHIP:TOO:   Networks: 0 entries
           [1646226488.740501][2488:2493] CHIP:EM: Sending Standalone Ack for MessageCounter:9725190 on exchange 29852i
       disabled: true
+
     - label: "TH1 reads InterfaceEnabled attribute from the DUT"
       verification: |
           ubuntu@ubuntu:~/apps$ sudo ./chip-tool networkcommissioning read interface-enabled 1 0
@@ -118,6 +123,7 @@ tests:
           [1646226615.428331][2502:2507] CHIP:TOO:   InterfaceEnabled: TRUE
           [1646226615.428415][2502:2507] CHIP:EM: Sending Standalone Ack for MessageCounter:3894401 on exchange 55691i
       disabled: true
+
     - label: "TH1 reads LastNetworkingStatus attribute from the DUT"
       verification: |
           ubuntu@ubuntu:~/apps$ sudo ./chip-tool networkcommissioning read last-networking-status 1 0
@@ -129,6 +135,7 @@ tests:
           [1646227167.614385][2533:2538] CHIP:TOO:   LastNetworkingStatus: 0
           [1646227167.614468][2533:2538] CHIP:EM: Sending Standalone Ack for MessageCounter:8947540 on exchange 12532i
       disabled: true
+
     - label:
           "TH1 reads the LastNetworkID attribute from the DUT TH1 reads the
           Networks attribute from the DUT"
@@ -143,6 +150,7 @@ tests:
           [1646227218.543836][2545:2550] CHIP:TOO:   LastNetworkID:
           [1646227218.543924][2545:2550] CHIP:EM: Sending Standalone Ack for MessageCounter:9758721 on exchange 15256i
       disabled: true
+
     - label: "TH1 reads the LastConnectErrorValue attribute from the DUT"
       verification: |
           ubuntu@ubuntu:~/apps$ sudo ./chip-tool networkcommissioning read last-connect-error-value 1 0
@@ -155,6 +163,7 @@ tests:
           [1646227266.753556][2560:2565] CHIP:TOO:   LastConnectErrorValue: 0
           [1646227266.753632][2560:2565] CHIP:EM: Sending Standalone Ack for MessageCounter:7911198 on exchange 43970i
       disabled: true
+
     - label: "TH1 reads ClientGeneratedCommandList attribute from the DUT"
       verification: |
           ubuntu@ubuntu:~/apps$ sudo ./chip-tool networkcommissioning read client-generated-command-list 1 0

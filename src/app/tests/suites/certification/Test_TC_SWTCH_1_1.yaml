@@ -11,21 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: "[TC-SWTCH-1.1] Global attributes with server as DUT"
+name: 74.1.1. [TC-SWTCH-1.1] Global attributes with server as DUT
+
 config:
-    nodeId: "0x12344321"
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
+
 tests:
-    - label: "Test Step"
-      verification: |
-          chip-tool verification steps
-      disabled: true
     - label: "Commission DUT to TH (can be skipped if done in a preceding test)"
-      verification: |4+
+      verification: |
 
       disabled: true
+
     - label: "Read FeatureMap (global attribute 65532)"
       verification: |
           ./chip-tool switch read feature-map 1 1
@@ -33,22 +33,27 @@ tests:
           [1646208136.241983][2390:2395] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_FFFCDataVersion: 1206711661
           [1646208136.242043][2390:2395] CHIP:TOO:   FeatureMap: 0
       disabled: true
+
     - label: "Check values of flags in this FeatureMap"
       verification: |
           no Matter messages, but TH internal checking
       disabled: true
+
     - label: "Check values of flags in this FeatureMap"
       verification: |
           no Matter messages, but TH internal checking
       disabled: true
+
     - label: "Check values of flags in this FeatureMap"
       verification: |
           no Matter messages, but TH internal checking
       disabled: true
+
     - label: "Check values of flags in this FeatureMap"
       verification: |
           no Matter messages, but TH internal checking
       disabled: true
+
     - label: "Check values of flags in this FeatureMap"
       verification: |
           no Matter messages, but TH internal checking

@@ -11,23 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     3.16. [TC-NC-1.16] NetworkNotFound value as LastNetworkingstatus argument
     validation for wifi interface [DUT-Commissionee]
+
 config:
-    nodeId: "0x12344321"
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
+
 tests:
-    - label: "Test Step"
-      verification: |
-          Chip-Tool Verification Steps
-      disabled: true
     - label: "TH1 sends ArmFailSafe command to the DUT"
-      verification: |4+
+      verification: |
 
       disabled: true
+
     - label:
           "TH1 sends RemoveNetwork Command to the DUT with NetworkID argument
           value as 'Userwifi_ssid1' and Breadcrumb argument value as 0"
@@ -43,6 +43,7 @@ tests:
           [1646296227.059598][3118:3123] CHIP:DMG: ICR moving to [AwaitingDe]
           [1646296227.059667][3118:3123] CHIP:EM: Sending Standalone Ack for MessageCounter:15895540 on exchange 28900i
       disabled: true
+
     - label:
           "TH1 sends ConnectNetwork Command to the DUT with NetworkID value as
           'Userwifi_ssid1' and Breadcrumb value as 0"

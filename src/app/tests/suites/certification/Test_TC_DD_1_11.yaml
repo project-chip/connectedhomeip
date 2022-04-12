@@ -11,24 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     3.1.11. [TC-DD-1.11] Concatenation - QR Code Onboarding Payload Verification
     [DUT - Commissioner]
+
 config:
-    nodeId: "0x12344321"
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
+
 tests:
-    - label: "Test Step"
-      verification: |
-          Chip-tool Verification Steps
-      disabled: true
     - label:
           "If (PICS_DT_CTRL_CONCATENATED_QR_CODE_1), scan larger QR code that
           will support the commissioning of all the devices"
-      verification: |+
-          "sudo ./chip-all-clusters-app
+      verification: |
+          '' ./chip-all-clusters-app
 
 
           [1646286638.375844][11651:11651] CHIP:DL: Device Configuration:
@@ -58,18 +57,20 @@ tests:
           [1646287790.029451][8190:8190] CHIP:SPL: Discriminator: 3840
           [1646287790.029469][8190:8190] CHIP:SPL: SetUpPINCode: 20202021
           [1646287790.029488][8190:8190] CHIP:SPL: RendezvousInformation: 2
-
       disabled: true
+
     - label: "If (PICS_DT_CTRL_CONCATENATED_QR_CODE_1)"
       verification: |
           Vendor specific field testcase
       disabled: true
+
     - label:
           "If !(PICS_DT_CTRL_CONCATENATED_QR_CODE_1) &&
           PICS_DT_CTRL_CONCATENATED_QR_CODE_2"
       verification: |
           Vendor specific field testcase
       disabled: true
+
     - label:
           "If !(PICS_DT_CTRL_CONCATENATED_QR_CODE_1) &&
           !(PICS_DT_CTRL_CONCATENATED_QR_CODE_2)"

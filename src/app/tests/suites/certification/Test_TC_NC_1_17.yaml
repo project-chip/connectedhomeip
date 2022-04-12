@@ -11,23 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     3.17. [TC-NC-1.17] NetworkNotFound value as LastNetworkingstatus argument
     validation for Thread interface [DUT-Commissionee]
+
 config:
-    nodeId: "0x12344321"
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
+
 tests:
-    - label: "Test Step"
-      verification: |
-          Chip-Tool Verification Steps
-      disabled: true
     - label: "TH1 sends ArmFailSafe command to the DUT"
-      verification: |4+
+      verification: |
 
       disabled: true
+
     - label:
           "TH1 sends RemoveNetwork Command to the DUT with NetworkID argument
           value as 'Userth_op1' and Breadcrumb argument value as 0"
@@ -43,6 +43,7 @@ tests:
           [1645774811.424256][4127:4132] CHIP:DMG: ICR moving to [AwaitingDe]
           [1645774811.424362][4127:4132] CHIP:EM: Sending Standalone Ack for MessageCounter:5388547 on exchange 23393i
       disabled: true
+
     - label:
           "TH1 sends ConnectNetwork Command to the DUT with NetworkID value as
           'Userth_op1' and Breadcrumb value as 0"
