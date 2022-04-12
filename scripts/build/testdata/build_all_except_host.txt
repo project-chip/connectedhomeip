@@ -169,6 +169,9 @@ bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 # Generating bl602-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=bl602_board="BL-HWC-G1"' {out}/bl602-light
 
+# Generating cc13x2x7_26x2x7-all-clusters
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-all-clusters
+
 # Generating cc13x2x7_26x2x7-lock-ftd
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT" chip_openthread_ftd=true' {out}/cc13x2x7_26x2x7-lock-ftd
 
@@ -180,9 +183,6 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 # Generating cc13x2x7_26x2x7-pump-controller
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/pump-controller-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-pump-controller
-
-# Generating cc13x2x7_26x2x7-all-clusters
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-all-clusters
 
 # Generating cyw30739-cyw930739m2evb_01-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/cyw30739 {out}/cyw30739-cyw930739m2evb_01-light
@@ -1165,6 +1165,9 @@ cp {out}/android-x86-chip-tool/lib/src/platform/android/AndroidPlatform.jar {roo
 # Building bl602-light
 ninja -C {out}/bl602-light
 
+# Building cc13x2x7_26x2x7-all-clusters
+ninja -C {out}/cc13x2x7_26x2x7-all-clusters
+
 # Building cc13x2x7_26x2x7-lock-ftd
 ninja -C {out}/cc13x2x7_26x2x7-lock-ftd
 
@@ -1176,9 +1179,6 @@ ninja -C {out}/cc13x2x7_26x2x7-pump
 
 # Building cc13x2x7_26x2x7-pump-controller
 ninja -C {out}/cc13x2x7_26x2x7-pump-controller
-
-# Building cc13x2x7_26x2x7-all-clusters
-ninja -C {out}/cc13x2x7_26x2x7-all-clusters
 
 # Building cyw30739-cyw930739m2evb_01-light
 ninja -C {out}/cyw30739-cyw930739m2evb_01-light

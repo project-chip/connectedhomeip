@@ -38,6 +38,9 @@
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
 
+#ifdef AUTO_PRINT_METRICS
+#include <platform/cc13x2_26x2/DiagnosticDataProviderImpl.h>
+#endif
 #include <app/server/OnboardingCodesUtil.h>
 
 #include <ti/drivers/apps/Button.h>
@@ -135,7 +138,7 @@ void DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
     }
 
 #ifdef AUTO_PRINT_METRICS
-    printAppMetrics();
+    printMetrics();
 #endif
 }
 
