@@ -44,6 +44,44 @@
 #include <transport/PairingSession.h>
 #include <transport/SessionManager.h>
 
+namespace
+{
+
+enum
+{
+    kTag_TBEData_SenderNOC    = 1,
+    kTag_TBEData_SenderICAC   = 2,
+    kTag_TBEData_Signature    = 3,
+    kTag_TBEData_ResumptionID = 4,
+};
+
+enum
+{
+  kTag_Sigma1_InitiatorRandom    = 1,
+  kTag_Sigma1_InitiatorSessionId = 2,
+  kTag_Sigma1_DestinationId      = 3,
+  kTag_Sigma1_InitiatorEphPubKey = 4,
+  kTag_Sigma1_InitiatorMRPParams = 5,
+  kTag_Sigma1_ResumptionID       = 6,
+  kTag_Sigma1_InitiatorResumeMIC = 7,
+};
+
+enum
+{
+  kTag_Sigma2_ResponderRandom    = 1,
+  kTag_Sigma2_ResponderSessionId = 2,
+  kTag_Sigma2_ResponderEphPubKey = 3,
+  kTag_Sigma2_Encrypted2         = 4,
+  kTag_Sigma2_ResponderMRPParams = 5,
+};
+
+enum
+{
+  kTag_Sigma3_Encrypted3  = 1,
+};
+
+} // namespace
+
 namespace chip {
 
 using namespace Crypto;
@@ -71,14 +109,6 @@ constexpr uint8_t kTBEData3_Nonce[] =
     /* "NCASE_Sigma3N" */ { 0x4e, 0x43, 0x41, 0x53, 0x45, 0x5f, 0x53, 0x69, 0x67, 0x6d, 0x61, 0x33, 0x4e };
 constexpr size_t kTBEDataNonceLength = sizeof(kTBEData2_Nonce);
 static_assert(sizeof(kTBEData2_Nonce) == sizeof(kTBEData3_Nonce), "TBEData2_Nonce and TBEData3_Nonce must be same size");
-
-enum
-{
-    kTag_TBEData_SenderNOC    = 1,
-    kTag_TBEData_SenderICAC   = 2,
-    kTag_TBEData_Signature    = 3,
-    kTag_TBEData_ResumptionID = 4,
-};
 
 #ifdef ENABLE_HSM_HKDF
 using HKDF_sha_crypto = HKDF_shaHSM;
@@ -846,6 +876,8 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R2_Signed;
     size_t msg_r2_signed_len;
+    size_t max_msg_r2_signed_enc_len;
+    constexpr size_t kCaseOverheadForFutureTbeData = 128;
 
     uint8_t sr2k[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
 
@@ -860,8 +892,6 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
 
     uint16_t responderSessionId;
 
-    uint32_t decodeTagIdSeq = 0;
-
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
 
     ChipLogProgress(SecureChannel, "Received Sigma2 msg");
@@ -871,21 +901,18 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     SuccessOrExit(err = tlvReader.EnterContainer(containerType));
 
     // Retrieve Responder's Random value
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
+    SuccessOrExit(err = tlvReader.Next(TLV::kTLVType_ByteString, TLV::ContextTag(kTag_Sigma2_ResponderRandom)));
     SuccessOrExit(err = tlvReader.GetBytes(responderRandom, sizeof(responderRandom)));
 
     // Assign Session ID
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
+    SuccessOrExit(err = tlvReader.Next(TLV::kTLVType_UnsignedInteger, TLV::ContextTag(kTag_Sigma2_ResponderSessionId)));
     SuccessOrExit(err = tlvReader.Get(responderSessionId));
 
     ChipLogDetail(SecureChannel, "Peer assigned session session ID %d", responderSessionId);
     SetPeerSessionId(responderSessionId);
 
     // Retrieve Responder's Ephemeral Pubkey
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
+    SuccessOrExit(err = tlvReader.Next(TLV::kTLVType_ByteString, TLV::ContextTag(kTag_Sigma2_ResponderEphPubKey)));
     SuccessOrExit(err = tlvReader.GetBytes(mRemotePubKey, static_cast<uint32_t>(mRemotePubKey.Length())));
 
     // Generate a Shared Secret
@@ -906,11 +933,19 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     SuccessOrExit(err = mCommissioningHash.AddData(ByteSpan{ buf, buflen }));
 
     // Generate decrypted data
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
-    VerifyOrExit(msg_R2_Encrypted.Alloc(tlvReader.GetLength()), err = CHIP_ERROR_NO_MEMORY);
+    SuccessOrExit(err = tlvReader.Next(TLV::kTLVType_ByteString, TLV::ContextTag(kTag_Sigma2_Encrypted2)));
+
+    max_msg_r2_signed_enc_len = TLV::EstimateStructOverhead(Credentials::kMaxCHIPCertLength, Credentials::kMaxCHIPCertLength,
+                                                            tbsData2Signature.Length(),
+                                                            SessionResumptionStorage::kResumptionIdSize,
+                                                            kCaseOverheadForFutureTbeData);
     msg_r2_encrypted_len_with_tag = tlvReader.GetLength();
+
+    // Validate we did not receive a buffer larger than legal
+    VerifyOrExit(msg_r2_encrypted_len_with_tag <= max_msg_r2_signed_enc_len, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
     VerifyOrExit(msg_r2_encrypted_len_with_tag > CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
+    VerifyOrExit(msg_R2_Encrypted.Alloc(msg_r2_encrypted_len_with_tag), err = CHIP_ERROR_NO_MEMORY);
+
     SuccessOrExit(err = tlvReader.GetBytes(msg_R2_Encrypted.Get(), static_cast<uint32_t>(msg_r2_encrypted_len_with_tag)));
     msg_r2_encrypted_len = msg_r2_encrypted_len_with_tag - CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
 
@@ -971,7 +1006,7 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     // Retrieve responderMRPParams if present
     if (tlvReader.Next() != CHIP_END_OF_TLV)
     {
-        SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
+        SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(kTag_Sigma2_ResponderMRPParams), tlvReader));
     }
 
 exit:
@@ -1126,9 +1161,12 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
     const uint8_t * buf   = msg->Start();
     const uint16_t bufLen = msg->DataLength();
 
+    constexpr size_t kCaseOverheadForFutureTbeData = 128;
+
     chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Encrypted;
     size_t msg_r3_encrypted_len          = 0;
     size_t msg_r3_encrypted_len_with_tag = 0;
+    size_t max_msg_r3_signed_enc_len;
     chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Signed;
     size_t msg_r3_signed_len;
 
@@ -1144,8 +1182,6 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
 
     uint8_t msg_salt[kIPKSize + kSHA256_Hash_Length];
 
-    uint32_t decodeTagIdSeq = 0;
-
     ChipLogProgress(SecureChannel, "Received Sigma3 msg");
 
     tlvReader.Init(std::move(msg));
@@ -1153,11 +1189,19 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
     SuccessOrExit(err = tlvReader.EnterContainer(containerType));
 
     // Fetch encrypted data
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
-    VerifyOrExit(msg_R3_Encrypted.Alloc(tlvReader.GetLength()), err = CHIP_ERROR_NO_MEMORY);
+    max_msg_r3_signed_enc_len = TLV::EstimateStructOverhead(Credentials::kMaxCHIPCertLength, Credentials::kMaxCHIPCertLength,
+                                                            tbsData3Signature.Length(),
+                                                            kCaseOverheadForFutureTbeData);
+
+    SuccessOrExit(err = tlvReader.Next(TLV::kTLVType_ByteString, TLV::ContextTag(kTag_Sigma3_Encrypted3)));
+
     msg_r3_encrypted_len_with_tag = tlvReader.GetLength();
+
+    // Validate we did not receive a buffer larger than legal
+    VerifyOrExit(msg_r3_encrypted_len_with_tag <= max_msg_r3_signed_enc_len, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
     VerifyOrExit(msg_r3_encrypted_len_with_tag > CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
+
+    VerifyOrExit(msg_R3_Encrypted.Alloc(msg_r3_encrypted_len_with_tag), err = CHIP_ERROR_NO_MEMORY);
     SuccessOrExit(err = tlvReader.GetBytes(msg_R3_Encrypted.Get(), static_cast<uint32_t>(msg_r3_encrypted_len_with_tag)));
     msg_r3_encrypted_len = msg_r3_encrypted_len_with_tag - CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
 
