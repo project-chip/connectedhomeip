@@ -266,7 +266,7 @@ FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
 
 CHIP_ERROR DeleteFabricFromTable(FabricIndex fabricIndex)
 {
-    ReturnLogErrorOnFailure(Server::GetInstance().GetFabricTable().Delete(fabricIndex));
+    ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().Delete(fabricIndex));
 
     // We need to withdraw the advertisement for the now-removed fabric, so need
     // to restart advertising altogether.
