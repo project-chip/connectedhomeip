@@ -210,7 +210,7 @@ DeviceInfoProvider::SupportedLocalesIterator * DeviceInfoProviderImpl::IterateSu
 
 size_t DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
 {
-    // In Linux Simulation, return the size of the hardcoded list of Strings that are valid values for the ActiveLocale.
+    // In Darwin Simulation, return the size of the hardcoded list of Strings that are valid values for the ActiveLocale.
     // {("en-US"), ("de-DE"), ("fr-FR"), ("en-GB"), ("es-ES"), ("zh-CN"), ("it-IT"), ("ja-JP")}
 
     return 8;
