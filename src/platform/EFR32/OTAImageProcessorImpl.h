@@ -67,6 +67,12 @@ private:
     OTADownloader * mDownloader;
     OTAImageHeaderParser mHeaderParser;
     const char * mImageFile = nullptr;
+
+#define ALIGNMENT_BYTES 64
+    // Intermediate, word-aligned buffer for writing to the bootloader storage
+    static uint8_t  writeBuffer[ALIGNMENT_BYTES];
+    // Offset indicates how far the write buffer has been filled
+    static uint16_t writeBufOffset;
 };
 
 } // namespace chip

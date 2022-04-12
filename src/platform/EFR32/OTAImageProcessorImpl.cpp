@@ -21,20 +21,19 @@
 
 extern "C" {
 #include "platform/bootloader/api/btl_interface.h"
+#include "platform/emlib/inc/em_bus.h" // For CORE_CRITICAL_SECTION
 }
 
 /// No error, operation OK
 #define SL_BOOTLOADER_OK 0L
 
-#define ALIGNMENT_BYTES 64
-uint8_t writeBuffer[ALIGNMENT_BYTES] = {0};
-uint16_t writeBufOffset = 0;
-
 namespace chip {
 
 // Define static memebers
-uint8_t OTAImageProcessorImpl::mSlotId;
-uint32_t OTAImageProcessorImpl::mWriteOffset;
+uint8_t OTAImageProcessorImpl::mSlotId = 0;
+uint32_t OTAImageProcessorImpl::mWriteOffset = 0;
+uint16_t OTAImageProcessorImpl::writeBufOffset= 0;
+uint8_t  OTAImageProcessorImpl::writeBuffer[ALIGNMENT_BYTES] = {0};
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
@@ -95,7 +94,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "HandlePrepareDownload");
 
-    bootloader_init();
+    CORE_CRITICAL_SECTION(bootloader_init();)
     mSlotId      = 0; // Single slot until we support multiple images
     writeBufOffset = 0;
     mWriteOffset = 0;
@@ -117,12 +116,11 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         return;
     }
 
-    // Pad the rest of the write buffer with zeros and write it to bootloader storage
+    // Pad the remainder of the write buffer with zeros and write it to bootloader storage
     if(writeBufOffset != 0)
         {
             // Account for last bytes of the image not yet written to storage
             imageProcessor->mParams.downloadedBytes += writeBufOffset;
-            ChipLogProgress(SoftwareUpdate, "HandleFinalize: mWriteOffset %lu writeBufOffset %u writeBuffer %p", mWriteOffset, writeBufOffset, writeBuffer);
 
             while(writeBufOffset != ALIGNMENT_BYTES)
                 {
@@ -130,7 +128,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
                     writeBufOffset++;
                 }
 
-            err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, writeBuffer, ALIGNMENT_BYTES);
+            CORE_CRITICAL_SECTION(err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, writeBuffer, ALIGNMENT_BYTES);)
             if (err)
                 {
                     ChipLogError(SoftwareUpdate, "ERROR: In HandleFinalize bootloader_eraseWriteStorage() error %ld", err);
@@ -144,8 +142,6 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully");
 }
 
-#include "sl_simple_button_instances.h"
-
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
     uint32_t err = SL_BOOTLOADER_OK;
@@ -157,35 +153,15 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     if (err != SL_BOOTLOADER_OK)
     {
         ChipLogError(SoftwareUpdate, "ERROR: bootloader_verifyImage() error %ld", err);
-        //   ChipLogError(SoftwareUpdate, "ERROR: bootloader_verifyImage() error %ld", err);
-        //  ChipLogError(SoftwareUpdate, "ERROR: bootloader_verifyImage() error %ld", err);
-        //   ChipLogError(SoftwareUpdate, "ERROR: bootloader_verifyImage() error %ld", err);
         return;
     }
-    else
-        {
-            ChipLogProgress(SoftwareUpdate, "bootloader_verifyImage SUCCESS");
-            //    ChipLogProgress(SoftwareUpdate, "bootloader_verifyImage SUCCESS");  
-            //    ChipLogProgress(SoftwareUpdate, "bootloader_verifyImage SUCCESS");
-            // ChipLogProgress(SoftwareUpdate, "bootloader_verifyImage SUCCESS");
-        }
 
     CORE_CRITICAL_SECTION(err = bootloader_setImageToBootload(mSlotId);)
     if (err != SL_BOOTLOADER_OK)
     {
-        ChipLogError(SoftwareUpdate, "ERROR: bootloader_setImageToBootload() error %ld", err);
-        //  ChipLogError(SoftwareUpdate, "ERROR: bootloader_setImageToBootload() error %ld", err);
-        //  ChipLogError(SoftwareUpdate, "ERROR: bootloader_setImageToBootload() error %ld", err);
-        //   ChipLogError(SoftwareUpdate, "ERROR: bootloader_setImageToBootload() error %ld", err);
+        ChipLogError(SoftwareUpdate, "ERROR: bootloader_setImageToBootload() error %ld", err); 
         return;
     }
-    else
-        {
-            ChipLogProgress(SoftwareUpdate, "bootloader_setImageToBootload SUCCESS");
-            //    ChipLogProgress(SoftwareUpdate, "bootloader_setImageToBootload SUCCESS");
-            //   ChipLogProgress(SoftwareUpdate, "bootloader_setImageToBootload SUCCESS");
-            // ChipLogProgress(SoftwareUpdate, "bootloader_setImageToBootload SUCCESS");
-        }
 
     // This reboots the device
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
@@ -228,11 +204,8 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
+    // Copy data into the word-aligned writeBuffer and once it fills write its contents to the bootloader storage
     uint32_t blockReadOffset = 0;
-
-    // LISS debug, do not commit !!!!
-    ChipLogProgress(SoftwareUpdate, "HandleProcessBlock: mWriteOffset %lu writeBufOffset %u block.size() %u", mWriteOffset, writeBufOffset, block.size());
-
     while (blockReadOffset < block.size())
         {
             writeBuffer[writeBufOffset] = *((block.data()) + blockReadOffset);
@@ -242,11 +215,10 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
                 {
                     writeBufOffset = 0;
 
-                    err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, writeBuffer, ALIGNMENT_BYTES);
+                    CORE_CRITICAL_SECTION(err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, writeBuffer, ALIGNMENT_BYTES);)
                     if (err)
                         {
                             ChipLogError(SoftwareUpdate, "ERROR: In HandleProcessBlock bootloader_eraseWriteStorage() error %ld", err);
-                            ChipLogProgress(SoftwareUpdate, "HandleProcessBlock: mWriteOffset %lu writeBuffer %p", mWriteOffset, writeBuffer);
                             imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
                             return;
                         }
@@ -254,10 +226,6 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
                     imageProcessor->mParams.downloadedBytes += ALIGNMENT_BYTES;
                 }
         }
-
-    // LISS debug, do not commit !!!!
-    ChipLogProgress(SoftwareUpdate, ": mWriteOffset %lu writeBufOffset %u blockReadOffset %lu", mWriteOffset, writeBufOffset, blockReadOffset);
-    
 
     imageProcessor->mDownloader->FetchNextData();
 }
