@@ -47,7 +47,7 @@ include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 target_include_directories(app PRIVATE
                            main/include
                            ${GEN_DIR}/app-common
-                           ${GEN_DIR}/lock-app
+                           ${GEN_DIR}/door-lock-app
                            ${NRFCONNECT_COMMON}/util/include
                            ${NRFCONNECT_COMMON}/app/include)
 
@@ -56,14 +56,14 @@ target_sources(app PRIVATE
                main/BoltLockManager.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
-               ${GEN_DIR}/lock-app/zap-generated/callback-stub.cpp
-               ${GEN_DIR}/lock-app/zap-generated/IMClusterCommandHandler.cpp
+               ${GEN_DIR}/door-lock-app/zap-generated/callback-stub.cpp
+               ${GEN_DIR}/door-lock-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp)
 
 chip_configure_data_model(app
     INCLUDE_SERVER
-    ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lock-common/lock-app.zap
+    ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../door-lock-common/door-lock-app.zap
 )
 
 if(CONFIG_CHIP_OTA_REQUESTOR)

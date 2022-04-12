@@ -45,6 +45,7 @@
 
 using namespace ::chip;
 using namespace ::chip::app;
+using namespace ::chip::app::Clusters::DoorLock;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
@@ -549,11 +550,17 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 
 void AppTask::UpdateClusterState()
 {
-    // write the new on/off value
-    EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(kLockEndpointId, !BoltLockMgr().IsUnlocked());
-
+    EmberAfStatus status;
+    LOG_INF("Updating door lock state");
+    chip::app::DataModel::Nullable<DlLockState> lockSate;
+    status = Clusters::DoorLock::Attributes::LockState::Get(kLockEndpointId, lockSate);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        LOG_ERR("Updating on/off %x", status);
+        LOG_ERR("Get Lock sate %x", status);
+    }
+    status = Clusters::DoorLock::Attributes::LockState::Set(kLockEndpointId, lockSate.Value() == DlLockState::kUnlocked ? DlLockState::kLocked:DlLockState::kUnlocked);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        LOG_ERR("Updating door lock state %x", status);
     }
 }

@@ -350,7 +350,7 @@ environment:
 
 1.  Navigate to the example's directory:
 
-        $ cd examples/lock-app/nrfconnect
+        $ cd examples/door-lock-app/nrfconnect
 
 2.  Run the following command to build the example, with _build-target_ replaced
     with the build target name of the Nordic Semiconductor's kit you own, for
@@ -391,11 +391,11 @@ To build for the low-power configuration, run the following command with
 _build-target_ replaced with the build target name of the Nordic Semiconductor's
 kit you own (for example `nrf52840dk_nrf52840`):
 
-    $ west build -b build-target -- -DOVERLAY_CONFIG=overlay-low_power.conf
+    $ west build -b build-target -- -DOVERLAY_CONFIG=../../overlay-low_power.conf
 
 For example, use the following command for `nrf52840dk_nrf52840`:
 
-    $ west build -b nrf52840dk_nrf52840 -- -DOVERLAY_CONFIG=overlay-low_power.conf
+    $ west build -b nrf52840dk_nrf52840 -- -DOVERLAY_CONFIG=../../overlay-low_power.conf
 
 ### Building with Device Firmware Upgrade support
 
