@@ -42,16 +42,6 @@ struct UpdateDescription
     ByteSpan metadataForRequestor;
 };
 
-enum class UpdateFailureState
-{
-    kUnknown,
-    kQuerying,
-    kDownloading,
-    kApplying,
-    kNotifying,
-    kDelayedOnUserConsent,
-};
-
 enum class UpdateNotFoundReason
 {
     kBusy,
