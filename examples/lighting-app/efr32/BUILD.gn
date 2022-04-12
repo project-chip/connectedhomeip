@@ -27,7 +27,6 @@ import("${chip_root}/src/platform/device.gni")
 if (chip_enable_pw_rpc) {
   import("//build_overrides/pigweed.gni")
   import("$dir_pw_build/target_types.gni")
-  import("${chip_root}/examples/build_overrides/tokenized_tracing.gni")
 }
 
 assert(current_os == "freertos")
