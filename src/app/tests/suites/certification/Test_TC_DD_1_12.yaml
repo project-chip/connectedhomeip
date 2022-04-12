@@ -11,17 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 3.1.12. [TC-DD-1.12] Onboarding Payload Verification - Custom Flow = 0
+
 config:
-    nodeId: "0x12344321"
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
+
 tests:
-    - label: "Test Step"
-      verification: |
-          Chip-tool Verification Steps
-      disabled: true
     - label: "Scan the DUTs QR code using a QR code reader"
       verification: |
           1. Get the QR code from the DUT
@@ -53,6 +52,7 @@ tests:
           [1641836844940] [16334:698889] CHIP: [SPL] SetUpPINCode: 20202021
           [1641836844940] [16334:698889] CHIP: [SPL] RendezvousInformation: 2
       disabled: true
+
     - label: "Verify Custom payload support"
       verification: |
           1. Custom Flow bit in the Onboarding Payload QR Code is set to 0 (Standard Flow)
@@ -67,6 +67,7 @@ tests:
           [1641836844940] [16334:698889] CHIP: [SPL] SetUpPINCode: 20202021
           [1641836844940] [16334:698889] CHIP: [SPL] RendezvousInformation: 2
       disabled: true
+
     - label:
           "if custom flow bit in step 2 is equal to 0 (Standard flow), reboot
           the device"

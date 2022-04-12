@@ -11,19 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     3.5. [TC-NC-1.5] UNSPPUORTED_ACCESS message Validation for Wifi interface
     [DUT-Commissionee]
+
 config:
-    nodeId: "0x12344321"
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
+
 tests:
-    - label: "Test Step"
-      verification: |
-          Chip-Tool Verification Steps
-      disabled: true
     - label:
           "TH1 sends the AddOrUpdateWiFiNetwork command to the DUT with the
           following argument: SSID argument value as 'Userwifi_ssid' Credentials
@@ -32,6 +31,7 @@ tests:
           Can't verify the test case as it need to be executed before the commissioning.
           Which is not possiable with the CHIP tool step
       disabled: true
+
     - label:
           "TH1 sends RemoveNetwork command to the DUT with NetworkID argument
           value as 'Userwifi_ssid' and Breadcrumb argument value as 0"
@@ -39,6 +39,7 @@ tests:
           Can't verify the test case as it need to be executed before the commissioning.
           Which is not possiable with the CHIP tool step
       disabled: true
+
     - label:
           "TH1 sends ConnectNetwork command to the DUT with NetworkID argument
           value as 'Userwifi_ssid' and Breadcrumb argument value as 0"

@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     3.7. [TC-NC-1.7] Verification for AddOrUpdateWiFiNetwork command
@@ -22,13 +23,8 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Test Step"
-      verification: |
-          Chip-Tool Verification Steps
-      disabled: true
-
     - label: "TH1 sends ArmFailSafe command to the DUT"
-      verification: |4+
+      verification: |
 
       disabled: true
 
@@ -54,7 +50,7 @@ tests:
       disabled: true
 
     - label: "TH1 reads MaxNetworks attribute from the DUT"
-      verification: |+
+      verification: |
           ubuntu@ubuntu:~/apps$ sudo ./chip-tool  networkcommissioning read max-networks 1 0
 
           [1646290259.940728][2681:2686] CHIP:DMG:
@@ -64,7 +60,6 @@ tests:
           [1646290259.941000][2681:2686] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0000DataVersion: 2391702431
           [1646290259.943230][2681:2686] CHIP:TOO:   MaxNetworks: 1
           [1646290259.943345][2681:2686] CHIP:EM: Sending Standalone Ack for MessageCounter:5523057 on exchange 61782i
-
       disabled: true
 
     - label: "TH1 reads LastNetworkingStatus attribute from the DUT"
