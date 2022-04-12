@@ -129,7 +129,7 @@ if (CONFIG_CHIP_ENABLE_EXTERNAL_PLATFORM)
     chip_gn_arg_append("chip_platform_target"   "\"${CONFIG_CHIP_EXTERNAL_PLATFORM_TARGET}\"")
 endif()
 
-if (CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER)
+if (CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER)
     chip_gn_arg_append("chip_use_transitional_commissionable_data_provider" "false")
 endif()
 

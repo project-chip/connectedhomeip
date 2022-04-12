@@ -95,34 +95,6 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
           $ idf.py -p /dev/tty.SLAB_USBtoUART monitor
 
-## Generating and flashing chip-factory NVS binary image
-
-If `CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER` option is enabled then
-ESP32 specific commissionable data provider is used, otherwise the default/test
-commissionable data provider in GenericConfigurationManagerImpl is used.
-
-Config option `CONFIG_CHIP_FACTORY_NAMESPACE_PARTITION_LABEL` lets us configure
-the partition name for reading `chip-factory` data. Default is `nvs`.
-
-In this example `CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER` option is
-enabled by default, please check `sdkconfig.defaults`. So, chip-factory data
-must be flashed into the configure partition.
-
-`scripts/tools/generate_esp32_chip_factory_bin.py` script generates the
-chip-factory NVS image `partition.bin`. It takes three arguments, passcode,
-discriminator and partition size(optional, default:0x6000).
-
-```
-./scripts/tools/generate_esp32_chip_factory_bin.py -p <passcode> -d <discriminator>
-```
-
-Use the following command to flash the NVS image. `0x9000` is default address
-for `nvs` partition.
-
-```
-esptool.py -p <port> write_flash 0x9000 partition.bin
-```
-
 ## Commissioning and cluster control
 
 Commissioning can be carried out using WiFi or BLE.

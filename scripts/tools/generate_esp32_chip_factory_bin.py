@@ -19,10 +19,10 @@
 import os
 import sys
 import shutil
-import random
 import logging
 import argparse
 import subprocess
+import cryptography.x509
 from types import SimpleNamespace
 
 if os.getenv('IDF_PATH'):
@@ -80,27 +80,58 @@ def gen_spake2p_params(passcode):
     return dict(zip(output[0].split(','), output[1].split(',')))
 
 
-def generate_nvs_bin(partition_size, discriminator, spake2p_params):
-    iteration = spake2p_params['Iteration Count']
-    salt = spake2p_params['Salt']
-    verifier = spake2p_params['Verifier']
+def gen_raw_ec_keypair_from_der(key_file, pubkey_raw_file, privkey_raw_file):
+    with open(key_file, 'rb') as f:
+        key_data = f.read()
+
+    key_der = cryptography.hazmat.primitives.serialization.load_der_private_key(key_data, None)
+
+    private_number_val = key_der.private_numbers().private_value
+    with open(privkey_raw_file, 'wb') as f:
+        f.write(private_number_val.to_bytes(32, byteorder='big'))
+
+    public_key_first_byte = 0x04
+    public_number_x = key_der.public_key().public_numbers().x
+    public_number_y = key_der.public_key().public_numbers().y
+    with open(pubkey_raw_file, 'wb') as f:
+        f.write(public_key_first_byte.to_bytes(1, byteorder='big'))
+        f.write(public_number_x.to_bytes(32, byteorder='big'))
+        f.write(public_number_y.to_bytes(32, byteorder='big'))
+
+
+def generate_nvs_bin(args, spake2p_params):
+    dac_raw_privkey = 'dac_raw_privkey.bin'
+    dac_raw_pubkey = 'dac_raw_pubkey.bin'
+    gen_raw_ec_keypair_from_der(args.dac_key, dac_raw_pubkey, dac_raw_privkey)
 
     csv_content = 'key,type,encoding,value\n'
     csv_content += 'chip-factory,namespace,,\n'
-    csv_content += 'discriminator,data,u32,{}\n'.format(discriminator)
-    csv_content += 'iteration-count,data,u32,{}\n'.format(iteration)
-    csv_content += 'salt,data,string,{}\n'.format(salt)
-    csv_content += 'verifier,data,string,{}\n'.format(verifier)
+
+    csv_content += 'discriminator,data,u32,{}\n'.format(args.discriminator)
+    csv_content += 'iteration-count,data,u32,{}\n'.format(spake2p_params['Iteration Count'])
+    csv_content += 'salt,data,string,{}\n'.format(spake2p_params['Salt'])
+    csv_content += 'verifier,data,string,{}\n'.format(spake2p_params['Verifier'])
+
+    csv_content += 'dac-cert,file,binary,{}\n'.format(os.path.abspath(args.dac_cert))
+    csv_content += 'dac-key,file,binary,{}\n'.format(os.path.abspath(dac_raw_privkey))
+    csv_content += 'dac-pub-key,file,binary,{}\n'.format(os.path.abspath(dac_raw_pubkey))
+    csv_content += 'pai-cert,file,binary,{}\n'.format(os.path.abspath(args.pai_cert))
+    csv_content += 'cert-dclrn,file,binary,{}\n'.format(os.path.abspath(args.cd))
 
     with open('nvs_partition.csv', 'w') as f:
         f.write(csv_content)
 
     nvs_args = SimpleNamespace(input='nvs_partition.csv',
                                output='partition.bin',
-                               size=hex(partition_size),
+                               size=hex(args.size),
                                outdir=os.getcwd(),
                                version=2)
+
     nvs_partition_gen.generate(nvs_args)
+
+    os.remove('nvs_partition.csv')
+    os.remove(dac_raw_privkey)
+    os.remove(dac_raw_pubkey)
 
 
 def print_flashing_help():
@@ -120,6 +151,14 @@ def main():
                         help='The discriminator for pairing, range: 0x01-0x5F5E0FE')
     parser.add_argument('-d', '--discriminator', type=any_base_int, required=True,
                         help='The passcode for pairing, range: 0x00-0x0FFF')
+    parser.add_argument('--dac-cert', type=str, required=True,
+                        help='The path to the DAC certificate in der format')
+    parser.add_argument('--dac-key', type=str, required=True,
+                        help='The path to the DAC private key in der format')
+    parser.add_argument('--pai-cert', type=str, required=True,
+                        help='The path to the PAI certificate in der format')
+    parser.add_argument('--cd', type=str, required=True,
+                        help='The path to the certificate declaration der format')
     parser.add_argument('-s', '--size', type=any_base_int, required=False, default=0x6000,
                         help='The size of the partition.bin, default: 0x6000')
 
@@ -127,7 +166,7 @@ def main():
     validate_args(args)
     check_tools_exists()
     spake2p_params = gen_spake2p_params(args.passcode)
-    generate_nvs_bin(args.size, args.discriminator, spake2p_params)
+    generate_nvs_bin(args, spake2p_params)
     print_flashing_help()
 
 

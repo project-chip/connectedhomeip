@@ -620,12 +620,15 @@ menu "CHIP Device Layer"
             bool "Enable Rotating Device Identifier Support"
             default n
 
-        config ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER
-            bool "Use ESP32 Commissionable Data Provider"
+        config ENABLE_ESP32_FACTORY_DATA_PROVIDER
+            bool "Use ESP32 Factory Data Provider"
             default n
             help
-                Use commissionable data provider implementation for ESP32.
-                Default is test-mode CommissionableDataProvider in GenericConfigurationManagerImpl.
+                If this option is enabled, then ESP32 implementation of CommissionableDataProvider and
+                DeviceAttestationCredentialsProvider is used. Otherwise, the test-mode CommissionableDataProvider
+                and Example DeviceAttestationCredentialsProvider is used. ESP32 implementation reads factory data from
+                nvs partition. Factory partition can be configured using CONFIG_CHIP_FACTORY_NAMESPACE_PARTITION_LABEL
+                option, default is "nvs".
 
     endmenu
 

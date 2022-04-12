@@ -16,14 +16,22 @@
  */
 #pragma once
 
+#include <credentials/DeviceAttestationCredsProvider.h>
 #include <platform/CommissionableDataProvider.h>
 
 namespace chip {
 namespace DeviceLayer {
 
-class ESP32CommissionableDataProvider : public CommissionableDataProvider
+class ESP32FactoryDataProvider : public CommissionableDataProvider, public chip::Credentials::DeviceAttestationCredentialsProvider
 {
 public:
+    static ESP32FactoryDataProvider & GetInstance()
+    {
+        static ESP32FactoryDataProvider instance;
+        return instance;
+    }
+
+    // ===== Members functions that implement the CommissionableDataProvider
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
 
     CHIP_ERROR SetSetupDiscriminator(uint16_t setupDiscriminator) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -37,6 +45,20 @@ public:
     CHIP_ERROR GetSetupPasscode(uint32_t & setupPasscode) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     CHIP_ERROR SetSetupPasscode(uint32_t setupPasscode) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    // ===== Members functions that implement the DeviceAttestationCredentialsProvider
+    CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & outBuffer) override;
+
+    CHIP_ERROR GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer) override;
+
+    CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & outBuffer) override;
+
+    CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & outBuffer) override;
+
+    CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer) override;
+
+private:
+    ESP32FactoryDataProvider() = default;
 };
 
 } // namespace DeviceLayer

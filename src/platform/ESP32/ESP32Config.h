@@ -76,6 +76,11 @@ public:
     static const Key kConfigKey_Spake2pIterationCount;
     static const Key kConfigKey_Spake2pSalt;
     static const Key kConfigKey_Spake2pVerifier;
+    static const Key kConfigKey_DACCert;
+    static const Key kConfigKey_DACPrivateKey;
+    static const Key kConfigKey_DACPublicKey;
+    static const Key kConfigKey_PAICert;
+    static const Key kConfigKey_CertDeclaration;
 
     // CHIP Counter keys
     static const Key kCounterKey_RebootCount;
