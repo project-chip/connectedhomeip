@@ -60,6 +60,15 @@ ColorControlServer & ColorControlServer::Instance()
     return instance;
 }
 
+bool ColorControlServer::HasFeature(chip::EndpointId endpoint, ColorControlFeature feature)
+{
+    bool success;
+    uint32_t featureMap;
+    success = (Attributes::FeatureMap::Get(endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+
+    return success ? ((featureMap & to_underlying(feature)) != 0) : false;
+}
+
 EmberAfStatus ColorControlServer::stopAllColorTransitions(EndpointId endpoint)
 {
     EmberEventControl * event = getEventControl(endpoint);
@@ -165,11 +174,9 @@ void ColorControlServer::handleModeSwitch(EndpointId endpoint, uint8_t newColorM
     {
         return;
     }
-    else
-    {
-        Attributes::EnhancedColorMode::Set(endpoint, newColorMode);
-        Attributes::ColorMode::Set(endpoint, newColorMode);
-    }
+
+    Attributes::EnhancedColorMode::Set(endpoint, newColorMode);
+    Attributes::ColorMode::Set(endpoint, newColorMode);
 
     colorModeTransition = static_cast<uint8_t>((newColorMode << 4) + oldColorMode);
 
@@ -664,63 +671,62 @@ bool ColorControlServer::computeNewHueValue(ColorControlServer::ColorHueTransiti
             // we are performing a move to and not a move.
             return true;
         }
+
+        // Check if we are in a color loop. If not, we         are in a moveHue
+        uint8_t isColorLoop = 0;
+        Attributes::ColorLoopActive::Get(p->endpoint, &isColorLoop);
+
+        if (isColorLoop)
+        {
+            p->currentEnhancedHue = p->initialEnhancedHue;
+        }
         else
         {
-            // Check if we are in a color loop. If not, we are in a moveHue
-            uint8_t isColorLoop = 0;
-            Attributes::ColorLoopActive::Get(p->endpoint, &isColorLoop);
-
-            if (isColorLoop)
+            // we are performing a Hue         move.  Need to compute the new values for the
+            // next move         period.
+            if (p->up)
             {
-                p->currentEnhancedHue = p->initialEnhancedHue;
-            }
-            else
-            {
-                // we are performing a Hue move.  Need to compute the new values for the
-                // next move period.
-                if (p->up)
+                if (p->isEnhancedHue)
                 {
-                    if (p->isEnhancedHue)
-                    {
-                        newHue = subtractEnhancedHue(p->finalEnhancedHue, p->initialEnhancedHue);
-                        newHue = addEnhancedHue(p->finalEnhancedHue, newHue);
+                    newHue = subtractEnhancedHue(p->finalEnhancedHue, p->initialEnhancedHue);
+                    newHue = addEnhancedHue(p->finalEnhancedHue, newHue);
 
-                        p->initialEnhancedHue = p->finalEnhancedHue;
-                        p->finalEnhancedHue   = newHue;
-                    }
-                    else
-                    {
-                        newHue = subtractHue(p->finalHue, p->initialHue);
-                        newHue = addHue(p->finalHue, static_cast<uint8_t>(newHue));
-
-                        p->initialHue = p->finalHue;
-                        p->finalHue   = static_cast<uint8_t>(newHue);
-                    }
+                    p->initialEnhancedHue = p->finalEnhancedHue;
+                    p->finalEnhancedHue   = newHue;
                 }
                 else
                 {
-                    if (p->isEnhancedHue)
-                    {
-                        newHue = subtractEnhancedHue(p->initialEnhancedHue, p->finalEnhancedHue);
-                        newHue = subtractEnhancedHue(p->finalEnhancedHue, newHue);
+                    newHue = subtractHue(p->finalHue, p->initialHue);
+                    newHue = addHue(p->finalHue, static_cast<uint8_t>(newHue));
 
-                        p->initialEnhancedHue = p->finalEnhancedHue;
-                        p->finalEnhancedHue   = newHue;
-                    }
-                    else
-                    {
-                        newHue = subtractHue(p->initialHue, p->finalHue);
-                        newHue = subtractHue(p->finalHue, static_cast<uint8_t>(newHue));
-
-                        p->initialHue = p->finalHue;
-                        p->finalHue   = static_cast<uint8_t>(newHue);
-                    }
+                    p->initialHue = p->finalHue;
+                    p->finalHue   = static_cast<uint8_t>(newHue);
                 }
             }
+            else
+            {
+                if (p->isEnhancedHue)
+                {
+                    newHue = subtractEnhancedHue(p->initialEnhancedHue, p->finalEnhancedHue);
+                    newHue = subtractEnhancedHue(p->finalEnhancedHue, newHue);
 
-            p->stepsRemaining = p->stepsTotal;
+                    p->initialEnhancedHue = p->finalEnhancedHue;
+                    p->finalEnhancedHue   = newHue;
+                }
+                else
+                {
+                    newHue = subtractHue(p->initialHue, p->finalHue);
+                    newHue = subtractHue(p->finalHue, static_cast<uint8_t>(newHue));
+
+                    p->initialHue = p->finalHue;
+                    p->finalHue   = static_cast<uint8_t>(newHue);
+                }
+            }
         }
+
+        p->stepsRemaining = p->stepsTotal;
     }
+
     return false;
 }
 

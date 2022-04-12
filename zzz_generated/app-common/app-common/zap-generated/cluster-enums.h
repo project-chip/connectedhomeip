@@ -1730,6 +1730,16 @@ enum class ColorCapabilities : uint16_t
     kColorTemperatureSupported = 0x10,
 };
 
+// Bitmap for ColorControlFeature
+enum class ColorControlFeature : uint32_t
+{
+    kHueAndSaturation = 0x1,
+    kEnhancedHue      = 0x2,
+    kColorLoop        = 0x4,
+    kXy               = 0x8,
+    kColorTemperature = 0x10,
+};
+
 // Bitmap for ColorLoopUpdateFlags
 enum class ColorLoopUpdateFlags : uint8_t
 {

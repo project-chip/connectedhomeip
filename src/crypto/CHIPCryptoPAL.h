@@ -178,6 +178,15 @@ enum class SupportedECPKeyTypes : uint8_t
  **/
 void ClearSecretData(uint8_t * buf, size_t len);
 
+/**
+ * Helper for clearing a C array which auto-deduces the size.
+ */
+template <size_t N>
+void ClearSecretData(uint8_t (&buf)[N])
+{
+    ClearSecretData(buf, N);
+}
+
 template <typename Sig>
 class ECPKey
 {
@@ -204,6 +213,18 @@ public:
     {
         // Sanitize after use
         ClearSecretData(&bytes[0], Cap);
+    }
+
+    CapacityBoundBuffer & operator=(const CapacityBoundBuffer & other)
+    {
+        // Guard self assignment
+        if (this == &other)
+            return *this;
+
+        ClearSecretData(&bytes[0], Cap);
+        SetLength(other.Length());
+        ::memcpy(Bytes(), other.Bytes(), other.Length());
+        return *this;
     }
 
     /** @brief Set current length of the buffer that's being used

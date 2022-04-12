@@ -240,6 +240,11 @@ enum PublicEventTypes
      * Signals that bindings were updated.
      */
     kBindingsChangedViaCluster,
+
+    /**
+     * Signals that the state of the OTA engine changed.
+     */
+    kOtaStateChanged,
 };
 
 /**
@@ -297,6 +302,11 @@ enum ActivityChange
     kActivity_NoChange = 0,
     kActivity_Started  = 1,
     kActivity_Stopped  = -1,
+};
+
+enum OtaState
+{
+    kOtaSpaceAvailable = 0,
 };
 
 inline ConnectivityChange GetConnectivityChange(bool prevState, bool newState)
@@ -468,6 +478,11 @@ struct ChipDeviceEvent final
             // TODO(cecille): This should just specify wifi or thread since we assume at most 1.
             int network;
         } OperationalNetwork;
+
+        struct
+        {
+            OtaState newState;
+        } OtaStateChanged;
     };
 
     void Clear() { memset(this, 0, sizeof(*this)); }

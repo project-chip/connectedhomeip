@@ -40,11 +40,9 @@ bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, co
         ChipLogProgress(Zcl, "AccountLoginManager::HandleLogin success");
         return true;
     }
-    else
-    {
-        ChipLogProgress(Zcl, "AccountLoginManager::HandleLogin failed expected pin %s", mSetupPin);
-        return false;
-    }
+
+    ChipLogProgress(Zcl, "AccountLoginManager::HandleLogin failed expected pin %s", mSetupPin);
+    return false;
 }
 
 bool AccountLoginManager::HandleLogout()

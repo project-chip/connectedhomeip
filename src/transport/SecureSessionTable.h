@@ -233,10 +233,8 @@ private:
             uint16_t available = static_cast<uint16_t>(candidate_base + offset);
             return MakeOptional<uint16_t>(available);
         }
-        else
-        {
-            return NullOptional;
-        }
+
+        return NullOptional;
     }
 
     BitMapObjectPool<SecureSession, kMaxSessionCount> mEntries;

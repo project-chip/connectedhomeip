@@ -246,6 +246,12 @@ uint16_t emberAfLongStringLength(const uint8_t * buffer)
 }
 
 namespace chip {
+namespace app {
+AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, ClusterId aClusterId)
+{
+    return nullptr;
+}
+} // namespace app
 namespace Test {
 
 CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,

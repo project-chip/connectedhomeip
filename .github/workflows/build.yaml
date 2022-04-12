@@ -52,10 +52,11 @@ jobs:
               with:
                   action: actions/checkout@v3
                   with: |
-                      submodules: true
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform linux
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -73,7 +74,7 @@ jobs:
               timeout-minutes: 20
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Run Tests
-              timeout-minutes: 15
+              timeout-minutes: 30
               run: scripts/tests/gn_tests.sh
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
@@ -126,7 +127,6 @@ jobs:
               with:
                   action: actions/checkout@v3
                   with: |
-                      submodules: true
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
@@ -135,6 +135,8 @@ jobs:
             #   uses: github/codeql-action/init@v1
             #   with:
             #      languages: "cpp"
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform linux
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -177,7 +179,7 @@ jobs:
                        check \
                     "
             - name: Run Tests with sanitizers
-              timeout-minutes: 30
+              timeout-minutes: 60
               env:
                   LSAN_OPTIONS: detect_leaks=0
               run: |
@@ -194,7 +196,7 @@ jobs:
                         scripts/tests/gn_tests.sh
                     done
             - name: Build using build_examples.py
-              timeout-minutes: 40
+              timeout-minutes: 60
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --no-log-timestamps \
@@ -255,10 +257,11 @@ jobs:
               with:
                   action: actions/checkout@v3
                   with: |
-                      submodules: true
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform linux
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -286,7 +289,6 @@ jobs:
               with:
                   action: actions/checkout@v3
                   with: |
-                      submodules: true
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
@@ -295,6 +297,8 @@ jobs:
             #  uses: github/codeql-action/init@v1
             #  with:
             #     languages: "cpp"
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform darwin
             - name: Setup Environment
               run: brew install openssl pkg-config
             - name: Try to ensure the directory for diagnostic log collection exists

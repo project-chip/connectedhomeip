@@ -271,7 +271,7 @@ bool Cmd_GenAttCert(int argc, char * argv[])
         fprintf(stderr, "Please specify attestation certificate type.\n");
         return false;
     }
-    else if (gAttCertType == kAttCertType_DAC)
+    if (gAttCertType == kAttCertType_DAC)
     {
         if (gSubjectVID == VendorId::NotSpecified || gSubjectPID == 0)
         {
@@ -301,7 +301,8 @@ bool Cmd_GenAttCert(int argc, char * argv[])
         fprintf(stderr, "Please specify the CA certificate file name using the --ca-cert option.\n");
         return false;
     }
-    else if (gCACertFileName != nullptr && gAttCertType == kAttCertType_PAA)
+
+    if (gCACertFileName != nullptr && gAttCertType == kAttCertType_PAA)
     {
         fprintf(stderr, "Please don't specify --ca-cert option for the self signed certificate. \n");
         return false;

@@ -152,7 +152,29 @@ void DefaultOTARequestor::OnQueryImageResponse(void * context, const QueryImageR
 
         if (err != CHIP_NO_ERROR)
         {
+            ChipLogError(SoftwareUpdate, "QueryImageResponse contains invalid fields: %" CHIP_ERROR_FORMAT, err.Format());
             requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, err);
+            return;
+        }
+
+        // This should never happen since receiving a response implies that a CASE session had previously been established with a
+        // valid provider
+        if (!requestorCore->mProviderLocation.HasValue())
+        {
+            ChipLogError(SoftwareUpdate, "No provider location set");
+            requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, CHIP_ERROR_INCORRECT_STATE);
+            return;
+        }
+
+        // The Operational Node ID in the host field SHALL match the NodeID of the OTA Provider responding with the
+        // QueryImageResponse
+        if (update.nodeId != requestorCore->mProviderLocation.Value().providerNodeID)
+        {
+            ChipLogError(SoftwareUpdate,
+                         "The ImageURI provider node 0x" ChipLogFormatX64
+                         " does not match the QueryImageResponse provider node 0x" ChipLogFormatX64,
+                         ChipLogValueX64(update.nodeId), ChipLogValueX64(requestorCore->mProviderLocation.Value().providerNodeID));
+            requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, CHIP_ERROR_WRONG_NODE_ID);
             return;
         }
 
@@ -617,7 +639,7 @@ IdleStateReason DefaultOTARequestor::MapErrorToIdleStateReason(CHIP_ERROR error)
     {
         return IdleStateReason::kIdle;
     }
-    else if (error == CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY)
+    if (error == CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY)
     {
         return IdleStateReason::kInvalidSession;
     }

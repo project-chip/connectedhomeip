@@ -44,11 +44,11 @@ FileAttestationTrustStore::FileAttestationTrustStore(const char * paaTrustStoreP
     DIR * dir;
 
     dir = opendir(paaTrustStorePath);
-    if (dir != NULL)
+    if (dir != nullptr)
     {
         // Nested directories are not handled.
         dirent * entry;
-        while ((entry = readdir(dir)) != NULL)
+        while ((entry = readdir(dir)) != nullptr)
         {
             const char * fileExtension = GetFilenameExtension(entry->d_name);
             if (strncmp(fileExtension, "der", strlen("der")) == 0)
@@ -61,7 +61,7 @@ FileAttestationTrustStore::FileAttestationTrustStore(const char * paaTrustStoreP
                 filename += std::string("/") + std::string(entry->d_name);
 
                 file = fopen(filename.c_str(), "rb");
-                if (file != NULL)
+                if (file != nullptr)
                 {
                     uint32_t certificateLength = fread(certificate.data(), sizeof(uint8_t), kMaxDERCertLength, file);
                     if (certificateLength > 0)

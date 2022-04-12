@@ -28,7 +28,6 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #endif
-#include <lwip/tcpip.h>
 
 #include "AppConfig.h"
 #include "FreeRTOS.h"

@@ -65,8 +65,6 @@ private:
 
     CHIP_ERROR _InitChipStack();
     CHIP_ERROR _Shutdown();
-    CHIP_ERROR _GetSupportedCalendarTypes(
-        AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes);
 
     // ===== Members for internal use by the following friends.
 

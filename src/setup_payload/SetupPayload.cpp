@@ -32,14 +32,16 @@
 
 namespace chip {
 
-bool IsCHIPTag(uint8_t tag)
+// Spec 5.1.4.2 CHIPCommon tag numbers are in the range [0x00, 0x7F]
+bool SetupPayload::IsCommonTag(uint8_t tag)
 {
-    return tag >= (1 << kRawVendorTagLengthInBits);
+    return tag < 0x80;
 }
 
-bool IsVendorTag(uint8_t tag)
+// Spec 5.1.4.1 Manufacture-specific tag numbers are in the range [0x80, 0xFF]
+bool SetupPayload::IsVendorTag(uint8_t tag)
 {
-    return tag < (1 << kRawVendorTagLengthInBits);
+    return !IsCommonTag(tag);
 }
 
 // Check the Setup Payload for validity
@@ -211,7 +213,7 @@ CHIP_ERROR SetupPayload::addOptionalVendorData(const OptionalQRCodeInfo & info)
 
 CHIP_ERROR SetupPayload::addOptionalExtensionData(const OptionalQRCodeInfoExtension & info)
 {
-    VerifyOrReturnError(IsCHIPTag(info.tag), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsCommonTag(info.tag), CHIP_ERROR_INVALID_ARGUMENT);
     optionalExtensionData[info.tag] = info;
 
     return CHIP_NO_ERROR;

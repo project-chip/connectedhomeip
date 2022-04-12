@@ -48,22 +48,22 @@ bool ToolChipDN::SetCertSubjectDN(X509 * cert) const
         case kOID_AttributeType_CommonName:
             attrNID = NID_commonName;
             break;
-        case kOID_AttributeType_ChipNodeId:
+        case kOID_AttributeType_MatterNodeId:
             attrNID = gNIDChipNodeId;
             break;
-        case kOID_AttributeType_ChipFirmwareSigningId:
+        case kOID_AttributeType_MatterFirmwareSigningId:
             attrNID = gNIDChipFirmwareSigningId;
             break;
-        case kOID_AttributeType_ChipICAId:
+        case kOID_AttributeType_MatterICACId:
             attrNID = gNIDChipICAId;
             break;
-        case kOID_AttributeType_ChipRootId:
+        case kOID_AttributeType_MatterRCACId:
             attrNID = gNIDChipRootId;
             break;
-        case kOID_AttributeType_ChipFabricId:
+        case kOID_AttributeType_MatterFabricId:
             attrNID = gNIDChipFabricId;
             break;
-        case kOID_AttributeType_ChipCASEAuthenticatedTag:
+        case kOID_AttributeType_MatterCASEAuthTag:
             attrNID = gNIDChipCASEAuthenticatedTag;
             break;
         default:
@@ -356,9 +356,8 @@ bool AddAuthorityKeyId(X509 * cert, X509 * caCert)
     int index = 0;
     std::unique_ptr<AUTHORITY_KEYID, void (*)(AUTHORITY_KEYID *)> akid(AUTHORITY_KEYID_new(), &AUTHORITY_KEYID_free);
 
-    akid.get()->keyid =
-        reinterpret_cast<ASN1_OCTET_STRING *>(X509_get_ext_d2i(caCert, NID_subject_key_identifier, &isCritical, &index));
-    if (akid.get()->keyid == nullptr)
+    akid->keyid = reinterpret_cast<ASN1_OCTET_STRING *>(X509_get_ext_d2i(caCert, NID_subject_key_identifier, &isCritical, &index));
+    if (akid->keyid == nullptr)
     {
         ReportOpenSSLErrorAndExit("X509_get_ext_d2i", res = false);
     }

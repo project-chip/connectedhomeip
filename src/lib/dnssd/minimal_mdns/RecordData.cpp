@@ -90,6 +90,7 @@ bool SrvRecord::Parse(const BytesRange & data, const BytesRange & packet)
 
 bool ParseARecord(const BytesRange & data, chip::Inet::IPAddress * addr)
 {
+#if INET_CONFIG_ENABLE_IPV4
     if (data.Size() != 4)
     {
         return false;
@@ -101,6 +102,10 @@ bool ParseARecord(const BytesRange & data, chip::Inet::IPAddress * addr)
     addr->Addr[3] = htonl(chip::Encoding::BigEndian::Get32(data.Start()));
 
     return true;
+#else
+    // IPV4 support is disabled: IPAddress should never get IPv4 values.
+    return false;
+#endif
 }
 
 bool ParseAAAARecord(const BytesRange & data, chip::Inet::IPAddress * addr)

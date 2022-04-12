@@ -67,7 +67,6 @@ struct ControllerDeviceInitParams
     SessionManager * sessionManager                               = nullptr;
     Messaging::ExchangeManager * exchangeMgr                      = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
-    PersistentStorageDelegate * storageDelegate                   = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
@@ -168,8 +167,6 @@ public:
      *   Update data of the device.
      *
      *   This function will set new IP address, port and MRP retransmission intervals of the device.
-     *   Since the device settings might have been moved from RAM to the persistent storage, the function
-     *   will load the device settings first, before making the changes.
      *
      * @param[in] addr   Address of the device to be set.
      * @param[in] config MRP parameters
@@ -190,7 +187,7 @@ public:
      * @brief
      * Called to indicate this proxy has been paired successfully.
      *
-     * This causes the secure session parameters to be loaded and stores the session details in the session manager.
+     * This stores the session details in the session manager.
      */
     CHIP_ERROR SetConnected();
 
@@ -217,12 +214,6 @@ public:
     PASESession & GetPairing() { return mPairing; }
 
     uint8_t GetNextSequenceNumber() override { return mSequenceNumber++; };
-
-    CHIP_ERROR LoadSecureSessionParametersIfNeeded()
-    {
-        bool loadedSecureSession = false;
-        return LoadSecureSessionParametersIfNeeded(loadedSecureSession);
-    };
 
     Transport::Type GetDeviceTransportType() const { return mDeviceAddress.GetTransportType(); }
 
@@ -265,24 +256,6 @@ private:
     SessionHolderWithDelegate mSecureSession;
 
     uint8_t mSequenceNumber = 0;
-
-    /**
-     * @brief
-     *   This function loads the secure session object from the serialized operational
-     *   credentials corresponding to the device. This is typically done when the device
-     *   does not have an active secure channel.
-     */
-    CHIP_ERROR LoadSecureSessionParameters();
-
-    /**
-     * @brief
-     *   This function loads the secure session object from the serialized operational
-     *   credentials corresponding if needed, based on the current state of the device and
-     *   underlying transport object.
-     *
-     * @param[out] didLoad   Were the secure session params loaded by the call to this function.
-     */
-    CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
 
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
 };

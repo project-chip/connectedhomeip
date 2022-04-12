@@ -3283,10 +3283,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace AcRefrigerantType
 
-namespace AcCompressor {
+namespace AcCompressorType {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace AcCompressor
+} // namespace AcCompressorType
 
 namespace AcErrorCode {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
