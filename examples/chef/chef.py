@@ -79,7 +79,6 @@ def definePaths():
     paths["scriptFolder"] = os.path.abspath(os.path.dirname(__file__))
     paths["matterFolder"] = paths["scriptFolder"] + "/../../"
     paths["rootSampleFolder"] = paths["scriptFolder"]
-    paths["genFolder"] = paths["rootSampleFolder"] + "/zap-generated"
     paths["devices"] = []
 
     for filepath in Path(f"{paths['rootSampleFolder']}/devices").rglob('*.zap'):
@@ -220,6 +219,8 @@ Notes:
     #
 
     queuePrint(f"Target is set to {options.sampleDeviceTypeName}")
+    paths["genFolder"] = paths["rootSampleFolder"] + f"/out/{options.sampleDeviceTypeName}/zap-generated/"
+
     queuePrint("Setting up environment...")
     if options.buildTarget == "esp32":
         if config['esp32']['IDF_PATH'] is None:
@@ -291,7 +292,7 @@ Notes:
         queueCommand(f"rm {paths['genFolder']}/*")
         queueCommand(
             f"{paths['matterFolder']}/scripts/tools/zap/generate.py {paths['rootSampleFolder']}/devices/{options.sampleDeviceTypeName}.zap -o {paths['genFolder']}")
-        # sometimes af-gen-event.h is not generated
+        # af-gen-event.h is not generated
         queueCommand(f"touch {paths['genFolder']}/af-gen-event.h")
 
     #
@@ -343,13 +344,13 @@ true''')
             if options.doClean:
                 queueCommand(f"rm {paths['rootSampleFolder']}/esp32/sdkconfig")
                 queueCommand(f"cd {paths['rootSampleFolder']}/esp32")
-                queueCommand(f"rm -rf {paths['rootSampleFolder']}/build")
+                queueCommand(f"rm -rf {paths['rootSampleFolder']}/esp32/build")
                 queueCommand("idf.py fullclean")
             queueCommand("idf.py build")
         elif options.buildTarget == "nrfconnect":
             queueCommand(f"cd {paths['rootSampleFolder']}/nrfconnect")
             if options.doClean:
-                queueCommand(f"rm -rf {paths['rootSampleFolder']}/build")
+                queueCommand(f"rm -rf {paths['rootSampleFolder']}/nrfconnect/build")
                 queueCommand(f"west build -b nrf52840dk_nrf52840")
             else:
                 queueCommand(f"west build -b nrf52840dk_nrf52840")
@@ -395,7 +396,7 @@ true''')
         elif options.buildTarget == "nrfconnect":
             queueCommand(f"cd {paths['rootSampleFolder']}/nrfconnect")
             if options.doErase:
-                queueCommand("west flash --erase")
+                queueCommand("rm -rf build")
             else:
                 queueCommand("west flash")
 

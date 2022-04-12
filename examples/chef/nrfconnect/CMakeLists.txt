@@ -19,10 +19,11 @@ get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connect
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
 get_filename_component(APP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/.. REALPATH)
 get_filename_component(CHEF ${CMAKE_CURRENT_SOURCE_DIR}/../ REALPATH)
-get_filename_component(GEN_DIR ${CHEF}/zap-generated/ REALPATH)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 include(${CHEF}/project_include.cmake)
+
+get_filename_component(GEN_DIR ${CHEF}/out/${SAMPLE_NAME}/zap-generated REALPATH)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${CONFIG_DEVICE_PRODUCT_ID}")
@@ -58,7 +59,7 @@ target_include_directories(app PRIVATE
                            ${APP_ROOT}/shell_common/include
                            ${GEN_DIR}
                            ${CHEF}
-                           ${GEN_DIR}/app-common
+                           ${GEN_DIR}/../
                            ${NRFCONNECT_COMMON}/util/include
                            ${NRFCONNECT_COMMON}/app/include
 )

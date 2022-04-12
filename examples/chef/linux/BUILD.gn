@@ -26,7 +26,7 @@ project_dir = "./.."
 chip_data_model("chef-data-model") {
   zap_file = "${project_dir}/devices/${sample_zap_file}"
 
-  zap_pregenerated_dir = "${chip_root}/examples/chef/zap-generated"
+  zap_pregenerated_dir = "${chip_root}/examples/chef/out/${sample_name}/zap-generated/"
   is_server = true
 }
 
