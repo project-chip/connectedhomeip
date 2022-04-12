@@ -270,6 +270,20 @@ protected:
     }
 
     template <typename T, typename U, std::enable_if_t<!std::is_enum<T>::value, int> = 0>
+    bool CheckConstraintNotValue(const char * itemName, const chip::app::DataModel::Nullable<T> & current,
+                                 const chip::app::DataModel::Nullable<U> & expected)
+    {
+        if (current == expected)
+        {
+            std::string expectedString(expected.HasValue() ? expected.Value() : "NULL");
+            std::string currentString(current.HasValue() ? current.Value() : "NULL");
+            Exit(std::string(itemName) + " expected " + expected + " got " + expectedString + " instead.");
+            return false;
+        }
+
+        return true;
+    }
+    template <typename T, typename U, std::enable_if_t<!std::is_enum<T>::value, int> = 0>
     bool CheckConstraintNotValue(const char * itemName, T current, U expected)
     {
         if (current == expected)
