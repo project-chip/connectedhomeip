@@ -420,7 +420,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
         delegate.mNumAttributeResponse = 0;
     }
-    // Second read of E2C2A* and E3C2A2. We cannot use the stored data versions in the cache since there is no cached version from previous test. Expect cache E2C2 version
+    // Second read of E2C2A* and E3C2A2. We cannot use the stored data versions in the cache since there is no cached version from
+    // previous test. Expect cache E2C2 version
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
@@ -431,9 +432,9 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         attributePathParams2[0].mClusterId   = Test::MockClusterId(3);
         attributePathParams2[0].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams2[1].mEndpointId  = Test::kMockEndpoint3;
-        attributePathParams2[1].mClusterId   = Test::MockClusterId(2);
-        attributePathParams2[1].mAttributeId = Test::MockAttributeId(2);
+        attributePathParams2[1].mEndpointId            = Test::kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = Test::MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = Test::MockAttributeId(2);
         readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
         readPrepareParams.mAttributePathParamsListSize = 2;
         err                                            = readClient.SendRequest(readPrepareParams);
@@ -452,8 +453,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         delegate.mNumAttributeResponse = 0;
     }
 
-    // Third read of E2C3A1, E2C3A2, and E3C2A2. It would use the stored data versions in the cache since our subsequent read's C1A1 path
-    // intersects with previous cached data version Expect no E2C3 attributes in report, only E3C2A1 attribute in report
+    // Third read of E2C3A1, E2C3A2, and E3C2A2. It would use the stored data versions in the cache since our subsequent read's C1A1
+    // path intersects with previous cached data version Expect no E2C3 attributes in report, only E3C2A1 attribute in report
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
@@ -501,9 +502,9 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         attributePathParams2[0].mClusterId   = Test::MockClusterId(3);
         attributePathParams2[0].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams2[1].mEndpointId  = Test::kMockEndpoint3;
-        attributePathParams2[1].mClusterId   = Test::MockClusterId(2);
-        attributePathParams2[1].mAttributeId = Test::MockAttributeId(2);
+        attributePathParams2[1].mEndpointId            = Test::kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = Test::MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = Test::MockAttributeId(2);
         readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
         readPrepareParams.mAttributePathParamsListSize = 2;
         err                                            = readClient.SendRequest(readPrepareParams);
@@ -523,9 +524,9 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
 
     Test::BumpVersion();
 
-    // Fifth read of E2C3A1, E2C3A2 and E3C2A2. It would use the stored data versions in the cache since our subsequent read's C1A* path
-    // intersects with previous cached data version, server's version is changed. Expect E2C3A1, E2C3A2 and E3C2A2 attribute in report, and
-    // invalidate the cached pending and committed data version since no wildcard attributes exists in mRequestPathSet.
+    // Fifth read of E2C3A1, E2C3A2 and E3C2A2. It would use the stored data versions in the cache since our subsequent read's C1A*
+    // path intersects with previous cached data version, server's version is changed. Expect E2C3A1, E2C3A2 and E3C2A2 attribute in
+    // report, and invalidate the cached pending and committed data version since no wildcard attributes exists in mRequestPathSet.
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
@@ -561,8 +562,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         delegate.mNumAttributeResponse = 0;
     }
 
-    // Sixth read of E2C3A1, E2C3A2 and E3C2A2. It would use none stored data versions in the cache since previous read does not cache any
-    // committed data version. Expect E2C3A1, E2C3A2 and E3C2A2 attribute in report
+    // Sixth read of E2C3A1, E2C3A2 and E3C2A2. It would use none stored data versions in the cache since previous read does not
+    // cache any committed data version. Expect E2C3A1, E2C3A2 and E3C2A2 attribute in report
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
@@ -610,9 +611,9 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         attributePathParams2[0].mClusterId   = Test::MockClusterId(3);
         attributePathParams2[0].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams2[1].mEndpointId  = Test::kMockEndpoint3;
-        attributePathParams2[1].mClusterId   = Test::MockClusterId(2);
-        attributePathParams2[1].mAttributeId = Test::MockAttributeId(2);
+        attributePathParams2[1].mEndpointId            = Test::kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = Test::MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = Test::MockAttributeId(2);
         readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
         readPrepareParams.mAttributePathParamsListSize = 2;
         err                                            = readClient.SendRequest(readPrepareParams);
@@ -630,9 +631,9 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         delegate.mNumAttributeResponse = 0;
     }
 
-    // Eighth read of E2C3A* and E3C2A2, and inject a large amount of event path list, then it would try to apply previous cache latest
-    // data version and construct data version list but no enough memory, finally fully rollback data version filter. Expect E2C3A*
-    // attributes in report, and E3C2A2 attribute in report
+    // Eighth read of E2C3A* and E3C2A2, and inject a large amount of event path list, then it would try to apply previous cache
+    // latest data version and construct data version list but no enough memory, finally fully rollback data version filter. Expect
+    // E2C3A* attributes in report, and E3C2A2 attribute in report
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
@@ -643,9 +644,9 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         attributePathParams2[0].mClusterId   = Test::MockClusterId(3);
         attributePathParams2[0].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams2[1].mEndpointId  = Test::kMockEndpoint3;
-        attributePathParams2[1].mClusterId   = Test::MockClusterId(2);
-        attributePathParams2[1].mAttributeId = Test::MockAttributeId(2);
+        attributePathParams2[1].mEndpointId            = Test::kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = Test::MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = Test::MockAttributeId(2);
         readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
         readPrepareParams.mAttributePathParamsListSize = 2;
 
@@ -671,8 +672,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
 
     Test::BumpVersion();
 
-    // Ninth read of E1C2A* and E2C3A* and E2C2A*, it would use C1 cached version to construct DataVersionFilter, but version has changed
-    // in server. Expect E1C2A* and C2C3A* and E2C2A* attributes in report, and cache their versions
+    // Ninth read of E1C2A* and E2C3A* and E2C2A*, it would use C1 cached version to construct DataVersionFilter, but version has
+    // changed in server. Expect E1C2A* and C2C3A* and E2C2A* attributes in report, and cache their versions
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
@@ -688,9 +689,9 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         attributePathParams3[1].mClusterId   = Test::MockClusterId(3);
         attributePathParams3[1].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams3[2].mEndpointId  = Test::kMockEndpoint2;
-        attributePathParams3[2].mClusterId   = Test::MockClusterId(2);
-        attributePathParams3[2].mAttributeId = kInvalidAttributeId;
+        attributePathParams3[2].mEndpointId            = Test::kMockEndpoint2;
+        attributePathParams3[2].mClusterId             = Test::MockClusterId(2);
+        attributePathParams3[2].mAttributeId           = kInvalidAttributeId;
         readPrepareParams.mpAttributePathParamsList    = attributePathParams3;
         readPrepareParams.mAttributePathParamsListSize = 3;
 
@@ -698,7 +699,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         ctx.DrainAndServiceIO();
-        //E1C2A* has 3 attributes and E2C3A* has 5 attributes and E2C2A* has 4 attributes
+        // E1C2A* has 3 attributes and E2C3A* has 5 attributes and E2C2A* has 4 attributes
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 12);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
@@ -713,10 +714,10 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         delegate.mNumAttributeResponse = 0;
     }
 
-    // Tenth read of E1C2A*(3 attributes) and E2C3A*(5 attributes) and E2C2A*(4 attributes), and inject a large amount of event path list,
-    // then it would try to apply previous cache latest data version and construct data version list with the ordering from largest
-    // cluster size to smallest cluster size(C2, C3, C1) but no enough memory, finally partially rollback data version filter with
-    // only C2. Expect E1C2A*, E2C2A* attributes(7 attributes) in report,
+    // Tenth read of E1C2A*(3 attributes) and E2C3A*(5 attributes) and E2C2A*(4 attributes), and inject a large amount of event path
+    // list, then it would try to apply previous cache latest data version and construct data version list with the ordering from
+    // largest cluster size to smallest cluster size(C2, C3, C1) but no enough memory, finally partially rollback data version
+    // filter with only C2. Expect E1C2A*, E2C2A* attributes(7 attributes) in report,
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
@@ -732,9 +733,9 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         attributePathParams3[1].mClusterId   = Test::MockClusterId(3);
         attributePathParams3[1].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams3[2].mEndpointId  = Test::kMockEndpoint2;
-        attributePathParams3[2].mClusterId   = Test::MockClusterId(2);
-        attributePathParams3[2].mAttributeId = kInvalidAttributeId;
+        attributePathParams3[2].mEndpointId            = Test::kMockEndpoint2;
+        attributePathParams3[2].mClusterId             = Test::MockClusterId(2);
+        attributePathParams3[2].mAttributeId           = kInvalidAttributeId;
         readPrepareParams.mpAttributePathParamsList    = attributePathParams3;
         readPrepareParams.mAttributePathParamsListSize = 3;
         readPrepareParams.mpEventPathParamsList        = eventPathParams;

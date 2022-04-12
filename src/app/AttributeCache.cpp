@@ -305,10 +305,12 @@ void AttributeCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter, s
                 if (attributeIter.second.Is<StatusIB>())
                 {
                     clusterSize +=
-                        5; // 1 byte: anonymous tag control byte for struct. 1 byte: control byte for uint8 value. 1 byte: context-specific tag for uint8 value.1 byte: the uint8 value. 1 byte: end of container.
+                        5; // 1 byte: anonymous tag control byte for struct. 1 byte: control byte for uint8 value. 1 byte:
+                           // context-specific tag for uint8 value.1 byte: the uint8 value. 1 byte: end of container.
                     if (attributeIter.second.Get<StatusIB>().mClusterStatus.HasValue())
                     {
-                        clusterSize += 3; // 1 byte: control byte for uint8 value. 1 byte: context-specific tag for uint8 value. 1 byte: the uint8 value.
+                        clusterSize += 3; // 1 byte: control byte for uint8 value. 1 byte: context-specific tag for uint8 value. 1
+                                          // byte: the uint8 value.
                     }
                 }
                 else
