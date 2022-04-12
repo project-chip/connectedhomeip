@@ -22,6 +22,7 @@ class cc13x2x7_26x2x7App(Enum):
     LOCK = auto()
     PUMP = auto()
     PUMP_CONTROLLER = auto()
+    ALL_CLUSTERS = auto()
 
     def ExampleName(self):
         if self == cc13x2x7_26x2x7App.LOCK:
