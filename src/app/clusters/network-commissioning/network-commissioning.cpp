@@ -54,62 +54,6 @@ enum ValidWiFiCredentialLength
     kWPAPSKHex = 64,
 };
 
-// Note: We cannot use the enums from cluster objects since we should avoid using app code in platform drivers. So we make a copy of
-// these enums and ensure they have the same values here.
-
-NetworkCommissioningStatus ToClusterObjectEnum(Status status)
-{
-    // clang-format off
-    static_assert(to_underlying(NetworkCommissioningStatus::kSuccess               ) == to_underlying(Status::kSuccess               ), "kSuccess value mismatch.");
-    static_assert(to_underlying(NetworkCommissioningStatus::kOutOfRange            ) == to_underlying(Status::kOutOfRange            ), "kOutOfRange value mismatch.");
-    static_assert(to_underlying(NetworkCommissioningStatus::kBoundsExceeded        ) == to_underlying(Status::kBoundsExceeded        ), "kBoundsExceeded value mismatch.");
-    static_assert(to_underlying(NetworkCommissioningStatus::kNetworkIDNotFound     ) == to_underlying(Status::kNetworkIDNotFound     ), "kNetworkIDNotFound value mismatch.");
-    static_assert(to_underlying(NetworkCommissioningStatus::kDuplicateNetworkID    ) == to_underlying(Status::kDuplicateNetworkID    ), "kDuplicateNetworkID value mismatch.");
-    static_assert(to_underlying(NetworkCommissioningStatus::kNetworkNotFound       ) == to_underlying(Status::kNetworkNotFound       ), "kNetworkNotFound value mismatch.");
-    static_assert(to_underlying(NetworkCommissioningStatus::kRegulatoryError       ) == to_underlying(Status::kRegulatoryError       ), "kRegulatoryError value mismatch.");
-    static_assert(to_underlying(NetworkCommissioningStatus::kAuthFailure           ) == to_underlying(Status::kAuthFailure           ), "kAuthFailure value mismatch.");
-    static_assert(to_underlying(NetworkCommissioningStatus::kUnsupportedSecurity   ) == to_underlying(Status::kUnsupportedSecurity   ), "kUnsupportedSecurity value mismatch.");
-    static_assert(to_underlying(NetworkCommissioningStatus::kOtherConnectionFailure) == to_underlying(Status::kOtherConnectionFailure), "kOtherConnectionFailure value mismatch.");
-    static_assert(to_underlying(NetworkCommissioningStatus::kIPV6Failed            ) == to_underlying(Status::kIPV6Failed            ), "kIPV6Failed value mismatch.");
-    static_assert(to_underlying(NetworkCommissioningStatus::kIPBindFailed          ) == to_underlying(Status::kIPBindFailed          ), "kIPBindFailed value mismatch.");
-    static_assert(to_underlying(NetworkCommissioningStatus::kUnknownError          ) == to_underlying(Status::kUnknownError          ), "kUnknownError value mismatch.");
-    // clang-format on
-    return static_cast<NetworkCommissioningStatus>(to_underlying(status));
-}
-
-NetworkCommissioning::WiFiBand ToClusterObjectEnum(DeviceLayer::NetworkCommissioning::WiFiBand band)
-{
-    using ClusterObject     = NetworkCommissioning::WiFiBand;
-    using PlatfromInterface = DeviceLayer::NetworkCommissioning::WiFiBand;
-
-    static_assert(to_underlying(ClusterObject::k2g4) == to_underlying(PlatfromInterface::k2g4), "k2g4 value mismatch.");
-    static_assert(to_underlying(ClusterObject::k3g65) == to_underlying(PlatfromInterface::k3g65), "k3g65 value mismatch.");
-    static_assert(to_underlying(ClusterObject::k5g) == to_underlying(PlatfromInterface::k5g), "k5g value mismatch.");
-    static_assert(to_underlying(ClusterObject::k6g) == to_underlying(PlatfromInterface::k6g), "k6g value mismatch.");
-    static_assert(to_underlying(ClusterObject::k60g) == to_underlying(PlatfromInterface::k60g), "k60g value mismatch.");
-
-    return static_cast<ClusterObject>(to_underlying(band));
-}
-
-chip::BitFlags<NetworkCommissioning::WiFiSecurity>
-ToClusterObjectBitFlags(const chip::BitFlags<DeviceLayer::NetworkCommissioning::WiFiSecurity> & security)
-{
-    using ClusterObject     = NetworkCommissioning::WiFiSecurity;
-    using PlatformInterface = DeviceLayer::NetworkCommissioning::WiFiSecurity;
-
-    // clang-format off
-    static_assert(to_underlying(ClusterObject::kUnencrypted) == to_underlying(PlatformInterface::kUnencrypted),"kUnencrypted value mismatch.");
-    static_assert(to_underlying(ClusterObject::kWepPersonal) == to_underlying(PlatformInterface::kWepPersonal),"kWepPersonal value mismatch.");
-    static_assert(to_underlying(ClusterObject::kWpaPersonal) == to_underlying(PlatformInterface::kWpaPersonal),"kWpaPersonal value mismatch.");
-    static_assert(to_underlying(ClusterObject::kWpa2Personal) == to_underlying(PlatformInterface::kWpa2Personal),"kWpa2Personal value mismatch.");
-    static_assert(to_underlying(ClusterObject::kWpa3Personal) == to_underlying(PlatformInterface::kWpa3Personal),"kWpa3Personal value mismatch.");
-    // clang-format on
-
-    chip::BitFlags<ClusterObject> ret;
-    ret.SetRaw(security.Raw());
-    return ret;
-}
-
 } // namespace
 
 CHIP_ERROR Instance::Init()
@@ -270,15 +214,15 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
     }
 }
 
-void Instance::OnNetworkingStatusChange(DeviceLayer::NetworkCommissioning::Status aCommissioningError,
-                                        Optional<ByteSpan> aNetworkId, Optional<int32_t> aConnectStatus)
+void Instance::OnNetworkingStatusChange(NetworkCommissioning::Status aCommissioningError, Optional<ByteSpan> aNetworkId,
+                                        Optional<int32_t> aConnectStatus)
 {
     if (aNetworkId.HasValue() && aNetworkId.Value().size() > kMaxNetworkIDLen)
     {
         ChipLogError(DeviceLayer, "Invalid network id received when calling OnNetworkingStatusChange");
         return;
     }
-    mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(aCommissioningError));
+    mLastNetworkingStatusValue.SetNonNull(aCommissioningError);
     if (aNetworkId.HasValue())
     {
         memcpy(mLastNetworkID, aNetworkId.Value().data(), aNetworkId.Value().size());
@@ -374,6 +318,17 @@ void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands
 
     VerifyOrReturn(CheckFailSafeArmed(ctx));
 
+    // Spec 11.8.8.4
+    // Valid Credentials length are:
+    // - 0 bytes: Unsecured (open) connection
+    // - 5 bytes: WEP-64 passphrase
+    // - 10 hexadecimal ASCII characters: WEP-64 40-bit hex raw PSK
+    // - 13 bytes: WEP-128 passphrase
+    // - 26 hexadecimal ASCII characters: WEP-128 104-bit hex raw PSK
+    // - 8..63 bytes: WPA/WPA2/WPA3 passphrase
+    // - 64 bytes: WPA/WPA2/WPA3 raw hex PSK
+    // Note 10 hex WEP64 and 13 bytes / 26 hex WEP128 passphrase are covered by 8~63 bytes WPA passphrase, so we don't check WEP64
+    // hex and WEP128 passphrase.
     if (req.credentials.size() == ValidWiFiCredentialLength::kOpen || req.credentials.size() == ValidWiFiCredentialLength::kWEP64 ||
         (req.credentials.size() >= ValidWiFiCredentialLength::kMinWPAPSK &&
          req.credentials.size() <= ValidWiFiCredentialLength::kMaxWPAPSK))
@@ -404,9 +359,9 @@ void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands
     char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE];
     debugText = MutableCharSpan(debugTextBuffer);
 #endif
-    uint8_t outNetworkIndex   = 0;
-    response.networkingStatus = ToClusterObjectEnum(
-        mpDriver.Get<WiFiDriver *>()->AddOrUpdateNetwork(req.ssid, req.credentials, debugText, outNetworkIndex));
+    uint8_t outNetworkIndex = 0;
+    response.networkingStatus =
+        mpDriver.Get<WiFiDriver *>()->AddOrUpdateNetwork(req.ssid, req.credentials, debugText, outNetworkIndex);
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -425,7 +380,7 @@ void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Comman
 #endif
     uint8_t outNetworkIndex = 0;
     response.networkingStatus =
-        ToClusterObjectEnum(mpDriver.Get<ThreadDriver *>()->AddOrUpdateNetwork(req.operationalDataset, debugText, outNetworkIndex));
+        mpDriver.Get<ThreadDriver *>()->AddOrUpdateNetwork(req.operationalDataset, debugText, outNetworkIndex);
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -443,7 +398,7 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
     debugText = MutableCharSpan(debugTextBuffer);
 #endif
     uint8_t outNetworkIndex   = 0;
-    response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->RemoveNetwork(req.networkID, debugText, outNetworkIndex));
+    response.networkingStatus = mpWirelessDriver->RemoveNetwork(req.networkID, debugText, outNetworkIndex);
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -475,7 +430,7 @@ void Instance::HandleReorderNetwork(HandlerContext & ctx, const Commands::Reorde
     char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE];
     debugText = MutableCharSpan(debugTextBuffer);
 #endif
-    response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->ReorderNetwork(req.networkID, req.networkIndex, debugText));
+    response.networkingStatus = mpWirelessDriver->ReorderNetwork(req.networkID, req.networkIndex, debugText);
     FillDebugTextAndNetworkIndex(response, debugText, req.networkIndex);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -492,7 +447,7 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
     }
 
     Commands::ConnectNetworkResponse::Type response;
-    response.networkingStatus = ToClusterObjectEnum(commissioningError);
+    response.networkingStatus = commissioningError;
     if (!debugText.empty())
     {
         response.debugText.SetValue(debugText);
@@ -511,7 +466,7 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
 
     mLastNetworkIDLen = mConnectingNetworkIDLen;
     memcpy(mLastNetworkID, mConnectingNetworkID, mLastNetworkIDLen);
-    mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(commissioningError));
+    mLastNetworkingStatusValue.SetNonNull(commissioningError);
 
     commandHandle->AddResponse(mPath, response);
 }
@@ -528,7 +483,7 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
         return;
     }
 
-    mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(status));
+    mLastNetworkingStatusValue.SetNonNull(status);
     mLastConnectErrorValue.SetNull();
     mLastNetworkIDLen = 0;
 
@@ -542,8 +497,8 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
                       ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id)));
     VerifyOrExit((writer = commandHandle->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kNetworkingStatus)),
-                                    ToClusterObjectEnum(status)));
+    SuccessOrExit(
+        err = writer->Put(TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kNetworkingStatus)), status));
     if (debugText.size() != 0)
     {
         SuccessOrExit(err = DataModel::Encode(
@@ -591,7 +546,7 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
         return;
     }
 
-    mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(status));
+    mLastNetworkingStatusValue.SetNonNull(status);
     mLastConnectErrorValue.SetNull();
     mLastNetworkIDLen = 0;
 
@@ -604,8 +559,8 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
                       ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id)));
     VerifyOrExit((writer = commandHandle->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kNetworkingStatus)),
-                                    ToClusterObjectEnum(status)));
+    SuccessOrExit(
+        err = writer->Put(TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kNetworkingStatus)), status));
     if (debugText.size() != 0)
     {
         SuccessOrExit(err = DataModel::Encode(
@@ -618,11 +573,11 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
     for (; networks != nullptr && networks->Next(scanResponse) && networksEncoded < kMaxNetworksInScanResponse; networksEncoded++)
     {
         Structs::WiFiInterfaceScanResult::Type result;
-        result.security = ToClusterObjectBitFlags(scanResponse.security);
+        result.security = scanResponse.security;
         result.ssid     = ByteSpan(scanResponse.ssid, scanResponse.ssidLen);
         result.bssid    = ByteSpan(scanResponse.bssid, sizeof(scanResponse.bssid));
         result.channel  = scanResponse.channel;
-        result.wiFiBand = ToClusterObjectEnum(scanResponse.wiFiBand);
+        result.wiFiBand = scanResponse.wiFiBand;
         result.rssi     = scanResponse.rssi;
         SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag(), result));
     }

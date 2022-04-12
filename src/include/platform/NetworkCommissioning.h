@@ -29,6 +29,8 @@
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
+#include <app-common/zap-generated/cluster-enums.h>
+
 #include <limits>
 
 namespace chip {
@@ -73,36 +75,6 @@ protected:
     Iterator() = default;
 };
 
-/**
- * The content should match the one in zap_generated/cluster-objects.h.
- * Matching is validated by cluster code.
- */
-enum class Status : uint8_t
-{
-    kSuccess                = 0x00,
-    kOutOfRange             = 0x01,
-    kBoundsExceeded         = 0x02,
-    kNetworkIDNotFound      = 0x03,
-    kDuplicateNetworkID     = 0x04,
-    kNetworkNotFound        = 0x05,
-    kRegulatoryError        = 0x06,
-    kAuthFailure            = 0x07,
-    kUnsupportedSecurity    = 0x08,
-    kOtherConnectionFailure = 0x09,
-    kIPV6Failed             = 0x0A,
-    kIPBindFailed           = 0x0B,
-    kUnknownError           = 0x0C,
-};
-
-enum class WiFiBand : uint8_t
-{
-    k2g4  = 0x00,
-    k3g65 = 0x01,
-    k5g   = 0x02,
-    k6g   = 0x03,
-    k60g  = 0x04,
-};
-
 // The following structs follows the generated cluster object structs.
 struct Network
 {
@@ -114,24 +86,15 @@ struct Network
 static_assert(sizeof(Network::networkID) <= std::numeric_limits<decltype(Network::networkIDLen)>::max(),
               "Max length of networkID ssid exceeds the limit of networkIDLen field");
 
-enum class WiFiSecurity : uint8_t
-{
-    kUnencrypted  = 0x1,
-    kWepPersonal  = 0x2,
-    kWpaPersonal  = 0x4,
-    kWpa2Personal = 0x8,
-    kWpa3Personal = 0x10,
-};
-
 struct WiFiScanResponse
 {
 public:
-    chip::BitFlags<WiFiSecurity> security;
+    chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurity> security;
     uint8_t ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength];
     uint8_t ssidLen;
     uint8_t bssid[6];
     uint16_t channel;
-    WiFiBand wiFiBand;
+    app::Clusters::NetworkCommissioning::WiFiBand wiFiBand;
     int8_t rssi;
 };
 
@@ -157,6 +120,9 @@ static_assert(sizeof(ThreadScanResponse::networkName) <= std::numeric_limits<dec
 using NetworkIterator            = Iterator<Network>;
 using WiFiScanResponseIterator   = Iterator<WiFiScanResponse>;
 using ThreadScanResponseIterator = Iterator<ThreadScanResponse>;
+using Status                     = app::Clusters::NetworkCommissioning::NetworkCommissioningStatus;
+using WiFiBand                   = app::Clusters::NetworkCommissioning::WiFiBand;
+using WiFiSecurity               = app::Clusters::NetworkCommissioning::WiFiSecurity;
 
 // BaseDriver and WirelessDriver are the common interfaces for a network driver, platform drivers should not implement this
 // directly, instead, users are expected to implement WiFiDriver, ThreadDriver and EthernetDriver.

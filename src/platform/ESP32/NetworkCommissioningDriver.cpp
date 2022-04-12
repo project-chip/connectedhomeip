@@ -210,7 +210,7 @@ exit:
 CHIP_ERROR ESPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
     esp_err_t err = ESP_OK;
-    if (ssid.data())
+    if (!ssid.empty())
     {
         wifi_scan_config_t scan_config = { 0 };
         memset(WiFiSSIDStr, 0, sizeof(WiFiSSIDStr));
