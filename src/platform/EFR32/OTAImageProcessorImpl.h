@@ -66,10 +66,10 @@ private:
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
     OTAImageHeaderParser mHeaderParser;
-    const char * mImageFile = nullptr;
+    const char * mImageFile                 = nullptr;
     static constexpr size_t kAlignmentBytes = 64;
     // Intermediate, word-aligned buffer for writing to the bootloader storage
-    static uint8_t writeBuffer[kAlignmentBytes] __attribute__((aligned (4)));
+    static uint8_t writeBuffer[kAlignmentBytes] __attribute__((aligned(4)));
     // Offset indicates how far the write buffer has been filled
     static uint16_t writeBufOffset;
 };

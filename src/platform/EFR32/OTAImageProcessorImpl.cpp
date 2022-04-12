@@ -30,10 +30,10 @@ extern "C" {
 namespace chip {
 
 // Define static memebers
-uint8_t OTAImageProcessorImpl::mSlotId                      = 0;
-uint32_t OTAImageProcessorImpl::mWriteOffset                = 0;
-uint16_t OTAImageProcessorImpl::writeBufOffset              = 0;
-uint8_t OTAImageProcessorImpl::writeBuffer[kAlignmentBytes] __attribute__((aligned (4))) = { 0 };
+uint8_t OTAImageProcessorImpl::mSlotId                                                  = 0;
+uint32_t OTAImageProcessorImpl::mWriteOffset                                            = 0;
+uint16_t OTAImageProcessorImpl::writeBufOffset                                          = 0;
+uint8_t OTAImageProcessorImpl::writeBuffer[kAlignmentBytes] __attribute__((aligned(4))) = { 0 };
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
