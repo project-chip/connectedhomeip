@@ -52,7 +52,7 @@ DeviceInfoProviderImpl::FixedLabelIteratorImpl::FixedLabelIteratorImpl(EndpointI
 
 size_t DeviceInfoProviderImpl::FixedLabelIteratorImpl::Count()
 {
-    // In Linux Simulation, return the size of the hardcoded labelList on all endpoints.
+    // In Darwin Simulation, return the size of the hardcoded labelList on all endpoints.
     return 4;
 }
 
