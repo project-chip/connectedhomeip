@@ -77,10 +77,9 @@ public:
 
     void SetCertificateValidityPeriod(uint32_t validity) { mValidity = validity; }
 
-    CHIP_ERROR GenerateControllerNOCChain(chip::NodeId nodeId, chip::FabricId fabricId,
-                                          const CATValues & cats, chip::Crypto::P256Keypair & keypair,
-                                          chip::MutableByteSpan & rcac, chip::MutableByteSpan & icac,
-                                          chip::MutableByteSpan & noc);
+    CHIP_ERROR GenerateControllerNOCChain(chip::NodeId nodeId, chip::FabricId fabricId, const CATValues & cats,
+                                          chip::Crypto::P256Keypair & keypair, chip::MutableByteSpan & rcac,
+                                          chip::MutableByteSpan & icac, chip::MutableByteSpan & noc);
     /**
      * This is a utility method that generates a operational certificate chain for the given public key.
      * This method is expected to be called once all the checks (e.g. device attestation, CSR verification etc)

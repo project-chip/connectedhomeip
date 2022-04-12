@@ -111,10 +111,9 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateControllerNOCChain(chip::NodeId nodeId, chip::FabricId fabricId,
-                                          const CATValues & cats, const chip::Crypto::P256Keypair & keypair,
-                                          chip::MutableByteSpan & rcac, chip::MutableByteSpan & icac,
-                                          chip::MutableByteSpan & noc)
+CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateControllerNOCChain(
+    chip::NodeId nodeId, chip::FabricId fabricId, const CATValues & cats, const chip::Crypto::P256Keypair & keypair,
+    chip::MutableByteSpan & rcac, chip::MutableByteSpan & icac, chip::MutableByteSpan & noc)
 {
     return GenerateNOCChainAfterValidation(nodeId, fabricId, cats, keypair.Pubkey(), rcac, icac, noc);
 }

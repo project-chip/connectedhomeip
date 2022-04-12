@@ -71,8 +71,9 @@ public:
 
     CHIP_ERROR Initialize(PersistentStorageDelegate & storageDelegate) { return mExampleOpCredsIssuer.Initialize(storageDelegate); }
 
-    CHIP_ERROR GenerateControllerNOCChain(NodeId nodeId, FabricId fabricId, const CATValues & cats, const Crypto::P256Keypair & keypair,
-                                MutableByteSpan & rcac, MutableByteSpan & icac, MutableByteSpan & noc)
+    CHIP_ERROR GenerateControllerNOCChain(NodeId nodeId, FabricId fabricId, const CATValues & cats,
+                                          const Crypto::P256Keypair & keypair, MutableByteSpan & rcac, MutableByteSpan & icac,
+                                          MutableByteSpan & noc)
     {
         return mExampleOpCredsIssuer.GenerateControllerNOCChain(nodeId, fabricId, cats, keypair, rcac, icac, noc);
     }
@@ -358,7 +359,7 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     MutableByteSpan rcacSpan(rcac.Get(), Controller::kMaxCHIPDERCertLength);
 
     err = context->mAdapter->GenerateControllerNOCChain(nodeId, fabricId, chip::kUndefinedCATs, ephemeralKey, rcacSpan, icacSpan,
-                                              nocSpan);
+                                                        nocSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     Controller::SetupParams initParams;
