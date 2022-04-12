@@ -11,25 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     3.2.2. [TC-DD-2.2] Discovery by commissioner verification [DUT -
     Commissioner]
+
 config:
-    nodeId: "0x12344321"
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
+
 tests:
-    - label: "Test Step"
-      verification: |
-          Chip-tool Verification Steps
-      disabled: true
     - label:
           "If (PICS_BLE) TH starts matter announcement procedure using BLE
           transport"
       verification: |
           1. User should manually verify that the TH is sending BLE advertisements.
       disabled: true
+
     - label:
           "If (PICS_BLE) DUT starts BLE scan across all three advertising
           channels with a sufficient dwell time, interval, and overall duration
@@ -37,14 +37,17 @@ tests:
       verification: |
           1. Using the DUT's means of discovering BLE advertisements, scan for the TH that is sending them out from step 1a
       disabled: true
+
     - label: "If (PICS_BLE) DUT starts scan in background using BLE transport"
       verification: |
           1. Using the DUT's means of discovering BLE advertisements, start scan before TH begins sending BLE advertisements
       disabled: true
+
     - label: "If (PICS_BLE) TH starts matter announcement using BLE transport"
       verification: |
           1. User should manually verify that the TH is sending BLE advertisements.
       disabled: true
+
     - label:
           "If (PICS_WIFI) TH starts SoftAP and begin matter announcement
           procedure"
@@ -53,6 +56,7 @@ tests:
 
           chip-all-clusters-app does not currently support Custom Commissioning Flow or SoftAP as part of its commissioning flow
       disabled: true
+
     - label:
           "If (PICS_WIFI) DUT starts Wi-Fi scan of all 2.4 GHz Wi-Fi channels
           allowed per its operational regulatory domain (channels 1, 6, and 11
@@ -62,12 +66,14 @@ tests:
 
           chip-all-clusters-app does not currently support Custom Commissioning Flow or SoftAP as part of its commissioning flow
       disabled: true
+
     - label: "If (PICS_WIFI) DUT scans using Wi-Fi in background"
       verification: |
           BLOCKED
 
           chip-all-clusters-app does not currently support Custom Commissioning Flow or SoftAP as part of its commissioning flow
       disabled: true
+
     - label:
           "If (PICS_WIFI) TH starts SoftAP and begin matter announcement
           procedure"
@@ -76,6 +82,7 @@ tests:
 
           chip-all-clusters-app does not currently support Custom Commissioning Flow or SoftAP as part of its commissioning flow
       disabled: true
+
     - label: "If (PICS_ETH) DUT performs service discovery using DNS-SD"
       verification: |
           1. Verify DUT controller is able to scan and find the TH device over ethernet
