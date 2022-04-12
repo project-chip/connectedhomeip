@@ -226,11 +226,22 @@ PICS:
       ## WC-Commands received
     - label:
           "Does the device implement receiving the GoToLiftPercentage command?"
-      id: PICS_CR_GOTOLIFTPERCENTAGE
+      id: CR_GOTOLIFTPERCENTAGE
 
     - label:
           "Does the device implement receiving the GoToTiltPercentage command?"
-      id: PICS_CR_GOTOTILTPERCENTAGE
+      id: CR_GOTOTILTPERCENTAGE
+
+      ## WC-Other features
+    - label: "Does the device support reversal of lift movement?"
+      id: WNCV_REVERSAL
+
+    - label: "Does the device support a calibration mode?"
+      id: WNCV_CALIBRATION
+
+    - label: "Does the device support a maintenance mode?"
+      id: WNCV_MAINTENANCE
+
 
       # On/Off Cluster
     - label: "Does the device implement the OnOff attribute?"
