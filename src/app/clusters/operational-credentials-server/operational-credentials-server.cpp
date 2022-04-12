@@ -264,6 +264,23 @@ FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
     return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
 }
 
+CHIP_ERROR DeleteFabricFromTable(FabricIndex fabricIndex)
+{
+    ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().Delete(fabricIndex));
+
+    // We need to withdraw the advertisement for the now-removed fabric, so need
+    // to restart advertising altogether.
+    app::DnssdServer::Instance().StartServer();
+
+    return CHIP_NO_ERROR;
+}
+
+void CleanupFabricContext(SessionManager & sessionMgr, FabricIndex fabricIndex)
+{
+    InteractionModelEngine::GetInstance()->CloseTransactionsFromFabricIndex(fabricIndex);
+    sessionMgr.ExpireAllPairingsForFabric(fabricIndex);
+}
+
 void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Call to FailSafeCleanup");
@@ -284,7 +301,8 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
             caseSessionManager->ReleaseSessionsForFabric(fabricInfo->GetCompressedId());
         }
 
-        Server::GetInstance().GetSecureSessionManager().ExpireAllPairingsForFabric(fabricIndex);
+        SessionManager & sessionMgr = Server::GetInstance().GetSecureSessionManager();
+        CleanupFabricContext(sessionMgr, fabricIndex);
     }
 
     // If an AddNOC command had been successfully invoked, achieve the equivalent effect of invoking the RemoveFabric command
@@ -292,7 +310,7 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     // command.
     if (event->FailSafeTimerExpired.AddNocCommandHasBeenInvoked)
     {
-        Server::GetInstance().GetFabricTable().Delete(fabricIndex);
+        DeleteFabricFromTable(fabricIndex);
     }
 
     // If an UpdateNOC command had been successfully invoked, revert the state of operational key pair, NOC and ICAC for that
@@ -406,9 +424,9 @@ public:
     void OnResponseTimeout(chip::Messaging::ExchangeContext * ec) override {}
     void OnExchangeClosing(chip::Messaging::ExchangeContext * ec) override
     {
-        FabricIndex currentFabricIndex = ec->GetSessionHandle()->GetFabricIndex();
-        InteractionModelEngine::GetInstance()->CloseTransactionsFromFabricIndex(currentFabricIndex);
-        ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(currentFabricIndex);
+        SessionManager * sessionManager = ec->GetExchangeMgr()->GetSessionManager();
+        FabricIndex currentFabricIndex  = ec->GetSessionHandle()->GetFabricIndex();
+        CleanupFabricContext(*sessionManager, currentFabricIndex);
     }
 };
 
@@ -425,12 +443,8 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandle
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: RemoveFabric"); // TODO: Generate emberAfFabricClusterPrintln
 
-    CHIP_ERROR err = Server::GetInstance().GetFabricTable().Delete(fabricBeingRemoved);
+    CHIP_ERROR err = DeleteFabricFromTable(fabricBeingRemoved);
     SuccessOrExit(err);
-
-    // We need to withdraw the advertisement for the now-removed fabric, so need
-    // to restart advertising altogether.
-    app::DnssdServer::Instance().StartServer();
 
 exit:
     fabricListChanged();
@@ -467,8 +481,8 @@ exit:
         }
         else
         {
-            InteractionModelEngine::GetInstance()->CloseTransactionsFromFabricIndex(fabricBeingRemoved);
-            ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(fabricBeingRemoved);
+            SessionManager * sessionManager = ec->GetExchangeMgr()->GetSessionManager();
+            CleanupFabricContext(*sessionManager, fabricBeingRemoved);
         }
     }
     return true;
