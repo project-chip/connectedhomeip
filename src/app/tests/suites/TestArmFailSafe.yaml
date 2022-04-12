@@ -1,0 +1,78 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: ArmFailSafe Tests
+
+config:
+    nodeId: 0x12344321
+    nodeId2:
+        type: NODE_ID
+        defaultValue: 0xCAFE
+    endpoint: 0
+    discriminator:
+        type: INT16U
+        defaultValue: 3840
+    payload:
+        type: CHAR_STRING
+        defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
+
+tests:
+    - label: "Reboot target device"
+      cluster: "SystemCommands"
+      command: "Reboot"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: discriminator
+
+    - label: "Wait for the alpha device to be retrieved "
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Opens a commissioning window on alpha device"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Query fabrics list"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "Fabrics"
+      response:
+          value: [{ Label: "", nodeId: nodeId }]
+          constraints:
+              type: list
+
+    - label: "Commission from beta device"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairDevice"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
+              - name: "timeout"
+                value: 0
+      response:
+          error: UNSUPPORTED_ACCESS

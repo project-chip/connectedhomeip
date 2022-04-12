@@ -20,6 +20,21 @@
 
 constexpr uint16_t kPayloadMaxSize = 64;
 
+CHIP_ERROR CommissionerCommands::PairDevice(chip::NodeId nodeId, const chip::CharSpan payload, uint16_t timeout)
+{
+    VerifyOrReturnError(payload.size() > 0 && payload.size() < kPayloadMaxSize, CHIP_ERROR_INVALID_ARGUMENT);
+
+    GetCurrentCommissioner().RegisterPairingDelegate(this);
+
+    char qrCode[kPayloadMaxSize];
+    memcpy(qrCode, payload.data(), payload.size());
+
+    chip::Controller::CommissioningParameters commissioningParams;
+    commissioningParams.SetFailsafeTimerSeconds(timeout);
+
+    return GetCurrentCommissioner().PairDevice(nodeId, qrCode, commissioningParams);
+}
+
 CHIP_ERROR CommissionerCommands::PairWithQRCode(chip::NodeId nodeId, const chip::CharSpan payload)
 {
     VerifyOrReturnError(payload.size() > 0 && payload.size() < kPayloadMaxSize, CHIP_ERROR_INVALID_ARGUMENT);

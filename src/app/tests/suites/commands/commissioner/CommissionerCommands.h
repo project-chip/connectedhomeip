@@ -31,6 +31,7 @@ public:
     virtual CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err)                              = 0;
     virtual chip::Controller::DeviceCommissioner & GetCurrentCommissioner()                  = 0;
 
+    CHIP_ERROR PairDevice(chip::NodeId nodeId, const chip::CharSpan payload, uint16_t timeout);
     CHIP_ERROR PairWithQRCode(chip::NodeId nodeId, const chip::CharSpan payload);
     CHIP_ERROR PairWithManualCode(chip::NodeId nodeId, const chip::CharSpan payload);
     CHIP_ERROR Unpair(chip::NodeId nodeId);
