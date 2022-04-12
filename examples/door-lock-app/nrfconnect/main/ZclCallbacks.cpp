@@ -19,10 +19,10 @@
 #include "AppTask.h"
 #include "BoltLockManager.h"
 
-#include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/door-lock-server/door-lock-server.h>
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;

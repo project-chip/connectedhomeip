@@ -558,7 +558,8 @@ void AppTask::UpdateClusterState()
     {
         LOG_ERR("Get Lock sate %x", status);
     }
-    status = Clusters::DoorLock::Attributes::LockState::Set(kLockEndpointId, lockSate.Value() == DlLockState::kUnlocked ? DlLockState::kLocked:DlLockState::kUnlocked);
+    status = Clusters::DoorLock::Attributes::LockState::Set(
+        kLockEndpointId, lockSate.Value() == DlLockState::kUnlocked ? DlLockState::kLocked : DlLockState::kUnlocked);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         LOG_ERR("Updating door lock state %x", status);
