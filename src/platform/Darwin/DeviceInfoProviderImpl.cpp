@@ -218,7 +218,7 @@ size_t DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
 
 bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & output)
 {
-    // In Linux simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
+    // In Darwin simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     const char * activeLocalePtr = nullptr;
