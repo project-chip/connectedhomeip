@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 3.2.9. [TC-CC-4.5] Saturation functionality with client as DUT
 
@@ -24,10 +25,11 @@ tests:
       verification: |
           Verification Steps
       disabled: true
+
     - label:
           "DUT sends MoveToSaturation command to TH a Saturation with
           _TransitionTime 300."
-      verification: |+
+      verification: |
           ./chip-tool colorcontrol move-to-saturation 200 300 0 0 1 1
 
           [1648101474.910794][2480:2480] CHIP:EM: Handling via exchange: 53143r, Delegate: 0xaaaab8814368
@@ -62,8 +64,8 @@ tests:
           [1648101474.912442][2480:2480] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=o
           [1648101474.912507][2480:2480] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0003
           [1648101474.912605][2480:2480] CHIP:DMG: Endpoint 1, Cluster 0x0000_0300 update version to 6143bba0
-
       disabled: true
+
     - label:
           "Over TransitionTime, DUT reads CurrentSaturation attribute from TH
           periodically."
@@ -87,8 +89,9 @@ tests:
           [1646210970.309871][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
           [1646210970.309892][2190:2190] CHIP:DMG: },
       disabled: true
+
     - label: "DUT sends MoveSaturation command to TH"
-      verification: |+
+      verification: |
           ./chip-tool colorcontrol move-saturation 1 10 0 0 1 1
 
           [1646211062.545513][2190:2190] CHIP:DMG: InvokeRequestMessage =
@@ -119,8 +122,8 @@ tests:
           [1646211062.546274][2190:2190] CHIP:DMG:
           [1646211062.546297][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
           [1646211062.546320][2190:2190] CHIP:DMG: },
-
       disabled: true
+
     - label: "DUT reads CurrentSaturation attribute from TH several times."
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
@@ -142,8 +145,9 @@ tests:
           [1646210970.309871][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
           [1646210970.309892][2190:2190] CHIP:DMG: },
       disabled: true
+
     - label: "DUT sends StepSaturation command to TH"
-      verification: |+
+      verification: |
           ./chip-tool colorcontrol step-saturation 1 10 200 0 0 1 1
           [1646211149.169696][2190:2190] CHIP:DMG: InvokeRequestMessage =
           [1646211149.169731][2190:2190] CHIP:DMG: {
@@ -174,8 +178,8 @@ tests:
           [1646211149.170576][2190:2190] CHIP:DMG:
           [1646211149.170603][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
           [1646211149.170629][2190:2190] CHIP:DMG: },
-
       disabled: true
+
     - label:
           "Over TransitionTime, DUT reads CurrentSaturation attribute from TH."
       verification: |
@@ -198,8 +202,9 @@ tests:
           [1646210970.309871][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
           [1646210970.309892][2190:2190] CHIP:DMG: },
       disabled: true
+
     - label: "DUT sends StopMoveStep command to TH."
-      verification: |+
+      verification: |
           ./chip-tool colorcontrol stop-move-step 0 0 1 1
           [1646211221.659999][2190:2190] CHIP:DMG: InvokeRequestMessage =
           [1646211221.660038][2190:2190] CHIP:DMG: {
@@ -227,5 +232,4 @@ tests:
           [1646211221.660823][2190:2190] CHIP:DMG:
           [1646211221.660849][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
           [1646211221.660877][2190:2190] CHIP:DMG: },
-
       disabled: true

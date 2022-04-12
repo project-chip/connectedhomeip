@@ -11,29 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     3.12. [TC-NC-1.12] Verificatrion for ConnectNetwork Command for Thread
     interface [DUT-Commissionee]
 
 config:
-    nodeId: "0x12344321"
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
-    - label: "Test Step"
-      verification: |
-          Chip-Tool Verification Steps
-      disabled: true
-
     - label: "TH1 sends ArmFailSafe command to the DUT"
-      verification: |4+
+      verification: |
 
       disabled: true
 
     - label: "TH1 saves the timestamp as CT1"
-      verification: |4+
+      verification: |
 
       disabled: true
 
@@ -55,16 +51,16 @@ tests:
       disabled: true
 
     - label: "TH1 saves the timestamp as CT2"
-      verification: |4+
+      verification: |
 
       disabled: true
 
     - label: "TH1 reads Networks attribute from the DUT"
-      verification: |4+
+      verification: |
 
       disabled: true
 
     - label: "TH1 sends CommissioningComplete Command from the DUT"
-      verification: |4+
+      verification: |
 
       disabled: true

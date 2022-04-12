@@ -11,23 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 3.3.3. [TC-DD-3.3] User Directed Commissioning - Commissionee
+
 config:
-    nodeId: "0x12344321"
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
+
 tests:
-    - label: "Test Step"
-      verification: |
-          Verification Steps
-      disabled: true
     - label:
           "DUT start scanning for available commissioners using Commissioner
           Discovery"
-      verification: |4+
+      verification: |
 
       disabled: true
+
     - label: "TH is instructed to advertise Commissioner Discovery service"
       verification: |
           DUT to advertsise commissioner discovery service, Ex: The TV app example in SDK is reference commissioner
@@ -534,6 +534,7 @@ tests:
           CHIP:DL: BLE layer shutdown
           CHIP:DL: System Layer shutdown
       disabled: true
+
     - label:
           "DUT start scanning for available commissioners using Commissioner
           Discovery"
@@ -577,14 +578,15 @@ tests:
                 Port: 5550
                 Commissioning Mode: 0
            1 commissioner(s) discovered. Select one (by number# above) to request commissioning from:
-
       disabled: true
+
     - label:
           "DUT is instructed to start the commissioning procedure with the TH
           found at step 2"
       verification: |
           Select option 1 on TH
       disabled: true
+
     - label: "TH verifies the Identification Declaration message"
       verification: |
           On DUT.

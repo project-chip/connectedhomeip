@@ -11,11 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 3.4.4. [TC-SC-4.4] Operational Discovery - Controller [DUT - Controller]
 
 config:
-    nodeId: "0x12344321"
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 

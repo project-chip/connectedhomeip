@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     3.3.8. [TC-DD-3.8] Commissioning Flow - Non-concurrent - Negative scenario
@@ -25,6 +26,6 @@ tests:
     - label:
           "Repeat steps 1.a-1.o from [TC-DD-3.6]. Force exit any step in 1.a and
           1.o."
-      verification: |4+
+      verification: |
 
       disabled: true

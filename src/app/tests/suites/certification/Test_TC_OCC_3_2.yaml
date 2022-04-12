@@ -11,23 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 3.2.6. [TC-OCC-3.2] Primary functionality with client as DUT
+
 config:
-    nodeId: "0x12344321"
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
+
 tests:
-    - label: "Test Step"
-      verification: |4+
-
-      disabled: true
     - label: "Commission TH to DUT"
-      verification: |4+
+      verification: |
 
       disabled: true
+
     - label: "DUT reads Occupancy attribute from TH"
-      verification: |+
+      verification: |
           ./chip-tool occupancysensing read occupancy  1 1
 
           [1646207231.401268][2190:2190] CHIP:DMG: ReadRequestMessage =
@@ -47,14 +47,15 @@ tests:
           [1646207231.401803][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
           [1646207231.401832][2190:2190] CHIP:DMG: },
           [1646207231.401908][2190:2190] CHIP:DMG: IM RH moving to [GeneratingReports]
-
       disabled: true
+
     - label: "Operate on TH to change the occupancy status"
       verification: |
           Logs will be device specific
       disabled: true
+
     - label: "after a few seconds, DUT reads Occupancy attribute from TH"
-      verification: |+
+      verification: |
           ./chip-tool occupancysensing read occupancy  1 1
 
           [1646207231.401268][2190:2190] CHIP:DMG: ReadRequestMessage =
@@ -74,5 +75,4 @@ tests:
           [1646207231.401803][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
           [1646207231.401832][2190:2190] CHIP:DMG: },
           [1646207231.401908][2190:2190] CHIP:DMG: IM RH moving to [GeneratingReports]
-
       disabled: true
