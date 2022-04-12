@@ -63,7 +63,7 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
     {
         LOG_ERR("Updating type %x", status);
     }
-    // Set FeatureMap to 0, defaults is 
+    // Set FeatureMap to 0, defaults is
     //(kUsersManagement|kAccessSchedules|kRFIDCredentials|kPINCredentials) 0x113
     status = DoorLock::Attributes::FeatureMap::Set(endpoint, 0);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
