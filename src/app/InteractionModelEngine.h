@@ -100,10 +100,11 @@ public:
      * Spec 8.5.1 A publisher SHALL always ensure that every fabric the node is commissioned into can create at least three
      * subscriptions to the publisher and that each subscription SHALL support at least 3 attribute/event paths.
      */
-    static constexpr size_t kMinSupportedSubscriptionPerFabric  = 2;
-    static constexpr size_t kMinSupportedPathPerSubscription    = 2;
-    static constexpr size_t kReservedPathPoolForReadRequests    = 9;
-    static constexpr size_t kReservedReadHandlerForReadRequests = 1;
+    static constexpr size_t kMinSupportedSubscriptionPerFabric           = 2;
+    static constexpr size_t kMinSupportedPathPerSubscription             = 2;
+    static constexpr size_t kReservedPathPerReadRequests                 = 9;
+    static constexpr size_t kReservedReadHandlerPerFabricForReadRequests = 1;
+
     // TODO: Per spec, the above number should be 3, 3, 9, 1, however, we use a lower limit to reduce the memory usage and should
     // fix it when we reduced the memory footrprint of ReadHandlers.
 
@@ -270,6 +271,36 @@ public:
     void SetHandlerCapacity(int32_t sz) { mReadHandlerCapacityOverride = sz; }
 
     //
+    // Override the maximal capacity of the underlying attribute path pool and event path pool to mimic
+    // out of paths exhausted scenarios in unit-tests.
+    //
+    // If -1 is passed in, no override is instituted and default behavior resumes.
+    //
+    void SetPathPoolCapacity(int32_t sz) { mPathPoolCapacityOverride = sz; }
+
+    //
+    // Override the maximal capacity of the underlying read handler pool to mimic
+    // out of memory scenarios in unit-tests.
+    //
+    // If -1 is passed in, no override is instituted and default behavior resumes.
+    //
+    void SetHandlerCapacityForSubscriptions(int32_t sz)
+    {
+        SetHandlerCapacity(sz == -1 ? -1 : sz + static_cast<int32_t>(kReservedHandlerForReads));
+    }
+
+    //
+    // Override the maximal capacity of the underlying attribute path pool and event path pool to mimic
+    // out of paths exhausted scenarios in unit-tests.
+    //
+    // If -1 is passed in, no override is instituted and default behavior resumes.
+    //
+    void SetPathPoolCapacityForSubscriptions(int32_t sz)
+    {
+        SetPathPoolCapacity(sz == -1 ? -1 : sz + static_cast<int32_t>(kReservedPathsForReads));
+    }
+
+    //
     // We won't limit the handler used per fabric on platforms that are using heap for memory pools, so we introduces a flag to
     // enforce such check based on the configured size. This flag is used for unit tests only, there is another compare time flag
     // CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK for stress tests.
@@ -378,8 +409,8 @@ private:
      *
      * @retval true when we have enough resources for the incoming subscription, false if not.
      */
-    bool EnsureResourceForSubscription(FabricIndex aFabricIndex, size_t aRequestedAttributePathCount,
-                                       size_t aRequestedEventPathCount);
+    bool EnsureResourceForSubscription(FabricIndex aFabricIndex, int32_t aRequestedAttributePathCount,
+                                       int32_t aRequestedEventPathCount);
 
     template <typename T, size_t N>
     void ReleasePool(ObjectList<T> *& aObjectList, ObjectPool<ObjectList<T>, N> & aObjectPool);
@@ -395,12 +426,15 @@ private:
     WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
 
-#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     // CHIP_CONFIG_MAX_FABRICS = actual max number of fabrics + 1 reserved for rotation, so CHIP_CONFIG_MAX_FABRICS - 1 is the
     // actual maximum number of fabrics supported.
+    static constexpr size_t kReservedHandlerForReads =
+        static_cast<int32_t>(kReservedReadHandlerPerFabricForReadRequests) * (CHIP_CONFIG_MAX_FABRICS - 1);
+    static constexpr size_t kReservedPathsForReads = static_cast<int32_t>(kReservedPathPerReadRequests) * kReservedHandlerForReads;
+
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS >= (CHIP_CONFIG_MAX_FABRICS - 1) *
-                          (kMinSupportedPathPerSubscription * kMinSupportedSubscriptionPerFabric +
-                           kReservedPathPoolForReadRequests),
+                          (kMinSupportedPathPerSubscription * kMinSupportedSubscriptionPerFabric + kReservedPathPerReadRequests),
                   "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS is too small to match the requirements of spec 8.5.1");
     static_assert(CHIP_IM_MAX_NUM_READ_HANDLER >= (CHIP_CONFIG_MAX_FABRICS - 1) * (kMinSupportedSubscriptionPerFabric + 1),
                   "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS is too small to match the requirements of spec 8.5.1");
@@ -418,6 +452,7 @@ private:
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     int mReadHandlerCapacityOverride = -1;
+    int mPathPoolCapacityOverride    = -1;
 
     // We won't limit the handler used per fabric on platforms that are using heap for memory pools, so we introduces a flag to
     // enforce such check based on the configured size. This flag is used for unit tests only, there is another compare time flag
