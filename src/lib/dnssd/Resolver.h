@@ -68,7 +68,7 @@ struct ResolvedNodeData
 
     bool IsDeviceTreatedAsSleepy(const ReliableMessageProtocolConfig * defaultMRPConfig) const
     {
-        // If either retry interval (Idle - CRI, Active - CRA) has a value and that value is greater
+        // If either retry interval (Idle - SII, Active - SAI) has a value and that value is greater
         // than the value passed to this function, then the peer device will be treated as if it is
         // a Sleepy End Device (SED)
         return (mMrpRetryIntervalIdle.HasValue() && (mMrpRetryIntervalIdle.Value() > defaultMRPConfig->mIdleRetransTimeout)) ||

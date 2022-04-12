@@ -404,9 +404,9 @@ void ResetRetryIntervalActive(ResolvedNodeData & nodeData)
     nodeData.mMrpRetryIntervalActive.ClearValue();
 }
 
-// Test CRI
+// Test SAI (formally CRI)
 template <class NodeData>
-void TxtFieldMrpRetryIntervalIdle(nlTestSuite * inSuite, void * inContext)
+void TxtFieldSleepyIdleInterval(nlTestSuite * inSuite, void * inContext)
 {
     char key[4];
     char val[16];
@@ -430,46 +430,46 @@ void TxtFieldMrpRetryIntervalIdle(nlTestSuite * inSuite, void * inContext)
     ResetRetryIntervalIdle(nodeData);
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
 
-    // Invalid CRI - negative value
+    // Invalid SII - negative value
     strcpy(key, "SII");
     strcpy(val, "-1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
 
-    // Invalid CRI - greater than maximum
+    // Invalid SII - greater than maximum
     strcpy(key, "SII");
     strcpy(val, "3600001");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
 
-    // Invalid CRI - much greater than maximum
+    // Invalid SII - much greater than maximum
     strcpy(key, "SII");
     strcpy(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
 
-    // Invalid CRI - hexadecimal value
+    // Invalid SII - hexadecimal value
     strcpy(key, "SII");
     strcpy(val, "0x20");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
 
-    // Invalid CRI - leading zeros
+    // Invalid SII - leading zeros
     strcpy(key, "SII");
     strcpy(val, "0700");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
 
-    // Invalid CRI - text at the end
+    // Invalid SII - text at the end
     strcpy(key, "SII");
     strcpy(val, "123abc");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
 }
 
-// Test CRA
+// Test SAI (formerly CRA)
 template <class NodeData>
-void TxtFieldMrpRetryIntervalActive(nlTestSuite * inSuite, void * inContext)
+void TxtFieldSleepyActiveInterval(nlTestSuite * inSuite, void * inContext)
 {
     char key[4];
     char val[16];
@@ -493,37 +493,37 @@ void TxtFieldMrpRetryIntervalActive(nlTestSuite * inSuite, void * inContext)
     ResetRetryIntervalActive(nodeData);
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
 
-    // Invalid CRA - negative value
+    // Invalid SAI - negative value
     strcpy(key, "SAI");
     strcpy(val, "-1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
 
-    // Invalid CRA - greater than maximum
+    // Invalid SAI - greater than maximum
     strcpy(key, "SAI");
     strcpy(val, "3600001");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
 
-    // Invalid CRA - much greater than maximum
+    // Invalid SAI - much greater than maximum
     strcpy(key, "SAI");
     strcpy(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
 
-    // Invalid CRA - hexadecimal value
+    // Invalid SAI - hexadecimal value
     strcpy(key, "SAI");
     strcpy(val, "0x20");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
 
-    // Invalid CRA - leading zeros
+    // Invalid SAI - leading zeros
     strcpy(key, "SAI");
     strcpy(val, "0700");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
 
-    // Invalid CRA - text at the end
+    // Invalid SAI - text at the end
     strcpy(key, "SAI");
     strcpy(val, "123abc");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
@@ -626,13 +626,13 @@ const nlTest sTests[] = {
     NL_TEST_DEF("TxtFieldPairingHint", TestGetPairingHint),                                  //
     NL_TEST_DEF("TxtFieldPairingInstruction", TestGetPairingInstruction),                    //
     NL_TEST_DEF("TxtFieldFillDiscoveredNodeDataFromTxt", TestFillDiscoveredNodeDataFromTxt), //
-    NL_TEST_DEF("TxtDiscoveredFieldMrpRetryIntervalIdle", TxtFieldMrpRetryIntervalIdle<DiscoveredNodeData>),
-    NL_TEST_DEF("TxtDiscoveredFieldMrpRetryIntervalActive", TxtFieldMrpRetryIntervalActive<DiscoveredNodeData>),
+    NL_TEST_DEF("TxtDiscoveredFieldMrpRetryIntervalIdle", TxtFieldSleepyIdleInterval<DiscoveredNodeData>),
+    NL_TEST_DEF("TxtDiscoveredFieldMrpRetryIntervalActive", TxtFieldSleepyActiveInterval<DiscoveredNodeData>),
     NL_TEST_DEF("TxtDiscoveredFieldTcpSupport", (TxtFieldTcpSupport<DiscoveredNodeData, &DiscoveredNodeData::supportsTcp>) ),
     NL_TEST_DEF("TxtDiscoveredIsDeviceSleepyIdle", TestIsDeviceSleepyIdle<DiscoveredNodeData>),
     NL_TEST_DEF("TxtDiscoveredIsDeviceSleepyActive", TestIsDeviceSleepyActive<DiscoveredNodeData>),
-    NL_TEST_DEF("TxtResolvedFieldMrpRetryIntervalIdle", TxtFieldMrpRetryIntervalIdle<ResolvedNodeData>),
-    NL_TEST_DEF("TxtResolvedFieldMrpRetryIntervalActive", TxtFieldMrpRetryIntervalActive<ResolvedNodeData>),
+    NL_TEST_DEF("TxtResolvedFieldMrpRetryIntervalIdle", TxtFieldSleepyIdleInterval<ResolvedNodeData>),
+    NL_TEST_DEF("TxtResolvedFieldMrpRetryIntervalActive", TxtFieldSleepyActiveInterval<ResolvedNodeData>),
     NL_TEST_DEF("TxtResolvedFieldTcpSupport", (TxtFieldTcpSupport<ResolvedNodeData, &ResolvedNodeData::mSupportsTcp>) ),
     NL_TEST_DEF("TxtResolvedIsDeviceSleepyIdle", TestIsDeviceSleepyIdle<ResolvedNodeData>),
     NL_TEST_DEF("TxtResolvedIsDeviceSleepyActive", TestIsDeviceSleepyActive<ResolvedNodeData>),

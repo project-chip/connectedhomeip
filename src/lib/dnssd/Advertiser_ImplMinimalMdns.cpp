@@ -228,7 +228,7 @@ private:
                     mrp.mIdleRetransTimeout = kMaxRetryInterval;
                 }
                 size_t writtenCharactersNumber = snprintf(storage.mrpRetryIntervalIdleBuf, sizeof(storage.mrpRetryIntervalIdleBuf),
-                                                          "CRI=%" PRIu32, mrp.mIdleRetransTimeout.count());
+                                                          "SII=%" PRIu32, mrp.mIdleRetransTimeout.count());
                 VerifyOrReturnError((writtenCharactersNumber > 0) &&
                                         (writtenCharactersNumber < sizeof(storage.mrpRetryIntervalIdleBuf)),
                                     CHIP_ERROR_INVALID_STRING_LENGTH);
@@ -244,7 +244,7 @@ private:
                     mrp.mActiveRetransTimeout = kMaxRetryInterval;
                 }
                 size_t writtenCharactersNumber =
-                    snprintf(storage.mrpRetryIntervalActiveBuf, sizeof(storage.mrpRetryIntervalActiveBuf), "CRA=%" PRIu32,
+                    snprintf(storage.mrpRetryIntervalActiveBuf, sizeof(storage.mrpRetryIntervalActiveBuf), "SAI=%" PRIu32,
                              mrp.mActiveRetransTimeout.count());
                 VerifyOrReturnError((writtenCharactersNumber > 0) &&
                                         (writtenCharactersNumber < sizeof(storage.mrpRetryIntervalActiveBuf)),
