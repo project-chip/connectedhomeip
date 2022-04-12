@@ -18,9 +18,13 @@ all of the EFR32 example applications.
            scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
 
 -   Build or download the Gecko Bootloader binary. Bootloader should be built
-    with the Gecko SDK version 3.2.1 or earlier, type "external SPI" configured
-    with a single slot of at least 1000 KB. Pre-built binaries should be
-    available in
+    with the Gecko SDK version 3.2.1 or earlier. For the bootloader using the
+    external flash select the "external SPI" bootloader type configured with a
+    single slot of at least 1000 KB.
+    For the bootloader using the internal flash (supported on MG24 boards only)
+    select the "internal storage" bootloader type. Follow the instructions in 
+    "UG266: Silicon Labs Gecko Bootloader User’s Guide"
+    Pre-built binaries for some configurations should be available in
 
            third_party/efr32_sdk/repo/platform/bootloader/sample-apps/bootloader-storage-spiflash-single
 
