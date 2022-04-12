@@ -106,6 +106,7 @@ static void InitServer(intptr_t context)
         chip::app::DnssdServer::Instance().StartServer();
     }
 #endif
+    InitOTARequestor();
 }
 
 extern "C" void app_main()
@@ -151,8 +152,6 @@ extern "C" void app_main()
     }
 #endif
     AppLED.Init();
-
-    InitOTARequestor();
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }
