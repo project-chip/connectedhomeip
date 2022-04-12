@@ -57,13 +57,13 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
     {
         return PrintAllCommands();
     }
-    else if (strcmp(argv[0], "discover") == 0)
+    if (strcmp(argv[0], "discover") == 0)
     {
         ChipLogProgress(DeviceLayer, "discover");
 
         return DiscoverCommissioners();
     }
-    else if (strcmp(argv[0], "request") == 0)
+    if (strcmp(argv[0], "request") == 0)
     {
         ChipLogProgress(DeviceLayer, "request");
         if (argc < 2)
@@ -74,7 +74,7 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         int index = (int) strtol(argv[1], &eptr, 10);
         return RequestCommissioning(index);
     }
-    else if (strcmp(argv[0], "launch") == 0)
+    if (strcmp(argv[0], "launch") == 0)
     {
         ChipLogProgress(DeviceLayer, "launch");
         if (argc < 3)
@@ -85,7 +85,7 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         char * display = argv[2];
         return ContentLauncherLaunchURL(url, display);
     }
-    else if (strcmp(argv[0], "access") == 0)
+    if (strcmp(argv[0], "access") == 0)
     {
         ChipLogProgress(DeviceLayer, "access");
         if (argc < 2)
@@ -98,7 +98,7 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         return CHIP_NO_ERROR;
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    else if (strcmp(argv[0], "sendudc") == 0)
+    if (strcmp(argv[0], "sendudc") == 0)
     {
         char * eptr;
         chip::Inet::IPAddress commissioner;
@@ -107,10 +107,7 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         return SendUDC(chip::Transport::PeerAddress::UDP(commissioner, port));
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    else
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
 void RegisterCastingCommands()
