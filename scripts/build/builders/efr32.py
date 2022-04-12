@@ -120,10 +120,7 @@ class Efr32Builder(GnBuilder):
         self.extra_gn_options = ['efr32_board="%s"' % board.GnArgName()]
 
         if enable_rpcs:
-            if self.app == Efr32App.LIGHT:
-                self.extra_gn_options.append('import("//with_pw_rpc.gni")')
-            else:
-                self.extra_gn_options.append('import("//with_pw_rpc.gni")')
+            self.extra_gn_options.append('import("//with_pw_rpc.gni")')
 
         if enable_ota_requestor:
             self.extra_gn_options.append('chip_enable_ota_requestor=true')
