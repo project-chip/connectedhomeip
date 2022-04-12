@@ -477,61 +477,6 @@ class ClusterObjectTests:
 
     @classmethod
     @base.test_case
-    async def TestParallelSubscriptions(cls, setOfDevCtrl):
-        success = True
-        subscriptionsEstablished = [[] for _ in setOfDevCtrl]
-        for i in range(len(setOfDevCtrl)):
-            ctrl = setOfDevCtrl[i]
-            fabricId = ctrl.GetFabricId()
-            logger.info(
-                f"Trying to establish as many subscriptions as possible on Fabric {fabricId}")
-            while True:
-                try:
-                    res = await ctrl.ReadAttribute(nodeid=NODE_ID, attributes=[(0, Clusters.Basic.Attributes.ProductID), (0, Clusters.Basic.Attributes.VendorID)], reportInterval=(3, 10), keepSubscriptions=True)
-                    subscriptionsEstablished[i].append(res)
-                    logger.info(
-                        f"Established {len(subscriptionsEstablished[i])} subscriptions on fabric {fabricId}")
-                except chip.exceptions.ChipStackError as ex:
-                    # Note: 1417 is 0x589 IM error 0x89 - ResourceExhausted
-                    # 1480 is 0x5c8 - PathsExhausted
-                    # TODO: We should convert this error to im error here.
-                    if ex.err != 1417 and ex.err != 1480:
-                        logger.info(f"Unexpected status code {ex} received.")
-                        success = False
-                    else:
-                        logger.info(
-                            f"Failed to establish new subscription on fabric {fabricId}")
-                    break
-                except Exception as ex:
-                    success = False
-                    logger.exception(f"Unexpected exception {ex} received.")
-                    break
-            logger.info(
-                f"{len(subscriptionsEstablished[i])} subscriptions established on Fabric {fabricId}")
-        # We should still be able to read attributes since we have reserved enough resource for read requests.
-        for i in range(len(setOfDevCtrl)):
-            fabricId = ctrl.GetFabricId()
-            logger.info(
-                f"Trying to read some attributes on Fabric {fabricId}")
-            try:
-                ctrl = setOfDevCtrl[i]
-                res = await ctrl.ReadAttribute(nodeid=NODE_ID, attributes=[(0, Clusters.Basic.Attributes.ProductID), (0, Clusters.Basic.Attributes.VendorID), (0, Clusters.Basic.Attributes.VendorName)])
-            except Exception as ex:
-                success = False
-                logger.exception(f"Unexpected exception {ex} received.")
-        for i in range(len(subscriptionsEstablished)):
-            # TODO: Should be 3
-            if len(subscriptionsEstablished[i]) < 2:
-                success = False
-                logger.error(
-                    f"Expect at least 2 subscriptions in parallel per fabric, but only {len(subscriptionsEstablished[i])} established with Controller {i}.")
-            for sub in subscriptionsEstablished[i]:
-                sub.Shutdown()
-        if not success:
-            raise AssertionError(
-                "Failed to test parallel subscriptions, see logs above.")
-
-    @classmethod
     async def TestMixedReadAttributeAndEvents(cls, devCtrl):
         def attributePathPossibilities():
             yield ('Ex Cx Ax', [
@@ -561,22 +506,21 @@ class ClusterObjectTests:
                 VerifyDecodeSuccess(res.attributes)
 
     @classmethod
-    async def RunTest(cls, setOfDevCtrl):
+    async def RunTest(cls, devCtrl):
         try:
             cls.TestAPI()
-            await cls.TestCommandRoundTrip(setOfDevCtrl[0])
-            await cls.TestCommandRoundTripWithBadEndpoint(setOfDevCtrl[0])
-            await cls.TestCommandWithResponse(setOfDevCtrl[0])
-            await cls.TestReadEventRequests(setOfDevCtrl[0], 1)
-            await cls.TestReadWriteAttributeRequestsWithVersion(setOfDevCtrl[0])
-            await cls.TestReadAttributeRequests(setOfDevCtrl[0])
-            await cls.TestSubscribeAttribute(setOfDevCtrl[0])
-            await cls.TestMixedReadAttributeAndEvents(setOfDevCtrl[0])
+            await cls.TestCommandRoundTrip(devCtrl)
+            await cls.TestCommandRoundTripWithBadEndpoint(devCtrl)
+            await cls.TestCommandWithResponse(devCtrl)
+            await cls.TestReadEventRequests(devCtrl, 1)
+            await cls.TestReadWriteAttributeRequestsWithVersion(devCtrl)
+            await cls.TestReadAttributeRequests(devCtrl)
+            await cls.TestSubscribeAttribute(devCtrl)
+            await cls.TestMixedReadAttributeAndEvents(devCtrl)
             # Note: Write will change some attribute values, always put it after read tests
-            await cls.TestWriteRequest(setOfDevCtrl[0])
-            await cls.TestTimedRequest(setOfDevCtrl[0])
-            await cls.TestTimedRequestTimeout(setOfDevCtrl[0])
-            await cls.TestParallelSubscriptions(setOfDevCtrl)
+            await cls.TestWriteRequest(devCtrl)
+            await cls.TestTimedRequest(devCtrl)
+            await cls.TestTimedRequestTimeout(devCtrl)
         except Exception as ex:
             logger.error(
                 f"Unexpected error occurred when running tests: {ex}")
