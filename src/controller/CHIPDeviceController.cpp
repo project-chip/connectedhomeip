@@ -40,11 +40,6 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <controller-clusters/zap-generated/CHIPClusters.h>
 
-#if CONFIG_DEVICE_LAYER
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/ConfigurationManager.h>
-#endif
-
 #include <app/server/Dnssd.h>
 
 #include <app/InteractionModelEngine.h>
@@ -1888,23 +1883,18 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             ChipLogProgress(Controller, "Device does not support configurable regulatory location");
             regulatoryConfig = capability;
         }
-        static constexpr size_t kMaxCountryCodeSize = 3;
-        char countryCodeStr[kMaxCountryCodeSize]    = "XX";
-        size_t actualCountryCodeSize                = 2;
 
-#if CONFIG_DEVICE_LAYER
-        CHIP_ERROR status =
-            DeviceLayer::ConfigurationMgr().GetCountryCode(countryCodeStr, kMaxCountryCodeSize, actualCountryCodeSize);
-#else
-        CHIP_ERROR status = CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
-        if (status != CHIP_NO_ERROR)
+        CharSpan countryCode;
+        const auto & providedCountryCode = params.GetCountryCode();
+        if (providedCountryCode.HasValue())
         {
-            actualCountryCodeSize = 2;
-            memset(countryCodeStr, 'X', actualCountryCodeSize);
-            ChipLogError(Controller, "Unable to find country code, defaulting to %s", countryCodeStr);
+            countryCode = providedCountryCode.Value();
         }
-        chip::CharSpan countryCode(countryCodeStr, actualCountryCodeSize);
+        else
+        {
+            // Default to "XX", for lack of anything better.
+            countryCode = CharSpan::fromCharString("XX");
+        }
 
         GeneralCommissioning::Commands::SetRegulatoryConfig::Type request;
         request.newRegulatoryConfig = regulatoryConfig;
