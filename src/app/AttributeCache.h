@@ -389,13 +389,12 @@ private:
                                                      bool & aEncodedDataVersionList) override;
     virtual void OnReadingWildcardAttributePath(const AttributePathParams & aAttributePathParams) override;
 
-    // Committed the last wildcard attribute path's data version into the Cache if the related attribute path is valid and pending
-    // version has value.
-    void CommitLastWildcardAttributePathVersion();
+    // Committed the pending cluster data version, if there is one.
+    void CommitPendingDataVersion();
 
-    // Calculates the TLV playload size for clusters stored in the AttributeCache, and set sorted data version filter results
-    // in the vector from the largest to the smallest by cluster size.
-    //
+    // Get our list of data version filters, sorted from larges to smallest by the total size of the TLV
+    // payload for the filter's cluster.  Applying filters in this order should maximize space savings
+    // on the wire if not all filters can be applied.
     void GetSortedFilters(std::vector<std::pair<DataVersionFilter, size_t>> & aVector);
 
     Callback & mCallback;
