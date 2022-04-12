@@ -207,6 +207,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err);
 #endif
 
+    app::DnssdServer::Instance().SetSecuredPort(mOperationalServicePort);
+    app::DnssdServer::Instance().SetUnsecuredPort(mUserDirectedCommissioningPort);
+    app::DnssdServer::Instance().SetInterfaceId(mInterfaceId);
+
     if (GetFabricTable().FabricCount() != 0)
     {
         // The device is already commissioned, proactively disable BLE advertisement.
@@ -222,10 +226,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         SuccessOrExit(err = mCommissioningWindowManager.OpenBasicCommissioningWindow());
 #endif
     }
-
-    app::DnssdServer::Instance().SetSecuredPort(mOperationalServicePort);
-    app::DnssdServer::Instance().SetUnsecuredPort(mUserDirectedCommissioningPort);
-    app::DnssdServer::Instance().SetInterfaceId(mInterfaceId);
 
     // TODO @bzbarsky-apple @cecille Move to examples
     // ESP32 and Mbed OS examples have a custom logic for enabling DNS-SD

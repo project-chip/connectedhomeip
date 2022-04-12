@@ -19229,7 +19229,7 @@ private:
             {
                 id actualValue = value;
                 VerifyOrReturn(CheckValueNonNull("default move rate", actualValue));
-                VerifyOrReturn(CheckValue("default move rate", actualValue, 0));
+                VerifyOrReturn(CheckValue("default move rate", actualValue, 50));
             }
 
             VerifyOrReturn(CheckConstraintType("defaultMoveRate", "", "uint8"));
