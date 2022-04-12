@@ -47935,7 +47935,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue count], 23);
+            XCTAssertEqual([actualValue count], 24);
             XCTAssertEqual([actualValue[0] unsignedIntValue], 0UL);
             XCTAssertEqual([actualValue[1] unsignedIntValue], 1UL);
             XCTAssertEqual([actualValue[2] unsignedIntValue], 2UL);
@@ -47955,10 +47955,11 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
             XCTAssertEqual([actualValue[16] unsignedIntValue], 16UL);
             XCTAssertEqual([actualValue[17] unsignedIntValue], 17UL);
             XCTAssertEqual([actualValue[18] unsignedIntValue], 18UL);
-            XCTAssertEqual([actualValue[19] unsignedIntValue], 65528UL);
-            XCTAssertEqual([actualValue[20] unsignedIntValue], 65529UL);
-            XCTAssertEqual([actualValue[21] unsignedIntValue], 65531UL);
-            XCTAssertEqual([actualValue[22] unsignedIntValue], 65533UL);
+            XCTAssertEqual([actualValue[19] unsignedIntValue], 19UL);
+            XCTAssertEqual([actualValue[20] unsignedIntValue], 65528UL);
+            XCTAssertEqual([actualValue[21] unsignedIntValue], 65529UL);
+            XCTAssertEqual([actualValue[22] unsignedIntValue], 65531UL);
+            XCTAssertEqual([actualValue[23] unsignedIntValue], 65533UL);
         }
 
         [expectation fulfill];
