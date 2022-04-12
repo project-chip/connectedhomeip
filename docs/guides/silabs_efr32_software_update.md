@@ -23,7 +23,7 @@ all of the EFR32 example applications.
     single slot of at least 1000 KB.
     For the bootloader using the internal flash (supported on MG24 boards only)
     select the "internal storage" bootloader type. Follow the instructions in 
-    "UG266: Silicon Labs Gecko Bootloader User’s Guide"
+    "UG266: Silicon Labs Gecko Bootloader User’s Guide".
     Pre-built binaries for some configurations should be available in
 
            third_party/efr32_sdk/repo/platform/bootloader/sample-apps/bootloader-storage-spiflash-single
