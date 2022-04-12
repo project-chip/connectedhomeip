@@ -275,14 +275,10 @@ CHIP_ERROR DeleteFabricFromTable(FabricIndex fabricIndex)
     return CHIP_NO_ERROR;
 }
 
-void CleanupFabricContext(SessionManager * sessionMgr, FabricIndex fabricIndex)
+void CleanupFabricContext(SessionManager & sessionMgr, FabricIndex fabricIndex)
 {
     InteractionModelEngine::GetInstance()->CloseTransactionsFromFabricIndex(fabricIndex);
-
-    if (sessionMgr)
-    {
-        sessionMgr->ExpireAllPairingsForFabric(fabricIndex);
-    }
+    sessionMgr.ExpireAllPairingsForFabric(fabricIndex);
 }
 
 void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
@@ -306,7 +302,7 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
         }
 
         SessionManager & sessionMgr = Server::GetInstance().GetSecureSessionManager();
-        CleanupFabricContext(&sessionMgr, fabricIndex);
+        CleanupFabricContext(sessionMgr, fabricIndex);
     }
 
     // If an AddNOC command had been successfully invoked, achieve the equivalent effect of invoking the RemoveFabric command
@@ -428,8 +424,9 @@ public:
     void OnResponseTimeout(chip::Messaging::ExchangeContext * ec) override {}
     void OnExchangeClosing(chip::Messaging::ExchangeContext * ec) override
     {
-        FabricIndex currentFabricIndex = ec->GetSessionHandle()->GetFabricIndex();
-        CleanupFabricContext(ec->GetExchangeMgr()->GetSessionManager(), currentFabricIndex);
+        SessionManager * sessionManager = ec->GetExchangeMgr()->GetSessionManager();
+        FabricIndex currentFabricIndex  = ec->GetSessionHandle()->GetFabricIndex();
+        CleanupFabricContext(*sessionManager, currentFabricIndex);
     }
 };
 
@@ -484,7 +481,8 @@ exit:
         }
         else
         {
-            CleanupFabricContext(ec->GetExchangeMgr()->GetSessionManager(), fabricBeingRemoved);
+            SessionManager * sessionManager = ec->GetExchangeMgr()->GetSessionManager();
+            CleanupFabricContext(*sessionManager, fabricBeingRemoved);
         }
     }
     return true;
