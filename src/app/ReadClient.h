@@ -183,10 +183,6 @@ public:
             aEncodedDataVersionList = false;
             return CHIP_NO_ERROR;
         }
-
-        // This function is invoked for each read/subscribe path that has a wildcard attribute when
-        // a client is generating a request.
-        virtual void OnReadingWildcardAttributePath(const AttributePathParams & aAttributePathParams) {}
     };
 
     enum class InteractionType : uint8_t

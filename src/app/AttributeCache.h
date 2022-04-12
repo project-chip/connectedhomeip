@@ -218,6 +218,12 @@ public:
      */
     CHIP_ERROR Get(const ConcreteAttributePath & path, TLV::TLVReader & reader);
 
+    /*
+     * Retrieve the data version for the given cluster.  If there is no data for the specified path in the cache,
+     * CHIP_ERROR_KEY_NOT_FOUND shall be returned.  Otherwise aVersion will be set to the
+     * current data version for the cluster (which may have no value if we don't have a known data version
+     * for it, for example because none of our paths were wildcards that covered the whole cluster).
+     */
     CHIP_ERROR GetVersion(EndpointId mEndpointId, ClusterId mClusterId, Optional<DataVersion> & aVersion);
 
     /*
@@ -387,9 +393,8 @@ private:
     virtual CHIP_ERROR OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                                      const Span<AttributePathParams> & aAttributePaths,
                                                      bool & aEncodedDataVersionList) override;
-    virtual void OnReadingWildcardAttributePath(const AttributePathParams & aAttributePathParams) override;
 
-    // Committed the pending cluster data version, if there is one.
+    // Commit the pending cluster data version, if there is one.
     void CommitPendingDataVersion();
 
     // Get our list of data version filters, sorted from larges to smallest by the total size of the TLV
@@ -403,7 +408,7 @@ private:
     std::set<AttributePathParams, Comparator> mRequestPathSet; // wildcard attribute request path only
     std::vector<EndpointId> mAddedEndpoints;
     BufferedReadCallback mBufferedReader;
-    ConcreteClusterPath mLastWildcardAttributePath = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
+    ConcreteClusterPath mLastReportDataPath = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
 };
 
 }; // namespace app

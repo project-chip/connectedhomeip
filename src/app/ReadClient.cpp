@@ -303,18 +303,14 @@ CHIP_ERROR ReadClient::GenerateEventPaths(EventPathIBs::Builder & aEventPathsBui
 }
 
 CHIP_ERROR ReadClient::GenerateAttributePaths(AttributePathIBs::Builder & aAttributePathIBsBuilder,
-                                              const Span<AttributePathParams> & aAttributePath)
+                                              const Span<AttributePathParams> & aAttributePaths)
 {
-    for (auto & attribute : aAttributePath)
+    for (auto & attribute : aAttributePaths)
     {
         VerifyOrReturnError(attribute.IsValidAttributePath(), CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
         AttributePathIB::Builder & path = aAttributePathIBsBuilder.CreatePath();
         ReturnErrorOnFailure(aAttributePathIBsBuilder.GetError());
         ReturnErrorOnFailure(path.Encode(attribute));
-        if (attribute.HasAttributeWildcard())
-        {
-            mpCallback.OnReadingWildcardAttributePath(attribute);
-        }
     }
 
     aAttributePathIBsBuilder.EndOfAttributePathIBs();

@@ -91,17 +91,12 @@ struct AttributePathParams
         return true;
     }
 
-    bool IncludesAttributesInCluster(const ConcreteClusterPath & other) const
-    {
-        VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
-        VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
-
-        return true;
-    }
-
+    // check if input concrete cluster path is subset of current wildcard attribute
     bool IncludesAllAttributesInCluster(const ConcreteClusterPath & aOther) const
     {
-        return IncludesAttributesInCluster(aOther) && HasWildcardAttributeId();
+        VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == aOther.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || mClusterId == aOther.mClusterId, false);
+        return HasWildcardAttributeId();
     }
 
     ClusterId mClusterId     = kInvalidClusterId;   // uint32
