@@ -366,41 +366,6 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
     err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    chip::app::AttributePathParams attributePathParams1[3];
-    attributePathParams1[0].mEndpointId  = Test::kMockEndpoint2;
-    attributePathParams1[0].mClusterId   = Test::MockClusterId(3);
-    attributePathParams1[0].mAttributeId = Test::MockAttributeId(1);
-
-    attributePathParams1[1].mEndpointId  = Test::kMockEndpoint2;
-    attributePathParams1[1].mClusterId   = Test::MockClusterId(3);
-    attributePathParams1[1].mAttributeId = Test::MockAttributeId(2);
-
-    attributePathParams1[2].mEndpointId  = Test::kMockEndpoint3;
-    attributePathParams1[2].mClusterId   = Test::MockClusterId(2);
-    attributePathParams1[2].mAttributeId = Test::MockAttributeId(2);
-
-    chip::app::AttributePathParams attributePathParams2[2];
-    attributePathParams2[0].mEndpointId  = Test::kMockEndpoint2;
-    attributePathParams2[0].mClusterId   = Test::MockClusterId(3);
-    attributePathParams2[0].mAttributeId = kInvalidAttributeId;
-
-    attributePathParams2[1].mEndpointId  = Test::kMockEndpoint3;
-    attributePathParams2[1].mClusterId   = Test::MockClusterId(2);
-    attributePathParams2[1].mAttributeId = Test::MockAttributeId(2);
-
-    chip::app::AttributePathParams attributePathParams3[3];
-    attributePathParams3[0].mEndpointId  = Test::kMockEndpoint1;
-    attributePathParams3[0].mClusterId   = Test::MockClusterId(2);
-    attributePathParams3[0].mAttributeId = kInvalidAttributeId;
-
-    attributePathParams3[1].mEndpointId  = Test::kMockEndpoint2;
-    attributePathParams3[1].mClusterId   = Test::MockClusterId(3);
-    attributePathParams3[1].mAttributeId = kInvalidAttributeId;
-
-    attributePathParams3[2].mEndpointId  = Test::kMockEndpoint2;
-    attributePathParams3[2].mClusterId   = Test::MockClusterId(2);
-    attributePathParams3[2].mAttributeId = kInvalidAttributeId;
-
     chip::app::EventPathParams eventPathParams[100];
     for (uint32_t index = 0; index < 100; index++)
     {
@@ -419,13 +384,26 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
     app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
 
     int testId = 0;
-    // Initial Read of C1A1, C1A2 and C2A1. Cache has two C1 attributes at version 0, and one C2 attribute at version 0.
+    // Initial Read of E2C3A1, E2C3A2 and E3C2A2.
     // Expect no versions would be cached.
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams1[3];
+        attributePathParams1[0].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams1[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams1[0].mAttributeId = Test::MockAttributeId(1);
+
+        attributePathParams1[1].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams1[1].mClusterId   = Test::MockClusterId(3);
+        attributePathParams1[1].mAttributeId = Test::MockAttributeId(2);
+
+        attributePathParams1[2].mEndpointId  = Test::kMockEndpoint3;
+        attributePathParams1[2].mClusterId   = Test::MockClusterId(2);
+        attributePathParams1[2].mAttributeId = Test::MockAttributeId(2);
+
         readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
         readPrepareParams.mAttributePathParamsListSize = 3;
         err                                            = readClient.SendRequest(readPrepareParams);
@@ -434,39 +412,66 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         ctx.DrainAndServiceIO();
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 3);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
-        Optional<DataVersion> version;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(apSuite, !version.HasValue());
+        Optional<DataVersion> version1;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version1.HasValue());
+        Optional<DataVersion> version2;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version2.HasValue());
         delegate.mNumAttributeResponse = 0;
     }
-    // Second read of C1A* and C2A1. We cannot use the stored data versions in the cache since our subsequent read is 'broader' then
-    // the previous read that resulted in the data in the cache. Expect cache C1 version
+    // Second read of E2C2A* and E3C2A2. We cannot use the stored data versions in the cache since there is no cached version from previous test. Expect cache E2C2 version
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams2[2];
+        attributePathParams2[0].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams2[0].mAttributeId = kInvalidAttributeId;
+
+        attributePathParams2[1].mEndpointId  = Test::kMockEndpoint3;
+        attributePathParams2[1].mClusterId   = Test::MockClusterId(2);
+        attributePathParams2[1].mAttributeId = Test::MockAttributeId(2);
         readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
         readPrepareParams.mAttributePathParamsListSize = 2;
         err                                            = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         ctx.DrainAndServiceIO();
+        // There are supported 2 global and 3 non-global attributes in E2C2A* and  1 E3C2A2
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
-        Optional<DataVersion> version;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(apSuite, version.HasValue() && (version.Value() == 0));
+        Optional<DataVersion> version1;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 0));
+        Optional<DataVersion> version2;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version2.HasValue());
         delegate.mNumAttributeResponse = 0;
     }
 
-    // Third read of C1A1 and C2A1. It would use the stored data versions in the cache since our subsequent read's C1A1 path
-    // intersects with previous cached data version Expect no C1 attributes in report, only C2A1 attribute in report
+    // Third read of E2C3A1, E2C3A2, and E3C2A2. It would use the stored data versions in the cache since our subsequent read's C1A1 path
+    // intersects with previous cached data version Expect no E2C3 attributes in report, only E3C2A1 attribute in report
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams1[3];
+        attributePathParams1[0].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams1[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams1[0].mAttributeId = Test::MockAttributeId(1);
+
+        attributePathParams1[1].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams1[1].mClusterId   = Test::MockClusterId(3);
+        attributePathParams1[1].mAttributeId = Test::MockAttributeId(2);
+
+        attributePathParams1[2].mEndpointId  = Test::kMockEndpoint3;
+        attributePathParams1[2].mClusterId   = Test::MockClusterId(2);
+        attributePathParams1[2].mAttributeId = Test::MockAttributeId(2);
+
         readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
         readPrepareParams.mAttributePathParamsListSize = 3;
         err                                            = readClient.SendRequest(readPrepareParams);
@@ -475,19 +480,30 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         ctx.DrainAndServiceIO();
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
-        Optional<DataVersion> version;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(apSuite, version.HasValue() && (version.Value() == 0));
+        Optional<DataVersion> version1;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 0));
+        Optional<DataVersion> version2;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version2.HasValue());
         delegate.mNumAttributeResponse = 0;
     }
 
-    // Fourth read of C1A* and C2A1. It would use the stored data versions in the cache since our subsequent read's C1A* path
-    // intersects with previous cached data version Expect no C1 attributes in report, only C2A1 attribute in report
+    // Fourth read of E2C3A* and E3C2A2. It would use the stored data versions in the cache since our subsequent read's C1A* path
+    // intersects with previous cached data version Expect no C1 attributes in report, only E3C2A2 attribute in report
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams2[2];
+        attributePathParams2[0].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams2[0].mAttributeId = kInvalidAttributeId;
+
+        attributePathParams2[1].mEndpointId  = Test::kMockEndpoint3;
+        attributePathParams2[1].mClusterId   = Test::MockClusterId(2);
+        attributePathParams2[1].mAttributeId = Test::MockAttributeId(2);
         readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
         readPrepareParams.mAttributePathParamsListSize = 2;
         err                                            = readClient.SendRequest(readPrepareParams);
@@ -496,22 +512,38 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         ctx.DrainAndServiceIO();
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
-        Optional<DataVersion> version;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(apSuite, version.HasValue() && (version.Value() == 0));
+        Optional<DataVersion> version1;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 0));
+        Optional<DataVersion> version2;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version2.HasValue());
         delegate.mNumAttributeResponse = 0;
     }
 
     Test::BumpVersion();
 
-    // Fifth read of C1A1, C1A2 and C2A1. It would use the stored data versions in the cache since our subsequent read's C1A* path
-    // intersects with previous cached data version, server's version is changed Expect C1A1, C1A2, C2A1 attribute in report, and
+    // Fifth read of E2C3A1, E2C3A2 and E3C2A2. It would use the stored data versions in the cache since our subsequent read's C1A* path
+    // intersects with previous cached data version, server's version is changed. Expect E2C3A1, E2C3A2 and E3C2A2 attribute in report, and
     // invalidate the cached pending and committed data version since no wildcard attributes exists in mRequestPathSet.
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams1[3];
+        attributePathParams1[0].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams1[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams1[0].mAttributeId = Test::MockAttributeId(1);
+
+        attributePathParams1[1].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams1[1].mClusterId   = Test::MockClusterId(3);
+        attributePathParams1[1].mAttributeId = Test::MockAttributeId(2);
+
+        attributePathParams1[2].mEndpointId  = Test::kMockEndpoint3;
+        attributePathParams1[2].mClusterId   = Test::MockClusterId(2);
+        attributePathParams1[2].mAttributeId = Test::MockAttributeId(2);
+
         readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
         readPrepareParams.mAttributePathParamsListSize = 3;
         err                                            = readClient.SendRequest(readPrepareParams);
@@ -520,19 +552,35 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         ctx.DrainAndServiceIO();
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 3);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
-        Optional<DataVersion> version;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(apSuite, !version.HasValue());
+        Optional<DataVersion> version1;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version1.HasValue());
+        Optional<DataVersion> version2;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version2.HasValue());
         delegate.mNumAttributeResponse = 0;
     }
 
-    // Sixth read of C1A1, C1A2 and C2A1. It would use none stored data versions in the cache since previous read does not cache any
-    // committed data version. Expect C1A1, C1A2, C2A1 attribute in report
+    // Sixth read of E2C3A1, E2C3A2 and E3C2A2. It would use none stored data versions in the cache since previous read does not cache any
+    // committed data version. Expect E2C3A1, E2C3A2 and E3C2A2 attribute in report
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams1[3];
+        attributePathParams1[0].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams1[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams1[0].mAttributeId = Test::MockAttributeId(1);
+
+        attributePathParams1[1].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams1[1].mClusterId   = Test::MockClusterId(3);
+        attributePathParams1[1].mAttributeId = Test::MockAttributeId(2);
+
+        attributePathParams1[2].mEndpointId  = Test::kMockEndpoint3;
+        attributePathParams1[2].mClusterId   = Test::MockClusterId(2);
+        attributePathParams1[2].mAttributeId = Test::MockAttributeId(2);
+
         readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
         readPrepareParams.mAttributePathParamsListSize = 3;
         err                                            = readClient.SendRequest(readPrepareParams);
@@ -541,19 +589,30 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         ctx.DrainAndServiceIO();
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 3);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
-        Optional<DataVersion> version;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(apSuite, !version.HasValue());
+        Optional<DataVersion> version1;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version1.HasValue());
+        Optional<DataVersion> version2;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version2.HasValue());
         delegate.mNumAttributeResponse = 0;
     }
 
-    // Seventh read of C1A* and C2A1, here there is no cached data version filter
-    // Expect C1 attributes in report, and C2A1 attribute in report and cache latest data version
+    // Seventh read of E2C3A* and E3C2A2, here there is no cached data version filter
+    // Expect E2C3A* attributes in report, and E3C2A2 attribute in report and cache latest data version
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams2[2];
+        attributePathParams2[0].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams2[0].mAttributeId = kInvalidAttributeId;
+
+        attributePathParams2[1].mEndpointId  = Test::kMockEndpoint3;
+        attributePathParams2[1].mClusterId   = Test::MockClusterId(2);
+        attributePathParams2[1].mAttributeId = Test::MockAttributeId(2);
         readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
         readPrepareParams.mAttributePathParamsListSize = 2;
         err                                            = readClient.SendRequest(readPrepareParams);
@@ -562,20 +621,31 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         ctx.DrainAndServiceIO();
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
-        Optional<DataVersion> version;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(apSuite, version.HasValue() && (version.Value() == 1));
+        Optional<DataVersion> version1;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 1));
+        Optional<DataVersion> version2;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version2.HasValue());
         delegate.mNumAttributeResponse = 0;
     }
 
-    // Eighth read of C1A* and C2A1, and inject a large amount of event path list, then it would try to apply previous cache latest
-    // data version and construct data version list but no enough memory, finally fully rollback data version filter Expect C1
-    // attributes in report, and C2A1 attribute in report
+    // Eighth read of E2C3A* and E3C2A2, and inject a large amount of event path list, then it would try to apply previous cache latest
+    // data version and construct data version list but no enough memory, finally fully rollback data version filter. Expect E2C3A*
+    // attributes in report, and E3C2A2 attribute in report
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams2[2];
+        attributePathParams2[0].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams2[0].mAttributeId = kInvalidAttributeId;
+
+        attributePathParams2[1].mEndpointId  = Test::kMockEndpoint3;
+        attributePathParams2[1].mClusterId   = Test::MockClusterId(2);
+        attributePathParams2[1].mAttributeId = Test::MockAttributeId(2);
         readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
         readPrepareParams.mAttributePathParamsListSize = 2;
 
@@ -588,9 +658,12 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         ctx.DrainAndServiceIO();
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
-        Optional<DataVersion> version;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(apSuite, version.HasValue() && (version.Value() == 1));
+        Optional<DataVersion> version1;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 1));
+        Optional<DataVersion> version2;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version2.HasValue());
         delegate.mNumAttributeResponse             = 0;
         readPrepareParams.mpEventPathParamsList    = nullptr;
         readPrepareParams.mEventPathParamsListSize = 0;
@@ -598,13 +671,26 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
 
     Test::BumpVersion();
 
-    // Ninth read of C1A* and C2A* and C3A*, it would use C1 cached version to construct DataVersionFilter, but version has changed
-    // in server. Expect C1, C2, C3 attributes in report, and cache their versions
+    // Ninth read of E1C2A* and E2C3A* and E2C2A*, it would use C1 cached version to construct DataVersionFilter, but version has changed
+    // in server. Expect E1C2A* and C2C3A* and E2C2A* attributes in report, and cache their versions
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+
+        chip::app::AttributePathParams attributePathParams3[3];
+        attributePathParams3[0].mEndpointId  = Test::kMockEndpoint1;
+        attributePathParams3[0].mClusterId   = Test::MockClusterId(2);
+        attributePathParams3[0].mAttributeId = kInvalidAttributeId;
+
+        attributePathParams3[1].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams3[1].mClusterId   = Test::MockClusterId(3);
+        attributePathParams3[1].mAttributeId = kInvalidAttributeId;
+
+        attributePathParams3[2].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams3[2].mClusterId   = Test::MockClusterId(2);
+        attributePathParams3[2].mAttributeId = kInvalidAttributeId;
         readPrepareParams.mpAttributePathParamsList    = attributePathParams3;
         readPrepareParams.mAttributePathParamsListSize = 3;
 
@@ -612,6 +698,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         ctx.DrainAndServiceIO();
+        //E1C2A* has 3 attributes and E2C3A* has 5 attributes and E2C2A* has 4 attributes
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 12);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
@@ -626,15 +713,28 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         delegate.mNumAttributeResponse = 0;
     }
 
-    // Tenth read of C1A*(3 attributes) and C2A*(5 attributes) and C3A*(4 attributes), and inject a large amount of event path list,
+    // Tenth read of E1C2A*(3 attributes) and E2C3A*(5 attributes) and E2C2A*(4 attributes), and inject a large amount of event path list,
     // then it would try to apply previous cache latest data version and construct data version list with the ordering from largest
     // cluster size to smallest cluster size(C2, C3, C1) but no enough memory, finally partially rollback data version filter with
-    // only C2 Expect C1, C3 attributes(7 attributes) in report,
+    // only C2. Expect E1C2A*, E2C2A* attributes(7 attributes) in report,
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+
+        chip::app::AttributePathParams attributePathParams3[3];
+        attributePathParams3[0].mEndpointId  = Test::kMockEndpoint1;
+        attributePathParams3[0].mClusterId   = Test::MockClusterId(2);
+        attributePathParams3[0].mAttributeId = kInvalidAttributeId;
+
+        attributePathParams3[1].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams3[1].mClusterId   = Test::MockClusterId(3);
+        attributePathParams3[1].mAttributeId = kInvalidAttributeId;
+
+        attributePathParams3[2].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams3[2].mClusterId   = Test::MockClusterId(2);
+        attributePathParams3[2].mAttributeId = kInvalidAttributeId;
         readPrepareParams.mpAttributePathParamsList    = attributePathParams3;
         readPrepareParams.mAttributePathParamsListSize = 3;
         readPrepareParams.mpEventPathParamsList        = eventPathParams;
