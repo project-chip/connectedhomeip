@@ -58,6 +58,8 @@ size_t DeviceInfoProviderImpl::FixedLabelIteratorImpl::Count()
 
 bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & output)
 {
+    bool retval = true;
+
     // In Darwin Simulation, use the following hardcoded labelList on all endpoints.
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -104,12 +106,14 @@ bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & outpu
 
         mIndex++;
 
-        return true;
+        retval = true;
     }
     else
     {
-        return false;
+        retval = false;
     }
+
+    return retval;
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelLength(EndpointId endpoint, size_t val)
@@ -218,6 +222,8 @@ size_t DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
 
 bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & output)
 {
+    bool retval = true;
+
     // In Darwin simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -266,12 +272,14 @@ bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & outpu
 
         mIndex++;
 
-        return true;
+        retval = true;
     }
     else
     {
-        return false;
+        retval = false;
     }
+
+    return retval;
 }
 
 DeviceInfoProvider::SupportedCalendarTypesIterator * DeviceInfoProviderImpl::IterateSupportedCalendarTypes()
@@ -281,7 +289,7 @@ DeviceInfoProvider::SupportedCalendarTypesIterator * DeviceInfoProviderImpl::Ite
 
 size_t DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Count()
 {
-    // In Linux Simulation, return the size of the hardcoded list of Strings that are valid values for the Calendar Types.
+    // In Darwin Simulation, return the size of the hardcoded list of Strings that are valid values for the Calendar Types.
     // {("kBuddhist"), ("kChinese"), ("kCoptic"), ("kEthiopian"), ("kGregorian"), ("kHebrew"), ("kIndian"), ("kJapanese"),
     //  ("kKorean"), ("kPersian"), ("kTaiwanese"), ("kIslamic")}
 
@@ -290,7 +298,9 @@ size_t DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Count()
 
 bool DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarType & output)
 {
-    // In Linux Simulation, return following hardcoded list of Strings that are valid values for the Calendar Types.
+    bool retval = true;
+
+    // In Darwin Simulation, return following hardcoded list of Strings that are valid values for the Calendar Types.
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrReturnError(mIndex < 12, false);
@@ -341,12 +351,14 @@ bool DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarTy
     if (err == CHIP_NO_ERROR)
     {
         mIndex++;
-        return true;
+        retval = true;
     }
     else
     {
-        return false;
+        retval = false;
     }
+
+    return retval;
 }
 
 } // namespace DeviceLayer

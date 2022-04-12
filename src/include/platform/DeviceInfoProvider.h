@@ -84,7 +84,6 @@ public:
 
     /**
      * @brief Set the storage implementation used for non-volatile storage of device information data.
-     *        This method MUST be called before Init().
      *
      * @param storage Pointer to storage instance to set. Cannot be nullptr, will assert.
      */
