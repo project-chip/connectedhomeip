@@ -207,8 +207,8 @@ private:
     {
         // +2 for all to account for '=' and terminating nullchar
         char mrpRetryIntervalIdleBuf[KeySize(TxtFieldKey::kSleepyIdleInterval) + ValSize(TxtFieldKey::kSleepyIdleInterval) + 2];
-        char mrpRetryIntervalActiveBuf[KeySize(TxtFieldKey::kSleepyActiveInterval) +
-                                       ValSize(TxtFieldKey::kSleepyActiveInterval) + 2];
+        char mrpRetryIntervalActiveBuf[KeySize(TxtFieldKey::kSleepyActiveInterval) + ValSize(TxtFieldKey::kSleepyActiveInterval) +
+                                       2];
         char tcpSupportedBuf[KeySize(TxtFieldKey::kTcpSupported) + ValSize(TxtFieldKey::kTcpSupported) + 2];
     };
     template <class Derived>
@@ -228,7 +228,7 @@ private:
                     mrp.mIdleRetransTimeout = kMaxRetryInterval;
                 }
                 size_t writtenCharactersNumber = snprintf(storage.mrpRetryIntervalIdleBuf, sizeof(storage.mrpRetryIntervalIdleBuf),
-                                                          "CRI=%" PRIu32, mrp.mIdleRetransTimeout.count());
+                                                          "SII=%" PRIu32, mrp.mIdleRetransTimeout.count());
                 VerifyOrReturnError((writtenCharactersNumber > 0) &&
                                         (writtenCharactersNumber < sizeof(storage.mrpRetryIntervalIdleBuf)),
                                     CHIP_ERROR_INVALID_STRING_LENGTH);
@@ -244,7 +244,7 @@ private:
                     mrp.mActiveRetransTimeout = kMaxRetryInterval;
                 }
                 size_t writtenCharactersNumber =
-                    snprintf(storage.mrpRetryIntervalActiveBuf, sizeof(storage.mrpRetryIntervalActiveBuf), "CRA=%" PRIu32,
+                    snprintf(storage.mrpRetryIntervalActiveBuf, sizeof(storage.mrpRetryIntervalActiveBuf), "SAI=%" PRIu32,
                              mrp.mActiveRetransTimeout.count());
                 VerifyOrReturnError((writtenCharactersNumber > 0) &&
                                         (writtenCharactersNumber < sizeof(storage.mrpRetryIntervalActiveBuf)),
