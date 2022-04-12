@@ -71,7 +71,8 @@ public:
 
     bool _IsThreadAttached() const;
 
-    CHIP_ERROR _AttachToThreadNetwork(ByteSpan netInfo, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
+    CHIP_ERROR _AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
+                                      NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
 
     CHIP_ERROR _SetThreadEnabled(bool val);
 

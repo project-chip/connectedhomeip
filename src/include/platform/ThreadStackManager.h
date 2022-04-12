@@ -108,7 +108,8 @@ public:
     CHIP_ERROR JoinerStart();
     CHIP_ERROR SetThreadProvision(ByteSpan aDataset);
     CHIP_ERROR SetThreadEnabled(bool val);
-    CHIP_ERROR AttachToThreadNetwork(ByteSpan netInfo, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
+    CHIP_ERROR AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
+                                     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
     CHIP_ERROR StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
     void OnThreadAttachFinished(void);
 
@@ -357,10 +358,10 @@ inline CHIP_ERROR ThreadStackManager::SetThreadProvision(ByteSpan netInfo)
 }
 
 inline CHIP_ERROR
-ThreadStackManager::AttachToThreadNetwork(ByteSpan netInfo,
+ThreadStackManager::AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
                                           NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
 {
-    return static_cast<ImplClass *>(this)->_AttachToThreadNetwork(netInfo, callback);
+    return static_cast<ImplClass *>(this)->_AttachToThreadNetwork(dataset, callback);
 }
 
 inline void ThreadStackManager::OnThreadAttachFinished(void)

@@ -313,7 +313,7 @@ static void TestASN1_ObjectID(nlTestSuite * inSuite, void * inContext)
 
     ASN1_START_SEQUENCE
     {
-        ASN1_ENCODE_OBJECT_ID(kOID_AttributeType_ChipNodeId);
+        ASN1_ENCODE_OBJECT_ID(kOID_AttributeType_MatterNodeId);
         ASN1_ENCODE_OBJECT_ID(kOID_SigAlgo_ECDSAWithSHA256);
         ASN1_ENCODE_OBJECT_ID(kOID_EllipticCurve_prime256v1);
         ASN1_ENCODE_OBJECT_ID(kOID_Extension_AuthorityKeyIdentifier);

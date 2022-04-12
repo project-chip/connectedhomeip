@@ -818,6 +818,11 @@ bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-native-posix-64-tests -b native_posix_64 {root}/src/test_driver/nrfconnect'
 
+# Generating nrf-nrf52840dk-all-clusters
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840dk-all-clusters -b nrf52840dk_nrf52840 {root}/examples/all-clusters-app/nrfconnect'
+
 # Generating nrf-nrf52840dk-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
@@ -826,7 +831,7 @@ west build --cmake-only -d {out}/nrf-nrf52840dk-light -b nrf52840dk_nrf52840 {ro
 # Generating nrf-nrf52840dk-light-rpc
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf52840dk-light-rpc -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=../../rpc.overlay'
+west build --cmake-only -d {out}/nrf-nrf52840dk-light-rpc -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=rpc.overlay'
 
 # Generating nrf-nrf52840dk-lock
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
@@ -848,10 +853,20 @@ bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf52840dk-shell -b nrf52840dk_nrf52840 {root}/examples/shell/nrfconnect'
 
+# Generating nrf-nrf52840dongle-all-clusters
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840dongle-all-clusters -b nrf52840dongle_nrf52840 {root}/examples/all-clusters-app/nrfconnect'
+
 # Generating nrf-nrf52840dongle-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf52840dongle-light -b nrf52840dongle_nrf52840 {root}/examples/lighting-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf52840dongle-light -b nrf52840dongle_nrf52840 {root}/examples/lighting-app/nrfconnect -- -DCONF_FILE=prj_no_dfu.conf'
+
+# Generating nrf-nrf5340dk-all-clusters
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340dk-all-clusters -b nrf5340dk_nrf5340_cpuapp {root}/examples/all-clusters-app/nrfconnect'
 
 # Generating nrf-nrf5340dk-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
@@ -861,7 +876,7 @@ west build --cmake-only -d {out}/nrf-nrf5340dk-light -b nrf5340dk_nrf5340_cpuapp
 # Generating nrf-nrf5340dk-light-rpc
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf5340dk-light-rpc -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=../../rpc.overlay'
+west build --cmake-only -d {out}/nrf-nrf5340dk-light-rpc -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=rpc.overlay'
 
 # Generating nrf-nrf5340dk-lock
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
@@ -1725,6 +1740,9 @@ ninja -C {out}/nrf-native-posix-64-tests
 # Run Tests nrf-native-posix-64-tests
 ctest --build-nocmake -V --output-on-failure --test-dir {out}/nrf-native-posix-64-tests
 
+# Building nrf-nrf52840dk-all-clusters
+ninja -C {out}/nrf-nrf52840dk-all-clusters
+
 # Building nrf-nrf52840dk-light
 ninja -C {out}/nrf-nrf52840dk-light
 
@@ -1743,8 +1761,14 @@ ninja -C {out}/nrf-nrf52840dk-pump-controller
 # Building nrf-nrf52840dk-shell
 ninja -C {out}/nrf-nrf52840dk-shell
 
+# Building nrf-nrf52840dongle-all-clusters
+ninja -C {out}/nrf-nrf52840dongle-all-clusters
+
 # Building nrf-nrf52840dongle-light
 ninja -C {out}/nrf-nrf52840dongle-light
+
+# Building nrf-nrf5340dk-all-clusters
+ninja -C {out}/nrf-nrf5340dk-all-clusters
 
 # Building nrf-nrf5340dk-light
 ninja -C {out}/nrf-nrf5340dk-light

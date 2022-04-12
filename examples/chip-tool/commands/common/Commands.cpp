@@ -310,7 +310,7 @@ void Commands::ShowCommand(std::string executable, std::string clusterName, Comm
 {
     fprintf(stderr, "Usage:\n");
 
-    std::string arguments = "";
+    std::string arguments;
     arguments += command->GetName();
 
     size_t argumentsCount = command->GetArgumentsCount();

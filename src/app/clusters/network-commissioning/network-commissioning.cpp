@@ -625,6 +625,7 @@ void Instance::OnFailSafeTimerExpired()
 
     ChipLogDetail(Zcl, "Failsafe timeout, tell platform driver to revert network credentials.");
     mpWirelessDriver->RevertConfiguration();
+    mAsyncCommandHandle.Release();
 }
 
 bool NullNetworkDriver::GetEnabled()

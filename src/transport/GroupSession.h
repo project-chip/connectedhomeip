@@ -58,6 +58,8 @@ public:
         return cfg;
     }
 
+    System::Clock::Timestamp GetMRPBaseTimeout() override { return System::Clock::kZero; }
+
     System::Clock::Milliseconds32 GetAckTimeout() const override
     {
         VerifyOrDie(false);
@@ -99,6 +101,8 @@ public:
         VerifyOrDie(false);
         return cfg;
     }
+
+    System::Clock::Timestamp GetMRPBaseTimeout() override { return System::Clock::kZero; }
 
     System::Clock::Milliseconds32 GetAckTimeout() const override
     {

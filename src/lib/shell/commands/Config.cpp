@@ -157,10 +157,8 @@ static CHIP_ERROR ConfigDiscriminator(int argc, char ** argv)
     {
         return ConfigGetSetupDiscriminator(false);
     }
-    else
-    {
-        return ConfigSetSetupDiscriminator(argv[0]);
-    }
+
+    return ConfigSetSetupDiscriminator(argv[0]);
 }
 
 static CHIP_ERROR PrintAllConfigs()
@@ -211,7 +209,6 @@ void RegisterConfigCommands()
 
     // Register the root `config` command with the top-level shell.
     Engine::Root().RegisterCommands(&sConfigComand, 1);
-    return;
 }
 
 } // namespace Shell

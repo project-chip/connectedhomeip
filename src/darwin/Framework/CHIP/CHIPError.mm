@@ -41,55 +41,51 @@ NSString * const MatterInteractionErrorDomain = @"MatterInteractionErrorDomain";
         return [CHIPError errorForIMStatus:status];
     }
 
+    NSMutableDictionary * userInfo = [[NSMutableDictionary alloc] init];
+    CHIPErrorCode code = CHIPErrorCodeGeneralError;
+
     if (errorCode == CHIP_ERROR_INVALID_STRING_LENGTH) {
-        return [NSError errorWithDomain:CHIPErrorDomain
-                                   code:CHIPErrorCodeInvalidStringLength
-                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"A list length is invalid.", nil) }];
+        code = CHIPErrorCodeInvalidStringLength;
+        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"A list length is invalid.", nil) }];
+    } else if (errorCode == CHIP_ERROR_INVALID_INTEGER_VALUE) {
+        code = CHIPErrorCodeInvalidIntegerValue;
+        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Unexpected integer value.", nil) }];
+    } else if (errorCode == CHIP_ERROR_INVALID_ARGUMENT) {
+        code = CHIPErrorCodeInvalidArgument;
+        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"An argument is invalid.", nil) }];
+    } else if (errorCode == CHIP_ERROR_INVALID_MESSAGE_LENGTH) {
+        code = CHIPErrorCodeInvalidMessageLength;
+        [userInfo
+            addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"A message length is invalid.", nil) }];
+    } else if (errorCode == CHIP_ERROR_INCORRECT_STATE) {
+        code = CHIPErrorCodeInvalidState;
+        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Invalid object state.", nil) }];
+    } else if (errorCode == CHIP_ERROR_INTEGRITY_CHECK_FAILED) {
+        code = CHIPErrorCodeIntegrityCheckFailed;
+        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Integrity check failed.", nil) }];
+    } else if (errorCode == CHIP_ERROR_TIMEOUT) {
+        code = CHIPErrorCodeTimeout;
+        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Transaction timed out.", nil) }];
+    } else {
+        code = CHIPErrorCodeGeneralError;
+        [userInfo addEntriesFromDictionary:@{
+            NSLocalizedDescriptionKey :
+                [NSString stringWithFormat:NSLocalizedString(@"Undefined error:%u.", nil), errorCode.AsInteger()],
+            @"errorCode" : @(errorCode.AsInteger()),
+        }];
     }
 
-    if (errorCode == CHIP_ERROR_INVALID_INTEGER_VALUE) {
-        return [NSError errorWithDomain:CHIPErrorDomain
-                                   code:CHIPErrorCodeInvalidIntegerValue
-                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Unexpected integer value.", nil) }];
+#if CHIP_CONFIG_ERROR_SOURCE
+    if (errorCode.GetFile()) {
+        userInfo[@"errorFile"] = [NSString stringWithUTF8String:errorCode.GetFile()];
     }
 
-    if (errorCode == CHIP_ERROR_INVALID_ARGUMENT) {
-        return [NSError errorWithDomain:CHIPErrorDomain
-                                   code:CHIPErrorCodeInvalidArgument
-                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"An argument is invalid.", nil) }];
+    if (errorCode.GetLine()) {
+        userInfo[@"errorLine"] = @(errorCode.GetLine());
     }
+#endif // CHIP_CONFIG_ERROR_SOURCE
 
-    if (errorCode == CHIP_ERROR_INVALID_MESSAGE_LENGTH) {
-        return [NSError errorWithDomain:CHIPErrorDomain
-                                   code:CHIPErrorCodeInvalidMessageLength
-                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"A message length is invalid.", nil) }];
-    }
-
-    if (errorCode == CHIP_ERROR_INCORRECT_STATE) {
-        return [NSError errorWithDomain:CHIPErrorDomain
-                                   code:CHIPErrorCodeInvalidState
-                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Invalid object state.", nil) }];
-    }
-
-    if (errorCode == CHIP_ERROR_INTEGRITY_CHECK_FAILED) {
-        return [NSError errorWithDomain:CHIPErrorDomain
-                                   code:CHIPErrorCodeIntegrityCheckFailed
-                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Integrity check failed.", nil) }];
-    }
-
-    if (errorCode == CHIP_ERROR_TIMEOUT) {
-        return [NSError errorWithDomain:CHIPErrorDomain
-                                   code:CHIPErrorCodeTimeout
-                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Transaction timed out.", nil) }];
-    }
-
-    return [NSError errorWithDomain:CHIPErrorDomain
-                               code:CHIPErrorCodeGeneralError
-                           userInfo:@{
-                               NSLocalizedDescriptionKey : [NSString
-                                   stringWithFormat:NSLocalizedString(@"Undefined error:%u.", nil), errorCode.AsInteger()],
-                               @"errorCode" : @(errorCode.AsInteger()),
-                           }];
+    return [NSError errorWithDomain:CHIPErrorDomain code:code userInfo:userInfo];
     ;
 }
 
@@ -220,7 +216,7 @@ NSString * const MatterInteractionErrorDomain = @"MatterInteractionErrorDomain";
 
     if (error.domain == MatterInteractionErrorDomain) {
         chip::app::StatusIB status(static_cast<chip::Protocols::InteractionModel::Status>(error.code));
-        if (error.userInfo[@"clusterStatus"] != nil) {
+        if (error.userInfo != nil && error.userInfo[@"clusterStatus"] != nil) {
             status.mClusterStatus.Emplace([error.userInfo[@"clusterStatus"] unsignedCharValue]);
         }
         return status.ToChipError();
@@ -230,24 +226,52 @@ NSString * const MatterInteractionErrorDomain = @"MatterInteractionErrorDomain";
         return CHIP_ERROR_INTERNAL;
     }
 
+    chip::ChipError::StorageType code;
     switch (error.code) {
     case CHIPErrorCodeInvalidStringLength:
-        return CHIP_ERROR_INVALID_STRING_LENGTH;
+        code = CHIP_ERROR_INVALID_STRING_LENGTH.AsInteger();
+        break;
     case CHIPErrorCodeInvalidIntegerValue:
-        return CHIP_ERROR_INVALID_INTEGER_VALUE;
+        code = CHIP_ERROR_INVALID_INTEGER_VALUE.AsInteger();
+        break;
     case CHIPErrorCodeInvalidArgument:
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        code = CHIP_ERROR_INVALID_ARGUMENT.AsInteger();
+        break;
     case CHIPErrorCodeInvalidMessageLength:
-        return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
+        code = CHIP_ERROR_INVALID_MESSAGE_LENGTH.AsInteger();
+        break;
     case CHIPErrorCodeInvalidState:
-        return CHIP_ERROR_INCORRECT_STATE;
+        code = CHIP_ERROR_INCORRECT_STATE.AsInteger();
+        break;
     case CHIPErrorCodeIntegrityCheckFailed:
-        return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
+        code = CHIP_ERROR_INTEGRITY_CHECK_FAILED.AsInteger();
+        break;
     case CHIPErrorCodeTimeout:
-        return CHIP_ERROR_TIMEOUT;
+        code = CHIP_ERROR_TIMEOUT.AsInteger();
+        break;
+    case CHIPErrorCodeGeneralError: {
+        if (error.userInfo != nil && error.userInfo[@"errorCode"] != nil) {
+            code = static_cast<decltype(code)>([error.userInfo[@"errorCode"] unsignedLongValue]);
+            break;
+        }
+        // Weird error we did not create.  Fall through.
     default:
-        return CHIP_ERROR_INTERNAL;
+        code = CHIP_ERROR_INTERNAL.AsInteger();
+        break;
     }
+    }
+
+    const char * file = nullptr;
+    unsigned int line = 0;
+    if (error.userInfo != nil) {
+        if (error.userInfo[@"errorFile"] != nil) {
+            file = [error.userInfo[@"errorFile"] cStringUsingEncoding:NSUTF8StringEncoding];
+        }
+        if (error.userInfo[@"errorLine"] != nil) {
+            line = [error.userInfo[@"errorLine"] unsignedIntValue];
+        }
+    }
+    return chip::ChipError(code, file, line);
 }
 
 @end

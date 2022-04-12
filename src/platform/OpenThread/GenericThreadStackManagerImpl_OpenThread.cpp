@@ -364,14 +364,19 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadAttached(void
 
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadNetwork(
-    ByteSpan netInfo, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
+    const Thread::OperationalDataset & dataset, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
 {
-    // There is another ongoing connect request, reject the new one.
-    VerifyOrReturnError(mpConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    // Reset the previously set callback since it will never be called in case incorrect dataset was supplied.
+    mpConnectCallback = nullptr;
     ReturnErrorOnFailure(Impl()->SetThreadEnabled(false));
-    ReturnErrorOnFailure(Impl()->SetThreadProvision(netInfo));
-    ReturnErrorOnFailure(Impl()->SetThreadEnabled(true));
-    mpConnectCallback = callback;
+    ReturnErrorOnFailure(Impl()->SetThreadProvision(dataset.AsByteSpan()));
+
+    if (dataset.IsCommissioned())
+    {
+        ReturnErrorOnFailure(Impl()->SetThreadEnabled(true));
+        mpConnectCallback = callback;
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -381,6 +386,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnThreadAttachFinishe
     if (mpConnectCallback != nullptr)
     {
         DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+            VerifyOrReturn(mpConnectCallback != nullptr);
             mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
             mpConnectCallback = nullptr;
         });

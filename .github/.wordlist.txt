@@ -307,6 +307,7 @@ ctypes
 CurrentHue
 CurrentLevel
 CurrentSaturation
+customAcl
 customizations
 cvfJ
 cxx
@@ -338,6 +339,9 @@ debugText
 DEDEDEDE
 deepnote
 DefaultOTAProviders
+DefaultOTARequestor
+DefaultOTARequestorDriver
+DefaultOTARequestorStorage
 DefaultSuccess
 definedValue
 DehumidificationControl
@@ -415,6 +419,7 @@ doru
 DOTBR
 DOVERLAY
 downcasting
+DownloadProtocolEnum
 Doxygen
 dpkg
 dropdown
@@ -730,8 +735,6 @@ lightin
 LightingColor
 LightingState
 LinkSoftwareAndDocumentationPack
-LinuxOTAImageProcessor
-LinuxOTARequestorDriver
 LocalConfigDisabled
 localedef
 localhost
@@ -921,9 +924,10 @@ OTAProviderIpAddress
 OTAProviderNodeId
 OTAProviderSerialPort
 OTARequesterImpl
-OTARequestor
 OTARequestorDriver
+OTARequestorInterface
 OTARequestorSerialPort
+OTARequestorStorage
 OtaSoftwareUpdateProvider
 otasoftwareupdaterequestor
 otatesting
@@ -1070,6 +1074,7 @@ RequestorCanConsent
 Requestor's
 Requestors
 responder
+RestrictedEvent
 retargeting
 reusability
 reviwed
@@ -1126,6 +1131,7 @@ SerialNumber
 ServiceId
 SetDns
 SetImageProcessorDelegate
+SetOTADownloader
 SetOtaRequestorDriver
 setpin
 setpoint

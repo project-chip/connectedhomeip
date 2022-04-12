@@ -243,14 +243,11 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
     char uniqueId[kMaxUniqueIDLength + 1];
 
     // Generate Unique ID only if it is not present in the storage.
-    if (GetUniqueId(uniqueId, sizeof(uniqueId)) == CHIP_NO_ERROR)
-        return CHIP_NO_ERROR;
-
-    err = GenerateUniqueId(uniqueId, sizeof(uniqueId));
-    ReturnErrorOnFailure(err);
-
-    err = StoreUniqueId(uniqueId, strlen(uniqueId));
-    ReturnErrorOnFailure(err);
+    if (GetUniqueId(uniqueId, sizeof(uniqueId)) != CHIP_NO_ERROR)
+    {
+        ReturnErrorOnFailure(GenerateUniqueId(uniqueId, sizeof(uniqueId)));
+        ReturnErrorOnFailure(StoreUniqueId(uniqueId, strlen(uniqueId)));
+    }
 
     bool failSafeArmed;
 

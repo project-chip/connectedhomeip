@@ -50,7 +50,8 @@ public:
     const char * FabricOpKey(FabricIndex fabric) { return Format("f/%x/o", fabric); }
 
     // FailSafeContext
-    const char * FailSafeContextKey() { return Format("g/fsc"); }
+    const char * FailSafeContextKey() { return Format("g/fs/c"); }
+    static const char * FailSafeNetworkConfig() { return "g/fs/n"; }
 
     // Session resumption
     const char * FabricSession(FabricIndex fabric, NodeId nodeId)

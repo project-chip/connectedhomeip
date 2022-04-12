@@ -9893,7 +9893,7 @@ private:
 | * AcType                                                            | 0x0040 |
 | * AcCapacity                                                        | 0x0041 |
 | * AcRefrigerantType                                                 | 0x0042 |
-| * AcCompressor                                                      | 0x0043 |
+| * AcCompressorType                                                  | 0x0043 |
 | * AcErrorCode                                                       | 0x0044 |
 | * AcLouverPosition                                                  | 0x0045 |
 | * AcCoilTemperature                                                 | 0x0046 |
@@ -10602,17 +10602,18 @@ private:
     uint8_t mValue;
 };
 
-class WriteThermostatAcCompressor : public WriteAttribute
+class WriteThermostatAcCompressorType : public WriteAttribute
 {
 public:
-    WriteThermostatAcCompressor(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("AcCompressor", credsIssuerConfig)
+    WriteThermostatAcCompressorType(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("AcCompressorType", credsIssuerConfig)
     {
-        AddArgument("attr-name", "ac-compressor");
+        AddArgument("attr-name", "ac-compressor-type");
         AddArgument("attr-value", 0, UINT8_MAX, &mValue);
         WriteAttribute::AddArguments();
     }
 
-    ~WriteThermostatAcCompressor() {}
+    ~WriteThermostatAcCompressorType() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
@@ -22508,7 +22509,7 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "ac-type", Attributes::AcType::Id, credsIssuerConfig),                              //
         make_unique<ReadAttribute>(Id, "ac-capacity", Attributes::AcCapacity::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "ac-refrigerant-type", Attributes::AcRefrigerantType::Id, credsIssuerConfig),       //
-        make_unique<ReadAttribute>(Id, "ac-compressor", Attributes::AcCompressor::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "ac-compressor-type", Attributes::AcCompressorType::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "ac-error-code", Attributes::AcErrorCode::Id, credsIssuerConfig),                   //
         make_unique<ReadAttribute>(Id, "ac-louver-position", Attributes::AcLouverPosition::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "ac-coil-temperature", Attributes::AcCoilTemperature::Id, credsIssuerConfig),       //
@@ -22539,7 +22540,7 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteThermostatAcType>(credsIssuerConfig),                                                             //
         make_unique<WriteThermostatAcCapacity>(credsIssuerConfig),                                                         //
         make_unique<WriteThermostatAcRefrigerantType>(credsIssuerConfig),                                                  //
-        make_unique<WriteThermostatAcCompressor>(credsIssuerConfig),                                                       //
+        make_unique<WriteThermostatAcCompressorType>(credsIssuerConfig),                                                   //
         make_unique<WriteThermostatAcErrorCode>(credsIssuerConfig),                                                        //
         make_unique<WriteThermostatAcLouverPosition>(credsIssuerConfig),                                                   //
         make_unique<WriteThermostatAcCapacityFormat>(credsIssuerConfig),                                                   //
@@ -22600,7 +22601,7 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "ac-type", Attributes::AcType::Id, credsIssuerConfig),                              //
         make_unique<SubscribeAttribute>(Id, "ac-capacity", Attributes::AcCapacity::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "ac-refrigerant-type", Attributes::AcRefrigerantType::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "ac-compressor", Attributes::AcCompressor::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "ac-compressor-type", Attributes::AcCompressorType::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "ac-error-code", Attributes::AcErrorCode::Id, credsIssuerConfig),                   //
         make_unique<SubscribeAttribute>(Id, "ac-louver-position", Attributes::AcLouverPosition::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "ac-coil-temperature", Attributes::AcCoilTemperature::Id, credsIssuerConfig),       //

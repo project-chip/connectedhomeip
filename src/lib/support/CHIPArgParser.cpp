@@ -75,11 +75,11 @@ static void FindOptionById(OptionSet ** optSets, int optId, OptionSet *& optSet,
 static const char ** MakeUniqueHelpGroupNamesList(OptionSet * optSets[]);
 static void PutStringWithNewLine(FILE * s, const char * str);
 static void PutStringWithBlankLine(FILE * s, const char * str);
-#if CHIP_CONFIG_ENABLE_ARG_PARSER_SANTIY_CHECK
+#if CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
 static bool SanityCheckOptions(OptionSet * optSets[]);
 static bool HelpTextContainsLongOption(const char * optName, const char * helpText);
 static bool HelpTextContainsShortOption(char optChar, const char * helpText);
-#endif // CHIP_CONFIG_ENABLE_ARG_PARSER_SANTIY_CHECK
+#endif // CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
 
 static inline bool IsShortOptionChar(int ch)
 {
@@ -313,7 +313,7 @@ bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSe
     // Set gActiveOptionSets to the current option set list.
     gActiveOptionSets = optSets;
 
-#if CHIP_CONFIG_ENABLE_ARG_PARSER_SANTIY_CHECK
+#if CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
     if (!SanityCheckOptions(optSets))
         goto done;
 #endif
@@ -1474,7 +1474,7 @@ static void PutStringWithBlankLine(FILE * s, const char * str)
         fputs("\n", s);
 }
 
-#if CHIP_CONFIG_ENABLE_ARG_PARSER_SANTIY_CHECK
+#if CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
 
 static bool SanityCheckOptions(OptionSet * optSets[])
 {
@@ -1558,7 +1558,7 @@ static bool HelpTextContainsShortOption(char optChar, const char * helpText)
     return false;
 }
 
-#endif // CHIP_CONFIG_ENABLE_ARG_PARSER_SANTIY_CHECK
+#endif // CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
 
 } // namespace ArgParser
 } // namespace chip

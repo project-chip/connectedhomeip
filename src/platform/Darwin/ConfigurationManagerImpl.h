@@ -38,6 +38,12 @@ static constexpr int kCountryCodeLength = 2;
 class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::PosixConfig>
 {
 public:
+    CHIP_ERROR StoreVendorId(uint16_t vendorId);
+    CHIP_ERROR StoreProductId(uint16_t productId);
+
+    CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
+    CHIP_ERROR GetProductId(uint16_t & productId) override;
+
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
 
@@ -60,6 +66,8 @@ private:
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
+    CHIP_ERROR WriteConfigValue(Key key, uint16_t val);
+    CHIP_ERROR ReadConfigValue(Key key, uint16_t & val);
 
     // ===== Members that implement the GenericConfigurationManagerImpl protected interface.
     CHIP_ERROR ReadConfigValue(Key key, bool & val) override;

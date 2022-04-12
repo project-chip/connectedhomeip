@@ -501,24 +501,22 @@ static CHIP_ERROR GetAddrInfo(void * context, DnssdResolveCallback callback, uin
 
         return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
     }
-    else
-    {
-        sockaddr_in6 sockaddr;
-        memset(&sockaddr, 0, sizeof(sockaddr));
-        sockaddr.sin6_len    = sizeof(sockaddr);
-        sockaddr.sin6_family = AF_INET6;
-        sockaddr.sin6_addr   = in6addr_loopback;
-        sockaddr.sin6_port   = htons((unsigned short) port);
-        uint32_t ttl         = 120; // default TTL for records with hostnames is 120 seconds
-        uint32_t interface   = 0;   // Set interface to ANY (0) - network stack can decide how to route this.
-        OnGetAddrInfo(nullptr, 0 /* flags */, interface, kDNSServiceErr_NoError, hostname,
-                      reinterpret_cast<struct sockaddr *>(&sockaddr), ttl, sdCtx);
 
-        // Don't leak memory.
-        sdCtx->serviceRef = nullptr;
-        MdnsContexts::GetInstance().Delete(sdCtx);
-        return CHIP_NO_ERROR;
-    }
+    sockaddr_in6 sockaddr;
+    memset(&sockaddr, 0, sizeof(sockaddr));
+    sockaddr.sin6_len    = sizeof(sockaddr);
+    sockaddr.sin6_family = AF_INET6;
+    sockaddr.sin6_addr   = in6addr_loopback;
+    sockaddr.sin6_port   = htons((unsigned short) port);
+    uint32_t ttl         = 120; // default TTL for records with hostnames is 120 seconds
+    uint32_t interface   = 0;   // Set interface to ANY (0) - network stack can decide how to route this.
+    OnGetAddrInfo(nullptr, 0 /* flags */, interface, kDNSServiceErr_NoError, hostname,
+                  reinterpret_cast<struct sockaddr *>(&sockaddr), ttl, sdCtx);
+
+    // Don't leak memory.
+    sdCtx->serviceRef = nullptr;
+    MdnsContexts::GetInstance().Delete(sdCtx);
+    return CHIP_NO_ERROR;
 }
 
 static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceId, DNSServiceErrorType err,
@@ -533,9 +531,10 @@ static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t inter
     GetAddrInfo(sdCtx->context, sdCtx->callback, interfaceId, sdCtx->addressType, sdCtx->name, hostname, ntohs(port), txtLen,
                 txtRecord);
 
-    // TODO: If flags & kDNSServiceFlagsMoreComing should we keep waiting to see
-    // what else we resolve instead of calling Remove() here?
-    MdnsContexts::GetInstance().Remove(sdCtx);
+    if (!(flags & kDNSServiceFlagsMoreComing))
+    {
+        MdnsContexts::GetInstance().Remove(sdCtx);
+    }
 }
 
 static CHIP_ERROR Resolve(void * context, DnssdResolveCallback callback, uint32_t interfaceId,

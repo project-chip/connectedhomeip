@@ -69,7 +69,6 @@ static void DefaultResubscribePolicy(uint32_t aNumCumulativeRetries, uint32_t & 
                     "Computing Resubscribe policy: attempts %" PRIu32 ", max wait time %" PRIu32 " ms, selected wait time %" PRIu32
                     " ms",
                     aNumCumulativeRetries, maxWaitTimeInMsec, waitTimeInMsec);
-    return;
 }
 
 ReadClient::ReadClient(InteractionModelEngine * apImEngine, Messaging::ExchangeManager * apExchangeMgr, Callback & apCallback,

@@ -195,10 +195,10 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
         if (!HeatSupported)
             return imcode::UnsupportedAttribute;
-        else if (requested < AbsMinHeatSetpointLimit || requested < MinHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit ||
-                 requested > MaxHeatSetpointLimit)
+        if (requested < AbsMinHeatSetpointLimit || requested < MinHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit ||
+            requested > MaxHeatSetpointLimit)
             return imcode::InvalidValue;
-        else if (AutoSupported)
+        if (AutoSupported)
         {
             if (requested > OccupiedCoolingSetpoint - DeadBandTemp)
                 return imcode::InvalidValue;
@@ -210,10 +210,10 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
         if (!CoolSupported)
             return imcode::UnsupportedAttribute;
-        else if (requested < AbsMinCoolSetpointLimit || requested < MinCoolSetpointLimit || requested > AbsMaxCoolSetpointLimit ||
-                 requested > MaxCoolSetpointLimit)
+        if (requested < AbsMinCoolSetpointLimit || requested < MinCoolSetpointLimit || requested > AbsMaxCoolSetpointLimit ||
+            requested > MaxCoolSetpointLimit)
             return imcode::InvalidValue;
-        else if (AutoSupported)
+        if (AutoSupported)
         {
             if (requested < OccupiedHeatingSetpoint + DeadBandTemp)
                 return imcode::InvalidValue;
@@ -225,10 +225,10 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
         if (!(HeatSupported && OccupancySupported))
             return imcode::UnsupportedAttribute;
-        else if (requested < AbsMinHeatSetpointLimit || requested < MinHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit ||
-                 requested > MaxHeatSetpointLimit)
+        if (requested < AbsMinHeatSetpointLimit || requested < MinHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit ||
+            requested > MaxHeatSetpointLimit)
             return imcode::InvalidValue;
-        else if (AutoSupported)
+        if (AutoSupported)
         {
             if (requested > UnoccupiedCoolingSetpoint - DeadBandTemp)
                 return imcode::InvalidValue;
@@ -239,10 +239,10 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
         if (!(CoolSupported && OccupancySupported))
             return imcode::UnsupportedAttribute;
-        else if (requested < AbsMinCoolSetpointLimit || requested < MinCoolSetpointLimit || requested > AbsMaxCoolSetpointLimit ||
-                 requested > MaxCoolSetpointLimit)
+        if (requested < AbsMinCoolSetpointLimit || requested < MinCoolSetpointLimit || requested > AbsMaxCoolSetpointLimit ||
+            requested > MaxCoolSetpointLimit)
             return imcode::InvalidValue;
-        else if (AutoSupported)
+        if (AutoSupported)
         {
             if (requested < UnoccupiedHeatingSetpoint + DeadBandTemp)
                 return imcode::InvalidValue;
@@ -254,9 +254,9 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
         if (!HeatSupported)
             return imcode::UnsupportedAttribute;
-        else if (requested < AbsMinHeatSetpointLimit || requested > MaxHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit)
+        if (requested < AbsMinHeatSetpointLimit || requested > MaxHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit)
             return imcode::InvalidValue;
-        else if (AutoSupported)
+        if (AutoSupported)
         {
             if (requested > MinCoolSetpointLimit - DeadBandTemp)
                 return imcode::InvalidValue;
@@ -267,9 +267,9 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
         if (!HeatSupported)
             return imcode::UnsupportedAttribute;
-        else if (requested < AbsMinHeatSetpointLimit || requested < MinHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit)
+        if (requested < AbsMinHeatSetpointLimit || requested < MinHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit)
             return imcode::InvalidValue;
-        else if (AutoSupported)
+        if (AutoSupported)
         {
             if (requested > MaxCoolSetpointLimit - DeadBandTemp)
                 return imcode::InvalidValue;
@@ -280,9 +280,9 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
         if (!CoolSupported)
             return imcode::UnsupportedAttribute;
-        else if (requested < AbsMinCoolSetpointLimit || requested > MaxCoolSetpointLimit || requested > AbsMaxCoolSetpointLimit)
+        if (requested < AbsMinCoolSetpointLimit || requested > MaxCoolSetpointLimit || requested > AbsMaxCoolSetpointLimit)
             return imcode::InvalidValue;
-        else if (AutoSupported)
+        if (AutoSupported)
         {
             if (requested < MinHeatSetpointLimit + DeadBandTemp)
                 return imcode::InvalidValue;
@@ -293,9 +293,9 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
         if (!CoolSupported)
             return imcode::UnsupportedAttribute;
-        else if (requested < AbsMinCoolSetpointLimit || requested < MinCoolSetpointLimit || requested > AbsMaxCoolSetpointLimit)
+        if (requested < AbsMinCoolSetpointLimit || requested < MinCoolSetpointLimit || requested > AbsMaxCoolSetpointLimit)
             return imcode::InvalidValue;
-        else if (AutoSupported)
+        if (AutoSupported)
         {
             if (requested < MaxHeatSetpointLimit + DeadBandTemp)
                 return imcode::InvalidValue;
@@ -306,7 +306,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         requested = *value;
         if (!AutoSupported)
             return imcode::UnsupportedAttribute;
-        else if (requested < 0 || requested > 25)
+        if (requested < 0 || requested > 25)
             return imcode::InvalidValue;
         return imcode::Success;
     }
@@ -332,27 +332,25 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         {
             return imcode::InvalidValue;
         }
-        else
-        {
-            switch (ControlSequenceOfOperation)
-            {
-            case ThermostatControlSequence::kCoolingOnly:
-            case ThermostatControlSequence::kCoolingWithReheat:
-                if (RequestedSystemMode == ThermostatSystemMode::kHeat ||
-                    RequestedSystemMode == ThermostatSystemMode::kEmergencyHeating)
-                    return imcode::InvalidValue;
-                else
-                    return imcode::Success;
 
-            case ThermostatControlSequence::kHeatingOnly:
-            case ThermostatControlSequence::kHeatingWithReheat:
-                if (RequestedSystemMode == ThermostatSystemMode::kCool || RequestedSystemMode == ThermostatSystemMode::kPrecooling)
-                    return imcode::InvalidValue;
-                else
-                    return imcode::Success;
-            default:
+        switch (ControlSequenceOfOperation)
+        {
+        case ThermostatControlSequence::kCoolingOnly:
+        case ThermostatControlSequence::kCoolingWithReheat:
+            if (RequestedSystemMode == ThermostatSystemMode::kHeat ||
+                RequestedSystemMode == ThermostatSystemMode::kEmergencyHeating)
+                return imcode::InvalidValue;
+            else
                 return imcode::Success;
-            }
+
+        case ThermostatControlSequence::kHeatingOnly:
+        case ThermostatControlSequence::kHeatingWithReheat:
+            if (RequestedSystemMode == ThermostatSystemMode::kCool || RequestedSystemMode == ThermostatSystemMode::kPrecooling)
+                return imcode::InvalidValue;
+            else
+                return imcode::Success;
+        default:
+            return imcode::Success;
         }
     }
     default:

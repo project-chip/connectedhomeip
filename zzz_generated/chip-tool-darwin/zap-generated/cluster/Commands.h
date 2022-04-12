@@ -62763,7 +62763,7 @@ private:
 | * AcType                                                            | 0x0040 |
 | * AcCapacity                                                        | 0x0041 |
 | * AcRefrigerantType                                                 | 0x0042 |
-| * AcCompressor                                                      | 0x0043 |
+| * AcCompressorType                                                  | 0x0043 |
 | * AcErrorCode                                                       | 0x0044 |
 | * AcLouverPosition                                                  | 0x0045 |
 | * AcCoilTemperature                                                 | 0x0046 |
