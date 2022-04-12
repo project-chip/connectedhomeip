@@ -30,10 +30,10 @@ extern "C" {
 namespace chip {
 
 // Define static memebers
-uint8_t OTAImageProcessorImpl::mSlotId = 0;
-uint32_t OTAImageProcessorImpl::mWriteOffset = 0;
-uint16_t OTAImageProcessorImpl::writeBufOffset= 0;
-uint8_t  OTAImageProcessorImpl::writeBuffer[ALIGNMENT_BYTES] = {0};
+uint8_t OTAImageProcessorImpl::mSlotId                      = 0;
+uint32_t OTAImageProcessorImpl::mWriteOffset                = 0;
+uint16_t OTAImageProcessorImpl::writeBufOffset              = 0;
+uint8_t OTAImageProcessorImpl::writeBuffer[ALIGNMENT_BYTES] = { 0 };
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
@@ -95,9 +95,9 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     ChipLogProgress(SoftwareUpdate, "HandlePrepareDownload");
 
     CORE_CRITICAL_SECTION(bootloader_init();)
-    mSlotId      = 0; // Single slot until we support multiple images
-    writeBufOffset = 0;
-    mWriteOffset = 0;
+    mSlotId                                 = 0; // Single slot until we support multiple images
+    writeBufOffset                          = 0;
+    mWriteOffset                            = 0;
     imageProcessor->mParams.downloadedBytes = 0;
 
     imageProcessor->mHeaderParser.Init();
@@ -117,25 +117,25 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     }
 
     // Pad the remainder of the write buffer with zeros and write it to bootloader storage
-    if(writeBufOffset != 0)
+    if (writeBufOffset != 0)
+    {
+        // Account for last bytes of the image not yet written to storage
+        imageProcessor->mParams.downloadedBytes += writeBufOffset;
+
+        while (writeBufOffset != ALIGNMENT_BYTES)
         {
-            // Account for last bytes of the image not yet written to storage
-            imageProcessor->mParams.downloadedBytes += writeBufOffset;
-
-            while(writeBufOffset != ALIGNMENT_BYTES)
-                {
-                    writeBuffer[writeBufOffset] = 0;
-                    writeBufOffset++;
-                }
-
-            CORE_CRITICAL_SECTION(err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, writeBuffer, ALIGNMENT_BYTES);)
-            if (err)
-                {
-                    ChipLogError(SoftwareUpdate, "ERROR: In HandleFinalize bootloader_eraseWriteStorage() error %ld", err);
-                    imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
-                    return;
-                }
+            writeBuffer[writeBufOffset] = 0;
+            writeBufOffset++;
         }
+
+        CORE_CRITICAL_SECTION(err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, writeBuffer, ALIGNMENT_BYTES);)
+        if (err)
+        {
+            ChipLogError(SoftwareUpdate, "ERROR: In HandleFinalize bootloader_eraseWriteStorage() error %ld", err);
+            imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+            return;
+        }
+    }
 
     imageProcessor->ReleaseBlock();
 
@@ -207,25 +207,25 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     // Copy data into the word-aligned writeBuffer and once it fills write its contents to the bootloader storage
     uint32_t blockReadOffset = 0;
     while (blockReadOffset < block.size())
+    {
+        writeBuffer[writeBufOffset] = *((block.data()) + blockReadOffset);
+        writeBufOffset++;
+        blockReadOffset++;
+        if (writeBufOffset == ALIGNMENT_BYTES)
         {
-            writeBuffer[writeBufOffset] = *((block.data()) + blockReadOffset);
-            writeBufOffset++;
-            blockReadOffset++;
-            if(writeBufOffset == ALIGNMENT_BYTES)
-                {
-                    writeBufOffset = 0;
+            writeBufOffset = 0;
 
-                    CORE_CRITICAL_SECTION(err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, writeBuffer, ALIGNMENT_BYTES);)
-                    if (err)
-                        {
-                            ChipLogError(SoftwareUpdate, "ERROR: In HandleProcessBlock bootloader_eraseWriteStorage() error %ld", err);
-                            imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
-                            return;
-                        }
-                    mWriteOffset += ALIGNMENT_BYTES;
-                    imageProcessor->mParams.downloadedBytes += ALIGNMENT_BYTES;
-                }
+            CORE_CRITICAL_SECTION(err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, writeBuffer, ALIGNMENT_BYTES);)
+            if (err)
+            {
+                ChipLogError(SoftwareUpdate, "ERROR: In HandleProcessBlock bootloader_eraseWriteStorage() error %ld", err);
+                imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+                return;
+            }
+            mWriteOffset += ALIGNMENT_BYTES;
+            imageProcessor->mParams.downloadedBytes += ALIGNMENT_BYTES;
         }
+    }
 
     imageProcessor->mDownloader->FetchNextData();
 }
