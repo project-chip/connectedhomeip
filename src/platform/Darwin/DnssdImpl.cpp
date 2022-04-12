@@ -301,7 +301,7 @@ CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t inte
 
     sdCtx = chip::Platform::New<RegisterContext>(type, callback, context);
     err   = DNSServiceRegister(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDot, nullptr, ntohs(port), recordLen,
-                               recordBytesPtr, OnRegister, sdCtx);
+                             recordBytesPtr, OnRegister, sdCtx);
     TXTRecordDeallocate(recordRef);
 
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err), CHIP_ERROR_INTERNAL);
