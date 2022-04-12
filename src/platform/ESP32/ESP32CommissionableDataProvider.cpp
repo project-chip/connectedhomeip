@@ -16,7 +16,7 @@
  */
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Base64.h>
-#include <platform/ESP32/CommissionableDataProviderImpl.h>
+#include <platform/ESP32/ESP32CommissionableDataProvider.h>
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/ESP32/ScopedNvsHandle.h>
 
@@ -25,7 +25,7 @@ namespace DeviceLayer {
 
 using namespace ::chip::DeviceLayer::Internal;
 
-CHIP_ERROR CommissionableDataProviderImpl::GetSetupDiscriminator(uint16_t & setupDiscriminator)
+CHIP_ERROR ESP32CommissionableDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
 {
     uint32_t setupDiscriminator32;
     ReturnErrorOnFailure(ESP32Config::ReadConfigValue(ESP32Config::kConfigKey_SetupDiscriminator, setupDiscriminator32));
@@ -34,12 +34,12 @@ CHIP_ERROR CommissionableDataProviderImpl::GetSetupDiscriminator(uint16_t & setu
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommissionableDataProviderImpl::GetSpake2pIterationCount(uint32_t & iterationCount)
+CHIP_ERROR ESP32CommissionableDataProvider::GetSpake2pIterationCount(uint32_t & iterationCount)
 {
     return ESP32Config::ReadConfigValue(ESP32Config::kConfigKey_Spake2pIterationCount, iterationCount);
 }
 
-CHIP_ERROR CommissionableDataProviderImpl::GetSpake2pSalt(MutableByteSpan & saltBuf)
+CHIP_ERROR ESP32CommissionableDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
 {
     static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
 
@@ -59,7 +59,7 @@ CHIP_ERROR CommissionableDataProviderImpl::GetSpake2pSalt(MutableByteSpan & salt
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommissionableDataProviderImpl::GetSpake2pVerifier(MutableByteSpan & verifierBuf, size_t & verifierLen)
+CHIP_ERROR ESP32CommissionableDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierBuf, size_t & verifierLen)
 {
     static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
         BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;

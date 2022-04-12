@@ -39,7 +39,7 @@
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 
 #if CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER
-#include <platform/ESP32/CommissionableDataProviderImpl.h>
+#include <platform/ESP32/ESP32CommissionableDataProvider.h>
 #endif // CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER
 
 #include <lib/support/ErrorStr.h>
@@ -63,7 +63,7 @@ app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
 
 #if CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER
-CommissionableDataProviderImpl sCommissionableDataProviderImpl;
+ESP32CommissionableDataProvider sCommissionableDataProvider;
 #endif // CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER
 
 static void InitServer(intptr_t context)
@@ -106,7 +106,7 @@ extern "C" void app_main()
     }
 
 #if CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER
-    SetCommissionableDataProvider(&sCommissionableDataProviderImpl);
+    SetCommissionableDataProvider(&sCommissionableDataProvider);
 #endif // CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();

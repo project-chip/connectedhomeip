@@ -21,7 +21,7 @@
 namespace chip {
 namespace DeviceLayer {
 
-class CommissionableDataProviderImpl : public CommissionableDataProvider
+class ESP32CommissionableDataProvider : public CommissionableDataProvider
 {
 public:
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;

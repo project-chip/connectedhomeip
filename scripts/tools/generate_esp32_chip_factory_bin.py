@@ -64,15 +64,13 @@ def validate_args(args):
 
 
 def gen_spake2p_params(passcode):
-    iter_count_min = 1000
     iter_count_max = 10000
-    salt_len_min = 16
     salt_len_max = 32
 
     cmd = [
         TOOLS['spake2p'], 'gen-verifier',
-        '--iteration-count', str(random.randint(iter_count_min, iter_count_max)),
-        '--salt-len', str(random.randint(salt_len_min, salt_len_max)),
+        '--iteration-count', str(iter_count_max),
+        '--salt-len', str(salt_len_max),
         '--pin-code', str(passcode),
         '--out', '-',
     ]
@@ -82,7 +80,7 @@ def gen_spake2p_params(passcode):
     return dict(zip(output[0].split(','), output[1].split(',')))
 
 
-def generate_nvs_bin(discriminator, spake2p_params):
+def generate_nvs_bin(partition_size, discriminator, spake2p_params):
     iteration = spake2p_params['Iteration Count']
     salt = spake2p_params['Salt']
     verifier = spake2p_params['Verifier']
@@ -94,12 +92,12 @@ def generate_nvs_bin(discriminator, spake2p_params):
     csv_content += 'salt,data,string,{}\n'.format(salt)
     csv_content += 'verifier,data,string,{}\n'.format(verifier)
 
-    with open('partition.csv', 'w') as f:
+    with open('nvs_partition.csv', 'w') as f:
         f.write(csv_content)
 
-    nvs_args = SimpleNamespace(input='partition.csv',
+    nvs_args = SimpleNamespace(input='nvs_partition.csv',
                                output='partition.bin',
-                               size='0x6000',
+                               size=hex(partition_size),
                                outdir=os.getcwd(),
                                version=2)
     nvs_partition_gen.generate(nvs_args)
@@ -117,20 +115,19 @@ def main():
     def any_base_int(s): return int(s, 0)
 
     parser = argparse.ArgumentParser(description='Chip Factory NVS binary generator tool')
-    parser.add_argument('-p', '--passcode', type=any_base_int, default=20202021,
-                        help='The discriminator for pairing. Default is 20202021 if not specified.')
-    parser.add_argument('-d', '--discriminator', type=any_base_int, default=3840,
-                        help='The passcode for pairing. Default is 3840 if not specified.')
+
+    parser.add_argument('-p', '--passcode', type=any_base_int, required=True,
+                        help='The discriminator for pairing, range: 0x01-0x5F5E0FE')
+    parser.add_argument('-d', '--discriminator', type=any_base_int, required=True,
+                        help='The passcode for pairing, range: 0x00-0x0FFF')
+    parser.add_argument('-s', '--size', type=any_base_int, required=False, default=0x6000,
+                        help='The size of the partition.bin, default: 0x6000')
 
     args = parser.parse_args()
     validate_args(args)
-
     check_tools_exists()
-
     spake2p_params = gen_spake2p_params(args.passcode)
-
-    generate_nvs_bin(args.discriminator, spake2p_params)
-
+    generate_nvs_bin(args.size, args.discriminator, spake2p_params)
     print_flashing_help()
 
 

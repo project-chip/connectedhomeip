@@ -39,6 +39,10 @@
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/ESP32/OTAImageProcessorImpl.h>
 
+#if CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER
+#include <platform/ESP32/ESP32CommissionableDataProvider.h>
+#endif // CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER
+
 using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
@@ -62,6 +66,10 @@ namespace {
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
 #endif
+
+#if CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER
+ESP32CommissionableDataProvider sCommissionableDataProvider;
+#endif // CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER
 } // namespace
 
 static void InitOTARequestor(void)
@@ -113,6 +121,10 @@ extern "C" void app_main()
     ESP_LOGI(TAG, "==================================================");
     ESP_LOGI(TAG, "chip-esp32-light-example starting");
     ESP_LOGI(TAG, "==================================================");
+
+#if CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER
+    SetCommissionableDataProvider(&sCommissionableDataProvider);
+#endif // CONFIG_ENABLE_ESP32_COMMISSIONABLE_DATA_PROVIDER
 
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();

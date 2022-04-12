@@ -109,8 +109,8 @@ enabled by default, please check `sdkconfig.defaults`. So, chip-factory data
 must be flashed into the configure partition.
 
 `scripts/tools/generate_esp32_chip_factory_bin.py` script generates the
-chip-factory NVS image `partition.bin`. It takes two optional arguments passcode
-and discriminator, if not provided default is 20202021 and 3840 respectively.
+chip-factory NVS image `partition.bin`. It takes three arguments, passcode,
+discriminator and partition size(optional, default:0x6000).
 
 ```
 ./scripts/tools/generate_esp32_chip_factory_bin.py -p <passcode> -d <discriminator>
