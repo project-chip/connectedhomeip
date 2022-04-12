@@ -1348,6 +1348,86 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTestAccessControlCluster_000019_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate resource minima (SubjectsPerAccessControlEntry)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster
+        readAttributeSubjectsPerAccessControlEntryWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate resource minima (SubjectsPerAccessControlEntry) Error: %@", err);
+
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+            {
+                id actualValue = value;
+                if (actualValue != nil) {
+                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 4U);
+                }
+            }
+
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestAccessControlCluster_000020_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate resource minima (TargetsPerAccessControlEntry)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeTargetsPerAccessControlEntryWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Validate resource minima (TargetsPerAccessControlEntry) Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 3U);
+            }
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestAccessControlCluster_000021_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate resource minima (AccessControlEntriesPerFabric)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster
+        readAttributeAccessControlEntriesPerFabricWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate resource minima (AccessControlEntriesPerFabric) Error: %@", err);
+
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+            {
+                id actualValue = value;
+                if (actualValue != nil) {
+                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 3U);
+                }
+            }
+
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTest_TC_BI_1_1_000000_WaitForCommissionee
 {
