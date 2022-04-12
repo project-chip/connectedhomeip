@@ -144,13 +144,16 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully");
 }
 
+#include "sl_simple_button_instances.h"
+
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
     uint32_t err = SL_BOOTLOADER_OK;
 
     ChipLogProgress(SoftwareUpdate, "OTAImageProcessorImpl::HandleApply()");
 
-    err = bootloader_verifyImage(mSlotId, NULL);
+    CORE_CRITICAL_SECTION(err = bootloader_verifyImage(mSlotId, NULL);)
+
     if (err != SL_BOOTLOADER_OK)
     {
         ChipLogError(SoftwareUpdate, "ERROR: bootloader_verifyImage() error %ld", err);
@@ -167,7 +170,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
             // ChipLogProgress(SoftwareUpdate, "bootloader_verifyImage SUCCESS");
         }
 
-    err = bootloader_setImageToBootload(mSlotId);
+    CORE_CRITICAL_SECTION(err = bootloader_setImageToBootload(mSlotId);)
     if (err != SL_BOOTLOADER_OK)
     {
         ChipLogError(SoftwareUpdate, "ERROR: bootloader_setImageToBootload() error %ld", err);
@@ -185,7 +188,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         }
 
     // This reboots the device
-    bootloader_rebootAndInstall();
+    CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
 }
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)
