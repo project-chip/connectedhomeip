@@ -99,6 +99,11 @@ uint16_t DefaultOTARequestorDriver::GetMaxDownloadBlockSize()
     return 1024;
 }
 
+void DefaultOTARequestorDriver::SetMaxDownloadBlockSize(uint16_t blockSize)
+{
+    maxDownloadBlockSize = blockSize;
+}
+
 void StartDelayTimerHandler(System::Layer * systemLayer, void * appState)
 {
     ToDriver(appState)->SendQueryImage();
@@ -110,10 +115,8 @@ bool DefaultOTARequestorDriver::ProviderLocationsEqual(const ProviderLocationTyp
     {
         return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 void DefaultOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR error) {}
@@ -457,11 +460,8 @@ bool DefaultOTARequestorDriver::GetNextProviderLocation(ProviderLocationType & p
         listExhausted    = true;
         return true;
     }
-    else
-    {
-        ChipLogError(SoftwareUpdate, "No suitable OTA Provider candidate found");
-        return false;
-    }
+
+    ChipLogError(SoftwareUpdate, "No suitable OTA Provider candidate found");
     return false;
 }
 

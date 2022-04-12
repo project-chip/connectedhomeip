@@ -121,33 +121,31 @@ struct Transitions
         {
             return mFactory.CreateState2();
         }
-        else if (state.Is<State2>() && event.Is<Event1>())
+        if (state.Is<State2>() && event.Is<Event1>())
         {
             return mFactory.CreateState1();
         }
-        else if (state.Is<State1>() && event.Is<Event4>())
+        if (state.Is<State1>() && event.Is<Event4>())
         {
             // legal - Dispatches event without transition
             mCtx.Dispatch(Event::Create<Event2>());
             return {};
         }
-        else if (state.Is<State2>() && event.Is<Event4>())
+        if (state.Is<State2>() && event.Is<Event4>())
         {
-            // mCtx.Dispatch(Event::Create<Event2>()); // dsipatching an event and returning a transition would be illegal
+            // mCtx.Dispatch(Event::Create<Event2>()); // dispatching an event and returning a transition would be illegal
             return mFactory.CreateState1();
         }
-        else if (state.Is<State1>() && event.Is<Event5>())
+        if (state.Is<State1>() && event.Is<Event5>())
         {
             return mFactory.CreateState3();
         }
-        else if (state.Is<State3>() && event.Is<Event5>())
+        if (state.Is<State3>() && event.Is<Event5>())
         {
             return mFactory.CreateState2();
         }
-        else
-        {
-            return {};
-        }
+
+        return {};
     }
 };
 

@@ -1737,7 +1737,7 @@ CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & referenceCertificate, c
     ASN1_TIME * refNotBeforeTime                    = nullptr;
     ASN1_TIME * tbeNotBeforeTime                    = nullptr;
     ASN1_TIME * tbeNotAfterTime                     = nullptr;
-    // int result                                      = 0;
+    int result                                      = 0;
 
     VerifyOrReturnError(!referenceCertificate.empty() && !toBeEvaluatedCertificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1753,14 +1753,13 @@ CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & referenceCertificate, c
     tbeNotAfterTime  = X509_get_notAfter(x509toBeEvaluatedCertificate);
     VerifyOrExit(refNotBeforeTime && tbeNotBeforeTime && tbeNotAfterTime, error = CHIP_ERROR_INTERNAL);
 
-    // TODO: Handle PAA/PAI re-issue and enable below time validations
-    // result = ASN1_TIME_compare(refNotBeforeTime, tbeNotBeforeTime);
+    result = ASN1_TIME_compare(refNotBeforeTime, tbeNotBeforeTime);
     // check if referenceCertificate is issued at or after tbeCertificate's notBefore timestamp
-    // VerifyOrExit(result >= 0, error = CHIP_ERROR_CERT_EXPIRED);
+    VerifyOrExit(result >= 0, error = CHIP_ERROR_CERT_EXPIRED);
 
-    // result = ASN1_TIME_compare(refNotBeforeTime, tbeNotAfterTime);
+    result = ASN1_TIME_compare(refNotBeforeTime, tbeNotAfterTime);
     // check if referenceCertificate is issued at or before tbeCertificate's notAfter timestamp
-    // VerifyOrExit(result <= 0, error = CHIP_ERROR_CERT_EXPIRED);
+    VerifyOrExit(result <= 0, error = CHIP_ERROR_CERT_EXPIRED);
 
 exit:
     X509_free(x509ReferenceCertificate);

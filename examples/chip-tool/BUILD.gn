@@ -24,6 +24,7 @@ declare_args() {
   # Use a separate eventloop for CHIP tasks
   config_use_separate_eventloop = true
   config_use_interactive_mode = true
+  config_enable_yaml_tests = true
 }
 
 config("config") {
@@ -36,6 +37,7 @@ config("config") {
   defines = [
     "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}",
     "CONFIG_USE_INTERACTIVE_MODE=${config_use_interactive_mode}",
+    "CONFIG_ENABLE_YAML_TESTS=${config_enable_yaml_tests}",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -72,12 +74,15 @@ static_library("chip-tool-utils") {
     "commands/payload/SetupPayloadGenerateCommand.cpp",
     "commands/payload/SetupPayloadParseCommand.cpp",
     "commands/payload/SetupPayloadVerhoeff.cpp",
-    "commands/tests/TestCommand.cpp",
     "config/PersistentStorage.cpp",
   ]
 
   if (config_use_interactive_mode) {
     sources += [ "commands/interactive/InteractiveCommands.cpp" ]
+  }
+
+  if (config_enable_yaml_tests) {
+    sources += [ "commands/tests/TestCommand.cpp" ]
   }
 
   public_deps = [

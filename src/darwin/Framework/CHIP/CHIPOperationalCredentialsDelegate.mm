@@ -46,6 +46,11 @@ static BOOL isRunningTests(void)
     return (environment[@"XCTestConfigurationFilePath"] != nil);
 }
 
+static void ClearSecretData(NSMutableData * data)
+{
+    Crypto::ClearSecretData(static_cast<uint8_t *>([data mutableBytes]), [data length]);
+}
+
 CHIP_ERROR CHIPOperationalCredentialsDelegate::init(
     CHIPPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner, NSData * _Nullable ipk)
 {
@@ -80,11 +85,11 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::init(
     }
 
     if (ipk) {
-        if ([ipk length] != sizeof(mIPK)) {
+        if ([ipk length] != mIPK.Length()) {
             CHIP_LOG_ERROR("CHIPOperationalCredentialsDelegate::init provided IPK is wrong size");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        memcpy(mIPK, [ipk bytes], [ipk length]);
+        memcpy(mIPK.Bytes(), [ipk bytes], [ipk length]);
     } else {
         CHIP_ERROR err = LoadIPKFromKeyChain();
 
@@ -141,6 +146,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::LoadRootCertKeysFromKeyChain()
         (id) kSecReturnData : @YES,
     };
 
+    // The CFDataRef we get from SecItemCopyMatching allocates its
+    // buffer in a way that zeroes it when deallocated.
     CFDataRef keyDataRef;
     OSStatus status = SecItemCopyMatching((CFDictionaryRef) query, (CFTypeRef *) &keyDataRef);
     if (status == errSecItemNotFound || keyDataRef == nil) {
@@ -151,16 +158,19 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::LoadRootCertKeysFromKeyChain()
     CHIP_LOG_ERROR("Found an existing self managed keypair in the keychain");
     NSData * keyData = CFBridgingRelease(keyDataRef);
 
-    NSData * keypairData = [[NSData alloc] initWithBase64EncodedData:keyData options:0];
+    NSMutableData * keypairData = [[NSMutableData alloc] initWithBase64EncodedData:keyData options:0];
 
     chip::Crypto::P256SerializedKeypair serialized;
     if ([keypairData length] != serialized.Capacity()) {
         NSLog(@"Keypair length %zu does not match expected length %zu", [keypairData length], serialized.Capacity());
+        ClearSecretData(keypairData);
         return CHIP_ERROR_INTERNAL;
     }
 
     std::memmove((uint8_t *) serialized, [keypairData bytes], [keypairData length]);
     serialized.SetLength([keypairData length]);
+
+    ClearSecretData(keypairData);
 
     CHIP_LOG_ERROR("Deserializing the key");
     return mIssuerKey->Deserialize(serialized);
@@ -175,6 +185,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::LoadIPKFromKeyChain()
         (id) kSecReturnData : @YES,
     };
 
+    // The CFDataRef we get from SecItemCopyMatching allocates its
+    // buffer in a way that zeroes it when deallocated.
     CFDataRef keyDataRef;
     OSStatus status = SecItemCopyMatching((CFDictionaryRef) query, (CFTypeRef *) &keyDataRef);
     if (status == errSecItemNotFound || keyDataRef == nil) {
@@ -185,13 +197,15 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::LoadIPKFromKeyChain()
     CHIP_LOG_ERROR("Found an existing IPK in the keychain");
     NSData * keyData = CFBridgingRelease(keyDataRef);
 
-    NSData * ipkData = [[NSData alloc] initWithBase64EncodedData:keyData options:0];
-    if ([ipkData length] != sizeof(mIPK)) {
-        NSLog(@"IPK length %zu does not match expected length %zu", [ipkData length], sizeof(mIPK));
+    NSMutableData * ipkData = [[NSMutableData alloc] initWithBase64EncodedData:keyData options:0];
+    if ([ipkData length] != mIPK.Length()) {
+        NSLog(@"IPK length %zu does not match expected length %zu", [ipkData length], mIPK.Length());
+        ClearSecretData(ipkData);
         return CHIP_ERROR_INTERNAL;
     }
 
-    memcpy(mIPK, [ipkData bytes], [ipkData length]);
+    memcpy(mIPK.Bytes(), [ipkData bytes], [ipkData length]);
+    ClearSecretData(ipkData);
     return CHIP_NO_ERROR;
 }
 
@@ -209,16 +223,19 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateRootCertKeys()
         return errorCode;
     }
 
-    NSData * keypairData = [NSData dataWithBytes:serializedKey.Bytes() length:serializedKey.Length()];
+    NSMutableData * keypairData = [NSMutableData dataWithBytes:serializedKey.Bytes() length:serializedKey.Length()];
 
     const NSDictionary * addParams = @{
         (id) kSecClass : (id) kSecClassGenericPassword,
         (id) kSecAttrService : kCHIPCAKeyChainLabel,
         (id) kSecAttrSynchronizable : @YES,
+        // TODO: Figure out how to ClearSecretData on the base-64 encoded data?
         (id) kSecValueData : [keypairData base64EncodedDataWithOptions:0],
     };
 
-    OSStatus status = SecItemAdd((__bridge CFDictionaryRef) addParams, NULL);
+    ClearSecretData(keypairData);
+
+    OSStatus status = SecItemAdd((__bridge CFDictionaryRef) addParams, nullptr);
     // TODO: Enable SecItemAdd for Darwin unit tests
     if (status != errSecSuccess && !isRunningTests()) {
         NSLog(@"Failed in storing key : %d", status);
@@ -232,21 +249,24 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateRootCertKeys()
 
 CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateIPK()
 {
-    CHIP_ERROR errorCode = DRBG_get_bytes(mIPK, sizeof(mIPK));
+    CHIP_ERROR errorCode = DRBG_get_bytes(mIPK.Bytes(), mIPK.Length());
     if (errorCode != CHIP_NO_ERROR) {
         return errorCode;
     }
 
-    NSData * ipkAdata = [NSData dataWithBytes:mIPK length:sizeof(mIPK)];
+    NSMutableData * ipkData = [NSMutableData dataWithBytes:mIPK.Bytes() length:mIPK.Length()];
 
     const NSDictionary * addParams = @{
         (id) kSecClass : (id) kSecClassGenericPassword,
         (id) kSecAttrService : kCHIPIPKKeyChainLabel,
         (id) kSecAttrSynchronizable : @YES,
-        (id) kSecValueData : [ipkAdata base64EncodedDataWithOptions:0],
+        // TODO: Figure out how to ClearSecretData on the base-64 encoded data?
+        (id) kSecValueData : [ipkData base64EncodedDataWithOptions:0],
     };
 
-    OSStatus status = SecItemAdd((__bridge CFDictionaryRef) addParams, NULL);
+    ClearSecretData(ipkData);
+
+    OSStatus status = SecItemAdd((__bridge CFDictionaryRef) addParams, nullptr);
     // TODO: Enable SecItemAdd for Darwin unit tests
     if (status != errSecSuccess && !isRunningTests()) {
         NSLog(@"Failed in storing IPK : %d", status);
@@ -326,8 +346,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
         }
     }
     if (!haveRootCert) {
-        ReturnErrorOnFailure(rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipRootId, mIssuerId));
-        ReturnErrorOnFailure(rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId));
+        ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterRCACId(mIssuerId));
+        ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterFabricId(fabricId));
 
         NSLog(@"Generating RCAC");
         X509CertRequestParams rcac_request = { 0, validityStart, validityEnd, rcac_dn, rcac_dn };
@@ -343,8 +363,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
     icac.reduce_size(0);
 
     ChipDN noc_dn;
-    ReturnErrorOnFailure(noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId));
-    ReturnErrorOnFailure(noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipNodeId, nodeId));
+    ReturnErrorOnFailure(noc_dn.AddAttribute_MatterFabricId(fabricId));
+    ReturnErrorOnFailure(noc_dn.AddAttribute_MatterNodeId(nodeId));
     ReturnErrorOnFailure(noc_dn.AddCATs(cats));
 
     X509CertRequestParams noc_request = { 1, validityStart, validityEnd, noc_dn, rcac_dn };

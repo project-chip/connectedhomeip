@@ -101,6 +101,7 @@ class {{filename}}: public TestCommandBridge
         {{#if (isTestOnlyCluster cluster)}}
         {{command}}(
         {{#chip_tests_item_parameters}}
+        {{~#not_first}}, {{/not_first~}}
         {{#*inline "defaultValue"}}{{asTypedLiteral (chip_tests_config_get_default_value definedValue) (chip_tests_config_get_type definedValue)}}{{/inline}}
           {{~#if (chip_tests_config_has definedValue)~}}
               m{{asUpperCamelCase definedValue}}.HasValue() ? m{{asUpperCamelCase definedValue}}.Value() : {{>defaultValue}}

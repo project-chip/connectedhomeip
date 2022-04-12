@@ -89,11 +89,19 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
 {
     CHIP_ERROR err = aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
         Descriptor::Structs::DeviceType::Type deviceStruct;
-        uint16_t index = emberAfIndexFromEndpoint(endpoint);
+        CHIP_ERROR err2;
 
-        deviceStruct.type     = emberAfDeviceIdFromIndex(index);
-        deviceStruct.revision = emberAfDeviceVersionFromIndex(index);
-        return encoder.Encode(deviceStruct);
+        auto deviceTypeList = emberAfDeviceTypeListFromEndpoint(endpoint, err2);
+        ReturnErrorOnFailure(err2);
+
+        for (auto & deviceType : deviceTypeList)
+        {
+            deviceStruct.type     = deviceType.deviceId;
+            deviceStruct.revision = deviceType.deviceVersion;
+            ReturnErrorOnFailure(encoder.Encode(deviceStruct));
+        }
+
+        return CHIP_NO_ERROR;
     });
 
     return err;

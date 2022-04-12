@@ -78,7 +78,7 @@ public:
         });
     }
 
-    void UserPrompt(NSString * _Nonnull message) { NextTest(); }
+    void UserPrompt(NSString * _Nonnull message, NSString * _Nullable expectedValue = nil) { NextTest(); }
 
     void WaitForCommissionee(chip::NodeId nodeId)
     {

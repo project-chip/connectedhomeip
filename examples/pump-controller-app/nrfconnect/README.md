@@ -404,11 +404,8 @@ Semiconductor kit you are using (for example `nrf52840dk_nrf52840`):
 
 #### Changing bootloader configuration
 
-To change the default MCUboot configuration, edit the `mcuboot.conf` or
-`mcuboot_release.conf` overlay files depending on whether you build the target
-with debug or release configuration. The files are located in the
-`configuration/build-target/child_image` directory (_build-target_ is your board
-name, for example `nrf52840dk_nrf52840`).
+To change the default MCUboot configuration, edit the `prj.conf` file located in
+the `child_image/mcuboot` directory.
 
 Make sure to keep the configuration consistent with changes made to the
 application configuration. This is necessary for the configuration to work, as
@@ -452,7 +449,7 @@ To make them persistent, save the configuration options in the `prj.conf` file.
 
 The example uses different configuration files depending on the supported
 features. Configuration files are provided for different build types and they
-are located in the `configuration/build-target` directory.
+are located in the application root directory.
 
 The `prj.conf` file represents a debug build type. Other build types are covered
 by dedicated files with the build type added as a suffix to the prj part, as per

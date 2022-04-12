@@ -235,11 +235,9 @@ static uint32_t calculateDelayMs(EndpointId endpoint, uint8_t targetPosition, bo
     {
         return MIN_POSITION_CHANGE_DELAY_MS;
     }
-    else
-    {
-        uint32_t delayMs = openOrClosePeriodMs / positionDelta;
-        return (delayMs < MIN_POSITION_CHANGE_DELAY_MS ? MIN_POSITION_CHANGE_DELAY_MS : delayMs);
-    }
+
+    uint32_t delayMs = openOrClosePeriodMs / positionDelta;
+    return (delayMs < MIN_POSITION_CHANGE_DELAY_MS ? MIN_POSITION_CHANGE_DELAY_MS : delayMs);
 }
 
 void emberAfBarrierControlClusterServerTickCallback(EndpointId endpoint)

@@ -50,7 +50,6 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "3b: reads back the RO mandatory attribute: Type"
-      disabled: true
       command: "readAttribute"
       attribute: "Type"
       response:
@@ -130,7 +129,6 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "3b: reads back the RO mandatory attribute: EndProductType"
-      disabled: true
       command: "readAttribute"
       attribute: "EndProductType"
       response:

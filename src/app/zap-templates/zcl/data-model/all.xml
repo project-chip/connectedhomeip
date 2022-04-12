@@ -14,7 +14,6 @@
    <xi:include href="chip/chip-ota.xml" />
    <xi:include href="chip/chip-types.xml" />
    <xi:include href="chip/clusters-extensions.xml" />
-   <xi:include href="chip/commissioning.xml" />
    <xi:include href="chip/content-launch-cluster.xml" />
    <xi:include href="chip/descriptor-cluster.xml" />
    <xi:include href="chip/diagnostic-logs-cluster.xml" />
@@ -34,6 +33,7 @@
    <xi:include href="chip/media-input-cluster.xml" />
    <xi:include href="chip/media-playback-cluster.xml" />
    <xi:include href="chip/mode-select-cluster.xml" />
+   <xi:include href="chip/network-commissioning-cluster.xml" />
    <xi:include href="chip/onoff-cluster.xml" />
    <xi:include href="chip/operational-credentials-cluster.xml" />
    <xi:include href="chip/pressure-measurement-cluster.xml" />

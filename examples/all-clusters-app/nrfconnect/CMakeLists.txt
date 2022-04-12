@@ -22,9 +22,11 @@ get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-cluster
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
-set(APPLICATION_CONFIG_DIR "configuration/\${BOARD}")
+# Set Kconfig root files that will be processed as a first Kconfig for used child images.
+set(mcuboot_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.mcuboot.root)
+set(multiprotocol_rpmsg_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.multiprotocol_rpmsg.root)
 
-if(NOT CONF_FILE STREQUAL "prj.conf")
+if(DEFINED CONF_FILE AND NOT CONF_FILE STREQUAL "prj.conf")
     set(PM_STATIC_YML_FILE ${CMAKE_CURRENT_SOURCE_DIR}/configuration/${BOARD}/pm_static_dfu.yml)
 endif()
 
@@ -66,4 +68,8 @@ chip_configure_data_model(app
 
 if(CONFIG_CHIP_OTA_REQUESTOR)
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/OTAUtil.cpp)
+endif()
+
+if (CONFIG_SHELL AND BOARD STREQUAL "nrf52840dongle_nrf52840")
+  target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUTrigger.cpp)
 endif()

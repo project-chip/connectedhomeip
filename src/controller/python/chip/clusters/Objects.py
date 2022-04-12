@@ -20046,7 +20046,7 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="acType", Tag=0x00000040, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="acCapacity", Tag=0x00000041, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="acRefrigerantType", Tag=0x00000042, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="acCompressor", Tag=0x00000043, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="acCompressorType", Tag=0x00000043, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="acErrorCode", Tag=0x00000044, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="acLouverPosition", Tag=0x00000045, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="acCoilTemperature", Tag=0x00000046, Type=typing.Optional[int]),
@@ -20096,7 +20096,7 @@ class Thermostat(Cluster):
     acType: 'typing.Optional[uint]' = None
     acCapacity: 'typing.Optional[uint]' = None
     acRefrigerantType: 'typing.Optional[uint]' = None
-    acCompressor: 'typing.Optional[uint]' = None
+    acCompressorType: 'typing.Optional[uint]' = None
     acErrorCode: 'typing.Optional[uint]' = None
     acLouverPosition: 'typing.Optional[uint]' = None
     acCoilTemperature: 'typing.Optional[int]' = None
@@ -20876,7 +20876,7 @@ class Thermostat(Cluster):
             value: 'typing.Optional[uint]' = None
 
         @dataclass
-        class AcCompressor(ClusterAttributeDescriptor):
+        class AcCompressorType(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0201

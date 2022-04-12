@@ -78,7 +78,7 @@ void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState);
 
 void Shutdown()
 {
-    chip::DeviceLayer::SystemLayer().CancelTimer(EchoTimerHandler, NULL);
+    chip::DeviceLayer::SystemLayer().CancelTimer(EchoTimerHandler, nullptr);
     gEchoClient.Shutdown();
     ShutdownChip();
 }
@@ -124,7 +124,7 @@ CHIP_ERROR SendEchoRequest()
 
     gLastEchoTime = chip::System::SystemClock().GetMonotonicTimestamp();
 
-    err = chip::DeviceLayer::SystemLayer().StartTimer(gEchoInterval, EchoTimerHandler, NULL);
+    err = chip::DeviceLayer::SystemLayer().StartTimer(gEchoInterval, EchoTimerHandler, nullptr);
     if (err != CHIP_NO_ERROR)
     {
         printf("Unable to schedule timer\n");
@@ -142,7 +142,7 @@ CHIP_ERROR SendEchoRequest()
     else
     {
         printf("Send echo request failed, err: %s\n", chip::ErrorStr(err));
-        chip::DeviceLayer::SystemLayer().CancelTimer(EchoTimerHandler, NULL);
+        chip::DeviceLayer::SystemLayer().CancelTimer(EchoTimerHandler, nullptr);
     }
 
     return err;
@@ -274,7 +274,7 @@ int main(int argc, char * argv[])
     // Arrange to get a callback whenever an Echo Response is received.
     gEchoClient.SetEchoResponseReceived(HandleEchoResponseReceived);
 
-    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::kZero, EchoTimerHandler, NULL);
+    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::kZero, EchoTimerHandler, nullptr);
     SuccessOrExit(err);
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
