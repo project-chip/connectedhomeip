@@ -420,6 +420,8 @@ def AndroidTargets():
     yield target.Extend('arm-chip-tvserver', board=AndroidBoard.ARM, app=AndroidApp.CHIP_TVServer)
     yield target.Extend('arm64-chip-tv-casting-app', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TV_CASTING_APP)
     yield target.Extend('arm-chip-tv-casting-app', board=AndroidBoard.ARM, app=AndroidApp.CHIP_TV_CASTING_APP)
+    yield target.Extend('x86-chip-tv-casting-app', board=AndroidBoard.X86, app=AndroidApp.CHIP_TV_CASTING_APP)
+    yield target.Extend('x86-chip-tvserver', board=AndroidBoard.X86, app=AndroidApp.CHIP_TVServer)
 
 
 def MbedTargets():

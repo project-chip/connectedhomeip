@@ -117,10 +117,11 @@ public class MatterServant {
     chipPlatform.updateCommissionableDataProviderData(
         null, null, 0, testSetupPasscode, testDiscriminator);
 
-    mTvApp.postInit();
-
     chipAppServer = new ChipAppServer();
     chipAppServer.startApp();
+
+    // probably need a preInit() and postInit()
+    mTvApp.postInit();
   }
 
   public void restart() {
