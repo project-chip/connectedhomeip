@@ -186,7 +186,7 @@ private:
      *
      * Return whether one of our paths is now a superset of the provided path.
      */
-    bool MergeOverlappedAttributePath(AttributePathParams & aAttributePath);
+    bool MergeOverlappedAttributePath(const AttributePathParams & aAttributePath);
 
     inline void BumpDirtySetGeneration() { mDirtyGeneration++; }
 

@@ -42,6 +42,8 @@ if (current_cpu == "arm" || current_cpu == "arm64") {
   import("${build_root}/config/arm.gni")
 } else if (current_cpu == "x86" || current_cpu == "x86_64") {
   import("${build_root}/config/x86.gni")
+} else if (current_cpu == "riscv") {
+  import("${build_root}/config/riscv.gni")
 }
 
 config("release") {
@@ -122,10 +124,39 @@ config("abi_default") {
         ]
       }
     }
+    if (current_cpu == "riscv") {
+      if (riscv_arch != "") {
+        cflags += [ "-march=${riscv_arch}" ]
+      }
+      if (riscv_cpu != "") {
+        cflags += [ "-mcpu=${riscv_cpu}" ]
+      }
+      if (riscv_tune != "") {
+        cflags += [ "-mtune=${riscv_tune}" ]
+      }
+      if (riscv_abi != "") {
+        cflags += [ "-mabi=${riscv_abi}" ]
+      }
+      if (riscv_fpu != "") {
+        cflags += [ "-mfpu=${riscv_fpu}" ]
+      }
+      if (riscv_float_abi != "") {
+        cflags += [ "-mfloat-abi=${riscv_float_abi}" ]
+      }
+    }
   }
 
   asmflags = cflags
   ldflags = cflags
+}
+
+config("dead_code_elimination_default") {
+  # Delete unreferenced sections. Helpful with -ffunction-sections.
+  if (current_os == "mac" || current_os == "ios") {
+    ldflags = [ "-Wl,-dead_strip" ]
+  } else {
+    ldflags = [ "-Wl,--gc-sections" ]
+  }
 }
 
 config("target_default") {

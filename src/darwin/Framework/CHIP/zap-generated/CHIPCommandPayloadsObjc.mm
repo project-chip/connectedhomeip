@@ -1359,9 +1359,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _ssid = [NSData data];
+        _ssid = nil;
 
-        _breadcrumb = @(0);
+        _breadcrumb = nil;
     }
     return self;
 }
@@ -1374,7 +1374,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _networkingStatus = @(0);
 
-        _debugText = @"";
+        _debugText = nil;
 
         _wiFiScanResults = nil;
 
@@ -1393,7 +1393,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _credentials = [NSData data];
 
-        _breadcrumb = @(0);
+        _breadcrumb = nil;
     }
     return self;
 }
@@ -1406,7 +1406,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _operationalDataset = [NSData data];
 
-        _breadcrumb = @(0);
+        _breadcrumb = nil;
     }
     return self;
 }
@@ -1419,7 +1419,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _networkID = [NSData data];
 
-        _breadcrumb = @(0);
+        _breadcrumb = nil;
     }
     return self;
 }
@@ -1447,7 +1447,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _networkID = [NSData data];
 
-        _breadcrumb = @(0);
+        _breadcrumb = nil;
     }
     return self;
 }
@@ -1460,9 +1460,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _networkingStatus = @(0);
 
-        _debugText = @"";
+        _debugText = nil;
 
-        _errorValue = @(0);
+        _errorValue = nil;
     }
     return self;
 }
@@ -1477,7 +1477,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _networkIndex = @(0);
 
-        _breadcrumb = @(0);
+        _breadcrumb = nil;
     }
     return self;
 }

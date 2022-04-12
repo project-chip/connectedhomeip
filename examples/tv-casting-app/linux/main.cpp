@@ -96,17 +96,16 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             gDiscoveryFilter = Dnssd::DiscoveryFilter(Dnssd::DiscoveryFilterType::kDeviceType, static_cast<uint16_t>(deviceType));
             return true;
         }
-        else
+
+        for (int i = 0; i < kKnownDeviceTypesCount; i++)
         {
-            for (int i = 0; i < kKnownDeviceTypesCount; i++)
+            if (strcasecmp(aValue, kKnownDeviceTypes[i].name) == 0)
             {
-                if (strcasecmp(aValue, kKnownDeviceTypes[i].name) == 0)
-                {
-                    gDiscoveryFilter = Dnssd::DiscoveryFilter(Dnssd::DiscoveryFilterType::kDeviceType, kKnownDeviceTypes[i].id);
-                    return true;
-                }
+                gDiscoveryFilter = Dnssd::DiscoveryFilter(Dnssd::DiscoveryFilterType::kDeviceType, kKnownDeviceTypes[i].id);
+                return true;
             }
         }
+
         ChipLogError(AppServer, "%s: INTERNAL ERROR: Unhandled option value: %s %s", aProgram, aName, aValue);
         return false;
     }
@@ -162,7 +161,10 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
     DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 
     // Enter commissioning mode, open commissioning window
-    Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
+
     Server::GetInstance().GetFabricTable().DeleteAllFabrics();
     ReturnOnFailure(
         Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(kCommissioningWindowTimeout));
@@ -350,10 +352,11 @@ public:
         }
 
         chip::DeviceProxyInitParams initParams = {
-            .sessionManager = &(server->GetSecureSessionManager()),
-            .exchangeMgr    = &(server->GetExchangeManager()),
-            .fabricTable    = &(server->GetFabricTable()),
-            .clientPool     = &gCASEClientPool,
+            .sessionManager           = &(server->GetSecureSessionManager()),
+            .sessionResumptionStorage = server->GetSessionResumptionStorage(),
+            .exchangeMgr              = &(server->GetExchangeManager()),
+            .fabricTable              = &(server->GetFabricTable()),
+            .clientPool               = &gCASEClientPool,
         };
 
         PeerId peerID           = fabric->GetPeerIdForNode(nodeId);

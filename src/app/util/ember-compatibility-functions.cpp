@@ -323,7 +323,6 @@ void IncreaseClusterDataVersion(const ConcreteClusterPath & aConcreteClusterPath
         ChipLogDetail(DataManagement, "Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI " update version to %" PRIx32,
                       aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId), *(version));
     }
-    return;
 }
 
 CHIP_ERROR SendSuccessStatus(AttributeReportIB::Builder & aAttributeReport, AttributeDataIB::Builder & aAttributeDataIBBuilder)
@@ -575,7 +574,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         // reader (which can be lightweight constructed even from nullptr).
         GlobalAttributeReader reader(attributeCluster);
         AttributeAccessInterface * attributeOverride =
-            (attributeCluster != nullptr) ? &reader : findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
+            (attributeCluster != nullptr) ? &reader : GetAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
         if (attributeOverride)
         {
             bool triedEncode;
@@ -964,11 +963,16 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * attributeMetadata, 
 }
 } // namespace
 
+const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
+{
+    return emberAfLocateAttributeMetadata(aConcreteClusterPath.mEndpointId, aConcreteClusterPath.mClusterId,
+                                          aConcreteClusterPath.mAttributeId, CLUSTER_MASK_SERVER);
+}
+
 CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
                                   TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
-    const EmberAfAttributeMetadata * attributeMetadata =
-        emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER);
+    const EmberAfAttributeMetadata * attributeMetadata = GetAttributeMetadata(aPath);
 
     if (attributeMetadata == nullptr)
     {
@@ -1009,7 +1013,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::DataVersionMismatch);
     }
 
-    if (auto * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
+    if (auto * attrOverride = GetAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
     {
         AttributeValueDecoder valueDecoder(aReader, aSubjectDescriptor);
         ReturnErrorOnFailure(attrOverride->Write(aPath, valueDecoder));
@@ -1056,8 +1060,22 @@ bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath,
 
 bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
 {
-    uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    return index != 0xFFFF && emberAfDeviceIdFromIndex(index) == deviceType;
+    CHIP_ERROR err;
+    auto deviceTypeList = emberAfDeviceTypeListFromEndpoint(endpoint, err);
+    if (err != CHIP_NO_ERROR)
+    {
+        return false;
+    }
+
+    for (auto & device : deviceTypeList)
+    {
+        if (device.deviceId == deviceType)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 } // namespace app

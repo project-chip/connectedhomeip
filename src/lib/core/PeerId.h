@@ -43,6 +43,7 @@ class PeerId
 {
 public:
     PeerId() {}
+    PeerId(CompressedFabricId compressedFabricId, NodeId nodeId) : mNodeId(nodeId), mCompressedFabricId(compressedFabricId) {}
 
     NodeId GetNodeId() const { return mNodeId; }
     PeerId & SetNodeId(NodeId id)

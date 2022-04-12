@@ -348,6 +348,7 @@ void ExchangeContext::OnSessionReleased()
     {
         // Exchange is already being closed. It may occur when closing an exchange after sending
         // RemoveFabric response which triggers removal of all sessions for the given fabric.
+        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(this);
         return;
     }
 

@@ -60,7 +60,10 @@ app::Clusters::NetworkCommissioning::Instance
 
 static void InitServer(intptr_t context)
 {
-    chip::Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
+
     sWiFiNetworkCommissioningInstance.Init();
 }
 

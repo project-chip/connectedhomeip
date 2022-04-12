@@ -64,6 +64,8 @@ public:
     // Called by the DeviceCommissioner to notify that we have discovered a new device.
     void NotifyCommissionableDeviceDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData);
 
+    void SetSystemLayer(System::Layer * systemLayer) { mSystemLayer = systemLayer; };
+
 #if CONFIG_NETWORK_LAYER_BLE
     void SetBleLayer(Ble::BleLayer * bleLayer) { mBleLayer = bleLayer; };
 #endif // CONFIG_NETWORK_LAYER_BLE
@@ -120,6 +122,8 @@ private:
         kTransportTypeCount,
     };
 
+    static void OnDeviceDiscoveredTimeoutCallback(System::Layer * layer, void * context);
+
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
     void OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj);
@@ -133,6 +137,7 @@ private:
     Dnssd::DiscoveryFilter currentFilter;
 
     DeviceCommissioner * mCommissioner = nullptr;
+    System::Layer * mSystemLayer       = nullptr;
     chip::NodeId mRemoteId;
     uint32_t mSetUpPINCode                   = 0;
     SetupCodePairerBehaviour mConnectionType = SetupCodePairerBehaviour::kCommission;

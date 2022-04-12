@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -27,6 +27,7 @@
 #define __STDC_FORMAT_MACROS
 
 #include "chip-cert.h"
+#include <lib/support/BytesToHex.h>
 
 #include <string>
 
@@ -47,46 +48,50 @@ bool ToolChipDN::SetCertSubjectDN(X509 * cert) const
         case kOID_AttributeType_CommonName:
             attrNID = NID_commonName;
             break;
-        case kOID_AttributeType_ChipNodeId:
+        case kOID_AttributeType_MatterNodeId:
             attrNID = gNIDChipNodeId;
             break;
-        case kOID_AttributeType_ChipFirmwareSigningId:
+        case kOID_AttributeType_MatterFirmwareSigningId:
             attrNID = gNIDChipFirmwareSigningId;
             break;
-        case kOID_AttributeType_ChipICAId:
+        case kOID_AttributeType_MatterICACId:
             attrNID = gNIDChipICAId;
             break;
-        case kOID_AttributeType_ChipRootId:
+        case kOID_AttributeType_MatterRCACId:
             attrNID = gNIDChipRootId;
             break;
-        case kOID_AttributeType_ChipFabricId:
+        case kOID_AttributeType_MatterFabricId:
             attrNID = gNIDChipFabricId;
             break;
-        case kOID_AttributeType_ChipCASEAuthenticatedTag:
+        case kOID_AttributeType_MatterCASEAuthTag:
             attrNID = gNIDChipCASEAuthenticatedTag;
             break;
         default:
             ExitNow(res = false);
         }
 
-        if (IsChipDNAttr(rdn[i].mAttrOID))
+        if (IsChip64bitDNAttr(rdn[i].mAttrOID))
         {
-            char chipAttrStr[17];
-            int chipAttrLen;
+            char chipAttrStr[kChip64bitAttrUTF8Length];
+            VerifyOrReturnError(Encoding::Uint64ToHex(rdn[i].mChipVal, chipAttrStr, sizeof(chipAttrStr),
+                                                      Encoding::HexFlags::kUppercase) == CHIP_NO_ERROR,
+                                false);
 
-            if (IsChip64bitDNAttr(rdn[i].mAttrOID))
+            if (!X509_NAME_add_entry_by_NID(X509_get_subject_name(cert), attrNID, MBSTRING_UTF8,
+                                            reinterpret_cast<uint8_t *>(chipAttrStr), sizeof(chipAttrStr), -1, 0))
             {
-                snprintf(chipAttrStr, sizeof(chipAttrStr), "%016" PRIX64 "", rdn[i].mChipVal);
-                chipAttrLen = 16;
+                ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
             }
-            else
-            {
-                snprintf(chipAttrStr, sizeof(chipAttrStr), "%08" PRIX32 "", static_cast<uint32_t>(rdn[i].mChipVal));
-                chipAttrLen = 8;
-            }
+        }
+        else if (IsChip32bitDNAttr(rdn[i].mAttrOID))
+        {
+            char chipAttrStr[kChip32bitAttrUTF8Length];
+            VerifyOrReturnError(Encoding::Uint32ToHex(static_cast<uint32_t>(rdn[i].mChipVal), chipAttrStr, sizeof(chipAttrStr),
+                                                      Encoding::HexFlags::kUppercase) == CHIP_NO_ERROR,
+                                false);
 
-            if (!X509_NAME_add_entry_by_NID(X509_get_subject_name(cert), attrNID, MBSTRING_UTF8, (unsigned char *) chipAttrStr,
-                                            chipAttrLen, -1, 0))
+            if (!X509_NAME_add_entry_by_NID(X509_get_subject_name(cert), attrNID, MBSTRING_UTF8,
+                                            reinterpret_cast<uint8_t *>(chipAttrStr), sizeof(chipAttrStr), -1, 0))
             {
                 ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
             }
@@ -133,11 +138,12 @@ void ToolChipDN::PrintDN(FILE * file, const char * name) const
     {
         if (IsChip64bitDNAttr(rdn[i].mAttrOID))
         {
-            snprintf(valueStr, sizeof(valueStr), "%016" PRIX64, rdn[i].mChipVal);
+            Encoding::Uint64ToHex(rdn[i].mChipVal, valueStr, sizeof(valueStr), Encoding::HexFlags::kUppercaseAndNullTerminate);
         }
         else if (IsChip32bitDNAttr(rdn[i].mAttrOID))
         {
-            snprintf(valueStr, sizeof(valueStr), "%08" PRIX32, static_cast<uint32_t>(rdn[i].mChipVal));
+            Encoding::Uint32ToHex(static_cast<uint32_t>(rdn[i].mChipVal), valueStr, sizeof(valueStr),
+                                  Encoding::HexFlags::kUppercaseAndNullTerminate);
         }
         else
         {
@@ -350,9 +356,8 @@ bool AddAuthorityKeyId(X509 * cert, X509 * caCert)
     int index = 0;
     std::unique_ptr<AUTHORITY_KEYID, void (*)(AUTHORITY_KEYID *)> akid(AUTHORITY_KEYID_new(), &AUTHORITY_KEYID_free);
 
-    akid.get()->keyid =
-        reinterpret_cast<ASN1_OCTET_STRING *>(X509_get_ext_d2i(caCert, NID_subject_key_identifier, &isCritical, &index));
-    if (akid.get()->keyid == nullptr)
+    akid->keyid = reinterpret_cast<ASN1_OCTET_STRING *>(X509_get_ext_d2i(caCert, NID_subject_key_identifier, &isCritical, &index));
+    if (akid->keyid == nullptr)
     {
         ReportOpenSSLErrorAndExit("X509_get_ext_d2i", res = false);
     }
@@ -742,8 +747,9 @@ exit:
     return res;
 }
 
-bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subjectVID, uint16_t subjectPID, X509 * caCert,
-                 EVP_PKEY * caKey, const struct tm & validFrom, uint32_t validDays, X509 * newCert, EVP_PKEY * newKey)
+bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subjectVID, uint16_t subjectPID,
+                 bool encodeVIDandPIDasCN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom, uint32_t validDays,
+                 X509 * newCert, EVP_PKEY * newKey)
 {
     bool res = true;
 
@@ -773,39 +779,105 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
         ReportOpenSSLErrorAndExit("X509_set_pubkey", res = false);
     }
 
-    // Add common name attribute to the certificate subject DN.
-    if (!X509_NAME_add_entry_by_NID(X509_get_subject_name(newCert), NID_commonName, MBSTRING_UTF8,
-                                    reinterpret_cast<unsigned char *>(const_cast<char *>(subjectCN)),
-                                    static_cast<int>(strlen(subjectCN)), -1, 0))
+    // Encode Common Name (CN) Attribute.
     {
-        ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
-    }
+        char cnAttrStr[chip::Crypto::kMax_CommonNameAttr_Length];
+        size_t cnAttrStrLen = 0;
+        if (subjectCN != nullptr)
+        {
+            VerifyOrReturnError(strlen(subjectCN) <= sizeof(cnAttrStr), false);
+            memcpy(cnAttrStr, subjectCN, strlen(subjectCN));
+            cnAttrStrLen += strlen(subjectCN);
+        }
 
-    // Add VID attribute to the certificate subject DN.
-    if (subjectVID != VendorId::NotSpecified)
-    {
-        char chipAttrStr[5];
+        if (encodeVIDandPIDasCN)
+        {
+            if (subjectVID != VendorId::NotSpecified)
+            {
+                // Add space to separate from the previous string.
+                if (cnAttrStrLen > 0)
+                {
+                    VerifyOrReturnError((cnAttrStrLen + 1) <= sizeof(cnAttrStr), false);
+                    cnAttrStr[cnAttrStrLen] = ' ';
+                    cnAttrStrLen++;
+                }
 
-        snprintf(chipAttrStr, sizeof(chipAttrStr), "%04" PRIX16 "", subjectVID);
+                VerifyOrReturnError((cnAttrStrLen + strlen(chip::Crypto::kVIDPrefixForCNEncoding) +
+                                     chip::Crypto::kVIDandPIDHexLength) <= sizeof(cnAttrStr),
+                                    false);
 
-        if (!X509_NAME_add_entry_by_NID(X509_get_subject_name(newCert), gNIDChipAttAttrVID, MBSTRING_UTF8,
-                                        reinterpret_cast<unsigned char *>(chipAttrStr), 4, -1, 0))
+                memcpy(&cnAttrStr[cnAttrStrLen], chip::Crypto::kVIDPrefixForCNEncoding,
+                       strlen(chip::Crypto::kVIDPrefixForCNEncoding));
+                cnAttrStrLen += strlen(chip::Crypto::kVIDPrefixForCNEncoding);
+
+                VerifyOrReturnError(Encoding::Uint16ToHex(subjectVID, &cnAttrStr[cnAttrStrLen], chip::Crypto::kVIDandPIDHexLength,
+                                                          Encoding::HexFlags::kUppercase) == CHIP_NO_ERROR,
+                                    false);
+                cnAttrStrLen += chip::Crypto::kVIDandPIDHexLength;
+            }
+
+            if (subjectPID != 0)
+            {
+                // Add space to separate from the previous string.
+                if (cnAttrStrLen > 0)
+                {
+                    VerifyOrReturnError((cnAttrStrLen + 1) <= sizeof(cnAttrStr), false);
+                    cnAttrStr[cnAttrStrLen++] = ' ';
+                }
+
+                VerifyOrReturnError((cnAttrStrLen + strlen(chip::Crypto::kPIDPrefixForCNEncoding) +
+                                     chip::Crypto::kVIDandPIDHexLength) <= sizeof(cnAttrStr),
+                                    false);
+
+                memcpy(&cnAttrStr[cnAttrStrLen], chip::Crypto::kPIDPrefixForCNEncoding,
+                       strlen(chip::Crypto::kPIDPrefixForCNEncoding));
+                cnAttrStrLen += strlen(chip::Crypto::kPIDPrefixForCNEncoding);
+
+                VerifyOrReturnError(Encoding::Uint16ToHex(subjectPID, &cnAttrStr[cnAttrStrLen], chip::Crypto::kVIDandPIDHexLength,
+                                                          Encoding::HexFlags::kUppercase) == CHIP_NO_ERROR,
+                                    false);
+                cnAttrStrLen += chip::Crypto::kVIDandPIDHexLength;
+            }
+        }
+
+        // Add common name attribute to the certificate subject DN.
+        if (!X509_NAME_add_entry_by_NID(X509_get_subject_name(newCert), NID_commonName, MBSTRING_UTF8,
+                                        reinterpret_cast<uint8_t *>(cnAttrStr), static_cast<int>(cnAttrStrLen), -1, 0))
         {
             ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
         }
     }
 
-    // Add PID attribute to the certificate subject DN.
-    if (subjectPID != 0)
+    if (!encodeVIDandPIDasCN)
     {
-        char chipAttrStr[5];
-
-        snprintf(chipAttrStr, sizeof(chipAttrStr), "%04" PRIX16 "", subjectPID);
-
-        if (!X509_NAME_add_entry_by_NID(X509_get_subject_name(newCert), gNIDChipAttAttrPID, MBSTRING_UTF8,
-                                        reinterpret_cast<unsigned char *>(chipAttrStr), 4, -1, 0))
+        // Add VID attribute to the certificate subject DN.
+        if (subjectVID != VendorId::NotSpecified)
         {
-            ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
+            char chipAttrStr[chip::Crypto::kVIDandPIDHexLength];
+            VerifyOrReturnError(Encoding::Uint16ToHex(subjectVID, chipAttrStr, chip::Crypto::kVIDandPIDHexLength,
+                                                      Encoding::HexFlags::kUppercase) == CHIP_NO_ERROR,
+                                false);
+
+            if (!X509_NAME_add_entry_by_NID(X509_get_subject_name(newCert), gNIDChipAttAttrVID, MBSTRING_UTF8,
+                                            reinterpret_cast<unsigned char *>(chipAttrStr), sizeof(chipAttrStr), -1, 0))
+            {
+                ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
+            }
+        }
+
+        // Add PID attribute to the certificate subject DN.
+        if (subjectPID != 0)
+        {
+            char chipAttrStr[chip::Crypto::kVIDandPIDHexLength];
+            VerifyOrReturnError(Encoding::Uint16ToHex(subjectPID, chipAttrStr, chip::Crypto::kVIDandPIDHexLength,
+                                                      Encoding::HexFlags::kUppercase) == CHIP_NO_ERROR,
+                                false);
+
+            if (!X509_NAME_add_entry_by_NID(X509_get_subject_name(newCert), gNIDChipAttAttrPID, MBSTRING_UTF8,
+                                            reinterpret_cast<unsigned char *>(chipAttrStr), sizeof(chipAttrStr), -1, 0))
+            {
+                ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
+            }
         }
     }
 

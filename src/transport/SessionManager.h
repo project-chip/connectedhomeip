@@ -194,6 +194,7 @@ public:
     void ExpirePairing(const SessionHandle & session);
     void ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric);
     void ExpireAllPairingsForFabric(FabricIndex fabric);
+    void ExpireAllPASEPairings();
 
     /**
      * @brief

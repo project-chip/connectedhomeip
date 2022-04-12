@@ -127,7 +127,7 @@ struct FabricList : public PersistentData<kPersistentBufferMax>
 
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
     {
-        key.FabricTable();
+        key.GroupFabricList();
         return CHIP_NO_ERROR;
     }
 
@@ -384,7 +384,7 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistentData<kPersiste
     bool first                      = true;
 
     GroupData() : GroupInfo(nullptr){};
-    GroupData(chip::FabricIndex fabric) : GroupInfo(), fabric_index(fabric) {}
+    GroupData(chip::FabricIndex fabric) : fabric_index(fabric) {}
     GroupData(chip::FabricIndex fabric, chip::GroupId group) : GroupInfo(group, nullptr), fabric_index(fabric) {}
 
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
@@ -505,7 +505,7 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
     chip::GroupId group_id         = kUndefinedGroupId;
     chip::KeysetId keyset_id       = 0;
 
-    KeyMapData() : GroupKey(){};
+    KeyMapData(){};
     KeyMapData(chip::FabricIndex fabric, uint16_t link_id = 0, chip::GroupId group = kUndefinedGroupId, chip::KeysetId keyset = 0) :
         GroupKey(group, keyset), LinkedData(link_id), fabric_index(fabric)
     {}

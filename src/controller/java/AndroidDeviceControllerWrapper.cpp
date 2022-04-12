@@ -125,12 +125,11 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
     initParams.bleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
 #endif
     initParams.listenPort                      = CHIP_PORT + 1;
-    setupParams.storageDelegate                = wrapper.get();
     setupParams.pairingDelegate                = wrapper.get();
     setupParams.operationalCredentialsDelegate = opCredsIssuer;
-    initParams.fabricIndependentStorage        = setupParams.storageDelegate;
+    initParams.fabricIndependentStorage        = wrapper.get();
 
-    wrapper->mGroupDataProvider.SetStorageDelegate(setupParams.storageDelegate);
+    wrapper->mGroupDataProvider.SetStorageDelegate(wrapper.get());
 
     CHIP_ERROR err = wrapper->mGroupDataProvider.Init();
     if (err != CHIP_NO_ERROR)

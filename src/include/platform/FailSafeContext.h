@@ -78,6 +78,10 @@ public:
         return mFabricIndex;
     }
 
+    // Immediately disarms the timer and schedules a failsafe timer expiry.
+    // If the failsafe is not armed, this is a no-op.
+    void ForceFailSafeTimerExpiry();
+
     static CHIP_ERROR LoadFromStorage(FabricIndex & fabricIndex, bool & addNocCommandInvoked, bool & updateNocCommandInvoked);
     static CHIP_ERROR DeleteFromStorage();
 

@@ -29,6 +29,7 @@ menuconfig CHIP
 	imply NET_IPV6
 	imply NET_CONFIG_NEED_IPV6
 	imply NET_SOCKETS
+	imply NETWORKING
 	help
 	  This option enables Connected Home over IP libraries.
 
@@ -174,6 +175,33 @@ config CHIP_OPERATIONAL_TIME_SAVE_INTERVAL
 	  memory. Selected value is a trade off between performing frequent saves to know
 	  precisely operation time in case of device reboot and maximizing flash memory
 	  lifetime.
+
+config CHIP_MALLOC_SYS_HEAP
+	bool "Memory allocator based on Zephyr sys_heap"
+	imply SYS_HEAP_RUNTIME_STATS
+	help
+	  Enable memory allocation functions, imitating with the default malloc,
+	  calloc, realloc and free, based on sys_heap from Zephyr RTOS.
+
+if CHIP_MALLOC_SYS_HEAP
+
+config CHIP_MALLOC_SYS_HEAP_OVERRIDE
+	bool "Override default allocator with custom one based on Zephyr sys_heap"
+	default y
+	help
+	  Replace the default memory allocation functions, such as malloc, calloc,
+	  realloc, free and their reentrant versions, with their counterparts based
+	  on sys_heap from Zephyr RTOS.
+
+config CHIP_MALLOC_SYS_HEAP_SIZE
+	int "Heap size used by memory allocator based on Zephyr sys_heap"
+	default 16384 # 16kB
+	help
+	  This value controls how much of the device RAM is reserved for the heap
+	  used by the memory allocation functions based on sys_heap from Zephyr
+	  RTOS.
+
+endif
 
 config APP_LINK_WITH_CHIP
 	bool "Link 'app' with Connected Home over IP"

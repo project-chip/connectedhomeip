@@ -26,9 +26,6 @@ chip_test_suite("tests") {
     "TestTxtFields.cpp",
   ]
 
-  if (chip_device_platform != "efr32") {
-    test_sources += [ "TestDnssdCache.cpp" ]
-  }
   if (chip_mdns == "minimal") {
     test_sources += [ "TestActiveResolveAttempts.cpp" ]
   }

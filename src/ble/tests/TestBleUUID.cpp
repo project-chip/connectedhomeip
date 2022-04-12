@@ -96,7 +96,7 @@ const nlTest sTests[] =
 
 int TestBleUUID()
 {
-    nlTestSuite theSuite = { "BleUUID", &sTests[0], NULL, NULL };
+    nlTestSuite theSuite = { "BleUUID", &sTests[0], nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

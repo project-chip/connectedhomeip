@@ -34,9 +34,9 @@
 #include <support/CHIPMem.h>
 
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
 #include <platform/Ameba/AmebaOTAImageProcessor.h>
 
 void * __dso_handle = 0;
@@ -44,6 +44,7 @@ void * __dso_handle = 0;
 using chip::AmebaOTAImageProcessor;
 using chip::BDXDownloader;
 using chip::ByteSpan;
+using chip::DefaultOTARequestor;
 using chip::EndpointId;
 using chip::FabricIndex;
 using chip::GetRequestorInstance;
@@ -51,7 +52,6 @@ using chip::NodeId;
 using chip::OnDeviceConnected;
 using chip::OnDeviceConnectionFailure;
 using chip::OTADownloader;
-using chip::OTARequestor;
 using chip::PeerId;
 using chip::Server;
 using chip::VendorId;
@@ -85,9 +85,9 @@ void NetWorkCommissioningInstInit()
 
 static DeviceCallbacks EchoCallbacks;
 
-OTARequestor gRequestorCore;
+DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
-GenericOTARequestorDriver gRequestorUser;
+DefaultOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 AmebaOTAImageProcessor gImageProcessor;
 
@@ -127,7 +127,9 @@ static void InitServer(intptr_t context)
     InitOTARequestor();
 
     // Init ZCL Data Model and CHIP App Server
-    chip::Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

@@ -31,6 +31,7 @@ namespace DeviceLayer {
 static constexpr size_t kMaxUserLabelListLength = 10;
 static constexpr size_t kMaxLabelNameLength     = 16;
 static constexpr size_t kMaxLabelValueLength    = 16;
+static constexpr size_t kMaxActiveLocaleLength  = 35;
 
 class DeviceInfoProvider
 {
@@ -65,9 +66,12 @@ public:
 
     using FixedLabelType = app::Clusters::FixedLabel::Structs::LabelStruct::Type;
     using UserLabelType  = app::Clusters::UserLabel::Structs::LabelStruct::Type;
+    using CalendarType   = app::Clusters::TimeFormatLocalization::CalendarType;
 
-    using FixedLabelIterator = Iterator<FixedLabelType>;
-    using UserLabelIterator  = Iterator<UserLabelType>;
+    using FixedLabelIterator             = Iterator<FixedLabelType>;
+    using UserLabelIterator              = Iterator<UserLabelType>;
+    using SupportedLocalesIterator       = Iterator<CharSpan>;
+    using SupportedCalendarTypesIterator = Iterator<CalendarType>;
 
     DeviceInfoProvider() = default;
 
@@ -90,6 +94,22 @@ public:
      */
     virtual FixedLabelIterator * IterateFixedLabel(EndpointId endpoint) = 0;
     virtual UserLabelIterator * IterateUserLabel(EndpointId endpoint)   = 0;
+
+    /**
+     *  Creates an iterator that may be used to obtain the list of supported locales of the device.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  @retval An instance of EndpointIterator on success
+     *  @retval nullptr if no iterator instances are available.
+     */
+    virtual SupportedLocalesIterator * IterateSupportedLocales() = 0;
+
+    /**
+     *  Creates an iterator that may be used to obtain the list of supported calendar types of the device.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  @retval An instance of EndpointIterator on success
+     *  @retval nullptr if no iterator instances are available.
+     */
+    virtual SupportedCalendarTypesIterator * IterateSupportedCalendarTypes() = 0;
 
 protected:
     /**

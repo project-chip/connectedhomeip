@@ -374,6 +374,18 @@ void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
     });
 }
 
+void SessionManager::ExpireAllPASEPairings()
+{
+    ChipLogDetail(Inet, "Expiring all PASE pairings");
+    mSecureSessions.ForEachSession([&](auto session) {
+        if (session->GetSecureSessionType() == Transport::SecureSession::Type::kPASE)
+        {
+            mSecureSessions.ReleaseSession(session);
+        }
+        return Loop::Continue;
+    });
+}
+
 Optional<SessionHandle> SessionManager::AllocateSession()
 {
     return mSecureSessions.CreateNewSecureSession();
@@ -544,7 +556,7 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & packetH
     unsecuredSession->SetPeerAddress(peerAddress);
     SessionMessageDelegate::DuplicateMessage isDuplicate = SessionMessageDelegate::DuplicateMessage::No;
 
-    unsecuredSession->MarkActive();
+    unsecuredSession->MarkActiveRx();
 
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
@@ -628,7 +640,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
         return;
     }
 
-    secureSession->MarkActive();
+    secureSession->MarkActiveRx();
 
     if (isDuplicate == SessionMessageDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
     {

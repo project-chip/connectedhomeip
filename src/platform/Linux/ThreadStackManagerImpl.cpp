@@ -235,7 +235,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(ByteSpan netInfo)
     return PlatformMgr().PostEvent(&event);
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(ByteSpan & netInfo)
+CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(Thread::OperationalDataset & dataset)
 {
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
 
@@ -257,7 +257,6 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(ByteSpan & netInfo)
 
         if (response == nullptr)
         {
-            netInfo = ByteSpan();
             return CHIP_ERROR_KEY_NOT_FOUND;
         }
 
@@ -265,7 +264,6 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(ByteSpan & netInfo)
 
         if (tupleContent == nullptr)
         {
-            netInfo = ByteSpan();
             return CHIP_ERROR_KEY_NOT_FOUND;
         }
 
@@ -273,7 +271,6 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(ByteSpan & netInfo)
 
         if (value == nullptr)
         {
-            netInfo = ByteSpan();
             return CHIP_ERROR_KEY_NOT_FOUND;
         }
 
@@ -282,7 +279,7 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(ByteSpan & netInfo)
         ReturnErrorOnFailure(mDataset.Init(ByteSpan(data, size)));
     }
 
-    netInfo = mDataset.AsByteSpan();
+    dataset.Init(mDataset.AsByteSpan());
 
     return CHIP_NO_ERROR;
 }
@@ -699,15 +696,20 @@ CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(A
 }
 
 CHIP_ERROR
-ThreadStackManagerImpl::_AttachToThreadNetwork(ByteSpan netInfo,
+ThreadStackManagerImpl::_AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
                                                NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
 {
-    // There is another ongoing connect request, reject the new one.
-    VerifyOrReturnError(mpConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    // Reset the previously set callback since it will never be called in case incorrect dataset was supplied.
+    mpConnectCallback = nullptr;
     ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(false));
-    ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadProvision(netInfo));
-    ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(true));
-    mpConnectCallback = callback;
+    ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadProvision(dataset.AsByteSpan()));
+
+    if (dataset.IsCommissioned())
+    {
+        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(true));
+        mpConnectCallback = callback;
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -716,20 +718,18 @@ void ThreadStackManagerImpl::_UpdateNetworkStatus()
     // Thread is not enabled, then we are not trying to connect to the network.
     VerifyOrReturn(IsThreadEnabled() && mpStatusChangeCallback != nullptr);
 
-    ByteSpan datasetTLV;
     Thread::OperationalDataset dataset;
     uint8_t extpanid[Thread::kSizeExtendedPanId];
 
     // If we have not provisioned any Thread network, return the status from last network scan,
     // If we have provisioned a network, we assume the ot-br-posix is activitely connecting to that network.
-    CHIP_ERROR err = ThreadStackMgrImpl().GetThreadProvision(datasetTLV);
+    CHIP_ERROR err = ThreadStackMgrImpl().GetThreadProvision(dataset);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to get configured network when updating network status: %s", err.AsString());
         return;
     }
 
-    VerifyOrReturn(dataset.Init(datasetTLV) == CHIP_NO_ERROR);
     // The Thread network is not enabled, but has a different extended pan id.
     VerifyOrReturn(dataset.GetExtendedPanId(extpanid) == CHIP_NO_ERROR);
 

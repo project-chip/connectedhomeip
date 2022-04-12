@@ -5866,6 +5866,15 @@ public class ChipClusters {
       clearCredential(chipClusterPtr, callback, credential, timedInvokeTimeoutMs);
     }
 
+    public void clearHolidaySchedule(DefaultClusterCallback callback, Integer holidayIndex) {
+      clearHolidaySchedule(chipClusterPtr, callback, holidayIndex, null);
+    }
+
+    public void clearHolidaySchedule(
+        DefaultClusterCallback callback, Integer holidayIndex, int timedInvokeTimeoutMs) {
+      clearHolidaySchedule(chipClusterPtr, callback, holidayIndex, timedInvokeTimeoutMs);
+    }
+
     public void clearUser(
         DefaultClusterCallback callback, Integer userIndex, int timedInvokeTimeoutMs) {
       clearUser(chipClusterPtr, callback, userIndex, timedInvokeTimeoutMs);
@@ -5908,6 +5917,18 @@ public class ChipClusters {
         ChipStructs.DoorLockClusterDlCredential credential,
         int timedInvokeTimeoutMs) {
       getCredentialStatus(chipClusterPtr, callback, credential, timedInvokeTimeoutMs);
+    }
+
+    public void getHolidaySchedule(
+        GetHolidayScheduleResponseCallback callback, Integer holidayIndex) {
+      getHolidaySchedule(chipClusterPtr, callback, holidayIndex, null);
+    }
+
+    public void getHolidaySchedule(
+        GetHolidayScheduleResponseCallback callback,
+        Integer holidayIndex,
+        int timedInvokeTimeoutMs) {
+      getHolidaySchedule(chipClusterPtr, callback, holidayIndex, timedInvokeTimeoutMs);
     }
 
     public void getUser(GetUserResponseCallback callback, Integer userIndex) {
@@ -5968,6 +5989,39 @@ public class ChipClusters {
           userIndex,
           userStatus,
           userType,
+          timedInvokeTimeoutMs);
+    }
+
+    public void setHolidaySchedule(
+        DefaultClusterCallback callback,
+        Integer holidayIndex,
+        Long localStartTime,
+        Long localEndTime,
+        Integer operatingMode) {
+      setHolidaySchedule(
+          chipClusterPtr,
+          callback,
+          holidayIndex,
+          localStartTime,
+          localEndTime,
+          operatingMode,
+          null);
+    }
+
+    public void setHolidaySchedule(
+        DefaultClusterCallback callback,
+        Integer holidayIndex,
+        Long localStartTime,
+        Long localEndTime,
+        Integer operatingMode,
+        int timedInvokeTimeoutMs) {
+      setHolidaySchedule(
+          chipClusterPtr,
+          callback,
+          holidayIndex,
+          localStartTime,
+          localEndTime,
+          operatingMode,
           timedInvokeTimeoutMs);
     }
 
@@ -6085,6 +6139,12 @@ public class ChipClusters {
         @Nullable ChipStructs.DoorLockClusterDlCredential credential,
         @Nullable Integer timedInvokeTimeoutMs);
 
+    private native void clearHolidaySchedule(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        Integer holidayIndex,
+        @Nullable Integer timedInvokeTimeoutMs);
+
     private native void clearUser(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
@@ -6109,6 +6169,12 @@ public class ChipClusters {
         long chipClusterPtr,
         GetCredentialStatusResponseCallback Callback,
         ChipStructs.DoorLockClusterDlCredential credential,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void getHolidaySchedule(
+        long chipClusterPtr,
+        GetHolidayScheduleResponseCallback Callback,
+        Integer holidayIndex,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void getUser(
@@ -6146,6 +6212,15 @@ public class ChipClusters {
         @Nullable Integer userIndex,
         @Nullable Integer userStatus,
         @Nullable Integer userType,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void setHolidaySchedule(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        Integer holidayIndex,
+        Long localStartTime,
+        Long localEndTime,
+        Integer operatingMode,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void setUser(
@@ -6199,6 +6274,17 @@ public class ChipClusters {
           Boolean credentialExists,
           @Nullable Integer userIndex,
           @Nullable Integer nextCredentialIndex);
+
+      void onError(Exception error);
+    }
+
+    public interface GetHolidayScheduleResponseCallback {
+      void onSuccess(
+          Integer holidayIndex,
+          Integer status,
+          Optional<Long> localStartTime,
+          Optional<Long> localEndTime,
+          Optional<Integer> operatingMode);
 
       void onError(Exception error);
     }
@@ -11337,21 +11423,26 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public void addOrUpdateThreadNetwork(
-        NetworkConfigResponseCallback callback, byte[] operationalDataset, Long breadcrumb) {
+        NetworkConfigResponseCallback callback,
+        byte[] operationalDataset,
+        Optional<Long> breadcrumb) {
       addOrUpdateThreadNetwork(chipClusterPtr, callback, operationalDataset, breadcrumb, null);
     }
 
     public void addOrUpdateThreadNetwork(
         NetworkConfigResponseCallback callback,
         byte[] operationalDataset,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         int timedInvokeTimeoutMs) {
       addOrUpdateThreadNetwork(
           chipClusterPtr, callback, operationalDataset, breadcrumb, timedInvokeTimeoutMs);
     }
 
     public void addOrUpdateWiFiNetwork(
-        NetworkConfigResponseCallback callback, byte[] ssid, byte[] credentials, Long breadcrumb) {
+        NetworkConfigResponseCallback callback,
+        byte[] ssid,
+        byte[] credentials,
+        Optional<Long> breadcrumb) {
       addOrUpdateWiFiNetwork(chipClusterPtr, callback, ssid, credentials, breadcrumb, null);
     }
 
@@ -11359,34 +11450,34 @@ public class ChipClusters {
         NetworkConfigResponseCallback callback,
         byte[] ssid,
         byte[] credentials,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         int timedInvokeTimeoutMs) {
       addOrUpdateWiFiNetwork(
           chipClusterPtr, callback, ssid, credentials, breadcrumb, timedInvokeTimeoutMs);
     }
 
     public void connectNetwork(
-        ConnectNetworkResponseCallback callback, byte[] networkID, Long breadcrumb) {
+        ConnectNetworkResponseCallback callback, byte[] networkID, Optional<Long> breadcrumb) {
       connectNetwork(chipClusterPtr, callback, networkID, breadcrumb, null);
     }
 
     public void connectNetwork(
         ConnectNetworkResponseCallback callback,
         byte[] networkID,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         int timedInvokeTimeoutMs) {
       connectNetwork(chipClusterPtr, callback, networkID, breadcrumb, timedInvokeTimeoutMs);
     }
 
     public void removeNetwork(
-        NetworkConfigResponseCallback callback, byte[] networkID, Long breadcrumb) {
+        NetworkConfigResponseCallback callback, byte[] networkID, Optional<Long> breadcrumb) {
       removeNetwork(chipClusterPtr, callback, networkID, breadcrumb, null);
     }
 
     public void removeNetwork(
         NetworkConfigResponseCallback callback,
         byte[] networkID,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         int timedInvokeTimeoutMs) {
       removeNetwork(chipClusterPtr, callback, networkID, breadcrumb, timedInvokeTimeoutMs);
     }
@@ -11395,7 +11486,7 @@ public class ChipClusters {
         NetworkConfigResponseCallback callback,
         byte[] networkID,
         Integer networkIndex,
-        Long breadcrumb) {
+        Optional<Long> breadcrumb) {
       reorderNetwork(chipClusterPtr, callback, networkID, networkIndex, breadcrumb, null);
     }
 
@@ -11403,20 +11494,23 @@ public class ChipClusters {
         NetworkConfigResponseCallback callback,
         byte[] networkID,
         Integer networkIndex,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         int timedInvokeTimeoutMs) {
       reorderNetwork(
           chipClusterPtr, callback, networkID, networkIndex, breadcrumb, timedInvokeTimeoutMs);
     }
 
-    public void scanNetworks(ScanNetworksResponseCallback callback, byte[] ssid, Long breadcrumb) {
+    public void scanNetworks(
+        ScanNetworksResponseCallback callback,
+        @Nullable Optional<byte[]> ssid,
+        Optional<Long> breadcrumb) {
       scanNetworks(chipClusterPtr, callback, ssid, breadcrumb, null);
     }
 
     public void scanNetworks(
         ScanNetworksResponseCallback callback,
-        byte[] ssid,
-        Long breadcrumb,
+        @Nullable Optional<byte[]> ssid,
+        Optional<Long> breadcrumb,
         int timedInvokeTimeoutMs) {
       scanNetworks(chipClusterPtr, callback, ssid, breadcrumb, timedInvokeTimeoutMs);
     }
@@ -11425,7 +11519,7 @@ public class ChipClusters {
         long chipClusterPtr,
         NetworkConfigResponseCallback Callback,
         byte[] operationalDataset,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void addOrUpdateWiFiNetwork(
@@ -11433,21 +11527,21 @@ public class ChipClusters {
         NetworkConfigResponseCallback Callback,
         byte[] ssid,
         byte[] credentials,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void connectNetwork(
         long chipClusterPtr,
         ConnectNetworkResponseCallback Callback,
         byte[] networkID,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void removeNetwork(
         long chipClusterPtr,
         NetworkConfigResponseCallback Callback,
         byte[] networkID,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void reorderNetwork(
@@ -11455,18 +11549,19 @@ public class ChipClusters {
         NetworkConfigResponseCallback Callback,
         byte[] networkID,
         Integer networkIndex,
-        Long breadcrumb,
+        Optional<Long> breadcrumb,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void scanNetworks(
         long chipClusterPtr,
         ScanNetworksResponseCallback Callback,
-        byte[] ssid,
-        Long breadcrumb,
+        @Nullable Optional<byte[]> ssid,
+        Optional<Long> breadcrumb,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface ConnectNetworkResponseCallback {
-      void onSuccess(Integer networkingStatus, String debugText, Long errorValue);
+      void onSuccess(
+          Integer networkingStatus, Optional<String> debugText, @Nullable Long errorValue);
 
       void onError(Exception error);
     }
@@ -11481,7 +11576,7 @@ public class ChipClusters {
     public interface ScanNetworksResponseCallback {
       void onSuccess(
           Integer networkingStatus,
-          String debugText,
+          Optional<String> debugText,
           Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
               wiFiScanResults,
           Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>

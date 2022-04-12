@@ -72,11 +72,9 @@ bool BDXDownloader::HasTransferTimedOut()
         mPrevBlockCounter = curBlockCounter;
         return false;
     }
-    else
-    {
-        ChipLogError(BDX, "BDX transfer timeout");
-        return true;
-    }
+
+    ChipLogError(BDX, "BDX transfer timeout");
+    return true;
 }
 
 void BDXDownloader::OnMessageReceived(const chip::PayloadHeader & payloadHeader, chip::System::PacketBufferHandle msg)

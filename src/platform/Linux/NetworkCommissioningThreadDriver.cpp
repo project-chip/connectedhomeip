@@ -43,12 +43,10 @@ namespace NetworkCommissioning {
 
 CHIP_ERROR LinuxThreadDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
-    ByteSpan currentProvision;
     VerifyOrReturnError(ConnectivityMgrImpl().IsThreadAttached(), CHIP_NO_ERROR);
-    VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(currentProvision) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+    VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(mStagingNetwork) == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
-    mSavedNetwork.Init(currentProvision);
-    mStagingNetwork.Init(currentProvision);
+    mSavedNetwork.Init(mStagingNetwork.AsByteSpan());
 
     ThreadStackMgrImpl().SetNetworkStatusChangeCallback(networkStatusChangeCallback);
 
@@ -147,7 +145,7 @@ void LinuxThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * cal
     VerifyOrExit((networkId.size() == kSizeExtendedPanId && memcmp(networkId.data(), extpanid, kSizeExtendedPanId) == 0),
                  status = Status::kNetworkNotFound);
 
-    VerifyOrExit(DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork.AsByteSpan(), callback) == CHIP_NO_ERROR,
+    VerifyOrExit(DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork, callback) == CHIP_NO_ERROR,
                  status = Status::kUnknownError);
 
 exit:
@@ -185,14 +183,12 @@ bool LinuxThreadDriver::ThreadNetworkIterator::Next(Network & item)
     item.connected    = false;
     exhausted         = true;
 
-    ByteSpan currentProvision;
     Thread::OperationalDataset currentDataset;
     uint8_t enabledExtPanId[Thread::kSizeExtendedPanId];
 
     // The Thread network is not actually enabled.
     VerifyOrReturnError(ConnectivityMgrImpl().IsThreadAttached(), true);
-    VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(currentProvision) == CHIP_NO_ERROR, true);
-    VerifyOrReturnError(currentDataset.Init(currentProvision) == CHIP_NO_ERROR, true);
+    VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(currentDataset) == CHIP_NO_ERROR, true);
     // The Thread network is not enabled, but has a different extended pan id.
     VerifyOrReturnError(currentDataset.GetExtendedPanId(enabledExtPanId) == CHIP_NO_ERROR, true);
     VerifyOrReturnError(memcmp(extpanid, enabledExtPanId, kSizeExtendedPanId) == 0, true);

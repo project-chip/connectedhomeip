@@ -156,8 +156,11 @@ public:
     // Reset any relevant states
     virtual void Reset(void) = 0;
 
-    // Handler for the AnnounceOTAProvider command
-    virtual EmberAfStatus HandleAnnounceOTAProvider(
+    /**
+     * Called to handle an AnnounceOTAProvider command and is responsible for sending the status. The caller is responsible for
+     * validating fields in the command.
+     */
+    virtual void HandleAnnounceOTAProvider(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) = 0;
 
@@ -168,7 +171,7 @@ public:
     virtual OTATriggerResult TriggerImmediateQuery() = 0;
 
     // Internal API meant for use by OTARequestorDriver to send the QueryImage command and start the image update process
-    // with the Provider currently set in the OTARequestor
+    // with the preset provider
     virtual void TriggerImmediateQueryInternal() = 0;
 
     // Download image
