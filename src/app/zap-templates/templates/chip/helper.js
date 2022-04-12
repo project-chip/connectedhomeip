@@ -20,6 +20,7 @@ const zapPath      = '../../../../../third_party/zap/repo/dist/src-electron/';
 const templateUtil = require(zapPath + 'generator/template-util.js');
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js');
 const iteratorUtil = require(zapPath + 'util/iterator-util.js');
+const queryAccess  = require(zapPath + 'db/query-access')
 
 const { asBlocks, ensureClusters } = require('../../common/ClustersHelper.js');
 const StringHelper                 = require('../../common/StringHelper.js');
@@ -492,6 +493,73 @@ async function if_chip_complex(options)
   return templateUtil.templatePromise(this.global, result);
 }
 
+async function chip_access_elements(options)
+{
+
+  // console.log(options);
+  let entityType = options.hash.entity
+
+  if (entityType == null)
+  {
+    throw new Error('Access helper requires entityType, either from context, or from the entity="<entityType>" option.')
+  }
+
+  let accessList = null
+
+  // Exaples of operations:
+  //   { operation: null, role: null, accessModifier: 'fabric-scoped' },
+  //   { operation: 'read', role: 'administer', accessModifier: null },
+  //   { operation: 'write', role: 'administer', accessModifier: null }
+  //
+  // Note the existence of a null operation with a modifier of fabric-scoped
+
+  // accessDefaults contains acceptable operations
+  // together with their default value
+  let accessDefaults = new Map();
+
+  switch (entityType) {
+  case 'attribute':
+    accessList = await queryAccess.selectAttributeAccess(this.global.db, this.id);
+    accessDefaults.set('read', 'view');
+    accessDefaults.set('write', 'operate');
+    break;
+  case 'command':
+    accessList = await queryAccess.selectCommandAccess(this.global.db, this.id);
+    accessDefaults.set('invoke', 'operate');
+    break;
+  case 'event':
+    accessList = await queryAccess.selectEventAccess(this.global.db, this.id);
+    accessDefaults.set('read', 'view');
+    break;
+  default:
+    throw new Error(`Entity type ${entityType} not supported. Requires: attribute/command/event.`)
+  }
+
+  let accessEntries = [];
+
+  for (element of accessList) {
+    if (!element.operation) {
+      continue; // not a valid operation (likely null)
+    }
+
+    const operation = element.operation.toLowerCase();
+    if (!accessDefaults.has(operation)) {
+      continue; // not a valid operation (may be a bug or non-matter operation)
+    }
+
+    const role = element.role.toLowerCase();
+
+    if (role === accessDefaults.get(operation)) {
+      continue; // already set as a default
+    }
+
+    accessEntries.push({ operation, role })
+  }
+
+  let p = templateUtil.collectBlocks(accessEntries, options, this)
+  return templateUtil.templatePromise(this.global, p)
+}
+
 //
 // Module exports
 //
@@ -520,3 +588,4 @@ exports.if_chip_complex                                      = if_chip_complex;
 exports.if_basic_global_response                             = if_basic_global_response;
 exports.chip_cluster_specific_structs                        = chip_cluster_specific_structs;
 exports.chip_shared_structs                                  = chip_shared_structs;
+exports.chip_access_elements                                 = chip_access_elements
