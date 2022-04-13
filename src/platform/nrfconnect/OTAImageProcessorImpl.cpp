@@ -25,6 +25,7 @@
 #include <dfu/dfu_target.h>
 #include <dfu/dfu_target_mcuboot.h>
 #include <dfu/mcuboot.h>
+#include <logging/log.h>
 #include <pm/device.h>
 #include <sys/reboot.h>
 
@@ -45,7 +46,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
     ReturnErrorOnFailure(System::MapErrorZephyr(dfu_target_mcuboot_set_buf(mBuffer, sizeof(mBuffer))));
     ReturnErrorOnFailure(System::MapErrorZephyr(dfu_target_reset()));
 
-    return System::MapErrorZephyr(dfu_target_init(DFU_TARGET_IMAGE_TYPE_MCUBOOT, /* size */ 0, nullptr));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Finalize()
@@ -60,19 +61,31 @@ CHIP_ERROR OTAImageProcessorImpl::Abort()
 
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
-    ReturnErrorOnFailure(System::MapErrorZephyr(dfu_target_done(true)));
+    int err = dfu_target_done(true);
+    if (err == 0)
+    {
+        // schedule update of all possible targets by caling this function with argument -1
+        err = dfu_target_schedule_update(-1);
+    }
 
 #ifdef CONFIG_CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
-    return SystemLayer().StartTimer(
-        System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_OTA_REQUESTOR_REBOOT_DELAY_MS),
-        [](System::Layer *, void * /* context */) {
-            PlatformMgr().HandleServerShuttingDown();
-            k_msleep(CHIP_DEVICE_CONFIG_SERVER_SHUTDOWN_ACTIONS_SLEEP_MS);
-            sys_reboot(SYS_REBOOT_WARM);
-        },
-        nullptr /* context */);
+    if (err == 0)
+    {
+        return SystemLayer().StartTimer(
+            System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_OTA_REQUESTOR_REBOOT_DELAY_MS),
+            [](System::Layer *, void * /* context */) {
+                PlatformMgr().HandleServerShuttingDown();
+                k_msleep(CHIP_DEVICE_CONFIG_SERVER_SHUTDOWN_ACTIONS_SLEEP_MS);
+                sys_reboot(SYS_REBOOT_WARM);
+            },
+            nullptr /* context */);
+    }
+    else
+    {
+        return System::MapErrorZephyr(err);
+    }
 #else
-    return CHIP_NO_ERROR;
+    return System::MapErrorZephyr(err);
 #endif
 }
 
@@ -81,11 +94,45 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
     VerifyOrReturnError(mDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_ERROR error = ProcessHeader(block);
-
     if (error == CHIP_NO_ERROR)
     {
-        // DFU target library buffers data internally, so do not clone the block data.
-        error = System::MapErrorZephyr(dfu_target_write(block.data(), block.size()));
+        mCurrentImage.mCurrentOffset += block.size();
+        if (mCurrentImage.mCurrentOffset >= mCurrentImage.mFileInfo->mFileSize)
+        {
+            // calculate how many data should be moved to the next image
+            uint64_t remainingDataSize = mCurrentImage.mCurrentOffset - static_cast<uint64_t>(mCurrentImage.mFileInfo->mFileSize);
+            // write last data of previous image
+            error = System::MapErrorZephyr(dfu_target_write(block.data(), block.size() - remainingDataSize));
+            // switch to net image
+            mCurrentImage.mIndex++;
+            mCurrentImage.mFileInfo = &mContentHeader.mFiles[mCurrentImage.mIndex];
+
+            if (OTAImageContentHeader::FileId::kNetMcuboot == mCurrentImage.mFileInfo->mFileId &&
+                mCurrentImage.mFileInfo->mFileSize > 0 && CHIP_NO_ERROR == error)
+            {
+                // finish previous image and reset target
+                dfu_target_done(true);
+                dfu_target_reset();
+                // initialize next dfu target to store net-core image.
+                dfu_target_init(DFU_TARGET_IMAGE_TYPE_MCUBOOT, mCurrentImage.mIndex, /* size */ 0, nullptr);
+                // write remaining data to new image
+                error =
+                    System::MapErrorZephyr(dfu_target_write(block.data() + (block.size() - remainingDataSize), remainingDataSize));
+                mCurrentImage.mCurrentOffset = remainingDataSize;
+            }
+            else
+            {
+                // Finish process with error to ensure that only two images are available.
+                error = CHIP_ERROR_INVALID_DATA_LIST;
+            }
+        }
+        else
+        {
+            // DFU target library buffers data internally, so do not clone the block data.
+            error = System::MapErrorZephyr(dfu_target_write(block.data(), block.size()));
+        }
+        ChipLogDetail(SoftwareUpdate, "Processed %llu/%u Bytes of image no. %u", mCurrentImage.mCurrentOffset,
+                      mCurrentImage.mFileInfo->mFileSize, mCurrentImage.mIndex);
     }
 
     // Report the result back to the downloader asynchronously.
@@ -129,12 +176,21 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
 
     if (mContentHeaderParser.IsInitialized() && !block.empty())
     {
-        OTAImageContentHeader header = {};
-        CHIP_ERROR error             = mContentHeaderParser.AccumulateAndDecode(block, header);
+        CHIP_ERROR error = mContentHeaderParser.AccumulateAndDecode(block, mContentHeader);
 
         // Needs more data to decode the header
         ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
         ReturnErrorOnFailure(error);
+
+        if (OTAImageContentHeader::FileId::kAppMcuboot == mContentHeader.mFiles[0].mFileId)
+        {
+            mCurrentImage.mIndex    = 0;
+            mCurrentImage.mFileInfo = &mContentHeader.mFiles[mCurrentImage.mIndex];
+            // Initialize dfu target to receive first image
+            error =
+                System::MapErrorZephyr(dfu_target_init(DFU_TARGET_IMAGE_TYPE_MCUBOOT, mCurrentImage.mIndex, /* size */ 0, nullptr));
+            ReturnErrorOnFailure(error);
+        }
 
         mContentHeaderParser.Clear();
     }

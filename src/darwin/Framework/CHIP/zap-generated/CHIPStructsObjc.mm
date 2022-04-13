@@ -204,6 +204,19 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPBasicClusterCapabilityMinimaStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _caseSessionsPerFabric = @(0);
+
+        _subscriptionsPerFabric = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPOtaSoftwareUpdateRequestorClusterProviderLocation
 - (instancetype)init
 {
