@@ -49,6 +49,9 @@ matrix:
           # Ignore URL in hyperlinks [title](url)
           - open: '\[[^]]*\]\('
             close: '\)'
+          # Ignore code markers
+          - open: '<code>'
+            close: '</code>'
 
       # converts markdown to HTML
       - pyspelling.filters.markdown:
