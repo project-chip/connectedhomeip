@@ -18,6 +18,26 @@ matrix:
       wordlists:
         - .github/.wordlist.txt
     pipeline:
+      # See https://facelessuser.github.io/pyspelling/configuration/#pipeline
+      # and https://facelessuser.github.io/pyspelling/filters/context/
+
+      # context-aware logic: we have a LOT of code examples in markdown,
+      # avoid trying to spellcheck code.
+      - pyspelling.filters.context:
+          context_visible_first: true
+          escapes: \\[\\`~]
+          delimiters:
+          # Ignore multiline content between fences (fences can have 3 or more back ticks)
+          # ```
+          # content
+          # ```
+          - open: '(?s)^(?P<open> *`{3,})$'
+            close: '^(?P=open)$'
+          # Ignore text between inline back ticks
+          - open: '(?P<open>`+)'
+            close: '(?P=open)'
+
+      # converts markdown to HTML
       - pyspelling.filters.markdown:
     sources:
       - '**/*.md|!third_party/**|!examples/common/**/repo/**'
