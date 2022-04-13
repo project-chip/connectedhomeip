@@ -50,6 +50,12 @@ void UserPrompt(XCTestExpectation * expectation, dispatch_queue_t queue, NSStrin
     [expectation fulfill];
 }
 
+// Stub for reboot target device.
+void Reboot(XCTestExpectation * expectation, dispatch_queue_t queue, uint16_t discriminator)
+{
+    [expectation fulfill];
+}
+
 void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_t queue, uint64_t deviceId)
 {
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
