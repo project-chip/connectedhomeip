@@ -62,6 +62,7 @@ public:
     const char * SessionResumption(const char * resumptionIdBase64) { return Format("s/%s", resumptionIdBase64); }
 
     // Access Control
+    const char * AccessControlAclEntry(FabricIndex fabric, size_t index) { return Format("f/%x/ac/0/%zx", fabric, index); }
     const char * AccessControlExtensionEntry(FabricIndex fabric) { return Format("f/%x/ac/1", fabric); }
 
     // TODO: We should probably store the fabric-specific parts of the ACL list

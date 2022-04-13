@@ -37,6 +37,8 @@ static_library("server") {
   output_name = "libCHIPAppServer"
 
   sources = [
+    "AclStorage.cpp",
+    "AclStorage.h",
     "CommissioningModeProvider.h",
     "CommissioningWindowManager.cpp",
     "CommissioningWindowManager.h",

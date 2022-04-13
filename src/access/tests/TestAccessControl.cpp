@@ -2137,7 +2137,7 @@ void TestUpdateEntry(nlTestSuite * inSuite, void * inContext)
 
 int Setup(void * inContext)
 {
-    AccessControl::Delegate * delegate = Examples::GetAccessControlDelegate(nullptr);
+    AccessControl::Delegate * delegate = Examples::GetAccessControlDelegate();
     SetAccessControl(accessControl);
     VerifyOrDie(GetAccessControl().Init(delegate, testDeviceTypeResolver) == CHIP_NO_ERROR);
     return SUCCESS;

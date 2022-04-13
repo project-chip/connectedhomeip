@@ -287,24 +287,27 @@ public:
         Delegate * mDelegate = &mDefaultDelegate;
     };
 
-    class Extension
-    {
-        // TODO: implement extension
-    };
-
-    class ExtensionIterator
-    {
-        // TODO: implement extension iterator
-    };
-
-    class Listener
+    /**
+     * Used by access control to notify of changes in access control list.
+     */
+    class EntryListener
     {
     public:
-        virtual ~Listener() = default;
+        enum class ChangeType
+        {
+            kAdded   = 1,
+            kRemoved = 2,
+            kUpdated = 3
+        };
 
-        // TODO: add entry/extension to listener interface
-        virtual void OnEntryChanged()     = 0;
-        virtual void OnExtensionChanged() = 0;
+        virtual ~EntryListener() = default;
+
+        virtual void OnEntryChanged(FabricIndex fabric, size_t index, const Entry & entry, ChangeType changeType) = 0;
+
+    private:
+        EntryListener * mNext = nullptr;
+
+        friend class AccessControl;
     };
 
     class Delegate
@@ -359,13 +362,6 @@ public:
         {
             return CHIP_ERROR_ACCESS_DENIED;
         }
-
-        // Listening
-        virtual void SetListener(Listener & listener) { mListener = &listener; }
-        virtual void ClearListener() { mListener = nullptr; }
-
-    private:
-        Listener * mListener = nullptr;
     };
 
     AccessControl() = default;
@@ -429,11 +425,45 @@ public:
      * @param [in]  entry       Entry from which to copy.
      * @param [out] fabricIndex Fabric index of created entry, if not null, in which case entry `index` will be relative to fabric.
      */
+    CHIP_ERROR CreateEntry(FabricIndex fabric, size_t * index, const Entry & entry)
+    {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
+        size_t i;
+        ReturnErrorOnFailure(mDelegate->CreateEntry(&i, entry, &fabric));
+        if (index)
+        {
+            *index = i;
+        }
+        NotifyEntryChanged(fabric, i, entry, EntryListener::ChangeType::kAdded);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * Creates an entry in the access control list.
+     *
+     * @param [out] index       Entry index of created entry, if not null. May be relative to `fabricIndex`.
+     * @param [in]  entry       Entry from which to copy.
+     * @param [out] fabricIndex Fabric index of created entry, if not null, in which case entry `index` will be relative to fabric.
+     */
     CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, FabricIndex * fabricIndex = nullptr)
     {
         ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         return mDelegate->CreateEntry(index, entry, fabricIndex);
+    }
+
+    /**
+     * Reads an entry from the access control list.
+     *
+     * @param [in]  index       Entry index of entry to read. May be relative to `fabricIndex`.
+     * @param [out] entry       Entry into which to copy.
+     * @param [in]  fabricIndex Fabric to which entry `index` is relative, if not null.
+     */
+    CHIP_ERROR ReadEntry(FabricIndex fabric, size_t index, Entry & entry) const
+    {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        return mDelegate->ReadEntry(index, entry, &fabric);
     }
 
     /**
@@ -456,11 +486,52 @@ public:
      * @param [in] entry        Entry from which to copy.
      * @param [in] fabricIndex  Fabric to which entry `index` is relative, if not null.
      */
+    CHIP_ERROR UpdateEntry(FabricIndex fabric, size_t index, const Entry & entry)
+    {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(mDelegate->UpdateEntry(index, entry, &fabric));
+        NotifyEntryChanged(fabric, index, entry, EntryListener::ChangeType::kUpdated);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * Updates an entry in the access control list.
+     *
+     * @param [in] index        Entry index of entry to update, if not null. May be relative to `fabricIndex`.
+     * @param [in] entry        Entry from which to copy.
+     * @param [in] fabricIndex  Fabric to which entry `index` is relative, if not null.
+     */
     CHIP_ERROR UpdateEntry(size_t index, const Entry & entry, const FabricIndex * fabricIndex = nullptr)
     {
         ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         return mDelegate->UpdateEntry(index, entry, fabricIndex);
+    }
+
+    /**
+     * Deletes an entry from the access control list.
+     *
+     * @param [in] index        Entry index of entry to delete. May be relative to `fabricIndex`.
+     * @param [in] fabricIndex  Fabric to which entry `index` is relative, if not null.
+     */
+    CHIP_ERROR DeleteEntry(FabricIndex fabric, size_t index)
+    {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        ChipLogProgress(DataManagement, "############### in DeleteEntry");
+        Entry entry;
+        if (mEntryListener != nullptr)
+        {
+            // This may fail but ignore failure.
+            CHIP_ERROR err = ReadEntry(index, entry, &fabric);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogProgress(DataManagement, "############### could not ReadEntry");
+            }
+        }
+        ReturnErrorOnFailure(mDelegate->DeleteEntry(index, &fabric));
+        NotifyEntryChanged(fabric, index, entry, EntryListener::ChangeType::kRemoved);
+        return CHIP_NO_ERROR;
     }
 
     /**
@@ -483,11 +554,29 @@ public:
      * @param [out] iterator    Iterator controlling the iteration.
      * @param [in]  fabricIndex Iteration is confined to fabric, if not null.
      */
+    CHIP_ERROR Entries(FabricIndex fabric, EntryIterator & iterator) const
+    {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        return mDelegate->Entries(iterator, &fabric);
+    }
+
+    /**
+     * Iterates over entries in the access control list.
+     *
+     * @param [out] iterator    Iterator controlling the iteration.
+     * @param [in]  fabricIndex Iteration is confined to fabric, if not null.
+     */
     CHIP_ERROR Entries(EntryIterator & iterator, const FabricIndex * fabricIndex = nullptr) const
     {
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         return mDelegate->Entries(iterator, fabricIndex);
     }
+
+    // Adds a listener to the end of the listener list, if not already in the list.
+    void AddEntryListener(EntryListener & listener);
+
+    // Removes a listener from the listener list, if in the list.
+    void RemoveEntryListener(EntryListener & listener);
 
     /**
      * Check whether access (by a subject descriptor, to a request path,
@@ -504,9 +593,14 @@ private:
 
     bool IsValid(const Entry & entry);
 
+    void NotifyEntryChanged(FabricIndex fabric, size_t index, const Entry & entry, EntryListener::ChangeType changeType);
+
+private:
     Delegate * mDelegate = nullptr;
 
     DeviceTypeResolver * mDeviceTypeResolver = nullptr;
+
+    EntryListener * mEntryListener = nullptr;
 };
 
 /**

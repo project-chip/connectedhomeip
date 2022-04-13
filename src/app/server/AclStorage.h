@@ -1,0 +1,145 @@
+/*
+ *
+ *    Copyright (c) 2022 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#pragma once
+
+#include <access/AccessControl.h>
+
+#include <app-common/zap-generated/cluster-objects.h>
+
+namespace chip {
+namespace app {
+
+/**
+ * Storage specifically for access control entries, which correspond to the
+ * ACL attribute of the access control cluster.
+ *
+ * This class is loosely coupled to the access control module (via
+ * Access::GetAccessControl()), and to the server's persistent storage (via
+ * Server::GetInstance().GetPersistentStorage()) as well as the server's
+ * fabric table (via Server::GetInstance().GetFabricTable()).
+ *
+ * An object of this class should be initialized directly after the access
+ * control module is initialized, as it will populate entries in the system
+ * module from storage, and also install a listener in the system module to
+ * keep storage up to date as entries change.
+ *
+ * This class also provides facilities for converting between access control
+ * entries (as used by the system module) and access control entries (as used
+ * by the generated cluster code).
+ */
+class AclStorage
+{
+public:
+    /**
+     * Used for decoding access control entries.
+     */
+    class DecodableEntry
+    {
+        using Entry        = Access::AccessControl::Entry;
+        using StagingEntry = Clusters::AccessControl::Structs::AccessControlEntry::DecodableType;
+
+    public:
+        DecodableEntry() = default;
+
+        /**
+         * Reader decodes into a staging entry, which is then unstaged
+         * into a constructor-provided entry.
+         */
+        CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+        Entry & GetEntry() { return mEntry; }
+
+        const Entry & GetEntry() const { return mEntry; }
+
+    public:
+        static constexpr bool kIsFabricScoped = true;
+
+        // FabricIndex GetFabricIndex() const
+        //{
+        //    FabricIndex fabricIndex = kUndefinedFabricIndex;
+        //    mEntry.GetFabricIndex(fabricIndex);
+        //    return fabricIndex;
+        //}
+
+        void SetFabricIndex(FabricIndex fabricIndex) { mEntry.SetFabricIndex(fabricIndex); }
+
+    private:
+        CHIP_ERROR Unstage();
+
+    private:
+        Entry mEntry;
+
+        StagingEntry mStagingEntry;
+    };
+
+    /**
+     * Used for encoding access control entries.
+     */
+    class EncodableEntry
+    {
+        using Entry         = Access::AccessControl::Entry;
+        using StagingEntry  = Clusters::AccessControl::Structs::AccessControlEntry::Type;
+        using StagingTarget = Clusters::AccessControl::Structs::Target::Type;
+
+    public:
+        EncodableEntry(const Entry & entry) : mEntry(entry) {}
+
+        /**
+         * Constructor-provided entry is staged into a staging entry,
+         * which is then encoded into a writer.
+         */
+        CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+        CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex fabric) const;
+
+        /**
+         * Constructor-provided entry is staged into a staging entry.
+         */
+        CHIP_ERROR Stage() const;
+
+        StagingEntry & GetStagingEntry() { return mStagingEntry; }
+
+    public:
+        static constexpr bool kIsFabricScoped = true;
+
+        FabricIndex GetFabricIndex() const
+        {
+            FabricIndex fabricIndex = kUndefinedFabricIndex;
+            mEntry.GetFabricIndex(fabricIndex);
+            return fabricIndex;
+        }
+
+    private:
+        const Entry & mEntry;
+
+        mutable StagingEntry mStagingEntry;
+        mutable NodeId mStagingSubjects[CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY];
+        mutable StagingTarget mStagingTargets[CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY];
+    };
+
+    /**
+     * Loads access control entries for all fabrics (Server::GetInstance().GetFabricTable())
+     * from persistent storage (Server::GetInstance().GetPersistentStorage())
+     * into access control (Access::GetAccessControl())
+     * and then installs a listener to keep persisted entries in sync.
+     */
+    CHIP_ERROR Init();
+};
+
+} // namespace app
+} // namespace chip

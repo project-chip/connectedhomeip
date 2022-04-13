@@ -25,6 +25,7 @@
 #include <app/CASESessionManager.h>
 #include <app/DefaultAttributePersistenceProvider.h>
 #include <app/OperationalDeviceProxyPool.h>
+#include <app/server/AclStorage.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <credentials/FabricTable.h>
@@ -169,7 +170,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
 #endif
 
         // Inject access control delegate
-        this->accessDelegate = Access::Examples::GetAccessControlDelegate(&sKvsPersistenStorageDelegate);
+        this->accessDelegate = Access::Examples::GetAccessControlDelegate();
 
         return CHIP_NO_ERROR;
     }
@@ -340,6 +341,7 @@ private:
     ServerFabricDelegate mFabricDelegate;
 
     Access::AccessControl mAccessControl;
+    app::AclStorage mAclStorage;
 
     uint16_t mOperationalServicePort;
     uint16_t mUserDirectedCommissioningPort;

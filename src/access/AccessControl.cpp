@@ -195,6 +195,7 @@ CHIP_ERROR AccessControl::RemoveFabric(FabricIndex fabricIndex)
     CHIP_ERROR err;
     do
     {
+        // TODO: switch to delete these in reverse order
         err = DeleteEntry(0, &fabricIndex);
     } while (err == CHIP_NO_ERROR);
 
@@ -202,6 +203,50 @@ CHIP_ERROR AccessControl::RemoveFabric(FabricIndex fabricIndex)
     ReturnErrorCodeIf(err != CHIP_ERROR_SENTINEL, err);
 
     return CHIP_NO_ERROR;
+}
+
+void AccessControl::AddEntryListener(EntryListener & listener)
+{
+    if (mEntryListener == nullptr)
+    {
+        mEntryListener = &listener;
+        listener.mNext = nullptr;
+        return;
+    }
+
+    for (EntryListener * l = mEntryListener; /**/; l = l->mNext)
+    {
+        if (l == &listener)
+        {
+            return;
+        }
+        else if (l->mNext == nullptr)
+        {
+            l->mNext       = &listener;
+            listener.mNext = nullptr;
+            return;
+        }
+    }
+}
+
+void AccessControl::RemoveEntryListener(EntryListener & listener)
+{
+    if (mEntryListener == &listener)
+    {
+        mEntryListener = listener.mNext;
+        listener.mNext = nullptr;
+        return;
+    }
+
+    for (EntryListener * l = mEntryListener; l != nullptr; l = l->mNext)
+    {
+        if (l->mNext == &listener)
+        {
+            l->mNext       = listener.mNext;
+            listener.mNext = nullptr;
+            return;
+        }
+    }
 }
 
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
@@ -412,6 +457,14 @@ bool AccessControl::IsValid(const Entry & entry)
 exit:
     ChipLogError(DataManagement, "AccessControl: %s", log);
     return false;
+}
+
+void AccessControl::NotifyEntryChanged(FabricIndex fabric, size_t index, const Entry & entry, EntryListener::ChangeType changeType)
+{
+    for (EntryListener * l = mEntryListener; l != nullptr; l = l->mNext)
+    {
+        l->OnEntryChanged(fabric, index, entry, changeType);
+    }
 }
 
 AccessControl & GetAccessControl()

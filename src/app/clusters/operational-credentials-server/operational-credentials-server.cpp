@@ -77,7 +77,7 @@ CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(FabricIndex fabricI
     ReturnErrorOnFailure(entry.SetPrivilege(Access::Privilege::kAdminister));
     ReturnErrorOnFailure(entry.SetAuthMode(Access::AuthMode::kCase));
     ReturnErrorOnFailure(entry.AddSubject(nullptr, subject));
-    ReturnErrorOnFailure(Access::GetAccessControl().CreateEntry(nullptr, entry));
+    ReturnErrorOnFailure(Access::GetAccessControl().CreateEntry(fabricIndex, nullptr, entry));
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: ACL entry created for Fabric %X CASE Admin NodeId 0x" ChipLogFormatX64,
                    fabricIndex, ChipLogValueX64(subject));
