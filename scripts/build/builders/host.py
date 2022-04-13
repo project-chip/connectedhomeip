@@ -104,7 +104,7 @@ class HostApp(Enum):
             yield 'chip-ota-requestor-app'
             yield 'chip-ota-requestor-app.map'
         elif self == HostApp.PYTHON_BINDINGS:
-            yield 'controller/python' # Directory containing WHL files
+            yield 'controller/python'  # Directory containing WHL files
         else:
             raise Exception('Unknown app type: %r' % self)
 
