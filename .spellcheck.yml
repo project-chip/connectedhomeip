@@ -12,6 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# To run locally:
+#   Prerequisits (only once):
+#
+#      apt-get install aspell aspell-en
+#      pip install pyspelling
+#
+#   Actual run:
+#
+#      pyspelling pyspelling --config .spellcheck.yml
+
 matrix:
   - name: markdown
     dictionary:
