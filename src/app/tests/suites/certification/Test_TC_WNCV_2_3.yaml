@@ -20,6 +20,14 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     ### ------------------------------------------------------
     ### Step 1x -> Check Lift Reversal (If PICS_WNCV_REVERSAL)
     ## Set b0
