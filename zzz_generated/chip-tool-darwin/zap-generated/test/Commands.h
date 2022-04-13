@@ -171,6 +171,7 @@ public:
         printf("Test_TC_WNCV_3_5\n");
         printf("Test_TC_WNCV_4_3\n");
         printf("Test_TC_WNCV_4_4\n");
+        printf("Test_TC_WNCV_4_5\n");
         printf("TestCluster\n");
         printf("TestSaveAs\n");
         printf("TestConstraints\n");
@@ -42897,6 +42898,400 @@ private:
     }
 };
 
+class Test_TC_WNCV_4_5 : public TestCommandBridge {
+public:
+    Test_TC_WNCV_4_5()
+        : TestCommandBridge("Test_TC_WNCV_4_5")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_WNCV_4_5() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_WNCV_4_5\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_WNCV_4_5\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : 0a: Wait for the commissioned device to be retrieved\n");
+            err = Test0aWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : 0b: TH sends UpOrOpen command to preposition the DUT\n");
+            err = Test0bThSendsUpOrOpenCommandToPrepositionTheDut_1();
+            break;
+        case 2:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 2 : 1a: If (PA_LF & LF) TH sends GoToLiftPercentage command with 90% to DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF")) {
+                NextTest();
+                return;
+            }
+            err = Test1aIfPaLfLfThSendsGoToLiftPercentageCommandWith90ToDut_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : 1b: TH Waits for 100ms-1s\n");
+            err = Test1bThWaitsFor100ms1s_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : 1c: TH sends StopMotion command to DUT\n");
+            err = Test1cThSendsStopMotionCommandToDut_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : 1d: TH Waits for 100ms-1s\n");
+            err = Test1dThWaitsFor100ms1s_5();
+            break;
+        case 6:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 6 : 2a: If (PA_TL & TL) TH sends GoToTiltPercentage command with 90% to DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL")) {
+                NextTest();
+                return;
+            }
+            err = Test2aIfPaTlTlThSendsGoToTiltPercentageCommandWith90ToDut_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : 2b: TH Waits for 100ms-1s\n");
+            err = Test2bThWaitsFor100ms1s_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : 2c: TH sends StopMotion command to DUT\n");
+            err = Test2cThSendsStopMotionCommandToDut_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : 2d: TH Waits for 100ms-1s\n");
+            err = Test2dThWaitsFor100ms1s_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : 3a: TH reads CurrentPositionLiftPercent100ths from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF")) {
+                NextTest();
+                return;
+            }
+            err = Test3aThReadsCurrentPositionLiftPercent100thsFromDut_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : 3b: TH reads CurrentPositionTiltPercent100ths from DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL")) {
+                NextTest();
+                return;
+            }
+            err = Test3bThReadsCurrentPositionTiltPercent100thsFromDut_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : 3c: reboot/restart the DUT\n");
+            err = Test3cRebootRestartTheDut_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : 3d: Wait for the commissioned device to be retrieved\n");
+            err = Test3dWaitForTheCommissionedDeviceToBeRetrieved_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : 3e: TH reads CurrentPositionLiftPercent100ths from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF")) {
+                NextTest();
+                return;
+            }
+            err = Test3eThReadsCurrentPositionLiftPercent100thsFromDut_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : 3f: TH reads CurrentPositionTiltPercent100ths from DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL")) {
+                NextTest();
+                return;
+            }
+            err = Test3fThReadsCurrentPositionTiltPercent100thsFromDut_15();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 16;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR Test0aWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test0bThSendsUpOrOpenCommandToPrepositionTheDut_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster upOrOpenWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"0b: TH sends UpOrOpen command to preposition the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test1aIfPaLfLfThSendsGoToLiftPercentageCommandWith90ToDut_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        __auto_type * params = [[CHIPWindowCoveringClusterGoToLiftPercentageParams alloc] init];
+        params.liftPercentageValue = [NSNumber numberWithUnsignedChar:90];
+        params.liftPercent100thsValue = [NSNumber numberWithUnsignedShort:9000U];
+        [cluster goToLiftPercentageWithParams:params
+                            completionHandler:^(NSError * _Nullable err) {
+                                NSLog(@"1a: If (PA_LF & LF) TH sends GoToLiftPercentage command with 90% to DUT Error: %@", err);
+
+                                VerifyOrReturn(CheckValue("status", err, 0));
+
+                                NextTest();
+                            }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test1bThWaitsFor100ms1s_3()
+    {
+        WaitForMs(500);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test1cThSendsStopMotionCommandToDut_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster stopMotionWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"1c: TH sends StopMotion command to DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test1dThWaitsFor100ms1s_5()
+    {
+        WaitForMs(500);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test2aIfPaTlTlThSendsGoToTiltPercentageCommandWith90ToDut_6()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        __auto_type * params = [[CHIPWindowCoveringClusterGoToTiltPercentageParams alloc] init];
+        params.tiltPercentageValue = [NSNumber numberWithUnsignedChar:90];
+        params.tiltPercent100thsValue = [NSNumber numberWithUnsignedShort:9000U];
+        [cluster goToTiltPercentageWithParams:params
+                            completionHandler:^(NSError * _Nullable err) {
+                                NSLog(@"2a: If (PA_TL & TL) TH sends GoToTiltPercentage command with 90% to DUT Error: %@", err);
+
+                                VerifyOrReturn(CheckValue("status", err, 0));
+
+                                NextTest();
+                            }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test2bThWaitsFor100ms1s_7()
+    {
+        WaitForMs(500);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test2cThSendsStopMotionCommandToDut_8()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster stopMotionWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"2c: TH sends StopMotion command to DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test2dThWaitsFor100ms1s_9()
+    {
+        WaitForMs(500);
+        return CHIP_NO_ERROR;
+    }
+    NSNumber * _Nullable attrCurrentPositionLiftPercent100ths;
+
+    CHIP_ERROR Test3aThReadsCurrentPositionLiftPercent100thsFromDut_10()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentPositionLiftPercent100thsWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"3a: TH reads CurrentPositionLiftPercent100ths from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintNotValue("currentPositionLiftPercent100ths", value, 0U));
+            }
+            {
+                attrCurrentPositionLiftPercent100ths = value;
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+    NSNumber * _Nullable attrCurrentPositionTiltPercent100ths;
+
+    CHIP_ERROR Test3bThReadsCurrentPositionTiltPercent100thsFromDut_11()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentPositionTiltPercent100thsWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"3b: TH reads CurrentPositionTiltPercent100ths from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintNotValue("currentPositionTiltPercent100ths", value, 0U));
+            }
+            {
+                attrCurrentPositionTiltPercent100ths = value;
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test3cRebootRestartTheDut_12()
+    {
+        Reboot(discriminator);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test3dWaitForTheCommissionedDeviceToBeRetrieved_13()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test3eThReadsCurrentPositionLiftPercent100thsFromDut_14()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentPositionLiftPercent100thsWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"3e: TH reads CurrentPositionLiftPercent100ths from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                if (attrCurrentPositionLiftPercent100ths == nil) {
+                    VerifyOrReturn(CheckValueNull("CurrentPositionLiftPercent100ths", actualValue));
+                } else {
+                    VerifyOrReturn(CheckValueNonNull("CurrentPositionLiftPercent100ths", actualValue));
+                    VerifyOrReturn(
+                        CheckValue("CurrentPositionLiftPercent100ths", actualValue, attrCurrentPositionLiftPercent100ths));
+                }
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test3fThReadsCurrentPositionTiltPercent100thsFromDut_15()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentPositionTiltPercent100thsWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"3f: TH reads CurrentPositionTiltPercent100ths from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                if (attrCurrentPositionTiltPercent100ths == nil) {
+                    VerifyOrReturn(CheckValueNull("CurrentPositionTiltPercent100ths", actualValue));
+                } else {
+                    VerifyOrReturn(CheckValueNonNull("CurrentPositionTiltPercent100ths", actualValue));
+                    VerifyOrReturn(
+                        CheckValue("CurrentPositionTiltPercent100ths", actualValue, attrCurrentPositionTiltPercent100ths));
+                }
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
 class TestCluster : public TestCommandBridge {
 public:
     TestCluster()
@@ -63403,6 +63798,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_WNCV_3_5>(),
         make_unique<Test_TC_WNCV_4_3>(),
         make_unique<Test_TC_WNCV_4_4>(),
+        make_unique<Test_TC_WNCV_4_5>(),
         make_unique<TestCluster>(),
         make_unique<TestSaveAs>(),
         make_unique<TestConstraints>(),
