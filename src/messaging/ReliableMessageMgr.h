@@ -69,7 +69,6 @@ public:
                                                        including both successfully and failure send. */
     };
 
-public:
     ReliableMessageMgr(BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool);
     ~ReliableMessageMgr();
 
@@ -101,6 +100,19 @@ public:
      *  @retval  #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR AddToRetransTable(ReliableMessageContext * rc, RetransTableEntry ** rEntry);
+
+    /**
+     *  Calculate the backoff timer for the retransmission.
+     *
+     *  @param[in]   backoffBase    The base interval to use for the backoff calculation, either the active or idle interval.
+     *  @param[in]   sendCount      Count of how many times this message
+     *                              has been retransmitted so far (0 if it has
+     *                              been sent only once with no retransmits,
+     *                              1 if it has been sent twice, etc).
+     *
+     *  @retval  The backoff time value, including jitter.
+     */
+    static System::Clock::Timestamp GetBackoff(System::Clock::Timestamp backoffBase, uint8_t sendCount);
 
     /**
      *  Start retranmisttion of cached encryped packet for current entry.

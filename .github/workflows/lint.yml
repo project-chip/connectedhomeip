@@ -36,6 +36,7 @@ jobs:
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
+
             - name: Check broken links
               # On-push disabled until the job can run fully green
               # At that point the step should be enabled.
@@ -67,3 +68,8 @@ jobs:
             - name: Check for disallowed include files
               if: always()
               run: scripts/tools/check_includes.sh
+
+            - name: Ensure all PICS are set for tests (to true or false)
+              if: always()
+              run: |
+                  scripts/tools/check_test_pics.py src/app/tests/suites/certification/ci-pics-values src/app/tests/suites/certification/PICS.yaml

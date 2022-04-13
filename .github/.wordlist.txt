@@ -55,8 +55,11 @@ APIs
 apk
 AppConfig
 AppImpl
+appliable
 ApplianceControl
+applianceeventsandalert
 ApplianceIdentification
+appliancestatistics
 ApplicationBasic
 ApplicationId
 ApplicationIdentifier
@@ -67,6 +70,7 @@ ApplyUpdateRequest
 ApplyUpdateResponse
 approver
 appspot
+appwrite
 aps
 arg
 argc
@@ -140,6 +144,7 @@ BooleanState
 bootable
 Bootloader
 BorderRouterAP
+bouffalolab
 BRD
 breakpoint
 bredr
@@ -229,6 +234,7 @@ clusterAttrs
 clusterId
 clusterList
 clusterListName
+ClusterObjectTests
 ClusterRevision
 ClusterTestGeneration
 cmake
@@ -247,11 +253,14 @@ ColorControl
 Comcast
 Commandline
 Commissionable
+commissionables
+commissionee
 CommissioningFlow
 commondatastorage
 CONF
 CONFIG
 ConfigDescription
+configs
 configTOTAL
 ConfigurationManager
 ConfigurationManagerImpl
@@ -288,6 +297,7 @@ CQM
 crypto
 cryptographic
 CSA
+csg
 csrrequest
 csu
 csv
@@ -297,6 +307,7 @@ ctypes
 CurrentHue
 CurrentLevel
 CurrentSaturation
+customAcl
 customizations
 cvfJ
 cxx
@@ -307,6 +318,7 @@ dadbdcdddedf
 DAP
 DAPLINK
 DataFrame
+datamodel
 DataModelRevision
 dataset
 datasets
@@ -320,12 +332,16 @@ dcc
 DCHIP
 DCL
 DCMAKE
+DCONF
 DCONFIG
 debianutils
 debugText
 DEDEDEDE
 deepnote
 DefaultOTAProviders
+DefaultOTARequestor
+DefaultOTARequestorDriver
+DefaultOTARequestorStorage
 DefaultSuccess
 definedValue
 DehumidificationControl
@@ -399,9 +415,11 @@ Dockerfile
 Dockerfiles
 Don'ts
 DoorLock
+doru
 DOTBR
 DOVERLAY
 downcasting
+DownloadProtocolEnum
 Doxygen
 dpkg
 dropdown
@@ -479,6 +497,7 @@ fb
 fbb
 fbd
 FC
+FCJ
 FDDE
 fddead
 fde
@@ -558,6 +577,7 @@ gtk
 GUA
 Gv
 gz
+gzbf
 HaloaceticAcidsConcentrationMeasurement
 hardcoded
 hardknott
@@ -589,6 +609,7 @@ IDF
 IDL
 IDLs
 idx
+ifconfig
 ifdef
 ifdefs
 IGMP
@@ -612,6 +633,7 @@ InetLayer
 Infineon
 ini
 init
+InitArgs
 inlined
 InputLoop
 installDebug
@@ -640,6 +662,7 @@ isLowerCase
 isUpperCase
 itemName
 iterable
+itsfoss
 JDK
 jinja
 JLink
@@ -712,8 +735,6 @@ lightin
 LightingColor
 LightingState
 LinkSoftwareAndDocumentationPack
-LinuxOTAImageProcessor
-LinuxOTARequestorDriver
 LocalConfigDisabled
 localedef
 localhost
@@ -823,7 +844,6 @@ mydir
 MyPASSWORD
 MySSID
 NAMESERVER
-nameserver
 namespacing
 nano
 natively
@@ -860,6 +880,7 @@ NTAG
 nullable
 nullptr
 NUM
+NVM
 nwk
 NXP
 objcopy
@@ -897,16 +918,19 @@ otaImageList
 OTAImageProcessorDriver
 OTAImageProcessorImpl
 OTAImageProcessorInterface
+otaissues
 OTAProvider
 OTAProviderIpAddress
 OTAProviderNodeId
 OTAProviderSerialPort
 OTARequesterImpl
-OTARequestor
 OTARequestorDriver
+OTARequestorInterface
 OTARequestorSerialPort
+OTARequestorStorage
 OtaSoftwareUpdateProvider
 otasoftwareupdaterequestor
+otatesting
 otaURL
 OTBR
 otcli
@@ -934,6 +958,7 @@ PCA
 pcaps
 PDFs
 PDK
+PDM
 peerAddrStr
 peerNodeId
 peerSessionId
@@ -983,6 +1008,7 @@ ProxyValid
 ProxyView
 PRs
 PSCAN
+PSECT
 PSK
 PSoC
 PTR
@@ -1013,6 +1039,7 @@ QSPI
 QueryImage
 QueryImageResponse
 queryImageStatus
+Quickstart
 qvCHIP
 RADVD
 raspberryPi
@@ -1047,6 +1074,7 @@ RequestorCanConsent
 Requestor's
 Requestors
 responder
+RestrictedEvent
 retargeting
 reusability
 reviwed
@@ -1062,6 +1090,7 @@ rootfs
 RPC
 RPCs
 RPi
+RPis
 rsn
 RSSI
 rsync
@@ -1102,6 +1131,7 @@ SerialNumber
 ServiceId
 SetDns
 SetImageProcessorDelegate
+SetOTADownloader
 SetOtaRequestorDriver
 setpin
 setpoint
@@ -1145,6 +1175,7 @@ spinel
 src
 SRP
 SRV
+SSBL
 SSID
 startoffset
 StartScan
@@ -1174,6 +1205,7 @@ subtype
 sudo
 SulfateConcentrationMeasurement
 SulfurDioxideConcentrationMeasurement
+suppressResponse
 svg
 SVR
 SWD
@@ -1213,6 +1245,7 @@ TESTSSID
 TestString
 TestStruct
 TestThreadStackMgr
+TestTimedRequestTimeout
 TestUint
 TestUpdateValue
 testws
@@ -1249,10 +1282,11 @@ totalTests
 TotalTrihalomethanesConcentrationMeasurement
 trackAlloc
 trackFree
-transitionTime
 TransferSession
+transitionTime
 TransportMgrBase
 TrustedRootCertificates
+tsan
 TSG
 tsv
 TTL
@@ -1330,7 +1364,9 @@ VSCode
 WaitNewInputEvent
 WakeOnLan
 WantedBy
+watchdogTimeout
 webpage
+wg
 wget
 whde
 whitespace
@@ -1356,8 +1392,8 @@ xAAAA
 xab
 xaver
 xb
-xbef
 xBEEF
+xbef
 xc
 xcd
 Xcode
@@ -1416,31 +1452,3 @@ zephyrproject
 Zigbee
 zigbeealliance
 zigbeethread
-libshell
-TestGroupDemoConfig
-ACLs
-AddNOC
-CHIPConfig
-CHIPProjectAppConfig
-CaseAdminNode
-DataVersion
-ProxyView
-ReadAttribute
-WriteAttribute
-kAdminister
-kManage
-kOperate
-kView
-xFFFFFFFD
-ClusterObjectTests
-TestTimedRequestTimeout
-datamodel
-appliable
-commissionee
-configs
-NAMESERVER
-UTF
-localedef
-nameserver
-nmcli
-tsan

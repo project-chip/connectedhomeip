@@ -208,7 +208,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::retrieveOptionalInfos(SetupPayload & outPay
             elemType = outPayload.getNumericTypeFor(tagNumber);
         }
 
-        if (IsCHIPTag(tagNumber))
+        if (SetupPayload::IsCommonTag(tagNumber))
         {
             OptionalQRCodeInfoExtension info;
             info.tag = tagNumber;

@@ -37,6 +37,7 @@ efr32_sdk("sdk") {
     "${chip_root}/src/platform/EFR32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
+    "${chip_root}/src/lib",
   ]
 
   defines = [ "BOARD_ID=${efr32_board}" ]
@@ -46,22 +47,20 @@ efr32_executable("persistent_storage") {
   output_name = "chip-efr32-persistent_storage-example.out"
 
   sources = [
-    "${efr32_project_dir}/../KeyValueStorageTest.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
+    "../KeyValueStorageTest.cpp",
     "main.cpp",
   ]
 
   deps = [
     ":sdk",
-    "$dir_pw_assert",
-    "$dir_pw_kvs:crc16",
     "${chip_root}/src/lib",
   ]
 
   include_dirs = [
-    "${efr32_project_dir}/..",
-    "${efr32_project_dir}/include",
+    "..",
+    "include",
   ]
 
   ldscript = "${examples_plat_dir}/ldscripts/${efr32_family}.ld"

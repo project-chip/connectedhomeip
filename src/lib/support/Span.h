@@ -38,8 +38,7 @@ template <class T>
 class Span
 {
 public:
-    using pointer       = T *;
-    using const_pointer = const T *;
+    using pointer = T *;
 
     constexpr Span() : mDataBuf(nullptr), mDataLen(0) {}
     constexpr Span(pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
@@ -73,10 +72,8 @@ public:
     constexpr pointer data() const { return mDataBuf; }
     constexpr size_t size() const { return mDataLen; }
     constexpr bool empty() const { return size() == 0; }
-    constexpr const_pointer begin() const { return data(); }
-    constexpr const_pointer end() const { return data() + size(); }
-    constexpr pointer begin() { return data(); }
-    constexpr pointer end() { return data() + size(); }
+    constexpr pointer begin() const { return data(); }
+    constexpr pointer end() const { return data() + size(); }
 
     template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
     bool data_equal(const Span<U> & other) const
@@ -145,8 +142,7 @@ template <class T, size_t N>
 class FixedSpan
 {
 public:
-    using pointer       = T *;
-    using const_pointer = const T *;
+    using pointer = T *;
 
     constexpr FixedSpan() : mDataBuf(nullptr) {}
 
@@ -189,11 +185,8 @@ public:
     constexpr pointer data() const { return mDataBuf; }
     constexpr size_t size() const { return N; }
     constexpr bool empty() const { return data() == nullptr; }
-
-    constexpr pointer begin() { return mDataBuf; }
-    constexpr pointer end() { return mDataBuf + N; }
-    constexpr const_pointer begin() const { return mDataBuf; }
-    constexpr const_pointer end() const { return mDataBuf + N; }
+    constexpr pointer begin() const { return mDataBuf; }
+    constexpr pointer end() const { return mDataBuf + N; }
 
     // Allow data_equal for spans that are over the same type up to const-ness.
     template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
@@ -270,6 +263,17 @@ inline CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan &
 
     memcpy(out_buf.data(), span_to_copy.data(), span_to_copy.size());
     out_buf.reduce_size(span_to_copy.size());
+
+    return CHIP_NO_ERROR;
+}
+
+inline CHIP_ERROR CopyCharSpanToMutableCharSpan(CharSpan cspan_to_copy, MutableCharSpan & out_buf)
+{
+    VerifyOrReturnError(IsSpanUsable(cspan_to_copy), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_buf.size() >= cspan_to_copy.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    memcpy(out_buf.data(), cspan_to_copy.data(), cspan_to_copy.size());
+    out_buf.reduce_size(cspan_to_copy.size());
 
     return CHIP_NO_ERROR;
 }

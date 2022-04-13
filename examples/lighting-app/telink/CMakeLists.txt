@@ -70,6 +70,7 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/util/ember-print.cpp
                ${CHIP_ROOT}/src/app/util/error-mapping.cpp
                ${CHIP_ROOT}/src/app/util/message.cpp
+               ${CHIP_ROOT}/src/app/util/privilege-storage.cpp
                ${CHIP_ROOT}/src/app/util/util.cpp
                ${CHIP_ROOT}/src/app/server/EchoHandler.cpp
                ${CHIP_ROOT}/src/app/server/Dnssd.cpp
@@ -105,7 +106,7 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
                ${CHIP_ROOT}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
                ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
-               ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
-               ${CHIP_ROOT}/src/app/clusters/ota-requestor/GenericOTARequestorDriver.cpp
+               ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
+               ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
                ${CHIP_ROOT}/src/app/clusters/groups-server/groups-server.cpp
                )

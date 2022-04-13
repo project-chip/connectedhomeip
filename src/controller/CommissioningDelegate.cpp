@@ -65,6 +65,10 @@ const char * StageToString(CommissioningStage stage)
         return "SendOpCertSigningRequest";
         break;
 
+    case kValidateCSR:
+        return "ValidateCSR";
+        break;
+
     case kGenerateNOCChain:
         return "GenerateNOCChain";
         break;

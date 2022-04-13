@@ -22,9 +22,13 @@
 #include "AppEvent.h"
 #include "LEDWidget.h"
 #include "binding-handler.h"
+#include "sl_simple_led_instances.h"
+
+#ifdef DISPLAY_ENABLED
 #include "lcd.h"
 #include "qrcodegen.h"
-#include "sl_simple_led_instances.h"
+#endif // DISPLAY_ENABLED
+
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>

@@ -44,6 +44,7 @@ using chip::Server;
 using chip::Span;
 using chip::app::Clusters::OTAProviderDelegate;
 using chip::bdx::TransferControlFlags;
+using chip::Protocols::InteractionModel::Status;
 using namespace chip;
 using namespace chip::ota;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
@@ -191,7 +192,7 @@ bool OTAProviderExample::ParseOTAHeader(const char * otaFilePath, OTAImageHeader
     }
 
     otaFile.read(reinterpret_cast<char *>(otaFileContent), kOtaHeaderMaxSize);
-    if (!otaFile.good())
+    if (otaFile.bad())
     {
         ChipLogError(SoftwareUpdate, "Error reading OTA image file: %s", otaFilePath);
         return false;
@@ -215,10 +216,11 @@ bool OTAProviderExample::ParseOTAHeader(const char * otaFilePath, OTAImageHeader
     return true;
 }
 
-CHIP_ERROR OTAProviderExample::SendQueryImageResponse(chip::app::CommandHandler * commandObj,
-                                                      const chip::app::ConcreteCommandPath & commandPath,
-                                                      const QueryImage::DecodableType & commandData)
+void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                const QueryImage::DecodableType & commandData)
 {
+    VerifyOrReturn(commandObj != nullptr, ChipLogError(SoftwareUpdate, "Invalid commandObj, cannot send QueryImageResponse"));
+
     QueryImageResponse::Type response;
     bool requestorCanConsent             = commandData.requestorCanConsent.ValueOr(false);
     uint8_t updateToken[kUpdateTokenLen] = { 0 };
@@ -249,9 +251,14 @@ CHIP_ERROR OTAProviderExample::SendQueryImageResponse(chip::app::CommandHandler 
         if (mBdxOtaSender.InitializeTransfer(commandObj->GetSubjectDescriptor().fabricIndex,
                                              commandObj->GetSubjectDescriptor().subject) == CHIP_NO_ERROR)
         {
-            ReturnErrorOnFailure(mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(),
-                                                                  chip::bdx::TransferRole::kSender, bdxFlags, kMaxBdxBlockSize,
-                                                                  kBdxTimeout, kBdxPollFreq));
+            CHIP_ERROR error = mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender,
+                                                                bdxFlags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollFreq);
+            if (error != CHIP_NO_ERROR)
+            {
+                ChipLogError(SoftwareUpdate, "Cannot prepare for transfer: %" CHIP_ERROR_FORMAT, error.Format());
+                commandObj->AddStatus(commandPath, Status::Failure);
+                return;
+            }
 
             response.imageURI.Emplace(chip::CharSpan::fromCharString(uriBuf));
             response.softwareVersion.Emplace(mSoftwareVersion);
@@ -282,22 +289,20 @@ CHIP_ERROR OTAProviderExample::SendQueryImageResponse(chip::app::CommandHandler 
         response.metadataForRequestor.Emplace(chip::ByteSpan());
     }
 
-    ReturnErrorOnFailure(commandObj->AddResponseData(commandPath, response));
-
-    return CHIP_NO_ERROR;
+    // Either sends the response or an error status
+    commandObj->AddResponse(commandPath, response);
 }
 
-EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * commandObj,
-                                                   const chip::app::ConcreteCommandPath & commandPath,
-                                                   const QueryImage::DecodableType & commandData)
+void OTAProviderExample::HandleQueryImage(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                          const QueryImage::DecodableType & commandData)
 {
     bool requestorCanConsent = commandData.requestorCanConsent.ValueOr(false);
 
     if (mIgnoreQueryImageCount > 0)
     {
-        ChipLogDetail(SoftwareUpdate, "Skip HandleQueryImage response. mIgnoreQueryImageCount %" PRIu32, mIgnoreQueryImageCount);
+        ChipLogDetail(SoftwareUpdate, "Skip sending QueryImageResponse, ignore count: %" PRIu32, mIgnoreQueryImageCount);
         mIgnoreQueryImageCount--;
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return;
     }
 
     if (mQueryImageStatus == OTAQueryStatus::kUpdateAvailable)
@@ -352,25 +357,24 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         }
     }
 
-    VerifyOrReturnError(SendQueryImageResponse(commandObj, commandPath, commandData) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
+    // Guarantees that either a response or an error status is sent
+    SendQueryImageResponse(commandObj, commandPath, commandData);
 
     // After the first response is sent, default to these values for subsequent queries
     mQueryImageStatus          = OTAQueryStatus::kUpdateAvailable;
     mDelayedQueryActionTimeSec = 0;
-
-    return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHandler * commandObj,
-                                                           const chip::app::ConcreteCommandPath & commandPath,
-                                                           const ApplyUpdateRequest::DecodableType & commandData)
+void OTAProviderExample::HandleApplyUpdateRequest(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                  const ApplyUpdateRequest::DecodableType & commandData)
 {
+    VerifyOrReturn(commandObj != nullptr, ChipLogError(SoftwareUpdate, "Invalid commandObj, cannot handle ApplyUpdateRequest"));
+
     if (mIgnoreApplyUpdateCount > 0)
     {
-        ChipLogDetail(SoftwareUpdate, "Skip HandleApplyUpdateRequest response. mIgnoreApplyUpdateCount %" PRIu32,
-                      mIgnoreApplyUpdateCount);
+        ChipLogDetail(SoftwareUpdate, "Skip sending ApplyUpdateResponse, ignore count %" PRIu32, mIgnoreApplyUpdateCount);
         mIgnoreApplyUpdateCount--;
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return;
     }
 
     // TODO: handle multiple transfers by tracking updateTokens
@@ -378,8 +382,6 @@ EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHan
 
     GetUpdateTokenString(commandData.updateToken, tokenBuf, kUpdateTokenStrLen);
     ChipLogDetail(SoftwareUpdate, "%s: token: %s, version: %" PRIu32, __FUNCTION__, tokenBuf, commandData.newVersion);
-
-    VerifyOrReturnError(commandObj != nullptr, EMBER_ZCL_STATUS_INVALID_VALUE);
 
     ApplyUpdateResponse::Type response;
     response.action            = mUpdateAction;
@@ -390,21 +392,19 @@ EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHan
     // Reset back to success case for subsequent uses
     mUpdateAction = OTAApplyUpdateAction::kProceed;
 
-    VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
-
-    return EMBER_ZCL_STATUS_SUCCESS;
+    // Either sends the response or an error status
+    commandObj->AddResponse(commandPath, response);
 }
 
-EmberAfStatus OTAProviderExample::HandleNotifyUpdateApplied(chip::app::CommandHandler * commandObj,
-                                                            const chip::app::ConcreteCommandPath & commandPath,
-                                                            const NotifyUpdateApplied::DecodableType & commandData)
+void OTAProviderExample::HandleNotifyUpdateApplied(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                   const NotifyUpdateApplied::DecodableType & commandData)
 {
+    VerifyOrReturn(commandObj != nullptr, ChipLogError(SoftwareUpdate, "Invalid commandObj, cannot handle NotifyUpdateApplied"));
+
     char tokenBuf[kUpdateTokenStrLen] = { 0 };
 
     GetUpdateTokenString(commandData.updateToken, tokenBuf, kUpdateTokenStrLen);
     ChipLogDetail(SoftwareUpdate, "%s: token: %s, version: %" PRIu32, __FUNCTION__, tokenBuf, commandData.softwareVersion);
 
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-
-    return EMBER_ZCL_STATUS_SUCCESS;
+    commandObj->AddStatus(commandPath, Status::Success);
 }

@@ -1201,7 +1201,7 @@ nlTestSuite theSuite =
 
 int TestNumericAttributeTraits()
 {
-    nlTestRunner(&theSuite, NULL);
+    nlTestRunner(&theSuite, nullptr);
     return (nlTestRunnerStats(&theSuite));
 }
 

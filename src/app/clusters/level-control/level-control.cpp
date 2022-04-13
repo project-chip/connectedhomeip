@@ -142,7 +142,7 @@ static void deactivate(EndpointId endpoint)
 static EmberAfLevelControlState * getState(EndpointId endpoint)
 {
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, LevelControl::Id);
-    return (ep == 0xFFFF ? NULL : &stateTable[ep]);
+    return (ep == 0xFFFF ? nullptr : &stateTable[ep]);
 }
 
 #if !defined(IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS) && defined(EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP)
@@ -172,7 +172,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     EmberAfStatus status;
     uint8_t currentLevel;
 
-    if (state == NULL)
+    if (state == nullptr)
     {
         return;
     }
@@ -515,7 +515,7 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
     uint8_t currentLevel;
     uint8_t actualStepSize;
 
-    if (state == NULL)
+    if (state == nullptr)
     {
         return EMBER_ZCL_STATUS_FAILURE;
     }
@@ -649,7 +649,7 @@ static void moveHandler(CommandId commandId, uint8_t moveMode, uint8_t rate, uin
     uint8_t currentLevel;
     uint8_t difference;
 
-    if (state == NULL)
+    if (state == nullptr)
     {
         status = EMBER_ZCL_STATUS_FAILURE;
         goto send_default_response;
@@ -762,7 +762,7 @@ static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize,
     uint8_t currentLevel;
     uint8_t actualStepSize = stepSize;
 
-    if (state == NULL)
+    if (state == nullptr)
     {
         status = EMBER_ZCL_STATUS_FAILURE;
         goto send_default_response;
@@ -881,7 +881,7 @@ static void stopHandler(CommandId commandId, uint8_t optionMask, uint8_t optionO
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
 
-    if (state == NULL)
+    if (state == nullptr)
     {
         status = EMBER_ZCL_STATUS_FAILURE;
         goto send_default_response;
@@ -912,7 +912,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     EmberAfStatus status;
 
     EmberAfLevelControlState * state = getState(endpoint);
-    if (state == NULL)
+    if (state == nullptr)
     {
         emberAfLevelControlClusterPrintln("ERR: Level control cluster not available on ep%d", endpoint);
         return;
@@ -1006,7 +1006,7 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
 {
     EmberAfLevelControlState * state = getState(endpoint);
 
-    if (state == NULL)
+    if (state == nullptr)
     {
         emberAfLevelControlClusterPrintln("ERR: Level control cluster not available on ep%d", endpoint);
         return;

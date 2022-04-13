@@ -4683,9 +4683,13 @@ CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricInde
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const
 {
+    bool includeSensitive = !accessingFabricIndex.HasValue() || (accessingFabricIndex.Value() == fabricIndex);
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kData)), data));
+    if (includeSensitive)
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kData)), data));
+    }
     if (accessingFabricIndex.HasValue())
     {
         ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
@@ -7111,7 +7115,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(
         DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kExpiryLengthSeconds)), expiryLengthSeconds));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kBreadcrumb)), breadcrumb));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTimeoutMs)), timeoutMs));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -7132,9 +7135,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kBreadcrumb):
             ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
-            break;
-        case to_underlying(Fields::kTimeoutMs):
-            ReturnErrorOnFailure(DataModel::Decode(reader, timeoutMs));
             break;
         default:
             break;
@@ -7189,10 +7189,10 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLocation)), location));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNewRegulatoryConfig)), newRegulatoryConfig));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCountryCode)), countryCode));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kBreadcrumb)), breadcrumb));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTimeoutMs)), timeoutMs));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -7208,17 +7208,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kLocation):
-            ReturnErrorOnFailure(DataModel::Decode(reader, location));
+        case to_underlying(Fields::kNewRegulatoryConfig):
+            ReturnErrorOnFailure(DataModel::Decode(reader, newRegulatoryConfig));
             break;
         case to_underlying(Fields::kCountryCode):
             ReturnErrorOnFailure(DataModel::Decode(reader, countryCode));
             break;
         case to_underlying(Fields::kBreadcrumb):
             ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
-            break;
-        case to_underlying(Fields::kTimeoutMs):
-            ReturnErrorOnFailure(DataModel::Decode(reader, timeoutMs));
             break;
         default:
             break;
@@ -7354,6 +7351,9 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         break;
     case Attributes::LocationCapability::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, locationCapability));
+        break;
+    case Attributes::SupportsConcurrentConnection::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, supportsConcurrentConnection));
         break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
@@ -7760,6 +7760,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNetworkingStatus)), networkingStatus));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kDebugText)), debugText));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNetworkIndex)), networkIndex));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -7780,6 +7781,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kDebugText):
             ReturnErrorOnFailure(DataModel::Decode(reader, debugText));
+            break;
+        case to_underlying(Fields::kNetworkIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, networkIndex));
             break;
         default:
             break;
@@ -15604,8 +15608,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::AcRefrigerantType::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, acRefrigerantType));
         break;
-    case Attributes::AcCompressor::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acCompressor));
+    case Attributes::AcCompressorType::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acCompressorType));
         break;
     case Attributes::AcErrorCode::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, acErrorCode));

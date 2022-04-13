@@ -21,6 +21,7 @@ import("${k32w0_sdk_build_root}/k32w0_sdk.gni")
 
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 
 if (chip_pw_tokenizer_logging) {
@@ -82,7 +83,7 @@ k32w0_executable("light_app") {
   deps = [
     ":sdk",
     "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/ota-requestor-app/ota-requestor-common",
+    "${chip_root}/examples/lighting-app/lighting-common/",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/mbedtls:mbedtls",
     "${k32w0_platform_dir}/app/support:freertos_mbedtls_utils",
@@ -107,6 +108,15 @@ k32w0_executable("light_app") {
   inputs = [ ldscript ]
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  if (chip_enable_ota_requestor) {
+    ldflags += [
+      "-Wl,--defsym",
+      "-Wl,__app_load_address__=0x4000",
+      "-Wl,--defsym",
+      "-Wl,__app_stated_size__=0x99A00",
+    ]
+  }
 
   output_dir = root_out_dir
 }

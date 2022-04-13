@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <platform/PlatformManager.h>
 
 namespace chip {
 namespace rpc {
@@ -35,6 +36,8 @@ public:
     ::pw::Status Write(const chip_rpc_AttributeWrite & request, pw_protobuf_Empty & response)
     {
         const void * data;
+        DeviceLayer::StackLock lock;
+
         switch (request.data.which_data)
         {
         case chip_rpc_AttributeData_data_bool_tag:
@@ -74,6 +77,8 @@ public:
     {
         void * data;
         size_t size = 0;
+        DeviceLayer::StackLock lock;
+
         switch (request.type)
         {
         case chip_rpc_AttributeType_ZCL_BOOLEAN_ATTRIBUTE_TYPE:

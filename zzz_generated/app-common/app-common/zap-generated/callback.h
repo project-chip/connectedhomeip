@@ -13948,7 +13948,8 @@ bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(
  */
 bool emberAfNetworkCommissioningClusterNetworkConfigResponseCallback(chip::EndpointId endpoint,
                                                                      chip::app::CommandSender * commandObj,
-                                                                     uint8_t NetworkingStatus, chip::CharSpan DebugText);
+                                                                     uint8_t NetworkingStatus, chip::CharSpan DebugText,
+                                                                     uint8_t NetworkIndex);
 /**
  * @brief Network Commissioning Cluster ConnectNetwork Command callback (from client)
  */

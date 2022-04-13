@@ -67,10 +67,8 @@ CHIP_ERROR BLEAdvertiseHandler(int argc, char ** argv)
             streamer_printf(sout, "Stopping BLE advertising\r\n");
             return ConnectivityMgr().SetBLEAdvertisingEnabled(false);
         }
-        else
-        {
-            streamer_printf(sout, "BLE advertising already stopped\r\n");
-        }
+
+        streamer_printf(sout, "BLE advertising already stopped\r\n");
     }
     else if (strcmp(argv[0], "state") == 0)
     {

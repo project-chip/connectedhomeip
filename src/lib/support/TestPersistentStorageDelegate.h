@@ -69,12 +69,10 @@ public:
             size = CanCastTo<uint16_t>(valueSize) ? static_cast<uint16_t>(valueSize) : 0;
             return CHIP_ERROR_BUFFER_TOO_SMALL;
         }
-        else
-        {
-            size = static_cast<uint16_t>(valueSize);
-            memcpy(buffer, value.data(), size);
-            return CHIP_NO_ERROR;
-        }
+
+        size = static_cast<uint16_t>(valueSize);
+        memcpy(buffer, value.data(), size);
+        return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
@@ -93,18 +91,14 @@ public:
                 mStorage[key] = std::vector<uint8_t>();
                 return CHIP_NO_ERROR;
             }
-            else
-            {
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
+
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
         // Handle non-empty values
-        else
-        {
-            const uint8_t * bytes = static_cast<const uint8_t *>(value);
-            mStorage[key]         = std::vector<uint8_t>(bytes, bytes + size);
-            return CHIP_NO_ERROR;
-        }
+
+        const uint8_t * bytes = static_cast<const uint8_t *>(value);
+        mStorage[key]         = std::vector<uint8_t>(bytes, bytes + size);
+        return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override
@@ -127,13 +121,19 @@ public:
      *
      * @param key - Poison key to add to the set.
      */
-    void AddPoisonKey(const std::string & key) { mPoisonKeys.insert(key); }
+    virtual void AddPoisonKey(const std::string & key) { mPoisonKeys.insert(key); }
 
     /**
      * @brief Clear all "poison keys"
      *
      */
-    void ClearPoisonKeys() { mPoisonKeys.clear(); }
+    virtual void ClearPoisonKeys() { mPoisonKeys.clear(); }
+
+    /**
+     * @brief Reset entire contents back to empty. This does NOT clear the "poison keys"
+     *
+     */
+    virtual void ClearStorage() { mStorage.clear(); }
 
 protected:
     std::map<std::string, std::vector<uint8_t>> mStorage;

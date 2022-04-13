@@ -75,7 +75,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 12
+#define GENERATED_ATTRIBUTE_COUNT 13
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -89,7 +89,9 @@
             /* Endpoint: 0, Cluster: General Commissioning (server) */                                                             \
             { 0x00000000, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(0) }, /* Breadcrumb */        \
             { 0x00000001, ZAP_TYPE(STRUCT), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                               \
-              ZAP_EMPTY_DEFAULT() },                                            /* BasicCommissioningInfo */                       \
+              ZAP_EMPTY_DEFAULT() }, /* BasicCommissioningInfo */                                                                  \
+            { 0x00000004, ZAP_TYPE(BOOLEAN), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                              \
+              ZAP_EMPTY_DEFAULT() },                                            /* SupportsConcurrentConnection */                 \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                              \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                             \
@@ -184,7 +186,7 @@
       /* Endpoint: 0, Cluster: General Commissioning (server) */ \
       .clusterId = 0x00000030,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(3), \
-      .attributeCount = 3, \
+      .attributeCount = 4, \
       .clusterSize = 10, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
@@ -194,7 +196,7 @@
   { \
       /* Endpoint: 0, Cluster: Network Commissioning (server) */ \
       .clusterId = 0x00000031,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(7), \
       .attributeCount = 1, \
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -205,7 +207,7 @@
   { \
       /* Endpoint: 0, Cluster: Diagnostic Logs (client) */ \
       .clusterId = 0x00000032,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(7), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(8), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -216,7 +218,7 @@
   { \
       /* Endpoint: 0, Cluster: Diagnostic Logs (server) */ \
       .clusterId = 0x00000032,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(7), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(8), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -227,7 +229,7 @@
   { \
       /* Endpoint: 0, Cluster: Operational Credentials (server) */ \
       .clusterId = 0x0000003E,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(7), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(8), \
       .attributeCount = 5, \
       .clusterSize = 4, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -276,15 +278,21 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
         0x0256                                                                                                                     \
     }
 
-// Array of device ids
-#define FIXED_DEVICE_IDS                                                                                                           \
+// Array of device types
+#define FIXED_DEVICE_TYPES                                                                                                         \
     {                                                                                                                              \
     }
 
-// Array of device versions
-#define FIXED_DEVICE_VERSIONS                                                                                                      \
+// Array of device type offsets
+#define FIXED_DEVICE_TYPE_OFFSETS                                                                                                  \
     {                                                                                                                              \
-        1                                                                                                                          \
+        0                                                                                                                          \
+    }
+
+// Array of device type lengths
+#define FIXED_DEVICE_TYPE_LENGTHS                                                                                                  \
+    {                                                                                                                              \
+        0                                                                                                                          \
     }
 
 // Array of endpoint types supported on each endpoint

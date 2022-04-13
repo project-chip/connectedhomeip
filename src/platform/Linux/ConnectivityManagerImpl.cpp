@@ -1641,7 +1641,7 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
     auto bandInfo   = GetBandAndChannelFromFrequency(frequency);
     result.wiFiBand = bandInfo.first;
     result.channel  = bandInfo.second;
-    result.security = GetNetworkSecurityType(bssProxy);
+    result.security.SetRaw(GetNetworkSecurityType(bssProxy));
 
     return true;
 }

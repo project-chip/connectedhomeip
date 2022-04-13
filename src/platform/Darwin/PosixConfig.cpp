@@ -57,6 +57,8 @@ const PosixConfig::Key PosixConfig::kConfigKey_SetupDiscriminator    = { kConfig
 const PosixConfig::Key PosixConfig::kConfigKey_Spake2pIterationCount = { kConfigNamespace_ChipFactory, "iteration-count" };
 const PosixConfig::Key PosixConfig::kConfigKey_Spake2pSalt           = { kConfigNamespace_ChipFactory, "salt" };
 const PosixConfig::Key PosixConfig::kConfigKey_Spake2pVerifier       = { kConfigNamespace_ChipFactory, "verifier" };
+const PosixConfig::Key PosixConfig::kConfigKey_VendorId              = { kConfigNamespace_ChipFactory, "vendor-id" };
+const PosixConfig::Key PosixConfig::kConfigKey_ProductId             = { kConfigNamespace_ChipFactory, "product-id" };
 
 // Keys stored in the Chip-config namespace
 const PosixConfig::Key PosixConfig::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };
@@ -95,6 +97,12 @@ CHIP_ERROR PosixConfig::ReadConfigValue(Key key, bool & val)
     return ReadConfigValueBin(key, reinterpret_cast<uint8_t *>(&val), sizeof(val), outLen);
 }
 
+CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint16_t & val)
+{
+    size_t outLen = 0;
+    return ReadConfigValueBin(key, reinterpret_cast<uint8_t *>(&val), sizeof(val), outLen);
+}
+
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint32_t & val)
 {
     size_t outLen = 0;
@@ -123,6 +131,11 @@ CHIP_ERROR PosixConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSiz
 }
 
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, bool val)
+{
+    return WriteConfigValueBin(key, reinterpret_cast<uint8_t *>(&val), sizeof(val));
+}
+
+CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint16_t val)
 {
     return WriteConfigValueBin(key, reinterpret_cast<uint8_t *>(&val), sizeof(val));
 }

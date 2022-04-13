@@ -1580,6 +1580,10 @@ namespace LocationCapability {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace LocationCapability
 
+namespace SupportsConcurrentConnection {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace SupportsConcurrentConnection
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -3412,9 +3416,9 @@ namespace AcRefrigerantType {
 static constexpr AttributeId Id = 0x00000042;
 } // namespace AcRefrigerantType
 
-namespace AcCompressor {
+namespace AcCompressorType {
 static constexpr AttributeId Id = 0x00000043;
-} // namespace AcCompressor
+} // namespace AcCompressorType
 
 namespace AcErrorCode {
 static constexpr AttributeId Id = 0x00000044;

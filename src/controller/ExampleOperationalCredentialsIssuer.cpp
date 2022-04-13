@@ -25,6 +25,7 @@
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/TestGroupData.h>
 
 namespace chip {
 namespace Controller {
@@ -130,7 +131,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     // If root certificate not found in the storage, generate new root certificate.
     else
     {
-        ReturnErrorOnFailure(rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipRootId, mIssuerId));
+        ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterRCACId(mIssuerId));
 
         ChipLogProgress(Controller, "Generating RCAC");
         X509CertRequestParams rcac_request = { 0, mNow, mNow + mValidity, rcac_dn, rcac_dn };
@@ -154,7 +155,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     // If intermediate certificate not found in the storage, generate new intermediate certificate.
     else
     {
-        ReturnErrorOnFailure(icac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipICAId, mIntermediateIssuerId));
+        ReturnErrorOnFailure(icac_dn.AddAttribute_MatterICACId(mIntermediateIssuerId));
 
         ChipLogProgress(Controller, "Generating ICAC");
         X509CertRequestParams icac_request = { 0, mNow, mNow + mValidity, icac_dn, rcac_dn };
@@ -166,8 +167,8 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     }
 
     ChipDN noc_dn;
-    ReturnErrorOnFailure(noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId));
-    ReturnErrorOnFailure(noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipNodeId, nodeId));
+    ReturnErrorOnFailure(noc_dn.AddAttribute_MatterFabricId(fabricId));
+    ReturnErrorOnFailure(noc_dn.AddAttribute_MatterNodeId(nodeId));
     ReturnErrorOnFailure(noc_dn.AddCATs(cats));
 
     ChipLogProgress(Controller, "Generating NOC");
@@ -175,12 +176,17 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     return NewNodeOperationalX509Cert(noc_request, pubkey, mIntermediateIssuer, noc);
 }
 
-CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan & csrElements,
-                                                                 const ByteSpan & attestationSignature, const ByteSpan & DAC,
-                                                                 const ByteSpan & PAI, const ByteSpan & PAA,
+CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
+                                                                 const ByteSpan & attestationSignature,
+                                                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC,
+                                                                 const ByteSpan & PAI,
                                                                  Callback::Callback<OnNOCChainGeneration> * onCompletion)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
+    // At this point, Credential issuer may wish to validate the CSR information
+    (void) attestationChallenge;
+    (void) csrNonce;
+
     NodeId assignedId;
     if (mNodeIdRequested)
     {
@@ -229,8 +235,24 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
     ReturnErrorOnFailure(
         GenerateNOCChainAfterValidation(assignedId, mNextFabricId, chip::kUndefinedCATs, pubkey, rcacSpan, icacSpan, nocSpan));
 
+    // TODO(#13825): Should always generate some IPK. Using a temporary fixed value until APIs are plumbed in to set it end-to-end
+    // TODO: Force callers to set IPK if used before GenerateNOCChain will succeed.
+    ByteSpan defaultIpkSpan = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+
+    // The below static assert validates a key assumption in types used (needed for public API conformance)
+    static_assert(CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == kAES_CCM128_Key_Length, "IPK span sizing must match");
+
+    // Prepare IPK to be sent back. A more fully-fledged operational credentials delegate
+    // would obtain a suitable key per fabric.
+    uint8_t ipkValue[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+    Crypto::AesCcm128KeySpan ipkSpan(ipkValue);
+
+    ReturnErrorCodeIf(defaultIpkSpan.size() != sizeof(ipkValue), CHIP_ERROR_INTERNAL);
+    memcpy(&ipkValue[0], defaultIpkSpan.data(), defaultIpkSpan.size());
+
+    // Callback onto commissioner.
     ChipLogProgress(Controller, "Providing certificate chain to the commissioner");
-    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, nocSpan, icacSpan, rcacSpan, Optional<AesCcm128KeySpan>(),
+    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, nocSpan, icacSpan, rcacSpan, MakeOptional(ipkSpan),
                         Optional<NodeId>());
     return CHIP_NO_ERROR;
 }

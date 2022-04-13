@@ -52,7 +52,7 @@ public:
         std::function<void(const app::ConcreteDataAttributePath & aPath, const DecodableAttributeType & aData)>;
     using OnErrorCallbackType = std::function<void(const app::ConcreteDataAttributePath * aPath, CHIP_ERROR aError)>;
     using OnDoneCallbackType  = std::function<void(TypedReadAttributeCallback * callback)>;
-    using OnSubscriptionEstablishedCallbackType = std::function<void()>;
+    using OnSubscriptionEstablishedCallbackType = std::function<void(const app::ReadClient & readClient)>;
 
     TypedReadAttributeCallback(ClusterId aClusterId, AttributeId aAttributeId, OnSuccessCallbackType aOnSuccess,
                                OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
@@ -102,7 +102,7 @@ private:
     {
         if (mOnSubscriptionEstablished)
         {
-            mOnSubscriptionEstablished();
+            mOnSubscriptionEstablished(*mReadClient.get());
         }
     }
 
@@ -112,8 +112,10 @@ private:
                     aReadPrepareParams.mpAttributePathParamsList != nullptr);
         chip::Platform::Delete<app::AttributePathParams>(aReadPrepareParams.mpAttributePathParamsList);
 
-        VerifyOrDie(aReadPrepareParams.mDataVersionFilterListSize == 1 && aReadPrepareParams.mpDataVersionFilterList != nullptr);
-        chip::Platform::Delete<app::DataVersionFilter>(aReadPrepareParams.mpDataVersionFilterList);
+        if (aReadPrepareParams.mDataVersionFilterListSize == 1 && aReadPrepareParams.mpDataVersionFilterList != nullptr)
+        {
+            chip::Platform::Delete<app::DataVersionFilter>(aReadPrepareParams.mpDataVersionFilterList);
+        }
     }
 
     ClusterId mClusterId;

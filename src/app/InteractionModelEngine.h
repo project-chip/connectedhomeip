@@ -56,6 +56,7 @@
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
+#include <app/util/attribute-metadata.h>
 #include <app/util/basic-types.h>
 
 namespace chip {
@@ -68,7 +69,9 @@ namespace app {
  * handlers
  *
  */
-class InteractionModelEngine : public Messaging::ExchangeDelegate, public CommandHandler::Callback, public ReadHandler::Callback
+class InteractionModelEngine : public Messaging::ExchangeDelegate,
+                               public CommandHandler::Callback,
+                               public ReadHandler::ManagementCallback
 {
 public:
     /**
@@ -157,6 +160,15 @@ public:
     CommandHandlerInterface * FindCommandHandler(EndpointId endpointId, ClusterId clusterId);
     void UnregisterCommandHandlers(EndpointId endpointId);
 
+    /*
+     * Register an application callback to be notified of notable events when handling reads/subscribes.
+     */
+    void RegisterReadHandlerAppCallback(ReadHandler::ApplicationCallback * mpApplicationCallback)
+    {
+        mpReadHandlerApplicationCallback = mpApplicationCallback;
+    }
+    void UnregisterReadHandlerAppCallback() { mpReadHandlerApplicationCallback = nullptr; }
+
     /**
      * Called when a timed interaction has failed (i.e. the exchange it was
      * happening on has closed while the exchange delegate was the timed
@@ -232,6 +244,7 @@ public:
             readClient->mpImEngine = nullptr;
             auto * tmpClient       = readClient->GetNextClient();
             readClient->SetNextClient(nullptr);
+            readClient->Close(CHIP_NO_ERROR);
             readClient = tmpClient;
         }
 
@@ -251,6 +264,8 @@ private:
 
     void OnDone(CommandHandler & apCommandObj) override;
     void OnDone(ReadHandler & apReadObj) override;
+
+    ReadHandler::ApplicationCallback * GetAppCallback() override { return mpReadHandlerApplicationCallback; }
 
     /**
      * Called when Interaction Model receives a Command Request message.  Errors processing
@@ -325,6 +340,8 @@ private:
     ObjectPool<ObjectList<DataVersionFilter>, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mDataVersionFilterPool;
     ReadClient * mpActiveReadClientList = nullptr;
 
+    ReadHandler::ApplicationCallback * mpReadHandlerApplicationCallback = nullptr;
+
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     int mReadHandlerCapacityOverride = -1;
 #endif
@@ -366,6 +383,13 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState);
 
 /**
+ *  Get the registered attribute access override. nullptr when attribute access override is not found.
+ *
+ * TODO(#16806): This function and registerAttributeAccessOverride can be member functions of InteractionModelEngine.
+ */
+AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, ClusterId aClusterId);
+
+/**
  * TODO: Document.
  */
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor,
@@ -376,5 +400,18 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
  * Check if the given cluster has the given DataVersion.
  */
 bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion);
+
+/**
+ * Returns true if device type is on endpoint, false otherwise.
+ */
+bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint);
+
+/**
+ * Returns the metadata of the attribute for the given path.
+ *
+ * @retval The metadata of the attribute, will return null if the given attribute does not exists.
+ */
+const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath);
+
 } // namespace app
 } // namespace chip

@@ -42,6 +42,7 @@ namespace chip {
 enum VendorId : uint16_t
 {
     Common       = 0x0000u,
+    Apple        = 0x1349u,
     Google       = 0x6006u,
     TestVendor1  = 0xFFF1u,
     TestVendor2  = 0xFFF2u,

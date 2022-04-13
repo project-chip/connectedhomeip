@@ -34,6 +34,8 @@
 // Set the following to 1 in order to run individual test case manually.
 #define MANUAL_INDIVIDUAL_TEST 0
 
+static uint16_t kTestVendorId = 0xFFF1u;
+
 //
 // Sample XPC Listener implementation that directly communicates with local CHIPDevice instance
 //
@@ -512,7 +514,7 @@ static CHIPDevice * GetConnectedDevice(void)
     [controller setListenPort:kLocalPort];
     [controller setPairingDelegate:pairing queue:callbackQueue];
 
-    BOOL started = [controller startup:nil vendorId:0 nocSigner:nil];
+    BOOL started = [controller startup:nil vendorId:kTestVendorId nocSigner:nil];
     XCTAssertTrue(started);
 
     NSError * error;

@@ -195,8 +195,6 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
     // StopEventLoopTask().
     //
     pthread_cond_signal(&mEventQueueStoppedCond);
-
-    return;
 }
 
 template <class ImplClass>

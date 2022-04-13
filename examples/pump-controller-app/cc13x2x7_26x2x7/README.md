@@ -1,7 +1,7 @@
 # Matter CC1352 CC2652 Pump Controller Example Application
 
 An example application showing the use of [Matter][matter] on the Texas
-Instruments CC13X2_26X2 family of Wireless MCUs.
+Instruments CC13XX_26XX family of Wireless MCUs.
 
 ---
 
@@ -28,15 +28,12 @@ Instruments CC13X2_26X2 family of Wireless MCUs.
 
 ![CC1352R1_LAUNCHXL](doc/images/cc1352r1_launchxl.jpg)
 
-The CC13X2_26X2 pump controller example application provides a working
+The CC13XX_26XX pump controller example application provides a working
 demonstration of a connected pump controller device. This uses the open-source
-Matter implementation and the Texas Instruments SimpleLink™ CC13x2 and CC26x2
+Matter implementation and the Texas Instruments SimpleLink™ CC13XX and CC26XX
 software development kit.
 
-This example is enabled to build for CC2652R7 devices. This upcoming devices are
-currently not yet in full production. For more information on device
-availability or early access to an engineering build of our Matter-enabled SDK,
-please reach out [here][ti_cc13x2_26x2_r7_matter_request].
+This example is enabled to build for CC2652R7 devices.
 
 The pump example is intended to serve both as a means to explore the workings of
 Matter, as well as a template for creating real products based on the Texas
@@ -64,38 +61,19 @@ information to allow for a new network setup.
 ### Preparation
 
 Some initial setup is necessary for preparing the build environment. This
-section will need to be done when migrating to new versions of the SDK.
-
--   An engineering SDK from TI is required. Please request access for it
-    [here][ti_cc13x2_26x2_r7_matter_request].
-
-    -   Follow the default installation instructions when executing the
-        installer.
-
-    -   The version of OpenThread used in this repository is newer than the one
-        packaged with the TI SDK. Check the following section for a list of
-        changes needed.
+section will need to be done when migrating to new versions of the SDK. This
+guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
 -   Download and install [SysConfig][sysconfig] ([recommended
-    version][sysconfig_recommended])
-
-    -   This may have already been installed with your SimpleLink SDK install.
-
--   If you have installed different versions, the build defaults will need to be
-    changed to reflect this in
-    `${chip_root}/examples/build_overrides/ti_simplelink_sdk.gni`.
-
--   Install Python 3.8 for the GN build system:
+    version][sysconfig_recommended]). This can be done simply with the following
+    commands.
 
     ```
-    # Linux
-    $ sudo apt-get install python3.8 python3.8-distutils python3.8-dev python3.8-venv
-    # Distutils listed due to a package manager error on Ubuntu 18.04
-
+    $ cd ~
+    $ wget https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.11.0_2225-setup.run
+    $ chmod +x sysconfig-1.11.0_2225-setup.run
+    $ ./sysconfig-1.11.0_2225-setup.run
     ```
-
-    -   You will have to ensure that the default version of Python 3 is Python
-        3.8.
 
 -   Run the bootstrap script to setup the build environment.
 
@@ -121,15 +99,13 @@ Ninja to build the executable.
 -   Run the build to produce a default executable. By default on Linux both the
     TI SimpleLink SDK and Sysconfig are located in a `ti` folder in the user's
     home directory, and you must provide the absolute path to them. For example
-    `/home/username/ti/simplelink_cc13xx_cc26xx_sdk_5_30_03_01_eng` and
-    `/home/username/ti/sysconfig_1.10.0`. On Windows the default directory is
-    `C:\ti`.
+    `/home/username/ti/sysconfig_1.11.0`. On Windows the default directory is
+    `C:\ti`. Take note of this install path, as it will be used in the next
+    step.
 
     ```
     $ cd ~/connectedhomeip/examples/pump-controller-app/cc13x2x7_26x2x7
-    $ export TI_SIMPLELINK_SDK_ROOT=$HOME/ti/simplelink_cc13xx_cc26xx_sdk_5_30_03_01_eng
-    $ export TI_SYSCONFIG_ROOT=$HOME/ti/sysconfig_1.10.0
-    $ gn gen out/debug --args="ti_simplelink_sdk_root=\"${TI_SIMPLELINK_SDK_ROOT}\" ti_sysconfig_root=\"${TI_SYSCONFIG_ROOT}\""
+    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.11.0\""
     $ ninja -C out/debug
 
     ```
@@ -223,10 +199,9 @@ Additionally, we welcome any feedback.
 [e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-and-thread
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG
 [sysconfig_recommended]:
-    https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.10.0_2163-setup.run
+    https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.11.0_2225-setup.run
 [ti_thread_dnd]:
     https://www.ti.com/wireless-connectivity/thread/design-development.html
-[ti_cc13x2_26x2_r7_matter_request]: https://ti.com/chip_sdk
 [ot_border_router_setup]:
     https://openthread.io/guides/border-router/beaglebone-black
 [qr_code_generator]: https://dhrishi.github.io/connectedhomeip/qrcode.html

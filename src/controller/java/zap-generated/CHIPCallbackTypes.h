@@ -442,6 +442,8 @@ typedef void (*CHIPDiagnosticLogsClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::DiagnosticLogs::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetCredentialStatusResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetUserResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType)(
@@ -619,6 +621,8 @@ typedef void (*CHIPGeneralCommissioningClusterRegulatoryConfigAttributeCallbackT
     void *, chip::app::Clusters::GeneralCommissioning::Attributes::RegulatoryConfig::TypeInfo::DecodableArgType);
 typedef void (*CHIPGeneralCommissioningClusterLocationCapabilityAttributeCallbackType)(
     void *, chip::app::Clusters::GeneralCommissioning::Attributes::LocationCapability::TypeInfo::DecodableArgType);
+typedef void (*CHIPGeneralCommissioningClusterSupportsConcurrentConnectionAttributeCallbackType)(
+    void *, chip::app::Clusters::GeneralCommissioning::Attributes::SupportsConcurrentConnection::TypeInfo::DecodableArgType);
 typedef void (*CHIPGeneralCommissioningClusterGeneratedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::GeneralCommissioning::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPGeneralCommissioningClusterAcceptedCommandListAttributeCallbackType)(

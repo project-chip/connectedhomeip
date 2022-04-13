@@ -209,7 +209,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
 
 bool Cmd_GenVerifier(int argc, char * argv[])
 {
-    FILE * outFile = NULL;
+    FILE * outFile = nullptr;
 
     if (argc == 1)
     {
@@ -231,12 +231,12 @@ bool Cmd_GenVerifier(int argc, char * argv[])
         fprintf(stderr, "Please specify at least one of the 'salt' or 'salt-len' parameters.\n");
         return false;
     }
-    else if (gSalt != nullptr && gSaltLen != 0 && gSaltLen != strlen(gSalt))
+    if (gSalt != nullptr && gSaltLen != 0 && gSaltLen != strlen(gSalt))
     {
         fprintf(stderr, "The specified 'salt-len' doesn't match the length of 'salt' parameter.\n");
         return false;
     }
-    else if (gSaltLen == 0)
+    if (gSaltLen == 0)
     {
         gSaltLen = static_cast<uint8_t>(strlen(gSalt));
     }
@@ -250,7 +250,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
     if (strcmp(gOutFileName, "-") != 0)
     {
         outFile = fopen(gOutFileName, "w+b");
-        if (outFile == NULL)
+        if (outFile == nullptr)
         {
             fprintf(stderr, "Unable to create file %s\n%s\n", gOutFileName, strerror(errno));
             return false;

@@ -93,7 +93,7 @@ class TestPythonController(CHIPVirtualHome):
         self.execute_device_cmd(req_device_id, "pip3 install {}".format(os.path.join(
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip-0.0-cp37-abi3-linux_x86_64.whl")))
 
-        command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 150 -a {} --paa-trust-store-path {}".format(
+        command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 240 -a {} --paa-trust-store-path {}".format(
             os.path.join(
                 CHIP_REPO, "src/controller/python/test/test_scripts/mobile-device-test.py"), ethernet_ip,
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS))

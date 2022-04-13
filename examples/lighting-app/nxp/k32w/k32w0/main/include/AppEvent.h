@@ -29,6 +29,7 @@ struct AppEvent
         kEventType_Timer,
         kEventType_TurnOn,
         kEventType_Install,
+        kEventType_OTAResume,
     };
 
     AppEventTypes Type;

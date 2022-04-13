@@ -22,6 +22,7 @@
 #import <CHIP/CHIPCommandPayloadsObjc.h>
 #import <CHIP/CHIPCommissioningParameters.h>
 #import <CHIP/CHIPDevice.h>
+#import <CHIP/CHIPDeviceAttestationDelegate.h>
 #import <CHIP/CHIPDeviceController+XPC.h>
 #import <CHIP/CHIPDeviceController.h>
 #import <CHIP/CHIPDevicePairingDelegate.h>
