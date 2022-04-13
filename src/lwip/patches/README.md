@@ -37,4 +37,5 @@ stateless, it would set the DNS server as an ipv4 address, which ended up being
 garbage. This would invalidate the whole DNS table, and lwip does not have a
 default backup.
 
--   fixed in upstream in this [commit](https://git.savannah.nongnu.org/cgit/lwip.git/commit/?id=941300c21c45a4dbf1c074b29a9ca3c88c9f6553)
+-   fixed in upstream in this
+    [commit](https://git.savannah.nongnu.org/cgit/lwip.git/commit/?id=941300c21c45a4dbf1c074b29a9ca3c88c9f6553)
