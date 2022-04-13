@@ -219,7 +219,6 @@ function getManualTests()
   ];
 
   const WindowCovering = [
-    'Test_TC_WNCV_2_3',
     'Test_TC_WNCV_6_1',
   ];
 
