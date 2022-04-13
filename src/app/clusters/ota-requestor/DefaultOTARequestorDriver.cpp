@@ -431,6 +431,8 @@ bool DefaultOTARequestorDriver::GetNextProviderLocation(ProviderLocationType & p
 
 CHIP_ERROR DefaultOTARequestorDriver::ScheduleQueryRetry(bool trySameProvider)
 {
+    CHIP_ERROR status = CHIP_NO_ERROR;
+
     if (trySameProvider == false)
     {
         VerifyOrDie(mRequestor != nullptr);
@@ -444,7 +446,7 @@ CHIP_ERROR DefaultOTARequestorDriver::ScheduleQueryRetry(bool trySameProvider)
         // start to end, until an OTA is successfully completed.
         if ((GetNextProviderLocation(providerLocation, listExhausted) != true) || (listExhausted == true))
         {
-            return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+            status = CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
         }
         else
         {
@@ -455,7 +457,7 @@ CHIP_ERROR DefaultOTARequestorDriver::ScheduleQueryRetry(bool trySameProvider)
     if (mProviderRetryCount > kMaxBusyProviderRetryCount)
     {
         ChipLogProgress(SoftwareUpdate, "Max retry of %u exceeded.  Will not retry", kMaxBusyProviderRetryCount);
-        return CHIP_ERROR_MAX_RETRY_EXCEEDED;
+        status = CHIP_ERROR_MAX_RETRY_EXCEEDED;
     }
     else
     {
@@ -463,7 +465,7 @@ CHIP_ERROR DefaultOTARequestorDriver::ScheduleQueryRetry(bool trySameProvider)
         ScheduleDelayedAction(kDefaultDelayedActionTime, StartDelayTimerHandler, this);
     }
 
-    return CHIP_NO_ERROR;
+    return status;
 }
 
 } // namespace DeviceLayer
