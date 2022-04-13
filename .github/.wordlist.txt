@@ -8,7 +8,6 @@
 21
 22
 AAAA
-aabbccddeeff
 aarch
 abcdef
 abfb
@@ -510,7 +509,6 @@ ffeebaefa
 FFF
 fffe
 fffff
-fHtcwcAAAAAAAAAwQAAAAAAXPMlAAAAAAA
 Fi
 filepath
 fini
@@ -1392,7 +1390,6 @@ xAAAA
 xab
 xaver
 xb
-xBEEF
 xbef
 xc
 xcd
@@ -1400,9 +1397,6 @@ Xcode
 xcodeproj
 xcworkspace
 xd
-xDEAD
-xDEADBEEF
-xdeadbeefcafe
 xds
 xdsdfu
 xEA
@@ -1420,15 +1414,8 @@ xFF
 xFFF
 xFFFF
 xfffff
-xFFFFFFFD
-xffffffffe
-xfffffffff
-xffffffffffff
-xffffffffffffXXXX
 xtensa
 xwayland
-XXXX
-XXXXXXXX
 xyz
 xz
 xzvf
@@ -1439,7 +1426,6 @@ YNJV
 Yocto
 yoctoproject
 YourFolder
-yWsC
 zapt
 zaptool
 ZCL
