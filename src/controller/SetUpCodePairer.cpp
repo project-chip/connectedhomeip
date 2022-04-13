@@ -138,9 +138,23 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverIP(SetupPayload & payload)
                                                       : Dnssd::DiscoveryFilterType::kLongDiscriminator;
     currentFilter.code =
         payload.isShortDiscriminator ? static_cast<uint16_t>((payload.discriminator >> 8) & 0x0F) : payload.discriminator;
+
+    // We're going to ensure that anything we discover matches currentFilter
+    // before we use it, which will do our discriminator checks for us.
+    //
+    // For the actual discovery, use a "commissionable nodes only" subtype.
+    // This avoids a problem we can run into if we use the discriminator-based
+    // subtypes where we discover a (possibly stale) advertisement for a
+    // non-commissionable (CM=0) node, then it becomes commissionable but we
+    // don't notice that because it does not add or remove SRV records, just
+    // updates TXT records.  But in this situation a PTR record _will_ get
+    // added, so that's what we look for.
+    Dnssd::DiscoveryFilter filter;
+    filter.type = Dnssd::DiscoveryFilterType::kCommissioningMode;
+
     // Handle possibly-sync callbacks.
     mWaitingForDiscovery[kIPTransport] = true;
-    CHIP_ERROR err                     = mCommissioner->DiscoverCommissionableNodes(currentFilter);
+    CHIP_ERROR err                     = mCommissioner->DiscoverCommissionableNodes(filter);
     if (err != CHIP_NO_ERROR)
     {
         mWaitingForDiscovery[kIPTransport] = false;
