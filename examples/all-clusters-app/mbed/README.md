@@ -208,13 +208,17 @@ open a terminal session and connect to the serial port of the device. You can
 use **mbed-tools** for this purpose
 ([mbed-tools](https://github.com/ARMmbed/mbed-tools)):
 
+    ```
     mbed-tools sterm -p /dev/ttyACM0 -b 115200 -e off
+    ```
 
 After device reset these lines should be visible:
 
+    ```
     [INFO][CHIP]: [-]Mbed all-clusters-app example application start
     ...
     [INFO][CHIP]: [-]Mbed all-clusters-app example application run
+    ```
 
 The all-clusters-app application launched correctly and you can follow traces in
 the terminal.

@@ -75,7 +75,7 @@ There are two commissioning modes supported by Ameba platform:
 
     - Set `chip_config_network_layer_ble = true`
 
-2. In "connectedhomeip/src/platform/Ameba/CHIPDevicePlatformConfig.h"
+2. In `connectedhomeip/src/platform/Ameba/CHIPDevicePlatformConfig.h`
 
     - Set `#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1`
 
