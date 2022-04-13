@@ -67,7 +67,7 @@ nRF52840 Dongle:
     LED on the dongle starts blinking.
 
 10. To install the RCP firmware package onto the dongle, run the following
-    command, with _/dev/ttyACM0_ replaced with the device node name of your
+    command, with `/dev/ttyACM0` replaced with the device node name of your
     nRF52840 Dongle:
 
         ```
