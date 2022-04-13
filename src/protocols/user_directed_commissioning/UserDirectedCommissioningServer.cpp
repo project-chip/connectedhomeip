@@ -103,8 +103,6 @@ void UserDirectedCommissioningServer::SetUDCClientProcessingState(char * instanc
     client->SetUDCClientProcessingState(state);
 
     mUdcClients.MarkUDCClientActive(client);
-
-    return;
 }
 
 void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::DiscoveredNodeData & nodeData)

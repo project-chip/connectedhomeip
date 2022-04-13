@@ -145,7 +145,7 @@ private:
     CHIP_ERROR BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
                                                        bool * apHasMoreChunks, bool * apHasEncodedData);
     CHIP_ERROR BuildSingleReportDataEventReports(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
-                                                 bool * apHasMoreChunks, bool * apHasEncodedData);
+                                                 bool aBufferIsUsed, bool * apHasMoreChunks, bool * apHasEncodedData);
     CHIP_ERROR RetrieveClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                    AttributeReportIBs::Builder & aAttributeReportIBs,
                                    const ConcreteReadAttributePath & aClusterInfo,
@@ -156,7 +156,8 @@ private:
     // of those will fail to match.  This function should return false if either nothing in the list matches the given
     // endpoint+cluster in the path or there is an entry in the list that matches the endpoint+cluster in the path but does not
     // match the current data version of that cluster.
-    bool IsClusterDataVersionMatch(ObjectList<DataVersionFilter> * aDataVersionFilterList, const ConcreteReadAttributePath & aPath);
+    bool IsClusterDataVersionMatch(const ObjectList<DataVersionFilter> * aDataVersionFilterList,
+                                   const ConcreteReadAttributePath & aPath);
 
     /**
      * Check all active subscription, if the subscription has no paths that intersect with global dirty set,
@@ -185,7 +186,7 @@ private:
      *
      * Return whether one of our paths is now a superset of the provided path.
      */
-    bool MergeOverlappedAttributePath(AttributePathParams & aAttributePath);
+    bool MergeOverlappedAttributePath(const AttributePathParams & aAttributePath);
 
     inline void BumpDirtySetGeneration() { mDirtyGeneration++; }
 

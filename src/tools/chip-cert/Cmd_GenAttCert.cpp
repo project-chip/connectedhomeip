@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,6 +49,7 @@ OptionDef gCmdOptionDefs[] =
     { "subject-cn",       kArgumentRequired, 'c' },
     { "subject-vid",      kArgumentRequired, 'V' },
     { "subject-pid",      kArgumentRequired, 'P' },
+    { "vid-pid-as-cn",    kNoArgument,       'a' },
     { "key",              kArgumentRequired, 'k' },
     { "ca-cert",          kArgumentRequired, 'C' },
     { "ca-key",           kArgumentRequired, 'K' },
@@ -78,6 +79,12 @@ const char * const gCmdOptionHelp =
     "   -P, --subject-pid <hex-digits>\n"
     "\n"
     "       Subject DN CHIP PID attribute (in hex).\n"
+    "\n"
+    "   -a, --vid-pid-as-cn\n"
+    "\n"
+    "       Encode Matter VID and PID parameters as Common Name attributes in the Subject DN.\n"
+    "       If not specified then by default the VID and PID fields are encoded using\n"
+    "       Matter specific OIDs.\n"
     "\n"
     "   -C, --ca-cert <file>\n"
     "\n"
@@ -141,6 +148,7 @@ AttCertType gAttCertType      = kAttCertType_NotSpecified;
 const char * gSubjectCN       = nullptr;
 uint16_t gSubjectVID          = VendorId::NotSpecified;
 uint16_t gSubjectPID          = 0;
+bool gEncodeVIDandPIDasCN     = false;
 const char * gCACertFileName  = nullptr;
 const char * gCAKeyFileName   = nullptr;
 const char * gInKeyFileName   = nullptr;
@@ -192,6 +200,9 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
             PrintArgError("%s: Invalid value specified for the subject PID attribute: %s\n", progName, arg);
             return false;
         }
+        break;
+    case 'a':
+        gEncodeVIDandPIDasCN = true;
         break;
     case 'k':
         gInKeyFileName = arg;
@@ -260,7 +271,7 @@ bool Cmd_GenAttCert(int argc, char * argv[])
         fprintf(stderr, "Please specify attestation certificate type.\n");
         return false;
     }
-    else if (gAttCertType == kAttCertType_DAC)
+    if (gAttCertType == kAttCertType_DAC)
     {
         if (gSubjectVID == VendorId::NotSpecified || gSubjectPID == 0)
         {
@@ -290,7 +301,8 @@ bool Cmd_GenAttCert(int argc, char * argv[])
         fprintf(stderr, "Please specify the CA certificate file name using the --ca-cert option.\n");
         return false;
     }
-    else if (gCACertFileName != nullptr && gAttCertType == kAttCertType_PAA)
+
+    if (gCACertFileName != nullptr && gAttCertType == kAttCertType_PAA)
     {
         fprintf(stderr, "Please don't specify --ca-cert option for the self signed certificate. \n");
         return false;
@@ -354,8 +366,8 @@ bool Cmd_GenAttCert(int argc, char * argv[])
 
     if (gAttCertType == kAttCertType_PAA)
     {
-        res = MakeAttCert(gAttCertType, gSubjectCN, gSubjectVID, gSubjectPID, newCert.get(), newKey.get(), gValidFrom, gValidDays,
-                          newCert.get(), newKey.get());
+        res = MakeAttCert(gAttCertType, gSubjectCN, gSubjectVID, gSubjectPID, gEncodeVIDandPIDasCN, newCert.get(), newKey.get(),
+                          gValidFrom, gValidDays, newCert.get(), newKey.get());
         VerifyTrueOrExit(res);
     }
     else
@@ -369,8 +381,8 @@ bool Cmd_GenAttCert(int argc, char * argv[])
         res = ReadKey(gCAKeyFileName, caKey.get());
         VerifyTrueOrExit(res);
 
-        res = MakeAttCert(gAttCertType, gSubjectCN, gSubjectVID, gSubjectPID, caCert.get(), caKey.get(), gValidFrom, gValidDays,
-                          newCert.get(), newKey.get());
+        res = MakeAttCert(gAttCertType, gSubjectCN, gSubjectVID, gSubjectPID, gEncodeVIDandPIDasCN, caCert.get(), caKey.get(),
+                          gValidFrom, gValidDays, newCert.get(), newKey.get());
         VerifyTrueOrExit(res);
     }
 

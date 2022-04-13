@@ -282,12 +282,7 @@ CHIP_ERROR FabricInfo::GeneratePeerId(FabricId fabricId, NodeId nodeId, PeerId *
         rootPubkey = rootPubkeySpan;
     }
 
-    ChipLogDetail(Inet, "Generating compressed fabric ID using uncompressed fabric ID 0x" ChipLogFormatX64 " and root pubkey",
-                  ChipLogValueX64(fabricId));
-    ChipLogByteSpan(Inet, ByteSpan(rootPubkey.ConstBytes(), rootPubkey.Length()));
     ReturnErrorOnFailure(GenerateCompressedFabricId(rootPubkey, fabricId, compressedFabricIdSpan));
-    ChipLogDetail(Inet, "Generated compressed fabric ID");
-    ChipLogByteSpan(Inet, compressedFabricIdSpan);
 
     // Decode compressed fabric ID accounting for endianness, as GenerateCompressedFabricId()
     // returns a binary buffer and is agnostic of usage of the output as an integer type.
@@ -437,68 +432,6 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricInfo::GenerateDestinationID(const ByteSpan & ipk, const ByteSpan & random, NodeId destNodeId,
-                                             MutableByteSpan & destinationId) const
-{
-    constexpr uint16_t kSigmaParamRandomNumberSize = 32;
-    constexpr size_t kDestinationMessageLen =
-        kSigmaParamRandomNumberSize + kP256_PublicKey_Length + sizeof(FabricId) + sizeof(NodeId);
-    HMAC_sha hmac;
-    uint8_t destinationMessage[kDestinationMessageLen];
-    P256PublicKeySpan rootPubkeySpan;
-
-    ReturnErrorOnFailure(GetRootPubkey(rootPubkeySpan));
-
-    Encoding::LittleEndian::BufferWriter bbuf(destinationMessage, sizeof(destinationMessage));
-
-    ChipLogDetail(Inet,
-                  "Generating DestinationID. Fabric ID 0x" ChipLogFormatX64 ", Dest node ID 0x" ChipLogFormatX64 ", Random data",
-                  ChipLogValueX64(mFabricId), ChipLogValueX64(destNodeId));
-    ChipLogByteSpan(Inet, random);
-
-    bbuf.Put(random.data(), random.size());
-    // TODO: In the current implementation this check is required because in some cases the
-    //       GenerateDestinationID() is called before mRootCert is initialized and GetRootPubkey() returns
-    //       empty Span.
-    if (!rootPubkeySpan.empty())
-    {
-        ChipLogDetail(Inet, "Root pubkey");
-        ChipLogByteSpan(Inet, rootPubkeySpan);
-        bbuf.Put(rootPubkeySpan.data(), rootPubkeySpan.size());
-    }
-    bbuf.Put64(mFabricId);
-    bbuf.Put64(destNodeId);
-
-    size_t written = 0;
-    VerifyOrReturnError(bbuf.Fit(written), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    ChipLogDetail(Inet, "IPK");
-    ChipLogByteSpan(Inet, ipk);
-
-    CHIP_ERROR err =
-        hmac.HMAC_SHA256(ipk.data(), ipk.size(), destinationMessage, written, destinationId.data(), destinationId.size());
-    ChipLogDetail(Inet, "Generated DestinationID output");
-    ChipLogByteSpan(Inet, destinationId);
-    return err;
-}
-
-CHIP_ERROR FabricInfo::MatchDestinationID(const ByteSpan & targetDestinationId, const ByteSpan & initiatorRandom,
-                                          const ByteSpan * ipkList, size_t ipkListEntries) const
-{
-    uint8_t localDestID[kSHA256_Hash_Length] = { 0 };
-    MutableByteSpan localDestIDSpan(localDestID);
-    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-    for (size_t ipkIdx = 0; ipkIdx < ipkListEntries; ++ipkIdx)
-    {
-        if (GenerateDestinationID(ipkList[ipkIdx], initiatorRandom, mOperationalId.GetNodeId(), localDestIDSpan) == CHIP_NO_ERROR &&
-            targetDestinationId.data_equal(localDestIDSpan))
-        {
-            return CHIP_NO_ERROR;
-        }
-    }
-    return CHIP_ERROR_CERT_NOT_TRUSTED;
-}
-
 FabricTable::~FabricTable()
 {
     FabricTableDelegate * delegate = mDelegate;
@@ -636,20 +569,6 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
     ChipLogProgress(Discovery, "Assigned compressed fabric ID: 0x" ChipLogFormatX64 ", node ID: 0x" ChipLogFormatX64,
                     ChipLogValueX64(mOperationalId.GetCompressedFabricId()), ChipLogValueX64(mOperationalId.GetNodeId()));
     return CHIP_NO_ERROR;
-}
-
-FabricIndex FabricTable::FindDestinationIDCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom,
-                                                    const ByteSpan * ipkList, size_t ipkListEntries)
-{
-    for (auto & fabric : *this)
-    {
-        if (fabric.MatchDestinationID(destinationId, initiatorRandom, ipkList, ipkListEntries) == CHIP_NO_ERROR)
-        {
-            return fabric.GetFabricIndex();
-        }
-    }
-
-    return kUndefinedFabricIndex;
 }
 
 CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outputIndex)
@@ -880,7 +799,6 @@ void FabricTable::UpdateNextAvailableFabricIndex()
     }
 
     mNextAvailableFabricIndex.ClearValue();
-    return;
 }
 
 CHIP_ERROR FabricTable::StoreFabricIndexInfo() const

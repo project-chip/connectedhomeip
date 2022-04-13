@@ -1043,22 +1043,22 @@ public class ChipStructs {
   }
 
   public static class NetworkCommissioningClusterThreadInterfaceScanResult {
-    public Long panId;
+    public Integer panId;
     public Long extendedPanId;
     public String networkName;
     public Integer channel;
     public Integer version;
-    public Long extendedAddress;
+    public byte[] extendedAddress;
     public Integer rssi;
     public Integer lqi;
 
     public NetworkCommissioningClusterThreadInterfaceScanResult(
-        Long panId,
+        Integer panId,
         Long extendedPanId,
         String networkName,
         Integer channel,
         Integer version,
-        Long extendedAddress,
+        byte[] extendedAddress,
         Integer rssi,
         Integer lqi) {
       this.panId = panId;
@@ -1091,7 +1091,7 @@ public class ChipStructs {
       output.append(version);
       output.append("\n");
       output.append("\textendedAddress: ");
-      output.append(extendedAddress);
+      output.append(Arrays.toString(extendedAddress));
       output.append("\n");
       output.append("\trssi: ");
       output.append(rssi);

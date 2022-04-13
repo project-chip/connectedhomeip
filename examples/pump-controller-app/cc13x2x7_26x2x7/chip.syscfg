@@ -42,8 +42,6 @@ const AESECB2     = AESECB.addInstance();
 const ECDH        = scripting.addModule("/ti/drivers/ECDH");
 const ECDH1       = ECDH.addInstance();
 const ECDH2       = ECDH.addInstance();
-const ECJPAKE     = scripting.addModule("/ti/drivers/ECJPAKE");
-const ECJPAKE1    = ECJPAKE.addInstance();
 const NVS         = scripting.addModule("/ti/drivers/NVS");
 const NVS1        = NVS.addInstance();
 const NVS2        = NVS.addInstance();
@@ -141,8 +139,6 @@ AESECB2.$name = "CONFIG_AESECB_1";
 ECDH1.$name = "CONFIG_ECDH0";
 
 ECDH2.$name = "CONFIG_ECDH_1";
-
-ECJPAKE1.$name = "CONFIG_ECJPAKE_0";
 
 NVS1.$name                    = "CONFIG_NVSINTERNAL";
 NVS1.internalFlash.$name      = "ti_drivers_nvs_NVSCC26XX0";

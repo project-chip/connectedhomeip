@@ -270,6 +270,11 @@ public:
     bool IsCommissioned(void) const;
 
     /**
+     * This method checks if the dataset is empty.
+     */
+    bool IsEmpty() const { return mLength == 0; }
+
+    /**
      * This method checks whether @p aData is formatted as ThreadTLVs.
      *
      * @note This method doesn't verify ThreadTLV values are valid.

@@ -133,9 +133,28 @@ def runClangPrettifier(templates_file, output_dir):
             filepath)[1] in listOfSupportedFileExtensions, outputs))
 
         if len(clangOutputs) > 0:
-            args = ['clang-format', '-i']
-            args.extend(clangOutputs)
-            subprocess.check_call(args)
+            # The "clang-format" pigweed comes with is now version 14, which
+            # changed behavior from version 13 and earlier regarding some
+            # whitespace formatting.  Unfortunately, all the CI bits run
+            # clang-format 13 or earlier, so we get styling mismatches.
+            #
+            # Try some older clang-format versions just in case they are
+            # installed.  In particular, clang-format-13 is available on various
+            # Linux distributions and clang-format-11 is available via homebrew
+            # on Mac.  If all else fails, fall back to clang-format.
+            clang_formats = ['clang-format-13', 'clang-format-12', 'clang-format-11', 'clang-format']
+            for clang_format in clang_formats:
+                args = [clang_format, '-i']
+                args.extend(clangOutputs)
+                try:
+                    subprocess.check_call(args)
+                    err = None
+                    break
+                except Exception as thrown:
+                    err = thrown
+                    # Press on to the next binary name
+            if err is not None:
+                raise err
     except Exception as err:
         print('clang-format error:', err)
 

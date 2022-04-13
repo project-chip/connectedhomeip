@@ -23,6 +23,8 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
+static uint16_t kTestVendorId = 0xFFF1u;
+
 @interface CHIPControllerTests : XCTestCase
 
 @end
@@ -32,11 +34,11 @@
 - (void)testControllerLifecycle
 {
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
-    XCTAssertTrue([controller startup:nil vendorId:0 nocSigner:nil]);
+    XCTAssertTrue([controller startup:nil vendorId:kTestVendorId nocSigner:nil]);
     XCTAssertTrue([controller shutdown]);
 
     // now try to restart the controller
-    XCTAssertTrue([controller startup:nil vendorId:0 nocSigner:nil]);
+    XCTAssertTrue([controller startup:nil vendorId:kTestVendorId nocSigner:nil]);
     XCTAssertTrue([controller shutdown]);
 }
 
@@ -44,7 +46,7 @@
 {
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     for (int i = 0; i < 5; i++) {
-        XCTAssertTrue([controller startup:nil vendorId:0 nocSigner:nil]);
+        XCTAssertTrue([controller startup:nil vendorId:kTestVendorId nocSigner:nil]);
     }
     XCTAssertTrue([controller shutdown]);
 }
@@ -52,7 +54,7 @@
 - (void)testControllerMultipleShutdown
 {
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
-    XCTAssertTrue([controller startup:nil vendorId:0 nocSigner:nil]);
+    XCTAssertTrue([controller startup:nil vendorId:kTestVendorId nocSigner:nil]);
     for (int i = 0; i < 5; i++) {
         XCTAssertTrue([controller shutdown]);
     }

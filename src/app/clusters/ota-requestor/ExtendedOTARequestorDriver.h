@@ -15,19 +15,19 @@
  *    limitations under the License.
  */
 #pragma once
+#include <app/clusters/ota-requestor/OTARequestorUserConsentDelegate.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/OTARequestorUserConsentDelegate.h>
 
-#include "GenericOTARequestorDriver.h"
+#include "DefaultOTARequestorDriver.h"
 
 namespace chip {
 namespace DeviceLayer {
 
 /**
- * This extends the GenericOTARequestorDriver and provides optional
+ * This extends the DefaultOTARequestorDriver and provides optional
  * features. For now, it adds support for the handling user consent.
  */
-class ExtendedOTARequestorDriver : public GenericOTARequestorDriver
+class ExtendedOTARequestorDriver : public DefaultOTARequestorDriver
 {
 public:
     bool CanConsent() override;

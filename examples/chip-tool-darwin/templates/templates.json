@@ -35,6 +35,10 @@
             "path": "../../../src/darwin/Framework/CHIP/templates/partials/encode_value.zapt"
         },
         {
+            "name": "decodable_value",
+            "path": "partials/decodable_value.zapt"
+        },
+        {
             "name": "decode_value",
             "path": "../../../src/darwin/Framework/CHIP/templates/partials/decode_value.zapt"
         },

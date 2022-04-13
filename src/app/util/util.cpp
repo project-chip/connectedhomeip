@@ -257,6 +257,7 @@ void MatterTimeSynchronizationPluginServerInitCallback() {}
 void MatterProxyValidPluginServerInitCallback() {}
 void MatterProxyDiscoveryPluginServerInitCallback() {}
 void MatterProxyConfigurationPluginServerInitCallback() {}
+void MatterFanControlPluginServerInitCallback() {}
 
 // ****************************************
 // This function is called by the application when the stack goes down,
@@ -553,38 +554,30 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
             {
                 return -1;
             }
-            else
-            {
-                return 0;
-            }
-        }
-        else
-        { // not supported
+
             return 0;
         }
-    }
-    else
-    { // regular unsigned number comparison
-        for (i = 0; i < len; i++)
-        {
-            j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
-            k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
 
-            if (j > k)
-            {
-                return 1;
-            }
-            if (k > j)
-            {
-                return -1;
-            }
-            else
-            {
-                // MISRA requires ..else if.. to have terminating else.
-            }
-        }
+        // not supported
         return 0;
     }
+
+    // regular unsigned number comparison
+    for (i = 0; i < len; i++)
+    {
+        j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
+        k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
+
+        if (j > k)
+        {
+            return 1;
+        }
+        if (k > j)
+        {
+            return -1;
+        }
+    }
+    return 0;
 }
 
 #if 0

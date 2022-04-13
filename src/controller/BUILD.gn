@@ -50,6 +50,7 @@ static_library("controller") {
       "CommissioningWindowOpener.cpp",
       "CommissioningWindowOpener.h",
       "DeviceDiscoveryDelegate.h",
+      "DevicePairingDelegate.h",
       "EmptyDataModelHandler.cpp",
       "ExampleOperationalCredentialsIssuer.cpp",
       "ExampleOperationalCredentialsIssuer.h",

@@ -21,6 +21,7 @@ import("${chip_root}/src/platform/nxp/k32w/k32w0/args.gni")
 declare_args() {
   # Location of the k32w0 SDK.
   k32w0_sdk_root = getenv("NXP_K32W061_SDK_ROOT")
+  chip_with_DK6 = true
   chip_with_OM15082 = 0
   chip_with_ot_cli = 0
   chip_with_low_power = 0
@@ -38,7 +39,13 @@ template("k32w0_sdk") {
     k32w0_sdk_root = invoker.k32w0_sdk_root
   }
 
+  if (defined(invoker.override_is_DK6)) {
+    chip_with_DK6 = invoker.override_is_DK6
+  }
+
   assert(k32w0_sdk_root != "", "k32w0_sdk_root must be specified")
+  assert(chip_with_OM15082 == 0 || chip_with_DK6,
+         "OM15082 expansion board is only supported on DK6 board")
   assert(
       chip_with_low_power == 0 ||
           (chip_with_low_power == 1 && chip_with_OM15082 == 0 &&
@@ -56,10 +63,21 @@ template("k32w0_sdk") {
     # We want to treat SDK headers as system headers, so that warnings in those
     # headers are not fatal.  Therefore don't add them directly to include_dirs;
     # we will add them to cflags below instead.
-    _sdk_include_dirs = [
-      "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm",
-      "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/enablement",
-      "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/hybrid/ble_ot/lped_ble_wuart/ble_802_15_4_common",
+    _sdk_include_dirs = []
+
+    if (chip_with_DK6) {
+      if (chip_with_low_power != 0) {
+        _sdk_include_dirs += [ "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/lped/bm" ]
+      } else {
+        _sdk_include_dirs += [ "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm" ]
+      }
+    }
+
+    if (chip_with_low_power != 0) {
+      _sdk_include_dirs += [ "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/hybrid/ble_ot/lped_ble_wuart/ble_802_15_4_common" ]
+    }
+
+    _sdk_include_dirs += [
       "${chip_root}/src/platform/nxp/k32w/k32w0",
       "${k32w0_sdk_root}/CMSIS/Include",
       "${k32w0_sdk_root}/components/serial_manager",
@@ -130,7 +148,7 @@ template("k32w0_sdk") {
       "CPU_JN518X_REV=2",
       "JENNIC_CHIP_FAMILY_NAME=_JN518x",
       "gPWR_LDOMEM_0_9V_PD=0",
-      "SDK_DEBUGCONSOLE=1",
+      "SDK_DEBUGCONSOLE=DEBUGCONSOLE_REDIRECT_TO_SDK",
       "NO_SYSCORECLK_UPD=0",
       "USE_RTOS=1",
       "USE_SDK_OSA=0",
@@ -140,26 +158,22 @@ template("k32w0_sdk") {
       "gUartDebugConsole_d=1",
       "DEBUG_SERIAL_INTERFACE_INSTANCE=0",
       "APP_SERIAL_INTERFACE_INSTANCE=1",
-      "gUsePdm_d=1",
-      "PDM_EXT_FLASH=1",
-      "gEepromType_d=gEepromDevice_MX25R8035F_c",
       "gOTA_externalFlash_d=1",
       "gEepromPostedOperations_d=1",
       "gOtaEepromPostedOperations_d=1",
+      "gOtaVerifyWrite_d=0",
+      "gExternalFlashIsCiphered_d=1",
+      "gBootData_None_c=1",
       "PROGRAM_PAGE_SZ=256",
-      "gKeyBoardSupported_d",
-      "gPdmNbSegments=63",
       "configFRTOS_MEMORY_SCHEME=4",
       "osCustomStartup=1",
-      "gLEDsOnTargetBoardCnt_c=2",
-      "gLED_InvertedMode_d=1",
       "ENABLE_RAM_VECTOR_TABLE=1",
       "gTMR_Enabled_d=1",
       "gTimestamp_Enabled_d=0",
       "K32W_LOG_ENABLED=1",
       "CHIP_ENABLE_OPENTHREAD=1",
       "gOtaMemPoolId_c=1",
-      "PoolsDetails_c=_block_size_ 32 _number_of_blocks_ 6 _pool_id_(0) _eol_ _block_size_ 256 _number_of_blocks_ 3 _pool_id_(0) _eol_ _block_size_ 512 _number_of_blocks_ 2 _pool_id_(0) _eol_ _block_size_ 768 _number_of_blocks_ 1 _pool_id_(0) _eol_ _block_size_ 268  _number_of_blocks_ 4 _pool_id_(gOtaMemPoolId_c) _eol_",
+      "PoolsDetails_c=_block_size_ 32 _number_of_blocks_ 6 _pool_id_(0) _eol_ _block_size_ 256 _number_of_blocks_ 3 _pool_id_(0) _eol_ _block_size_ 512 _number_of_blocks_ 2 _pool_id_(0) _eol_ _block_size_ 768 _number_of_blocks_ 1 _pool_id_(0) _eol_ _block_size_ 268  _number_of_blocks_ 8 _pool_id_(gOtaMemPoolId_c) _eol_",
       "SUPPORT_FOR_15_4=1",
       "gAppMaxConnections_c=1",
       "gAppUseBonding_d=0",
@@ -192,13 +206,34 @@ template("k32w0_sdk") {
       ]
     }
 
-    if (chip_with_OM15082 == 1) {
+    if (chip_with_DK6) {
       defines += [
-        "gKBD_KeysCount_c=4",
-        "OM15082=1",
+        "gUsePdm_d=1",
+        "PDM_EXT_FLASH=1",
+        "gEepromType_d=gEepromDevice_MX25R8035F_c",
+        "gPdmNbSegments=63",
       ]
-    } else {
-      defines += [ "gKBD_KeysCount_c=1" ]
+
+      if (chip_with_OM15082 != 0) {
+        defines += [
+          "OM15082=1",
+          "gKeyBoardSupported_d=1",
+          "gKBD_KeysCount_c=4",
+        ]
+      } else {
+        defines += [
+          "gKeyBoardSupported_d=1",
+          "gKBD_KeysCount_c=1",
+        ]
+      }
+
+      if (chip_with_low_power == 0) {
+        defines += [
+          "gLEDSupported_d=1",
+          "gLEDsOnTargetBoardCnt_c=2",
+          "gLED_InvertedMode_d=1",
+        ]
+      }
     }
 
     if (chip_with_ot_cli == 1) {
@@ -218,9 +253,6 @@ template("k32w0_sdk") {
       ]
     } else {
       defines += [
-        "gLEDSupported_d",
-        "gLED_InvertedMode_d=1",
-        "gLEDsOnTargetBoardCnt_c=2",
         "cPWR_UsePowerDownMode=0",
         "cPWR_FullPowerDownMode=0",
       ]
@@ -257,9 +289,6 @@ template("k32w0_sdk") {
     }
 
     sources += [
-      "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/board.c",
-      "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/board_utility.c",
-      "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/hardware_init.c",
       "${k32w0_sdk_root}/components/serial_manager/serial_manager.c",
       "${k32w0_sdk_root}/components/serial_manager/serial_port_uart.c",
       "${k32w0_sdk_root}/components/uart/usart_adapter.c",
@@ -332,19 +361,37 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/timers.c",
     ]
 
-    if (chip_with_se05x == 1) {
-      sources += [
-        "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/clock_config.c",
-        "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/pin_mux.c",
-      ]
-    } else {
-      sources += [
-        "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/enablement/clock_config.c",
-        "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/enablement/pin_mux.c",
-      ]
+    if (chip_with_DK6) {
+      if (chip_with_low_power != 0) {
+        sources += [
+          "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/lped/bm/board.c",
+          "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/lped/bm/board_utility.c",
+          "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/lped/bm/clock_config.c",
+          "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/lped/bm/hardware_init.c",
+          "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/lped/bm/pin_mux.c",
+        ]
+      } else {
+        sources += [
+          "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/board.c",
+          "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/board_utility.c",
+          "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/hardware_init.c",
+        ]
+
+        if (chip_with_se05x != 0) {
+          sources += [
+            "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/clock_config.c",
+            "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/pin_mux.c",
+          ]
+        } else {
+          sources += [
+            "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/clock_config.c",
+            "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/pin_mux.c",
+          ]
+        }
+      }
     }
 
-    if (chip_with_low_power == 1) {
+    if (chip_with_low_power != 0) {
       sources += [ "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/hybrid/ble_ot/lped_ble_wuart/ble_802_15_4_common/app_dual_mode_low_power.c" ]
     }
 

@@ -66,9 +66,15 @@ static Device gLight3("Light 3", "Kitchen");
 static Device gLight4("Light 4", "Den");
 
 // (taken from chip-devices.xml)
-#define DEVICE_TYPE_CHIP_BRIDGE 0x0a0b
+#define DEVICE_TYPE_BRIDGED_NODE 0x0013
 // (taken from lo-devices.xml)
 #define DEVICE_TYPE_LO_ON_OFF_LIGHT 0x0100
+
+// (taken from chip-devices.xml)
+#define DEVICE_TYPE_ROOT_NODE 0x0016
+// (taken from chip-devices.xml)
+#define DEVICE_TYPE_BRIDGE 0x000e
+
 // Device Version for dynamic endpoints:
 #define DEVICE_VERSION_DEFAULT 1
 
@@ -138,35 +144,41 @@ DataVersion gLight4DataVersions[ArraySize(bridgedLightClusters)];
 #define ZCL_FIXED_LABEL_CLUSTER_REVISION (1u)
 #define ZCL_ON_OFF_CLUSTER_REVISION (4u)
 
-CHIP_ERROR AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, uint16_t deviceType,
-                             const Span<DataVersion> & dataVersionStorage)
+int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
+                      const Span<DataVersion> & dataVersionStorage)
 {
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         if (NULL == gDevices[index])
         {
-            dev->SetEndpointId(gCurrentEndpointId);
             gDevices[index] = dev;
             EmberAfStatus ret;
-            ret = emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, deviceType, DEVICE_VERSION_DEFAULT, dataVersionStorage);
-            if (ret == EMBER_ZCL_STATUS_SUCCESS)
+            while (1)
             {
-                ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", dev->GetName(),
-                                gCurrentEndpointId, index);
-                gCurrentEndpointId++;
-                return CHIP_NO_ERROR;
-            }
-            else if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
-            {
-                ChipLogProgress(DeviceLayer, "Failed to add dynamic endpoint, Insufficient space");
-                return CHIP_ERROR_INTERNAL;
+                dev->SetEndpointId(gCurrentEndpointId);
+                ret = emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList);
+                if (ret == EMBER_ZCL_STATUS_SUCCESS)
+                {
+                    ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", dev->GetName(),
+                                    gCurrentEndpointId, index);
+                    return index;
+                }
+                else if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
+                {
+                    return -1;
+                }
+                // Handle wrap condition
+                if (++gCurrentEndpointId < gFirstDynamicEndpointId)
+                {
+                    gCurrentEndpointId = gFirstDynamicEndpointId;
+                }
             }
         }
         index++;
     }
     ChipLogProgress(DeviceLayer, "Failed to add dynamic endpoint: No endpoints available!");
-    return CHIP_ERROR_INTERNAL;
+    return -1;
 }
 
 CHIP_ERROR RemoveDeviceEndpoint(Device * dev)
@@ -369,9 +381,17 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
     }
 }
 
+const EmberAfDeviceType gBridgedRootDeviceTypes[] = { { DEVICE_TYPE_ROOT_NODE, DEVICE_VERSION_DEFAULT },
+                                                      { DEVICE_TYPE_BRIDGE, DEVICE_VERSION_DEFAULT } };
+
+const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT, DEVICE_VERSION_DEFAULT },
+                                                       { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
+
 static void InitServer(intptr_t context)
 {
-    chip::Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -388,19 +408,30 @@ static void InitServer(intptr_t context)
     // supported clusters so that ZAP will generated the requisite code.
     emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
 
+    //
+    // By default, ZAP only supports specifying a single device type in the UI. However for bridges, they are both
+    // a Bridge and Matter Root Node device on EP0. Consequently, over-ride the generated value to correct this.
+    //
+    emberAfSetDeviceTypeList(0, Span<const EmberAfDeviceType>(gBridgedRootDeviceTypes));
+
     // Add lights 1..3 --> will be mapped to ZCL endpoints 2, 3, 4
-    AddDeviceEndpoint(&gLight1, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, Span<DataVersion>(gLight1DataVersions));
-    AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, Span<DataVersion>(gLight2DataVersions));
-    AddDeviceEndpoint(&gLight3, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, Span<DataVersion>(gLight3DataVersions));
+    AddDeviceEndpoint(&gLight1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gLight1DataVersions));
+    AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gLight2DataVersions));
+    AddDeviceEndpoint(&gLight3, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gLight3DataVersions));
 
     // Remove Light 2 -- Lights 1 & 3 will remain mapped to endpoints 2 & 4
     RemoveDeviceEndpoint(&gLight2);
 
     // Add Light 4 -- > will be mapped to ZCL endpoint 5
-    AddDeviceEndpoint(&gLight4, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, Span<DataVersion>(gLight4DataVersions));
+    AddDeviceEndpoint(&gLight4, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gLight4DataVersions));
 
     // Re-add Light 2 -- > will be mapped to ZCL endpoint 6
-    AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, Span<DataVersion>(gLight2DataVersions));
+    AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gLight2DataVersions));
 }
 
 extern "C" void app_main()

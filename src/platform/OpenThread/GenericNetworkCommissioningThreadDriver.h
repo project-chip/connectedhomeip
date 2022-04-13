@@ -95,17 +95,19 @@ public:
     CHIP_ERROR CommitConfiguration() override;
     CHIP_ERROR RevertConfiguration() override;
 
-    Status RemoveNetwork(ByteSpan networkId) override;
-    Status ReorderNetwork(ByteSpan networkId, uint8_t index) override;
+    Status RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) override;
+    Status ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText) override;
     void ConnectNetwork(ByteSpan networkId, ConnectCallback * callback) override;
 
     // ThreadDriver
-    Status AddOrUpdateNetwork(ByteSpan operationalDataset) override;
+    Status AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) override;
     void ScanNetworks(ThreadDriver::ScanCallback * callback) override;
 
 private:
+    Status MatchesNetworkId(const Thread::OperationalDataset & dataset, const ByteSpan & networkId) const;
+    CHIP_ERROR BackupConfiguration();
+
     ThreadNetworkIterator mThreadIterator      = ThreadNetworkIterator(this);
-    Thread::OperationalDataset mSavedNetwork   = {};
     Thread::OperationalDataset mStagingNetwork = {};
     Optional<Status> mScanStatus;
 };

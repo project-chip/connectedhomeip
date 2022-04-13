@@ -20,6 +20,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/CommissionerDiscoveryController.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
@@ -28,7 +29,7 @@
 #include "Options.h"
 
 int ChipLinuxAppInit(int argc, char ** argv, chip::ArgParser::OptionSet * customOptions = nullptr);
-void ChipLinuxAppMainLoop();
+void ChipLinuxAppMainLoop(chip::Credentials::DeviceAttestationCredentialsProvider * dacProvider = nullptr);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 

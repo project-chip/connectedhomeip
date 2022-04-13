@@ -218,6 +218,7 @@ chip_gn_arg_bool  ("chip_error_logging"                     CONFIG_MATTER_LOG_LE
 chip_gn_arg_bool  ("chip_progress_logging"                  CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 3)
 chip_gn_arg_bool  ("chip_detail_logging"                    CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 4)
 chip_gn_arg_bool  ("chip_automation_logging"                "false")
+chip_gn_arg_bool  ("chip_malloc_sys_heap"                   CONFIG_CHIP_MALLOC_SYS_HEAP)
 
 if (CONFIG_CHIP_ROTATING_DEVICE_ID)
     chip_gn_arg_bool("chip_enable_rotating_device_id"          "true")
@@ -303,6 +304,19 @@ target_include_directories(chip INTERFACE
 target_link_directories(chip INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/lib)
 if (CONFIG_CHIP_LIB_SHELL)
     target_link_options(chip INTERFACE -Wl,--whole-archive -lCHIPShell -Wl,--no-whole-archive)
+endif()
+
+if (CONFIG_CHIP_MALLOC_SYS_HEAP_OVERRIDE)
+    target_link_options(chip INTERFACE
+        -Wl,--wrap=malloc
+        -Wl,--wrap=calloc
+        -Wl,--wrap=realloc
+        -Wl,--wrap=free
+        -Wl,--wrap=_malloc_r
+        -Wl,--wrap=_calloc_r
+        -Wl,--wrap=_realloc_r
+        -Wl,--wrap=_free_r
+    )
 endif()
 
 target_link_libraries(chip INTERFACE -Wl,--start-group ${CHIP_LIBRARIES} -Wl,--end-group)

@@ -102,6 +102,12 @@ menu "CHIP Core"
             help
                 Matter spec is based on IPv6 communication only. Enabling this option may save some flash/ram.
 
+        config BUILD_CHIP_TESTS
+            bool "Build CHIP tests"
+            default "y"
+            help
+                Build CHIP test binaries.
+
         # TODO: add log level selection
 
     endmenu # "General Options"
@@ -506,6 +512,18 @@ menu "CHIP Device Layer"
 
     endmenu
 
+    menu "CHIP Thread Options"
+        visible if OPENTHREAD_ENABLED
+
+        config THREAD_TASK_STACK_SIZE
+            int "Thread task stack size"
+            default 5120
+            depends on OPENTHREAD_ENABLED
+            help
+                Stack size of Thread task.
+
+    endmenu
+
     menu "CHIP Trait Manager"
 
         config ENABLE_TRAIT_MANAGER
@@ -745,6 +763,41 @@ menu "CHIP Device Layer"
               This option allows us to pass optional arguments(MinApplicableSoftwareVersion, MaxApplicableSoftwareVersion,
               and ReleaseNotesURL) to the ota_image_tool.py script.
               eg: "-mi 2 -ma 4 -rn https://github.com/espressif/esp-idf/releases/tag/v4.4"
+
+    endmenu
+
+    menu "External Platform"
+        config CHIP_ENABLE_EXTERNAL_PLATFORM
+            bool "Enable external platform layer"
+            default n
+            help
+                Use external platform layer to override the default ESP32 platform in Matter SDK.
+
+        config CHIP_EXTERNAL_PLATFORM_TARGET
+            string "The external platform target"
+            depends on CHIP_ENABLE_EXTERNAL_PLATFORM
+            help
+                The gn target of the external platform.
+    endmenu
+
+    menu "Matter Manufacturing Options"
+        config CHIP_FACTORY_NAMESPACE_PARTITION_LABEL
+            string "chip-factory namespace partition label"
+            default "nvs"
+            help
+                Label of the partition to store key-values in the "chip-factory" namespace.
+
+        config CHIP_CONFIG_NAMESPACE_PARTITION_LABEL
+            string "chip-config namespace partition label"
+            default "nvs"
+            help
+                Label of the partition to store key-values in the "chip-config" namespace.
+
+        config CHIP_COUNTERS_NAMESPACE_PARTITION_LABEL
+            string "chip-counters namespace partition label"
+            default "nvs"
+            help
+                Label of the partition to store key-values in the "chip-counters" namespace.
 
     endmenu
 

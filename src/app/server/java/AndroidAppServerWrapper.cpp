@@ -48,7 +48,12 @@ CHIP_ERROR ChipAndroidAppInit(void)
     ConfigurationMgr().LogDeviceConfig();
 
     // Init ZCL Data Model and CHIP App Server
-    err = chip::Server::GetInstance().Init(nullptr, CHIP_PORT, CHIP_UDC_PORT);
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.operationalServicePort        = CHIP_PORT;
+    initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
+
+    err = chip::Server::GetInstance().Init(initParams);
     SuccessOrExit(err);
 
     if (!IsDeviceAttestationCredentialsProviderSet())

@@ -53,6 +53,8 @@ struct ConcreteAttributePath : public ConcreteClusterPath
         return ConcreteClusterPath::operator==(aOther) && (mAttributeId == aOther.mAttributeId);
     }
 
+    bool operator!=(const ConcreteAttributePath & aOther) const { return !(*this == aOther); }
+
     bool operator<(const ConcreteAttributePath & path) const
     {
         return (mEndpointId < path.mEndpointId) || ((mEndpointId == path.mEndpointId) && (mClusterId < path.mClusterId)) ||

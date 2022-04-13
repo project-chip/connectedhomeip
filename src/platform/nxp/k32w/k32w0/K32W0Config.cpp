@@ -287,8 +287,20 @@ CHIP_ERROR K32WConfig::WriteConfigValueStr(Key key, const char * str, size_t str
 
     if (str != NULL)
     {
-        pdmStatus = PDM_eSaveRecordData((uint16_t) key, (void *) str, strLen);
-        SuccessOrExit(err = MapPdmStatus(pdmStatus));
+        uint8_t * pData = (uint8_t *) pvPortMalloc(strLen + 1);
+
+        if (pData != NULL)
+        {
+            memcpy(pData, str, strLen);
+            pData[strLen] = '\0';
+            pdmStatus     = PDM_eSaveRecordData((uint16_t) key, (void *) pData, strLen + 1);
+            vPortFree((void *) pData);
+            SuccessOrExit(err = MapPdmStatus(pdmStatus));
+        }
+        else
+        {
+            err = CHIP_ERROR_NO_MEMORY;
+        }
     }
     else
     {

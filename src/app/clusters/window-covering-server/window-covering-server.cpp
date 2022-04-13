@@ -158,16 +158,16 @@ bool HasFeaturePaTilt(chip::EndpointId endpoint)
     return (HasFeature(endpoint, WcFeature::kTilt) && HasFeature(endpoint, WcFeature::kPositionAwareTilt));
 }
 
-void TypeSet(chip::EndpointId endpoint, EmberAfWcType type)
+void TypeSet(chip::EndpointId endpoint, Type type)
 {
-    Attributes::Type::Set(endpoint, chip::to_underlying(type));
+    Attributes::Type::Set(endpoint, type);
 }
 
-EmberAfWcType TypeGet(chip::EndpointId endpoint)
+Type TypeGet(chip::EndpointId endpoint)
 {
-    std::underlying_type<EmberAfWcType>::type value;
+    Type value;
     Attributes::Type::Get(endpoint, &value);
-    return static_cast<EmberAfWcType>(value);
+    return value;
 }
 
 void ConfigStatusSet(chip::EndpointId endpoint, const ConfigStatus & status)
@@ -236,16 +236,17 @@ const OperationalStatus OperationalStatusGet(chip::EndpointId endpoint)
     return status;
 }
 
-void EndProductTypeSet(chip::EndpointId endpoint, EmberAfWcEndProductType type)
+void EndProductTypeSet(chip::EndpointId endpoint, EndProductType type)
 {
-    Attributes::EndProductType::Set(endpoint, chip::to_underlying(type));
+    Attributes::EndProductType::Set(endpoint, type);
 }
 
-EmberAfWcEndProductType EndProductTypeGet(chip::EndpointId endpoint)
+EndProductType EndProductTypeGet(chip::EndpointId endpoint)
 {
-    std::underlying_type<EmberAfWcType>::type value;
+    EndProductType value;
     Attributes::EndProductType::Get(endpoint, &value);
-    return static_cast<EmberAfWcEndProductType>(value);
+
+    return value;
 }
 
 void ModeSet(chip::EndpointId endpoint, const Mode & mode)
@@ -367,15 +368,26 @@ uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths)
     return Percent100thsToValue(limits, percent100ths);
 }
 
-void LiftPositionSet(chip::EndpointId endpoint, uint16_t percent100ths)
+void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
 {
-    uint8_t percent = static_cast<uint8_t>(percent100ths / 100);
-    uint16_t lift   = Percent100thsToLift(endpoint, percent100ths);
+    NPercent percent;
+    NAbsolute rawpos;
 
-    Attributes::CurrentPositionLift::Set(endpoint, lift);
+    if (percent100ths.IsNull())
+    {
+        percent.SetNull();
+        rawpos.SetNull();
+        emberAfWindowCoveringClusterPrint("Lift[%u] Position Set to Null", endpoint);
+    }
+    else
+    {
+        percent.SetNonNull(static_cast<uint8_t>(percent100ths.Value() / 100));
+        rawpos.SetNonNull(Percent100thsToLift(endpoint, percent100ths.Value()));
+        emberAfWindowCoveringClusterPrint("Lift[%u] Position Set: %u", endpoint, percent100ths.Value());
+    }
+    Attributes::CurrentPositionLift::Set(endpoint, rawpos);
     Attributes::CurrentPositionLiftPercentage::Set(endpoint, percent);
     Attributes::CurrentPositionLiftPercent100ths::Set(endpoint, percent100ths);
-    emberAfWindowCoveringClusterPrint("Lift Position Set: %u%%", percent);
 }
 
 uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt)
@@ -402,15 +414,26 @@ uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths)
     return Percent100thsToValue(limits, percent100ths);
 }
 
-void TiltPositionSet(chip::EndpointId endpoint, uint16_t percent100ths)
+void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
 {
-    uint8_t percent = static_cast<uint8_t>(percent100ths / 100);
-    uint16_t tilt   = Percent100thsToTilt(endpoint, percent100ths);
+    NPercent percent;
+    NAbsolute rawpos;
 
-    Attributes::CurrentPositionTilt::Set(endpoint, tilt);
+    if (percent100ths.IsNull())
+    {
+        percent.SetNull();
+        rawpos.SetNull();
+        emberAfWindowCoveringClusterPrint("Tilt[%u] Position Set to Null", endpoint);
+    }
+    else
+    {
+        percent.SetNonNull(static_cast<uint8_t>(percent100ths.Value() / 100));
+        rawpos.SetNonNull(Percent100thsToTilt(endpoint, percent100ths.Value()));
+        emberAfWindowCoveringClusterPrint("Tilt[%u] Position Set: %u", endpoint, percent100ths.Value());
+    }
+    Attributes::CurrentPositionTilt::Set(endpoint, rawpos);
     Attributes::CurrentPositionTiltPercentage::Set(endpoint, percent);
     Attributes::CurrentPositionTiltPercent100ths::Set(endpoint, percent100ths);
-    emberAfWindowCoveringClusterPrint("Tilt Position Set: %u%%", percent);
 }
 
 OperationalState ComputeOperationalState(uint16_t target, uint16_t current)
@@ -433,6 +456,43 @@ OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths c
     return OperationalState::Stall;
 }
 
+Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths previous, Percent100ths delta)
+{
+    Percent100ths percent100ths = previous;
+
+    switch (direction)
+    {
+    case OperationalState::MovingDownOrClose:
+        if (percent100ths < (WC_PERCENT100THS_MAX_CLOSED - delta))
+        {
+            percent100ths = static_cast<Percent100ths>(percent100ths + delta);
+        }
+        else
+        {
+            percent100ths = WC_PERCENT100THS_MAX_CLOSED;
+        }
+        break;
+    case OperationalState::MovingUpOrOpen:
+        if (percent100ths > (WC_PERCENT100THS_MIN_OPEN + delta))
+        {
+            percent100ths = static_cast<Percent100ths>(percent100ths - delta);
+        }
+        else
+        {
+            percent100ths = WC_PERCENT100THS_MIN_OPEN;
+        }
+        break;
+    default:
+        // nothing to do we keep previous value, simple passthrought
+        break;
+    }
+
+    if (percent100ths > WC_PERCENT100THS_MAX_CLOSED)
+        return WC_PERCENT100THS_MAX_CLOSED;
+
+    return percent100ths;
+}
+
 void emberAfPluginWindowCoveringFinalizeFakeMotionEventHandler(EndpointId endpoint)
 {
     NPercent100ths position;
@@ -445,7 +505,7 @@ void emberAfPluginWindowCoveringFinalizeFakeMotionEventHandler(EndpointId endpoi
         Attributes::TargetPositionLiftPercent100ths::Get(endpoint, position);
         if (!position.IsNull())
         {
-            LiftPositionSet(endpoint, position.Value());
+            LiftPositionSet(endpoint, position);
         }
     }
 
@@ -455,7 +515,7 @@ void emberAfPluginWindowCoveringFinalizeFakeMotionEventHandler(EndpointId endpoi
         Attributes::TargetPositionTiltPercent100ths::Get(endpoint, position);
         if (!position.IsNull())
         {
-            TiltPositionSet(endpoint, position.Value());
+            TiltPositionSet(endpoint, position);
         }
     }
 }
@@ -683,13 +743,12 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("GoToLiftPercentage Percentage command received");
+    emberAfWindowCoveringClusterPrint("GoToLiftPercentage %u%% %u command received", liftPercentageValue, liftPercent100thsValue);
     if (HasFeaturePaLift(endpoint))
     {
         if (IsPercent100thsValid(liftPercent100thsValue))
         {
-            Attributes::TargetPositionLiftPercent100ths::Set(
-                endpoint, static_cast<uint16_t>(liftPercentageValue > 100 ? liftPercent100thsValue : liftPercentageValue * 100));
+            Attributes::TargetPositionLiftPercent100ths::Set(endpoint, liftPercent100thsValue);
             emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
         }
         else
@@ -742,13 +801,12 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("GoToTiltPercentage command received");
+    emberAfWindowCoveringClusterPrint("GoToTiltPercentage %u%% %u command received", tiltPercentageValue, tiltPercent100thsValue);
     if (HasFeaturePaTilt(endpoint))
     {
         if (IsPercent100thsValid(tiltPercent100thsValue))
         {
-            Attributes::TargetPositionTiltPercent100ths::Set(
-                endpoint, static_cast<uint16_t>(tiltPercentageValue > 100 ? tiltPercent100thsValue : tiltPercentageValue * 100));
+            Attributes::TargetPositionTiltPercent100ths::Set(endpoint, tiltPercent100thsValue);
             emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
         }
         else

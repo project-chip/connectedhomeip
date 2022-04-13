@@ -17,6 +17,7 @@
 
 #include <app/AppBuildConfig.h>
 #include <app/MessageDef/StatusIB.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ErrorStr.h>
@@ -96,7 +97,12 @@ void TestStatusIBErrorToString(nlTestSuite * aSuite, void * aContext)
     status.mStatus   = Status::InvalidAction;
     CHIP_ERROR err   = status.ToChipError();
     const char * str = ErrorStr(err);
+
+#if CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
+    NL_TEST_ASSERT(aSuite, strcmp(str, "IM Error 0x00000580: General error: 0x80 (INVALID_ACTION)") == 0);
+#else  // CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
     NL_TEST_ASSERT(aSuite, strcmp(str, "IM Error 0x00000580: General error: 0x80") == 0);
+#endif // CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
 
     status.mStatus        = Status::Failure;
     status.mClusterStatus = MakeOptional(static_cast<ClusterStatus>(5));

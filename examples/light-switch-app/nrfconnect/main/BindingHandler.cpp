@@ -22,7 +22,7 @@
 #endif
 
 #include <logging/log.h>
-LOG_MODULE_DECLARE(app);
+LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 
 using namespace chip;
 using namespace chip::app;
@@ -89,7 +89,7 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindin
         else
         {
             Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
-            ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId, onCommand);
+            ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId, offCommand);
         }
         break;
     default:

@@ -55,8 +55,8 @@ public:
     ExampleOperationalCredentialsIssuer(uint32_t index = 0) { mIndex = index; }
     ~ExampleOperationalCredentialsIssuer() override {}
 
-    CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & attestationSignature, const ByteSpan & DAC,
-                                const ByteSpan & PAI, const ByteSpan & PAA,
+    CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
+                                const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
                                 Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
 
     void SetNodeIdForNextNOCRequest(NodeId nodeId) override

@@ -37,6 +37,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/DeviceControlServer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
@@ -224,7 +225,7 @@ CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::GetSpake2pVer
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
 {
-    CHIP_ERROR err;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
@@ -242,14 +243,31 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
     char uniqueId[kMaxUniqueIDLength + 1];
 
     // Generate Unique ID only if it is not present in the storage.
-    if (GetUniqueId(uniqueId, sizeof(uniqueId)) == CHIP_NO_ERROR)
-        return CHIP_NO_ERROR;
+    if (GetUniqueId(uniqueId, sizeof(uniqueId)) != CHIP_NO_ERROR)
+    {
+        ReturnErrorOnFailure(GenerateUniqueId(uniqueId, sizeof(uniqueId)));
+        ReturnErrorOnFailure(StoreUniqueId(uniqueId, strlen(uniqueId)));
+    }
 
-    err = GenerateUniqueId(uniqueId, sizeof(uniqueId));
-    ReturnErrorOnFailure(err);
+    bool failSafeArmed;
 
-    err = StoreUniqueId(uniqueId, strlen(uniqueId));
+    // If the fail-safe was armed when the device last shutdown, initiate cleanup based on the pending Fail Safe Context with
+    // which the fail-safe timer was armed.
+    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
+    {
+        FabricIndex fabricIndex;
+        bool addNocCommandInvoked;
+        bool updateNocCommandInvoked;
 
+        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot");
+
+        err = FailSafeContext::LoadFromStorage(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
+        SuccessOrExit(err);
+
+        DeviceControlServer::DeviceControlSvr().GetFailSafeContext().ScheduleFailSafeCleanup(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
+    }
+
+exit:
     return err;
 }
 

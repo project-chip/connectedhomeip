@@ -42,10 +42,11 @@ jobs:
               with:
                   action: actions/checkout@v3
                   with: |
-                      submodules: true
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform esp32
 
             - name: Set up environment for size reports
               if: ${{ !env.ACT }}
@@ -93,13 +94,13 @@ jobs:
                      example_binaries/esp32-build/chip-all-clusters-app.elf \
                      /tmp/bloat_reports/
             - name: Build example Pigweed App
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: scripts/examples/esp_example.sh pigweed-app sdkconfig.defaults
             - name: Build example Lighting App
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: scripts/examples/esp_example.sh lighting-app sdkconfig.defaults
             - name: Build example Lock App
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: scripts/examples/esp_example.sh lock-app sdkconfig.defaults
 
             - name: Uploading Size Reports
@@ -127,10 +128,11 @@ jobs:
               with:
                   action: actions/checkout@v3
                   with: |
-                      submodules: true
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform esp32
 
             - name: Bootstrap
               timeout-minutes: 10
@@ -146,29 +148,29 @@ jobs:
                       .environment/pigweed-venv/*.log
 
             - name: Build example Bridge App
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: scripts/examples/esp_example.sh bridge-app
 
             - name: Build example Persistent Storage App
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: scripts/examples/esp_example.sh persistent-storage sdkconfig.defaults
 
             - name: Build example Shell App
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: scripts/examples/esp_example.sh shell sdkconfig.defaults
 
             - name: Build example Temperature Measurement App
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: scripts/examples/esp_example.sh temperature-measurement-app sdkconfig.optimize.defaults
 
             - name: Build example IPv6 Only App
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: scripts/examples/esp_example.sh ipv6only-app sdkconfig.defaults
 
             - name: Build example OTA Requestor App
               run: scripts/examples/esp_example.sh ota-requestor-app sdkconfig.defaults
-              timeout-minutes: 10
+              timeout-minutes: 15
 
             - name: Build example OTA Provider App
               run: scripts/examples/esp_example.sh ota-provider-app sdkconfig.defaults
-              timeout-minutes: 10
+              timeout-minutes: 15

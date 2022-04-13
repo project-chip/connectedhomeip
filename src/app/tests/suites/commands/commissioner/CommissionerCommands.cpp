@@ -20,11 +20,9 @@
 
 constexpr uint16_t kPayloadMaxSize = 64;
 
-CHIP_ERROR CommissionerCommands::PairWithQRCode(chip::NodeId nodeId, const chip::CharSpan payload, CHIP_ERROR expectedStatus)
+CHIP_ERROR CommissionerCommands::PairWithQRCode(chip::NodeId nodeId, const chip::CharSpan payload)
 {
     VerifyOrReturnError(payload.size() > 0 && payload.size() < kPayloadMaxSize, CHIP_ERROR_INVALID_ARGUMENT);
-
-    mExpectedStatus = expectedStatus;
 
     GetCurrentCommissioner().RegisterPairingDelegate(this);
 
@@ -37,8 +35,6 @@ CHIP_ERROR CommissionerCommands::PairWithManualCode(chip::NodeId nodeId, const c
 {
     VerifyOrReturnError(payload.size() > 0 && payload.size() < kPayloadMaxSize, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mExpectedStatus = CHIP_NO_ERROR;
-
     GetCurrentCommissioner().RegisterPairingDelegate(this);
 
     char manualCode[kPayloadMaxSize];
@@ -48,9 +44,38 @@ CHIP_ERROR CommissionerCommands::PairWithManualCode(chip::NodeId nodeId, const c
 
 CHIP_ERROR CommissionerCommands::Unpair(chip::NodeId nodeId)
 {
-    mExpectedStatus = CHIP_NO_ERROR;
-
     return GetCurrentCommissioner().UnpairDevice(nodeId);
+}
+
+chip::app::StatusIB ConvertToStatusIB(CHIP_ERROR err)
+{
+    using chip::app::StatusIB;
+    using namespace chip;
+    using namespace chip::Protocols::InteractionModel;
+    using namespace chip::app::Clusters::OperationalCredentials;
+
+    if (CHIP_ERROR_INVALID_PUBLIC_KEY == err)
+    {
+        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidPublicKey));
+    }
+    if (CHIP_ERROR_WRONG_NODE_ID == err)
+    {
+        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNodeOpId));
+    }
+    if (CHIP_ERROR_UNSUPPORTED_CERT_FORMAT == err)
+    {
+        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNOC));
+    }
+    if (CHIP_ERROR_FABRIC_EXISTS == err)
+    {
+        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kFabricConflict));
+    }
+    if (CHIP_ERROR_INVALID_FABRIC_ID == err)
+    {
+        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidFabricIndex));
+    }
+
+    return StatusIB(err);
 }
 
 void CommissionerCommands::OnStatusUpdate(DevicePairingDelegate::Status status)
@@ -62,6 +87,7 @@ void CommissionerCommands::OnStatusUpdate(DevicePairingDelegate::Status status)
         break;
     case DevicePairingDelegate::Status::SecurePairingFailed:
         ChipLogError(chipTool, "Secure Pairing Failed");
+        OnResponse(ConvertToStatusIB(CHIP_ERROR_INCORRECT_STATE), nullptr);
         break;
     }
 }
@@ -71,52 +97,26 @@ void CommissionerCommands::OnPairingComplete(CHIP_ERROR err)
     if (CHIP_NO_ERROR != err)
     {
         ChipLogError(chipTool, "Pairing Complete Failure: %s", ErrorStr(err));
-        LogErrorOnFailure(ContinueOnChipMainThread(err));
+        OnResponse(ConvertToStatusIB(err), nullptr);
     }
 }
 
 void CommissionerCommands::OnPairingDeleted(CHIP_ERROR err)
 {
-    if (mExpectedStatus != err)
+    if (err != CHIP_NO_ERROR)
     {
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(chipTool, "Pairing Delete Failure: %s", ErrorStr(err));
-        }
-        else
-        {
-            ChipLogError(chipTool, "Got success but expected: %s", ErrorStr(mExpectedStatus));
-            err = CHIP_ERROR_INCORRECT_STATE;
-        }
-    }
-    else
-    {
-        // Treat as success.
-        err = CHIP_NO_ERROR;
+        ChipLogError(chipTool, "Pairing Delete Failure: %s", ErrorStr(err));
     }
 
-    LogErrorOnFailure(ContinueOnChipMainThread(err));
+    OnResponse(ConvertToStatusIB(err), nullptr);
 }
 
 void CommissionerCommands::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR err)
 {
-    if (mExpectedStatus != err)
+    if (err != CHIP_NO_ERROR)
     {
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(chipTool, "Commissioning Complete Failure: %s", ErrorStr(err));
-        }
-        else
-        {
-            ChipLogError(chipTool, "Got success but expected: %s", ErrorStr(mExpectedStatus));
-            err = CHIP_ERROR_INCORRECT_STATE;
-        }
-    }
-    else
-    {
-        // Treat as success.
-        err = CHIP_NO_ERROR;
+        ChipLogError(chipTool, "Commissioning Complete Failure: %s", ErrorStr(err));
     }
 
-    LogErrorOnFailure(ContinueOnChipMainThread(err));
+    OnResponse(ConvertToStatusIB(err), nullptr);
 }

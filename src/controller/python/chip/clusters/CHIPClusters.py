@@ -1837,6 +1837,13 @@ class ChipClusters:
                         "credentialIndex": "int",
                     },
                 },
+            0x00000013: {
+                    "commandId": 0x00000013,
+                    "commandName": "ClearHolidaySchedule",
+                    "args": {
+                        "holidayIndex": "int",
+                    },
+                },
             0x0000001D: {
                     "commandId": 0x0000001D,
                     "commandName": "ClearUser",
@@ -1866,6 +1873,13 @@ class ChipClusters:
                     "args": {
                         "credentialType": "int",
                         "credentialIndex": "int",
+                    },
+                },
+            0x00000012: {
+                    "commandId": 0x00000012,
+                    "commandName": "GetHolidaySchedule",
+                    "args": {
+                        "holidayIndex": "int",
                     },
                 },
             0x0000001B: {
@@ -1909,6 +1923,16 @@ class ChipClusters:
                         "userIndex": "int",
                         "userStatus": "int",
                         "userType": "int",
+                    },
+                },
+            0x00000011: {
+                    "commandId": 0x00000011,
+                    "commandName": "SetHolidaySchedule",
+                    "args": {
+                        "holidayIndex": "int",
+                        "localStartTime": "int",
+                        "localEndTime": "int",
+                        "operatingMode": "int",
                     },
                 },
             0x0000001A: {
@@ -2475,7 +2499,6 @@ class ChipClusters:
                     "args": {
                         "expiryLengthSeconds": "int",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
                     },
                 },
             0x00000004: {
@@ -2488,10 +2511,9 @@ class ChipClusters:
                     "commandId": 0x00000002,
                     "commandName": "SetRegulatoryConfig",
                     "args": {
-                        "location": "int",
+                        "newRegulatoryConfig": "int",
                         "countryCode": "str",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
                     },
                 },
             },
@@ -2519,6 +2541,12 @@ class ChipClusters:
                     "attributeName": "LocationCapability",
                     "attributeId": 0x00000003,
                     "type": "int",
+                    "reportable": True,
+                },
+                0x00000004: {
+                    "attributeName": "SupportsConcurrentConnection",
+                    "attributeId": 0x00000004,
+                    "type": "bool",
                     "reportable": True,
                 },
                 0x0000FFF8: {

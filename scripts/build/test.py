@@ -14,18 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
-import coloredlogs
 import difflib
-import logging
 import os
 import subprocess
 import sys
-import time
 import unittest
-
-from builders.host import HostBoard
-
 from typing import List
 
 SCRIPT_ROOT = os.path.dirname(__file__)
@@ -51,6 +44,7 @@ def build_actual_output(root: str, out: str, args: List[str]) -> List[str]:
         'TELINK_ZEPHYR_SDK_DIR': 'TELINK_ZEPHYR_SDK_DIR',
         'SYSROOT_AARCH64': 'SYSROOT_AARCH64',
         'NXP_K32W061_SDK_ROOT': 'TEST_NXP_K32W061_SDK_ROOT',
+        'TI_SYSCONFIG_ROOT': 'TEST_TI_SYSCONFIG_ROOT',
     })
 
     retval = subprocess.run([
@@ -92,7 +86,7 @@ class TestBuilder(unittest.TestCase):
             msg += "Expected file can be found in %s" % reference
             for l in diffs:
                 msg += ("\n   " + l.replace(ROOT,
-                        '{root}').replace(OUT, '{out}').strip())
+                                            '{root}').replace(OUT, '{out}').strip())
             self.fail(msg)
 
     def test_output(self):

@@ -64,6 +64,10 @@
 // Support udp multicast by enabling Multicast Listener Registration (MLR)
 #define OPENTHREAD_CONFIG_MLR_ENABLE 1
 
+// Define as 1 to stay awake between fragments while transmitting a large packet,
+// and to stay awake after receiving a packet with frame pending set to true.
+#define OPENTHREAD_CONFIG_MAC_STAY_AWAKE_BETWEEN_FRAGMENTS 1
+
 // Use the SiLabs-supplied default platform configuration for remainder
 // of OpenThread config options.
 //

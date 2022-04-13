@@ -114,6 +114,21 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPDoorLockClusterGetHolidayScheduleResponseCallback
+    : public Callback::Callback<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType>
+{
+public:
+    CHIPDoorLockClusterGetHolidayScheduleResponseCallback(jobject javaCallback);
+
+    ~CHIPDoorLockClusterGetHolidayScheduleResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPDoorLockClusterGetUserResponseCallback : public Callback::Callback<CHIPDoorLockClusterGetUserResponseCallbackType>
 {
 public:

@@ -571,7 +571,7 @@ CHIP_ERROR InteractionModelEngine::PushFrontAttributePathList(ObjectList<Attribu
     CHIP_ERROR err = PushFront(aAttributePathList, aAttributePath, mAttributePathPool);
     if (err == CHIP_ERROR_NO_MEMORY)
     {
-        ChipLogError(InteractionModel, "AttributePath pool full, cannot handle more entries!");
+        ChipLogError(InteractionModel, "AttributePath pool full");
     }
     return err;
 }
@@ -587,7 +587,7 @@ CHIP_ERROR InteractionModelEngine::PushFrontEventPathParamsList(ObjectList<Event
     CHIP_ERROR err = PushFront(aEventPathList, aEventPath, mEventPathPool);
     if (err == CHIP_ERROR_NO_MEMORY)
     {
-        ChipLogError(InteractionModel, "EventPath pool full, cannot handle more entries!");
+        ChipLogError(InteractionModel, "EventPath pool full");
     }
     return err;
 }
@@ -603,7 +603,7 @@ CHIP_ERROR InteractionModelEngine::PushFrontDataVersionFilterList(ObjectList<Dat
     CHIP_ERROR err = PushFront(aDataVersionFilterList, aDataVersionFilter, mDataVersionFilterPool);
     if (err == CHIP_ERROR_NO_MEMORY)
     {
-        ChipLogError(InteractionModel, "DataVersionFilter pool full, cannot handle more entries, reset this error and continue!");
+        ChipLogError(InteractionModel, "DataVersionFilter pool full, ignore this filter");
         err = CHIP_NO_ERROR;
     }
     return err;
