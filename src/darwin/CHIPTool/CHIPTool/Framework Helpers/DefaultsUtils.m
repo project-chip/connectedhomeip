@@ -68,24 +68,47 @@ static CHIPToolPersistentStorageDelegate * storage = nil;
 
 static uint16_t kTestVendorId = 0xFFF1u;
 
+static CHIPDeviceController * sController = nil;
+
 CHIPDeviceController * InitializeCHIP(void)
 {
     static dispatch_once_t onceToken;
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     dispatch_once(&onceToken, ^{
-        storage = [[CHIPToolPersistentStorageDelegate alloc] init];
-        [controller startup:storage vendorId:kTestVendorId nocSigner:nil];
+        CHIPToolPersistentStorageDelegate * storage = [[CHIPToolPersistentStorageDelegate alloc] init];
+        __auto_type * stack = [MatterStack singletonStack];
+        __auto_type * stackParams = [[MatterStackStartupParams alloc] initWithStorage:storage];
+        if (![stack startup:stackParams]) {
+            return;
+        }
+
+        __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] init];
+        params.vendorId = kTestVendorId;
+        params.fabricId = 1;
+
+        // We're not sure whether we have a fabric configured already; try as if
+        // we did, and if not fall back to creating a new one.
+        sController = [stack startControllerOnExistingFabric:params];
+        if (sController == nil) {
+            sController = [stack startControllerOnNewFabric:params];
+        }
     });
 
-    return controller;
+    return sController;
 }
 
-void CHIPRestartController(CHIPDeviceController * controller)
+CHIPDeviceController * CHIPRestartController(CHIPDeviceController * controller)
 {
     NSLog(@"Shutting down the stack");
     [controller shutdown];
+
     NSLog(@"Starting up the stack");
-    [controller startup:storage vendorId:kTestVendorId nocSigner:nil];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] init];
+    params.vendorId = kTestVendorId;
+    params.fabricId = 1;
+
+    sController = [[MatterStack singletonStack] startControllerOnExistingFabric:params];
+
+    return sController;
 }
 
 uint64_t CHIPGetLastPairedDeviceId(void)

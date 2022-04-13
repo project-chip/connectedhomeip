@@ -34,20 +34,40 @@ CHIP_ERROR CHIPCommandBridge::Run()
     CHIPToolKeypair * nocSigner = [[CHIPToolKeypair alloc] init];
     storage = [[CHIPToolPersistentStorageDelegate alloc] init];
 
-    mController = [CHIPDeviceController sharedController];
-    if (mController == nil) {
+    auto stack = [MatterStack singletonStack];
+    if (stack == nil) {
         ChipLogError(chipTool, "Controller is nil");
         return CHIP_ERROR_INTERNAL;
     }
 
-    [mController setListenPort:kListenPort];
-    [mController setKeyValueStoreManagerPath:"/tmp/chip_kvs_darwin"];
+    auto params = [[MatterStackStartupParams alloc] initWithStorage:storage];
+    params.port = @(kListenPort);
+    params.startServer = YES;
+    params.kvsPath = "/tmp/chip_kvs_darwin";
+
+    if ([stack startup:params] == NO) {
+        ChipLogError(chipTool, "Stack startup failed");
+        return CHIP_ERROR_INTERNAL;
+    }
 
     ReturnLogErrorOnFailure([nocSigner createOrLoadKeys:storage]);
 
     ipk = [nocSigner getIPK];
 
-    if (![mController startup:storage vendorId:chip::VendorId::TestVendor1 nocSigner:nocSigner ipk:ipk paaCerts:nil]) {
+    auto controllerParams = [[CHIPDeviceControllerStartupParams alloc] init];
+    controllerParams.vendorId = chip::VendorId::TestVendor1;
+    controllerParams.rootCAKeypair = nocSigner;
+    controllerParams.fabricId = 1;
+    controllerParams.ipk = ipk;
+
+    // We're not sure whether we're creating a new fabric or using an
+    // existing one, so just try both.
+    mController = [stack startControllerOnExistingFabric:controllerParams];
+    if (mController == nil) {
+        // Maybe we didn't have this fabric yet.
+        mController = [stack startControllerOnNewFabric:controllerParams];
+    }
+    if (mController == nil) {
         ChipLogError(chipTool, "Controller startup failure.");
         return CHIP_ERROR_INTERNAL;
     }
@@ -63,11 +83,9 @@ CHIPDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mContro
 CHIP_ERROR CHIPCommandBridge::ShutdownCommissioner()
 {
     ChipLogProgress(chipTool, "Shutting down controller");
-    BOOL result = [CurrentCommissioner() shutdown];
-    if (!result) {
-        ChipLogError(chipTool, "Unable to shut down controller");
-        return CHIP_ERROR_INTERNAL;
-    }
+    [CurrentCommissioner() shutdown];
+
+    [[MatterStack singletonStack] shutdown];
 
     return CHIP_NO_ERROR;
 }

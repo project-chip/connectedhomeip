@@ -31,44 +31,131 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
 @implementation CHIPControllerTests
 
-- (void)testControllerLifecycle
+- (void)testStackLifecycle
 {
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
-    XCTAssertTrue([controller startup:nil vendorId:kTestVendorId nocSigner:nil]);
-    XCTAssertTrue([controller shutdown]);
+    __auto_type * stack = [MatterStack singletonStack];
+    XCTAssertNotNil(stack);
+    XCTAssertFalse([stack isRunning]);
 
-    // now try to restart the controller
-    XCTAssertTrue([controller startup:nil vendorId:kTestVendorId nocSigner:nil]);
-    XCTAssertTrue([controller shutdown]);
+    __auto_type * stackParams = [[MatterStackStartupParams alloc] initWithStorage:nil];
+    XCTAssertTrue([stack startup:stackParams]);
+    XCTAssertTrue([stack isRunning]);
+
+    [stack shutdown];
+    XCTAssertFalse([stack isRunning]);
+
+    // Now try to restart the stack.
+    XCTAssertTrue([stack startup:stackParams]);
+    XCTAssertTrue([stack isRunning]);
+
+    [stack shutdown];
+    XCTAssertFalse([stack isRunning]);
 }
 
-- (void)testControllerMultipleStartup
+- (void)testControllerLifecycle
 {
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
-    for (int i = 0; i < 5; i++) {
-        XCTAssertTrue([controller startup:nil vendorId:kTestVendorId nocSigner:nil]);
-    }
-    XCTAssertTrue([controller shutdown]);
+    __auto_type * stack = [MatterStack singletonStack];
+    XCTAssertNotNil(stack);
+
+    __auto_type * stackParams = [[MatterStackStartupParams alloc] initWithStorage:nil];
+    XCTAssertTrue([stack startup:stackParams]);
+    XCTAssertTrue([stack isRunning]);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] init];
+    params.vendorId = kTestVendorId;
+    params.fabricId = 1;
+
+    CHIPDeviceController * controller = [stack startControllerOnNewFabric:params];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    // now try to restart the controller
+    controller = [stack startControllerOnExistingFabric:params];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    [stack shutdown];
+    XCTAssertFalse([stack isRunning]);
+}
+
+- (void)testStackShutdownShutsDownController
+{
+    __auto_type * stack = [MatterStack singletonStack];
+    XCTAssertNotNil(stack);
+
+    __auto_type * stackParams = [[MatterStackStartupParams alloc] initWithStorage:nil];
+    XCTAssertTrue([stack startup:stackParams]);
+    XCTAssertTrue([stack isRunning]);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] init];
+    params.vendorId = kTestVendorId;
+    params.fabricId = 1;
+
+    CHIPDeviceController * controller = [stack startControllerOnNewFabric:params];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    [stack shutdown];
+    XCTAssertFalse([stack isRunning]);
+    XCTAssertFalse([controller isRunning]);
 }
 
 - (void)testControllerMultipleShutdown
 {
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
-    XCTAssertTrue([controller startup:nil vendorId:kTestVendorId nocSigner:nil]);
+    __auto_type * stack = [MatterStack singletonStack];
+    XCTAssertNotNil(stack);
+
+    __auto_type * stackParams = [[MatterStackStartupParams alloc] initWithStorage:nil];
+    XCTAssertTrue([stack startup:stackParams]);
+    XCTAssertTrue([stack isRunning]);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] init];
+    params.vendorId = kTestVendorId;
+    params.fabricId = 1;
+
+    CHIPDeviceController * controller = [stack startControllerOnNewFabric:params];
+    XCTAssertTrue([controller isRunning]);
     for (int i = 0; i < 5; i++) {
-        XCTAssertTrue([controller shutdown]);
+        [controller shutdown];
+        XCTAssertFalse([controller isRunning]);
     }
+
+    [stack shutdown];
+    XCTAssertFalse([stack isRunning]);
 }
 
 - (void)testControllerInvalidAccess
 {
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    __auto_type * stack = [MatterStack singletonStack];
+    XCTAssertNotNil(stack);
+
+    __auto_type * stackParams = [[MatterStackStartupParams alloc] initWithStorage:nil];
+    XCTAssertTrue([stack startup:stackParams]);
+    XCTAssertTrue([stack isRunning]);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] init];
+    params.vendorId = kTestVendorId;
+    params.fabricId = 1;
+
+    CHIPDeviceController * controller = [stack startControllerOnNewFabric:params];
+    XCTAssertTrue([controller isRunning]);
+    [controller shutdown];
+
     XCTAssertFalse([controller isRunning]);
     XCTAssertFalse([controller getConnectedDevice:1234
                                             queue:dispatch_get_main_queue()
                                 completionHandler:^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
                                     XCTAssertEqual(error.code, CHIPErrorCodeInvalidState);
                                 }]);
+
+    [stack shutdown];
+    XCTAssertFalse([stack isRunning]);
 }
 
 @end
