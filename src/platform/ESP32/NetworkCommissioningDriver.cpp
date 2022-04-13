@@ -97,24 +97,6 @@ Status ESPWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, Mu
 {
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
-    // If device is already connected to WiFi, then disconnect the WiFi,
-    // clear the WiFi configurations and add the newly provided WiFi configurations.
-    if (chip::DeviceLayer::Internal::ESP32Utils::IsStationProvisioned())
-    {
-        ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
-        esp_err_t err = esp_wifi_disconnect();
-        if (err != ESP_OK)
-        {
-            ChipLogError(DeviceLayer, "esp_wifi_disconnect() failed: %s", esp_err_to_name(err));
-            return Status::kOtherConnectionFailure;
-        }
-        CHIP_ERROR error = chip::DeviceLayer::Internal::ESP32Utils::ClearWiFiStationProvision();
-        if (error != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %s", chip::ErrorStr(error));
-            return Status::kUnknownError;
-        }
-    }
     VerifyOrReturnError(mStagingNetwork.ssidLen == 0 || NetworkMatch(mStagingNetwork, ssid), Status::kBoundsExceeded);
     VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetwork.credentials), Status::kOutOfRange);
     VerifyOrReturnError(ssid.size() <= sizeof(mStagingNetwork.ssid), Status::kOutOfRange);
@@ -151,6 +133,25 @@ Status ESPWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableC
 
 CHIP_ERROR ESPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
+    // If device is already connected to WiFi, then disconnect the WiFi,
+    // clear the WiFi configurations and add the newly provided WiFi configurations.
+    if (chip::DeviceLayer::Internal::ESP32Utils::IsStationProvisioned())
+    {
+        ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
+        esp_err_t err = esp_wifi_disconnect();
+        if (err != ESP_OK)
+        {
+            ChipLogError(DeviceLayer, "esp_wifi_disconnect() failed: %s", esp_err_to_name(err));
+            return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
+        }
+        CHIP_ERROR error = chip::DeviceLayer::Internal::ESP32Utils::ClearWiFiStationProvision();
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %s", chip::ErrorStr(error));
+            return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
+        }
+    }
+
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
 
     wifi_config_t wifiConfig;
