@@ -37,14 +37,14 @@ ReliableMessageProtocolConfig GetLocalMRPConfig()
                                          CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    DeviceLayer::ConnectivityManager::SEDPollingConfig sedPollingConfig;
+    DeviceLayer::ConnectivityManager::SEDIntervalsConfig sedIntervalsConfig;
 
-    if (DeviceLayer::ConnectivityMgr().GetSEDPollingConfig(sedPollingConfig) == CHIP_NO_ERROR)
+    if (DeviceLayer::ConnectivityMgr().GetSEDIntervalsConfig(sedIntervalsConfig) == CHIP_NO_ERROR)
     {
-        // Increase default MRP retry intervals by SED polling intervals. That is, intervals for
+        // Increase default MRP retry intervals by SED intervals. That is, intervals for
         // which the device can be at sleep and not be able to receive any messages).
-        config.mIdleRetransTimeout += sedPollingConfig.SlowPollingIntervalMS;
-        config.mActiveRetransTimeout += sedPollingConfig.FastPollingIntervalMS;
+        config.mIdleRetransTimeout += sedIntervalsConfig.IdleIntervalMS;
+        config.mActiveRetransTimeout += sedIntervalsConfig.ActiveIntervalMS;
     }
 #endif
 
