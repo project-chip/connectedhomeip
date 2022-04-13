@@ -56,6 +56,48 @@ public class ClusterReadMapping {
             readAccessControlExtensionCommandParams);
     readAccessControlInteractionInfo.put(
         "readExtensionAttribute", readAccessControlExtensionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readAccessControlSubjectsPerAccessControlEntryCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readAccessControlSubjectsPerAccessControlEntryAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.AccessControlCluster) cluster)
+                  .readSubjectsPerAccessControlEntryAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readAccessControlSubjectsPerAccessControlEntryCommandParams);
+    readAccessControlInteractionInfo.put(
+        "readSubjectsPerAccessControlEntryAttribute",
+        readAccessControlSubjectsPerAccessControlEntryAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readAccessControlTargetsPerAccessControlEntryCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readAccessControlTargetsPerAccessControlEntryAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.AccessControlCluster) cluster)
+                  .readTargetsPerAccessControlEntryAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readAccessControlTargetsPerAccessControlEntryCommandParams);
+    readAccessControlInteractionInfo.put(
+        "readTargetsPerAccessControlEntryAttribute",
+        readAccessControlTargetsPerAccessControlEntryAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readAccessControlAccessControlEntriesPerFabricCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readAccessControlAccessControlEntriesPerFabricAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.AccessControlCluster) cluster)
+                  .readAccessControlEntriesPerFabricAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readAccessControlAccessControlEntriesPerFabricCommandParams);
+    readAccessControlInteractionInfo.put(
+        "readAccessControlEntriesPerFabricAttribute",
+        readAccessControlAccessControlEntriesPerFabricAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readAccessControlGeneratedCommandListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readAccessControlGeneratedCommandListAttributeInteractionInfo =

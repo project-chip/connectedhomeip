@@ -109,8 +109,16 @@ const CommissioningParameters & AutoCommissioner::GetCommissioningParameters() c
 CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr)
 {
     auto nextStage = GetNextCommissioningStageInternal(currentStage, lastErr);
-    ChipLogProgress(Controller, "Going from commissioning step '%s' with lastErr = '%s' --> '%s'", StageToString(currentStage),
-                    lastErr.AsString(), StageToString(nextStage));
+    if (lastErr == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Controller, "Commissioning stage next step: '%s' -> '%s'", StageToString(currentStage),
+                        StageToString(nextStage));
+    }
+    else
+    {
+        ChipLogProgress(Controller, "Going from commissioning step '%s' with lastErr = '%s' -> '%s'", StageToString(currentStage),
+                        lastErr.AsString(), StageToString(nextStage));
+    }
     return nextStage;
 }
 
@@ -326,8 +334,16 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 {
     CompletionStatus completionStatus;
     completionStatus.err = err;
-    ChipLogProgress(Controller, "Finished commissioning step '%s' with error '%s'", StageToString(report.stageCompleted),
-                    err.AsString());
+
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Controller, "Successfully finished commissioning step '%s'", StageToString(report.stageCompleted));
+    }
+    else
+    {
+        ChipLogProgress(Controller, "Error on commissioning step '%s': '%s'", StageToString(report.stageCompleted), err.AsString());
+    }
+
     if (err != CHIP_NO_ERROR)
     {
         completionStatus.failedStage = MakeOptional(report.stageCompleted);

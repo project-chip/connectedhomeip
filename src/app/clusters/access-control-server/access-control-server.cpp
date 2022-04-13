@@ -483,6 +483,19 @@ CHIP_ERROR AccessControlAttribute::Read(const ConcreteReadAttributePath & aPath,
         return aEncoder.Encode(ClusterRevision);
     case AccessControlCluster::Attributes::Extension::Id:
         return ReadExtension(aEncoder);
+    // TODO: For the following 3 attributes, need to add API surface to AccessControl to runtime get value from actual impl used.
+    case AccessControlCluster::Attributes::SubjectsPerAccessControlEntry::Id: {
+        uint16_t value = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY;
+        return aEncoder.Encode(value);
+    }
+    case AccessControlCluster::Attributes::TargetsPerAccessControlEntry::Id: {
+        uint16_t value = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY;
+        return aEncoder.Encode(value);
+    }
+    case AccessControlCluster::Attributes::AccessControlEntriesPerFabric::Id: {
+        uint16_t value = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC;
+        return aEncoder.Encode(value);
+    }
     }
 
     return CHIP_NO_ERROR;

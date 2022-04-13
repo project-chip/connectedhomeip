@@ -432,11 +432,7 @@
                         NSURL * payloadURI = [payload wellKnownTypeURIPayload];
                         NSLog(@"Payload text:%@", payloadURI);
                         if (payloadURI) {
-                            /* CHIP Issue #415
-                             Once #415 goes in, there will b no need to replace _ with spaces.
-                            */
-                            NSString * qrCode = [[payloadURI absoluteString] stringByReplacingOccurrencesOfString:@"_"
-                                                                                                       withString:@" "];
+                            NSString * qrCode = [payloadURI absoluteString];
                             NSLog(@"Scanned code string:%@", qrCode);
                             [self scannedQRCode:qrCode];
                         }

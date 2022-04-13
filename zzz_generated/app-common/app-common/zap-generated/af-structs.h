@@ -215,6 +215,13 @@ typedef struct _BatFaultChangeType
     /* TYPE WARNING: array array defaults to */ uint8_t * previous;
 } BatFaultChangeType;
 
+// Struct for CapabilityMinimaStruct
+typedef struct _CapabilityMinimaStruct
+{
+    uint16_t CaseSessionsPerFabric;
+    uint16_t SubscriptionsPerFabric;
+} CapabilityMinimaStruct;
+
 // Struct for ChannelInfo
 typedef struct _ChannelInfo
 {

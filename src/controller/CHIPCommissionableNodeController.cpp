@@ -35,6 +35,7 @@ CHIP_ERROR CommissionableNodeController::DiscoverCommissioners(Dnssd::DiscoveryF
     if (mResolver == nullptr)
     {
 #if CONFIG_DEVICE_LAYER
+        mDNSResolver.Shutdown(); // reset if already inited
         ReturnErrorOnFailure(mDNSResolver.Init(DeviceLayer::UDPEndPointManager()));
 #endif
         mDNSResolver.SetCommissioningDelegate(this);
