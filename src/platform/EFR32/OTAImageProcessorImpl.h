@@ -61,6 +61,8 @@ private:
      */
     CHIP_ERROR ReleaseBlock();
 
+    // EFR32 platform creates a single instance of OTAImageProcessorImpl class.
+    // If that changes then the use of static members and functions must be revisited
     static uint32_t mWriteOffset; // End of last written block
     static uint8_t mSlotId;       // Bootloader storage slot
     MutableByteSpan mBlock;
@@ -68,7 +70,8 @@ private:
     OTAImageHeaderParser mHeaderParser;
     const char * mImageFile                 = nullptr;
     static constexpr size_t kAlignmentBytes = 64;
-    // Intermediate, word-aligned buffer for writing to the bootloader storage
+    // Intermediate, word-aligned buffer for writing to the bootloader storage.
+    // Bootloader storage API requires the buffer size to be a multiple of 4.
     static uint8_t writeBuffer[kAlignmentBytes] __attribute__((aligned(4)));
     // Offset indicates how far the write buffer has been filled
     static uint16_t writeBufOffset;

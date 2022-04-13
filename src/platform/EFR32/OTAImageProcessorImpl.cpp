@@ -205,6 +205,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     }
 
     // Copy data into the word-aligned writeBuffer, once it fills write its contents to the bootloader storage
+    // Final data block is handled in HandleFinalize().
     uint32_t blockReadOffset = 0;
     while (blockReadOffset < block.size())
     {
