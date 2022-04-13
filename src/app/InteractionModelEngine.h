@@ -397,6 +397,26 @@ private:
     CHIP_ERROR ShutdownExistingSubscriptionsIfNeeded(Messaging::ExchangeContext * apExchangeContext,
                                                      System::PacketBufferHandle && aPayload);
 
+    inline int32_t GetPathPoolCapacity() const
+    {
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+        return (mPathPoolCapacityOverride == -1) ? CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
+                                                 : static_cast<int32_t>(mPathPoolCapacityOverride);
+#else
+        return CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS;
+#endif
+    }
+
+    inline int32_t GetReadHandlerPoolCapacity() const
+    {
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+        return (mReadHandlerCapacityOverride == -1) ? CHIP_IM_MAX_NUM_READ_HANDLER
+                                                    : static_cast<int32_t>(mReadHandlerCapacityOverride);
+#else
+        return CHIP_IM_MAX_NUM_READ_HANDLER;
+#endif
+    }
+
     /**
      * Verify and ensure (by killing oldest read handlers that makes the resource used by chrrent fabric exceeds the fabric quota)
      * the incoming subscription with the required resources request can be handled.

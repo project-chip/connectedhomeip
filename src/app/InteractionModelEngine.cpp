@@ -542,15 +542,8 @@ void InteractionModelEngine::AddReadClient(ReadClient * apReadClient)
 
 bool InteractionModelEngine::CheckResourceAndEvictExceededSubscription(FabricIndex aFabricIndex, bool aForceEvict)
 {
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    const int32_t pathPoolCapacity =
-        (mPathPoolCapacityOverride == -1) ? CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS : static_cast<int32_t>(mPathPoolCapacityOverride);
-    const int32_t readHandlerPoolCapacity =
-        (mReadHandlerCapacityOverride == -1) ? CHIP_IM_MAX_NUM_READ_HANDLER : static_cast<int32_t>(mReadHandlerCapacityOverride);
-#else
-    const int32_t pathPoolCapacity        = CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS;
-    const int32_t readHandlerPoolCapacity = CHIP_IM_MAX_NUM_READ_HANDLER;
-#endif
+    const int32_t pathPoolCapacity        = GetPathPoolCapacity();
+    const int32_t readHandlerPoolCapacity = GetReadHandlerPoolCapacity();
 
     uint8_t fabricCount                             = mpFabricTable->FabricCount();
     int32_t attributePathsSubscribedByCurrentFabric = 0;
@@ -562,12 +555,12 @@ bool InteractionModelEngine::CheckResourceAndEvictExceededSubscription(FabricInd
         return false;
     }
 
-    int32_t maxNumberOfPathsCanBeUsed =
+    int32_t perFabricPathCapacity =
         (pathPoolCapacity - static_cast<int32_t>(kReservedPathsForReads)) / static_cast<int32_t>(fabricCount);
-    int32_t maxNumberOfSubscriptions =
+    int32_t perFabricSubscriptionCapacity =
         (readHandlerPoolCapacity - static_cast<int32_t>(kReservedPathsForReads)) / static_cast<int32_t>(fabricCount);
 
-    ReadHandler * candicate            = nullptr;
+    ReadHandler * candidate            = nullptr;
     int32_t candicateAttributePathUsed = 0;
     int32_t candicateEventPathUsed     = 0;
 
@@ -585,35 +578,35 @@ bool InteractionModelEngine::CheckResourceAndEvictExceededSubscription(FabricInd
         eventPathsSubscribedByCurrentFabric += eventPathsUsed;
         subscriptionsEstablishedByCurrentFabric++;
 
-        if (candicate == nullptr)
+        if (candidate == nullptr)
         {
-            candicate = handler;
+            candidate = handler;
         }
         // This handler uses more resources than the one we picked before.
-        else if ((attributePathsUsed > maxNumberOfPathsCanBeUsed || eventPathsUsed > maxNumberOfPathsCanBeUsed) &&
-                 (candicateAttributePathUsed <= maxNumberOfPathsCanBeUsed && candicateEventPathUsed <= maxNumberOfPathsCanBeUsed))
+        else if ((attributePathsUsed > perFabricPathCapacity || eventPathsUsed > perFabricPathCapacity) &&
+                 (candicateAttributePathUsed <= perFabricPathCapacity && candicateEventPathUsed <= perFabricPathCapacity))
         {
-            candicate                  = handler;
+            candidate                  = handler;
             candicateAttributePathUsed = attributePathsUsed;
             candicateEventPathUsed     = eventPathsUsed;
         }
         // This handler is older than the one we picked before.
-        else if (handler->GetSubscriptionStartTimestamp() < candicate->GetSubscriptionStartTimestamp() &&
+        else if (handler->GetSubscriptionStartTimestamp() < candidate->GetSubscriptionStartTimestamp() &&
                  // And the level of resource usage is the same (both exceed or neither exceed)
-                 ((attributePathsUsed > maxNumberOfPathsCanBeUsed || eventPathsUsed > maxNumberOfPathsCanBeUsed) ==
-                  (candicateAttributePathUsed > maxNumberOfPathsCanBeUsed || candicateEventPathUsed > maxNumberOfPathsCanBeUsed)))
+                 ((attributePathsUsed > perFabricPathCapacity || eventPathsUsed > perFabricPathCapacity) ==
+                  (candicateAttributePathUsed > perFabricPathCapacity || candicateEventPathUsed > perFabricPathCapacity)))
         {
-            candicate = handler;
+            candidate = handler;
         }
         return Loop::Continue;
     });
 
-    if (candicate != nullptr &&
-        (aForceEvict || attributePathsSubscribedByCurrentFabric > maxNumberOfPathsCanBeUsed ||
-         eventPathsSubscribedByCurrentFabric > maxNumberOfPathsCanBeUsed ||
-         subscriptionsEstablishedByCurrentFabric > maxNumberOfSubscriptions))
+    if (candidate != nullptr &&
+        (aForceEvict || attributePathsSubscribedByCurrentFabric > perFabricPathCapacity ||
+         eventPathsSubscribedByCurrentFabric > perFabricPathCapacity ||
+         subscriptionsEstablishedByCurrentFabric > perFabricSubscriptionCapacity))
     {
-        candicate->Abort();
+        candidate->Abort();
         return true;
     }
     return false;
@@ -624,32 +617,25 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
 {
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    const bool overrideResult = !mForceHandlerQuota;
+    const bool allowUnlimited = !mForceHandlerQuota;
 #else  // CONFIG_IM_BUILD_FOR_UNIT_TEST
        // If the resources are allocated on the heap, we should be able to handle as many Read / Subscribe requests as possible.
-    const bool overrideResult = true;
+    const bool allowUnlimited = true;
 #endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
 #else  // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
-    const bool overrideResult             = false;
+    const bool allowUnlimited = false;
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
 
     // Don't couple with read requests, always reserve enough resource for read requests.
 
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    const int32_t pathPoolCapacity =
-        (mPathPoolCapacityOverride == -1) ? CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS : static_cast<int32_t>(mPathPoolCapacityOverride);
-    const int32_t readHandlerPoolCapacity =
-        (mReadHandlerCapacityOverride == -1) ? CHIP_IM_MAX_NUM_READ_HANDLER : static_cast<int32_t>(mReadHandlerCapacityOverride);
-#else
-    const int32_t pathPoolCapacity        = CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS;
-    const int32_t readHandlerPoolCapacity = CHIP_IM_MAX_NUM_READ_HANDLER;
-#endif
+    const int32_t pathPoolCapacity        = GetPathPoolCapacity();
+    const int32_t readHandlerPoolCapacity = GetReadHandlerPoolCapacity();
 
     // If we return early here, the compiler will complain about the unreachable code, so we add a always-true check.
-    const int32_t attributePathCap = overrideResult ? INT32_MAX : (pathPoolCapacity - static_cast<int32_t>(kReservedPathsForReads));
-    const int32_t eventPathCap     = overrideResult ? INT32_MAX : (pathPoolCapacity - static_cast<int32_t>(kReservedPathsForReads));
+    const int32_t attributePathCap = allowUnlimited ? INT32_MAX : (pathPoolCapacity - static_cast<int32_t>(kReservedPathsForReads));
+    const int32_t eventPathCap     = allowUnlimited ? INT32_MAX : (pathPoolCapacity - static_cast<int32_t>(kReservedPathsForReads));
     const int32_t readHandlerCap =
-        overrideResult ? INT32_MAX : (readHandlerPoolCapacity - static_cast<int32_t>(kReservedHandlerForReads));
+        allowUnlimited ? INT32_MAX : (readHandlerPoolCapacity - static_cast<int32_t>(kReservedHandlerForReads));
 
     int32_t usedAttributePaths = static_cast<int32_t>(mAttributePathPool.Allocated());
     int32_t usedEventPaths     = static_cast<int32_t>(mEventPathPool.Allocated());
@@ -671,7 +657,7 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
         return false;
     }
 
-    bool hasEvictedHandlers = true;
+    bool didEvictHandler = true;
 
     const auto evictAndUpdateResourceUsage = [&](FabricIndex fabricIndex, bool forceEvict) {
         bool ret           = CheckResourceAndEvictExceededSubscription(fabricIndex, forceEvict);
@@ -681,14 +667,22 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
         return ret;
     };
 
+    //
+    // At this point, we have an inbound request that respects minimas but we still don't have enough resources to handle it. Which
+    // means that we definitely have handlers on existing fabrics that are over limits and need to evict at least one of them to
+    // make space.
+    //
     while ((usedAttributePaths + aRequestedAttributePathCount > attributePathCap ||
             usedEventPaths + aRequestedEventPathCount > eventPathCap || usedReadHandlers >= readHandlerCap) &&
-           hasEvictedHandlers)
+           didEvictHandler)
     {
-        hasEvictedHandlers = false;
+        // There might be cases that one fabric has lots of subscriptions with one interested path, while the other fabrics are not
+        // using excess resources. So we need to do this multiple times until we have enough room or no fabrics are using excess
+        // resources.
+        didEvictHandler = false;
         for (const auto & fabric : *mpFabricTable)
         {
-            hasEvictedHandlers = hasEvictedHandlers || evictAndUpdateResourceUsage(fabric.GetFabricIndex(), false);
+            didEvictHandler = didEvictHandler || evictAndUpdateResourceUsage(fabric.GetFabricIndex(), false);
             if (usedAttributePaths + aRequestedAttributePathCount <= attributePathCap &&
                 usedEventPaths + aRequestedEventPathCount <= eventPathCap && usedReadHandlers < readHandlerCap)
             {
@@ -699,16 +693,16 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
 
     // We either have enough resources, or the resource usage from all fabrics are within the quota, so evict one (possibly the
     // oldest) subscription from the current fabric.
-    hasEvictedHandlers = true;
+    didEvictHandler = true;
     while ((usedAttributePaths + aRequestedAttributePathCount > attributePathCap ||
             usedEventPaths + aRequestedEventPathCount > eventPathCap || usedReadHandlers >= readHandlerCap) &&
            // Avoid infinity loop
-           hasEvictedHandlers)
+           didEvictHandler)
     {
-        hasEvictedHandlers = evictAndUpdateResourceUsage(aFabricIndex, true);
+        didEvictHandler = evictAndUpdateResourceUsage(aFabricIndex, true);
     }
 
-    if (!hasEvictedHandlers)
+    if (!didEvictHandler)
     {
         // This should never happen, since we should always be able to serve the request after evicting all subscriptions on the
         // current fabric.
@@ -722,17 +716,17 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
 
 bool InteractionModelEngine::CanEstablishReadTransaction(const ReadHandler * apReadHandler)
 {
-    const bool overrideResult =
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
-        !mForceHandlerQuota;
+    const bool allowUnlimited = !mForceHandlerQuota;
 #else  // CONFIG_IM_BUILD_FOR_UNIT_TEST
        // If the resources are allocated on the heap, we should be able to handle as many Read / Subscribe requests as possible.
-        true;
+    const bool allowUnlimited = true;
 #endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
 #else  // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
-        false;
+    const bool allowUnlimited = false;
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
+
     FabricIndex currentFabricIndex           = apReadHandler->GetAccessingFabricIndex();
     size_t activeReadHandlersOnCurrentFabric = 0;
 
@@ -748,13 +742,13 @@ bool InteractionModelEngine::CanEstablishReadTransaction(const ReadHandler * apR
     // The incoming read handler here is also counted above.
     if (activeReadHandlersOnCurrentFabric > kReservedReadHandlerPerFabricForReadRequests)
     {
-        return overrideResult;
+        return allowUnlimited;
     }
 
     return (apReadHandler->GetAttributePathCount() <= kReservedPathPerReadRequests &&
             apReadHandler->GetEventPathCount() <= kReservedPathPerReadRequests &&
             apReadHandler->GetDataVersionFilterCount() <= kReservedPathPerReadRequests) ||
-        overrideResult;
+        allowUnlimited;
 }
 
 void InteractionModelEngine::RemoveReadClient(ReadClient * apReadClient)
