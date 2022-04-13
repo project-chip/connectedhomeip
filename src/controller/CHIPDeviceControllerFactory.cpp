@@ -36,6 +36,7 @@
 
 #include <app/server/Dnssd.h>
 #include <protocols/secure_channel/CASEServer.h>
+#include <protocols/secure_channel/SimpleSessionResumptionStorage.h>
 
 using namespace chip::Inet;
 using namespace chip::System;
@@ -146,13 +147,16 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #endif
                                                             ));
 
-    stateParams.fabricTable           = chip::Platform::New<FabricTable>();
-    stateParams.sessionMgr            = chip::Platform::New<SessionManager>();
-    stateParams.exchangeMgr           = chip::Platform::New<Messaging::ExchangeManager>();
-    stateParams.messageCounterManager = chip::Platform::New<secure_channel::MessageCounterManager>();
-    stateParams.groupDataProvider     = params.groupDataProvider;
+    stateParams.fabricTable                                   = chip::Platform::New<FabricTable>();
+    stateParams.sessionMgr                                    = chip::Platform::New<SessionManager>();
+    SimpleSessionResumptionStorage * sessionResumptionStorage = chip::Platform::New<SimpleSessionResumptionStorage>();
+    stateParams.sessionResumptionStorage                      = sessionResumptionStorage;
+    stateParams.exchangeMgr                                   = chip::Platform::New<Messaging::ExchangeManager>();
+    stateParams.messageCounterManager                         = chip::Platform::New<secure_channel::MessageCounterManager>();
+    stateParams.groupDataProvider                             = params.groupDataProvider;
 
     ReturnErrorOnFailure(stateParams.fabricTable->Init(params.fabricIndependentStorage));
+    ReturnErrorOnFailure(sessionResumptionStorage->Init(params.fabricIndependentStorage));
 
     auto delegate = chip::Platform::MakeUnique<ControllerFabricDelegate>();
     ReturnErrorOnFailure(delegate->Init(stateParams.sessionMgr, stateParams.groupDataProvider));
@@ -186,7 +190,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #if CONFIG_NETWORK_LAYER_BLE
             nullptr,
 #endif
-            stateParams.sessionMgr, stateParams.fabricTable, stateParams.groupDataProvider));
+            stateParams.sessionMgr, stateParams.fabricTable, stateParams.sessionResumptionStorage, stateParams.groupDataProvider));
 
         //
         // We need to advertise the port that we're listening to for unsolicited messages over UDP. However, we have both a IPv4
@@ -214,26 +218,22 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         chip::app::DnssdServer::Instance().StartServer();
     }
 
-    stateParams.sessionIDAllocator    = Platform::New<SessionIDAllocator>();
     stateParams.operationalDevicePool = Platform::New<DeviceControllerSystemStateParams::OperationalDevicePool>();
     stateParams.caseClientPool        = Platform::New<DeviceControllerSystemStateParams::CASEClientPool>();
 
     DeviceProxyInitParams deviceInitParams = {
-        .sessionManager    = stateParams.sessionMgr,
-        .exchangeMgr       = stateParams.exchangeMgr,
-        .idAllocator       = stateParams.sessionIDAllocator,
-        .fabricTable       = stateParams.fabricTable,
-        .clientPool        = stateParams.caseClientPool,
-        .groupDataProvider = stateParams.groupDataProvider,
-        .mrpLocalConfig    = Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()),
+        .sessionManager           = stateParams.sessionMgr,
+        .sessionResumptionStorage = stateParams.sessionResumptionStorage,
+        .exchangeMgr              = stateParams.exchangeMgr,
+        .fabricTable              = stateParams.fabricTable,
+        .clientPool               = stateParams.caseClientPool,
+        .groupDataProvider        = stateParams.groupDataProvider,
+        .mrpLocalConfig           = Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()),
     };
 
     CASESessionManagerConfig sessionManagerConfig = {
         .sessionInitParams = deviceInitParams,
-#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-        .dnsCache = NoSuchThingWeWouldNeedToAddIt,
-#endif
-        .devicePool = stateParams.operationalDevicePool,
+        .devicePool        = stateParams.operationalDevicePool,
     };
 
     // TODO: Need to be able to create a CASESessionManagerConfig here!
@@ -253,7 +253,6 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
     controllerParams.controllerNOC                  = params.controllerNOC;
     controllerParams.controllerICAC                 = params.controllerICAC;
     controllerParams.controllerRCAC                 = params.controllerRCAC;
-    controllerParams.storageDelegate                = params.storageDelegate;
 
     controllerParams.systemState        = mSystemState;
     controllerParams.controllerVendorId = params.controllerVendorId;
@@ -336,13 +335,8 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
         mCASESessionManager = nullptr;
     }
 
-    // mSessionIDAllocator, mCASEClientPool, and mDevicePool must be deallocated
+    // mCASEClientPool and mDevicePool must be deallocated
     // after mCASESessionManager, which uses them.
-    if (mSessionIDAllocator != nullptr)
-    {
-        Platform::Delete(mSessionIDAllocator);
-        mSessionIDAllocator = nullptr;
-    }
 
     if (mOperationalDevicePool != nullptr)
     {

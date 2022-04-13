@@ -994,6 +994,18 @@ namespace Extension {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace Extension
 
+namespace SubjectsPerAccessControlEntry {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace SubjectsPerAccessControlEntry
+
+namespace TargetsPerAccessControlEntry {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace TargetsPerAccessControlEntry
+
+namespace AccessControlEntriesPerFabric {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace AccessControlEntriesPerFabric
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -1187,6 +1199,10 @@ static constexpr AttributeId Id = 0x00000011;
 namespace UniqueID {
 static constexpr AttributeId Id = 0x00000012;
 } // namespace UniqueID
+
+namespace CapabilityMinima {
+static constexpr AttributeId Id = 0x00000013;
+} // namespace CapabilityMinima
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -3416,9 +3432,9 @@ namespace AcRefrigerantType {
 static constexpr AttributeId Id = 0x00000042;
 } // namespace AcRefrigerantType
 
-namespace AcCompressor {
+namespace AcCompressorType {
 static constexpr AttributeId Id = 0x00000043;
-} // namespace AcCompressor
+} // namespace AcCompressorType
 
 namespace AcErrorCode {
 static constexpr AttributeId Id = 0x00000044;

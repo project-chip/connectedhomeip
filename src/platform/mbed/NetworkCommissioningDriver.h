@@ -46,7 +46,7 @@ public:
             return false;
         }
 
-        item.security = mScanResults[mIternum].get_security();
+        item.security.SetRaw(mScanResults[mIternum].get_security());
         item.ssidLen  = strnlen(reinterpret_cast<const char *>(mScanResults[mIternum].get_ssid()),
                                chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
         item.channel  = mScanResults[mIternum].get_channel();

@@ -36,7 +36,6 @@
 #include <lib/core/CHIPConfig.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
-#include <protocols/secure_channel/SessionIDAllocator.h>
 
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
@@ -82,13 +81,13 @@ struct DeviceControllerSystemStateParams
     // Params that will be deallocated via Platform::Delete in
     // DeviceControllerSystemState::Shutdown.
     DeviceTransportMgr * transportMgr                             = nullptr;
+    SessionResumptionStorage * sessionResumptionStorage           = nullptr;
     SessionManager * sessionMgr                                   = nullptr;
     Messaging::ExchangeManager * exchangeMgr                      = nullptr;
     secure_channel::MessageCounterManager * messageCounterManager = nullptr;
     FabricTable * fabricTable                                     = nullptr;
     CASEServer * caseServer                                       = nullptr;
     CASESessionManager * caseSessionManager                       = nullptr;
-    SessionIDAllocator * sessionIDAllocator                       = nullptr;
     OperationalDevicePool * operationalDevicePool                 = nullptr;
     CASEClientPool * caseClientPool                               = nullptr;
     Credentials::GroupDataProvider * groupDataProvider            = nullptr;
@@ -109,8 +108,8 @@ public:
         mUDPEndPointManager(params.udpEndPointManager), mTransportMgr(params.transportMgr), mSessionMgr(params.sessionMgr),
         mExchangeMgr(params.exchangeMgr), mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable),
         mCASEServer(params.caseServer), mCASESessionManager(params.caseSessionManager),
-        mSessionIDAllocator(params.sessionIDAllocator), mOperationalDevicePool(params.operationalDevicePool),
-        mCASEClientPool(params.caseClientPool), mGroupDataProvider(params.groupDataProvider)
+        mOperationalDevicePool(params.operationalDevicePool), mCASEClientPool(params.caseClientPool),
+        mGroupDataProvider(params.groupDataProvider)
     {
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
@@ -143,8 +142,7 @@ public:
     {
         return mSystemLayer != nullptr && mUDPEndPointManager != nullptr && mTransportMgr != nullptr && mSessionMgr != nullptr &&
             mExchangeMgr != nullptr && mMessageCounterManager != nullptr && mFabrics != nullptr && mCASESessionManager != nullptr &&
-            mSessionIDAllocator != nullptr && mOperationalDevicePool != nullptr && mCASEClientPool != nullptr &&
-            mGroupDataProvider != nullptr;
+            mOperationalDevicePool != nullptr && mCASEClientPool != nullptr && mGroupDataProvider != nullptr;
     };
 
     System::Layer * SystemLayer() const { return mSystemLayer; };
@@ -159,7 +157,6 @@ public:
     Ble::BleLayer * BleLayer() const { return mBleLayer; };
 #endif
     CASESessionManager * CASESessionMgr() const { return mCASESessionManager; }
-    SessionIDAllocator * SessionIDAlloc() const { return mSessionIDAllocator; }
     Credentials::GroupDataProvider * GetGroupDataProvider() const { return mGroupDataProvider; }
 
 private:
@@ -178,7 +175,6 @@ private:
     FabricTable * mFabrics                                         = nullptr;
     CASEServer * mCASEServer                                       = nullptr;
     CASESessionManager * mCASESessionManager                       = nullptr;
-    SessionIDAllocator * mSessionIDAllocator                       = nullptr;
     OperationalDevicePool * mOperationalDevicePool                 = nullptr;
     CASEClientPool * mCASEClientPool                               = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider            = nullptr;

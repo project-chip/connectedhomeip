@@ -16,9 +16,9 @@
  */
 
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
 #include <app/server/Server.h>
 #include <platform/nrfconnect/OTAImageProcessorImpl.h>
 
@@ -28,9 +28,9 @@ using namespace chip::DeviceLayer;
 namespace {
 
 DefaultOTARequestorStorage sOTARequestorStorage;
-GenericOTARequestorDriver sOTARequestorDriver;
+DefaultOTARequestorDriver sOTARequestorDriver;
 chip::BDXDownloader sBDXDownloader;
-chip::OTARequestor sOTARequestor;
+chip::DefaultOTARequestor sOTARequestor;
 
 } // namespace
 

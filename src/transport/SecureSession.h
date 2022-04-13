@@ -61,14 +61,50 @@ public:
         kUndefined = 0,
         kPASE      = 1,
         kCASE      = 2,
+        // kPending denotes a secure session object that is internally
+        // reserved by the stack before and during session establishment.
+        //
+        // Although the stack can tolerate eviction of these (releasing one
+        // out from under the holder would exhibit as CHIP_ERROR_INCORRECT_STATE
+        // during CASE or PASE), intent is that we should not and would leave
+        // these untouched until CASE or PASE complete.
+        kPending = 3,
     };
 
     SecureSession(Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId,
                   FabricIndex fabric, const ReliableMessageProtocolConfig & config) :
         mSecureSessionType(secureSessionType),
         mPeerNodeId(peerNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId),
-        mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
+        mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()),
+        mLastPeerActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
     {
+        SetFabricIndex(fabric);
+    }
+
+    /**
+     * @brief
+     *   Construct a secure session object to associate with a pending secure
+     *   session establishment attempt.  The object for the pending session
+     *   receives a local session ID, but no other state.
+     */
+    SecureSession(uint16_t localSessionId) :
+        SecureSession(Type::kPending, localSessionId, kUndefinedNodeId, CATValues{}, 0, kUndefinedFabricIndex, GetLocalMRPConfig())
+    {}
+
+    /**
+     * @brief
+     *   Activate a pending Secure Session that had been reserved during CASE or
+     *   PASE, setting internal state according to the parameters used and
+     *   discovered during session establishment.
+     */
+    void Activate(Type secureSessionType, NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric,
+                  const ReliableMessageProtocolConfig & config)
+    {
+        mSecureSessionType = secureSessionType;
+        mPeerNodeId        = peerNodeId;
+        mPeerCATs          = peerCATs;
+        mPeerSessionId     = peerSessionId;
+        mMRPConfig         = config;
         SetFabricIndex(fabric);
     }
     ~SecureSession() override { NotifySessionReleased(); }
@@ -134,21 +170,35 @@ public:
     }
 
     System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
+    System::Clock::Timestamp GetLastPeerActivityTime() const { return mLastPeerActivityTime; }
     void MarkActive() { mLastActivityTime = System::SystemClock().GetMonotonicTimestamp(); }
+    void MarkActiveRx()
+    {
+        mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp();
+        MarkActive();
+    }
+
+    bool IsPeerActive() { return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) < kMinActiveTime); }
+
+    System::Clock::Timestamp GetMRPBaseTimeout() override
+    {
+        return IsPeerActive() ? GetMRPConfig().mActiveRetransTimeout : GetMRPConfig().mIdleRetransTimeout;
+    }
 
     CryptoContext & GetCryptoContext() { return mCryptoContext; }
 
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
 private:
-    const Type mSecureSessionType;
-    const NodeId mPeerNodeId;
-    const CATValues mPeerCATs;
+    Type mSecureSessionType;
+    NodeId mPeerNodeId;
+    CATValues mPeerCATs;
     const uint16_t mLocalSessionId;
-    const uint16_t mPeerSessionId;
+    uint16_t mPeerSessionId;
 
     PeerAddress mPeerAddress;
-    System::Clock::Timestamp mLastActivityTime;
+    System::Clock::Timestamp mLastActivityTime;     ///< Timestamp of last tx or rx
+    System::Clock::Timestamp mLastPeerActivityTime; ///< Timestamp of last rx
     ReliableMessageProtocolConfig mMRPConfig;
     CryptoContext mCryptoContext;
     SessionMessageCounter mSessionMessageCounter;

@@ -114,10 +114,19 @@ struct Network
 static_assert(sizeof(Network::networkID) <= std::numeric_limits<decltype(Network::networkIDLen)>::max(),
               "Max length of networkID ssid exceeds the limit of networkIDLen field");
 
+enum class WiFiSecurity : uint8_t
+{
+    kUnencrypted  = 0x1,
+    kWepPersonal  = 0x2,
+    kWpaPersonal  = 0x4,
+    kWpa2Personal = 0x8,
+    kWpa3Personal = 0x10,
+};
+
 struct WiFiScanResponse
 {
 public:
-    uint8_t security;
+    chip::BitFlags<WiFiSecurity> security;
     uint8_t ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength];
     uint8_t ssidLen;
     uint8_t bssid[6];
@@ -131,7 +140,7 @@ static_assert(sizeof(WiFiScanResponse::ssid) <= std::numeric_limits<decltype(WiF
 
 struct ThreadScanResponse
 {
-    uint64_t panId;
+    uint16_t panId;
     uint64_t extendedPanId;
     char networkName[16];
     uint8_t networkNameLen;

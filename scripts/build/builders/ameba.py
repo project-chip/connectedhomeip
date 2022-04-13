@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os
-
 from enum import Enum, auto
 
 from .builder import Builder

@@ -18,7 +18,6 @@
 
 #include "AppTask.h"
 #include "AppConfig.h"
-#include "BindingHandler.h"
 #include "LEDWidget.h"
 #include "LightSwitch.h"
 #include "ThreadUtil.h"
@@ -159,7 +158,9 @@ CHIP_ERROR AppTask::Init()
 
     // Print initial configs
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    ReturnErrorOnFailure(Server::GetInstance().Init());
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    ReturnErrorOnFailure(initParams.InitializeStaticResourcesBeforeServerInit());
+    ReturnErrorOnFailure(Server::GetInstance().Init(initParams));
 #if CONFIG_CHIP_OTA_REQUESTOR
     InitBasicOTARequestor();
 #endif

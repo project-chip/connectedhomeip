@@ -472,9 +472,9 @@ if (CONFIG_CHIP_OTA_REQUESTOR)
 
     target_sources(${APP_TARGET} PRIVATE
         ${CHIP_ROOT}/examples/platform/mbed/ota/OTARequestorDriverImpl.cpp
-        ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
-        ${CHIP_ROOT}/src/app/clusters/ota-requestor/GenericOTARequestorDriver.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
         ${CHIP_ROOT}/src/platform/mbed/OTAImageProcessorImpl.cpp
     )

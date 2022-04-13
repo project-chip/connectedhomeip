@@ -6755,6 +6755,42 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Extension
+namespace SubjectsPerAccessControlEntry {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SubjectsPerAccessControlEntry::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SubjectsPerAccessControlEntry
+namespace TargetsPerAccessControlEntry {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TargetsPerAccessControlEntry::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TargetsPerAccessControlEntry
+namespace AccessControlEntriesPerFabric {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AccessControlEntriesPerFabric::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AccessControlEntriesPerFabric
 namespace GeneratedCommandList {
 struct TypeInfo
 {
@@ -6826,6 +6862,9 @@ struct TypeInfo
 
         Attributes::Acl::TypeInfo::DecodableType acl;
         Attributes::Extension::TypeInfo::DecodableType extension;
+        Attributes::SubjectsPerAccessControlEntry::TypeInfo::DecodableType subjectsPerAccessControlEntry = static_cast<uint16_t>(0);
+        Attributes::TargetsPerAccessControlEntry::TypeInfo::DecodableType targetsPerAccessControlEntry   = static_cast<uint16_t>(0);
+        Attributes::AccessControlEntriesPerFabric::TypeInfo::DecodableType accessControlEntriesPerFabric = static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -8074,6 +8113,31 @@ public:
 } // namespace Events
 } // namespace BridgedActions
 namespace Basic {
+namespace Structs {
+namespace CapabilityMinimaStruct {
+enum class Fields
+{
+    kCaseSessionsPerFabric  = 0,
+    kSubscriptionsPerFabric = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t caseSessionsPerFabric  = static_cast<uint16_t>(0);
+    uint16_t subscriptionsPerFabric = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace CapabilityMinimaStruct
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -8358,6 +8422,18 @@ struct TypeInfo
     static constexpr size_t MaxLength() { return 32; }
 };
 } // namespace UniqueID
+namespace CapabilityMinima {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::Type;
+    using DecodableType    = chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::DecodableType &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CapabilityMinima::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CapabilityMinima
 namespace GeneratedCommandList {
 struct TypeInfo
 {
@@ -8446,6 +8522,7 @@ struct TypeInfo
         Attributes::LocalConfigDisabled::TypeInfo::DecodableType localConfigDisabled = static_cast<bool>(0);
         Attributes::Reachable::TypeInfo::DecodableType reachable                     = static_cast<bool>(0);
         Attributes::UniqueID::TypeInfo::DecodableType uniqueID;
+        Attributes::CapabilityMinima::TypeInfo::DecodableType capabilityMinima;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -10717,14 +10794,14 @@ enum class Fields
 struct Type
 {
 public:
-    uint64_t panId         = static_cast<uint64_t>(0);
+    uint16_t panId         = static_cast<uint16_t>(0);
     uint64_t extendedPanId = static_cast<uint64_t>(0);
     chip::CharSpan networkName;
-    uint16_t channel         = static_cast<uint16_t>(0);
-    uint8_t version          = static_cast<uint8_t>(0);
-    uint64_t extendedAddress = static_cast<uint64_t>(0);
-    int8_t rssi              = static_cast<int8_t>(0);
-    uint8_t lqi              = static_cast<uint8_t>(0);
+    uint16_t channel = static_cast<uint16_t>(0);
+    uint8_t version  = static_cast<uint8_t>(0);
+    chip::ByteSpan extendedAddress;
+    int8_t rssi = static_cast<int8_t>(0);
+    uint8_t lqi = static_cast<uint8_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -10750,7 +10827,7 @@ enum class Fields
 struct Type
 {
 public:
-    uint8_t security = static_cast<uint8_t>(0);
+    chip::BitFlags<WiFiSecurity> security = static_cast<chip::BitFlags<WiFiSecurity>>(0);
     chip::ByteSpan ssid;
     chip::ByteSpan bssid;
     uint16_t channel  = static_cast<uint16_t>(0);
@@ -10834,8 +10911,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ScanNetworks::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    chip::ByteSpan ssid;
-    uint64_t breadcrumb = static_cast<uint64_t>(0);
+    Optional<DataModel::Nullable<chip::ByteSpan>> ssid;
+    Optional<uint64_t> breadcrumb;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -10850,8 +10927,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ScanNetworks::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    chip::ByteSpan ssid;
-    uint64_t breadcrumb = static_cast<uint64_t>(0);
+    Optional<DataModel::Nullable<chip::ByteSpan>> ssid;
+    Optional<uint64_t> breadcrumb;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ScanNetworks
@@ -10872,7 +10949,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
-    chip::CharSpan debugText;
+    Optional<chip::CharSpan> debugText;
     Optional<DataModel::List<const Structs::WiFiInterfaceScanResult::Type>> wiFiScanResults;
     Optional<DataModel::List<const Structs::ThreadInterfaceScanResult::Type>> threadScanResults;
 
@@ -10890,7 +10967,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
-    chip::CharSpan debugText;
+    Optional<chip::CharSpan> debugText;
     Optional<DataModel::DecodableList<Structs::WiFiInterfaceScanResult::DecodableType>> wiFiScanResults;
     Optional<DataModel::DecodableList<Structs::ThreadInterfaceScanResult::DecodableType>> threadScanResults;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10913,7 +10990,7 @@ public:
 
     chip::ByteSpan ssid;
     chip::ByteSpan credentials;
-    uint64_t breadcrumb = static_cast<uint64_t>(0);
+    Optional<uint64_t> breadcrumb;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -10930,7 +11007,7 @@ public:
 
     chip::ByteSpan ssid;
     chip::ByteSpan credentials;
-    uint64_t breadcrumb = static_cast<uint64_t>(0);
+    Optional<uint64_t> breadcrumb;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddOrUpdateWiFiNetwork
@@ -10949,7 +11026,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan operationalDataset;
-    uint64_t breadcrumb = static_cast<uint64_t>(0);
+    Optional<uint64_t> breadcrumb;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -10965,7 +11042,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan operationalDataset;
-    uint64_t breadcrumb = static_cast<uint64_t>(0);
+    Optional<uint64_t> breadcrumb;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddOrUpdateThreadNetwork
@@ -10984,7 +11061,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan networkID;
-    uint64_t breadcrumb = static_cast<uint64_t>(0);
+    Optional<uint64_t> breadcrumb;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -11000,7 +11077,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan networkID;
-    uint64_t breadcrumb = static_cast<uint64_t>(0);
+    Optional<uint64_t> breadcrumb;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RemoveNetwork
@@ -11057,7 +11134,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan networkID;
-    uint64_t breadcrumb = static_cast<uint64_t>(0);
+    Optional<uint64_t> breadcrumb;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -11073,7 +11150,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan networkID;
-    uint64_t breadcrumb = static_cast<uint64_t>(0);
+    Optional<uint64_t> breadcrumb;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ConnectNetwork
@@ -11093,8 +11170,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
-    chip::CharSpan debugText;
-    int32_t errorValue = static_cast<int32_t>(0);
+    Optional<chip::CharSpan> debugText;
+    DataModel::Nullable<int32_t> errorValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -11110,8 +11187,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
-    chip::CharSpan debugText;
-    int32_t errorValue = static_cast<int32_t>(0);
+    Optional<chip::CharSpan> debugText;
+    DataModel::Nullable<int32_t> errorValue;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ConnectNetworkResponse
@@ -11132,7 +11209,7 @@ public:
 
     chip::ByteSpan networkID;
     uint8_t networkIndex = static_cast<uint8_t>(0);
-    uint64_t breadcrumb  = static_cast<uint64_t>(0);
+    Optional<uint64_t> breadcrumb;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -11149,7 +11226,7 @@ public:
 
     chip::ByteSpan networkID;
     uint8_t networkIndex = static_cast<uint8_t>(0);
-    uint64_t breadcrumb  = static_cast<uint64_t>(0);
+    Optional<uint64_t> breadcrumb;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ReorderNetwork
@@ -20367,9 +20444,9 @@ namespace Attributes {
 namespace Type {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::WindowCovering::Type;
+    using DecodableType    = chip::app::Clusters::WindowCovering::Type;
+    using DecodableArgType = chip::app::Clusters::WindowCovering::Type;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Type::Id; }
@@ -20523,9 +20600,9 @@ struct TypeInfo
 namespace EndProductType {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::WindowCovering::EndProductType;
+    using DecodableType    = chip::app::Clusters::WindowCovering::EndProductType;
+    using DecodableArgType = chip::app::Clusters::WindowCovering::EndProductType;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EndProductType::Id; }
@@ -20697,7 +20774,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Type::TypeInfo::DecodableType type                                       = static_cast<uint8_t>(0);
+        Attributes::Type::TypeInfo::DecodableType type = static_cast<chip::app::Clusters::WindowCovering::Type>(0);
         Attributes::PhysicalClosedLimitLift::TypeInfo::DecodableType physicalClosedLimitLift = static_cast<uint16_t>(0);
         Attributes::PhysicalClosedLimitTilt::TypeInfo::DecodableType physicalClosedLimitTilt = static_cast<uint16_t>(0);
         Attributes::CurrentPositionLift::TypeInfo::DecodableType currentPositionLift;
@@ -20710,7 +20787,8 @@ struct TypeInfo
         Attributes::OperationalStatus::TypeInfo::DecodableType operationalStatus = static_cast<uint8_t>(0);
         Attributes::TargetPositionLiftPercent100ths::TypeInfo::DecodableType targetPositionLiftPercent100ths;
         Attributes::TargetPositionTiltPercent100ths::TypeInfo::DecodableType targetPositionTiltPercent100ths;
-        Attributes::EndProductType::TypeInfo::DecodableType endProductType = static_cast<uint8_t>(0);
+        Attributes::EndProductType::TypeInfo::DecodableType endProductType =
+            static_cast<chip::app::Clusters::WindowCovering::EndProductType>(0);
         Attributes::CurrentPositionLiftPercent100ths::TypeInfo::DecodableType currentPositionLiftPercent100ths;
         Attributes::CurrentPositionTiltPercent100ths::TypeInfo::DecodableType currentPositionTiltPercent100ths;
         Attributes::InstalledOpenLimitLift::TypeInfo::DecodableType installedOpenLimitLift     = static_cast<uint16_t>(0);
@@ -22648,7 +22726,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcRefrigerantType
-namespace AcCompressor {
+namespace AcCompressorType {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -22656,10 +22734,10 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcCompressor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcCompressorType::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace AcCompressor
+} // namespace AcCompressorType
 namespace AcErrorCode {
 struct TypeInfo
 {
@@ -22818,7 +22896,7 @@ struct TypeInfo
         Attributes::AcType::TypeInfo::DecodableType acType                                               = static_cast<uint8_t>(0);
         Attributes::AcCapacity::TypeInfo::DecodableType acCapacity                                       = static_cast<uint16_t>(0);
         Attributes::AcRefrigerantType::TypeInfo::DecodableType acRefrigerantType                         = static_cast<uint8_t>(0);
-        Attributes::AcCompressor::TypeInfo::DecodableType acCompressor                                   = static_cast<uint8_t>(0);
+        Attributes::AcCompressorType::TypeInfo::DecodableType acCompressorType                           = static_cast<uint8_t>(0);
         Attributes::AcErrorCode::TypeInfo::DecodableType acErrorCode                                     = static_cast<uint32_t>(0);
         Attributes::AcLouverPosition::TypeInfo::DecodableType acLouverPosition                           = static_cast<uint8_t>(0);
         Attributes::AcCoilTemperature::TypeInfo::DecodableType acCoilTemperature                         = static_cast<int16_t>(0);

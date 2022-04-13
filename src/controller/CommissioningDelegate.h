@@ -19,6 +19,7 @@
 #pragma once
 #include <app/OperationalDeviceProxy.h>
 #include <controller/CommissioneeDeviceProxy.h>
+#include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/support/Variant.h>
 
@@ -39,6 +40,7 @@ enum CommissioningStage : uint8_t
     kSendAttestationRequest,
     kAttestationVerification,
     kSendOpCertSigningRequest,
+    kValidateCSR,
     kGenerateNOCChain,
     kSendTrustedRootCert,
     kSendNOC,
@@ -64,6 +66,14 @@ struct NOCChainGenerationParameters
 {
     ByteSpan nocsrElements;
     ByteSpan signature;
+};
+
+struct CompletionStatus
+{
+    CompletionStatus() : err(CHIP_NO_ERROR), failedStage(NullOptional), attestationResult(NullOptional) {}
+    CHIP_ERROR err;
+    Optional<CommissioningStage> failedStage;
+    Optional<Credentials::AttestationVerificationResult> attestationResult;
 };
 
 constexpr uint16_t kDefaultFailsafeTimeout = 60;
@@ -198,7 +208,7 @@ public:
 
     // Status to send when calling CommissioningComplete on the PairingDelegate during the kCleanup step. The AutoCommissioner uses
     // this to pass through any error messages received during commissioning.
-    CHIP_ERROR GetCompletionStatus() { return completionStatus; }
+    const CompletionStatus & GetCompletionStatus() const { return completionStatus; }
 
     CommissioningParameters & SetFailsafeTimerSeconds(uint16_t seconds)
     {
@@ -312,7 +322,15 @@ public:
         mLocationCapability = MakeOptional(capability);
         return *this;
     }
-    void SetCompletionStatus(CHIP_ERROR err) { completionStatus = err; }
+    void SetCompletionStatus(const CompletionStatus & status) { completionStatus = status; }
+
+    CommissioningParameters & SetDeviceAttestationDelegate(Credentials::DeviceAttestationDelegate * deviceAttestationDelegate)
+    {
+        mDeviceAttestationDelegate = deviceAttestationDelegate;
+        return *this;
+    }
+
+    Credentials::DeviceAttestationDelegate * GetDeviceAttestationDelegate() const { return mDeviceAttestationDelegate; }
 
 private:
     // Items that can be set by the commissioner
@@ -337,7 +355,9 @@ private:
     Optional<uint16_t> mRemoteProductId;
     Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> mDefaultRegulatoryLocation;
     Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> mLocationCapability;
-    CHIP_ERROR completionStatus = CHIP_NO_ERROR;
+    CompletionStatus completionStatus;
+    Credentials::DeviceAttestationDelegate * mDeviceAttestationDelegate =
+        nullptr; // Delegate to handle device attestation failures during commissioning
 };
 
 struct RequestedCertificate
@@ -451,6 +471,7 @@ public:
         CommissioningStage stageCompleted;
     };
     virtual CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params)                           = 0;
+    virtual const CommissioningParameters & GetCommissioningParameters() const                                      = 0;
     virtual void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) = 0;
     virtual CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy)       = 0;
     virtual CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningReport report)                        = 0;

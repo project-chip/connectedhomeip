@@ -29,12 +29,17 @@
 #include <controller/CHIPDeviceController.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
+#include <system/SystemClock.h>
+
+constexpr uint32_t kDeviceDiscoveredTimeout = CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS * chip::kMillisecondsPerSecond;
 
 namespace chip {
 namespace Controller {
 
 CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, SetupCodePairerBehaviour commission)
 {
+    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     SetupPayload payload;
     mConnectionType = commission;
 
@@ -47,7 +52,10 @@ CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, 
 
     ResetDiscoveryState();
 
-    return Connect(payload);
+    ReturnErrorOnFailure(Connect(payload));
+
+    return mSystemLayer->StartTimer(System::Clock::Milliseconds32(kDeviceDiscoveredTimeout), OnDeviceDiscoveredTimeoutCallback,
+                                    this);
 }
 
 CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
@@ -162,6 +170,8 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverSoftAP()
 
 bool SetUpCodePairer::ConnectToDiscoveredDevice()
 {
+    mSystemLayer->CancelTimer(OnDeviceDiscoveredTimeoutCallback, this);
+
     if (mWaitingForPASE)
     {
         // Nothing to do.  Just wait until we either succeed or fail at that
@@ -405,6 +415,15 @@ void SetUpCodePairer::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error)
     {
         mPairingDelegate->OnCommissioningComplete(deviceId, error);
     }
+}
+
+void SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback(System::Layer * layer, void * context)
+{
+    auto * pairer = static_cast<SetUpCodePairer *>(context);
+    LogErrorOnFailure(pairer->StopConnectOverBle());
+    LogErrorOnFailure(pairer->StopConnectOverIP());
+    LogErrorOnFailure(pairer->StopConnectOverSoftAP());
+    pairer->mCommissioner->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
 }
 
 } // namespace Controller

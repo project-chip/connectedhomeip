@@ -22,7 +22,8 @@ set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
 # Load NCS/Zephyr build system
-set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/app/sample-defaults.conf prj.conf)
+set(CONF_FILE prj.conf)
+
 if(${BOARD} STREQUAL "nrf52840dongle_nrf52840")
     list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-usb_support.conf)
 endif()

@@ -41,7 +41,7 @@ namespace chip {
 namespace Messaging {
 
 ReliableMessageMgr::RetransTableEntry::RetransTableEntry(ReliableMessageContext * rc) :
-    ec(*rc->GetExchangeContext()), retainedBuf(EncryptedPacketBufferHandle()), nextRetransTime(0), sendCount(0)
+    ec(*rc->GetExchangeContext()), nextRetransTime(0), sendCount(0)
 {
     ec->SetMessageNotAcked(true);
 }
@@ -89,10 +89,7 @@ void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
     });
 }
 #else
-void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
-{
-    return;
-}
+void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log) {}
 #endif // RMP_TICKLESS_DEBUG
 
 void ReliableMessageMgr::ExecuteActions()
@@ -144,12 +141,12 @@ void ReliableMessageMgr::ExecuteActions()
                       "Retransmitting MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange
                       " Send Cnt %d",
                       messageCounter, ChipLogValueExchange(&entry->ec.Get()), entry->sendCount);
-        // TODO(#15800): Choose active/idle timeout corresponding to the activity of exchanges of the session.
-        System::Clock::Timestamp backoff =
-            ReliableMessageMgr::GetBackoff(entry->ec->GetSessionHandle()->GetMRPConfig().mActiveRetransTimeout, entry->sendCount);
-        entry->nextRetransTime = System::SystemClock().GetMonotonicTimestamp() + backoff;
+
+        // Choose active/idle timeout from PeerActiveMode of session per 4.11.2.1. Retransmissions.
+        System::Clock::Timestamp baseTimeout = entry->ec->GetSessionHandle()->GetMRPBaseTimeout();
+        System::Clock::Timestamp backoff     = ReliableMessageMgr::GetBackoff(baseTimeout, entry->sendCount);
+        entry->nextRetransTime               = System::SystemClock().GetMonotonicTimestamp() + backoff;
         SendFromRetransTable(entry);
-        // For test not using async IO loop, the entry may have been removed after send, do not use entry below
 
         return Loop::Continue;
     });
@@ -226,10 +223,10 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
 
 void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
 {
-    // TODO(#15800): Choose active/idle timeout corresponding to the ActiveState of peer in session.
-    System::Clock::Timestamp backoff =
-        ReliableMessageMgr::GetBackoff(entry->ec->GetSessionHandle()->GetMRPConfig().mIdleRetransTimeout, entry->sendCount);
-    entry->nextRetransTime = System::SystemClock().GetMonotonicTimestamp() + backoff;
+    // Choose active/idle timeout from PeerActiveMode of session per 4.11.2.1. Retransmissions.
+    System::Clock::Timestamp baseTimeout = entry->ec->GetSessionHandle()->GetMRPBaseTimeout();
+    System::Clock::Timestamp backoff     = ReliableMessageMgr::GetBackoff(baseTimeout, entry->sendCount);
+    entry->nextRetransTime               = System::SystemClock().GetMonotonicTimestamp() + backoff;
     StartTimer();
 }
 

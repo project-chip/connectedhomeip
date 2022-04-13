@@ -46,9 +46,9 @@ public:
      */
     CHIP_ERROR init(CHIPPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner, NSData * _Nullable ipk);
 
-    CHIP_ERROR GenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & attestationSignature,
-        const chip::ByteSpan & DAC, const chip::ByteSpan & PAI, const chip::ByteSpan & PAA,
-        chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion) override;
+    CHIP_ERROR GenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
+        const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
+        const chip::ByteSpan & PAI, chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion) override;
 
     void SetNodeIdForNextNOCRequest(chip::NodeId nodeId) override
     {
@@ -65,7 +65,7 @@ public:
         const chip::Crypto::P256PublicKey & pubkey, chip::MutableByteSpan & rcac, chip::MutableByteSpan & icac,
         chip::MutableByteSpan & noc);
 
-    const chip::Crypto::AesCcm128KeySpan GetIPK() { return chip::Crypto::AesCcm128KeySpan(mIPK); }
+    const chip::Crypto::AesCcm128KeySpan GetIPK() { return mIPK.Span(); }
 
 private:
     CHIP_ERROR GenerateRootCertKeys();
@@ -83,7 +83,7 @@ private:
     ChipP256KeypairPtr mIssuerKey;
     uint64_t mIssuerId = 1234;
 
-    uint8_t mIPK[chip::Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+    chip::Crypto::AesCcm128Key mIPK;
 
     const uint32_t kCertificateValiditySecs = 365 * 24 * 60 * 60;
     const NSString * kCHIPCAKeyChainLabel = @"matter.nodeopcerts.CA:0";

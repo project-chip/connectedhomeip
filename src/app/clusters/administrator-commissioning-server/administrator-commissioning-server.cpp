@@ -31,6 +31,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/DeviceControlServer.h>
 #include <protocols/interaction_model/Constants.h>
 #include <setup_payload/SetupPayload.h>
 #include <system/SystemClock.h>
@@ -104,9 +105,12 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
 
     ChipLogProgress(Zcl, "Received command to open commissioning window");
 
-    FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
-    FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+    FabricIndex fabricIndex                        = commandObj->GetAccessingFabricIndex();
+    FabricInfo * fabricInfo                        = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+    DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+
     VerifyOrExit(fabricInfo != nullptr, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(!failSafeContext.IsFailSafeArmed(), status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
 
     VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() ==
                      CommissioningWindowStatus::kWindowNotOpen,
@@ -145,7 +149,8 @@ exit:
     {
         if (globalStatus != InteractionModel::Status::Success)
         {
-            ChipLogError(Zcl, "Failed to open commissioning window. Global status %d", to_underlying(globalStatus));
+            ChipLogError(Zcl, "Failed to open commissioning window. Global status " ChipLogFormatIMStatus,
+                         ChipLogValueIMStatus(globalStatus));
         }
         commandObj->AddStatus(commandPath, globalStatus);
     }
@@ -164,11 +169,15 @@ bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallbac
 
     FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
     FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+    chip::DeviceLayer::FailSafeContext & failSafeContext =
+        DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+
     VerifyOrExit(fabricInfo != nullptr, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
 
     VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() ==
                      CommissioningWindowStatus::kWindowNotOpen,
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
+    VerifyOrExit(!failSafeContext.IsFailSafeArmed(), status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
     VerifyOrExit(commissioningTimeout <= CommissioningWindowManager::MaxCommissioningTimeout(),
                  globalStatus = InteractionModel::Status::InvalidCommand);
     VerifyOrExit(commissioningTimeout >= CommissioningWindowManager::MinCommissioningTimeout(),
@@ -191,7 +200,8 @@ exit:
     {
         if (globalStatus != InteractionModel::Status::Success)
         {
-            ChipLogError(Zcl, "Failed to open commissioning window. Global status %d", to_underlying(globalStatus));
+            ChipLogError(Zcl, "Failed to open commissioning window. Global status " ChipLogFormatIMStatus,
+                         ChipLogValueIMStatus(globalStatus));
         }
         commandObj->AddStatus(commandPath, globalStatus);
     }

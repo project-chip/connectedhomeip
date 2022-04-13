@@ -40,6 +40,7 @@ public:
     static constexpr uint16_t SW_VER_STR_MAX_LEN = 64;
     static constexpr uint16_t OTA_URL_MAX_LEN    = 512;
     static constexpr size_t kFilepathBufLen      = 256;
+    static constexpr size_t kUriMaxLen           = 256;
 
     typedef struct DeviceSoftwareVersionModel
     {
@@ -67,6 +68,7 @@ public:
 
     //////////// OTAProviderExample public APIs ///////////////
     void SetOTAFilePath(const char * path);
+    void SetImageUri(const char * imageUri);
     BdxOtaSender * GetBdxOtaSender() { return &mBdxOtaSender; }
 
     void SetOTACandidates(std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates);
@@ -104,6 +106,7 @@ private:
     BdxOtaSender mBdxOtaSender;
     std::vector<DeviceSoftwareVersionModel> mCandidates;
     char mOTAFilePath[kFilepathBufLen]; // null-terminated
+    char mImageUri[kUriMaxLen];
     OTAQueryStatus mQueryImageStatus;
     OTAApplyUpdateAction mUpdateAction;
     uint32_t mIgnoreQueryImageCount;

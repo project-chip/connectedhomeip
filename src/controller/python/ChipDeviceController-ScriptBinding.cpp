@@ -162,6 +162,10 @@ pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(chip::Controller::Devi
 ChipError::StorageType pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
     chip::Controller::DeviceCommissioner * devCtrl, chip::Controller::DevicePairingDelegate_OnCommissioningCompleteFunct callback);
 
+ChipError::StorageType pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback(
+    chip::Controller::DeviceCommissioner * devCtrl,
+    chip::Controller::DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback);
+
 // BLE
 ChipError::StorageType pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::DeviceCommissioner * devCtrl);
 
@@ -277,7 +281,7 @@ const char * pychip_DeviceController_ErrorToString(ChipError::StorageType err)
 const char * pychip_DeviceController_StatusReportToString(uint32_t profileId, uint16_t statusCode)
 {
     // return chip::StatusReportStr(profileId, statusCode);
-    return NULL;
+    return nullptr;
 }
 
 uint8_t pychip_DeviceController_GetLogFilter()
@@ -523,6 +527,14 @@ ChipError::StorageType pychip_ScriptDevicePairingDelegate_SetCommissioningComple
     return CHIP_NO_ERROR.AsInteger();
 }
 
+ChipError::StorageType pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback(
+    chip::Controller::DeviceCommissioner * devCtrl,
+    chip::Controller::DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback)
+{
+    sPairingDelegate.SetCommissioningStatusUpdateCallback(callback);
+    return CHIP_NO_ERROR.AsInteger();
+}
+
 ChipError::StorageType pychip_DeviceController_UpdateDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
     return devCtrl->UpdateDevice(nodeid).AsInteger();
@@ -568,7 +580,7 @@ const char * pychip_Stack_ErrorToString(ChipError::StorageType err)
 const char * pychip_Stack_StatusReportToString(uint32_t profileId, uint16_t statusCode)
 {
     // return chip::StatusReportStr(profileId, statusCode);
-    return NULL;
+    return nullptr;
 }
 
 namespace {

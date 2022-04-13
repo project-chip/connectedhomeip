@@ -4305,6 +4305,9 @@ private:
 | Attributes:                                                         |        |
 | * Acl                                                               | 0x0000 |
 | * Extension                                                         | 0x0001 |
+| * SubjectsPerAccessControlEntry                                     | 0x0002 |
+| * TargetsPerAccessControlEntry                                      | 0x0003 |
+| * AccessControlEntriesPerFabric                                     | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -5017,6 +5020,7 @@ private:
 | * LocalConfigDisabled                                               | 0x0010 |
 | * Reachable                                                         | 0x0011 |
 | * UniqueID                                                          | 0x0012 |
+| * CapabilityMinima                                                  | 0x0013 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -9893,7 +9897,7 @@ private:
 | * AcType                                                            | 0x0040 |
 | * AcCapacity                                                        | 0x0041 |
 | * AcRefrigerantType                                                 | 0x0042 |
-| * AcCompressor                                                      | 0x0043 |
+| * AcCompressorType                                                  | 0x0043 |
 | * AcErrorCode                                                       | 0x0044 |
 | * AcLouverPosition                                                  | 0x0045 |
 | * AcCoilTemperature                                                 | 0x0046 |
@@ -10602,17 +10606,18 @@ private:
     uint8_t mValue;
 };
 
-class WriteThermostatAcCompressor : public WriteAttribute
+class WriteThermostatAcCompressorType : public WriteAttribute
 {
 public:
-    WriteThermostatAcCompressor(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("AcCompressor", credsIssuerConfig)
+    WriteThermostatAcCompressorType(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("AcCompressorType", credsIssuerConfig)
     {
-        AddArgument("attr-name", "ac-compressor");
+        AddArgument("attr-name", "ac-compressor-type");
         AddArgument("attr-value", 0, UINT8_MAX, &mValue);
         WriteAttribute::AddArguments();
     }
 
-    ~WriteThermostatAcCompressor() {}
+    ~WriteThermostatAcCompressorType() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
@@ -20075,20 +20080,32 @@ void registerClusterAccessControl(Commands & commands, CredentialIssuerCommands 
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                      //
-        make_unique<ReadAttribute>(Id, "acl", Attributes::Acl::Id, credsIssuerConfig),                                          //
-        make_unique<ReadAttribute>(Id, "extension", Attributes::Extension::Id, credsIssuerConfig),                              //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),        //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                     //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                           //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                 //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                     //
-        make_unique<WriteAccessControlAcl>(credsIssuerConfig),                                                                  //
-        make_unique<WriteAccessControlExtension>(credsIssuerConfig),                                                            //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "acl", Attributes::Acl::Id, credsIssuerConfig),                                     //
-        make_unique<SubscribeAttribute>(Id, "extension", Attributes::Extension::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                         //
+        make_unique<ReadAttribute>(Id, "acl", Attributes::Acl::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "extension", Attributes::Extension::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "subjects-per-access-control-entry", Attributes::SubjectsPerAccessControlEntry::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "targets-per-access-control-entry", Attributes::TargetsPerAccessControlEntry::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "access-control-entries-per-fabric", Attributes::AccessControlEntriesPerFabric::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<WriteAccessControlAcl>(credsIssuerConfig),                                                             //
+        make_unique<WriteAccessControlExtension>(credsIssuerConfig),                                                       //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                            //
+        make_unique<SubscribeAttribute>(Id, "acl", Attributes::Acl::Id, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, "extension", Attributes::Extension::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "subjects-per-access-control-entry", Attributes::SubjectsPerAccessControlEntry::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "targets-per-access-control-entry", Attributes::TargetsPerAccessControlEntry::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "access-control-entries-per-fabric", Attributes::AccessControlEntriesPerFabric::Id,
+                                        credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -20259,6 +20276,7 @@ void registerClusterBasic(Commands & commands, CredentialIssuerCommands * credsI
         make_unique<ReadAttribute>(Id, "local-config-disabled", Attributes::LocalConfigDisabled::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                                //
         make_unique<ReadAttribute>(Id, "unique-id", Attributes::UniqueID::Id, credsIssuerConfig),                                 //
+        make_unique<ReadAttribute>(Id, "capability-minima", Attributes::CapabilityMinima::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                       //
@@ -20288,6 +20306,7 @@ void registerClusterBasic(Commands & commands, CredentialIssuerCommands * credsI
         make_unique<SubscribeAttribute>(Id, "local-config-disabled", Attributes::LocalConfigDisabled::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                           //
         make_unique<SubscribeAttribute>(Id, "unique-id", Attributes::UniqueID::Id, credsIssuerConfig),                            //
+        make_unique<SubscribeAttribute>(Id, "capability-minima", Attributes::CapabilityMinima::Id, credsIssuerConfig),            //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
@@ -22508,7 +22527,7 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "ac-type", Attributes::AcType::Id, credsIssuerConfig),                              //
         make_unique<ReadAttribute>(Id, "ac-capacity", Attributes::AcCapacity::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "ac-refrigerant-type", Attributes::AcRefrigerantType::Id, credsIssuerConfig),       //
-        make_unique<ReadAttribute>(Id, "ac-compressor", Attributes::AcCompressor::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "ac-compressor-type", Attributes::AcCompressorType::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "ac-error-code", Attributes::AcErrorCode::Id, credsIssuerConfig),                   //
         make_unique<ReadAttribute>(Id, "ac-louver-position", Attributes::AcLouverPosition::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "ac-coil-temperature", Attributes::AcCoilTemperature::Id, credsIssuerConfig),       //
@@ -22539,7 +22558,7 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteThermostatAcType>(credsIssuerConfig),                                                             //
         make_unique<WriteThermostatAcCapacity>(credsIssuerConfig),                                                         //
         make_unique<WriteThermostatAcRefrigerantType>(credsIssuerConfig),                                                  //
-        make_unique<WriteThermostatAcCompressor>(credsIssuerConfig),                                                       //
+        make_unique<WriteThermostatAcCompressorType>(credsIssuerConfig),                                                   //
         make_unique<WriteThermostatAcErrorCode>(credsIssuerConfig),                                                        //
         make_unique<WriteThermostatAcLouverPosition>(credsIssuerConfig),                                                   //
         make_unique<WriteThermostatAcCapacityFormat>(credsIssuerConfig),                                                   //
@@ -22600,7 +22619,7 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "ac-type", Attributes::AcType::Id, credsIssuerConfig),                              //
         make_unique<SubscribeAttribute>(Id, "ac-capacity", Attributes::AcCapacity::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "ac-refrigerant-type", Attributes::AcRefrigerantType::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "ac-compressor", Attributes::AcCompressor::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "ac-compressor-type", Attributes::AcCompressorType::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "ac-error-code", Attributes::AcErrorCode::Id, credsIssuerConfig),                   //
         make_unique<SubscribeAttribute>(Id, "ac-louver-position", Attributes::AcLouverPosition::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "ac-coil-temperature", Attributes::AcCoilTemperature::Id, credsIssuerConfig),       //

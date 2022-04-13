@@ -48,6 +48,7 @@ IGNORE: Set[str] = {
     '/platform/nxp/',
     '/platform/Tizen/',
     '/platform/P6/',
+    '/platform/bouffalolab/BL602',
     r'POSIX\.h$',
 }
 

@@ -73,6 +73,63 @@ NS_ASSUME_NONNULL_BEGIN
                                            queue:(dispatch_queue_t)queue
                                completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (void)readAttributeSubjectsPerAccessControlEntryWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                            NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeSubjectsPerAccessControlEntryWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                params:(CHIPSubscribeParams * _Nullable)params
+                                               subscriptionEstablished:
+                                                   (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                         reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                           NSError * _Nullable error))reportHandler;
++ (void)readAttributeSubjectsPerAccessControlEntryWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                            endpoint:(NSNumber *)endpoint
+                                                               queue:(dispatch_queue_t)queue
+                                                   completionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeTargetsPerAccessControlEntryWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                           NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeTargetsPerAccessControlEntryWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                               params:(CHIPSubscribeParams * _Nullable)params
+                                              subscriptionEstablished:
+                                                  (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                        reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                          NSError * _Nullable error))reportHandler;
++ (void)readAttributeTargetsPerAccessControlEntryWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                           endpoint:(NSNumber *)endpoint
+                                                              queue:(dispatch_queue_t)queue
+                                                  completionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                        NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeAccessControlEntriesPerFabricWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                            NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeAccessControlEntriesPerFabricWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                params:(CHIPSubscribeParams * _Nullable)params
+                                               subscriptionEstablished:
+                                                   (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                         reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                           NSError * _Nullable error))reportHandler;
++ (void)readAttributeAccessControlEntriesPerFabricWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                            endpoint:(NSNumber *)endpoint
+                                                               queue:(dispatch_queue_t)queue
+                                                   completionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
 /**
@@ -1347,6 +1404,24 @@ NS_ASSUME_NONNULL_BEGIN
                                        endpoint:(NSNumber *)endpoint
                                           queue:(dispatch_queue_t)queue
                               completionHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeCapabilityMinimaWithCompletionHandler:(void (^)(CHIPBasicClusterCapabilityMinimaStruct * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeCapabilityMinimaWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
+                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                            reportHandler:(void (^)(CHIPBasicClusterCapabilityMinimaStruct * _Nullable value,
+                                                              NSError * _Nullable error))reportHandler;
++ (void)readAttributeCapabilityMinimaWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                               endpoint:(NSNumber *)endpoint
+                                                  queue:(dispatch_queue_t)queue
+                                      completionHandler:(void (^)(CHIPBasicClusterCapabilityMinimaStruct * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
@@ -3795,6 +3870,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)clearCredentialWithParams:(CHIPDoorLockClusterClearCredentialParams *)params
                 completionHandler:(StatusCompletion)completionHandler;
+- (void)clearHolidayScheduleWithParams:(CHIPDoorLockClusterClearHolidayScheduleParams *)params
+                     completionHandler:(StatusCompletion)completionHandler;
 - (void)clearUserWithParams:(CHIPDoorLockClusterClearUserParams *)params completionHandler:(StatusCompletion)completionHandler;
 - (void)clearWeekDayScheduleWithParams:(CHIPDoorLockClusterClearWeekDayScheduleParams *)params
                      completionHandler:(StatusCompletion)completionHandler;
@@ -3803,6 +3880,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)getCredentialStatusWithParams:(CHIPDoorLockClusterGetCredentialStatusParams *)params
                     completionHandler:(void (^)(CHIPDoorLockClusterGetCredentialStatusResponseParams * _Nullable data,
                                           NSError * _Nullable error))completionHandler;
+- (void)getHolidayScheduleWithParams:(CHIPDoorLockClusterGetHolidayScheduleParams *)params
+                   completionHandler:(void (^)(CHIPDoorLockClusterGetHolidayScheduleResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completionHandler;
 - (void)getUserWithParams:(CHIPDoorLockClusterGetUserParams *)params
         completionHandler:
             (void (^)(CHIPDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
@@ -3817,6 +3897,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setCredentialWithParams:(CHIPDoorLockClusterSetCredentialParams *)params
               completionHandler:(void (^)(CHIPDoorLockClusterSetCredentialResponseParams * _Nullable data,
                                     NSError * _Nullable error))completionHandler;
+- (void)setHolidayScheduleWithParams:(CHIPDoorLockClusterSetHolidayScheduleParams *)params
+                   completionHandler:(StatusCompletion)completionHandler;
 - (void)setUserWithParams:(CHIPDoorLockClusterSetUserParams *)params completionHandler:(StatusCompletion)completionHandler;
 - (void)setWeekDayScheduleWithParams:(CHIPDoorLockClusterSetWeekDayScheduleParams *)params
                    completionHandler:(StatusCompletion)completionHandler;
@@ -7414,7 +7496,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reorderNetworkWithParams:(CHIPNetworkCommissioningClusterReorderNetworkParams *)params
                completionHandler:(void (^)(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                      NSError * _Nullable error))completionHandler;
-- (void)scanNetworksWithParams:(CHIPNetworkCommissioningClusterScanNetworksParams *)params
+- (void)scanNetworksWithParams:(CHIPNetworkCommissioningClusterScanNetworksParams * _Nullable)params
              completionHandler:(void (^)(CHIPNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler;
 
@@ -15268,6 +15350,14 @@ typedef NS_OPTIONS(uint32_t, CHIPNetworkCommissioningFeature) {
     CHIPNetworkCommissioningFeatureEthernetNetworkInterface = 0x4,
 };
 
+typedef NS_OPTIONS(uint8_t, CHIPNetworkCommissioningWiFiSecurity) {
+    CHIPNetworkCommissioningWiFiSecurityUnencrypted = 0x1,
+    CHIPNetworkCommissioningWiFiSecurityWepPersonal = 0x2,
+    CHIPNetworkCommissioningWiFiSecurityWpaPersonal = 0x4,
+    CHIPNetworkCommissioningWiFiSecurityWpa2Personal = 0x8,
+    CHIPNetworkCommissioningWiFiSecurityWpa3Personal = 0x10,
+};
+
 typedef NS_ENUM(uint8_t, CHIPDiagnosticLogsLogsIntent) {
     CHIPDiagnosticLogsLogsIntentEndUserSupport = 0x00,
     CHIPDiagnosticLogsLogsIntentNetworkDiag = 0x01,
@@ -15778,6 +15868,48 @@ typedef NS_OPTIONS(uint32_t, CHIPDoorLockFeature) {
     CHIPDoorLockFeatureNotifications = 0x200,
 };
 
+typedef NS_ENUM(uint8_t, CHIPWindowCoveringEndProductType) {
+    CHIPWindowCoveringEndProductTypeRollerShade = 0x00,
+    CHIPWindowCoveringEndProductTypeRomanShade = 0x01,
+    CHIPWindowCoveringEndProductTypeBalloonShade = 0x02,
+    CHIPWindowCoveringEndProductTypeWovenWood = 0x03,
+    CHIPWindowCoveringEndProductTypePleatedShade = 0x04,
+    CHIPWindowCoveringEndProductTypeCellularShade = 0x05,
+    CHIPWindowCoveringEndProductTypeLayeredShade = 0x06,
+    CHIPWindowCoveringEndProductTypeLayeredShade2D = 0x07,
+    CHIPWindowCoveringEndProductTypeSheerShade = 0x08,
+    CHIPWindowCoveringEndProductTypeTiltOnlyInteriorBlind = 0x09,
+    CHIPWindowCoveringEndProductTypeInteriorBlind = 0x0A,
+    CHIPWindowCoveringEndProductTypeVerticalBlindStripCurtain = 0x0B,
+    CHIPWindowCoveringEndProductTypeInteriorVenetianBlind = 0x0C,
+    CHIPWindowCoveringEndProductTypeExteriorVenetianBlind = 0x0D,
+    CHIPWindowCoveringEndProductTypeLateralLeftCurtain = 0x0E,
+    CHIPWindowCoveringEndProductTypeLateralRightCurtain = 0x0F,
+    CHIPWindowCoveringEndProductTypeCentralCurtain = 0x10,
+    CHIPWindowCoveringEndProductTypeRollerShutter = 0x11,
+    CHIPWindowCoveringEndProductTypeExteriorVerticalScreen = 0x12,
+    CHIPWindowCoveringEndProductTypeAwningTerracePatio = 0x13,
+    CHIPWindowCoveringEndProductTypeAwningVerticalScreen = 0x14,
+    CHIPWindowCoveringEndProductTypeTiltOnlyPergola = 0x15,
+    CHIPWindowCoveringEndProductTypeSwingingShutter = 0x16,
+    CHIPWindowCoveringEndProductTypeSlidingShutter = 0x17,
+    CHIPWindowCoveringEndProductTypeUnknown = 0xFF,
+};
+
+typedef NS_ENUM(uint8_t, CHIPWindowCoveringType) {
+    CHIPWindowCoveringTypeRollerShade = 0x00,
+    CHIPWindowCoveringTypeRollerShade2Motor = 0x01,
+    CHIPWindowCoveringTypeRollerShadeExterior = 0x02,
+    CHIPWindowCoveringTypeRollerShadeExterior2Motor = 0x03,
+    CHIPWindowCoveringTypeDrapery = 0x04,
+    CHIPWindowCoveringTypeAwning = 0x05,
+    CHIPWindowCoveringTypeShutter = 0x06,
+    CHIPWindowCoveringTypeTiltBlindTiltOnly = 0x07,
+    CHIPWindowCoveringTypeTiltBlindLiftAndTilt = 0x08,
+    CHIPWindowCoveringTypeProjectorScreen = 0x09,
+    CHIPWindowCoveringTypeUnknown = 0xFF,
+};
+
 typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringWcConfigStatus) {
     CHIPWindowCoveringWcConfigStatusOperational = 0x1,
     CHIPWindowCoveringWcConfigStatusOnline = 0x2,
@@ -15800,7 +15932,7 @@ typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringWcMode) {
     CHIPWindowCoveringWcModeMotorDirectionReversed = 0x1,
     CHIPWindowCoveringWcModeCalibrationMode = 0x2,
     CHIPWindowCoveringWcModeMaintenanceMode = 0x4,
-    CHIPWindowCoveringWcModeLEDFeedback = 0x8,
+    CHIPWindowCoveringWcModeLedFeedback = 0x8,
 };
 
 typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringWcOperationalStatus) {
@@ -15960,6 +16092,14 @@ typedef NS_OPTIONS(uint16_t, CHIPColorControlColorCapabilities) {
     CHIPColorControlColorCapabilitiesColorLoopSupported = 0x4,
     CHIPColorControlColorCapabilitiesXYAttributesSupported = 0x8,
     CHIPColorControlColorCapabilitiesColorTemperatureSupported = 0x10,
+};
+
+typedef NS_OPTIONS(uint32_t, CHIPColorControlFeature) {
+    CHIPColorControlFeatureHueAndSaturation = 0x1,
+    CHIPColorControlFeatureEnhancedHue = 0x2,
+    CHIPColorControlFeatureColorLoop = 0x4,
+    CHIPColorControlFeatureXY = 0x8,
+    CHIPColorControlFeatureColorTemperature = 0x10,
 };
 
 typedef NS_OPTIONS(uint8_t, CHIPColorControlColorLoopUpdateFlags) {

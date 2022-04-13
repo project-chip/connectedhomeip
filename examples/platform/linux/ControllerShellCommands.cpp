@@ -202,8 +202,6 @@ static CHIP_ERROR PrintAllCommands()
 
 static CHIP_ERROR ControllerHandler(int argc, char ** argv)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
     if (argc == 0 || strcmp(argv[0], "help") == 0)
     {
         return PrintAllCommands();
@@ -211,25 +209,25 @@ static CHIP_ERROR ControllerHandler(int argc, char ** argv)
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     else if (strcmp(argv[0], "udc-reset") == 0)
     {
-        return error = ResetUDC(true);
+        return ResetUDC(true);
     }
     else if (strcmp(argv[0], "udc-print") == 0)
     {
-        return error = PrintUDC(true);
+        return PrintUDC(true);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     else if (strcmp(argv[0], "discover-commissionable") == 0)
     {
-        return error = discover(true);
+        return discover(true);
     }
     else if (strcmp(argv[0], "discover-commissionable-instance") == 0)
     {
-        return error = discover(true, argv[1]);
+        return discover(true, argv[1]);
     }
     else if (strcmp(argv[0], "discover-display") == 0)
     {
-        return error = display(true);
+        return display(true);
     }
     else if (strcmp(argv[0], "commission-onnetwork") == 0)
     {
@@ -247,7 +245,7 @@ static CHIP_ERROR ControllerHandler(int argc, char ** argv)
 
         uint16_t port = (uint16_t) strtol(argv[4], &eptr, 10);
 
-        return error = pairOnNetwork(true, pincode, disc, Transport::PeerAddress::UDP(address, port));
+        return pairOnNetwork(true, pincode, disc, Transport::PeerAddress::UDP(address, port));
     }
     else if (strcmp(argv[0], "ux") == 0)
     {
@@ -289,14 +287,11 @@ static CHIP_ERROR ControllerHandler(int argc, char ** argv)
         char * eptr;
         uint32_t pincode = (uint32_t) strtol(argv[1], &eptr, 10);
         size_t index     = (size_t) strtol(argv[2], &eptr, 10);
-        return error     = pairUDC(true, pincode, index);
+        return pairUDC(true, pincode, index);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    else
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    return error;
+
+    return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
 void RegisterControllerCommands()

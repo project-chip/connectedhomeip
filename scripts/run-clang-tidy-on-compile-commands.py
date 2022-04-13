@@ -189,6 +189,7 @@ class ClangTidyRunner:
         self.fixes_file = None
         self.fixes_temporary_file_dir = None
         self.gcc_sysroot = None
+        self.file_names_to_check = set()
 
         if sys.platform == 'darwin':
             # Darwin gcc invocation will auto select a system root, however clang requires an explicit path since
@@ -206,6 +207,11 @@ class ClangTidyRunner:
             if not item.valid:
                 continue
 
+            if item.file in self.file_names_to_check:
+                logging.info('Ignoring additional request for checking %s', item.file)
+                continue
+
+            self.file_names_to_check.add(item.file)
             self.entries.append(item)
 
     def Cleanup(self):
@@ -389,6 +395,7 @@ def main(
         if not compile_database:
             raise Exception("Could not find `compile_commands.json` in ./out")
         logging.info("Will use %s for compile", compile_database)
+        compile_database = [compile_database]
 
     context.obj = runner = ClangTidyRunner()
 

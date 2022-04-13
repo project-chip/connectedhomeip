@@ -23,7 +23,6 @@
 #include <lib/dnssd/Advertiser.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
-#include <protocols/secure_channel/SessionIDAllocator.h>
 #include <system/SystemClock.h>
 
 namespace chip {
@@ -64,8 +63,6 @@ public:
     }
 
     void SetAppDelegate(AppDelegate * delegate) { mAppDelegate = delegate; }
-
-    void SetSessionIDAllocator(SessionIDAllocator * idAllocator) { mIDAllocator = idAllocator; }
 
     /**
      * Open the pairing window using default configured parameters.
@@ -118,6 +115,11 @@ private:
     // called when a commissioning window timeout timer is running.
     CHIP_ERROR AdvertiseAndListenForPASE();
 
+    // Call AdvertiseAndListenForPASE, only if max attempts have not been reached.
+    // Cleans up and calls app server delegate on failure.
+    // err gives the current error we're attemping to recover from
+    void HandleFailedAttempt(CHIP_ERROR err);
+
     // Helper for Shutdown and Cleanup.  Does not do anything with
     // advertisements, because Shutdown and Cleanup want to handle those
     // differently.
@@ -146,7 +148,6 @@ private:
 
     bool mIsBLE = true;
 
-    SessionIDAllocator * mIDAllocator = nullptr;
     PASESession mPairingSession;
 
     uint8_t mFailedCommissioningAttempts = 0;

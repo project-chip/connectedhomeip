@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@
 
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
@@ -1736,7 +1737,7 @@ CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & referenceCertificate, c
     ASN1_TIME * refNotBeforeTime                    = nullptr;
     ASN1_TIME * tbeNotBeforeTime                    = nullptr;
     ASN1_TIME * tbeNotAfterTime                     = nullptr;
-    // int result                                      = 0;
+    int result                                      = 0;
 
     VerifyOrReturnError(!referenceCertificate.empty() && !toBeEvaluatedCertificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1752,14 +1753,13 @@ CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & referenceCertificate, c
     tbeNotAfterTime  = X509_get_notAfter(x509toBeEvaluatedCertificate);
     VerifyOrExit(refNotBeforeTime && tbeNotBeforeTime && tbeNotAfterTime, error = CHIP_ERROR_INTERNAL);
 
-    // TODO: Handle PAA/PAI re-issue and enable below time validations
-    // result = ASN1_TIME_compare(refNotBeforeTime, tbeNotBeforeTime);
+    result = ASN1_TIME_compare(refNotBeforeTime, tbeNotBeforeTime);
     // check if referenceCertificate is issued at or after tbeCertificate's notBefore timestamp
-    // VerifyOrExit(result >= 0, error = CHIP_ERROR_CERT_EXPIRED);
+    VerifyOrExit(result >= 0, error = CHIP_ERROR_CERT_EXPIRED);
 
-    // result = ASN1_TIME_compare(refNotBeforeTime, tbeNotAfterTime);
+    result = ASN1_TIME_compare(refNotBeforeTime, tbeNotAfterTime);
     // check if referenceCertificate is issued at or before tbeCertificate's notAfter timestamp
-    // VerifyOrExit(result <= 0, error = CHIP_ERROR_CERT_EXPIRED);
+    VerifyOrExit(result <= 0, error = CHIP_ERROR_CERT_EXPIRED);
 
 exit:
     X509_free(x509ReferenceCertificate);
@@ -1872,20 +1872,18 @@ CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
     return ExtractKIDFromX509Cert(false, certificate, akid);
 }
 
-namespace {
-
-CHIP_ERROR ExtractDNAttributeFromX509Cert(const char * oidString, const ByteSpan & certificate, uint16_t & id)
+CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCertVidPid & vidpid)
 {
-    CHIP_ERROR err                            = CHIP_NO_ERROR;
-    X509 * x509certificate                    = nullptr;
-    const unsigned char * pCertificate        = certificate.data();
-    size_t oidStringSize                      = strlen(oidString) + 1;
-    constexpr size_t sOidStringSize           = 22;
-    char dnAttributeOidString[sOidStringSize] = { 0 };
-    X509_NAME * subject                       = nullptr;
-    int x509EntryCountIdx                     = 0;
+    ASN1_OBJECT * commonNameObj = OBJ_txt2obj("2.5.4.3", 1);
+    ASN1_OBJECT * matterVidObj  = OBJ_txt2obj("1.3.6.1.4.1.37244.2.1", 1); // Matter VID OID - taken from Spec
+    ASN1_OBJECT * matterPidObj  = OBJ_txt2obj("1.3.6.1.4.1.37244.2.2", 1); // Matter PID OID - taken from Spec
 
-    VerifyOrReturnError(oidStringSize == sOidStringSize, CHIP_ERROR_INVALID_ARGUMENT);
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    X509 * x509certificate             = nullptr;
+    const unsigned char * pCertificate = certificate.data();
+    X509_NAME * subject                = nullptr;
+    int x509EntryCountIdx              = 0;
+    AttestationCertVidPid vidpidFromCN;
 
     x509certificate = d2i_X509(nullptr, &pCertificate, static_cast<long>(certificate.size()));
     VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
@@ -1899,47 +1897,46 @@ CHIP_ERROR ExtractDNAttributeFromX509Cert(const char * oidString, const ByteSpan
         VerifyOrExit(name_entry != nullptr, err = CHIP_ERROR_INTERNAL);
         ASN1_OBJECT * object = X509_NAME_ENTRY_get_object(name_entry);
         VerifyOrExit(object != nullptr, err = CHIP_ERROR_INTERNAL);
-        VerifyOrExit(OBJ_obj2txt(dnAttributeOidString, sizeof(dnAttributeOidString), object, 0) != 0, err = CHIP_ERROR_INTERNAL);
 
-        if (strncmp(oidString, dnAttributeOidString, sizeof(dnAttributeOidString)) == 0)
+        DNAttrType attrType = DNAttrType::kUnspecified;
+        if (OBJ_cmp(object, commonNameObj) == 0)
+        {
+            attrType = DNAttrType::kCommonName;
+        }
+        else if (OBJ_cmp(object, matterVidObj) == 0)
+        {
+            attrType = DNAttrType::kMatterVID;
+        }
+        else if (OBJ_cmp(object, matterPidObj) == 0)
+        {
+            attrType = DNAttrType::kMatterPID;
+        }
+
+        if (attrType != DNAttrType::kUnspecified)
         {
             ASN1_STRING * data_entry = X509_NAME_ENTRY_get_data(name_entry);
             VerifyOrExit(data_entry != nullptr, err = CHIP_ERROR_INTERNAL);
             unsigned char * str = ASN1_STRING_data(data_entry);
             VerifyOrExit(str != nullptr, err = CHIP_ERROR_INTERNAL);
+            int len = ASN1_STRING_length(data_entry);
+            VerifyOrExit(CanCastTo<size_t>(len), err = CHIP_ERROR_INTERNAL);
 
-            VerifyOrExit(ArgParser::ParseInt(reinterpret_cast<const char *>(str), id, 16), err = CHIP_ERROR_INTERNAL);
-            break;
+            err = ExtractVIDPIDFromAttributeString(attrType, ByteSpan(str, static_cast<size_t>(len)), vidpid, vidpidFromCN);
+            SuccessOrExit(err);
         }
     }
 
-    // returning CHIP_ERROR_KEY_NOT_FOUND to indicate VID is not present in the certificate.
-    VerifyOrExit(x509EntryCountIdx < X509_NAME_entry_count(subject), err = CHIP_ERROR_KEY_NOT_FOUND);
+    // If Matter Attributes were not found use values extracted from the CN Attribute,
+    // which might be uninitialized as well.
+    if (!vidpid.Initialized())
+    {
+        vidpid = vidpidFromCN;
+    }
 
 exit:
     X509_free(x509certificate);
 
     return err;
-}
-
-} // namespace
-
-CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & certificate, uint16_t & id)
-{
-    constexpr char vidOidString[] = "1.3.6.1.4.1.37244.2.1"; // Matter VID OID - taken from Spec
-    constexpr char pidOidString[] = "1.3.6.1.4.1.37244.2.2"; // Matter PID OID - taken from Spec
-
-    switch (matterOid)
-    {
-    case MatterOid::kVendorId:
-        id = VendorId::NotSpecified;
-        return ExtractDNAttributeFromX509Cert(vidOidString, certificate, id);
-    case MatterOid::kProductId:
-        id = 0; // PID not specified value
-        return ExtractDNAttributeFromX509Cert(pidOidString, certificate, id);
-    default:
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
 }
 
 } // namespace Crypto

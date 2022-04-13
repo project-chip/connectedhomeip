@@ -35,6 +35,8 @@
 //
 //
 
+// NOTE: currently, level server cluster is not declared on endpoint 1
+
 // Enclosing macro to prevent multiple inclusion
 #ifndef __AF_GEN_EVENT__
 #define __AF_GEN_EVENT__

@@ -61,9 +61,9 @@ __attribute__((used)) ApplicationProperties_t sl_app_properties = {
 };
 
 // Global OTA objects
-chip::OTARequestor gRequestorCore;
+chip::DefaultOTARequestor gRequestorCore;
 chip::DefaultOTARequestorStorage gRequestorStorage;
-chip::DeviceLayer::GenericOTARequestorDriver gRequestorUser;
+chip::DeviceLayer::DefaultOTARequestorDriver gRequestorUser;
 chip::BDXDownloader gDownloader;
 chip::OTAImageProcessorImpl gImageProcessor;
 

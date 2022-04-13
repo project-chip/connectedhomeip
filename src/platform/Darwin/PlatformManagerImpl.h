@@ -64,10 +64,6 @@ private:
     CHIP_ERROR _StartEventLoopTask();
     CHIP_ERROR _StopEventLoopTask();
 
-    CHIP_ERROR _GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales);
-    CHIP_ERROR _GetSupportedCalendarTypes(
-        AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes);
-
     void _RunEventLoop();
     void _LockChipStack(){};
     bool _TryLockChipStack() { return false; };

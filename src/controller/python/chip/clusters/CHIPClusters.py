@@ -49,6 +49,24 @@ class ChipClusters:
                     "reportable": True,
                     "writable": True,
                 },
+                0x00000002: {
+                    "attributeName": "SubjectsPerAccessControlEntry",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000003: {
+                    "attributeName": "TargetsPerAccessControlEntry",
+                    "attributeId": 0x00000003,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000004: {
+                    "attributeName": "AccessControlEntriesPerFabric",
+                    "attributeId": 0x00000004,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFF8: {
                     "attributeName": "GeneratedCommandList",
                     "attributeId": 0x0000FFF8,
@@ -601,6 +619,12 @@ class ChipClusters:
                     "attributeName": "UniqueID",
                     "attributeId": 0x00000012,
                     "type": "str",
+                    "reportable": True,
+                },
+                0x00000013: {
+                    "attributeName": "CapabilityMinima",
+                    "attributeId": 0x00000013,
+                    "type": "",
                     "reportable": True,
                 },
                 0x0000FFF8: {
@@ -1837,6 +1861,13 @@ class ChipClusters:
                         "credentialIndex": "int",
                     },
                 },
+            0x00000013: {
+                    "commandId": 0x00000013,
+                    "commandName": "ClearHolidaySchedule",
+                    "args": {
+                        "holidayIndex": "int",
+                    },
+                },
             0x0000001D: {
                     "commandId": 0x0000001D,
                     "commandName": "ClearUser",
@@ -1866,6 +1897,13 @@ class ChipClusters:
                     "args": {
                         "credentialType": "int",
                         "credentialIndex": "int",
+                    },
+                },
+            0x00000012: {
+                    "commandId": 0x00000012,
+                    "commandName": "GetHolidaySchedule",
+                    "args": {
+                        "holidayIndex": "int",
                     },
                 },
             0x0000001B: {
@@ -1909,6 +1947,16 @@ class ChipClusters:
                         "userIndex": "int",
                         "userStatus": "int",
                         "userType": "int",
+                    },
+                },
+            0x00000011: {
+                    "commandId": 0x00000011,
+                    "commandName": "SetHolidaySchedule",
+                    "args": {
+                        "holidayIndex": "int",
+                        "localStartTime": "int",
+                        "localEndTime": "int",
+                        "operatingMode": "int",
                     },
                 },
             0x0000001A: {
