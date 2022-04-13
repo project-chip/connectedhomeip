@@ -237,7 +237,8 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
 #else
             if (result != CHIP_NO_ERROR)
             {
-                ChipLogProgress(DataManagement, "AccessControl: %s (delegate)", (result == CHIP_ERROR_ACCESS_DENIED) ? "denied" : "error");
+                ChipLogProgress(DataManagement, "AccessControl: %s (delegate)",
+                                (result == CHIP_ERROR_ACCESS_DENIED) ? "denied" : "error");
             }
 #endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
             return result;
@@ -357,7 +358,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
 
 #if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
         ChipLogProgress(DataManagement, "AccessControl: allowed");
-#endif //CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
+#endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
 
         return CHIP_NO_ERROR;
     }
@@ -388,7 +389,7 @@ bool AccessControl::IsValid(const Entry & entry)
     ChipLogProgress(DataManagement, "AccessControl: validating f=%u p=%c a=%c s=%d t=%d", fabricIndex,
                     GetPrivilegeStringForLogging(privilege), GetAuthModeStringForLogging(authMode), static_cast<int>(subjectCount),
                     static_cast<int>(targetCount));
-#endif //CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
+#endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
     // Fabric index must be defined.
     VerifyOrExit(fabricIndex != kUndefinedFabricIndex, log = "invalid fabric index");
@@ -410,7 +411,7 @@ bool AccessControl::IsValid(const Entry & entry)
         const bool kIsGroup = authMode == AuthMode::kGroup;
 #if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
         ChipLogProgress(DataManagement, "  validating subject 0x" ChipLogFormatX64, ChipLogValueX64(subject));
-#endif //CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
+#endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
         VerifyOrExit((kIsCase && IsValidCaseNodeId(subject)) || (kIsGroup && IsValidGroupNodeId(subject)), log = "invalid subject");
     }
 
