@@ -39,6 +39,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DeviceInfoProvider.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
@@ -97,6 +98,7 @@ static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BU
 CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 {
     CASESessionManagerConfig caseSessionManagerConfig;
+    DeviceLayer::DeviceInfoProvider * deviceInfoprovider = nullptr;
 
     mOperationalServicePort        = initParams.operationalServicePort;
     mUserDirectedCommissioningPort = initParams.userDirectedCommissioningPort;
@@ -115,7 +117,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mCommissioningWindowManager.SetAppDelegate(initParams.appDelegate);
 
     // Initialize PersistentStorageDelegate-based storage
-    mDeviceStorage = initParams.persistentStorageDelegate;
+    mDeviceStorage            = initParams.persistentStorageDelegate;
+    mSessionResumptionStorage = initParams.sessionResumptionStorage;
 
     // Set up attribute persistence before we try to bring up the data model
     // handler.
@@ -132,6 +135,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     mGroupsProvider = initParams.groupDataProvider;
     SetGroupDataProvider(mGroupsProvider);
+
+    deviceInfoprovider = DeviceLayer::GetDeviceInfoProvider();
+    if (deviceInfoprovider)
+    {
+        deviceInfoprovider->SetStorageDelegate(mDeviceStorage);
+    }
 
     err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver);
     SuccessOrExit(err);
@@ -206,6 +215,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err);
 #endif
 
+    app::DnssdServer::Instance().SetSecuredPort(mOperationalServicePort);
+    app::DnssdServer::Instance().SetUnsecuredPort(mUserDirectedCommissioningPort);
+    app::DnssdServer::Instance().SetInterfaceId(mInterfaceId);
+
     if (GetFabricTable().FabricCount() != 0)
     {
         // The device is already commissioned, proactively disable BLE advertisement.
@@ -222,10 +235,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif
     }
 
-    app::DnssdServer::Instance().SetSecuredPort(mOperationalServicePort);
-    app::DnssdServer::Instance().SetUnsecuredPort(mUserDirectedCommissioningPort);
-    app::DnssdServer::Instance().SetInterfaceId(mInterfaceId);
-
     // TODO @bzbarsky-apple @cecille Move to examples
     // ESP32 and Mbed OS examples have a custom logic for enabling DNS-SD
 #if !CHIP_DEVICE_LAYER_TARGET_ESP32 && !CHIP_DEVICE_LAYER_TARGET_MBED &&                                                           \
@@ -237,14 +246,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     caseSessionManagerConfig = {
         .sessionInitParams =  {
             .sessionManager    = &mSessions,
+            .sessionResumptionStorage = mSessionResumptionStorage,
             .exchangeMgr       = &mExchangeMgr,
             .fabricTable       = &mFabrics,
             .clientPool        = &mCASEClientPool,
             .groupDataProvider = mGroupsProvider,
         },
-#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-        .dnsCache          = nullptr,
-#endif
         .devicePool        = &mDevicePool,
     };
 
@@ -255,7 +262,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #if CONFIG_NETWORK_LAYER_BLE
                                                     chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
 #endif
-                                                    &mSessions, &mFabrics, mGroupsProvider);
+                                                    &mSessions, &mFabrics, mSessionResumptionStorage, mGroupsProvider);
     SuccessOrExit(err);
 
     // This code is necessary to restart listening to existing groups after a reboot

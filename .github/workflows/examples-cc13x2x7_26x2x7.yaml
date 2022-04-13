@@ -29,13 +29,12 @@ jobs:
 
         env:
             BUILD_TYPE: gn_cc26x2x7
-            TI_SYSCONFIG_ROOT: /opt/ti/sysconfig_1.11.0
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:latest
+            image: connectedhomeip/chip-build-ti:0.5.61
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -44,21 +43,16 @@ jobs:
               with:
                   action: actions/checkout@v3
                   with: |
-                      submodules: true
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform cc13x2_26x2
             - name: Set up environment for size reports
               if: ${{ !env.ACT }}
               env:
                   GH_CONTEXT: ${{ toJson(github) }}
               run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
-            - name: Install SysConfig
-              timeout-minutes: 30
-              run: |
-                  wget https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.11.0_2225-setup.run
-                  chmod +x sysconfig-1.11.0_2225-setup.run
-                  ./sysconfig-1.11.0_2225-setup.run --mode unattended
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh

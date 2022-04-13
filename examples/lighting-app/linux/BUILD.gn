@@ -57,6 +57,7 @@ executable("chip-lighting-app") {
       "PW_RPC_DESCRIPTOR_SERVICE=1",
       "PW_RPC_DEVICE_SERVICE=1",
       "PW_RPC_LIGHTING_SERVICE=1",
+      "PW_RPC_TRACING_SERVICE=1",
     ]
 
     sources += [
@@ -73,6 +74,9 @@ executable("chip-lighting-app") {
       "$dir_pw_stream:socket_stream",
       "$dir_pw_stream:sys_io_stream",
       "$dir_pw_sync:mutex",
+      "$dir_pw_trace",
+      "$dir_pw_trace_tokenized",
+      "$dir_pw_trace_tokenized:trace_rpc_service",
       "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",

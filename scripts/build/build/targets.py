@@ -222,8 +222,8 @@ def HostTargets():
     targets = [target_native]
 
     # x64 linux  supports cross compile
-    if (HostBoard.NATIVE.PlatformName() == 'linux') and (
-            HostBoard.NATIVE.BoardName() != HostBoard.ARM64.BoardName()):
+    cross_compile = (HostBoard.NATIVE.PlatformName() == 'linux') and (HostBoard.NATIVE.BoardName() != HostBoard.ARM64.BoardName())
+    if cross_compile:
         targets.append(target.Extend('arm64', board=HostBoard.ARM64))
 
     app_targets = []
@@ -266,6 +266,7 @@ def HostTargets():
                           "clang"], use_libfuzzer=True),
     builder.AppendVariant(name="clang", use_clang=True),
 
+    builder.WhitelistVariantNameForGlob('no-interactive-ipv6only')
     builder.WhitelistVariantNameForGlob('ipv6only')
 
     for target in app_targets:
@@ -276,7 +277,12 @@ def HostTargets():
             builder.targets.append(target)
 
     for target in builder.AllVariants():
-        yield target
+        if cross_compile and 'chip-tool' in target.name and 'arm64' in target.name and '-no-interactive' not in target.name:
+            # Interactive builds will not compile by default on arm cross compiles
+            # because libreadline is not part of the default sysroot
+            yield target.GlobBlacklist('Arm crosscompile does not support libreadline-dev')
+        else:
+            yield target
 
     # Without extra build variants
     yield target_native.Extend('chip-cert', app=HostApp.CERT_TOOL)
@@ -376,10 +382,12 @@ def NrfTargets():
         target.Extend('nrf52840dk', board=NrfBoard.NRF52840DK),
     ]
 
-    # Enable nrf52840dongle for lighting app only
+    # Enable nrf52840dongle for all-clusters and lighting app only
+    yield target.Extend('nrf52840dongle-all-clusters', board=NrfBoard.NRF52840DONGLE, app=NrfApp.ALL_CLUSTERS)
     yield target.Extend('nrf52840dongle-light', board=NrfBoard.NRF52840DONGLE, app=NrfApp.LIGHT)
 
     for target in targets:
+        yield target.Extend('all-clusters', app=NrfApp.ALL_CLUSTERS)
         yield target.Extend('lock', app=NrfApp.LOCK)
         yield target.Extend('light', app=NrfApp.LIGHT)
         yield target.Extend('shell', app=NrfApp.SHELL)
@@ -460,15 +468,8 @@ def AmebaTargets():
 def K32WTargets():
     target = Target('k32w', K32WBuilder)
 
-    # This is for testing only  in case debug builds are to be fixed
-    # Error is LWIP_DEBUG being redefined between 0 and 1 in debug builds in:
-    #    third_party/connectedhomeip/src/lwip/k32w0/lwipopts.h
-    #    gen/include/lwip/lwip_buildconfig.h
-    yield target.Extend('light', app=K32WApp.LIGHT).GlobBlacklist("Debug builds broken due to LWIP_DEBUG redefition")
-
-    yield target.Extend('light-release', app=K32WApp.LIGHT, release=True)
-    yield target.Extend('light-tokenizer-release', app=K32WApp.LIGHT,
-                        tokenizer=True, release=True).GlobBlacklist("Only on demand build")
+    yield target.Extend('light-ota-se', app=K32WApp.LIGHT, release=True, disable_ble=True, se05x=True).GlobBlacklist("Only on demand build")
+    yield target.Extend('light-release-no-ota', app=K32WApp.LIGHT, tokenizer=True, disable_ota=True, release=True)
     yield target.Extend('shell-release', app=K32WApp.SHELL, release=True)
     yield target.Extend('lock-release', app=K32WApp.LOCK, release=True)
     yield target.Extend('lock-low-power-release', app=K32WApp.LOCK,

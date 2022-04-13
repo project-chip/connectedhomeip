@@ -542,12 +542,12 @@ typedef struct _TestListStructOctet
 // Struct for ThreadInterfaceScanResult
 typedef struct _ThreadInterfaceScanResult
 {
-    uint64_t PanId;
+    uint16_t PanId;
     uint64_t ExtendedPanId;
     chip::CharSpan NetworkName;
     uint16_t Channel;
     uint8_t Version;
-    uint64_t ExtendedAddress;
+    chip::ByteSpan ExtendedAddress;
     int8_t RSSI;
     uint8_t LQI;
 } ThreadInterfaceScanResult;

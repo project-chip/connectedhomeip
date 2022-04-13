@@ -245,7 +245,7 @@ protected:
         return CheckConstraintMaxValue(itemName, current.Value(), static_cast<T>(expected));
     }
 
-    template <typename T, typename U>
+    template <typename T, typename U, std::enable_if_t<!std::is_enum<T>::value, int> = 0>
     bool CheckConstraintNotValue(const char * itemName, T current, U expected)
     {
         if (current == expected)
@@ -255,6 +255,12 @@ protected:
         }
 
         return true;
+    }
+
+    template <typename T, typename U, std::enable_if_t<std::is_enum<T>::value, int> = 0>
+    bool CheckConstraintNotValue(const char * itemName, T current, U expected)
+    {
+        return CheckConstraintNotValue(itemName, chip::to_underlying(current), expected);
     }
 
     template <typename T>

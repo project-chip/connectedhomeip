@@ -149,10 +149,8 @@ private:
                 ChipLogError(BDX, "BDXDownloader instance is null, can't pass message");
                 return CHIP_NO_ERROR;
             }
-            else
-            {
-                mDownloader->OnMessageReceived(payloadHeader, payload.Retain());
-            }
+
+            mDownloader->OnMessageReceived(payloadHeader, payload.Retain());
 
             // For a receiver using BDX Protocol, all received messages will require a response except for a StatusReport
             if (!payloadHeader.HasMessageType(chip::Protocols::SecureChannel::MsgType::StatusReport))

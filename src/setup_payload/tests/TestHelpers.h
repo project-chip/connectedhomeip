@@ -30,10 +30,10 @@ namespace chip {
 const uint16_t kSmallBufferSizeInBytes   = 1;
 const uint16_t kDefaultBufferSizeInBytes = 512;
 
-const uint8_t kOptionalDefaultStringTag      = 2;
+const uint8_t kOptionalDefaultStringTag      = 0x82; // Vendor "test" tag
 constexpr char kOptionalDefaultStringValue[] = "myData";
 
-const uint8_t kOptionalDefaultIntTag    = 3;
+const uint8_t kOptionalDefaultIntTag    = 0x83; // Vendor "test" tag
 const uint32_t kOptionalDefaultIntValue = 12;
 
 constexpr char kSerialNumberDefaultStringValue[] = "123456789";

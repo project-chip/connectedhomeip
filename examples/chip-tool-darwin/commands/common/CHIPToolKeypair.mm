@@ -84,7 +84,7 @@ std::string Base64ToString(const std::string & b64Value)
         (NSString *) kSecAttrLabel : kCHIPToolKeychainLabel,
         (NSString *) kSecAttrApplicationTag : @CHIPPlugin_CAKeyTag,
     };
-    return SecKeyCreateWithData((__bridge CFDataRef) publicKeyNSData, (__bridge CFDictionaryRef) attributes, NULL);
+    return SecKeyCreateWithData((__bridge CFDataRef) publicKeyNSData, (__bridge CFDictionaryRef) attributes, nullptr);
 }
 
 - (CHIP_ERROR)Deserialize:(chip::Crypto::P256SerializedKeypair &)input

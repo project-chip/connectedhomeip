@@ -29,6 +29,7 @@ menuconfig CHIP
 	imply NET_IPV6
 	imply NET_CONFIG_NEED_IPV6
 	imply NET_SOCKETS
+	imply NETWORKING
 	help
 	  This option enables Connected Home over IP libraries.
 

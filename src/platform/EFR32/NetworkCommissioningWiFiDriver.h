@@ -30,39 +30,6 @@ constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
 constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
 } // namespace
 
-// class SlScanResponseIterator : public Iterator<WiFiScanResponse>
-// {
-// public:
-//     SlScanResponseIterator(const size_t size, const wifi_ap_record_t * scanResults) : mSize(size), mpScanResults(scanResults) {}
-//     size_t Count() override { return mSize; }
-//     bool Next(WiFiScanResponse & item) override
-//     {
-//         if (mIternum >= mSize)
-//         {
-//             return false;
-//         }
-
-//         item.security = mpScanResults[mIternum].authmode;
-//         item.ssidLen =
-//             strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid),
-//             chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
-//         item.channel  = mpScanResults[mIternum].primary;
-//         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-//         item.rssi     = mpScanResults[mIternum].rssi;
-//         memcpy(item.ssid, mpScanResults[mIternum].ssid, item.ssidLen);
-//         memcpy(item.bssid, mpScanResults[mIternum].bssid, 6);
-
-//         mIternum++;
-//         return true;
-//     }
-//     void Release() override {}
-
-// private:
-//     const size_t mSize;
-//     const wifi_ap_record_t * mpScanResults;
-//     size_t mIternum = 0;
-// };
-
 template <typename T>
 class SlScanResponseIterator : public Iterator<T>
 {
@@ -153,7 +120,7 @@ public:
 
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
 
-    uint8_t ConvertSecuritytype(uint8_t security);
+    chip::BitFlags<WiFiSecurity> ConvertSecuritytype(uint8_t security);
 
     void OnConnectWiFiNetwork();
     static SlWiFiDriver & GetInstance()

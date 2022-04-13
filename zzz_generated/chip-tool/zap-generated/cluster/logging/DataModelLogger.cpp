@@ -9098,10 +9098,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ac refrigerant type", 1, value);
         }
-        case Thermostat::Attributes::AcCompressor::Id: {
+        case Thermostat::Attributes::AcCompressorType::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac compressor", 1, value);
+            return DataModelLogger::LogValue("ac compressor type", 1, value);
         }
         case Thermostat::Attributes::AcErrorCode::Id: {
             uint32_t value;
@@ -9804,7 +9804,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case WindowCovering::Attributes::Type::Id: {
-            uint8_t value;
+            chip::app::Clusters::WindowCovering::Type value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Type", 1, value);
         }
@@ -9869,7 +9869,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("TargetPositionTiltPercent100ths", 1, value);
         }
         case WindowCovering::Attributes::EndProductType::Id: {
-            uint8_t value;
+            chip::app::Clusters::WindowCovering::EndProductType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EndProductType", 1, value);
         }

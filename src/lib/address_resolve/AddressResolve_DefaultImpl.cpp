@@ -144,11 +144,9 @@ System::Clock::Timeout NodeLookupHandle::NextEventTimeout(System::Clock::Timesta
     {
         return mRequest.GetMaxLookupTime() - elapsed;
     }
-    else
-    {
-        ChipLogError(Discovery, "Unexpected timeout: lookup should have been cleaned already.");
-        return System::Clock::Timeout::zero();
-    }
+
+    ChipLogError(Discovery, "Unexpected timeout: lookup should have been cleaned already.");
+    return System::Clock::Timeout::zero();
 }
 
 NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)

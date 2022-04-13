@@ -38,6 +38,7 @@ constexpr chip::FabricId kIdentityNullFabricId  = chip::kUndefinedFabricId;
 constexpr chip::FabricId kIdentityAlphaFabricId = 1;
 constexpr chip::FabricId kIdentityBetaFabricId  = 2;
 constexpr chip::FabricId kIdentityGammaFabricId = 3;
+constexpr chip::FabricId kIdentityOtherFabricId = 4;
 
 namespace {
 const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStore(const char * paaTrustStorePath)
@@ -48,10 +49,8 @@ const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStor
     {
         return &attestationTrustStore;
     }
-    else
-    {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 } // namespace
 
@@ -113,6 +112,13 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityBeta, kIdentityBetaFabricId, trustStore));
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityGamma, kIdentityGammaFabricId, trustStore));
 
+    std::string name        = GetIdentity();
+    chip::FabricId fabricId = strtoull(name.c_str(), nullptr, 0);
+    if (fabricId >= kIdentityOtherFabricId)
+    {
+        ReturnLogErrorOnFailure(InitializeCommissioner(name, fabricId, trustStore));
+    }
+
     // Initialize Group Data, including IPK
     for (auto it = mCommissioners.begin(); it != mCommissioners.end(); it++)
     {
@@ -155,6 +161,13 @@ CHIP_ERROR CHIPCommand::MaybeTearDownStack()
     ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityAlpha));
     ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityBeta));
     ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityGamma));
+
+    std::string name        = GetIdentity();
+    chip::FabricId fabricId = strtoull(name.c_str(), nullptr, 0);
+    if (fabricId >= kIdentityOtherFabricId)
+    {
+        ReturnLogErrorOnFailure(ShutdownCommissioner(name));
+    }
 
     StopTracing();
 
@@ -201,10 +214,10 @@ void CHIPCommand::SetIdentity(const char * identity)
 {
     std::string name = std::string(identity);
     if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0 &&
-        name.compare(kIdentityNull) != 0)
+        name.compare(kIdentityNull) != 0 && strtoull(name.c_str(), nullptr, 0) < kIdentityOtherFabricId)
     {
-        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(), kIdentityAlpha,
-                     kIdentityBeta, kIdentityGamma);
+        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s, 4, 5...]", name.c_str(),
+                     kIdentityAlpha, kIdentityBeta, kIdentityGamma);
         chipDie();
     }
 
@@ -217,9 +230,22 @@ std::string CHIPCommand::GetIdentity()
     if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0 &&
         name.compare(kIdentityNull) != 0)
     {
-        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(), kIdentityAlpha,
-                     kIdentityBeta, kIdentityGamma);
-        chipDie();
+        chip::FabricId fabricId = strtoull(name.c_str(), nullptr, 0);
+        if (fabricId >= kIdentityOtherFabricId)
+        {
+            // normalize name since it is used in persistent storage
+
+            char s[24];
+            sprintf(s, "%" PRIu64, fabricId);
+
+            name = s;
+        }
+        else
+        {
+            ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s, 4, 5...]", name.c_str(),
+                         kIdentityAlpha, kIdentityBeta, kIdentityGamma);
+            chipDie();
+        }
     }
 
     return name;
@@ -246,10 +272,10 @@ chip::FabricId CHIPCommand::CurrentCommissionerId()
     {
         id = kIdentityNullFabricId;
     }
-    else
+    else if ((id = strtoull(name.c_str(), nullptr, 0)) < kIdentityOtherFabricId)
     {
-        VerifyOrDieWithMsg(false, chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(),
-                           kIdentityAlpha, kIdentityBeta, kIdentityGamma);
+        VerifyOrDieWithMsg(false, chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s, 4, 5...]",
+                           name.c_str(), kIdentityAlpha, kIdentityBeta, kIdentityGamma);
     }
 
     return id;
@@ -258,7 +284,7 @@ chip::FabricId CHIPCommand::CurrentCommissionerId()
 chip::Controller::DeviceCommissioner & CHIPCommand::CurrentCommissioner()
 {
     auto item = mCommissioners.find(GetIdentity());
-    return *item->second.get();
+    return *item->second;
 }
 
 CHIP_ERROR CHIPCommand::ShutdownCommissioner(std::string key)
@@ -299,16 +325,15 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
         chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
 
         ReturnLogErrorOnFailure(ephemeralKey.Initialize());
-        ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(mCommissionerStorage.GetLocalNodeId(), fabricId,
-                                                                            mCommissionerStorage.GetCommissionerCATs(),
-                                                                            ephemeralKey, rcacSpan, icacSpan, nocSpan));
+        chip::NodeId nodeId = mCommissionerNodeId.ValueOr(mCommissionerStorage.GetLocalNodeId());
+        ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(
+            nodeId, fabricId, mCommissionerStorage.GetCommissionerCATs(), ephemeralKey, rcacSpan, icacSpan, nocSpan));
         commissionerParams.operationalKeypair = &ephemeralKey;
         commissionerParams.controllerRCAC     = rcacSpan;
         commissionerParams.controllerICAC     = icacSpan;
         commissionerParams.controllerNOC      = nocSpan;
     }
 
-    commissionerParams.storageDelegate = &mCommissionerStorage;
     // TODO: Initialize IPK epoch key in ExampleOperationalCredentials issuer rather than relying on DefaultIpkValue
     commissionerParams.operationalCredentialsDelegate = mCredIssuerCmds->GetCredentialIssuer();
     commissionerParams.controllerVendorId             = chip::VendorId::TestVendor1;
