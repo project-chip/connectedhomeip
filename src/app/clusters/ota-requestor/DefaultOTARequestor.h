@@ -196,7 +196,7 @@ private:
     void RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error = CHIP_NO_ERROR);
 
     /**
-     * Record the error update state by informing the driver of the error and calling `RecordNewUpdateState`
+     * Record the error update state and transition to the idle state
      */
     void RecordErrorUpdateState(CHIP_ERROR error, OTAChangeReasonEnum reason = OTAChangeReasonEnum::kFailure);
 
