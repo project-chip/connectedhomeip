@@ -76,7 +76,7 @@ constexpr bool IsValidGroupNodeId(NodeId aNodeId)
     return chip::IsGroupId(aNodeId) && chip::IsValidGroupId(chip::GroupIdFromNodeId(aNodeId));
 }
 
-#if CHIP_PROGRESS_LOGGING
+#if CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
 char GetAuthModeStringForLogging(AuthMode authMode)
 {
@@ -157,7 +157,7 @@ char GetPrivilegeStringForLogging(Privilege privilege)
     return 'u';
 }
 
-#endif // CHIP_PROGRESS_LOGGING
+#endif // CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
 } // namespace
 
