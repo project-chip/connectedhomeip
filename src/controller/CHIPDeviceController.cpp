@@ -768,13 +768,13 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestationFailure(DevicePro
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::GetAttestationChallenge(ByteSpan & attestationChallenge)
+CHIP_ERROR DeviceCommissioner::GetAttestationChallenge(DeviceProxy * device, ByteSpan & attestationChallenge)
 {
     Optional<SessionHandle> secureSessionHandle;
 
-    VerifyOrReturnError(mDeviceBeingCommissioned != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    secureSessionHandle = mDeviceBeingCommissioned->GetSecureSession();
+    secureSessionHandle = device->GetSecureSession();
     VerifyOrReturnError(secureSessionHandle.HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
     attestationChallenge = secureSessionHandle.Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();

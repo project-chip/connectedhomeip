@@ -430,11 +430,12 @@ public:
      * @brief
      *   This function returns the attestation challenge for the secure session of the device being commissioned.
      *
+     * @param[in] device                The device being commissioned.
      * @param[out] attestationChallenge The output for the attestationChallenge
      *
      * @return CHIP_ERROR               CHIP_NO_ERROR on success, or CHIP_ERROR_INVALID_ARGUMENT if no secure session is active
      */
-    CHIP_ERROR GetAttestationChallenge(ByteSpan & attestationChallenge);
+    CHIP_ERROR GetAttestationChallenge(DeviceProxy * device, ByteSpan & attestationChallenge);
 
     /**
      * @brief
