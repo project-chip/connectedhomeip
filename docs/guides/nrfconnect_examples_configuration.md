@@ -96,7 +96,7 @@ Because Kconfig configuration files are used in the building process, make sure
 that you rebuild your application after editing them by typing the following
 command in the example directory, with _build-target_ replaced with the build
 target name of the kit, for example _nrf52840dk_nrf52840_:
- 
+
         ```
         west build -b build-target
         ```

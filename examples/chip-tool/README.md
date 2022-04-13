@@ -216,8 +216,8 @@ Finally to bind the keyset to the group
 
 To use the Client to send Matter commands, run the built executable and pass it
 the target cluster name, the target command name, the Group Id in Node Id form
-(`0xffffffffffffXXXX`) and an unused endpoint Id. Take note that Only commands and
-attributes write can be send with Group Id.
+(`0xffffffffffffXXXX`) and an unused endpoint Id. Take note that Only commands
+and attributes write can be send with Group Id.
 
 E.G. sending to group Id 0x0025
 

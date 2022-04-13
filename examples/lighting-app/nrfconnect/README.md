@@ -425,9 +425,9 @@ host computer. To build the example with the RPC server, run the following
 command with _build-target_ replaced with the build target name of the Nordic
 Semiconductor's kit you own:
 
-    ``` 
+    ```
     $ west build -b build-target -- -DOVERLAY_CONFIG=rpc.overlay
-    ``` 
+    ```
 
 ### Building with Device Firmware Upgrade support
 
@@ -437,17 +437,17 @@ To enable DFU over Bluetooth LE, run the following command with _build-target_
 replaced with the build target name of the Nordic Semiconductor kit you are
 using (for example `nrf52840dk_nrf52840`):
 
-    ``` 
+    ```
     $ west build -b build-target -- -DCONFIG_CHIP_DFU_OVER_BT_SMP=y
-    ``` 
+    ```
 
 To completely disable support for both DFU methods, run the following command
 with _build-target_ replaced with the build target name of the Nordic
 Semiconductor kit you are using (for example `nrf52840dk_nrf52840`):
 
-    ``` 
+    ```
     $ west build -b build-target -- -DCONF_FILE=prj_no_dfu.conf
-    ``` 
+    ```
 
 > **Note**:
 >
@@ -496,9 +496,9 @@ using the menuconfig utility.
 To open the menuconfig utility, run the following command from the example
 directory:
 
-    ``` 
+    ```
     $ west build -b build-target -t menuconfig
-    ``` 
+    ```
 
 Remember to replace _build-target_ with the build target name of the Nordic
 Semiconductor's kit you own.
@@ -555,9 +555,9 @@ the nRF52840 Dongle.
 To flash the application to the device, use the west tool and run the following
 command from the example directory:
 
-        ``` 
+        ```
         $ west flash --erase
-        ``` 
+        ```
 
 If you have multiple development kits connected, west will prompt you to pick
 the correct one.
@@ -565,9 +565,9 @@ the correct one.
 To debug the application on target, run the following command from the example
 directory:
 
-        ``` 
+        ```
         $ west debug
-        ``` 
+        ```
 
 <a name="nrf52840dongle_flashing"></a>
 
@@ -607,9 +607,9 @@ Build or install the [rpc console](../../common/pigweed/rpc_console/README.md)
 
 Start the console
 
-        ``` 
+        ```
         $ chip-console --device /dev/ttyUSB0
-        ``` 
+        ```
 
 From within the console you can then invoke rpcs:
 
@@ -617,7 +617,7 @@ From within the console you can then invoke rpcs:
         rpcs.chip.rpc.Lighting.Get()
 
         rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))
-        ``` 
+        ```
 
 ## Device Tracing
 

@@ -165,7 +165,7 @@ To make your PC work as a Thread Border Router, complete the following tasks:
 
     -   We need to tell hostapd to use our config file by editing the main
         hostapd configuration file. Change the line that starts with
-        #DAEMON_CONF (remember to remove #):  
+        #DAEMON_CONF (remember to remove #):
 
               ```
               $ sudo vim /etc/default/hostapd
