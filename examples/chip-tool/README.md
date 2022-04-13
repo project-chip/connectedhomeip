@@ -73,9 +73,9 @@ the ESP32 all-clusters-app to commission it onto a Wi-Fi network:
 
 where:
 
--   \${NODE_ID_TO_ASSIGN} (which must be a decimal number or a 0x-prefixed hex
+-   \${NODE_ID_TO_ASSIGN} (which must be a decimal number or a `0x`-prefixed hex
     number) is the node id to assign to the node being commissioned.
--   \${SSID} is the Wi-Fi SSID either as a string, or in the form hex:XXXXXXXX
+-   \${SSID} is the Wi-Fi SSID either as a string, or in the form `hex:XXXXXXXX`
     where the bytes of the SSID are encoded as two-digit hex numbers.
 -   \${PASSWORD} is the Wi-Fi password, again either as a string or as hex data
 
@@ -216,7 +216,7 @@ Finally to bind the keyset to the group
 
 To use the Client to send Matter commands, run the built executable and pass it
 the target cluster name, the target command name, the Group Id in Node Id form
-(0xffffffffffffXXXX) and an unused endpoint Id. Take note that Only commands and
+(`0xffffffffffffXXXX`) and an unused endpoint Id. Take note that Only commands and
 attributes write can be send with Group Id.
 
 E.G. sending to group Id 0x0025
