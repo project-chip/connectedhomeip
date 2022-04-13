@@ -305,9 +305,10 @@ combination with JLinkRTTClient as follows:
 
 #On Border Router: `sudo ip addr add dev <Network interface> 2002::2/64`
 
-#On PC(Linux):  `sudo ip addr add dev <Network interface> 2002::1/64`
+#On PC(Linux): `sudo ip addr add dev <Network interface> 2002::1/64`
 
-#Add Ipv6 route on PC(Linux) `sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2`
+#Add Ipv6 route on PC(Linux)
+`sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2`
 
 <a name="running-pigweed-rpc-console"></a>
 

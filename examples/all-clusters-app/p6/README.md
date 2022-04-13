@@ -39,7 +39,7 @@ will then join the network.
     tools.
 
 -   Install some additional tools (likely already present for Matter
-    developers): 
+    developers):
 
     ```
     sudo apt install gcc g++ clang ninja-build python \
