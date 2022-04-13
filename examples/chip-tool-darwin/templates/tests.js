@@ -260,6 +260,7 @@ function getTests()
     'Test_TC_WNCV_3_5',
     'Test_TC_WNCV_4_3',
     'Test_TC_WNCV_4_4',
+    'Test_TC_WNCV_4_5',
   ];
 
   const Others = [
