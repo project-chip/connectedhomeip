@@ -28,24 +28,25 @@ Instruments CC13XX_26XX family of Wireless MCUs.
 
 ![CC1352R1_LAUNCHXL](doc/images/cc1352r1_launchxl.jpg)
 
-The CC13XX_26XX all clusters example application provides the basis to query and run
-commands for all currently implemented Matter clusters. This uses the open-source Matter
-implementation and the Texas Instruments SimpleLink™ CC13XX and CC26XX software development kit.
+The CC13XX_26XX all clusters example application provides the basis to query and
+run commands for all currently implemented Matter clusters. This uses the
+open-source Matter implementation and the Texas Instruments SimpleLink™ CC13XX
+and CC26XX software development kit.
 
 This example is enabled to build for CC2652R7 devices.
 
-The all-clusters example is intended to serve both as a means to explore the workings of
-Matter, as well as a template for creating real products based on the Texas
-Instruments devices.
+The all-clusters example is intended to serve both as a means to explore the
+workings of Matter, as well as a template for creating real products based on
+the Texas Instruments devices.
 
 ## Device UI
 
 This example application has a simple User Interface to depict the state of the
-various Matter clusters and the attribute changes associated with them.
-The user LEDs on the LaunchPad are used for the onoff, levelcontrol
-and identify clusters to provide a working demonstration of the cluster
-attribute changes. The Green LED is used to represent attribute changes to 
-endpoint 1 while the Red LED is used to represent changes to endpoint 2.
+various Matter clusters and the attribute changes associated with them. The user
+LEDs on the LaunchPad are used for the onoff, levelcontrol and identify clusters
+to provide a working demonstration of the cluster attribute changes. The Green
+LED is used to represent attribute changes to endpoint 1 while the Red LED is
+used to represent changes to endpoint 2.
 
 Short presses (less than 1000ms) of the user buttons are used currently unused
 in the all-clusters application, but stubs are provided.
