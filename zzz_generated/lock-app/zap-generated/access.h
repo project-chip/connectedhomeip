@@ -37,6 +37,8 @@
     /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     49, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -59,6 +61,8 @@
     /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     0, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     1, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -81,6 +85,8 @@
     /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -102,6 +108,8 @@
     40, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
     40, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
     40, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    257, /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: manage */ \
+    257, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
     48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     6, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
@@ -115,6 +123,8 @@
     5, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
     6, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
     16, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    35, /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: manage */ \
+    51, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
     0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     4, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     16387, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
@@ -128,6 +138,8 @@
     kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: manage */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
@@ -141,6 +153,18 @@
     60, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
     60, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
     60, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: SetWeekDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: ClearYearDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
     48, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     48, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     48, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
@@ -166,6 +190,18 @@
     0, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
     1, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
     2, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
+    11, /* Cluster: Door Lock, Command: SetWeekDaySchedule, Privilege: administer */ \
+    12, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
+    13, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
+    14, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
+    15, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
+    16, /* Cluster: Door Lock, Command: ClearYearDaySchedule, Privilege: administer */ \
+    26, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
+    27, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
+    29, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
+    34, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
+    36, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
+    38, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
     0, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     2, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     4, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
@@ -191,6 +227,18 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetWeekDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearYearDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
