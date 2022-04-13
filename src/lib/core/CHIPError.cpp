@@ -668,11 +668,23 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB.AsInteger():
         desc = "Malformed Interaction Model Data Version Filter IB";
         break;
+    case CHIP_ERROR_NOT_FOUND.AsInteger():
+        desc = "The item referenced in the function call was not found";
+        break;
+    case CHIP_ERROR_INVALID_SCHEME_PREFIX.AsInteger():
+        desc = "The scheme field contains an invalid prefix";
+        break;
+    case CHIP_ERROR_MISSING_URI_SEPARATOR.AsInteger():
+        desc = "The URI separator is missing";
+        break;
     case CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE.AsInteger():
         desc = "Malformed Interaction Model Status Response Message";
         break;
     case CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE.AsInteger():
         desc = "Malformed Interaction Model Timed Request Message";
+        break;
+    case CHIP_ERROR_INVALID_FILE_IDENTIFIER.AsInteger():
+        desc = "The file identifier, encoded in the first few bytes of a processed file, has unexpected value";
         break;
     case CHIP_ERROR_BUSY.AsInteger():
         desc = "The Resource is busy and cannot process the request";
