@@ -37,7 +37,7 @@ tests:
 
     ######## Command GoTo 1 #######
     ### Step 1x -> Check GoToLiftPercentage NVM effects
-    - label: "1a: If (PA_LF & LF) TH sends GoToLiftPercentage command with 90% to DUT
+    - label: "1a: If (PA_LF & LF) TH sends GoToLiftPercentage command with 90% to DUT"
       command: "GoToLiftPercentage"
       PICS: WNCV_LF && WNCV_PA_LF
       arguments:
@@ -68,7 +68,7 @@ tests:
 
     ######## Command GoTo 2 ######
     ### Step 2x -> Check GoToTiltPercentage NVM effects
-    - label: "2a: If (PA_TL & TL) TH sends GoToLiftPercentage command with 90% to DUT
+    - label: "2a: If (PA_TL & TL) TH sends GoToTiltPercentage command with 90% to DUT"
       command: "GoToTiltPercentage"
       PICS: WNCV_TL && WNCV_PA_TL
       arguments:
@@ -106,6 +106,8 @@ tests:
       PICS: WNCV_LF && WNCV_PA_LF
       response:
           saveAs: attrCurrentPositionLiftPercent100ths
+          constraints:
+              notValue: 0
 
     ### CONDITIONAL Tilt Store CurrentPositionTiltPercent100ths this value for step 3f
     - label: "3b: TH reads CurrentPositionTiltPercent100ths from DUT"
@@ -114,6 +116,8 @@ tests:
       PICS: WNCV_TL && WNCV_PA_TL
       response:
           saveAs: attrCurrentPositionTiltPercent100ths
+          constraints:
+              notValue: 0
 
     ### DUT TurnOff
     - label: "3c: reboot/restart the DUT"
