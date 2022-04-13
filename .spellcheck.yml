@@ -41,7 +41,12 @@ matrix:
           # ```
           # content
           # ```
-          - open: '(?s)^(?P<open> *`{3,})$'
+          #
+          # Allows language marker (since github allows it) like:
+          # ```python
+          # content
+          # ```
+          - open: '(?s)^(?P<open> *`{3,})[a-z]*$'
             close: '^(?P=open)$'
           # Ignore text between inline back ticks
           - open: '(?P<open>`+)'
