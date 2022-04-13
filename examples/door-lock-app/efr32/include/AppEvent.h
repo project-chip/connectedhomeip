@@ -1,6 +1,7 @@
 /*
+ *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
+ *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +17,39 @@
  *    limitations under the License.
  */
 
-#ifndef APP_CONFIG_H
-#define APP_CONFIG_H
+#pragma once
 
-#endif // APP_CONFIG_H
+struct AppEvent;
+typedef void (*EventHandler)(AppEvent *);
+
+struct AppEvent
+{
+    enum AppEventTypes
+    {
+        kEventType_Button = 0,
+        kEventType_Timer,
+        kEventType_Lock,
+        kEventType_Install,
+    };
+
+    uint16_t Type;
+
+    union
+    {
+        struct
+        {
+            uint8_t Action;
+        } ButtonEvent;
+        struct
+        {
+            void * Context;
+        } TimerEvent;
+        struct
+        {
+            uint8_t Action;
+            int32_t Actor;
+        } LockEvent;
+    };
+
+    EventHandler Handler;
+};
