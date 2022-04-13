@@ -31,7 +31,8 @@ template("tizen_toolchain") {
     forward_variables_from(_invoker_toolchain_args, "*")
   }
 
-  _tizen_toolchain_prefix = "${tizen_sdk_root}/tools/arm-linux-gnueabi/bin/arm-linux-gnueabi-"
+  _tizen_toolchain_prefix =
+      "${tizen_sdk_root}/tools/arm-linux-gnueabi/bin/arm-linux-gnueabi-"
 
   gcc_toolchain(target_name) {
     toolchain_args = _tizen_toolchain_args
