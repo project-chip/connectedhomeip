@@ -79,12 +79,9 @@ CHIP_ERROR ClusterStateCache::UpdateEventCache(const EventHeader & aEventHeader,
             return CHIP_NO_ERROR;
         }
 
-        EventData eventData;
-        System::PacketBufferHandle handle;
+        System::PacketBufferHandle handle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+
         System::PacketBufferTLVWriter writer;
-
-        handle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
-
         writer.Init(std::move(handle), false);
 
         ReturnErrorOnFailure(writer.CopyElement(TLV::AnonymousTag(), *apData));
@@ -96,6 +93,7 @@ CHIP_ERROR ClusterStateCache::UpdateEventCache(const EventHeader & aEventHeader,
         //
         handle.RightSize();
 
+        EventData eventData;
         eventData.first  = aEventHeader;
         eventData.second = std::move(handle);
 

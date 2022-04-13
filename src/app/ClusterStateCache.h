@@ -221,12 +221,15 @@ public:
     CHIP_ERROR Get(const ConcreteAttributePath & path, TLV::TLVReader & reader);
 
     /*
-     * Retrieve the value of an event from the cache given a concrete event path by decoding
+     * Retrieve the value of an event from the cache given an EventNumber by decoding
      * it using DataModel::Decode into the in-out argument 'value'.
      *
-     * For some types of events, the values for the fields in the event is directly backed by the underlying TLV buffer
-     * and has pointers into that buffer. (e.g octet strings, char strings and lists). Unlike its attribute counterpart,
-     * these pointers are stable and will not change until a call to `ClearEventCache` is called.
+     * This should be used in conjunction with the ForEachEvent() iterator function to
+     * retrieve the EventHeader (and corresponding metadata information for the event) along with its EventNumber.
+     *
+     * For some types of events, the values for the fields in the event are directly backed by the underlying TLV buffer
+     * and have pointers into that buffer. (e.g octet strings, char strings and lists). Unlike its attribute counterpart,
+     * these pointers are stable and will not change until a call to `ClearEventCache` happens.
      *
      * The template parameter EventObjectTypeT is generally expected to be a
      * ClusterName::Events::EventName::DecodableType, but any
@@ -274,6 +277,8 @@ public:
      * Otherwise, a CHIP_ERROR_KEY_NOT_FOUND error will be returned.
      *
      * This is to be used with the `ForEachEventStatus` iterator function.
+     *
+     * NOTE: Receipt of a StatusIB does not affect any pre-existing or future event data entries in the cache (and vice-versa).
      *
      */
     CHIP_ERROR GetStatus(const ConcreteEventPath & path, StatusIB & status);
@@ -372,7 +377,14 @@ public:
     }
 
     /*
-     * Execute an iterator function that is called for every event in the event data cache.
+     * Execute an iterator function that is called for every event in the event data cache that satisfies the following
+     * conditions:
+     *      - It matches the provided path filter
+     *      - Its event number is greater than or equal to the provided minimum event number filter.
+     *
+     * Each filter argument can be omitted from the match criteria above by passing in an empty EventPathParams() and/or
+     * a minimum event filter of 0.
+     *
      * This iterator is called in increasing order from the event with the lowest event number to the highest.
      *
      * The function is passed a const reference to the EventHeader associated with that event.
@@ -386,11 +398,15 @@ public:
      *
      */
     template <typename IteratorFunc>
-    CHIP_ERROR ForEachEventData(IteratorFunc func)
+    CHIP_ERROR ForEachEventData(IteratorFunc func, EventPathParams pathFilter = EventPathParams(),
+                                EventNumber minEventNumberFilter = 0)
     {
         for (const auto & item : mEventDataCache)
         {
-            ReturnErrorOnFailure(func(item.first));
+            if (pathFilter.IsEventPathSupersetOf(item.first.mPath) && item.first.mEventNumber >= minEventNumberFilter)
+            {
+                ReturnErrorOnFailure(func(item.first));
+            }
         }
 
         return CHIP_NO_ERROR;
@@ -405,6 +421,8 @@ public:
      * Notable return values:
      *      - If func returns an error, that will result in termination of any further iteration over events
      *        and that error shall be returned back up to the original call to this function.
+     *
+     * NOTE: Receipt of a StatusIB does not affect any pre-existing event data entries in the cache (and vice-versa).
      *
      */
     template <typename IteratorFunc>
@@ -433,6 +451,8 @@ public:
         {
             mHighestReceivedEventNumber = 0;
         }
+
+        mEventStatusCache.clear();
     }
 
 private:
@@ -478,6 +498,14 @@ private:
      * with the provided status.
      */
     CHIP_ERROR UpdateCache(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus);
+
+    /*
+     * If apData is not null, updates the cached event set with the specified event header + payload.
+     * If apData is null and apStatus is not null, the StatusIB is stored in the event status cache.
+     *
+     * Storage of either of these do not affect pre-existing data for the other in the cache.
+     *
+     */
     CHIP_ERROR UpdateEventCache(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus);
 
 private:
