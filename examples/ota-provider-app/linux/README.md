@@ -101,7 +101,7 @@ out/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "auth
     to all nodes for the OTA Provider cluster (0x0029) on every endpoint
 
 In the example above, the provider is on fabric index 1 with provider node ID
-being 0xDEAD`BEEF` on endpoint 0.
+being `0xDEADBEEF` on endpoint 0.
 
 ## Current Limitations
 
