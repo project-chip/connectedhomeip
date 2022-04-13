@@ -30,8 +30,7 @@ declare_args() {
   #
   # If set to > 1, it is desired to log every single check
   chip_access_control_policy_logging_verbosity = 0
-  if (is_debug && (current_os == "linux" || current_os == "mac"))
-  {
+  if (is_debug && (current_os == "linux" || current_os == "mac")) {
     chip_access_control_policy_logging_verbosity = 2
   }
 
