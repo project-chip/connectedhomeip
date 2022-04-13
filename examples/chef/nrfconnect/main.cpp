@@ -17,12 +17,12 @@
 
 #include <lib/shell/Engine.h>
 
+#include <app/server/Dnssd.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
- #include <app/server/Dnssd.h>
 
 #include <ChipShellCollection.h>
 #include <lib/support/CHIPMem.h>
@@ -39,7 +39,7 @@ using namespace chip::Shell;
 using namespace chip::DeviceLayer;
 
 namespace {
-    constexpr int kExtDiscoveryTimeoutSecs         = 20;
+constexpr int kExtDiscoveryTimeoutSecs = 20;
 }
 
 CHIP_ERROR main()

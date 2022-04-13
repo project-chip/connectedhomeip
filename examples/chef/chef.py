@@ -49,6 +49,7 @@ def printc(strInput):
     color = TermColors.STRCYAN
     print(color + strInput + TermColors.STRRESET)
 
+
 def loadConfig(paths):
     config = dict()
     config["nrfconnect"] = dict()
@@ -73,6 +74,7 @@ def loadConfig(paths):
         configStream.close()
 
     return config
+
 
 def definePaths():
     paths = dict()
@@ -127,6 +129,7 @@ def hexInputToInt(valIn):
     else:
         valOut = valIn
     return valOut
+
 
 def main(argv):
     checkPythonVersion()
@@ -208,7 +211,7 @@ Notes:
     parser.add_option("", "--rpc_console", help="Opens PW RPC Console",
                       action="store_true", dest="doRPC_CONSOLE")
     parser.add_option("-y", "--tty", help="Enumerated USB tty/serial interface enumerated for your physical device. E.g.: /dev/ACM0",
-                      dest="tty", metavar= "TTY", default=None)
+                      dest="tty", metavar="TTY", default=None)
 
     options, _ = parser.parse_args(argv)
 
