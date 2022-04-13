@@ -459,7 +459,8 @@ CHIP_ERROR DefaultOTARequestorDriver::ScheduleQueryRetry(bool trySameProvider)
         ChipLogProgress(SoftwareUpdate, "Max retry of %u exceeded.  Will not retry", kMaxBusyProviderRetryCount);
         status = CHIP_ERROR_MAX_RETRY_EXCEEDED;
     }
-    else
+
+    if (status == CHIP_NO_ERROR)
     {
         ChipLogProgress(SoftwareUpdate, "Scheduling a retry");
         ScheduleDelayedAction(kDefaultDelayedActionTime, StartDelayTimerHandler, this);
