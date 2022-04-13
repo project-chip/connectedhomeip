@@ -1327,6 +1327,7 @@ ureverse
 URI
 urlrequest
 usbmodem
+usbmodemXXXXXXX
 usbserial
 USBtoUART
 uscif
@@ -1427,6 +1428,7 @@ xffffffffffff
 xffffffffffffXXXX
 xtensa
 xwayland
+xxxxx
 XXXX
 XXXXXXXX
 xyz
