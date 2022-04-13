@@ -49,6 +49,24 @@ class ChipClusters:
                     "reportable": True,
                     "writable": True,
                 },
+                0x00000002: {
+                    "attributeName": "SubjectsPerAccessControlEntry",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000003: {
+                    "attributeName": "TargetsPerAccessControlEntry",
+                    "attributeId": 0x00000003,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000004: {
+                    "attributeName": "AccessControlEntriesPerFabric",
+                    "attributeId": 0x00000004,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFF8: {
                     "attributeName": "GeneratedCommandList",
                     "attributeId": 0x0000FFF8,
@@ -601,6 +619,12 @@ class ChipClusters:
                     "attributeName": "UniqueID",
                     "attributeId": 0x00000012,
                     "type": "str",
+                    "reportable": True,
+                },
+                0x00000013: {
+                    "attributeName": "CapabilityMinima",
+                    "attributeId": 0x00000013,
+                    "type": "",
                     "reportable": True,
                 },
                 0x0000FFF8: {

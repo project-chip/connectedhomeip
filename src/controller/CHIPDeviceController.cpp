@@ -1777,8 +1777,15 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                                                   CommissioningDelegate * delegate, EndpointId endpoint,
                                                   Optional<System::Clock::Timeout> timeout)
 {
-    ChipLogProgress(Controller, "Performing next commissioning step '%s' with completion status = '%s'", StageToString(step),
-                    params.GetCompletionStatus().err.AsString());
+    if (params.GetCompletionStatus().err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Controller, "Performing next commissioning step '%s'", StageToString(step));
+    }
+    else
+    {
+        ChipLogProgress(Controller, "Performing next commissioning step '%s' with completion status = '%s'", StageToString(step),
+                        params.GetCompletionStatus().err.AsString());
+    }
 
     // For now, we ignore errors coming in from the device since not all commissioning clusters are implemented on the device
     // side.

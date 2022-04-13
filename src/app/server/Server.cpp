@@ -39,6 +39,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DeviceInfoProvider.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
@@ -97,6 +98,7 @@ static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BU
 CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 {
     CASESessionManagerConfig caseSessionManagerConfig;
+    DeviceLayer::DeviceInfoProvider * deviceInfoprovider = nullptr;
 
     mOperationalServicePort        = initParams.operationalServicePort;
     mUserDirectedCommissioningPort = initParams.userDirectedCommissioningPort;
@@ -133,6 +135,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     mGroupsProvider = initParams.groupDataProvider;
     SetGroupDataProvider(mGroupsProvider);
+
+    deviceInfoprovider = DeviceLayer::GetDeviceInfoProvider();
+    if (deviceInfoprovider)
+    {
+        deviceInfoprovider->SetStorageDelegate(mDeviceStorage);
+    }
 
     err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver);
     SuccessOrExit(err);

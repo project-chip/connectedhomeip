@@ -46,6 +46,7 @@ constexpr chip::EndpointId kOtaProviderEndpoint = 0;
 constexpr uint16_t kOptionUpdateAction              = 'a';
 constexpr uint16_t kOptionUserConsentNeeded         = 'c';
 constexpr uint16_t kOptionFilepath                  = 'f';
+constexpr uint16_t kOptionImageUri                  = 'i';
 constexpr uint16_t kOptionOtaImageList              = 'o';
 constexpr uint16_t kOptionDelayedApplyActionTimeSec = 'p';
 constexpr uint16_t kOptionQueryImageStatus          = 'q';
@@ -64,6 +65,7 @@ static uint32_t gDelayedQueryActionTimeSec           = 0;
 static uint32_t gDelayedApplyActionTimeSec           = 0;
 static const char * gOtaFilepath                     = nullptr;
 static const char * gOtaImageListFilepath            = nullptr;
+static const char * gImageUri                        = nullptr;
 static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kUnknown;
 static bool gUserConsentNeeded                       = false;
 static uint32_t gIgnoreQueryImageCount               = 0;
@@ -147,6 +149,9 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             gOtaFilepath = aValue;
         }
         break;
+    case kOptionImageUri:
+        gImageUri = aValue;
+        break;
     case kOptionOtaImageList:
         kOptionOtaImageListSelected = true;
         if (0 != access(aValue, R_OK))
@@ -165,12 +170,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         break;
     case kOptionQueryImageStatus:
-        if (aValue == NULL)
-        {
-            PrintArgError("%s: ERROR: NULL queryImageStatus parameter\n", aProgram);
-            retval = false;
-        }
-        else if (strcmp(aValue, "updateAvailable") == 0)
+        if (strcmp(aValue, "updateAvailable") == 0)
         {
             gQueryImageStatus = OTAQueryStatus::kUpdateAvailable;
         }
@@ -195,12 +195,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         gIgnoreApplyUpdateCount = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
     case kOptionUpdateAction:
-        if (aValue == NULL)
-        {
-            PrintArgError("%s: ERROR: NULL applyUpdateAction parameter\n", aProgram);
-            retval = false;
-        }
-        else if (strcmp(aValue, "proceed") == 0)
+        if (strcmp(aValue, "proceed") == 0)
         {
             gOptionUpdateAction = OTAApplyUpdateAction::kProceed;
         }
@@ -225,12 +220,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         gDelayedApplyActionTimeSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
     case kOptionUserConsentState:
-        if (aValue == NULL)
-        {
-            PrintArgError("%s: ERROR: NULL UserConsent parameter\n", aProgram);
-            retval = false;
-        }
-        else if (strcmp(aValue, "granted") == 0)
+        if (strcmp(aValue, "granted") == 0)
         {
             gUserConsentState = chip::ota::UserConsentState::kGranted;
         }
@@ -264,6 +254,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "applyUpdateAction", chip::ArgParser::kArgumentRequired, kOptionUpdateAction },
     { "userConsentNeeded", chip::ArgParser::kNoArgument, kOptionUserConsentNeeded },
     { "filepath", chip::ArgParser::kArgumentRequired, kOptionFilepath },
+    { "imageUri", chip::ArgParser::kArgumentRequired, kOptionImageUri },
     { "otaImageList", chip::ArgParser::kArgumentRequired, kOptionOtaImageList },
     { "delayedApplyActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedApplyActionTimeSec },
     { "queryImageStatus", chip::ArgParser::kArgumentRequired, kOptionQueryImageStatus },
@@ -285,6 +276,9 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        Otherwise, value of the UserConsentNeeded field is false.\n"
                              "  -f, --filepath <file path>\n"
                              "        Path to a file containing an OTA image\n"
+                             "  -i, --imageUri <uri>\n"
+                             "        Value for the ImageURI field in the QueryImageResponse.\n"
+                             "        If none is supplied, a valid URI is generated.\n"
                              "  -o, --otaImageList <file path>\n"
                              "        Path to a file containing a list of OTA images\n"
                              "  -p, --delayedApplyActionTimeSec <time in seconds>\n"
@@ -329,6 +323,11 @@ void ApplicationInit()
     if (gOtaFilepath != nullptr)
     {
         gOtaProvider.SetOTAFilePath(gOtaFilepath);
+    }
+
+    if (gImageUri != nullptr)
+    {
+        gOtaProvider.SetImageUri(gImageUri);
     }
 
     gOtaProvider.SetIgnoreQueryImageCount(gIgnoreQueryImageCount);

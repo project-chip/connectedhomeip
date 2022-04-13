@@ -646,6 +646,18 @@ CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mDelegate->Retain();
 
+    if (filter.type == DiscoveryFilterType::kInstanceName)
+    {
+        // when we have the instance name, no need to browse, only need to resolve
+        DnssdService service;
+
+        ReturnErrorOnFailure(MakeServiceSubtype(service.mName, sizeof(service.mName), filter));
+        strncpy(service.mType, kCommissionableServiceName, sizeof(service.mType));
+        service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolUdp;
+        service.mAddressType = Inet::IPAddressType::kAny;
+        return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeResolve, mDelegate);
+    }
+
     char serviceName[kMaxCommissionableServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionableNode));
 
@@ -657,6 +669,18 @@ CHIP_ERROR ResolverProxy::FindCommissioners(DiscoveryFilter filter)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mDelegate->Retain();
+
+    if (filter.type == DiscoveryFilterType::kInstanceName)
+    {
+        // when we have the instance name, no need to browse, only need to resolve
+        DnssdService service;
+
+        ReturnErrorOnFailure(MakeServiceSubtype(service.mName, sizeof(service.mName), filter));
+        strncpy(service.mType, kCommissionerServiceName, sizeof(service.mType));
+        service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolUdp;
+        service.mAddressType = Inet::IPAddressType::kAny;
+        return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeResolve, mDelegate);
+    }
 
     char serviceName[kMaxCommissionerServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionerNode));
