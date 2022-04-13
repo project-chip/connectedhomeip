@@ -4305,6 +4305,9 @@ private:
 | Attributes:                                                         |        |
 | * Acl                                                               | 0x0000 |
 | * Extension                                                         | 0x0001 |
+| * SubjectsPerAccessControlEntry                                     | 0x0002 |
+| * TargetsPerAccessControlEntry                                      | 0x0003 |
+| * AccessControlEntriesPerFabric                                     | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -5017,6 +5020,7 @@ private:
 | * LocalConfigDisabled                                               | 0x0010 |
 | * Reachable                                                         | 0x0011 |
 | * UniqueID                                                          | 0x0012 |
+| * CapabilityMinima                                                  | 0x0013 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -20076,20 +20080,32 @@ void registerClusterAccessControl(Commands & commands, CredentialIssuerCommands 
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                      //
-        make_unique<ReadAttribute>(Id, "acl", Attributes::Acl::Id, credsIssuerConfig),                                          //
-        make_unique<ReadAttribute>(Id, "extension", Attributes::Extension::Id, credsIssuerConfig),                              //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),        //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                     //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                           //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                 //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                     //
-        make_unique<WriteAccessControlAcl>(credsIssuerConfig),                                                                  //
-        make_unique<WriteAccessControlExtension>(credsIssuerConfig),                                                            //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "acl", Attributes::Acl::Id, credsIssuerConfig),                                     //
-        make_unique<SubscribeAttribute>(Id, "extension", Attributes::Extension::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                         //
+        make_unique<ReadAttribute>(Id, "acl", Attributes::Acl::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "extension", Attributes::Extension::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "subjects-per-access-control-entry", Attributes::SubjectsPerAccessControlEntry::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "targets-per-access-control-entry", Attributes::TargetsPerAccessControlEntry::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "access-control-entries-per-fabric", Attributes::AccessControlEntriesPerFabric::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<WriteAccessControlAcl>(credsIssuerConfig),                                                             //
+        make_unique<WriteAccessControlExtension>(credsIssuerConfig),                                                       //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                            //
+        make_unique<SubscribeAttribute>(Id, "acl", Attributes::Acl::Id, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, "extension", Attributes::Extension::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "subjects-per-access-control-entry", Attributes::SubjectsPerAccessControlEntry::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "targets-per-access-control-entry", Attributes::TargetsPerAccessControlEntry::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "access-control-entries-per-fabric", Attributes::AccessControlEntriesPerFabric::Id,
+                                        credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -20260,6 +20276,7 @@ void registerClusterBasic(Commands & commands, CredentialIssuerCommands * credsI
         make_unique<ReadAttribute>(Id, "local-config-disabled", Attributes::LocalConfigDisabled::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                                //
         make_unique<ReadAttribute>(Id, "unique-id", Attributes::UniqueID::Id, credsIssuerConfig),                                 //
+        make_unique<ReadAttribute>(Id, "capability-minima", Attributes::CapabilityMinima::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                       //
@@ -20289,6 +20306,7 @@ void registerClusterBasic(Commands & commands, CredentialIssuerCommands * credsI
         make_unique<SubscribeAttribute>(Id, "local-config-disabled", Attributes::LocalConfigDisabled::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                           //
         make_unique<SubscribeAttribute>(Id, "unique-id", Attributes::UniqueID::Id, credsIssuerConfig),                            //
+        make_unique<SubscribeAttribute>(Id, "capability-minima", Attributes::CapabilityMinima::Id, credsIssuerConfig),            //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //

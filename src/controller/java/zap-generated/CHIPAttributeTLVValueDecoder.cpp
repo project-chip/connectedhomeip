@@ -246,6 +246,51 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
+        case Attributes::SubjectsPerAccessControlEntry::Id: {
+            using TypeInfo = Attributes::SubjectsPerAccessControlEntry::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                           cppValue, value);
+            return value;
+        }
+        case Attributes::TargetsPerAccessControlEntry::Id: {
+            using TypeInfo = Attributes::TargetsPerAccessControlEntry::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                           cppValue, value);
+            return value;
+        }
+        case Attributes::AccessControlEntriesPerFabric::Id: {
+            using TypeInfo = Attributes::AccessControlEntriesPerFabric::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                           cppValue, value);
+            return value;
+        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -1596,6 +1641,48 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             jobject value;
             value = env->NewStringUTF(std::string(cppValue.data(), cppValue.size()).c_str());
+            return value;
+        }
+        case Attributes::CapabilityMinima::Id: {
+            using TypeInfo = Attributes::CapabilityMinima::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            jobject value_caseSessionsPerFabric;
+            std::string value_caseSessionsPerFabricClassName     = "java/lang/Integer";
+            std::string value_caseSessionsPerFabricCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                value_caseSessionsPerFabricClassName.c_str(), value_caseSessionsPerFabricCtorSignature.c_str(),
+                cppValue.caseSessionsPerFabric, value_caseSessionsPerFabric);
+            jobject value_subscriptionsPerFabric;
+            std::string value_subscriptionsPerFabricClassName     = "java/lang/Integer";
+            std::string value_subscriptionsPerFabricCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                value_subscriptionsPerFabricClassName.c_str(), value_subscriptionsPerFabricCtorSignature.c_str(),
+                cppValue.subscriptionsPerFabric, value_subscriptionsPerFabric);
+
+            jclass capabilityMinimaStructStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$BasicClusterCapabilityMinimaStruct", capabilityMinimaStructStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipStructs$BasicClusterCapabilityMinimaStruct");
+                return nullptr;
+            }
+            jmethodID capabilityMinimaStructStructCtor =
+                env->GetMethodID(capabilityMinimaStructStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
+            if (capabilityMinimaStructStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipStructs$BasicClusterCapabilityMinimaStruct constructor");
+                return nullptr;
+            }
+
+            value = env->NewObject(capabilityMinimaStructStructClass, capabilityMinimaStructStructCtor, value_caseSessionsPerFabric,
+                                   value_subscriptionsPerFabric);
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {

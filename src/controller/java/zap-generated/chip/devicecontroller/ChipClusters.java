@@ -206,6 +206,36 @@ public class ChipClusters {
       subscribeExtensionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readSubjectsPerAccessControlEntryAttribute(IntegerAttributeCallback callback) {
+      readSubjectsPerAccessControlEntryAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeSubjectsPerAccessControlEntryAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeSubjectsPerAccessControlEntryAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readTargetsPerAccessControlEntryAttribute(IntegerAttributeCallback callback) {
+      readTargetsPerAccessControlEntryAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeTargetsPerAccessControlEntryAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeTargetsPerAccessControlEntryAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAccessControlEntriesPerFabricAttribute(IntegerAttributeCallback callback) {
+      readAccessControlEntriesPerFabricAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAccessControlEntriesPerFabricAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAccessControlEntriesPerFabricAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
       readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
@@ -264,6 +294,24 @@ public class ChipClusters {
 
     private native void subscribeExtensionAttribute(
         long chipClusterPtr, ExtensionAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readSubjectsPerAccessControlEntryAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeSubjectsPerAccessControlEntryAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readTargetsPerAccessControlEntryAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeTargetsPerAccessControlEntryAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAccessControlEntriesPerFabricAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeAccessControlEntriesPerFabricAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(
         long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
