@@ -165,6 +165,7 @@ public:
         printf("Test_TC_WNCV_1_1\n");
         printf("Test_TC_WNCV_2_1\n");
         printf("Test_TC_WNCV_2_2\n");
+        printf("Test_TC_WNCV_2_3\n");
         printf("Test_TC_WNCV_2_4\n");
         printf("Test_TC_WNCV_2_5\n");
         printf("Test_TC_WNCV_3_4\n");
@@ -41629,6 +41630,596 @@ private:
     }
 };
 
+class Test_TC_WNCV_2_3 : public TestCommandBridge {
+public:
+    Test_TC_WNCV_2_3()
+        : TestCommandBridge("Test_TC_WNCV_2_3")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_WNCV_2_3() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_WNCV_2_3\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_WNCV_2_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : 1a: TH set the Mode Attribute bit0 of the DUT\n");
+            if (ShouldSkip("WNCV_REVERSAL")) {
+                NextTest();
+                return;
+            }
+            err = Test1aThSetTheModeAttributeBit0OfTheDut_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : 1b: TH reads ConfigStatus attribute from DUT\n");
+            if (ShouldSkip("WNCV_REVERSAL")) {
+                NextTest();
+                return;
+            }
+            err = Test1bThReadsConfigStatusAttributeFromDut_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : 1c: TH clear the Mode Attribute bit0 of the DUT\n");
+            if (ShouldSkip("WNCV_REVERSAL")) {
+                NextTest();
+                return;
+            }
+            err = Test1cThClearTheModeAttributeBit0OfTheDut_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : 1d: TH reads ConfigStatus attribute from DUT\n");
+            if (ShouldSkip("WNCV_REVERSAL")) {
+                NextTest();
+                return;
+            }
+            err = Test1dThReadsConfigStatusAttributeFromDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : 2a: TH set the Mode Attribute bit1 of the DUT\n");
+            if (ShouldSkip("WNCV_CALIBRATION")) {
+                NextTest();
+                return;
+            }
+            err = Test2aThSetTheModeAttributeBit1OfTheDut_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : 2b: TH reads ConfigStatus attribute from DUT\n");
+            if (ShouldSkip("WNCV_CALIBRATION")) {
+                NextTest();
+                return;
+            }
+            err = Test2bThReadsConfigStatusAttributeFromDut_5();
+            break;
+        case 6:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 6 : 2c: If (ConfigStatus bit0 == 0) TH send DownOrClose command to the DUT\n");
+            if (ShouldSkip("WNCV_CALIBRATION")) {
+                NextTest();
+                return;
+            }
+            err = Test2cIfConfigStatusBit00ThSendDownOrCloseCommandToTheDut_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : 2d: TH clear the Mode Attribute bit1 of the DUT\n");
+            if (ShouldSkip("WNCV_CALIBRATION")) {
+                NextTest();
+                return;
+            }
+            err = Test2dThClearTheModeAttributeBit1OfTheDut_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : 2e: TH reads ConfigStatus attribute from DUT\n");
+            if (ShouldSkip("WNCV_CALIBRATION")) {
+                NextTest();
+                return;
+            }
+            err = Test2eThReadsConfigStatusAttributeFromDut_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : 2f: TH reads the Mode Attribute from the DUT\n");
+            if (ShouldSkip("WNCV_CALIBRATION")) {
+                NextTest();
+                return;
+            }
+            err = Test2fThReadsTheModeAttributeFromTheDut_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : 2g: TH send DownOrClose command to the DUT\n");
+            if (ShouldSkip("WNCV_CALIBRATION")) {
+                NextTest();
+                return;
+            }
+            err = Test2gThSendDownOrCloseCommandToTheDut_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : 3a: TH set the Mode Attribute bit2 of the DUT\n");
+            if (ShouldSkip("WNCV_MAINTENANCE")) {
+                NextTest();
+                return;
+            }
+            err = Test3aThSetTheModeAttributeBit2OfTheDut_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : 3c: TH reads ConfigStatus attribute from DUT\n");
+            if (ShouldSkip("WNCV_MAINTENANCE")) {
+                NextTest();
+                return;
+            }
+            err = Test3cThReadsConfigStatusAttributeFromDut_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : 3c: TH send DownOrClose command to the DUT\n");
+            if (ShouldSkip("WNCV_MAINTENANCE")) {
+                NextTest();
+                return;
+            }
+            err = Test3cThSendDownOrCloseCommandToTheDut_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : 3d: TH clear the Mode Attribute bit2 of the DUT\n");
+            if (ShouldSkip("WNCV_MAINTENANCE")) {
+                NextTest();
+                return;
+            }
+            err = Test3dThClearTheModeAttributeBit2OfTheDut_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : 3e: TH reads ConfigStatus attribute from DUT\n");
+            if (ShouldSkip("WNCV_MAINTENANCE")) {
+                NextTest();
+                return;
+            }
+            err = Test3eThReadsConfigStatusAttributeFromDut_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : 3f: TH reads the Mode Attribute from the DUT\n");
+            if (ShouldSkip("WNCV_MAINTENANCE")) {
+                NextTest();
+                return;
+            }
+            err = Test3fThReadsTheModeAttributeFromTheDut_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : 3g: TH send DownOrClose command to the DUT\n");
+            if (ShouldSkip("WNCV_MAINTENANCE")) {
+                NextTest();
+                return;
+            }
+            err = Test3gThSendDownOrCloseCommandToTheDut_17();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 18;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR Test1aThSetTheModeAttributeBit0OfTheDut_0()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id modeArgument;
+        modeArgument = [NSNumber numberWithUnsignedChar:1];
+        [cluster writeAttributeModeWithValue:modeArgument
+                           completionHandler:^(NSError * _Nullable err) {
+                               NSLog(@"1a: TH set the Mode Attribute bit0 of the DUT Error: %@", err);
+
+                               VerifyOrReturn(CheckValue("status", err, 0));
+
+                               NextTest();
+                           }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test1bThReadsConfigStatusAttributeFromDut_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeConfigStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"1b: TH reads ConfigStatus attribute from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("configStatus", [value unsignedCharValue], 4));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("configStatus", [value unsignedCharValue], 127));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test1cThClearTheModeAttributeBit0OfTheDut_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id modeArgument;
+        modeArgument = [NSNumber numberWithUnsignedChar:0];
+        [cluster writeAttributeModeWithValue:modeArgument
+                           completionHandler:^(NSError * _Nullable err) {
+                               NSLog(@"1c: TH clear the Mode Attribute bit0 of the DUT Error: %@", err);
+
+                               VerifyOrReturn(CheckValue("status", err, 0));
+
+                               NextTest();
+                           }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test1dThReadsConfigStatusAttributeFromDut_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeConfigStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"1d: TH reads ConfigStatus attribute from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("configStatus", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("configStatus", [value unsignedCharValue], 127));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test2aThSetTheModeAttributeBit1OfTheDut_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id modeArgument;
+        modeArgument = [NSNumber numberWithUnsignedChar:2];
+        [cluster writeAttributeModeWithValue:modeArgument
+                           completionHandler:^(NSError * _Nullable err) {
+                               NSLog(@"2a: TH set the Mode Attribute bit1 of the DUT Error: %@", err);
+
+                               VerifyOrReturn(CheckValue("status", err, 0));
+
+                               NextTest();
+                           }];
+
+        return CHIP_NO_ERROR;
+    }
+    NSNumber * _Nonnull configStatusValA;
+
+    CHIP_ERROR Test2bThReadsConfigStatusAttributeFromDut_5()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeConfigStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"2b: TH reads ConfigStatus attribute from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("configStatus", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("configStatus", [value unsignedCharValue], 127));
+            }
+            {
+                configStatusValA = value;
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test2cIfConfigStatusBit00ThSendDownOrCloseCommandToTheDut_6()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster downOrCloseWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"2c: If (ConfigStatus bit0 == 0) TH send DownOrClose command to the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_FAILURE));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test2dThClearTheModeAttributeBit1OfTheDut_7()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id modeArgument;
+        modeArgument = [NSNumber numberWithUnsignedChar:0];
+        [cluster writeAttributeModeWithValue:modeArgument
+                           completionHandler:^(NSError * _Nullable err) {
+                               NSLog(@"2d: TH clear the Mode Attribute bit1 of the DUT Error: %@", err);
+
+                               VerifyOrReturn(CheckValue("status", err, 0));
+
+                               NextTest();
+                           }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test2eThReadsConfigStatusAttributeFromDut_8()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeConfigStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"2e: TH reads ConfigStatus attribute from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("configStatus", [value unsignedCharValue], 1));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("configStatus", [value unsignedCharValue], 127));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test2fThReadsTheModeAttributeFromTheDut_9()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"2f: TH reads the Mode Attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("mode", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("mode", [value unsignedCharValue], 127));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test2gThSendDownOrCloseCommandToTheDut_10()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster downOrCloseWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"2g: TH send DownOrClose command to the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test3aThSetTheModeAttributeBit2OfTheDut_11()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id modeArgument;
+        modeArgument = [NSNumber numberWithUnsignedChar:4];
+        [cluster writeAttributeModeWithValue:modeArgument
+                           completionHandler:^(NSError * _Nullable err) {
+                               NSLog(@"3a: TH set the Mode Attribute bit2 of the DUT Error: %@", err);
+
+                               VerifyOrReturn(CheckValue("status", err, 0));
+
+                               NextTest();
+                           }];
+
+        return CHIP_NO_ERROR;
+    }
+    NSNumber * _Nonnull configStatusValB;
+
+    CHIP_ERROR Test3cThReadsConfigStatusAttributeFromDut_12()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeConfigStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"3c: TH reads ConfigStatus attribute from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("configStatus", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("configStatus", [value unsignedCharValue], 127));
+            }
+            {
+                configStatusValB = value;
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test3cThSendDownOrCloseCommandToTheDut_13()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster downOrCloseWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"3c: TH send DownOrClose command to the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_BUSY));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test3dThClearTheModeAttributeBit2OfTheDut_14()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id modeArgument;
+        modeArgument = [NSNumber numberWithUnsignedChar:0];
+        [cluster writeAttributeModeWithValue:modeArgument
+                           completionHandler:^(NSError * _Nullable err) {
+                               NSLog(@"3d: TH clear the Mode Attribute bit2 of the DUT Error: %@", err);
+
+                               VerifyOrReturn(CheckValue("status", err, 0));
+
+                               NextTest();
+                           }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test3eThReadsConfigStatusAttributeFromDut_15()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeConfigStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"3e: TH reads ConfigStatus attribute from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("configStatus", [value unsignedCharValue], 1));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("configStatus", [value unsignedCharValue], 127));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test3fThReadsTheModeAttributeFromTheDut_16()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"3f: TH reads the Mode Attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("mode", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("mode", [value unsignedCharValue], 127));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test3gThSendDownOrCloseCommandToTheDut_17()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster downOrCloseWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"3g: TH send DownOrClose command to the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_WNCV_2_4 : public TestCommandBridge {
 public:
     Test_TC_WNCV_2_4()
@@ -63397,6 +63988,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_WNCV_1_1>(),
         make_unique<Test_TC_WNCV_2_1>(),
         make_unique<Test_TC_WNCV_2_2>(),
+        make_unique<Test_TC_WNCV_2_3>(),
         make_unique<Test_TC_WNCV_2_4>(),
         make_unique<Test_TC_WNCV_2_5>(),
         make_unique<Test_TC_WNCV_3_4>(),
