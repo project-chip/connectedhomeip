@@ -358,7 +358,8 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     // Gets called when a fabric is deleted from KVS store
     void OnFabricDeletedFromStorage(CompressedFabricId compressedFabricId, FabricIndex fabricIndex) override
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric index 0x%x was deleted from fabric storage.", static_cast<unsigned>(fabricIndex));
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric index 0x%x was deleted from fabric storage.",
+                       static_cast<unsigned>(fabricIndex));
         fabricListChanged();
 
         // The Leave event SHOULD be emitted by a Node prior to permanently
@@ -391,8 +392,8 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     void OnFabricPersistedToStorage(FabricInfo * fabric) override
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "OpCreds: Fabric  index 0x%x was persisted to storage. FabricId " ChipLogFormatX64 ", NodeId " ChipLogFormatX64
-                       ", VendorId 0x%04" PRIX16,
+                       "OpCreds: Fabric  index 0x%x was persisted to storage. FabricId " ChipLogFormatX64
+                       ", NodeId " ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
                        static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         fabricListChanged();
@@ -694,7 +695,8 @@ exit:
     }
     else
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: successfully created fabric index %u via AddNOC", static_cast<unsigned>(fabricIndex));
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: successfully created fabric index %u via AddNOC",
+                       static_cast<unsigned>(fabricIndex));
     }
 
     return true;

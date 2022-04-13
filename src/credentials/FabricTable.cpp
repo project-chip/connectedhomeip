@@ -568,7 +568,8 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
     SetNOCCert(newFabric.mNOCCert);
     SetVendorId(newFabric.GetVendorId());
     SetFabricLabel(newFabric.GetFabricLabel());
-    ChipLogProgress(Discovery, "Added new fabric at index: 0x%x, Initialized: %d", static_cast<unsigned>(GetFabricIndex()), IsInitialized());
+    ChipLogProgress(Discovery, "Added new fabric at index: 0x%x, Initialized: %d", static_cast<unsigned>(GetFabricIndex()),
+                    IsInitialized());
     ChipLogProgress(Discovery, "Assigned compressed fabric ID: 0x" ChipLogFormatX64 ", node ID: 0x" ChipLogFormatX64,
                     ChipLogValueX64(mOperationalId.GetCompressedFabricId()), ChipLogValueX64(mOperationalId.GetNodeId()));
     return CHIP_NO_ERROR;
