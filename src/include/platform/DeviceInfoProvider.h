@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/AttributeList.h>
 
 namespace chip {
@@ -81,6 +82,13 @@ public:
     DeviceInfoProvider(const DeviceInfoProvider &) = delete;
     DeviceInfoProvider & operator=(const DeviceInfoProvider &) = delete;
 
+    /**
+     * @brief Set the storage implementation used for non-volatile storage of device information data.
+     *
+     * @param storage Pointer to storage instance to set. Cannot be nullptr, will assert.
+     */
+    void SetStorageDelegate(PersistentStorageDelegate * storage);
+
     CHIP_ERROR SetUserLabelList(EndpointId endpoint, const AttributeList<UserLabelType, kMaxUserLabelListLength> & labelList);
     CHIP_ERROR AppendUserLabel(EndpointId endpoint, const UserLabelType & label);
 
@@ -112,6 +120,8 @@ public:
     virtual SupportedCalendarTypesIterator * IterateSupportedCalendarTypes() = 0;
 
 protected:
+    PersistentStorageDelegate * mStorage = nullptr;
+
     /**
      * @brief Set the UserLabel at the specified index of the UserLabelList on a given endpoint
      *
