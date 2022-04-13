@@ -39,9 +39,13 @@ will then join the network.
     tools.
 
 -   Install some additional tools (likely already present for Matter
-    developers): `sudo apt install gcc g++ clang ninja-build python
-    python3-venv libssl-dev libavahi-client-dev libglib2.0-dev git cmake
-    python3-pip`
+    developers): 
+
+    ```
+    sudo apt install gcc g++ clang ninja-build python \
+      python3-venv libssl-dev libavahi-client-dev libglib2.0-dev git cmake \
+      python3-pip
+    ```
 
 -   Supported hardware:
     [CY8CKIT-062S2-43012](https://www.cypress.com/CY8CKIT-062S2-43012)

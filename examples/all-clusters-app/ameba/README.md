@@ -87,11 +87,11 @@ There are two commissioning modes supported by Ameba platform:
 
 ### IP mode
 
-1. In "connectedhomeip/config/ameba/args.gni"
+1. In `connectedhomeip/config/ameba/args.gni`
 
     - Set `chip_config_network_layer_ble = false`
 
-2. In "connectedhomeip/src/platform/Ameba/CHIPDevicePlatformConfig.h"
+2. In `connectedhomeip/src/platform/Ameba/CHIPDevicePlatformConfig.h`
 
     - Set `#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0`
 
