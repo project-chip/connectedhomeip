@@ -25,6 +25,8 @@ include(${CHEF}/project_include.cmake)
 
 get_filename_component(GEN_DIR ${CHEF}/out/${SAMPLE_NAME}/zap-generated REALPATH)
 
+set(CONF_FILE prj.conf)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${CONFIG_DEVICE_PRODUCT_ID}")
 set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID=${CONFIG_DEVICE_VENDOR_ID}")
@@ -32,17 +34,18 @@ set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_PLATFORM_NRFCONNECT=1")
 message(STATUS "Product ID " ${CONFIG_DEVICE_PRODUCT_ID})
 message(STATUS "Vendor ID " ${CONFIG_DEVICE_VENDOR_ID})
 
-# Load NCS/Zephyr build system
-set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/app/sample-defaults.conf prj.conf)
+# Set Kconfig root files that will be processed as a first Kconfig for used child images.
+set(mcuboot_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.mcuboot.root)
+set(multiprotocol_rpmsg_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.multiprotocol_rpmsg.root)
+
+list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
+find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.conf)
   list(APPEND CONF_FILE boards/${BOARD}.conf)
 endif()
 
-list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
-find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
-
-project(chip-nrfconnect-shell-example)
+project(chip-nrfconnect-chef-example)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
@@ -60,6 +63,7 @@ target_include_directories(app PRIVATE
                            ${GEN_DIR}
                            ${CHEF}
                            ${GEN_DIR}/../
+                           ${CHIP_ROOT}/src
                            ${NRFCONNECT_COMMON}/util/include
                            ${NRFCONNECT_COMMON}/app/include
 )

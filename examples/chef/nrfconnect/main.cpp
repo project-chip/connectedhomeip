@@ -22,6 +22,7 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+ #include <app/server/Dnssd.h>
 
 #include <ChipShellCollection.h>
 #include <lib/support/CHIPMem.h>
@@ -35,34 +36,68 @@
 
 using namespace chip;
 using namespace chip::Shell;
+using namespace chip::DeviceLayer;
 
-int main()
+namespace {
+    constexpr int kExtDiscoveryTimeoutSecs         = 20;
+}
+
+CHIP_ERROR main()
 {
-    chip::Platform::MemoryInit();
-    chip::DeviceLayer::PlatformMgr().InitChipStack();
-    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
+    CHIP_ERROR err = chip::Platform::MemoryInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Platform::MemoryInit() failed");
+        return err;
+    }
+
+    err = PlatformMgr().InitChipStack();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "PlatformMgr().InitChipStack() failed");
+        return err;
+    }
 
     // Network connectivity
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    chip::DeviceLayer::ConnectivityManagerImpl().StartWiFiManagement();
+    ConnectivityManagerImpl().StartWiFiManagement();
 #endif
 #if CHIP_ENABLE_OPENTHREAD
-    chip::DeviceLayer::ThreadStackMgr().InitThreadStack();
-#ifdef CONFIG_OPENTHREAD_MTD_SED
-    chip::DeviceLayer::ConnectivityMgr().SetThreadDeviceType(
-        chip::DeviceLayer::ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
-#else
-    chip::DeviceLayer::ConnectivityMgr().SetThreadDeviceType(
-        chip::DeviceLayer::ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
-#endif /* CONFIG_OPENTHREAD_MTD_SED */
-#endif /* CHIP_ENABLE_OPENTHREAD */
+    err = ThreadStackMgr().InitThreadStack();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "ThreadStackMgr().InitThreadStack() failed");
+        return err;
+    }
 
-    // Start IM server
-    chip::Server::GetInstance().Init();
+#ifdef CONFIG_OPENTHREAD_MTD
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+#else
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_FullEndDevice);
+#endif
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "ConnectivityMgr().SetThreadDeviceType() failed");
+        return err;
+    }
+#endif /* CHIP_ENABLE_OPENTHREAD */
 
     // Device Attestation & Onboarding codes
     chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(kExtDiscoveryTimeoutSecs);
+
+    // Start IM server
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
+
+    err = chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "PlatformMgr().StartEventLoopTask() failed");
+    }
 
     // When SoftAP support becomes available, it should be added here.
 #if CONFIG_NETWORK_LAYER_BLE
@@ -74,18 +109,17 @@ int main()
     // Starts commissioning window automatically. Starts BLE advertising when BLE enabled
     if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
     {
-        ChipLogError(Shell, "OpenBasicCommissioningWindow() failed");
+        ChipLogError(AppServer, "OpenBasicCommissioningWindow() failed");
     }
 
-    const int rc = Engine::Root().Init();
-
+#if CONFIG_ENABLE_CHIP_SHELL || CONFIG_CHIP_LIB_SHELL
+    int rc = Engine::Root().Init();
     if (rc != 0)
     {
-        ChipLogError(Shell, "Streamer initialization failed: %d", rc);
-        return rc;
+        ChipLogError(AppServer, "Streamer initialization failed: %d", rc);
+        return CHIP_ERROR_INTERNAL;
     }
 
-#if CONFIG_ENABLE_CHIP_SHELL
     cmd_misc_init();
     cmd_otcli_init();
     cmd_ping_init();
@@ -96,9 +130,9 @@ int main()
     cmd_app_server_init();
 #endif
 
-#if CONFIG_ENABLE_CHIP_SHELL
+#if CONFIG_ENABLE_CHIP_SHELL || CONFIG_CHIP_LIB_SHELL
     Engine::Root().RunMainLoop();
 #endif
 
-    return 0;
+    return err;
 }

@@ -350,7 +350,7 @@ true''')
         elif options.buildTarget == "nrfconnect":
             queueCommand(f"cd {paths['rootSampleFolder']}/nrfconnect")
             if options.doClean:
-                queueCommand(f"rm -rf {paths['rootSampleFolder']}/nrfconnect/build")
+                # queueCommand(f"rm -rf {paths['rootSampleFolder']}/nrfconnect/build")
                 queueCommand(f"west build -b nrf52840dk_nrf52840")
             else:
                 queueCommand(f"west build -b nrf52840dk_nrf52840")
