@@ -9,9 +9,7 @@ Mbed-OS 6.
 The following diagram shows a simplified structure of a Matter application which
 runs on the top of the Mbed-OS.
 
-<p align="center">
-    <img src="images/matter_mbedos_overview_simplified.png" alt="matter_mbedos_overview_simplified">
-</p>
+![matter_mbedos_overview_simplified](images/matter_mbedos_overview_simplified.png)
 
 # ARM Mbed-OS
 

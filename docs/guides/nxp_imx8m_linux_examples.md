@@ -247,31 +247,39 @@ Thermostat-app is used as an example below.
 
     -   Initialize the BT device on the **i.MX 8M Mini EVK** board
 
-              $ modprobe moal mod_para=nxp/wifi_mod_para.conf       # Load the Wi-Fi/BT firmware
-              $ hciattach /dev/ttymxc0 any 115200 flow              # Initialize the BT device
+              ```
+              modprobe moal mod_para=nxp/wifi_mod_para.conf       # Load the Wi-Fi/BT firmware
+              hciattach /dev/ttymxc0 any 115200 flow              # Initialize the BT device
+              ```
 
     -   Find the Bluetooth device id for **i.MX 8M Mini EVK** by executing the
         command below. The number following string `hci` is the Bluetooth device
         id, `0` in this example.
 
+              ```
               $ hciconfig
               hci0:   Type: Primary  Bus: USB
                       BD Address: 00:1A:7D:DA:71:13  ACL MTU: 310:10  SCO MTU: 64:8
                       UP RUNNING
                       RX bytes:73311 acl:1527 sco:0 events:3023 errors:0
                       TX bytes:48805 acl:1459 sco:0 commands:704 errors:0
+              ```
 
     -   Run the Linux Example App
 
-              $ /home/root/thermostat-app --ble-device 0 --wifi  # The bluetooth device used is hci0 and support wifi network
+              ```
+              /home/root/thermostat-app --ble-device 0 --wifi  # The bluetooth device used is hci0 and support wifi network
+              ```
 
     -   Run [ChipDeviceController](../../src/controller/python) on the
         controller device to communicate with **i.MX 8M Mini EVK** running the
         example.
 
+              ```
               $ sudo out/python_env/bin/chip-device-ctrl                                          # execute the tool
                 chip-device-ctrl > connect -ble 3840 20202021 8889                                # connect to i.MX 8M Mini EVK
                 chip-device-ctrl > zcl Thermostat SetpointRaiseLower 8889 1 0 mode=1 amount=10    # send command to i.MX 8M Mini EVK via BLE
+              ```
 
         (Note that the last two commands `connect -ble 3840 20202021 8889` and
         `zcl Thermostat SetpointRaiseLower 8889 1 0 mode=1 amount=10` are Python
