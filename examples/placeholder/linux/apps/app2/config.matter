@@ -91,6 +91,11 @@ server cluster ApplicationBasic = 1293 {
 }
 
 server cluster Basic = 40 {
+  struct CapabilityMinimaStruct {
+    int16u caseSessionsPerFabric = 0;
+    int16u subscriptionsPerFabric = 1;
+  }
+
   critical event StartUp = 0 {
     INT32U softwareVersion = 0;
   }
@@ -124,6 +129,7 @@ server cluster Basic = 40 {
   attribute boolean localConfigDisabled = 16;
   readonly attribute boolean reachable = 17;
   readonly attribute char_string<32> uniqueID = 18;
+  readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
   readonly attribute int16u clusterRevision = 65533;
 }
 

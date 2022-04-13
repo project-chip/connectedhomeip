@@ -113,9 +113,6 @@ public:
     static const char * OTACurrentUpdateState() { return "g/o/us"; }
     static const char * OTATargetVersion() { return "g/o/tv"; }
 
-    // [G]lobal [D]NS-related keys
-    static const char * DNSExtendedDiscoveryTimeout() { return "g/d/edt"; }
-
 private:
     // The ENFORCE_FORMAT args are "off by one" because this is a class method,
     // with an implicit "this" as first arg.

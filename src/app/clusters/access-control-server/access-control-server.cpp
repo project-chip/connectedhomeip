@@ -113,6 +113,21 @@ CHIP_ERROR AccessControlAttribute::Read(const ConcreteReadAttributePath & aPath,
         return ReadAcl(aEncoder);
     case AccessControlCluster::Attributes::Extension::Id:
         return ReadExtension(aEncoder);
+    // TODO(#14455): use API to get actual capabilities
+    case AccessControlCluster::Attributes::SubjectsPerAccessControlEntry::Id: {
+        uint16_t value = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY;
+        return aEncoder.Encode(value);
+    }
+    // TODO(#14455): use API to get actual capabilities
+    case AccessControlCluster::Attributes::TargetsPerAccessControlEntry::Id: {
+        uint16_t value = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY;
+        return aEncoder.Encode(value);
+    }
+    // TODO(#14455): use API to get actual capabilities
+    case AccessControlCluster::Attributes::AccessControlEntriesPerFabric::Id: {
+        uint16_t value = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC;
+        return aEncoder.Encode(value);
+    }
     case AccessControlCluster::Attributes::ClusterRevision::Id:
         return aEncoder.Encode(kClusterRevision);
     }

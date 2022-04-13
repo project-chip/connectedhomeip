@@ -312,6 +312,18 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 18 : Verify\n");
             err = TestVerify_18();
             break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Validate resource minima (SubjectsPerAccessControlEntry)\n");
+            err = TestValidateResourceMinimaSubjectsPerAccessControlEntry_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Validate resource minima (TargetsPerAccessControlEntry)\n");
+            err = TestValidateResourceMinimaTargetsPerAccessControlEntry_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Validate resource minima (AccessControlEntriesPerFabric)\n");
+            err = TestValidateResourceMinimaAccessControlEntriesPerFabric_21();
+            break;
         }
 
         if (CHIP_NO_ERROR != err) {
@@ -327,7 +339,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 19;
+    const uint16_t mTestCount = 22;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -1420,6 +1432,72 @@ private:
 
                               NextTest();
                           }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateResourceMinimaSubjectsPerAccessControlEntry_19()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeSubjectsPerAccessControlEntryWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate resource minima (SubjectsPerAccessControlEntry) Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("subjectsPerAccessControlEntry", [value unsignedShortValue], 4U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateResourceMinimaTargetsPerAccessControlEntry_20()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTargetsPerAccessControlEntryWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate resource minima (TargetsPerAccessControlEntry) Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("targetsPerAccessControlEntry", [value unsignedShortValue], 3U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestValidateResourceMinimaAccessControlEntriesPerFabric_21()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAccessControlEntriesPerFabricWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate resource minima (AccessControlEntriesPerFabric) Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("accessControlEntriesPerFabric", [value unsignedShortValue], 3U));
+            }
+
+            NextTest();
+        }];
 
         return CHIP_NO_ERROR;
     }
@@ -60060,7 +60138,7 @@ private:
 
             {
                 id actualValue = value;
-                VerifyOrReturn(CheckValue("AttributeList", [actualValue count], static_cast<uint32_t>(23)));
+                VerifyOrReturn(CheckValue("AttributeList", [actualValue count], static_cast<uint32_t>(24)));
                 VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
                 VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
                 VerifyOrReturn(CheckValue("", actualValue[2], 2UL));
@@ -60080,10 +60158,11 @@ private:
                 VerifyOrReturn(CheckValue("", actualValue[16], 16UL));
                 VerifyOrReturn(CheckValue("", actualValue[17], 17UL));
                 VerifyOrReturn(CheckValue("", actualValue[18], 18UL));
-                VerifyOrReturn(CheckValue("", actualValue[19], 65528UL));
-                VerifyOrReturn(CheckValue("", actualValue[20], 65529UL));
-                VerifyOrReturn(CheckValue("", actualValue[21], 65531UL));
-                VerifyOrReturn(CheckValue("", actualValue[22], 65533UL));
+                VerifyOrReturn(CheckValue("", actualValue[19], 19UL));
+                VerifyOrReturn(CheckValue("", actualValue[20], 65528UL));
+                VerifyOrReturn(CheckValue("", actualValue[21], 65529UL));
+                VerifyOrReturn(CheckValue("", actualValue[22], 65531UL));
+                VerifyOrReturn(CheckValue("", actualValue[23], 65533UL));
             }
 
             NextTest();
