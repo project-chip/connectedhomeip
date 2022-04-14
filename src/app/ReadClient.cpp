@@ -308,7 +308,7 @@ void ReadClient::DeduplicateNonWildcardAttributePath(const Span<AttributePathPar
 {
     for (auto first = aAttributePaths.begin(); first != aAttributePaths.end(); ++first)
     {
-        if(first->HasAttributeWildcard())
+        if (first->HasAttributeWildcard())
         {
             continue;
         }

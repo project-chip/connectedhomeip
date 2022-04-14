@@ -2551,17 +2551,17 @@ void TestReadInteraction::TestDeduplicateNonWildcardAttributePath(nlTestSuite * 
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     MockInteractionModelApp delegate;
     app::ReadClient client(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
-                               chip::app::ReadClient::InteractionType::Read);
+                           chip::app::ReadClient::InteractionType::Read);
 
     // Duplicate detects
     {
         AttributePathParams attribute[2];
-        attribute[0].mEndpointId = kInvalidEndpointId;
-        attribute[0].mClusterId = 1;
+        attribute[0].mEndpointId  = kInvalidEndpointId;
+        attribute[0].mClusterId   = 1;
         attribute[0].mAttributeId = kInvalidAttributeId;
 
-        attribute[1].mEndpointId = 1;
-        attribute[1].mClusterId = 1;
+        attribute[1].mEndpointId  = 1;
+        attribute[1].mClusterId   = 1;
         attribute[1].mAttributeId = 1;
 
         Span<AttributePathParams> attributePaths(attribute, 2);
@@ -2573,12 +2573,12 @@ void TestReadInteraction::TestDeduplicateNonWildcardAttributePath(nlTestSuite * 
     // Duplicate detects
     {
         AttributePathParams attribute[2];
-        attribute[0].mEndpointId = 1;
-        attribute[0].mClusterId = kInvalidClusterId;
+        attribute[0].mEndpointId  = 1;
+        attribute[0].mClusterId   = kInvalidClusterId;
         attribute[0].mAttributeId = kInvalidAttributeId;
 
-        attribute[1].mEndpointId = 1;
-        attribute[1].mClusterId = 1;
+        attribute[1].mEndpointId  = 1;
+        attribute[1].mClusterId   = 1;
         attribute[1].mAttributeId = 1;
 
         Span<AttributePathParams> attributePaths(attribute, 2);
@@ -2590,12 +2590,12 @@ void TestReadInteraction::TestDeduplicateNonWildcardAttributePath(nlTestSuite * 
     // Duplicate detects
     {
         AttributePathParams attribute[2];
-        attribute[0].mEndpointId = kInvalidEndpointId;
-        attribute[0].mClusterId = kInvalidClusterId;
+        attribute[0].mEndpointId  = kInvalidEndpointId;
+        attribute[0].mClusterId   = kInvalidClusterId;
         attribute[0].mAttributeId = kInvalidAttributeId;
 
-        attribute[1].mEndpointId = 1;
-        attribute[1].mClusterId = 1;
+        attribute[1].mEndpointId  = 1;
+        attribute[1].mClusterId   = 1;
         attribute[1].mAttributeId = 1;
 
         Span<AttributePathParams> attributePaths(attribute, 2);
@@ -2607,12 +2607,12 @@ void TestReadInteraction::TestDeduplicateNonWildcardAttributePath(nlTestSuite * 
     // Duplicate detects
     {
         AttributePathParams attribute[2];
-        attribute[0].mEndpointId = 1;
-        attribute[0].mClusterId = 1;
+        attribute[0].mEndpointId  = 1;
+        attribute[0].mClusterId   = 1;
         attribute[0].mAttributeId = kInvalidAttributeId;
 
-        attribute[1].mEndpointId = 1;
-        attribute[1].mClusterId = 1;
+        attribute[1].mEndpointId  = 1;
+        attribute[1].mClusterId   = 1;
         attribute[1].mAttributeId = 1;
 
         Span<AttributePathParams> attributePaths(attribute, 2);
@@ -2624,12 +2624,12 @@ void TestReadInteraction::TestDeduplicateNonWildcardAttributePath(nlTestSuite * 
     // Duplicate detects
     {
         AttributePathParams attribute[2];
-        attribute[0].mEndpointId = 1;
-        attribute[0].mClusterId = 1;
+        attribute[0].mEndpointId  = 1;
+        attribute[0].mClusterId   = 1;
         attribute[0].mAttributeId = 1;
 
-        attribute[1].mEndpointId = 1;
-        attribute[1].mClusterId = 1;
+        attribute[1].mEndpointId  = 1;
+        attribute[1].mClusterId   = 1;
         attribute[1].mAttributeId = 1;
 
         Span<AttributePathParams> attributePaths(attribute, 2);
@@ -2641,12 +2641,12 @@ void TestReadInteraction::TestDeduplicateNonWildcardAttributePath(nlTestSuite * 
     // No duplicate
     {
         AttributePathParams attribute[2];
-        attribute[0].mEndpointId = kInvalidEndpointId;
-        attribute[0].mClusterId = 1;
+        attribute[0].mEndpointId  = kInvalidEndpointId;
+        attribute[0].mClusterId   = 1;
         attribute[0].mAttributeId = 1;
 
-        attribute[1].mEndpointId = 1;
-        attribute[1].mClusterId = 1;
+        attribute[1].mEndpointId  = 1;
+        attribute[1].mClusterId   = 1;
         attribute[1].mAttributeId = 1;
 
         Span<AttributePathParams> attributePaths(attribute, 2);
@@ -2658,12 +2658,12 @@ void TestReadInteraction::TestDeduplicateNonWildcardAttributePath(nlTestSuite * 
     // No duplicate
     {
         AttributePathParams attribute[2];
-        attribute[0].mEndpointId = 1;
-        attribute[0].mClusterId = kInvalidClusterId;
+        attribute[0].mEndpointId  = 1;
+        attribute[0].mClusterId   = kInvalidClusterId;
         attribute[0].mAttributeId = 1;
 
-        attribute[1].mEndpointId = 1;
-        attribute[1].mClusterId = 1;
+        attribute[1].mEndpointId  = 1;
+        attribute[1].mClusterId   = 1;
         attribute[1].mAttributeId = 1;
 
         Span<AttributePathParams> attributePaths(attribute, 2);
@@ -2675,12 +2675,12 @@ void TestReadInteraction::TestDeduplicateNonWildcardAttributePath(nlTestSuite * 
     // No duplicate
     {
         AttributePathParams attribute[2];
-        attribute[0].mEndpointId = kInvalidEndpointId;
-        attribute[0].mClusterId = kInvalidClusterId;
+        attribute[0].mEndpointId  = kInvalidEndpointId;
+        attribute[0].mClusterId   = kInvalidClusterId;
         attribute[0].mAttributeId = 1;
 
-        attribute[1].mEndpointId = 1;
-        attribute[1].mClusterId = 1;
+        attribute[1].mEndpointId  = 1;
+        attribute[1].mClusterId   = 1;
         attribute[1].mAttributeId = 1;
 
         Span<AttributePathParams> attributePaths(attribute, 2);
@@ -2692,12 +2692,12 @@ void TestReadInteraction::TestDeduplicateNonWildcardAttributePath(nlTestSuite * 
     // No duplicate
     {
         AttributePathParams attribute[2];
-        attribute[0].mEndpointId = 1;
-        attribute[0].mClusterId = 2;
+        attribute[0].mEndpointId  = 1;
+        attribute[0].mClusterId   = 2;
         attribute[0].mAttributeId = 1;
 
-        attribute[1].mEndpointId = 1;
-        attribute[1].mClusterId = 1;
+        attribute[1].mEndpointId  = 1;
+        attribute[1].mClusterId   = 1;
         attribute[1].mAttributeId = 1;
 
         Span<AttributePathParams> attributePaths(attribute, 2);
@@ -2709,12 +2709,12 @@ void TestReadInteraction::TestDeduplicateNonWildcardAttributePath(nlTestSuite * 
     // two wildcard paths, the second path is part of the first path, No duplicate
     {
         AttributePathParams attribute[2];
-        attribute[0].mEndpointId = kInvalidEndpointId;
-        attribute[0].mClusterId = kInvalidClusterId;
+        attribute[0].mEndpointId  = kInvalidEndpointId;
+        attribute[0].mClusterId   = kInvalidClusterId;
         attribute[0].mAttributeId = kInvalidAttributeId;
 
-        attribute[1].mEndpointId = kInvalidEndpointId;
-        attribute[1].mClusterId = kInvalidClusterId;
+        attribute[1].mEndpointId  = kInvalidEndpointId;
+        attribute[1].mClusterId   = kInvalidClusterId;
         attribute[1].mAttributeId = 1;
 
         Span<AttributePathParams> attributePaths(attribute, 2);
@@ -2726,12 +2726,12 @@ void TestReadInteraction::TestDeduplicateNonWildcardAttributePath(nlTestSuite * 
     // two wildcard paths, the second path is not intersected with the first path, no duplicate
     {
         AttributePathParams attribute[2];
-        attribute[0].mEndpointId = 1;
-        attribute[0].mClusterId = kInvalidClusterId;
+        attribute[0].mEndpointId  = 1;
+        attribute[0].mClusterId   = kInvalidClusterId;
         attribute[0].mAttributeId = kInvalidAttributeId;
 
-        attribute[1].mEndpointId = 2;
-        attribute[1].mClusterId = kInvalidClusterId;
+        attribute[1].mEndpointId  = 2;
+        attribute[1].mClusterId   = kInvalidClusterId;
         attribute[1].mAttributeId = kInvalidAttributeId;
 
         Span<AttributePathParams> attributePaths(attribute, 2);

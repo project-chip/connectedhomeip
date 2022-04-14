@@ -117,7 +117,7 @@ struct AttributePathParams
     AttributeId mAttributeId = kInvalidAttributeId; // uint32
     EndpointId mEndpointId   = kInvalidEndpointId;  // uint16
     ListIndex mListIndex     = kInvalidListIndex;   // uint16
-    bool mIsDuplicate = false; // uint8
+    bool mIsDuplicate        = false;               // uint8
 };
 
 } // namespace app
