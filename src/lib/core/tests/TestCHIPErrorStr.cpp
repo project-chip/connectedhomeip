@@ -231,11 +231,6 @@ static const CHIP_ERROR kTestElements[] =
     CHIP_ERROR_PEER_NODE_NOT_FOUND,
     CHIP_ERROR_HSM,
     CHIP_ERROR_IM_STATUS_CODE_RECEIVED,
-<<<<<<< HEAD
-    CHIP_ERROR_MAX_RETRY_EXCEEDED,
-    CHIP_ERROR_PROVIDER_LIST_EXHAUSTED,
-||||||| parent of 3834a8deb (Add error codes from CHIPError.h that are missing from CHIPError.cpp and TestCHIPErrorStr.cpp)
-=======
     CHIP_ERROR_IM_MALFORMED_COMMAND_STATUS_IB,
     CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_IB,
     CHIP_ERROR_IM_MALFORMED_INVOKE_REQUEST_MESSAGE,
@@ -259,17 +254,9 @@ static const CHIP_ERROR kTestElements[] =
     CHIP_ERROR_INVALID_SCHEME_PREFIX,
     CHIP_ERROR_MISSING_URI_SEPARATOR,
     CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE,
-<<<<<<< HEAD
     CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE,
     CHIP_ERROR_INVALID_FILE_IDENTIFIER,
     CHIP_ERROR_BUSY
->>>>>>> 3834a8deb (Add error codes from CHIPError.h that are missing from CHIPError.cpp and TestCHIPErrorStr.cpp)
-||||||| parent of 390126501 (Add events missing in string translation and kTestElements[])
-    CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE,
-    CHIP_ERROR_INVALID_FILE_IDENTIFIER,
-    CHIP_ERROR_BUSY
-=======
->>>>>>> 390126501 (Add events missing in string translation and kTestElements[])
 };
 // clang-format on
 
