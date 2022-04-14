@@ -74,7 +74,7 @@ CHIP_ERROR ClusterStateCache::UpdateEventCache(const EventHeader & aEventHeader,
         //
         // If we've already seen this event before, there's no more work to be done.
         //
-        if (aEventHeader.mEventNumber < mHighestReceivedEventNumber)
+        if (aEventHeader.mEventNumber <= mHighestReceivedEventNumber)
         {
             return CHIP_NO_ERROR;
         }

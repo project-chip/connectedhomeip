@@ -236,7 +236,7 @@ public:
      * object that can be decoded using the DataModel::Decode machinery will work.
      *
      * Notable return values:
-     *      - If the provided attribute object's Cluster and Event IDs don't match that of the event in the cache,
+     *      - If the provided attribute object's Cluster and Event IDs don't match those of the event in the cache,
      *        a CHIP_ERROR_SCHEMA_MISMATCH shall be returned.
      *
      *      - If event doesn't exist in the cache, CHIP_ERROR_KEY_NOT_FOUND
@@ -262,7 +262,7 @@ public:
     }
 
     /*
-     * Retrieve the value of an event by updating a in-out TLVReader to be positioned
+     * Retrieve the data of an event by updating a in-out TLVReader to be positioned
      * right at the structure that encapsulates the event payload.
      *
      * Notable return values:
@@ -390,7 +390,7 @@ public:
      * The function is passed a const reference to the EventHeader associated with that event.
      *
      * The iterator is expected to have this signature:
-     *      CHIP_ERROR IteratorFunc(const EventHeader &eventHeader);
+     *      CHIP_ERROR IteratorFunc(const EventHeader & eventHeader);
      *
      * Notable return values:
      *      - If func returns an error, that will result in termination of any further iteration over events
@@ -416,7 +416,7 @@ public:
      * Execute an iterator function that is called for every StatusIB in the event status cache.
      *
      * The iterator is expected to have this signature:
-     *      CHIP_ERROR IteratorFunc(const ConcreteEventPath &eventPath, const StatusIB &statusIB);
+     *      CHIP_ERROR IteratorFunc(const ConcreteEventPath & eventPath, const StatusIB & statusIB);
      *
      * Notable return values:
      *      - If func returns an error, that will result in termination of any further iteration over events
@@ -503,7 +503,7 @@ private:
      * If apData is not null, updates the cached event set with the specified event header + payload.
      * If apData is null and apStatus is not null, the StatusIB is stored in the event status cache.
      *
-     * Storage of either of these do not affect pre-existing data for the other in the cache.
+     * Storage of either of these do not affect pre-existing data for the other events in the cache.
      *
      */
     CHIP_ERROR UpdateEventCache(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus);
