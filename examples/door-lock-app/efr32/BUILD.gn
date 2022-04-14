@@ -173,7 +173,6 @@ efr32_executable("door_lock_app") {
 
   deps = [
     ":sdk",
-    "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/door-lock-app/door-lock-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
