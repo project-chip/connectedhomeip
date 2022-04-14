@@ -177,77 +177,131 @@
 
 // Parallel array data (*cluster*, command, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER { \
-    257, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: ClearYearDaySchedule, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
+    60, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
+    60, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
+    60, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: SetWeekDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
-    62, /* Cluster: Operational Credentials, Command: AddNOC, Privilege: administer */ \
-    62, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: ClearYearDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    48, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
+    48, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
+    48, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
+    4, /* Cluster: Groups, Command: AddGroup, Privilege: manage */ \
+    4, /* Cluster: Groups, Command: RemoveGroup, Privilege: manage */ \
+    4, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
+    4, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
+    3, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
+    3, /* Cluster: Identify, Command: IdentifyQuery, Privilege: manage */ \
+    49, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
+    49, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
+    49, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
+    49, /* Cluster: Network Commissioning, Command: RemoveNetwork, Privilege: administer */ \
+    49, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
+    49, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
-    62, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
-    62, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
-    62, /* Cluster: Operational Credentials, Command: RemoveTrustedRootCertificate, Privilege: administer */ \
-    62, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: AddNOC, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: UpdateNOC, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: RemoveTrustedRootCertificate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *command*, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__COMMAND { \
-    38, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
-    29, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
-    13, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
-    16, /* Cluster: Door Lock, Command: ClearYearDaySchedule, Privilege: administer */ \
-    36, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
-    27, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
-    12, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
-    15, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
-    34, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
-    26, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
+    0, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
+    1, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
+    2, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
     11, /* Cluster: Door Lock, Command: SetWeekDaySchedule, Privilege: administer */ \
+    12, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
+    13, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
     14, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
-    6, /* Cluster: Operational Credentials, Command: AddNOC, Privilege: administer */ \
-    11, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
+    15, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
+    16, /* Cluster: Door Lock, Command: ClearYearDaySchedule, Privilege: administer */ \
+    26, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
+    27, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
+    29, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
+    34, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
+    36, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
+    38, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    0, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
+    2, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
+    4, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
+    0, /* Cluster: Groups, Command: AddGroup, Privilege: manage */ \
+    3, /* Cluster: Groups, Command: RemoveGroup, Privilege: manage */ \
+    4, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
+    5, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
+    0, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
+    1, /* Cluster: Identify, Command: IdentifyQuery, Privilege: manage */ \
+    0, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
+    2, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
+    3, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
+    4, /* Cluster: Network Commissioning, Command: RemoveNetwork, Privilege: administer */ \
+    6, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
+    8, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     0, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
-    4, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
     2, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
-    10, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
-    12, /* Cluster: Operational Credentials, Command: RemoveTrustedRootCertificate, Privilege: administer */ \
-    9, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
+    4, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
+    6, /* Cluster: Operational Credentials, Command: AddNOC, Privilege: administer */ \
     7, /* Cluster: Operational Credentials, Command: UpdateNOC, Privilege: administer */ \
+    9, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
+    10, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
+    11, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
+    12, /* Cluster: Operational Credentials, Command: RemoveTrustedRootCertificate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, command, *privilege*) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__PRIVILEGE { \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearYearDaySchedule, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetWeekDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: AddNOC, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearYearDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Groups, Command: AddGroup, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Groups, Command: RemoveGroup, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Identify, Command: IdentifyQuery, Privilege: manage */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: RemoveNetwork, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: RemoveTrustedRootCertificate, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: AddNOC, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: UpdateNOC, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: RemoveTrustedRootCertificate, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
