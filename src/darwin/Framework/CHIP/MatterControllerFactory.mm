@@ -272,7 +272,9 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
         }
 
         CHIPP256KeypairBridge keypairBridge;
-        keypairBridge.Init(startupParams.rootCAKeypair);
+        if (keypairBridge.Init(startupParams.rootCAKeypair) != CHIP_NO_ERROR) {
+            return;
+        }
         auto * fabric
             = fabricTable.FindFabric(Credentials::P256PublicKeySpan(keypairBridge.Pubkey().ConstBytes()), startupParams.fabricId);
 
@@ -297,6 +299,22 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
         okToStart = YES;
     });
 
+    if (startupParams.rootCAKeypair == nil) {
+        // TODO: This block needs for nil keypair needs to go away.
+        //
+        // We don't have to a public key to identify this fabric, so
+        // okToStart got set to false, just assume that it's OK to start
+        // the controller.  But only if we have no running controllers
+        // already, so we don't stomp on other controllers.
+        //
+        // Our controller is already in _controllers.
+        if ([_controllers count] == 1) {
+            okToStart = YES;
+        } else {
+            CHIP_LOG_ERROR("No root key, an a controller is already running.  Blocking second controller");
+        }
+    }
+
     if (okToStart == NO) {
         [self controllerShuttingDown:controller];
         return nil;
@@ -318,6 +336,14 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
         return nil;
     }
 
+    if (startupParams.rootCAKeypair == nil) {
+        // TODO: This block needs for nil keypair needs to go away.
+        //
+        // Disallow starting on a "new fabric" if there is no indication
+        // of what the new fabric should be.
+        return nil;
+    }
+
     // Create the controller, so we start the event loop, since we plan to do our fabric table operations there.
     auto * controller = [self createController];
     if (controller == nil) {
@@ -333,7 +359,10 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
         }
 
         CHIPP256KeypairBridge keypairBridge;
-        keypairBridge.Init(startupParams.rootCAKeypair);
+        if (keypairBridge.Init(startupParams.rootCAKeypair) != CHIP_NO_ERROR) {
+            CHIP_LOG_ERROR("Can't start controller without a usable public key");
+            return;
+        }
         auto * fabric
             = fabricTable.FindFabric(Credentials::P256PublicKeySpan(keypairBridge.Pubkey().ConstBytes()), startupParams.fabricId);
         if (fabric) {

@@ -81,7 +81,7 @@ CHIPDeviceController * InitializeCHIP(void)
             return;
         }
 
-        __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] init];
+        __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nil];
         params.vendorId = kTestVendorId;
         params.fabricId = 1;
 
@@ -102,7 +102,7 @@ CHIPDeviceController * CHIPRestartController(CHIPDeviceController * controller)
     [controller shutdown];
 
     NSLog(@"Starting up the stack");
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] init];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nil];
     params.vendorId = kTestVendorId;
     params.fabricId = 1;
 

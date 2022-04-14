@@ -89,6 +89,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (strong, nonatomic, nullable) NSData * ipk;
 
+- (instancetype)init NS_UNAVAILABLE;
+// TODO The keypair should not be nullable, but we need to sort out
+// CHIPClustersTests and CHIPTool use of these APIs first.
+- (instancetype)initWithKeypair:(_Nullable id<CHIPKeypair>)rootCAKeypair;
+
 @end
 
 @interface MatterControllerFactory : NSObject

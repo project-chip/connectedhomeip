@@ -137,11 +137,12 @@ CHIPDevice * GetConnectedDevice(void)
     BOOL ok = [factory startup:factoryParams];
     XCTAssertTrue(ok);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] init];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nil];
     params.vendorId = kTestVendorId;
     params.fabricId = 1;
 
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    // TODO: Once we have a non-nil keypair, use startControllerOnNewFabric.
+    CHIPDeviceController * controller = [factory startControllerOnExistingFabric:params];
     XCTAssertNotNil(controller);
 
     sController = controller;

@@ -727,15 +727,16 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 
 @implementation CHIPDeviceControllerStartupParams
 
-- (instancetype)init
+- (instancetype)initWithKeypair:(_Nullable id<CHIPKeypair>)rootCAKeypair
 {
     if (!(self = [super init])) {
         return nil;
     }
 
+    _rootCAKeypair = rootCAKeypair;
+
     // Set various invalid values.
     _vendorId = chip::VendorId::Common;
-    _rootCAKeypair = nil;
     _fabricId = chip::kUndefinedFabricId;
     _ipk = nil;
 

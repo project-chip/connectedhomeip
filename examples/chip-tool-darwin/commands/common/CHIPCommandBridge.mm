@@ -54,9 +54,8 @@ CHIP_ERROR CHIPCommandBridge::Run()
 
     ipk = [nocSigner getIPK];
 
-    auto controllerParams = [[CHIPDeviceControllerStartupParams alloc] init];
+    auto controllerParams = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nocSigner];
     controllerParams.vendorId = chip::VendorId::TestVendor1;
-    controllerParams.rootCAKeypair = nocSigner;
     controllerParams.fabricId = 1;
     controllerParams.ipk = ipk;
 
