@@ -87,11 +87,6 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
         return nil;
     }
 
-    _persistentStorageDelegateBridge = new CHIPPersistentStorageDelegateBridge();
-    if ([self checkForInitError:(_persistentStorageDelegateBridge != nullptr) logMsg:kErrorPersistentStorageInit]) {
-        return nil;
-    }
-
     _attestationTrustStoreBridge = new CHIPAttestationTrustStoreBridge();
     if ([self checkForInitError:(_attestationTrustStoreBridge != nullptr) logMsg:kErrorAttestationTrustStoreInit]) {
         return nil;
@@ -193,7 +188,11 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
             }
         }
 
-        _persistentStorageDelegateBridge->setFrameworkDelegate(startupParams.storageDelegate);
+        _persistentStorageDelegateBridge = new CHIPPersistentStorageDelegateBridge(startupParams.storageDelegate);
+        if (_persistentStorageDelegateBridge == nil) {
+            CHIP_LOG_ERROR("Error: %@", kErrorPersistentStorageInit);
+            return;
+        }
 
         // Initialize device attestation verifier
         if (startupParams.paaCerts) {
@@ -243,9 +242,14 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
     CHIP_LOG_DEBUG("%@", kInfoFactoryShutdown);
     _controllerFactory->Shutdown();
 
+    if (_persistentStorageDelegateBridge) {
+        delete _persistentStorageDelegateBridge;
+        _persistentStorageDelegateBridge = nullptr;
+    }
+
     // NOTE: we do not call cleanupOwnedObjects because we can be restarted, and
-    // that does not re-create the owned objects.  Maybe we should be creating
-    // them in startup?
+    // that does not re-create the owned objects that we create inside init.
+    // Maybe we should be creating them in startup?
 
     _isRunning = NO;
 }
