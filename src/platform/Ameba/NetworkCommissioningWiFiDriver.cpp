@@ -185,7 +185,7 @@ exit:
 
 CHIP_ERROR AmebaWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
-    if (ssid.data()) // ssid is given, only scan this network
+    if (!ssid.empty()) // ssid is given, only scan this network
     {
         matter_scan_networks_with_ssid(ssid.data(), ssid.size());
     }

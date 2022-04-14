@@ -81,14 +81,12 @@ namespace Controller {
 using namespace chip::Protocols::UserDirectedCommissioning;
 
 constexpr uint16_t kNumMaxActiveDevices = CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES;
-constexpr uint16_t kNumMaxPairedDevices = 128;
 
 // Raw functions for cluster callbacks
 void OnBasicFailure(void * context, CHIP_ERROR err);
 
 struct ControllerInitParams
 {
-    PersistentStorageDelegate * storageDelegate                     = nullptr;
     DeviceControllerSystemState * systemState                       = nullptr;
     DeviceDiscoveryDelegate * deviceDiscoveryDelegate               = nullptr;
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
@@ -147,12 +145,6 @@ public:
     virtual CHIP_ERROR Shutdown();
 
     CHIP_ERROR GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port);
-
-    /**
-     *   This function returns true if the device corresponding to `deviceId` has previously been commissioned
-     *   on the fabric.
-     */
-    bool DoesDevicePairingExist(const PeerId & deviceId);
 
     /**
      *   This function finds the device corresponding to deviceId, and establishes a secure connection with it.
@@ -247,21 +239,15 @@ protected:
 
     State mState;
 
-    SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
-    bool mPairedDevicesInitialized;
-
     PeerId mLocalId          = PeerId();
     FabricId mFabricId       = kUndefinedFabricId;
     FabricInfo * mFabricInfo = nullptr;
 
-    PersistentStorageDelegate * mStorageDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
     Dnssd::DiscoveredNodeData mCommissionableNodes[kMaxCommissionableNodes];
     DeviceControllerSystemState * mSystemState = nullptr;
 
-    CHIP_ERROR InitializePairedDeviceList();
-    CHIP_ERROR SetPairedDeviceList(ByteSpan pairedDeviceSerializedSet);
     ControllerDeviceInitParams GetControllerDeviceInitParams();
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
@@ -574,11 +560,6 @@ private:
 
     DeviceProxy * mDeviceBeingCommissioned               = nullptr;
     CommissioneeDeviceProxy * mDeviceInPASEEstablishment = nullptr;
-
-    /* This field is true when device pairing information changes, e.g. a new device is paired, or
-       the pairing for a device is removed. The DeviceCommissioner uses this to decide when to
-       persist the device list */
-    bool mPairedDevicesUpdated;
 
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
     bool mRunCommissioningAfterConnection  = false;

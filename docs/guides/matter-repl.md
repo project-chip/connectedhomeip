@@ -149,9 +149,7 @@ cloud-hosted playground.
 The following icon is present at the top of applicable guides that can be
 launched into the playground:
 
-<a href="https://www.w3schools.com">
-<img src="https://i.ibb.co/hR3yWsC/launch-playground.png" alt="drawing" width="130"/>
-</a>
+![Launch playground icon](https://i.ibb.co/hR3yWsC/launch-playground.png")
 <br></br>
 
 ## Guides

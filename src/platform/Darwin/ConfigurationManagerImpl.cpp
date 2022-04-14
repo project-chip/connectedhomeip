@@ -44,6 +44,7 @@
 #include <IOKit/network/IOEthernetController.h>
 #include <IOKit/network/IOEthernetInterface.h>
 #include <IOKit/network/IONetworkInterface.h>
+#include <IOKit/network/IONetworkMedium.h>
 #endif // TARGET_OS_OSX
 
 namespace chip {
@@ -99,15 +100,26 @@ CHIP_ERROR GetMACAddressFromInterfaces(io_iterator_t primaryInterfaceIterator, u
 
     while ((interfaceService = IOIteratorNext(primaryInterfaceIterator)))
     {
-        CFTypeRef MACAddressAsCFData = nullptr;
-        kernResult                   = IORegistryEntryGetParentEntry(interfaceService, kIOServicePlane, &controllerService);
+        CFTypeRef MACAddressAsCFData   = nullptr;
+        CFTypeRef linkStatusAsCFNumber = nullptr;
+        kernResult                     = IORegistryEntryGetParentEntry(interfaceService, kIOServicePlane, &controllerService);
         VerifyOrExit(KERN_SUCCESS == kernResult, err = CHIP_ERROR_INTERNAL);
 
-        MACAddressAsCFData = IORegistryEntryCreateCFProperty(controllerService, CFSTR(kIOMACAddress), kCFAllocatorDefault, 0);
-        VerifyOrExit(MACAddressAsCFData != nullptr, err = CHIP_ERROR_INTERNAL);
+        linkStatusAsCFNumber = IORegistryEntryCreateCFProperty(controllerService, CFSTR(kIOLinkStatus), kCFAllocatorDefault, 0);
+        VerifyOrExit(linkStatusAsCFNumber != nullptr, err = CHIP_ERROR_INTERNAL);
 
-        CFDataGetBytes((CFDataRef) MACAddressAsCFData, CFRangeMake(0, kIOEthernetAddressSize), buf);
-        CFRelease(MACAddressAsCFData);
+        uint64_t linkStatus;
+        CFNumberGetValue((CFNumberRef) linkStatusAsCFNumber, CFNumberType::kCFNumberLongType, &linkStatus);
+        CFRelease(linkStatusAsCFNumber);
+
+        if ((linkStatus & kIONetworkLinkValid) && (linkStatus & kIONetworkLinkActive))
+        {
+            MACAddressAsCFData = IORegistryEntryCreateCFProperty(controllerService, CFSTR(kIOMACAddress), kCFAllocatorDefault, 0);
+            VerifyOrExit(MACAddressAsCFData != nullptr, err = CHIP_ERROR_INTERNAL);
+
+            CFDataGetBytes((CFDataRef) MACAddressAsCFData, CFRangeMake(0, kIOEthernetAddressSize), buf);
+            CFRelease(MACAddressAsCFData);
+        }
 
         kernResult = IOObjectRelease(controllerService);
         VerifyOrExit(KERN_SUCCESS == kernResult, err = CHIP_ERROR_INTERNAL);

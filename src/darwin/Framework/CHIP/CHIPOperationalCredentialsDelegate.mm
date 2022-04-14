@@ -346,8 +346,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
         }
     }
     if (!haveRootCert) {
-        ReturnErrorOnFailure(rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipRootId, mIssuerId));
-        ReturnErrorOnFailure(rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId));
+        ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterRCACId(mIssuerId));
+        ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterFabricId(fabricId));
 
         NSLog(@"Generating RCAC");
         X509CertRequestParams rcac_request = { 0, validityStart, validityEnd, rcac_dn, rcac_dn };
@@ -363,8 +363,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
     icac.reduce_size(0);
 
     ChipDN noc_dn;
-    ReturnErrorOnFailure(noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId));
-    ReturnErrorOnFailure(noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipNodeId, nodeId));
+    ReturnErrorOnFailure(noc_dn.AddAttribute_MatterFabricId(fabricId));
+    ReturnErrorOnFailure(noc_dn.AddAttribute_MatterNodeId(nodeId));
     ReturnErrorOnFailure(noc_dn.AddCATs(cats));
 
     X509CertRequestParams noc_request = { 1, validityStart, validityEnd, noc_dn, rcac_dn };

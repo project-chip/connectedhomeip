@@ -383,10 +383,12 @@ def NrfTargets():
         target.Extend('nrf52840dk', board=NrfBoard.NRF52840DK),
     ]
 
-    # Enable nrf52840dongle for lighting app only
+    # Enable nrf52840dongle for all-clusters and lighting app only
+    yield target.Extend('nrf52840dongle-all-clusters', board=NrfBoard.NRF52840DONGLE, app=NrfApp.ALL_CLUSTERS)
     yield target.Extend('nrf52840dongle-light', board=NrfBoard.NRF52840DONGLE, app=NrfApp.LIGHT)
 
     for target in targets:
+        yield target.Extend('all-clusters', app=NrfApp.ALL_CLUSTERS)
         yield target.Extend('lock', app=NrfApp.LOCK)
         yield target.Extend('light', app=NrfApp.LIGHT)
         yield target.Extend('shell', app=NrfApp.SHELL)
@@ -482,6 +484,7 @@ def cc13x2x7_26x2x7Targets():
     yield target.Extend('lock-mtd', app=cc13x2x7_26x2x7App.LOCK, openthread_ftd=False)
     yield target.Extend('pump', app=cc13x2x7_26x2x7App.PUMP)
     yield target.Extend('pump-controller', app=cc13x2x7_26x2x7App.PUMP_CONTROLLER)
+    yield target.Extend('all-clusters', app=cc13x2x7_26x2x7App.ALL_CLUSTERS)
 
 
 def Cyw30739Targets():

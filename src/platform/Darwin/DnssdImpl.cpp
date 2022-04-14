@@ -543,6 +543,8 @@ static CHIP_ERROR Resolve(void * context, DnssdResolveCallback callback, uint32_
     DNSServiceRef sdRef;
     ResolveContext * sdCtx;
 
+    ChipLogProgress(Controller, "Resolve type=%s name=%s", type, name);
+
     sdCtx = chip::Platform::New<ResolveContext>(context, callback, name, addressType);
     err   = DNSServiceResolve(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDot, OnResolve, sdCtx);
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err), CHIP_ERROR_INTERNAL);
