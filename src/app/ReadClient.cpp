@@ -213,6 +213,8 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
     Span<DataVersionFilter> dataVersionFilters(aReadPrepareParams.mpDataVersionFilterList,
                                                aReadPrepareParams.mDataVersionFilterListSize);
 
+    DeduplicateNonWildcardAttributePath(attributePaths);
+
     System::PacketBufferHandle msgBuf;
     ReadRequestMessage::Builder request;
     System::PacketBufferTLVWriter writer;
@@ -302,11 +304,40 @@ CHIP_ERROR ReadClient::GenerateEventPaths(EventPathIBs::Builder & aEventPathsBui
     return aEventPathsBuilder.GetError();
 }
 
+void ReadClient::DeduplicateNonWildcardAttributePath(const Span<AttributePathParams> & aAttributePaths)
+{
+    for (auto first = aAttributePaths.begin(); first != aAttributePaths.end(); ++first)
+    {
+        if(first->HasAttributeWildcard())
+        {
+            continue;
+        }
+        ConcreteAttributePath concreteAttributePath(first->mEndpointId, first->mClusterId, first->mAttributeId);
+        for (auto second = aAttributePaths.begin(); second != first; ++second)
+        {
+            if (second->IncludesSingleAttributesInCluster(concreteAttributePath))
+            {
+                first->mIsDuplicate = true;
+                break;
+            }
+            if (second->IsSameAttribute(*first))
+            {
+                first->mIsDuplicate = true;
+                break;
+            }
+        }
+    }
+}
+
 CHIP_ERROR ReadClient::GenerateAttributePaths(AttributePathIBs::Builder & aAttributePathIBsBuilder,
                                               const Span<AttributePathParams> & aAttributePaths)
 {
     for (auto & attribute : aAttributePaths)
     {
+        if (attribute.IsDuplicate())
+        {
+            continue;
+        }
         VerifyOrReturnError(attribute.IsValidAttributePath(), CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
         AttributePathIB::Builder & path = aAttributePathIBsBuilder.CreatePath();
         ReturnErrorOnFailure(aAttributePathIBsBuilder.GetError());
@@ -852,6 +883,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     VerifyOrReturnError(aReadPrepareParams.mMinIntervalFloorSeconds <= aReadPrepareParams.mMaxIntervalCeilingSeconds,
                         err = CHIP_ERROR_INVALID_ARGUMENT);
 
+    DeduplicateNonWildcardAttributePath(attributePaths);
     System::PacketBufferHandle msgBuf;
     System::PacketBufferTLVWriter writer;
     SubscribeRequestMessage::Builder request;
@@ -981,5 +1013,6 @@ void ReadClient::UpdateDataVersionFilters(const ConcreteDataAttributePath & aPat
         }
     }
 }
+
 } // namespace app
 } // namespace chip

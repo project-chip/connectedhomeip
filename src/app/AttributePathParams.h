@@ -99,10 +99,25 @@ struct AttributePathParams
         return HasWildcardAttributeId();
     }
 
+    // check if input concrete attribute path is subset of current wildcard attribute
+    bool IncludesSingleAttributesInCluster(const ConcreteAttributePath & aOther) const
+    {
+        return IncludesAllAttributesInCluster(aOther);
+    }
+
+    // check if input attribute path is same as current one.
+    bool IsSameAttribute(const AttributePathParams & aOther) const
+    {
+        return (mEndpointId == aOther.mEndpointId) && (mClusterId == aOther.mClusterId) && (mAttributeId == aOther.mAttributeId);
+    }
+
+    bool IsDuplicate() { return mIsDuplicate; }
+
     ClusterId mClusterId     = kInvalidClusterId;   // uint32
     AttributeId mAttributeId = kInvalidAttributeId; // uint32
     EndpointId mEndpointId   = kInvalidEndpointId;  // uint16
     ListIndex mListIndex     = kInvalidListIndex;   // uint16
+    bool mIsDuplicate = false; // uint8
 };
 
 } // namespace app

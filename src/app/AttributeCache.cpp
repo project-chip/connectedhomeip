@@ -351,7 +351,7 @@ CHIP_ERROR AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::B
 
     for (auto & attribute : aAttributePaths)
     {
-        if (attribute.HasAttributeWildcard())
+        if (attribute.HasAttributeWildcard() && !attribute.IsDuplicate())
         {
             mRequestPathSet.insert(attribute);
         }
