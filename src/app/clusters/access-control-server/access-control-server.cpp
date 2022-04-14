@@ -46,19 +46,12 @@ using ExtensionEvent = Clusters::AccessControl::Events::AccessControlExtensionCh
 // TODO(#13590): generated code doesn't automatically handle max length so do it manually
 constexpr int kExtensionDataMaxLength = 128;
 
-constexpr int kClusterRevision = 1;
+constexpr uint16_t kClusterRevision = 1;
 
 namespace {
 
 class AccessControlAttribute : public AttributeAccessInterface, public EntryListener
 {
-    struct SubjectDescriptorRAII
-    {
-        SubjectDescriptorRAII(const SubjectDescriptor * subjectDescriptor) : mSubjectDescriptor(subjectDescriptor) {}
-        ~SubjectDescriptorRAII() { mSubjectDescriptor = nullptr; }
-        const SubjectDescriptor *& mSubjectDescriptor;
-    };
-
 public:
     AccessControlAttribute() : AttributeAccessInterface(Optional<EndpointId>(0), AccessControlCluster::Id) {}
 
@@ -66,16 +59,14 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 public:
-    void OnEntryChanged(FabricIndex fabric, size_t index, const Entry & entry, ChangeType changeType) override;
+    void OnEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry & entry,
+                        ChangeType changeType) override;
 
 private:
     CHIP_ERROR ReadAcl(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadExtension(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteAcl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
     CHIP_ERROR WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
-
-private:
-    const SubjectDescriptor * mSubjectDescriptor = nullptr;
 } sAttribute;
 
 CHIP_ERROR LogExtensionChangedEvent(const AccessControlCluster::Structs::ExtensionEntry::Type & item,
@@ -200,7 +191,6 @@ CHIP_ERROR AccessControlAttribute::Write(const ConcreteDataAttributePath & aPath
 
 CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
-    SubjectDescriptorRAII raii(mSubjectDescriptor = &aDecoder.GetSubjectDescriptor());
     FabricIndex accessingFabricIndex = aDecoder.AccessingFabricIndex();
 
     if (!aPath.IsListItemOperation())
@@ -236,15 +226,13 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
         {
             if (i < oldCount)
             {
-                ReturnErrorOnFailure(GetAccessControl().UpdateEntry(accessingFabricIndex, i, iterator.GetValue().GetEntry()));
-                // ReturnErrorOnFailure(LogAclChangedEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
-                //                                        AccessControlCluster::ChangeTypeEnum::kChanged));
+                ReturnErrorOnFailure(GetAccessControl().UpdateEntry(&aDecoder.GetSubjectDescriptor(), accessingFabricIndex, i,
+                                                                    iterator.GetValue().GetEntry()));
             }
             else
             {
-                ReturnErrorOnFailure(GetAccessControl().CreateEntry(accessingFabricIndex, nullptr, iterator.GetValue().GetEntry()));
-                // ReturnErrorOnFailure(LogAclChangedEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
-                //                                        AccessControlCluster::ChangeTypeEnum::kAdded));
+                ReturnErrorOnFailure(GetAccessControl().CreateEntry(&aDecoder.GetSubjectDescriptor(), accessingFabricIndex, nullptr,
+                                                                    iterator.GetValue().GetEntry()));
             }
             ++i;
         }
@@ -252,13 +240,8 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
 
         while (i < oldCount)
         {
-            // AccessControl::Entry entry;
-
             --oldCount;
-            // ReturnErrorOnFailure(GetAccessControl().ReadEntry(accessingFabricIndex, oldCount, entry));
-            // ReturnErrorOnFailure(
-            //    LogAclChangedEvent(entry, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kRemoved));
-            ReturnErrorOnFailure(GetAccessControl().DeleteEntry(accessingFabricIndex, oldCount));
+            ReturnErrorOnFailure(GetAccessControl().DeleteEntry(&aDecoder.GetSubjectDescriptor(), accessingFabricIndex, oldCount));
         }
     }
     else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
@@ -266,9 +249,8 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
         AclStorage::DecodableEntry decodableEntry;
         ReturnErrorOnFailure(aDecoder.Decode(decodableEntry));
 
-        ReturnErrorOnFailure(GetAccessControl().CreateEntry(accessingFabricIndex, nullptr, decodableEntry.GetEntry()));
-        // ReturnErrorOnFailure(
-        //    LogAclChangedEvent(item.entry, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kAdded));
+        ReturnErrorOnFailure(GetAccessControl().CreateEntry(&aDecoder.GetSubjectDescriptor(), accessingFabricIndex, nullptr,
+                                                            decodableEntry.GetEntry()));
     }
     else
     {
@@ -354,9 +336,17 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
     return CHIP_NO_ERROR;
 }
 
-void AccessControlAttribute::OnEntryChanged(FabricIndex fabric, size_t index, const Entry & entry, ChangeType changeType)
+void AccessControlAttribute::OnEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index,
+                                            const Entry & entry, ChangeType changeType)
 {
-    ChipLogProgress(DataManagement, "AccessControlCluster: ACL changed, %s subject descriptor", mSubjectDescriptor ? "HAVE" : "NO");
+    ChipLogProgress(DataManagement, "AccessControlCluster: ACL changed, %s subject descriptor", subjectDescriptor ? "HAVE" : "NO");
+
+    // TODO: currently, all cases where we don't have a subject descriptor
+    // are cases where we don't want to send an event.
+    if (subjectDescriptor == nullptr)
+    {
+        return;
+    }
 
     CHIP_ERROR err;
     AclEvent event{ .changeType = ChangeTypeEnum::kChanged };
@@ -370,18 +360,20 @@ void AccessControlAttribute::OnEntryChanged(FabricIndex fabric, size_t index, co
         event.changeType = ChangeTypeEnum::kRemoved;
     }
 
-    if (mSubjectDescriptor != nullptr)
+#if 0
+    if (subjectDescriptor != nullptr)
     {
-        event.adminFabricIndex = mSubjectDescriptor->fabricIndex;
-        if (mSubjectDescriptor->authMode == Access::AuthMode::kCase)
+        event.adminFabricIndex = subjectDescriptor->fabricIndex;
+        if (subjectDescriptor->authMode == Access::AuthMode::kCase)
         {
-            event.adminNodeID.SetNonNull(mSubjectDescriptor->subject);
+            event.adminNodeID.SetNonNull(subjectDescriptor->subject);
         }
-        else if (mSubjectDescriptor->authMode == Access::AuthMode::kPase)
+        else if (subjectDescriptor->authMode == Access::AuthMode::kPase)
         {
-            event.adminPasscodeID.SetNonNull(PAKEKeyIdFromNodeId(mSubjectDescriptor->subject));
+            event.adminPasscodeID.SetNonNull(PAKEKeyIdFromNodeId(subjectDescriptor->subject));
         }
     }
+#endif
 
     // TODO: handle entry (latestValue) not available (will need to change listener API)
     // TODO: for now, gonna say if removing, don't do this (issues with having a valid entry)

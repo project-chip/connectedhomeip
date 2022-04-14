@@ -302,7 +302,8 @@ public:
 
         virtual ~EntryListener() = default;
 
-        virtual void OnEntryChanged(FabricIndex fabric, size_t index, const Entry & entry, ChangeType changeType) = 0;
+        virtual void OnEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index,
+                                    const Entry & entry, ChangeType changeType) = 0;
 
     private:
         EntryListener * mNext = nullptr;
@@ -425,7 +426,7 @@ public:
      * @param [in]  entry       Entry from which to copy.
      * @param [out] fabricIndex Fabric index of created entry, if not null, in which case entry `index` will be relative to fabric.
      */
-    CHIP_ERROR CreateEntry(FabricIndex fabric, size_t * index, const Entry & entry)
+    CHIP_ERROR CreateEntry(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t * index, const Entry & entry)
     {
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
@@ -435,7 +436,7 @@ public:
         {
             *index = i;
         }
-        NotifyEntryChanged(fabric, i, entry, EntryListener::ChangeType::kAdded);
+        NotifyEntryChanged(subjectDescriptor, fabric, i, entry, EntryListener::ChangeType::kAdded);
         return CHIP_NO_ERROR;
     }
 
@@ -486,12 +487,12 @@ public:
      * @param [in] entry        Entry from which to copy.
      * @param [in] fabricIndex  Fabric to which entry `index` is relative, if not null.
      */
-    CHIP_ERROR UpdateEntry(FabricIndex fabric, size_t index, const Entry & entry)
+    CHIP_ERROR UpdateEntry(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry & entry)
     {
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(mDelegate->UpdateEntry(index, entry, &fabric));
-        NotifyEntryChanged(fabric, index, entry, EntryListener::ChangeType::kUpdated);
+        NotifyEntryChanged(subjectDescriptor, fabric, index, entry, EntryListener::ChangeType::kUpdated);
         return CHIP_NO_ERROR;
     }
 
@@ -515,7 +516,7 @@ public:
      * @param [in] index        Entry index of entry to delete. May be relative to `fabricIndex`.
      * @param [in] fabricIndex  Fabric to which entry `index` is relative, if not null.
      */
-    CHIP_ERROR DeleteEntry(FabricIndex fabric, size_t index)
+    CHIP_ERROR DeleteEntry(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index)
     {
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         ChipLogProgress(DataManagement, "############### in DeleteEntry");
@@ -530,7 +531,7 @@ public:
             }
         }
         ReturnErrorOnFailure(mDelegate->DeleteEntry(index, &fabric));
-        NotifyEntryChanged(fabric, index, entry, EntryListener::ChangeType::kRemoved);
+        NotifyEntryChanged(subjectDescriptor, fabric, index, entry, EntryListener::ChangeType::kRemoved);
         return CHIP_NO_ERROR;
     }
 
@@ -593,7 +594,8 @@ private:
 
     bool IsValid(const Entry & entry);
 
-    void NotifyEntryChanged(FabricIndex fabric, size_t index, const Entry & entry, EntryListener::ChangeType changeType);
+    void NotifyEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry & entry,
+                            EntryListener::ChangeType changeType);
 
 private:
     Delegate * mDelegate = nullptr;

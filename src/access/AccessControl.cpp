@@ -481,11 +481,12 @@ exit:
     return false;
 }
 
-void AccessControl::NotifyEntryChanged(FabricIndex fabric, size_t index, const Entry & entry, EntryListener::ChangeType changeType)
+void AccessControl::NotifyEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index,
+                                       const Entry & entry, EntryListener::ChangeType changeType)
 {
     for (EntryListener * l = mEntryListener; l != nullptr; l = l->mNext)
     {
-        l->OnEntryChanged(fabric, index, entry, changeType);
+        l->OnEntryChanged(subjectDescriptor, fabric, index, entry, changeType);
     }
 }
 

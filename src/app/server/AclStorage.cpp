@@ -225,7 +225,8 @@ CHIP_ERROR Convert(const StagingTarget & from, Target & to)
 class : public EntryListener
 {
 public:
-    void OnEntryChanged(FabricIndex fabric, size_t index, const Entry & entry, ChangeType changeType) override
+    void OnEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry & entry,
+                        ChangeType changeType) override
     {
         auto & storage = Server::GetInstance().GetPersistentStorage();
         DefaultStorageKeyAllocator key;
@@ -434,7 +435,7 @@ CHIP_ERROR AclStorage::Init()
             Entry & entry = decodableEntry.GetEntry();
             ReturnErrorOnFailure(entry.SetFabricIndex(fabric));
 
-            ReturnErrorOnFailure(GetAccessControl().CreateEntry(fabric, nullptr, entry));
+            ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, fabric, nullptr, entry));
         }
     }
 
