@@ -109,7 +109,7 @@ CHIP_ERROR OTAImageProcessorImpl::SwitchToNextImage(const ByteSpan & aRemainingD
         mCurrentImage.mCurrentOffset = aRemainingData.size();
     }
     return error;
-} 
+}
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
 {
