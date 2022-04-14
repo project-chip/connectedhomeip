@@ -112,6 +112,9 @@ public:
     static const char * OTACurrentUpdateState() { return "g/o/us"; }
     static const char * OTATargetVersion() { return "g/o/tv"; }
 
+    // Event number counter.
+    const char * IMEventNumber() { return Format("g/im/e"); }
+
 private:
     // The ENFORCE_FORMAT args are "off by one" because this is a class method,
     // with an implicit "this" as first arg.
