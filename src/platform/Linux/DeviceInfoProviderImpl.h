@@ -29,15 +29,6 @@ public:
     DeviceInfoProviderImpl() = default;
     ~DeviceInfoProviderImpl() override {}
 
-    /**
-     *  Initialize the DeviceInfoProvider, including possibly any persistent
-     *  data store initialization done by the implementation. Must be called once
-     *  before any other API succeeds.
-     *
-     *  @retval #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR Init();
-
     // Iterators
     FixedLabelIterator * IterateFixedLabel(EndpointId endpoint) override;
     UserLabelIterator * IterateUserLabel(EndpointId endpoint) override;
@@ -109,8 +100,6 @@ protected:
     CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override;
 
 private:
-    DeviceLayer::Internal::ChipLinuxStorage mStorage;
-
     static constexpr size_t UserLabelTLVMaxSize() { return TLV::EstimateStructOverhead(kMaxLabelNameLength, kMaxLabelValueLength); }
 };
 
