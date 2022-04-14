@@ -142,7 +142,7 @@ exit:
     return res;
 }
 
-bool ReadKey(const char * fileName, EVP_PKEY * key)
+bool ReadKey(const char * fileName, EVP_PKEY * key, bool ignorErrorIfUnsupportedCurve)
 {
     bool res            = true;
     uint32_t keyDataLen = 0;
@@ -207,7 +207,8 @@ bool ReadKey(const char * fileName, EVP_PKEY * key)
         }
     }
 
-    if (EC_GROUP_get_curve_name(EC_KEY_get0_group(EVP_PKEY_get1_EC_KEY(key))) != gNIDChipCurveP256)
+    if ((EC_GROUP_get_curve_name(EC_KEY_get0_group(EVP_PKEY_get1_EC_KEY(key))) != gNIDChipCurveP256) &&
+        !ignorErrorIfUnsupportedCurve)
     {
         fprintf(stderr, "Specified key uses unsupported Elliptic Curve\n");
         ExitNow(res = false);
@@ -221,6 +222,27 @@ bool GenerateKeyPair(EVP_PKEY * key)
 {
     bool res = true;
     std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EC_KEY_new_by_curve_name(gNIDChipCurveP256), &EC_KEY_free);
+
+    VerifyOrExit(key != nullptr, res = false);
+
+    if (!EC_KEY_generate_key(ecKey.get()))
+    {
+        ReportOpenSSLErrorAndExit("EC_KEY_generate_key", res = false);
+    }
+
+    if (!EVP_PKEY_set1_EC_KEY(key, ecKey.get()))
+    {
+        ReportOpenSSLErrorAndExit("EVP_PKEY_set1_EC_KEY", res = false);
+    }
+
+exit:
+    return res;
+}
+
+bool GenerateKeyPair_Secp256k1(EVP_PKEY * key)
+{
+    bool res = true;
+    std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EC_KEY_new_by_curve_name(NID_secp256k1), &EC_KEY_free);
 
     VerifyOrExit(key != nullptr, res = false);
 
