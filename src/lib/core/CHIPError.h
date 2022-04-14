@@ -2373,14 +2373,30 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_BUSY                     CHIP_CORE_ERROR(0xdb)
 
 /**
+ * @def CHIP_ERROR_MAX_RETRY_EXCEEDED
+ *
+ * @brief
+ *   The maximum retry limit has been exceeded.
+ */
+#define CHIP_ERROR_MAX_RETRY_EXCEEDED   CHIP_CORE_ERROR(0xdc)
+
+/**
+ * @def CHIP_ERROR_PROVIDER_LIST_EXHAUSTED
+ *
+ * @brief
+ *   The provider list has been exhausted.
+ */
+#define CHIP_ERROR_PROVIDER_LIST_EXHAUSTED   CHIP_CORE_ERROR(0xdd)
+
+/**
  *  @}
  */
 
 // clang-format on
 
 // !!!!! IMPORTANT !!!!!  If you add new CHIP errors, please update the translation
-// of error codes to strings in CHIPError.cpp, and add them to unittest
-// in test-apps/TestErrorStr.cpp
+// of error codes to strings in CHIPError.cpp, and add them to kTestElements[]
+// in core/tests/TestCHIPErrorStr.cpp
 
 namespace chip {
 
