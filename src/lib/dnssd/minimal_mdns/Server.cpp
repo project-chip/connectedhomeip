@@ -407,7 +407,14 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
     {
         // if we had failures, log if the final status was success or failure, to make log reading
         // easier. Some mDNS failures may be expected (e.g. for interfaces unavailable)
-        ChipLogProgress(Discovery, "mDNS broadcast had %u successes and %u failures.", successes, failures);
+        if (successes != 0)
+        {
+            ChipLogDetail(Discovery, "mDNS broadcast had only partial success: %u successes and %u failures.", successes, failures);
+        }
+        else
+        {
+            ChipLogProgress(Discovery, "mDNS broadcast full failed in %u separate send attempts.", failures);
+        }
     }
 
     if (!successes)
