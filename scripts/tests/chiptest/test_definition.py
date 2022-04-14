@@ -145,14 +145,14 @@ class App:
 class TestTarget(Enum):
     ALL_CLUSTERS = auto()
     TV = auto()
-    DOOR_LOCK = auto()
+    LOCK = auto()
 
 
 @dataclass
 class ApplicationPaths:
     chip_tool: typing.List[str]
     all_clusters_app: typing.List[str]
-    door_lock_app: typing.List[str]
+    lock_app: typing.List[str]
     tv_app: typing.List[str]
 
 
@@ -212,8 +212,8 @@ class TestDefinition:
                 app_cmd = paths.all_clusters_app
             elif self.target == TestTarget.TV:
                 app_cmd = paths.tv_app
-            elif self.target == TestTarget.DOOR_LOCK:
-                app_cmd = paths.door_lock_app
+            elif self.target == TestTarget.LOCK:
+                app_cmd = paths.lock_app
             else:
                 raise Exception("Unknown test target - "
                                 "don't know which application to run")
