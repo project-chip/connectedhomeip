@@ -63,9 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic, nullable) NSString * kvsPath;
 
 - (instancetype)init NS_UNAVAILABLE;
-// TODO The delegate should not be nullable, but we need to sort out
-// CHIPClustersTests use of these APIs first.
-- (instancetype)initWithStorage:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate;
+- (instancetype)initWithStorage:(id<CHIPPersistentStorageDelegate>)storageDelegate;
 @end
 
 @interface CHIPDeviceControllerStartupParams : NSObject
