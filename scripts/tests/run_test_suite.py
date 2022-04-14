@@ -114,7 +114,7 @@ def main(context, log_level, target, target_glob, target_skip_glob,
         log_fmt = '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
-    if (chip_tool is None):
+    if chip_tool is None:
         chip_tool = FindBinaryPath('chip-tool')
 
     # Figures out selected test that match the given name(s)
@@ -183,13 +183,13 @@ def cmd_list(context):
 def cmd_run(context, iterations, all_clusters_app, door_lock_app, tv_app, pics_file):
     runner = chiptest.runner.Runner()
 
-    if (all_clusters_app is None):
+    if all_clusters_app is None:
         all_clusters_app = FindBinaryPath('chip-all-clusters-app')
 
-    if (door_lock_app is None):
+    if door_lock_app is None:
         door_lock_app = FindBinaryPath('chip-door-lock-app')
 
-    if (tv_app is None):
+    if tv_app is None:
         tv_app = FindBinaryPath('chip-tv-app')
 
     # Command execution requires an array
