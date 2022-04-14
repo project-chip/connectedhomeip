@@ -57,6 +57,10 @@ OptionDef gCmdOptionDefs[] =
     { "out-key",          kArgumentRequired, 'O' },
     { "valid-from",       kArgumentRequired, 'f' },
     { "lifetime",         kArgumentRequired, 'l' },
+#if CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
+    { "ignore-error",     kNoArgument,       'i' },
+    { "error-type",       kArgumentRequired, 'e' },
+#endif
     { }
 };
 
@@ -119,6 +123,55 @@ const char * const gCmdOptionHelp =
     "       4294967295 to indicate that certificate doesn't have well defined\n"
     "       expiration date\n"
     "\n"
+#if CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
+    "   -i, --ignore-error\n"
+    "\n"
+    "       Ignore some input parameters error.\n"
+    "       WARNING: This option makes it possible to circumvent attestation certificate\n"
+    "       structure requirement. This is required for negative testing of the attestation flow.\n"
+    "       Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.\n"
+    "\n"
+    "   -e, --error-type <error-type>\n"
+    "\n"
+    "       When specified injects specific error into the structure of generated attestation certificate.\n"
+    "       Note that 'ignore-error' option MUST be specified for this error injection to take effect.\n"
+    "       Supported error types that can be injected are:\n"
+    "           no-error                         - No error to inject.\n"
+    "           cert-version                     - Certificate version will be set to v2 instead of required v3.\n"
+    "           sig-algo                         - Use ecdsa-with-SHA1 signature algorithm instead of required ecdsa-with-SHA256.\n"
+    "           issuer-vid                       - TODO\n"
+    "           issuer-pid                       - TODO\n"
+    "           subject-vid                      - TODO\n"
+    "           subject-pid                      - TODO\n"
+    "           sig-curve                        - Use secp256k1 curve to generate certificate signature instead of\n"
+    "                                              required secp256r1 (aka prime256v1).\n"
+    "           ext-basic-missing                - Certificate won't have required Basic Constraint extension.\n"
+    "           ext-basic-critical-missing       - Basic Constraint extension won't have critical field.\n"
+    "           ext-basic-critical-wrong         - Basic Constraint extension will be marked as non-critical.\n"
+    "           ext-basic-ca-missing             - Basic Constraint extension won't have cA field.\n"
+    "           ext-basic-ca-wrong               - Basic Constraint extension cA field will be set to TRUE for DAC\n"
+    "                                              and to FALSE for PAI and PAA.\n"
+    "           ext-basic-pathlen-presence-wrong - Basic Constraint extension will include pathLen field for DAC\n"
+    "                                              and won't have pathLen field for PAI and PAA.\n"
+    "           ext-basic-pathlen0               - Basic Constraint extension pathLen field will be set to 0.\n"
+    "           ext-basic-pathlen1               - Basic Constraint extension pathLen field will be set to 1.\n"
+    "           ext-basic-pathlen2               - Basic Constraint extension pathLen field will be set to 2.\n"
+    "           ext-key-usage-missing            - Certificate won't have required Key Usage extension.\n"
+    "           ext-key-usage-critical-missing   - Key Usage extension won't have critical field.\n"
+    "           ext-key-usage-critical-wrong     - Key Usage extension will be marked as non-critical.\n"
+    "           ext-key-usage-dig-sig            - Key Usage extension digitalSignature flag won't be set for DAC\n"
+    "                                              and will be set for PAI/PAA.\n"
+    "           ext-key-usage-key-cert-sign      - Key Usage extension keyCertSign flag will be set for DAC\n"
+    "                                              and won't be set for PAI/PAA.\n"
+    "           ext-key-usage-crl-sign           - Key Usage extension cRLSign flag will be set for DAC\n"
+    "                                              and won't set for PAI/PAA.\n"
+    "           ext-akid-missing                 - Certificate won't have required Authority Key ID extension.\n"
+    "           ext-skid-missing                 - Certificate won't have required Subject Key ID extension.\n"
+    "           ext-extended-key-usage           - Certificate will include optional Extended Key Usage extension.\n"
+    "           ext-authority-info-access        - Certificate will include optional Authority Information Access extension.\n"
+    "           ext-subject-alt-name             - Certificate will include optional Subject Alternative Name extension.\n"
+    "\n"
+#endif
     ;
 
 OptionSet gCmdOptions =
@@ -156,6 +209,7 @@ const char * gOutCertFileName = nullptr;
 const char * gOutKeyFileName  = nullptr;
 uint32_t gValidDays           = kCertValidDays_Undefined;
 struct tm gValidFrom;
+AttestationCertErrors gCertErrors;
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {
@@ -233,6 +287,110 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
             return false;
         }
         break;
+#if CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
+    case 'i':
+        gCertErrors.EnableErrorTestCase();
+        break;
+    case 'e':
+        if (strcmp(arg, "cert-version") == 0)
+        {
+            gCertErrors.SetCertVersionWrong();
+        }
+        else if (strcmp(arg, "sig-algo") == 0)
+        {
+            gCertErrors.SetSigAlgoWrong();
+        }
+        else if (strcmp(arg, "sig-curve") == 0)
+        {
+            gCertErrors.SetSigCurveWrong();
+        }
+        else if (strcmp(arg, "ext-basic-missing") == 0)
+        {
+            gCertErrors.SetExtensionBasicMissing();
+        }
+        else if (strcmp(arg, "ext-basic-critical-missing") == 0)
+        {
+            gCertErrors.SetExtensionBasicCriticalMissing();
+        }
+        else if (strcmp(arg, "ext-basic-critical-wrong") == 0)
+        {
+            gCertErrors.SetExtensionBasicCriticalWrong();
+        }
+        else if (strcmp(arg, "ext-basic-ca-missing") == 0)
+        {
+            gCertErrors.SetExtensionBasicCAMissing();
+        }
+        else if (strcmp(arg, "ext-basic-ca-wrong") == 0)
+        {
+            gCertErrors.SetExtensionBasicCAWrong();
+        }
+        else if (strcmp(arg, "ext-basic-pathlen-presence-wrong") == 0)
+        {
+            gCertErrors.SetExtensionBasicPathLenPresenceWrong();
+        }
+        else if (strcmp(arg, "ext-basic-pathlen0") == 0)
+        {
+            gCertErrors.SetExtensionBasicPathLen0();
+        }
+        else if (strcmp(arg, "ext-basic-pathlen1") == 0)
+        {
+            gCertErrors.SetExtensionBasicPathLen1();
+        }
+        else if (strcmp(arg, "ext-basic-pathlen2") == 0)
+        {
+            gCertErrors.SetExtensionBasicPathLen2();
+        }
+        else if (strcmp(arg, "ext-key-usage-missing") == 0)
+        {
+            gCertErrors.SetExtensionKeyUsageMissing();
+        }
+        else if (strcmp(arg, "ext-key-usage-critical-missing") == 0)
+        {
+            gCertErrors.SetExtensionKeyUsageCriticalMissing();
+        }
+        else if (strcmp(arg, "ext-key-usage-critical-wrong") == 0)
+        {
+            gCertErrors.SetExtensionKeyUsageCriticalWrong();
+        }
+        else if (strcmp(arg, "ext-key-usage-dig-sig") == 0)
+        {
+            gCertErrors.SetExtensionKeyUsageDigitalSigWrong();
+        }
+        else if (strcmp(arg, "ext-key-usage-key-cert-sign") == 0)
+        {
+            gCertErrors.SetExtensionKeyUsageKeyCertSignWrong();
+        }
+        else if (strcmp(arg, "ext-key-usage-crl-sign") == 0)
+        {
+            gCertErrors.SetExtensionKeyUsageCRLSignWrong();
+        }
+        else if (strcmp(arg, "ext-akid-missing") == 0)
+        {
+            gCertErrors.SetExtensionAKIDMissing();
+        }
+        else if (strcmp(arg, "ext-skid-missing") == 0)
+        {
+            gCertErrors.SetExtensionSKIDMissing();
+        }
+        else if (strcmp(arg, "ext-extended-key-usage") == 0)
+        {
+            gCertErrors.SetExtensionExtendedKeyUsagePresent();
+        }
+        else if (strcmp(arg, "ext-authority-info-access") == 0)
+        {
+            gCertErrors.SetExtensionAuthorityInfoAccessPresent();
+        }
+        else if (strcmp(arg, "ext-subject-alt-name") == 0)
+        {
+            gCertErrors.SetExtensionextSubjectAltNamePresent();
+        }
+        else if (strcmp(arg, "no-error") != 0)
+        {
+            PrintArgError("%s: Invalid value specified for the error type: %s\n", progName, arg);
+            return false;
+        }
+        break;
+#endif
     default:
         PrintArgError("%s: Unhandled option: %s\n", progName, name);
         return false;
@@ -266,33 +424,42 @@ bool Cmd_GenAttCert(int argc, char * argv[])
     res = ParseArgs(CMD_NAME, argc, argv, gCmdOptionSets);
     VerifyTrueOrExit(res);
 
+    if (gCertErrors.IsErrorTestCaseEnabled())
+    {
+        fprintf(stderr,
+                "WARNING: The ignor-error option is set. This option makes it possible to generate invalid certificates.\n");
+    }
+
     if (gAttCertType == kAttCertType_NotSpecified)
     {
         fprintf(stderr, "Please specify attestation certificate type.\n");
         return false;
     }
-    if (gAttCertType == kAttCertType_DAC)
+    else if (!gCertErrors.IsErrorTestCaseEnabled())
     {
-        if (gSubjectVID == VendorId::NotSpecified || gSubjectPID == 0)
+        if (gAttCertType == kAttCertType_DAC)
         {
-            fprintf(stderr, "Please specify VID and PID subject DN attributes.\n");
-            return false;
+            if (gSubjectVID == VendorId::NotSpecified || gSubjectPID == 0)
+            {
+                fprintf(stderr, "Please specify VID and PID subject DN attributes.\n");
+                return false;
+            }
         }
-    }
-    else if (gAttCertType == kAttCertType_PAI)
-    {
-        if (gSubjectVID == VendorId::NotSpecified)
+        else if (gAttCertType == kAttCertType_PAI)
         {
-            fprintf(stderr, "Please specify VID subject DN attributes.\n");
-            return false;
+            if (gSubjectVID == VendorId::NotSpecified)
+            {
+                fprintf(stderr, "Please specify VID subject DN attributes.\n");
+                return false;
+            }
         }
-    }
-    else if (gAttCertType == kAttCertType_PAA)
-    {
-        if (gSubjectPID != 0)
+        else if (gAttCertType == kAttCertType_PAA)
         {
-            fprintf(stderr, "VID & PID SHALL NOT specify subject DN attributes.\n");
-            return false;
+            if (gSubjectPID != 0)
+            {
+                fprintf(stderr, "VID & PID SHALL NOT specify subject DN attributes.\n");
+                return false;
+            }
         }
     }
 
@@ -367,7 +534,7 @@ bool Cmd_GenAttCert(int argc, char * argv[])
     if (gAttCertType == kAttCertType_PAA)
     {
         res = MakeAttCert(gAttCertType, gSubjectCN, gSubjectVID, gSubjectPID, gEncodeVIDandPIDasCN, newCert.get(), newKey.get(),
-                          gValidFrom, gValidDays, newCert.get(), newKey.get());
+                          gValidFrom, gValidDays, newCert.get(), newKey.get(), gCertErrors);
         VerifyTrueOrExit(res);
     }
     else
@@ -382,7 +549,7 @@ bool Cmd_GenAttCert(int argc, char * argv[])
         VerifyTrueOrExit(res);
 
         res = MakeAttCert(gAttCertType, gSubjectCN, gSubjectVID, gSubjectPID, gEncodeVIDandPIDasCN, caCert.get(), caKey.get(),
-                          gValidFrom, gValidDays, newCert.get(), newKey.get());
+                          gValidFrom, gValidDays, newCert.get(), newKey.get(), gCertErrors);
         VerifyTrueOrExit(res);
     }
 
