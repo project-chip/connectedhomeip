@@ -14,17 +14,17 @@
  *    limitations under the License.
  */
 
-#ifndef MATTER_STACK_INTERNAL_H
-#define MATTER_STACK_INTERNAL_H
+#ifndef MATTER_CONTROLLER_FACTORY_INTERNAL_H
+#define MATTER_CONTROLLER_FACTORY_INTERNAL_H
 
 /**
- * Parts of MatterStack that are not part of the framework API.
+ * Parts of MatterControllerFactory that are not part of the framework API.
  * Mostly for use from CHIPDeviceController.
  */
 
 #import <Foundation/Foundation.h>
 
-#import "MatterStack.h"
+#import "MatterControllerFactory.h"
 
 class CHIPPersistentStorageDelegateBridge;
 
@@ -38,7 +38,7 @@ namespace Credentials {
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MatterStack (InternalMethods)
+@interface MatterControllerFactory (InternalMethods)
 
 - (void)controllerShuttingDown:(CHIPDeviceController *)controller;
 
@@ -49,4 +49,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 NS_ASSUME_NONNULL_END
 
-#endif // MATTER_STACK_INTERNAL_H
+#endif // MATTER_CONTROLLER_FACTORY_INTERNAL_H

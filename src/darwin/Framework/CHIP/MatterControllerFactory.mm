@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#import "MatterStack.h"
-#import "MatterStack_Internal.h"
+#import "MatterControllerFactory.h"
+#import "MatterControllerFactory_Internal.h"
 
 #import "CHIPAttestationTrustStoreBridge.h"
 #import "CHIPControllerAccessControl.h"
@@ -37,13 +37,13 @@ using namespace chip::Controller;
 static NSString * const kErrorMemoryInit = @"Init Memory failure";
 static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
 static NSString * const kErrorAttestationTrustStoreInit = @"Init failure while creating the attestation trust store";
-static NSString * const kInfoStackShutdown = @"Shutting down the Matter Stack";
+static NSString * const kInfoFactorykShutdown = @"Shutting down the Matter controller factory";
 static NSString * const kErrorGroupProviderInit = @"Init failure while initializing group data provider";
 static NSString * const kErrorKVSInit = @"Init Key Value Store failure";
 static NSString * const kErrorControllersInit = @"Init controllers array failure";
 static NSString * const kErrorControllerFactoryInit = @"Init failure while initializing controller factory";
 
-@interface MatterStack ()
+@interface MatterControllerFactory ()
 
 @property (atomic, readonly) dispatch_queue_t chipWorkQueue;
 @property (readonly) DeviceControllerFactory * controllerFactory;
@@ -58,17 +58,17 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
 
 @end
 
-@implementation MatterStack
+@implementation MatterControllerFactory
 
-+ (MatterStack *)singletonStack
++ (instancetype)sharedInstance
 {
-    static MatterStack * stack = nil;
+    static MatterControllerFactory * factory = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        // initialize the stack.
-        stack = [[MatterStack alloc] init];
+        // initialize the factory.
+        factory = [[MatterControllerFactory alloc] init];
     });
-    return stack;
+    return factory;
 }
 
 - (instancetype)init
@@ -166,10 +166,10 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
     Platform::MemoryShutdown();
 }
 
-- (BOOL)startup:(MatterStackStartupParams *)startupParams
+- (BOOL)startup:(MatterControllerFactoryParams *)startupParams
 {
     if ([self isRunning]) {
-        CHIP_LOG_DEBUG("Ignoring duplicate call to startup, Matter stack already started...");
+        CHIP_LOG_DEBUG("Ignoring duplicate call to startup, Matter controller factory already started...");
         return YES;
     }
 
@@ -238,7 +238,7 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
         [_controllers[0] shutdown];
     }
 
-    CHIP_LOG_DEBUG("%@", kInfoStackShutdown);
+    CHIP_LOG_DEBUG("%@", kInfoFactoryShutdown);
     _controllerFactory->Shutdown();
 
     // NOTE: we do not call cleanupOwnedObjects because we can be restarted, and
@@ -251,7 +251,7 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
 - (CHIPDeviceController * _Nullable)startControllerOnExistingFabric:(CHIPDeviceControllerStartupParams *)startupParams
 {
     if (![self isRunning]) {
-        CHIP_LOG_ERROR("Trying to start controller while Matter stack is not running");
+        CHIP_LOG_ERROR("Trying to start controller while Matter controller factory is not running");
         return nil;
     }
 
@@ -268,7 +268,7 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
 - (CHIPDeviceController * _Nullable)startControllerOnNewFabric:(CHIPDeviceControllerStartupParams *)startupParams
 {
     if (![self isRunning]) {
-        CHIP_LOG_ERROR("Trying to start controller while Matter stack is not running");
+        CHIP_LOG_ERROR("Trying to start controller while Matter controlle factory is not running");
         return nil;
     }
 
@@ -285,7 +285,7 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
         return nil;
     }
 
-    CHIPDeviceController * controller = [[CHIPDeviceController alloc] initWithStack:self queue:_chipWorkQueue];
+    CHIPDeviceController * controller = [[CHIPDeviceController alloc] initWithFactory:self queue:_chipWorkQueue];
     if (controller == nil) {
         CHIP_LOG_ERROR("Failed to init controller");
         return nil;
@@ -321,7 +321,7 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
 
 @end
 
-@implementation MatterStack (InternalMethods)
+@implementation MatterControllerFactory (InternalMethods)
 
 - (void)controllerShuttingDown:(CHIPDeviceController *)controller
 {
@@ -364,7 +364,7 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
 
 @end
 
-@implementation MatterStackStartupParams
+@implementation MatterControllerFactoryParams
 
 - (instancetype)initWithStorage:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
 {

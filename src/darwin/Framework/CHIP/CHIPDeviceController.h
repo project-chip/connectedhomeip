@@ -78,7 +78,7 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
 - (BOOL)deviceBeingCommissionedOverBLE:(uint64_t)deviceId;
 
 /**
- * Controllers are created via the MatterStack object.
+ * Controllers are created via the MatterControllerFactory object.
  */
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;

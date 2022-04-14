@@ -31,41 +31,41 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
 @implementation CHIPControllerTests
 
-- (void)testStackLifecycle
+- (void)testFactoryLifecycle
 {
-    __auto_type * stack = [MatterStack singletonStack];
-    XCTAssertNotNil(stack);
-    XCTAssertFalse([stack isRunning]);
+    __auto_type * factory = [MatterControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+    XCTAssertFalse([factory isRunning]);
 
-    __auto_type * stackParams = [[MatterStackStartupParams alloc] initWithStorage:nil];
-    XCTAssertTrue([stack startup:stackParams]);
-    XCTAssertTrue([stack isRunning]);
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:nil];
+    XCTAssertTrue([factory startup:factoryParams]);
+    XCTAssertTrue([factory isRunning]);
 
-    [stack shutdown];
-    XCTAssertFalse([stack isRunning]);
+    [factory shutdown];
+    XCTAssertFalse([factory isRunning]);
 
-    // Now try to restart the stack.
-    XCTAssertTrue([stack startup:stackParams]);
-    XCTAssertTrue([stack isRunning]);
+    // Now try to restart the factory.
+    XCTAssertTrue([factory startup:factoryParams]);
+    XCTAssertTrue([factory isRunning]);
 
-    [stack shutdown];
-    XCTAssertFalse([stack isRunning]);
+    [factory shutdown];
+    XCTAssertFalse([factory isRunning]);
 }
 
 - (void)testControllerLifecycle
 {
-    __auto_type * stack = [MatterStack singletonStack];
-    XCTAssertNotNil(stack);
+    __auto_type * factory = [MatterControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
 
-    __auto_type * stackParams = [[MatterStackStartupParams alloc] initWithStorage:nil];
-    XCTAssertTrue([stack startup:stackParams]);
-    XCTAssertTrue([stack isRunning]);
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:nil];
+    XCTAssertTrue([factory startup:factoryParams]);
+    XCTAssertTrue([factory isRunning]);
 
     __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] init];
     params.vendorId = kTestVendorId;
     params.fabricId = 1;
 
-    CHIPDeviceController * controller = [stack startControllerOnNewFabric:params];
+    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
@@ -73,77 +73,77 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertFalse([controller isRunning]);
 
     // now try to restart the controller
-    controller = [stack startControllerOnExistingFabric:params];
+    controller = [factory startControllerOnExistingFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 
-    [stack shutdown];
-    XCTAssertFalse([stack isRunning]);
+    [factory shutdown];
+    XCTAssertFalse([factory isRunning]);
 }
 
-- (void)testStackShutdownShutsDownController
+- (void)testFactoryShutdownShutsDownController
 {
-    __auto_type * stack = [MatterStack singletonStack];
-    XCTAssertNotNil(stack);
+    __auto_type * factory = [MatterControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
 
-    __auto_type * stackParams = [[MatterStackStartupParams alloc] initWithStorage:nil];
-    XCTAssertTrue([stack startup:stackParams]);
-    XCTAssertTrue([stack isRunning]);
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:nil];
+    XCTAssertTrue([factory startup:factoryParams]);
+    XCTAssertTrue([factory isRunning]);
 
     __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] init];
     params.vendorId = kTestVendorId;
     params.fabricId = 1;
 
-    CHIPDeviceController * controller = [stack startControllerOnNewFabric:params];
+    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    [stack shutdown];
-    XCTAssertFalse([stack isRunning]);
+    [factory shutdown];
+    XCTAssertFalse([factory isRunning]);
     XCTAssertFalse([controller isRunning]);
 }
 
 - (void)testControllerMultipleShutdown
 {
-    __auto_type * stack = [MatterStack singletonStack];
-    XCTAssertNotNil(stack);
+    __auto_type * factory = [MatterControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
 
-    __auto_type * stackParams = [[MatterStackStartupParams alloc] initWithStorage:nil];
-    XCTAssertTrue([stack startup:stackParams]);
-    XCTAssertTrue([stack isRunning]);
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:nil];
+    XCTAssertTrue([factory startup:factoryParams]);
+    XCTAssertTrue([factory isRunning]);
 
     __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] init];
     params.vendorId = kTestVendorId;
     params.fabricId = 1;
 
-    CHIPDeviceController * controller = [stack startControllerOnNewFabric:params];
+    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertTrue([controller isRunning]);
     for (int i = 0; i < 5; i++) {
         [controller shutdown];
         XCTAssertFalse([controller isRunning]);
     }
 
-    [stack shutdown];
-    XCTAssertFalse([stack isRunning]);
+    [factory shutdown];
+    XCTAssertFalse([factory isRunning]);
 }
 
 - (void)testControllerInvalidAccess
 {
-    __auto_type * stack = [MatterStack singletonStack];
-    XCTAssertNotNil(stack);
+    __auto_type * factory = [MatterControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
 
-    __auto_type * stackParams = [[MatterStackStartupParams alloc] initWithStorage:nil];
-    XCTAssertTrue([stack startup:stackParams]);
-    XCTAssertTrue([stack isRunning]);
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:nil];
+    XCTAssertTrue([factory startup:factoryParams]);
+    XCTAssertTrue([factory isRunning]);
 
     __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] init];
     params.vendorId = kTestVendorId;
     params.fabricId = 1;
 
-    CHIPDeviceController * controller = [stack startControllerOnNewFabric:params];
+    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertTrue([controller isRunning]);
     [controller shutdown];
 
@@ -154,8 +154,8 @@ static uint16_t kTestVendorId = 0xFFF1u;
                                     XCTAssertEqual(error.code, CHIPErrorCodeInvalidState);
                                 }]);
 
-    [stack shutdown];
-    XCTAssertFalse([stack isRunning]);
+    [factory shutdown];
+    XCTAssertFalse([factory isRunning]);
 }
 
 @end

@@ -15,12 +15,12 @@
  *    limitations under the License.
  */
 
-#ifndef MATTER_STACK_H
-#define MATTER_STACK_H
+#ifndef MATTER_CONTROLLER_FACTORY_H
+#define MATTER_CONTROLLER_FACTORY_H
 
 /**
- * An object representing a Matter stack.  There can be only one such object in
- * a given process.
+ * An object that allows creating Matter controllers. There can be only one such
+ * object in a given process.
  */
 
 #import <Foundation/Foundation.h>
@@ -31,18 +31,18 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol CHIPKeypair;
 @class CHIPDeviceController;
 
-@interface MatterStackStartupParams : NSObject
+@interface MatterControllerFactoryParams : NSObject
 /*
- * Storage delegate must be provided for correct functioning of the stack.  It
- * is used to store persistent information for the fabrics the stack ends up
- * interacting with.
+ * Storage delegate must be provided for correct functioning of Matter
+ * controllers.  It is used to store persistent information for the fabrics the
+ * controllers ends up interacting with.
  */
 @property (strong, nonatomic, readonly) id<CHIPPersistentStorageDelegate> storageDelegate;
 /*
  * The Product Attestation Authority certificates that are trusted to sign
  * device attestation information.  Defaults to nil.
  *
- * TODO: We may wabt to support different PAA sets per controller, but
+ * TODO: We may want to support different PAA sets per controller, but
  * the underlying SDK code does not handle that right now.
  */
 @property (strong, nonatomic, nullable) NSArray<NSData *> * paaCerts;
@@ -89,10 +89,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (strong, nonatomic, nullable) NSData * ipk;
 
-- (instancetype)init;
 @end
 
-@interface MatterStack : NSObject
+@interface MatterControllerFactory : NSObject
 
 @property (readonly, nonatomic) BOOL isRunning;
 
@@ -100,25 +99,25 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * Return the single MatterStack we support existing.  It starts off
+ * Return the single MatterControllerFactory we support existing.  It starts off
  * in a "not started" state.
  */
-+ (MatterStack *)singletonStack;
++ (instancetype)sharedInstance;
 
 /**
- * Start the Matter Stack. Repeated calls to startup without calls to shutdown
- * in between are NO-OPs. Use the isRunning property to check whether the stack
- * needs to be started up.
+ * Start the controller factory. Repeated calls to startup without calls to
+ * shutdown in between are NO-OPs. Use the isRunning property to check whether
+ * the controller factory needs to be started up.
  *
- * @param[in] startupParams data needed to start up the stack.
+ * @param[in] startupParams data needed to start up the controller factory.
  *
  * @return Whether startup succeded.
  */
-- (BOOL)startup:(MatterStackStartupParams *)startupParams;
+- (BOOL)startup:(MatterControllerFactoryParams *)startupParams;
 
 /**
- * Shut down the Matter Stack. This will shut down any outstanding
- * controllers as part of the stack shutdown.
+ * Shut down the controller factory. This will shut down any outstanding
+ * controllers as part of the factory shutdown.
  *
  * Repeated calls to shutdown without calls to startup in between are
  * NO-OPs.
@@ -146,10 +145,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (CHIPDeviceController * _Nullable)startControllerOnNewFabric:(CHIPDeviceControllerStartupParams *)startupParams;
 
-- (void)dealloc;
-
 @end
 
 NS_ASSUME_NONNULL_END
 
-#endif // MATTER_STACK_H
+#endif // MATTER_CONTROLLER_FACTORY_H

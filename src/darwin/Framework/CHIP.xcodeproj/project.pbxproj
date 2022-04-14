@@ -36,9 +36,9 @@
 		2FD775552695557E00FF4B12 /* error-mapping.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FD775542695557E00FF4B12 /* error-mapping.cpp */; };
 		5129BCFD26A9EE3300122DDF /* CHIPError.h in Headers */ = {isa = PBXBuildFile; fileRef = 5129BCFC26A9EE3300122DDF /* CHIPError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5136661328067D550025EDAE /* CHIPDeviceController_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 5136660F28067D540025EDAE /* CHIPDeviceController_Internal.h */; };
-		5136661428067D550025EDAE /* MatterStack.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5136661028067D540025EDAE /* MatterStack.mm */; };
-		5136661528067D550025EDAE /* MatterStack_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 5136661128067D540025EDAE /* MatterStack_Internal.h */; };
-		5136661628067D550025EDAE /* MatterStack.h in Headers */ = {isa = PBXBuildFile; fileRef = 5136661228067D550025EDAE /* MatterStack.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5136661428067D550025EDAE /* MatterControllerFactory.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5136661028067D540025EDAE /* MatterControllerFactory.mm */; };
+		5136661528067D550025EDAE /* MatterControllerFactory_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 5136661128067D540025EDAE /* MatterControllerFactory_Internal.h */; };
+		5136661628067D550025EDAE /* MatterControllerFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 5136661228067D550025EDAE /* MatterControllerFactory.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		513DDB862761F69300DAA01A /* CHIPAttributeTLVValueDecoder_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 513DDB852761F69300DAA01A /* CHIPAttributeTLVValueDecoder_Internal.h */; };
 		513DDB8A2761F6F900DAA01A /* CHIPAttributeTLVValueDecoder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 513DDB892761F6F900DAA01A /* CHIPAttributeTLVValueDecoder.mm */; };
 		51431AF927D2973E008A7943 /* CHIPIMDispatch.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51431AF827D2973E008A7943 /* CHIPIMDispatch.mm */; };
@@ -138,9 +138,9 @@
 		2FD775542695557E00FF4B12 /* error-mapping.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "error-mapping.cpp"; path = "../../../app/util/error-mapping.cpp"; sourceTree = "<group>"; };
 		5129BCFC26A9EE3300122DDF /* CHIPError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CHIPError.h; path = CHIP/CHIPError.h; sourceTree = "<group>"; };
 		5136660F28067D540025EDAE /* CHIPDeviceController_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceController_Internal.h; sourceTree = "<group>"; };
-		5136661028067D540025EDAE /* MatterStack.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MatterStack.mm; sourceTree = "<group>"; };
-		5136661128067D540025EDAE /* MatterStack_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MatterStack_Internal.h; sourceTree = "<group>"; };
-		5136661228067D550025EDAE /* MatterStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MatterStack.h; sourceTree = "<group>"; };
+		5136661028067D540025EDAE /* MatterControllerFactory.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MatterControllerFactory.mm; sourceTree = "<group>"; };
+		5136661128067D540025EDAE /* MatterControllerFactory_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MatterControllerFactory_Internal.h; sourceTree = "<group>"; };
+		5136661228067D550025EDAE /* MatterControllerFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MatterControllerFactory.h; sourceTree = "<group>"; };
 		513DDB852761F69300DAA01A /* CHIPAttributeTLVValueDecoder_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPAttributeTLVValueDecoder_Internal.h; sourceTree = "<group>"; };
 		513DDB892761F6F900DAA01A /* CHIPAttributeTLVValueDecoder.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CHIPAttributeTLVValueDecoder.mm; path = "zap-generated/CHIPAttributeTLVValueDecoder.mm"; sourceTree = "<group>"; };
 		51431AF827D2973E008A7943 /* CHIPIMDispatch.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPIMDispatch.mm; sourceTree = "<group>"; };
@@ -327,9 +327,9 @@
 				991DC0822475F45400C13860 /* CHIPDeviceController.h */,
 				991DC0872475F47D00C13860 /* CHIPDeviceController.mm */,
 				5136660F28067D540025EDAE /* CHIPDeviceController_Internal.h */,
-				5136661128067D540025EDAE /* MatterStack_Internal.h */,
-				5136661228067D550025EDAE /* MatterStack.h */,
-				5136661028067D540025EDAE /* MatterStack.mm */,
+				5136661128067D540025EDAE /* MatterControllerFactory_Internal.h */,
+				5136661228067D550025EDAE /* MatterControllerFactory.h */,
+				5136661028067D540025EDAE /* MatterControllerFactory.mm */,
 				5A7947E227C0101200434CF2 /* CHIPDeviceController+XPC.h */,
 				5A7947E327C0129500434CF2 /* CHIPDeviceController+XPC.m */,
 				B20252912459E34F00F97062 /* Info.plist */,
@@ -379,7 +379,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5136661628067D550025EDAE /* MatterStack.h in Headers */,
+				5136661628067D550025EDAE /* MatterControllerFactory.h in Headers */,
 				5A6FEC9927B5C88900F25F42 /* CHIPDeviceOverXPC.h in Headers */,
 				51B22C222740CB1D008D5055 /* CHIPCommandPayloadsObjc.h in Headers */,
 				51B22C1E2740CB0A008D5055 /* CHIPStructsObjc.h in Headers */,
@@ -389,7 +389,7 @@
 				5A6FEC9227B5669C00F25F42 /* CHIPDeviceControllerOverXPC.h in Headers */,
 				2C1B027B2641DB4E00780EF1 /* CHIPOperationalCredentialsDelegate.h in Headers */,
 				99D466E12798936D0089A18F /* CHIPCommissioningParameters.h in Headers */,
-				5136661528067D550025EDAE /* MatterStack_Internal.h in Headers */,
+				5136661528067D550025EDAE /* MatterControllerFactory_Internal.h in Headers */,
 				B289D4212639C0D300D4E314 /* CHIPOnboardingPayloadParser.h in Headers */,
 				513DDB862761F69300DAA01A /* CHIPAttributeTLVValueDecoder_Internal.h in Headers */,
 				2CB7163F252F731E0026E2BB /* CHIPDevicePairingDelegate.h in Headers */,
@@ -552,7 +552,7 @@
 				27A53C1827FBC6920053F131 /* CHIPAttestationTrustStoreBridge.mm in Sources */,
 				998F287126D56940001846C6 /* CHIPP256KeypairBridge.mm in Sources */,
 				1E16A90226B98AB700683C53 /* CHIPTestClustersObjc.mm in Sources */,
-				5136661428067D550025EDAE /* MatterStack.mm in Sources */,
+				5136661428067D550025EDAE /* MatterControllerFactory.mm in Sources */,
 				51B22C2A2740CB47008D5055 /* CHIPCommandPayloadsObjc.mm in Sources */,
 				2C5EEEF7268A85C400CAE3D3 /* CHIPDeviceConnectionBridge.mm in Sources */,
 				51B22C262740CB32008D5055 /* CHIPStructsObjc.mm in Sources */,

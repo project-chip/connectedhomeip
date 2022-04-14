@@ -19,7 +19,7 @@
 
 /**
  * Parts of CHIPDeviceController that are not part of the framework API.  Mostly
- * for use from MatterStack.
+ * for use from MatterControllerFactory.
  */
 
 #import <Foundation/Foundation.h>
@@ -29,7 +29,7 @@
 #include <lib/core/DataModelTypes.h>
 
 @class CHIPDeviceControllerStartupParams;
-@class MatterStack;
+@class MatterControllerFactory;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -37,9 +37,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Start a new controller.  Returns whether startup succeeded.  If this fails,
- * it guarantees that it has called controllerShuttingDown on the MatterStack.
+ * it guarantees that it has called controllerShuttingDown on the
+ * MatterControllerFactory.
  *
- * Only MatterStack should be calling this.
+ * Only MatterControllerFactory should be calling this.
  */
 - (BOOL)startup:(CHIPDeviceControllerStartupParams *)startupParams;
 
@@ -51,9 +52,9 @@ NS_ASSUME_NONNULL_BEGIN
 /*
  * Init a newly created controller.
  *
- * Only MatterStack should be calling this.
+ * Only MatterControllerFactory should be calling this.
  */
-- (instancetype)initWithStack:(MatterStack *)stack queue:(dispatch_queue_t)queue;
+- (instancetype)initWithFactory:(MatterControllerFactory *)factory queue:(dispatch_queue_t)queue;
 
 @end
 

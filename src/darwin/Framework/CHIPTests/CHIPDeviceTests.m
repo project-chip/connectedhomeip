@@ -139,20 +139,20 @@ static CHIPDevice * GetConnectedDevice(void)
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
 
-    __auto_type * stack = [MatterStack singletonStack];
-    XCTAssertNotNil(stack);
+    __auto_type * factory = [MatterControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
 
-    __auto_type * stackParams = [[MatterStackStartupParams alloc] initWithStorage:nil];
-    stackParams.port = @(kLocalPort);
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:nil];
+    factoryParams.port = @(kLocalPort);
 
-    BOOL ok = [stack startup:stackParams];
+    BOOL ok = [factory startup:factoryParams];
     XCTAssertTrue(ok);
 
     __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] init];
     params.vendorId = kTestVendorId;
     params.fabricId = 1;
 
-    CHIPDeviceController * controller = [stack startControllerOnNewFabric:params];
+    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
 
     sController = controller;
@@ -192,7 +192,7 @@ static CHIPDevice * GetConnectedDevice(void)
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 
-    [[MatterStack singletonStack] shutdown];
+    [[MatterControllerFactory sharedInstance] shutdown];
 }
 
 - (void)waitForCommissionee

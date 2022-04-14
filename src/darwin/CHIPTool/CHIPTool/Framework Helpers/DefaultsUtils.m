@@ -75,9 +75,9 @@ CHIPDeviceController * InitializeCHIP(void)
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         CHIPToolPersistentStorageDelegate * storage = [[CHIPToolPersistentStorageDelegate alloc] init];
-        __auto_type * stack = [MatterStack singletonStack];
-        __auto_type * stackParams = [[MatterStackStartupParams alloc] initWithStorage:storage];
-        if (![stack startup:stackParams]) {
+        __auto_type * factory = [MatterControllerFactory sharedInstance];
+        __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
+        if (![factory startup:factoryParams]) {
             return;
         }
 
@@ -87,9 +87,9 @@ CHIPDeviceController * InitializeCHIP(void)
 
         // We're not sure whether we have a fabric configured already; try as if
         // we did, and if not fall back to creating a new one.
-        sController = [stack startControllerOnExistingFabric:params];
+        sController = [factory startControllerOnExistingFabric:params];
         if (sController == nil) {
-            sController = [stack startControllerOnNewFabric:params];
+            sController = [factory startControllerOnNewFabric:params];
         }
     });
 
@@ -106,7 +106,7 @@ CHIPDeviceController * CHIPRestartController(CHIPDeviceController * controller)
     params.vendorId = kTestVendorId;
     params.fabricId = 1;
 
-    sController = [[MatterStack singletonStack] startControllerOnExistingFabric:params];
+    sController = [[MatterControllerFactory sharedInstance] startControllerOnExistingFabric:params];
 
     return sController;
 }

@@ -34,19 +34,19 @@ CHIP_ERROR CHIPCommandBridge::Run()
     CHIPToolKeypair * nocSigner = [[CHIPToolKeypair alloc] init];
     storage = [[CHIPToolPersistentStorageDelegate alloc] init];
 
-    auto stack = [MatterStack singletonStack];
-    if (stack == nil) {
-        ChipLogError(chipTool, "Controller is nil");
+    auto factory = [MatterControllerFactory sharedInstance];
+    if (factory == nil) {
+        ChipLogError(chipTool, "Controller factory is nil");
         return CHIP_ERROR_INTERNAL;
     }
 
-    auto params = [[MatterStackStartupParams alloc] initWithStorage:storage];
+    auto params = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
     params.port = @(kListenPort);
     params.startServer = YES;
     params.kvsPath = "/tmp/chip_kvs_darwin";
 
-    if ([stack startup:params] == NO) {
-        ChipLogError(chipTool, "Stack startup failed");
+    if ([factory startup:params] == NO) {
+        ChipLogError(chipTool, "Controller factory startup failed");
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -62,10 +62,10 @@ CHIP_ERROR CHIPCommandBridge::Run()
 
     // We're not sure whether we're creating a new fabric or using an
     // existing one, so just try both.
-    mController = [stack startControllerOnExistingFabric:controllerParams];
+    mController = [factory startControllerOnExistingFabric:controllerParams];
     if (mController == nil) {
         // Maybe we didn't have this fabric yet.
-        mController = [stack startControllerOnNewFabric:controllerParams];
+        mController = [factory startControllerOnNewFabric:controllerParams];
     }
     if (mController == nil) {
         ChipLogError(chipTool, "Controller startup failure.");
@@ -85,7 +85,7 @@ CHIP_ERROR CHIPCommandBridge::ShutdownCommissioner()
     ChipLogProgress(chipTool, "Shutting down controller");
     [CurrentCommissioner() shutdown];
 
-    [[MatterStack singletonStack] shutdown];
+    [[MatterControllerFactory sharedInstance] shutdown];
 
     return CHIP_NO_ERROR;
 }

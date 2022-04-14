@@ -26,7 +26,7 @@
 #import "CHIPP256KeypairBridge.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
 #import "CHIPSetupPayload.h"
-#import "MatterStack_Internal.h"
+#import "MatterControllerFactory_Internal.h"
 #import <setup_payload/ManualSetupPayloadGenerator.h>
 #import <setup_payload/SetupPayload.h>
 #import <zap-generated/CHIPClustersObjc.h>
@@ -71,16 +71,16 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 @property (readonly) CHIPP256KeypairBridge keypairBridge;
 @property (readonly) CHIPDeviceAttestationDelegateBridge * deviceAttestationDelegateBridge;
 @property (readonly) chip::NodeId localDeviceId;
-@property (readonly) MatterStack * stack;
+@property (readonly) MatterControllerFactory * factory;
 @end
 
 @implementation CHIPDeviceController
 
-- (instancetype)initWithStack:(MatterStack *)stack queue:(dispatch_queue_t)queue
+- (instancetype)initWithFactory:(MatterControllerFactory *)factory queue:(dispatch_queue_t)queue
 {
     if (self = [super init]) {
         _chipWorkQueue = queue;
-        _stack = stack;
+        _factory = factory;
 
         _pairingDelegateBridge = new CHIPDevicePairingDelegateBridge();
         if ([self checkForInitError:(_pairingDelegateBridge != nullptr) logMsg:kErrorPairingInit]) {
@@ -113,7 +113,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 // Clean up from a state where startup was called.
 - (void)cleanupAfterStartup
 {
-    [_stack controllerShuttingDown:self];
+    [_factory controllerShuttingDown:self];
     [self cleanup];
 }
 
@@ -172,7 +172,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
             _keypairBridge.Init(startupParams.rootCAKeypair);
             nativeBridge.reset(new chip::Crypto::CHIPP256KeypairNativeBridge(_keypairBridge));
         }
-        errorCode = _operationalCredentialsDelegate->init(_stack.storageDelegateBridge, std::move(nativeBridge), startupParams.ipk);
+        errorCode
+            = _operationalCredentialsDelegate->init(_factory.storageDelegateBridge, std::move(nativeBridge), startupParams.ipk);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorOperationalCredentialsInit]) {
             return;
         }
@@ -238,7 +239,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         }
 
         errorCode = chip::Credentials::SetSingleIpkEpochKey(
-            _stack.groupData, fabricIdx, _operationalCredentialsDelegate->GetIPK(), compressedId);
+            _factory.groupData, fabricIdx, _operationalCredentialsDelegate->GetIPK(), compressedId);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorIPKInit]) {
             return;
         }
@@ -266,12 +267,12 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 {
     uint16_t deviceIdLength = sizeof(_localDeviceId);
     if (CHIP_NO_ERROR
-        != _stack.storageDelegateBridge->SyncGetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, &_localDeviceId, deviceIdLength)) {
+        != _factory.storageDelegateBridge->SyncGetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, &_localDeviceId, deviceIdLength)) {
         _localDeviceId = arc4random();
         _localDeviceId = _localDeviceId << 32 | arc4random();
         CHIP_LOG_ERROR("Assigned %llx node ID to the controller", _localDeviceId);
 
-        _stack.storageDelegateBridge->SyncSetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, &_localDeviceId, sizeof(_localDeviceId));
+        _factory.storageDelegateBridge->SyncSetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, &_localDeviceId, sizeof(_localDeviceId));
     } else {
         CHIP_LOG_ERROR("Found %llx node ID for the controller", _localDeviceId);
     }
