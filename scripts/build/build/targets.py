@@ -233,6 +233,8 @@ def HostTargets():
         target_native.Extend('rpc-console', app=HostApp.RPC_CONSOLE))
     app_targets.append(
         target_native.Extend('tv-app', app=HostApp.TV_APP))
+    app_targets.append(
+        target_native.Extend('nl-test-runner', app=HostApp.NL_TEST_RUNNER))
 
     for target in targets:
         app_targets.append(target.Extend(
@@ -246,6 +248,7 @@ def HostTargets():
             'ota-provider', app=HostApp.OTA_PROVIDER, enable_ble=False))
         app_targets.append(target.Extend(
             'ota-requestor', app=HostApp.OTA_REQUESTOR, enable_ble=False))
+        app_targets.append(target.Extend('python-bindings', app=HostApp.PYTHON_BINDINGS))
 
     builder = VariantBuilder()
 
@@ -270,8 +273,8 @@ def HostTargets():
     builder.WhitelistVariantNameForGlob('ipv6only')
 
     for target in app_targets:
-        if 'rpc-console' in target.name:
-            # rpc console  has only one build variant right now
+        if ('-rpc-console' in target.name) or ('-python-bindings' in target.name) or ('nl-test-runner' in target.name):
+            # Single-variant builds
             yield target
         else:
             builder.targets.append(target)
@@ -483,6 +486,7 @@ def cc13x2x7_26x2x7Targets():
     yield target.Extend('lock-mtd', app=cc13x2x7_26x2x7App.LOCK, openthread_ftd=False)
     yield target.Extend('pump', app=cc13x2x7_26x2x7App.PUMP)
     yield target.Extend('pump-controller', app=cc13x2x7_26x2x7App.PUMP_CONTROLLER)
+    yield target.Extend('all-clusters', app=cc13x2x7_26x2x7App.ALL_CLUSTERS)
 
 
 def Cyw30739Targets():

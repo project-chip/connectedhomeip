@@ -278,6 +278,14 @@
                                                                                                                                    \
             /* 375 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x0A,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Door Lock (server), big-endian */                                                             \
+                                                                                                                                   \
+            /* 379 - AutoRelockTime, */                                                                                            \
+            0x00, 0x00, 0x00, 0x60,                                                                                                \
+                                                                                                                                   \
+            /* 383 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
     }
 
 #else // !BIGENDIAN_CPU
@@ -533,11 +541,19 @@
                                                                                                                                    \
             /* 375 - FeatureMap, */                                                                                                \
             0x0A, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Door Lock (server), little-endian */                                                          \
+                                                                                                                                   \
+            /* 379 - AutoRelockTime, */                                                                                            \
+            0x60, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* 383 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
     }
 
 #endif // BIGENDIAN_CPU
 
-#define GENERATED_DEFAULTS_COUNT (76)
+#define GENERATED_DEFAULTS_COUNT (78)
 
 #define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
 #define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
@@ -570,7 +586,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 211
+#define GENERATED_ATTRIBUTE_COUNT 218
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -872,6 +888,16 @@
             { 0x00000013, ZAP_TYPE(CHAR_STRING), 61, 0, ZAP_EMPTY_DEFAULT() },          /* BatteryReplacementDescription */        \
             { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(375) },     /* FeatureMap */                           \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },              /* ClusterRevision */                      \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Door Lock (server) */                                                                         \
+            { 0x00000000, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_SIMPLE_DEFAULT(2) },         /* LockState */       \
+            { 0x00000001, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                                      /* LockType */        \
+            { 0x00000003, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() },           /* DoorState */       \
+            { 0x00000023, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(379) }, /* AutoRelockTime */  \
+            { 0x00000033, ZAP_TYPE(BOOLEAN), 1, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                      \
+              ZAP_SIMPLE_DEFAULT(0) },                                              /* RequirePINforRemoteOperation */             \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(383) }, /* FeatureMap */                               \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },          /* ClusterRevision */                          \
     }
 
 // This is an array of EmberAfCluster structures.
@@ -894,6 +920,10 @@
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayOnOffServer[] = {                                                             \
         (EmberAfGenericClusterFunction) emberAfOnOffClusterServerInitCallback,                                                     \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayDoorLockServer[] = {                                                          \
+        (EmberAfGenericClusterFunction) MatterDoorLockClusterServerAttributeChangedCallback,                                       \
+        (EmberAfGenericClusterFunction) MatterDoorLockClusterServerPreAttributeChangedCallback,                                    \
     };
 
 // clang-format off
@@ -975,12 +1005,29 @@
   0x00000001 /* On */, \
   0x00000002 /* Toggle */, \
   chip::kInvalidCommandId /* end of list */, \
+  /* Endpoint: 1, Cluster: Door Lock (server) */\
+  /*   client_generated */ \
+  0x00000000 /* LockDoor */, \
+  0x00000001 /* UnlockDoor */, \
+  0x0000000B /* SetWeekDaySchedule */, \
+  0x0000000C /* GetWeekDaySchedule */, \
+  0x0000000D /* ClearWeekDaySchedule */, \
+  0x0000000E /* SetYearDaySchedule */, \
+  0x0000000F /* GetYearDaySchedule */, \
+  0x00000010 /* ClearYearDaySchedule */, \
+  0x0000001A /* SetUser */, \
+  0x0000001B /* GetUser */, \
+  0x0000001D /* ClearUser */, \
+  0x00000022 /* SetCredential */, \
+  0x00000024 /* GetCredentialStatus */, \
+  0x00000026 /* ClearCredential */, \
+  chip::kInvalidCommandId /* end of list */, \
 }
 
 // clang-format on
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 24
+#define GENERATED_CLUSTER_COUNT 25
 
 // clang-format off
 #define GENERATED_CLUSTERS { \
@@ -1248,18 +1295,29 @@
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
     },\
+  { \
+      /* Endpoint: 1, Cluster: Door Lock (server) */ \
+      .clusterId = 0x00000101,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(211), \
+      .attributeCount = 7, \
+      .clusterSize = 14, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
+      .functions = chipFuncArrayDoorLockServer, \
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 52 ) ,\
+      .generatedCommandList = nullptr ,\
+    },\
 }
 
 // clang-format on
 
 #define ZAP_CLUSTER_INDEX(index) (&generatedClusters[index])
 
-#define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 23
+#define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 24
 
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 21, 646 }, { ZAP_CLUSTER_INDEX(21), 3, 146 },                                                      \
+        { ZAP_CLUSTER_INDEX(0), 21, 646 }, { ZAP_CLUSTER_INDEX(21), 4, 160 },                                                      \
     }
 
 // Largest attribute size is needed for various buffers
@@ -1271,7 +1329,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (39)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (792)
+#define ATTRIBUTE_MAX_SIZE (806)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)

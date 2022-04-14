@@ -303,12 +303,12 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     auto * pairingCommissioner = chip::Platform::New<CASESession>();
     pairingCommissioner->SetGroupDataProvider(&gCommissionerGroupDataProvider);
 
-    SessionManager sessionManager;
-
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     gLoopback.mSentMessageCount = 0;
 
+    // Use the same session manager on both CASE client and server sides to validate that both
+    // components may work simultaneously on a single device.
     NL_TEST_ASSERT(inSuite,
                    gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &ctx.GetTransportMgr(),
 #if CONFIG_NETWORK_LAYER_BLE
@@ -323,22 +323,29 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, fabric != nullptr);
 
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner->EstablishSession(sessionManager, Transport::PeerAddress(Transport::Type::kBle), fabric,
-                                                         Node01_01, contextCommissioner, nullptr,
-                                                         &delegateCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner->EstablishSession(ctx.GetSecureSessionManager(),
+                                                         Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01,
+                                                         contextCommissioner, nullptr, &delegateCommissioner) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 5);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
+
+    // Validate that secure session can be created after the pairing
+    SessionHolder sessionHolder;
+    NL_TEST_ASSERT(inSuite,
+                   ctx.GetSecureSessionManager().NewPairing(sessionHolder, NullOptional, Node01_01, pairingCommissioner,
+                                                            CryptoContext::SessionRole::kInitiator,
+                                                            gCommissionerFabricIndex) == CHIP_NO_ERROR);
 
     auto * pairingCommissioner1 = chip::Platform::New<CASESession>();
     pairingCommissioner1->SetGroupDataProvider(&gCommissionerGroupDataProvider);
     ExchangeContext * contextCommissioner1 = ctx.NewUnauthenticatedExchangeToBob(pairingCommissioner1);
 
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner1->EstablishSession(sessionManager, Transport::PeerAddress(Transport::Type::kBle), fabric,
-                                                          Node01_01, contextCommissioner1, nullptr,
-                                                          &delegateCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner1->EstablishSession(ctx.GetSecureSessionManager(),
+                                                          Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01,
+                                                          contextCommissioner1, nullptr, &delegateCommissioner) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     chip::Platform::Delete(pairingCommissioner);
