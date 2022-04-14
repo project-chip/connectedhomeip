@@ -270,7 +270,7 @@ private:
      * Returns true if a valid session was found, false otherwise.
      *
      */
-    bool CheckAndLoadExistingSession();
+    bool AttachToExistingSecureSession();
 
     bool IsSecureConnected() const override { return mState == State::SecureConnected; }
 

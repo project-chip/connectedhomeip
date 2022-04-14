@@ -58,18 +58,17 @@ void OperationalDeviceProxy::MoveToState(State aTargetState)
     }
 }
 
-bool OperationalDeviceProxy::CheckAndLoadExistingSession()
+bool OperationalDeviceProxy::AttachToExistingSecureSession()
 {
     VerifyOrReturnError(mState == State::NeedsAddress || mState == State::Initialized, false);
 
-    SessionHolder existingSession;
     ScopedNodeId peerNodeId(mPeerId.GetNodeId(), mFabricInfo->GetFabricIndex());
-
-    mInitParams.sessionManager->FindSecureSessionForNode(mSecureSession, peerNodeId, Transport::SecureSession::Type::kCASE);
-    if (mSecureSession)
+    auto sessionHandle = mInitParams.sessionManager->FindSecureSessionForNode(peerNodeId, Transport::SecureSession::Type::kCASE);
+    if (sessionHandle.HasValue())
     {
-        ChipLogProgress(Controller, "Found an existing secure session to [" ChipLogFormatX64 ":" ChipLogFormatX64 "]!",
+        ChipLogProgress(Controller, "Found an existing secure session to [" ChipLogFormatX64 "-" ChipLogFormatX64 "]!",
                         ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()));
+        mSecureSession.Grab(sessionHandle.Value());
         return true;
     }
 
@@ -96,7 +95,7 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
         break;
 
     case State::NeedsAddress:
-        isConnected = CheckAndLoadExistingSession();
+        isConnected = AttachToExistingSecureSession();
         if (!isConnected)
         {
             err = LookupPeerAddress();
@@ -105,7 +104,7 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
         break;
 
     case State::Initialized:
-        isConnected = CheckAndLoadExistingSession();
+        isConnected = AttachToExistingSecureSession();
         if (!isConnected)
         {
             err = EstablishConnection();
@@ -235,17 +234,24 @@ void OperationalDeviceProxy::EnqueueConnectionCallbacks(Callback::Callback<OnDev
 
 void OperationalDeviceProxy::DequeueConnectionCallbacks(CHIP_ERROR error)
 {
-    Cancelable ready;
-    mConnectionFailure.DequeueAll(ready);
+    Cancelable failureReady, successReady;
+
+    //
+    // Dequeue both failure and success callback lists into temporary stack args before invoking either of them.
+    // We do this since we may not have a valid 'this' pointer anymore upon invoking any of those callbacks
+    // since the callee may destroy this object as part of that callback.
+    //
+    mConnectionFailure.DequeueAll(failureReady);
+    mConnectionSuccess.DequeueAll(successReady);
 
     //
     // If we encountered no error, go ahead and call all success callbacks. Otherwise,
     // call the failure callbacks.
     //
-    while (ready.mNext != &ready)
+    while (failureReady.mNext != &failureReady)
     {
         Callback::Callback<OnDeviceConnectionFailure> * cb =
-            Callback::Callback<OnDeviceConnectionFailure>::FromCancelable(ready.mNext);
+            Callback::Callback<OnDeviceConnectionFailure>::FromCancelable(failureReady.mNext);
 
         cb->Cancel();
 
@@ -255,10 +261,9 @@ void OperationalDeviceProxy::DequeueConnectionCallbacks(CHIP_ERROR error)
         }
     }
 
-    mConnectionSuccess.DequeueAll(ready);
-    while (ready.mNext != &ready)
+    while (successReady.mNext != &successReady)
     {
-        Callback::Callback<OnDeviceConnected> * cb = Callback::Callback<OnDeviceConnected>::FromCancelable(ready.mNext);
+        Callback::Callback<OnDeviceConnected> * cb = Callback::Callback<OnDeviceConnected>::FromCancelable(successReady.mNext);
 
         cb->Cancel();
         if (error == CHIP_NO_ERROR)
@@ -286,7 +291,7 @@ void OperationalDeviceProxy::HandleCASEConnectionFailure(void * context, CASECli
     device->DequeueConnectionCallbacks(error);
 
     //
-    // Do not touch this instance anymore; it might have been destroyed by a failure
+    // Do not touch device instance anymore; it might have been destroyed by a failure
     // callback.
     //
 }
@@ -311,7 +316,7 @@ void OperationalDeviceProxy::HandleCASEConnected(void * context, CASEClient * cl
     }
 
     //
-    // Do not touch this instance anymore; it might have been destroyed by a failure
+    // Do not touch this instance anymore; it might have been destroyed by a
     // callback.
     //
 }
