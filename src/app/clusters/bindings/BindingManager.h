@@ -40,6 +40,8 @@ namespace chip {
  */
 using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry & binding, DeviceProxy * peer_device, void * context);
 
+using BoundDeviceContextReleaseHandler = void (*)(void * context);
+
 struct BindingManagerInitParams
 {
     FabricTable * mFabricTable               = nullptr;
@@ -69,6 +71,16 @@ public:
     {}
 
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
+
+    /*
+     * Registers handler that will be called when context used in NotifyBoundClusterChanged will not be needed and could be
+     * released.
+     *
+     */
+    void RegisterBoundDeviceContextReleaseHandler(BoundDeviceContextReleaseHandler handler)
+    {
+        mBoundDeviceContextReleaseHandler = handler;
+    }
 
     CHIP_ERROR Init(const BindingManagerInitParams & params);
 
@@ -117,6 +129,7 @@ private:
 
     PendingNotificationMap mPendingNotificationMap;
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;
+    BoundDeviceContextReleaseHandler mBoundDeviceContextReleaseHandler;
     BindingManagerInitParams mInitParams;
 
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;

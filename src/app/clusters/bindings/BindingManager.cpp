@@ -161,6 +161,7 @@ void BindingManager::HandleDeviceConnected(OperationalDeviceProxy * device)
             fabricToRemove = entry.fabricIndex;
             nodeToRemove   = entry.nodeId;
             mBoundDeviceChangedHandler(entry, device, pendingNotification.mContext);
+            mBoundDeviceContextReleaseHandler(pendingNotification.mContext);
         }
     }
     mPendingNotificationMap.RemoveAllEntriesForNode(fabricToRemove, nodeToRemove);
@@ -176,6 +177,19 @@ void BindingManager::HandleDeviceConnectionFailure(PeerId peerId, CHIP_ERROR err
 {
     // Simply release the entry, the connection will be re-established as needed.
     ChipLogError(AppServer, "Failed to establish connection to node 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
+
+    for (PendingNotificationEntry pendingNotification : mPendingNotificationMap)
+    {
+        EmberBindingTableEntry entry = BindingTable::GetInstance().GetAt(pendingNotification.mBindingEntryId);
+
+        PeerId peer = PeerIdForNode(mInitParams.mFabricTable, entry.fabricIndex, entry.nodeId);
+
+        if (peerId == peer)
+        {
+            mBoundDeviceContextReleaseHandler(pendingNotification.mContext);
+        }
+    }
+
     mInitParams.mCASESessionManager->ReleaseSession(peerId);
 }
 
@@ -204,6 +218,7 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
                 {
                     // We already have an active connection
                     mBoundDeviceChangedHandler(*iter, peerDevice, context);
+                    mBoundDeviceContextReleaseHandler(context);
                 }
                 else
                 {
@@ -214,6 +229,7 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
             else if (iter->type == EMBER_MULTICAST_BINDING)
             {
                 mBoundDeviceChangedHandler(*iter, nullptr, context);
+                mBoundDeviceContextReleaseHandler(context);
             }
         }
     }
