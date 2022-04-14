@@ -156,6 +156,11 @@ public:
     void UnregisterRecoveryDelegate(SessionRecoveryDelegate & cb);
     void RefreshSessionOperationalData(const SessionHandle & sessionHandle);
 
+    // Test-only: create a session on the fly.
+    CHIP_ERROR InjectPaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, NodeId peerNodeId,
+                                            uint16_t peerSessionId, FabricIndex fabric, const Transport::PeerAddress & peerAddress,
+                                            CryptoContext::SessionRole role);
+
     /**
      * @brief
      *   Establish a new pairing with a peer node
