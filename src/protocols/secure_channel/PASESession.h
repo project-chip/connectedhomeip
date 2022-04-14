@@ -255,56 +255,8 @@ protected:
     bool mPairingComplete = false;
 };
 
-/*
- * The following constants are node IDs that test devices and test
- * controllers use while using the SecurePairingUsingTestSecret to
- * establish secure channel
- */
+// The following constants are node IDs that test devices and test controllers use.
 constexpr chip::NodeId kTestControllerNodeId = 112233;
 constexpr chip::NodeId kTestDeviceNodeId     = 12344321;
-
-/*
- * The following class should only be used for test usecases.
- * The class is currently also used for devices that do no yet support
- * rendezvous. Once all the non-test usecases start supporting
- * rendezvous, this class will be moved to the test code.
- */
-class SecurePairingUsingTestSecret : public PairingSession
-{
-public:
-    SecurePairingUsingTestSecret() : PairingSession(Transport::SecureSession::Type::kPASE)
-    {
-        // Do not set to 0 to prevent an unwanted unsecured session
-        // since the session type is unknown.
-        SetPeerSessionId(1);
-    }
-
-    void Init(SessionManager & sessionManager)
-    {
-        // Do not set to 0 to prevent an unwanted unsecured session
-        // since the session type is unknown.
-        AllocateSecureSession(sessionManager, mLocalSessionId);
-    }
-
-    SecurePairingUsingTestSecret(uint16_t peerSessionId, uint16_t localSessionId, SessionManager & sessionManager) :
-        PairingSession(Transport::SecureSession::Type::kPASE), mLocalSessionId(localSessionId)
-    {
-        AllocateSecureSession(sessionManager, localSessionId);
-        SetPeerSessionId(peerSessionId);
-    }
-
-    CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override
-    {
-        size_t secretLen = strlen(kTestSecret);
-        return session.InitFromSecret(ByteSpan(reinterpret_cast<const uint8_t *>(kTestSecret), secretLen), ByteSpan(nullptr, 0),
-                                      CryptoContext::SessionInfoType::kSessionEstablishment, role);
-    }
-
-private:
-    // Do not set to 0 to prevent an unwanted unsecured session
-    // since the session type is unknown.
-    uint16_t mLocalSessionId = 1;
-    const char * kTestSecret = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
-};
 
 } // namespace chip
