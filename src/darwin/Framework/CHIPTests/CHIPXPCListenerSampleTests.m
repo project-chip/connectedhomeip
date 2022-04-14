@@ -23,6 +23,7 @@
 #import <CHIP/CHIPDevice.h>
 
 #import "CHIPErrorTestUtils.h"
+#import "CHIPTestStorage.h"
 
 #import <app/util/af-enums.h>
 
@@ -510,7 +511,8 @@ static CHIPDevice * GetConnectedDevice(void)
     __auto_type * factory = [MatterControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
-    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:nil];
+    __auto_type * storage = [[CHIPTestStorage alloc] init];
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
     factoryParams.port = @(kLocalPort);
 
     BOOL ok = [factory startup:factoryParams];

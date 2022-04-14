@@ -23,6 +23,8 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
+#import "CHIPTestStorage.h"
+
 static uint16_t kTestVendorId = 0xFFF1u;
 
 @interface CHIPControllerTests : XCTestCase
@@ -37,7 +39,8 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(factory);
     XCTAssertFalse([factory isRunning]);
 
-    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:nil];
+    __auto_type * storage = [[CHIPTestStorage alloc] init];
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
     XCTAssertTrue([factory startup:factoryParams]);
     XCTAssertTrue([factory isRunning]);
 
@@ -57,7 +60,8 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * factory = [MatterControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
-    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:nil];
+    __auto_type * storage = [[CHIPTestStorage alloc] init];
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
     XCTAssertTrue([factory startup:factoryParams]);
     XCTAssertTrue([factory isRunning]);
 
@@ -90,7 +94,8 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * factory = [MatterControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
-    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:nil];
+    __auto_type * storage = [[CHIPTestStorage alloc] init];
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
     XCTAssertTrue([factory startup:factoryParams]);
     XCTAssertTrue([factory isRunning]);
 
@@ -113,7 +118,8 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * factory = [MatterControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
-    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:nil];
+    __auto_type * storage = [[CHIPTestStorage alloc] init];
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
     XCTAssertTrue([factory startup:factoryParams]);
     XCTAssertTrue([factory isRunning]);
 
@@ -138,7 +144,8 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * factory = [MatterControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
-    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:nil];
+    __auto_type * storage = [[CHIPTestStorage alloc] init];
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
     XCTAssertTrue([factory startup:factoryParams]);
     XCTAssertTrue([factory isRunning]);
 
@@ -167,7 +174,8 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * factory = [MatterControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
-    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:nil];
+    __auto_type * storage = [[CHIPTestStorage alloc] init];
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
     XCTAssertTrue([factory startup:factoryParams]);
     XCTAssertTrue([factory isRunning]);
 

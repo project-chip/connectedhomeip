@@ -454,7 +454,7 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
 
 @implementation MatterControllerFactoryParams
 
-- (instancetype)initWithStorage:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
+- (instancetype)initWithStorage:(id<CHIPPersistentStorageDelegate>)storageDelegate
 {
     if (!(self = [super init])) {
         return nil;
