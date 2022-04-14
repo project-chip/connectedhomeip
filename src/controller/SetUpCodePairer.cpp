@@ -142,13 +142,16 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverIP(SetupPayload & payload)
     // We're going to ensure that anything we discover matches currentFilter
     // before we use it, which will do our discriminator checks for us.
     //
-    // For the actual discovery, use a "commissionable nodes only" subtype.
-    // This avoids a problem we can run into if we use the discriminator-based
-    // subtypes where we discover a (possibly stale) advertisement for a
-    // non-commissionable (CM=0) node, then it becomes commissionable but we
-    // don't notice that because it does not add or remove SRV records, just
-    // updates TXT records.  But in this situation a PTR record _will_ get
-    // added, so that's what we look for.
+    // We are using an mdns continuous query for some PTR record to discover
+    // devices.  If the PTR record we use is for one of the discriminator-based
+    // subtypes (based on currentFilter), then we can run into a problem where
+    // we discover a (possibly stale) advertisement for a non-commissionable
+    // (CM=0) node and ignore it, and then when it becomes commissionable we
+    // don't notice because that just updates the TXT record to CM=1 and does
+    // not touch the PTR record we are querying for.
+    //
+    // So instead we query the PTR record for the "_CM" subtype, which will get
+    // added when a node enters commissioning mode.
     Dnssd::DiscoveryFilter filter;
     filter.type = Dnssd::DiscoveryFilterType::kCommissioningMode;
 
