@@ -30843,7 +30843,15 @@ NSNumber * _Nonnull OccupancyValue;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTest_TC_WNCV_2_3_000000_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_3_000000_WaitForCommissionee
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForCommissionee(expectation, queue, 305414945);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_3_000001_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"1a: TH set the Mode Attribute bit0 of the DUT"];
 
@@ -30865,7 +30873,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_3_000001_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_3_000002_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"1b: TH reads ConfigStatus attribute from DUT"];
 
@@ -30897,7 +30905,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_3_000002_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_3_000003_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"1c: TH clear the Mode Attribute bit0 of the DUT"];
 
@@ -30919,7 +30927,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_3_000003_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_3_000004_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"1d: TH reads ConfigStatus attribute from DUT"];
 
@@ -30951,7 +30959,7 @@ NSNumber * _Nonnull OccupancyValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_3_000004_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_3_000005_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"2a: TH set the Mode Attribute bit1 of the DUT"];
 
@@ -30974,7 +30982,7 @@ NSNumber * _Nonnull OccupancyValue;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 NSNumber * _Nonnull configStatusValA;
-- (void)testSendClusterTest_TC_WNCV_2_3_000005_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_3_000006_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"2b: TH reads ConfigStatus attribute from DUT"];
 
@@ -31010,7 +31018,7 @@ NSNumber * _Nonnull configStatusValA;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_3_000006_DownOrClose
+- (void)testSendClusterTest_TC_WNCV_2_3_000007_DownOrClose
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"2c: If (ConfigStatus bit0 == 0) TH send DownOrClose command to the DUT"];
@@ -31029,7 +31037,7 @@ NSNumber * _Nonnull configStatusValA;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_3_000007_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_3_000008_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"2d: TH clear the Mode Attribute bit1 of the DUT"];
 
@@ -31051,7 +31059,7 @@ NSNumber * _Nonnull configStatusValA;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_3_000008_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_3_000009_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"2e: TH reads ConfigStatus attribute from DUT"];
 
@@ -31083,7 +31091,7 @@ NSNumber * _Nonnull configStatusValA;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_3_000009_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_3_000010_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"2f: TH reads the Mode Attribute from the DUT"];
 
@@ -31115,7 +31123,7 @@ NSNumber * _Nonnull configStatusValA;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_3_000010_DownOrClose
+- (void)testSendClusterTest_TC_WNCV_2_3_000011_DownOrClose
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"2g: TH send DownOrClose command to the DUT"];
 
@@ -31134,7 +31142,7 @@ NSNumber * _Nonnull configStatusValA;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_3_000011_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_3_000012_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"3a: TH set the Mode Attribute bit2 of the DUT"];
 
@@ -31157,7 +31165,7 @@ NSNumber * _Nonnull configStatusValA;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 NSNumber * _Nonnull configStatusValB;
-- (void)testSendClusterTest_TC_WNCV_2_3_000012_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_3_000013_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"3c: TH reads ConfigStatus attribute from DUT"];
 
@@ -31193,7 +31201,7 @@ NSNumber * _Nonnull configStatusValB;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_3_000013_DownOrClose
+- (void)testSendClusterTest_TC_WNCV_2_3_000014_DownOrClose
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"3c: TH send DownOrClose command to the DUT"];
 
@@ -31211,7 +31219,7 @@ NSNumber * _Nonnull configStatusValB;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_3_000014_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_3_000015_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"3d: TH clear the Mode Attribute bit2 of the DUT"];
 
@@ -31233,7 +31241,7 @@ NSNumber * _Nonnull configStatusValB;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_3_000015_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_3_000016_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"3e: TH reads ConfigStatus attribute from DUT"];
 
@@ -31265,7 +31273,7 @@ NSNumber * _Nonnull configStatusValB;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_3_000016_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_3_000017_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"3f: TH reads the Mode Attribute from the DUT"];
 
@@ -31297,7 +31305,7 @@ NSNumber * _Nonnull configStatusValB;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_3_000017_DownOrClose
+- (void)testSendClusterTest_TC_WNCV_2_3_000018_DownOrClose
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"3g: TH send DownOrClose command to the DUT"];
 
