@@ -83,7 +83,11 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_POWER_SOURCE_CLUSTER_ID:
         emberAfPowerSourceClusterInitCallback(endpoint);
         break;
+<<<<<<< HEAD
     case ZCL_SOFTWARE_DIAGNOSTICS_CLUSTER_ID:
+=======
+     case ZCL_SOFTWARE_DIAGNOSTICS_CLUSTER_ID :
+>>>>>>> 4caf404b4 (Code review changes: update zap, remove dead code, update comments)
         emberAfSoftwareDiagnosticsClusterInitCallback(endpoint);
         break;
     case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:

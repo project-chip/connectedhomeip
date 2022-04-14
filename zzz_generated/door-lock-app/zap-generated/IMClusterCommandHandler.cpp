@@ -70,6 +70,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
+        case Commands::OpenBasicCommissioningWindow::Id: {
+        Commands::OpenBasicCommissioningWindow::DecodableType commandData;
+        TLVError = DataModel::Decode(aDataTlv, commandData);
+        if (TLVError == CHIP_NO_ERROR) {
+        wasHandled = emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(apCommandObj, aCommandPath, commandData);
+        }
+            break;
+        }
         case Commands::RevokeCommissioning::Id: {
             Commands::RevokeCommissioning::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
@@ -327,6 +335,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
+        case Commands::CommissioningComplete::Id: {
+        Commands::CommissioningComplete::DecodableType commandData;
+        TLVError = DataModel::Decode(aDataTlv, commandData);
+        if (TLVError == CHIP_NO_ERROR) {
+        wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteCallback(apCommandObj, aCommandPath, commandData);
+        }
+            break;
+        }
         default: {
             // Unrecognized command ID, error status will apply.
             apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
@@ -528,6 +544,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             {
                 wasHandled = emberAfNetworkCommissioningClusterConnectNetworkCallback(apCommandObj, aCommandPath, commandData);
             }
+            break;
+        }
+        case Commands::ConnectNetwork::Id: {
+        Commands::ConnectNetwork::DecodableType commandData;
+        TLVError = DataModel::Decode(aDataTlv, commandData);
+        if (TLVError == CHIP_NO_ERROR) {
+        wasHandled = emberAfNetworkCommissioningClusterConnectNetworkCallback(apCommandObj, aCommandPath, commandData);
+        }
             break;
         }
         case Commands::ReorderNetwork::Id: {

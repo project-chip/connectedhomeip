@@ -98,7 +98,6 @@ public:
 
     bool setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
     const char * lockStateToString(DlLockState lockState) const;
-
     bool ReadConfigValues();
 
 private:
@@ -119,9 +118,6 @@ private:
     static void TimerEventHandler(TimerHandle_t xTimer);
     static void AutoLockTimerEventHandler(AppEvent * aEvent);
     static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
-
-    LockUserInfo mLockUser;
-    LockCredentialInfo mLockCredentials;
 
     static LockManager sLock;
 };
