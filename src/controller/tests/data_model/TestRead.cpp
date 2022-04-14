@@ -1077,6 +1077,7 @@ void EstablishSubscriptions(nlTestSuite * apSuite, void * apContext, int32_t num
 
 } // namespace SubscriptionPathQuotaHelpers
 
+// TODO: (#17381) Need to add the case with more than one fabrics.
 void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite * apSuite, void * apContext)
 {
     using namespace SubscriptionPathQuotaHelpers;

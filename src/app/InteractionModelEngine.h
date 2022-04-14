@@ -254,7 +254,7 @@ public:
      * fabric with the given fabric index. Evict it when the fabric uses more resources than the per fabric quota or aForceEvict is
      * true.
      */
-    bool EvictOneSubscriptionForCompliance(FabricIndex aFabricIndex, bool aForceEvict);
+    bool TrimFabric(FabricIndex aFabricIndex, bool aForceEvict);
 
     uint16_t GetMinSubscriptionsPerFabric() const;
 
