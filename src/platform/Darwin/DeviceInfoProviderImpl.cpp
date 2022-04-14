@@ -20,7 +20,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <platform/Darwin/DeviceInfoProviderImpl.h>
-#include <platform/KeyValueStoreManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <stdlib.h>
