@@ -58,9 +58,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL startServer;
 /*
  * Path to a file to use for backing our KVS storage.  This should not
- * be used, generally; it will be removed soon.  Defaults to nullptr;
+ * be used, generally; it will be removed soon.  Defaults to nil.
  */
-@property (nonatomic) const char * kvsPath;
+@property (strong, nonatomic, nullable) NSString * kvsPath;
 
 - (instancetype)init NS_UNAVAILABLE;
 // TODO The delegate should not be nullable, but we need to sort out

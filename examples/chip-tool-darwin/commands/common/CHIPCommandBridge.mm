@@ -43,7 +43,7 @@ CHIP_ERROR CHIPCommandBridge::Run()
     auto params = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
     params.port = @(kListenPort);
     params.startServer = YES;
-    params.kvsPath = "/tmp/chip_kvs_darwin";
+    params.kvsPath = @("/tmp/chip_kvs_darwin");
 
     if ([factory startup:params] == NO) {
         ChipLogError(chipTool, "Controller factory startup failed");

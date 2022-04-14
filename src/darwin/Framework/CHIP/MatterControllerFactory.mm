@@ -182,9 +182,9 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
 
         [CHIPControllerAccessControl init];
 
-        if (startupParams.kvsPath != nullptr) {
-            // TODO: WE should stop needing a KeyValueStoreManager on the client side, then remove this code.
-            CHIP_ERROR errorCode = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(startupParams.kvsPath);
+        if (startupParams.kvsPath != nil) {
+            // TODO: We should stop needing a KeyValueStoreManager on the client side, then remove this code.
+            CHIP_ERROR errorCode = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init([startupParams.kvsPath UTF8String]);
             if (errorCode != CHIP_NO_ERROR) {
                 CHIP_LOG_ERROR("Error: %@", kErrorKVSInit);
                 return;
@@ -376,7 +376,7 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
     _paaCerts = nil;
     _port = nil;
     _startServer = NO;
-    _kvsPath = nullptr;
+    _kvsPath = nil;
 
     return self;
 }
