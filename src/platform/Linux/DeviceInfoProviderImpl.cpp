@@ -170,7 +170,7 @@ bool DeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
 
     DefaultStorageKeyAllocator keyAlloc;
     uint8_t buf[UserLabelTLVMaxSize()];
-    uint16_t len = static_cast<uint16_t>(UserLabelTLVMaxSize());
+    uint16_t len = static_cast<uint16_t>(sizeof(buf));
 
     err = mProvider.mStorage->SyncGetKeyValue(keyAlloc.UserLabelIndexKey(mEndpoint, mIndex), buf, len);
     VerifyOrReturnError(err == CHIP_NO_ERROR, false);
