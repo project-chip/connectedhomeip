@@ -39,6 +39,7 @@
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/CommissioningWindowOpener.h>
+#include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CHIPMem.h>
@@ -657,6 +658,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 
 - (void)dealloc
 {
+    [self cleanup];
 }
 
 - (BOOL)deviceBeingCommissionedOverBLE:(uint64_t)deviceId
@@ -693,6 +695,32 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     }
 
     return fabricIdx;
+}
+
+- (CHIP_ERROR)isRunningOnFabric:(chip::FabricInfo *)fabric isRunning:(BOOL *)isRunning
+{
+    if (![self isRunning]) {
+        *isRunning = NO;
+        return CHIP_NO_ERROR;
+    }
+
+    chip::FabricInfo * ourFabric = _cppCommissioner->GetFabricInfo();
+    if (!ourFabric) {
+        // Surprising!
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    if (ourFabric->GetFabricId() != fabric->GetFabricId()) {
+        *isRunning = NO;
+        return CHIP_NO_ERROR;
+    }
+
+    chip::Credentials::P256PublicKeySpan ourRootPublicKey, otherRootPublicKey;
+    ReturnErrorOnFailure(ourFabric->GetRootPubkey(ourRootPublicKey));
+    ReturnErrorOnFailure(fabric->GetRootPubkey(otherRootPublicKey));
+
+    *isRunning = (ourRootPublicKey.data_equal(otherRootPublicKey));
+    return CHIP_NO_ERROR;
 }
 
 @end

@@ -75,8 +75,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic) uint16_t vendorId;
 /*
- * Root CA keypair to use for signing certificates.  Nullable for now,
- * but that will change.
+ * Root CA keypair that identifies (via its public key) the fabric.  Nullable
+ * for now, but that will change.
  */
 @property (strong, nonatomic, nullable) id<CHIPKeypair> rootCAKeypair;
 /*

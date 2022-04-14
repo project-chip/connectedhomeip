@@ -22,9 +22,11 @@
 #import "CHIPDeviceController.h"
 #import "CHIPDeviceController_Internal.h"
 #import "CHIPLogging.h"
+#import "CHIPP256KeypairBridge.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
 
 #include <controller/CHIPDeviceControllerFactory.h>
+#include <credentials/FabricTable.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
@@ -37,7 +39,7 @@ using namespace chip::Controller;
 static NSString * const kErrorMemoryInit = @"Init Memory failure";
 static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
 static NSString * const kErrorAttestationTrustStoreInit = @"Init failure while creating the attestation trust store";
-static NSString * const kInfoFactorykShutdown = @"Shutting down the Matter controller factory";
+static NSString * const kInfoFactoryShutdown = @"Shutting down the Matter controller factory";
 static NSString * const kErrorGroupProviderInit = @"Init failure while initializing group data provider";
 static NSString * const kErrorKVSInit = @"Init Key Value Store failure";
 static NSString * const kErrorControllersInit = @"Init controllers array failure";
@@ -255,44 +257,114 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
         return nil;
     }
 
-    // TODO: Need to do the "this is an existing fabric and there is no existing
-    // controller for it" validation.  For now just use common startup code.
-    //
-    // Once we start doing that validation, we can start allowing more than one
-    // controller in _controllers; right now we prevent that to avoid two
-    // controllers both targeting the same fabric and confusing things.
+    // Create the controller, so we start the event loop, since we plan to do our fabric table operations there.
+    auto * controller = [self createController];
+    if (controller == nil) {
+        return nil;
+    }
 
-    return [self startController:startupParams];
+    __block BOOL okToStart = NO;
+    dispatch_sync(_chipWorkQueue, ^{
+        FabricTable fabricTable;
+        if (fabricTable.Init(_persistentStorageDelegateBridge) != CHIP_NO_ERROR) {
+            CHIP_LOG_ERROR("Can't start on existing fabric: fabric table init failed");
+            return;
+        }
+
+        CHIPP256KeypairBridge keypairBridge;
+        keypairBridge.Init(startupParams.rootCAKeypair);
+        auto * fabric
+            = fabricTable.FindFabric(Credentials::P256PublicKeySpan(keypairBridge.Pubkey().ConstBytes()), startupParams.fabricId);
+
+        if (!fabric) {
+            CHIP_LOG_ERROR("Can't start on existing fabric: fabric not found");
+            return;
+        }
+
+        for (CHIPDeviceController * existing in _controllers) {
+            BOOL isRunning = YES; // assume the worst
+            if ([existing isRunningOnFabric:fabric isRunning:&isRunning] != CHIP_NO_ERROR) {
+                CHIP_LOG_ERROR("Can't tell what fabric a controller is running on.  Not safe to start.");
+                return;
+            }
+
+            if (isRunning) {
+                CHIP_LOG_ERROR("Can't start on existing fabric: another controller is running on it");
+                return;
+            }
+        }
+
+        okToStart = YES;
+    });
+
+    if (okToStart == NO) {
+        [self controllerShuttingDown:controller];
+        return nil;
+    }
+
+    // TODO: Pass in the existing NOC and whatnot, as needed.
+    BOOL ok = [controller startup:startupParams];
+    if (ok == NO) {
+        return nil;
+    }
+
+    return controller;
 }
 
 - (CHIPDeviceController * _Nullable)startControllerOnNewFabric:(CHIPDeviceControllerStartupParams *)startupParams
 {
     if (![self isRunning]) {
-        CHIP_LOG_ERROR("Trying to start controller while Matter controlle factory is not running");
+        CHIP_LOG_ERROR("Trying to start controller while Matter controller factory is not running");
         return nil;
     }
 
-    // TODO: Need to do the "this is a new fabric" validation.  For now just use
-    // common startup code.
+    // Create the controller, so we start the event loop, since we plan to do our fabric table operations there.
+    auto * controller = [self createController];
+    if (controller == nil) {
+        return nil;
+    }
 
-    return [self startController:startupParams];
+    __block BOOL okToStart = NO;
+    dispatch_sync(_chipWorkQueue, ^{
+        FabricTable fabricTable;
+        if (fabricTable.Init(_persistentStorageDelegateBridge) != CHIP_NO_ERROR) {
+            CHIP_LOG_ERROR("Can't start on new fabric: storage can't read fabric table");
+            return;
+        }
+
+        CHIPP256KeypairBridge keypairBridge;
+        keypairBridge.Init(startupParams.rootCAKeypair);
+        auto * fabric
+            = fabricTable.FindFabric(Credentials::P256PublicKeySpan(keypairBridge.Pubkey().ConstBytes()), startupParams.fabricId);
+        if (fabric) {
+            CHIP_LOG_ERROR("Can't start on new fabric that matches existing fabric");
+            return;
+        }
+
+        okToStart = YES;
+    });
+
+    if (okToStart == NO) {
+        [self controllerShuttingDown:controller];
+        return nil;
+    }
+
+    BOOL ok = [controller startup:startupParams];
+    if (ok == NO) {
+        return nil;
+    }
+
+    return controller;
 }
 
-- (CHIPDeviceController * _Nullable)startController:(CHIPDeviceControllerStartupParams *)startupParams
+- (CHIPDeviceController * _Nullable)createController
 {
-    if ([_controllers count] != 0) {
-        CHIP_LOG_ERROR("We don't support more than one controller at a time yet");
-        return nil;
-    }
-
     CHIPDeviceController * controller = [[CHIPDeviceController alloc] initWithFactory:self queue:_chipWorkQueue];
     if (controller == nil) {
         CHIP_LOG_ERROR("Failed to init controller");
         return nil;
     }
 
-    // TODO: Make sure to keep this "if" check when the restriction above is
-    // removed and we allow multiple controllers.
     if ([_controllers count] == 0) {
         // Bringing up the first controller.  Start the event loop now.  If we
         // fail to bring it up, its cleanup will stop the event loop again.
@@ -302,19 +374,6 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
     // Add the controller to _controllers now, so if we fail partway through its
     // startup we will still do the right cleanups.
     [_controllers addObject:controller];
-
-    BOOL ok = [controller startup:startupParams];
-    if (ok == NO) {
-        if ([controller isRunning]) {
-            CHIP_LOG_ERROR("Controller running after failing to start up");
-        }
-        return nil;
-    }
-
-    if (![controller isRunning]) {
-        CHIP_LOG_ERROR("Controller not running after starting up");
-        return nil;
-    }
 
     return controller;
 }
