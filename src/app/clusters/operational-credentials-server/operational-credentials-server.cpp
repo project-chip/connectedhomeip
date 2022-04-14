@@ -264,6 +264,23 @@ FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
     return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
 }
 
+CHIP_ERROR DeleteFabricFromTable(FabricIndex fabricIndex)
+{
+    ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().Delete(fabricIndex));
+
+    // We need to withdraw the advertisement for the now-removed fabric, so need
+    // to restart advertising altogether.
+    app::DnssdServer::Instance().StartServer();
+
+    return CHIP_NO_ERROR;
+}
+
+void CleanupFabricContext(SessionManager & sessionMgr, FabricIndex fabricIndex)
+{
+    InteractionModelEngine::GetInstance()->CloseTransactionsFromFabricIndex(fabricIndex);
+    sessionMgr.ExpireAllPairingsForFabric(fabricIndex);
+}
+
 void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Call to FailSafeCleanup");
@@ -284,7 +301,8 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
             caseSessionManager->ReleaseSessionsForFabric(fabricInfo->GetCompressedId());
         }
 
-        Server::GetInstance().GetSecureSessionManager().ExpireAllPairingsForFabric(fabricIndex);
+        SessionManager & sessionMgr = Server::GetInstance().GetSecureSessionManager();
+        CleanupFabricContext(sessionMgr, fabricIndex);
     }
 
     // If an AddNOC command had been successfully invoked, achieve the equivalent effect of invoking the RemoveFabric command
@@ -292,7 +310,7 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     // command.
     if (event->FailSafeTimerExpired.AddNocCommandHasBeenInvoked)
     {
-        Server::GetInstance().GetFabricTable().Delete(fabricIndex);
+        DeleteFabricFromTable(fabricIndex);
     }
 
     // If an UpdateNOC command had been successfully invoked, revert the state of operational key pair, NOC and ICAC for that
@@ -406,9 +424,9 @@ public:
     void OnResponseTimeout(chip::Messaging::ExchangeContext * ec) override {}
     void OnExchangeClosing(chip::Messaging::ExchangeContext * ec) override
     {
-        FabricIndex currentFabricIndex = ec->GetSessionHandle()->GetFabricIndex();
-        InteractionModelEngine::GetInstance()->CloseTransactionsFromFabricIndex(currentFabricIndex);
-        ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(currentFabricIndex);
+        SessionManager * sessionManager = ec->GetExchangeMgr()->GetSessionManager();
+        FabricIndex currentFabricIndex  = ec->GetSessionHandle()->GetFabricIndex();
+        CleanupFabricContext(*sessionManager, currentFabricIndex);
     }
 };
 
@@ -425,12 +443,8 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandle
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: RemoveFabric"); // TODO: Generate emberAfFabricClusterPrintln
 
-    CHIP_ERROR err = Server::GetInstance().GetFabricTable().Delete(fabricBeingRemoved);
+    CHIP_ERROR err = DeleteFabricFromTable(fabricBeingRemoved);
     SuccessOrExit(err);
-
-    // We need to withdraw the advertisement for the now-removed fabric, so need
-    // to restart advertising altogether.
-    app::DnssdServer::Instance().StartServer();
 
 exit:
     fabricListChanged();
@@ -467,8 +481,8 @@ exit:
         }
         else
         {
-            InteractionModelEngine::GetInstance()->CloseTransactionsFromFabricIndex(fabricBeingRemoved);
-            ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(fabricBeingRemoved);
+            SessionManager * sessionManager = ec->GetExchangeMgr()->GetSessionManager();
+            CleanupFabricContext(*sessionManager, fabricBeingRemoved);
         }
     }
     return true;
@@ -545,27 +559,27 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
     {
         return OperationalCertStatus::kSuccess;
     }
-    else if (err == CHIP_ERROR_INVALID_PUBLIC_KEY)
+    if (err == CHIP_ERROR_INVALID_PUBLIC_KEY)
     {
         return OperationalCertStatus::kInvalidPublicKey;
     }
-    else if (err == CHIP_ERROR_INVALID_FABRIC_ID || err == CHIP_ERROR_WRONG_NODE_ID)
+    if (err == CHIP_ERROR_INVALID_FABRIC_ID || err == CHIP_ERROR_WRONG_NODE_ID)
     {
         return OperationalCertStatus::kInvalidNodeOpId;
     }
-    else if (err == CHIP_ERROR_CA_CERT_NOT_FOUND || err == CHIP_ERROR_CERT_PATH_LEN_CONSTRAINT_EXCEEDED ||
-             err == CHIP_ERROR_CERT_PATH_TOO_LONG || err == CHIP_ERROR_CERT_USAGE_NOT_ALLOWED || err == CHIP_ERROR_CERT_EXPIRED ||
-             err == CHIP_ERROR_CERT_NOT_VALID_YET || err == CHIP_ERROR_UNSUPPORTED_CERT_FORMAT ||
-             err == CHIP_ERROR_UNSUPPORTED_ELLIPTIC_CURVE || err == CHIP_ERROR_CERT_LOAD_FAILED ||
-             err == CHIP_ERROR_CERT_NOT_TRUSTED || err == CHIP_ERROR_WRONG_CERT_DN)
+    if (err == CHIP_ERROR_CA_CERT_NOT_FOUND || err == CHIP_ERROR_CERT_PATH_LEN_CONSTRAINT_EXCEEDED ||
+        err == CHIP_ERROR_CERT_PATH_TOO_LONG || err == CHIP_ERROR_CERT_USAGE_NOT_ALLOWED || err == CHIP_ERROR_CERT_EXPIRED ||
+        err == CHIP_ERROR_CERT_NOT_VALID_YET || err == CHIP_ERROR_UNSUPPORTED_CERT_FORMAT ||
+        err == CHIP_ERROR_UNSUPPORTED_ELLIPTIC_CURVE || err == CHIP_ERROR_CERT_LOAD_FAILED || err == CHIP_ERROR_CERT_NOT_TRUSTED ||
+        err == CHIP_ERROR_WRONG_CERT_DN)
     {
         return OperationalCertStatus::kInvalidNOC;
     }
-    else if (err == CHIP_ERROR_NO_MEMORY)
+    if (err == CHIP_ERROR_NO_MEMORY)
     {
         return OperationalCertStatus::kTableFull;
     }
-    else if (err == CHIP_ERROR_FABRIC_EXISTS)
+    if (err == CHIP_ERROR_FABRIC_EXISTS)
     {
         return OperationalCertStatus::kFabricConflict;
     }

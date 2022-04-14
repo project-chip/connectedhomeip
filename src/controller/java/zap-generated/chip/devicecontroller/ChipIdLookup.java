@@ -232,6 +232,15 @@ public final class ChipIdLookup {
       if (attributeId == 1L) {
         return "Extension";
       }
+      if (attributeId == 2L) {
+        return "SubjectsPerAccessControlEntry";
+      }
+      if (attributeId == 3L) {
+        return "TargetsPerAccessControlEntry";
+      }
+      if (attributeId == 4L) {
+        return "AccessControlEntriesPerFabric";
+      }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
       }
@@ -450,6 +459,9 @@ public final class ChipIdLookup {
       }
       if (attributeId == 18L) {
         return "UniqueID";
+      }
+      if (attributeId == 19L) {
+        return "CapabilityMinima";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";

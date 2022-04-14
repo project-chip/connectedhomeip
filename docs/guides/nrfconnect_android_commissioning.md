@@ -111,7 +111,9 @@ After building, install the application by completing the following steps:
 1.  Install the Android Debug Bridge (adb) package by running the following
     command:
 
-        $ sudo apt install android-tools-adb
+        ```
+        sudo apt install android-tools-adb
+        ```
 
 2.  Enable **USB debugging** on the smartphone. See the
     [Configure on-device developer options](https://developer.android.com/studio/debug/dev-options)
@@ -122,7 +124,9 @@ After building, install the application by completing the following steps:
 5.  Run the following command to install the application, with _chip-dir_
     replaced with the path to the Matter source directory:
 
-        $ adb install -r chip-dir/src/android/CHIPTool/app/build/outputs/apk/debug/app-debug.apk
+        ```
+        adb install -r chip-dir/src/android/CHIPTool/app/build/outputs/apk/debug/app-debug.apk
+        ```
 
 6.  Navigate to settings on your smartphone and grant **Camera** and
     **Location** permissions to CHIPTool.

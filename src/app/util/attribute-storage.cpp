@@ -627,10 +627,8 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                 {
                                     return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength);
                                 }
-                                else
-                                {
-                                    return EMBER_ZCL_STATUS_FAILURE;
-                                }
+
+                                return EMBER_ZCL_STATUS_FAILURE;
                             }
                         }
                         else

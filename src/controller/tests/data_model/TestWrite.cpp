@@ -116,7 +116,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
 
         return CHIP_NO_ERROR;
     }
-    else if (aPath.mClusterId == TestCluster::Id && aPath.mAttributeId == Attributes::ListFabricScoped::Id)
+    if (aPath.mClusterId == TestCluster::Id && aPath.mAttributeId == Attributes::ListFabricScoped::Id)
     {
         // Mock a invalid SubjectDescriptor
         AttributeValueDecoder decoder(aReader, Access::SubjectDescriptor());

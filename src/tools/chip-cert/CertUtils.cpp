@@ -48,22 +48,22 @@ bool ToolChipDN::SetCertSubjectDN(X509 * cert) const
         case kOID_AttributeType_CommonName:
             attrNID = NID_commonName;
             break;
-        case kOID_AttributeType_ChipNodeId:
+        case kOID_AttributeType_MatterNodeId:
             attrNID = gNIDChipNodeId;
             break;
-        case kOID_AttributeType_ChipFirmwareSigningId:
+        case kOID_AttributeType_MatterFirmwareSigningId:
             attrNID = gNIDChipFirmwareSigningId;
             break;
-        case kOID_AttributeType_ChipICAId:
+        case kOID_AttributeType_MatterICACId:
             attrNID = gNIDChipICAId;
             break;
-        case kOID_AttributeType_ChipRootId:
+        case kOID_AttributeType_MatterRCACId:
             attrNID = gNIDChipRootId;
             break;
-        case kOID_AttributeType_ChipFabricId:
+        case kOID_AttributeType_MatterFabricId:
             attrNID = gNIDChipFabricId;
             break;
-        case kOID_AttributeType_ChipCASEAuthenticatedTag:
+        case kOID_AttributeType_MatterCASEAuthTag:
             attrNID = gNIDChipCASEAuthenticatedTag;
             break;
         default:

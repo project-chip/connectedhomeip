@@ -582,7 +582,7 @@ CHIP_ERROR ChipDN::AddCATs(const chip::CATValues & cats)
     {
         if (cat != kUndefinedCAT)
         {
-            ReturnErrorOnFailure(AddAttribute(chip::ASN1::kOID_AttributeType_ChipCASEAuthenticatedTag, cat));
+            ReturnErrorOnFailure(AddAttribute_MatterCASEAuthTag(cat));
         }
     }
 
@@ -615,31 +615,31 @@ CHIP_ERROR ChipDN::GetCertType(uint8_t & certType) const
 
     for (uint8_t i = 0; i < rdnCount; i++)
     {
-        if (rdn[i].mAttrOID == kOID_AttributeType_ChipRootId)
+        if (rdn[i].mAttrOID == kOID_AttributeType_MatterRCACId)
         {
             VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_DN);
 
             lCertType = kCertType_Root;
         }
-        else if (rdn[i].mAttrOID == kOID_AttributeType_ChipICAId)
+        else if (rdn[i].mAttrOID == kOID_AttributeType_MatterICACId)
         {
             VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_DN);
 
             lCertType = kCertType_ICA;
         }
-        else if (rdn[i].mAttrOID == kOID_AttributeType_ChipNodeId)
+        else if (rdn[i].mAttrOID == kOID_AttributeType_MatterNodeId)
         {
             VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_DN);
             VerifyOrReturnError(IsOperationalNodeId(rdn[i].mChipVal), CHIP_ERROR_WRONG_CERT_DN);
             lCertType = kCertType_Node;
         }
-        else if (rdn[i].mAttrOID == kOID_AttributeType_ChipFirmwareSigningId)
+        else if (rdn[i].mAttrOID == kOID_AttributeType_MatterFirmwareSigningId)
         {
             VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_DN);
 
             lCertType = kCertType_FirmwareSigning;
         }
-        else if (rdn[i].mAttrOID == kOID_AttributeType_ChipFabricId)
+        else if (rdn[i].mAttrOID == kOID_AttributeType_MatterFabricId)
         {
             // Only one fabricId attribute is allowed per DN.
             VerifyOrExit(!fabricIdPresent, err = CHIP_ERROR_WRONG_CERT_DN);
@@ -669,10 +669,10 @@ CHIP_ERROR ChipDN::GetCertChipId(uint64_t & chipId) const
     {
         switch (rdn[i].mAttrOID)
         {
-        case kOID_AttributeType_ChipRootId:
-        case kOID_AttributeType_ChipICAId:
-        case kOID_AttributeType_ChipNodeId:
-        case kOID_AttributeType_ChipFirmwareSigningId:
+        case kOID_AttributeType_MatterRCACId:
+        case kOID_AttributeType_MatterICACId:
+        case kOID_AttributeType_MatterNodeId:
+        case kOID_AttributeType_MatterFirmwareSigningId:
             VerifyOrReturnError(chipId == 0, CHIP_ERROR_WRONG_CERT_DN);
 
             chipId = rdn[i].mChipVal;
@@ -695,7 +695,7 @@ CHIP_ERROR ChipDN::GetCertFabricId(uint64_t & fabricId) const
     {
         switch (rdn[i].mAttrOID)
         {
-        case kOID_AttributeType_ChipFabricId:
+        case kOID_AttributeType_MatterFabricId:
             // Ensure only one FabricID RDN present, since start value is kUndefinedFabricId, which is reserved and never seen.
             VerifyOrReturnError(fabricId == kUndefinedFabricId, CHIP_ERROR_WRONG_CERT_DN);
             VerifyOrReturnError(IsValidFabricId(rdn[i].mChipVal), CHIP_ERROR_WRONG_CERT_DN);
@@ -782,11 +782,11 @@ CHIP_ERROR ChipDN::DecodeFromTLV(TLVReader & reader)
             uint64_t chipAttr;
             VerifyOrReturnError(attrIsPrintableString == false, CHIP_ERROR_INVALID_TLV_TAG);
             ReturnErrorOnFailure(reader.Get(chipAttr));
-            if (attrOID == chip::ASN1::kOID_AttributeType_ChipNodeId)
+            if (attrOID == chip::ASN1::kOID_AttributeType_MatterNodeId)
             {
                 VerifyOrReturnError(IsOperationalNodeId(attrOID), CHIP_ERROR_INVALID_ARGUMENT);
             }
-            else if (attrOID == chip::ASN1::kOID_AttributeType_ChipFabricId)
+            else if (attrOID == chip::ASN1::kOID_AttributeType_MatterFabricId)
             {
                 VerifyOrReturnError(IsValidFabricId(attrOID), CHIP_ERROR_INVALID_ARGUMENT);
             }
@@ -798,7 +798,7 @@ CHIP_ERROR ChipDN::DecodeFromTLV(TLVReader & reader)
             uint32_t chipAttr;
             VerifyOrReturnError(attrIsPrintableString == false, CHIP_ERROR_INVALID_TLV_TAG);
             ReturnErrorOnFailure(reader.Get(chipAttr));
-            if (attrOID == chip::ASN1::kOID_AttributeType_ChipCASEAuthenticatedTag)
+            if (attrOID == chip::ASN1::kOID_AttributeType_MatterCASEAuthTag)
             {
                 VerifyOrReturnError(IsValidCASEAuthTag(chipAttr), CHIP_ERROR_INVALID_ARGUMENT);
             }
@@ -937,11 +937,11 @@ CHIP_ERROR ChipDN::DecodeFromASN1(ASN1Reader & reader)
                                                                            chipAttr) == sizeof(uint64_t),
                                             ASN1_ERROR_INVALID_ENCODING);
 
-                        if (attrOID == chip::ASN1::kOID_AttributeType_ChipNodeId)
+                        if (attrOID == chip::ASN1::kOID_AttributeType_MatterNodeId)
                         {
                             VerifyOrReturnError(IsOperationalNodeId(chipAttr), CHIP_ERROR_WRONG_CERT_DN);
                         }
-                        else if (attrOID == chip::ASN1::kOID_AttributeType_ChipFabricId)
+                        else if (attrOID == chip::ASN1::kOID_AttributeType_MatterFabricId)
                         {
                             VerifyOrReturnError(IsValidFabricId(chipAttr), CHIP_ERROR_WRONG_CERT_DN);
                         }
@@ -1135,12 +1135,12 @@ CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ChipCertificateData & opcert, N
     for (uint8_t i = 0; i < subjectDN.RDNCount(); ++i)
     {
         const auto & rdn = subjectDN.rdn[i];
-        if (rdn.mAttrOID == ASN1::kOID_AttributeType_ChipNodeId)
+        if (rdn.mAttrOID == ASN1::kOID_AttributeType_MatterNodeId)
         {
             nodeId      = rdn.mChipVal;
             foundNodeId = true;
         }
-        else if (rdn.mAttrOID == ASN1::kOID_AttributeType_ChipFabricId)
+        else if (rdn.mAttrOID == ASN1::kOID_AttributeType_MatterFabricId)
         {
             fabricId      = rdn.mChipVal;
             foundFabricId = true;
@@ -1182,7 +1182,7 @@ CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * 
     for (uint8_t i = 0; i < subjectDN.RDNCount(); ++i)
     {
         const auto & rdn = subjectDN.rdn[i];
-        if (rdn.mAttrOID == ASN1::kOID_AttributeType_ChipFabricId)
+        if (rdn.mAttrOID == ASN1::kOID_AttributeType_MatterFabricId)
         {
             *fabricId = rdn.mChipVal;
             return CHIP_NO_ERROR;
@@ -1216,7 +1216,7 @@ CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues &
     for (uint8_t i = 0; i < subjectDN.RDNCount(); ++i)
     {
         const auto & rdn = subjectDN.rdn[i];
-        if (rdn.mAttrOID == ASN1::kOID_AttributeType_ChipCASEAuthenticatedTag)
+        if (rdn.mAttrOID == ASN1::kOID_AttributeType_MatterCASEAuthTag)
         {
             // This error should never happen in practice because valid NOC cannot have more
             // than kMaxSubjectCATAttributeCount CATs in its subject. The check that it is

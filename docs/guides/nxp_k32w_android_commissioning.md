@@ -88,19 +88,27 @@ the RCP firmware onto an K32W061 DK6:
 1.  Clone the OpenThread repository into the current directory (we recommand
     using commit ced158e65a00dd5394c04548b7b187d3a3f11eef):
 
-        $ git clone https://github.com/openthread/openthread.git
+        ```
+        git clone https://github.com/openthread/openthread.git
+        ```
 
 2.  Enter the _openthread_ directory:
 
-        $ cd openthread
+        ```
+        cd openthread
+        ```
 
 3.  Install OpenThread dependencies:
 
-        $ ./script/bootstrap
+        ```
+        ./script/bootstrap
+        ```
 
 4.  Set up the build environment:
 
-        $ ./bootstrap
+        ```
+        ./bootstrap
+        ```
 
 5.  Build OpenThread for the K32W061 DK6:
 
@@ -130,10 +138,13 @@ To make your PC work as a Thread Border Router, complete the following tasks:
 
     -   Install the required package:
 
-              $ sudo apt-get install hostapd
+              ```
+              sudo apt-get install hostapd
+              ```
 
     -   Configure hostapd (create new file and add content):
 
+              ```
               $ sudo vim /etc/hostapd/hostapd.conf
 
               interface=wlan0
@@ -150,69 +161,88 @@ To make your PC work as a Thread Border Router, complete the following tasks:
               wpa_key_mgmt=WPA-PSK
               wpa_pairwise=TKIP
               rsn_pairwise=CCMP
+              ```
 
     -   We need to tell hostapd to use our config file by editing the main
         hostapd configuration file. Change the line that starts with
-        #DAEMON_CONF (remember to remove #):  
-         \$ sudo vim /etc/default/hostapd
+        #DAEMON_CONF (remember to remove #):
+
+              ```
+              $ sudo vim /etc/default/hostapd
 
               DAEMON_CONF="/etc/hostapd/hostapd.conf"
+              ```
 
     -   Start hostapd:
 
-              $ sudo systemctl unmask hostapd
-              $ sudo systemctl enable hostapd
+              ```
+              sudo systemctl unmask hostapd
+              sudo systemctl enable hostapd
+              ```
 
 3.  Configure Dnsmasq
 
     -   Install the required package:
 
-              $ sudo apt-get install dnsmasq
+              ```
+              sudo apt-get install dnsmasq
+              ```
 
     -   Make a backup of the default config file:
 
-              $ sudo cp /etc/dnsmasq.conf /etc/dnsmasq.conf.org
+              ```
+              sudo cp /etc/dnsmasq.conf /etc/dnsmasq.conf.org
+              ```
 
     -   Set the DHCP range:
 
+              ```
               $ sudo vim /etc/dnsmasq.conf
 
               interface=wlan0
               dhcp-range=192.168.4.2,192.168.4.20,255.255.255.0,24h
+              ```
 
     -   On System startup, dnsmasq will not wait for wlan0 interface to
         initialize and will fail. We need to tell systemd to launch it after
         networks get ready, so we will modify dnsmasq service file by specifying
         the initialization order under the _After=_ and _Wants=_ sections:
 
+              ```
               $ sudo vim /lib/systemd/system/dnsmasq.service
 
               [Unit]
               ...
               After=... network-online.target
               Wants=... network-online.target
+              ```
 
     -   Force systemd to avoid using port 53 (used by dnsmasqd service):
 
+              ```
               $ sudo vim /etc/systemd/resolved.conf
 
               DNSStubListener=no
+              ```
 
 4.  Configure static IP for the Wi-Fi AP interface
 
     -   Modify the cloud-init file and add content to it (use spaces, not tabs,
         USE THE ):
 
+            ```
             $ sudo vim /etc/netplan/50-cloud-init.yaml
 
             wlan0:
                 dhcp4: false
                 addresses:
                 - 192.168.4.1/24
+            ```
 
     -   The final configuration file should like like this (pay attention to the
         spacing used):
 
+              ```
               network:
                   version: 2
                   ethernets:
@@ -223,17 +253,22 @@ To make your PC work as a Thread Border Router, complete the following tasks:
                            dhcp4: false
                            addresses:
                            - 192.168.4.1/24
+              ```
 
 5)  Set up RADVD
 
     -   Install required package:
 
-        \$ sudo apt-get install radvd
+        ```
+        sudo apt-get install radvd
+        ```
 
-    -   Configure RADVD for distributing the prefix _fd11:33_::/64 to the
+    -   Configure RADVD for distributing the prefix `_fd11:33_::/64` to the
         devices connected to the AP, while announcing them that is also has a
-        route to _fd11:22::/64_  
-         \$ sudo vim /etc/radvd.conf
+        route to `_fd11:22::/64_`
+
+        ```
+         $ sudo vim /etc/radvd.conf
 
               interface wlan0 {
                  AdvManagedFlag on;
@@ -248,32 +283,40 @@ To make your PC work as a Thread Border Router, complete the following tasks:
                  route fd11:22::/64 {
                  };
               };
+        ```
 
 
     -   Enable radvd service:
-         $ sudo chmod u=rw,g=r,o=r /etc/radvd.conf
-            $ sudo systemctl enable
-        radvd.service
+
+        ```
+        sudo chmod u=rw,g=r,o=r /etc/radvd.conf
+        sudo systemctl enable radvd.service
+        ```
 
 6.  Configure routing:
 
     -   Create a configuration file for setting the routing behavior (forward
         between Thread and Wi-Fi AP interfaces):
 
+              ```
               $ sudo vim configurations.sh
 
               #!/bin/bash
               sudo iptables -A FORWARD -i wlan0 -o wpan0 -j ACCEPT
               sudo iptables -A FORWARD -i wpan0 -o wlan0 -j ACCEPT
+              ```
 
 
     -   Set the executable bit for the above file:
 
-              $ sudo chmod +x configurations.sh
+              ```
+              sudo chmod +x configurations.sh
+              ```
 
     -   Configure the above script to be run each time the PC is restarted using
         a systemd service configuration (change the path for _ExecStart_):
 
+              ```
               $ sudo vim /etc/systemd/system/br.service
 
               [Unit]
@@ -286,12 +329,14 @@ To make your PC work as a Thread Border Router, complete the following tasks:
 
               [Install]
               WantedBy=multi-user.target
-
+              ```
 
     -   Then run:
 
-              $ sudo systemctl daemon-reload
-              $ sudo systemctl enable br.service
+              ```
+              sudo systemctl daemon-reload
+              sudo systemctl enable br.service
+              ```
 
 7.  As a quick checkpoint, restart the PC and make sure that the mobile phone
     can connect to the _OT-BR_ AP (password: 12345678). Also, check that it gets
@@ -299,10 +344,12 @@ To make your PC work as a Thread Border Router, complete the following tasks:
     with the prefix _fd11:33::/64_. Commands for debugging possible issues with
     the services:
 
-        $ sudo service hostapd status
-        $ sudo service dnsmasq status
-        $ sudo service radvd status
-        $ sudo service br status
+        ```
+        sudo service hostapd status
+        sudo service dnsmasq status
+        sudo service radvd status
+        sudo service br status
+        ```
 
 <hr>
 
@@ -332,7 +379,9 @@ After building, install the application by completing the following steps:
 1.  Install the Android Debug Bridge (adb) package by running the following
     command:
 
-        $ sudo apt install android-tools-adb
+        ```
+        sudo apt install android-tools-adb
+        ```
 
 2.  Enable _USB debugging_ on the smartphone. See the
     [Configure on-device developer options](https://developer.android.com/studio/debug/dev-options)
@@ -343,7 +392,9 @@ After building, install the application by completing the following steps:
 5.  Run the following command to install the application, with _chip-dir_
     replaced with the path to the CHIP source directory:
 
-        $ adb install -r chip-dir/src/android/CHIPTool/app/build/outputs/apk/debug/app-debug.apk
+        ```
+        adb install -r chip-dir/src/android/CHIPTool/app/build/outputs/apk/debug/app-debug.apk
+        ```
 
 6.  Navigate to settings on your smartphone and grant _Camera_ and _Location_
     permissions to CHIPTool.
@@ -371,7 +422,9 @@ CHIPTool is now ready to be used for commissioning.
 5.  In case you ever want to reset these parameters issue this command from the
     border router shell:
 
-        $ sudo ot-ctl factoryreset
+        ```
+        sudo ot-ctl factoryreset
+        ```
 
 6.  Info: For debugging the Border Router, _ot-ctl_ offers an entry point to
     [Thread CLI Commands](https://github.com/openthread/openthread/blob/master/src/cli/README.md).
@@ -379,11 +432,15 @@ CHIPTool is now ready to be used for commissioning.
 7.  In case there is any issue with the Web GUI check the logs on the Border
     Router side / restart the daemon:
 
-        $ sudo service otbr-web status
+        ```
+        sudo service otbr-web status
+        ```
 
     In case the status is not _leader_ then restart the service:
 
-        $ sudo service otbr-web restart
+        ```
+        sudo service otbr-web restart
+        ```
 
 ## Preparing accessory device
 
@@ -402,8 +459,10 @@ To prepare the accessory device for commissioning, complete the following steps:
     the device.
 4.  Find a message similar to the following one in the application logs:
 
+        ```
         I: 666[SVR] Copy/paste the below URL in a browser to see the QR Code:
                 https://dhrishi.github.io/connectedhomeip/qrcode.html?data=CH%3AI34DV%2A-00%200C9SS0
+        ```
 
 5.  Open the URL in a web browser to have the commissioning QR code generated.
 

@@ -160,6 +160,9 @@
 | Attributes:                                                         |        |
 | * Acl                                                               | 0x0000 |
 | * Extension                                                         | 0x0001 |
+| * SubjectsPerAccessControlEntry                                     | 0x0002 |
+| * TargetsPerAccessControlEntry                                      | 0x0003 |
+| * AccessControlEntriesPerFabric                                     | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -452,6 +455,248 @@ public:
                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
                                                   }
                                               }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute SubjectsPerAccessControlEntry
+ */
+class ReadAccessControlSubjectsPerAccessControlEntry : public ModelCommand {
+public:
+    ReadAccessControlSubjectsPerAccessControlEntry()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "subjects-per-access-control-entry");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAccessControlSubjectsPerAccessControlEntry() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeSubjectsPerAccessControlEntryWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AccessControl.SubjectsPerAccessControlEntry response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "AccessControl SubjectsPerAccessControlEntry Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeAccessControlSubjectsPerAccessControlEntry : public ModelCommand {
+public:
+    SubscribeAttributeAccessControlSubjectsPerAccessControlEntry()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "subjects-per-access-control-entry");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeAccessControlSubjectsPerAccessControlEntry() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeSubjectsPerAccessControlEntryWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                    params:params
+                                                   subscriptionEstablished:nullptr
+                                                             reportHandler:^(
+                                                                 NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                                 NSLog(@"AccessControl.SubjectsPerAccessControlEntry response %@",
+                                                                     [value description]);
+                                                                 if (error || !mWait) {
+                                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                 }
+                                                             }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute TargetsPerAccessControlEntry
+ */
+class ReadAccessControlTargetsPerAccessControlEntry : public ModelCommand {
+public:
+    ReadAccessControlTargetsPerAccessControlEntry()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "targets-per-access-control-entry");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAccessControlTargetsPerAccessControlEntry() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeTargetsPerAccessControlEntryWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AccessControl.TargetsPerAccessControlEntry response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "AccessControl TargetsPerAccessControlEntry Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeAccessControlTargetsPerAccessControlEntry : public ModelCommand {
+public:
+    SubscribeAttributeAccessControlTargetsPerAccessControlEntry()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "targets-per-access-control-entry");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeAccessControlTargetsPerAccessControlEntry() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeTargetsPerAccessControlEntryWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                   params:params
+                                                  subscriptionEstablished:nullptr
+                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                                NSLog(@"AccessControl.TargetsPerAccessControlEntry response %@",
+                                                                    [value description]);
+                                                                if (error || !mWait) {
+                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                }
+                                                            }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute AccessControlEntriesPerFabric
+ */
+class ReadAccessControlAccessControlEntriesPerFabric : public ModelCommand {
+public:
+    ReadAccessControlAccessControlEntriesPerFabric()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "access-control-entries-per-fabric");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAccessControlAccessControlEntriesPerFabric() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeAccessControlEntriesPerFabricWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AccessControl.AccessControlEntriesPerFabric response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "AccessControl AccessControlEntriesPerFabric Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeAccessControlAccessControlEntriesPerFabric : public ModelCommand {
+public:
+    SubscribeAttributeAccessControlAccessControlEntriesPerFabric()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "access-control-entries-per-fabric");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeAccessControlAccessControlEntriesPerFabric() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeAccessControlEntriesPerFabricWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                    params:params
+                                                   subscriptionEstablished:nullptr
+                                                             reportHandler:^(
+                                                                 NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                                 NSLog(@"AccessControl.AccessControlEntriesPerFabric response %@",
+                                                                     [value description]);
+                                                                 if (error || !mWait) {
+                                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                 }
+                                                             }];
 
         return CHIP_NO_ERROR;
     }
@@ -4931,6 +5176,7 @@ private:
 | * LocalConfigDisabled                                               | 0x0010 |
 | * Reachable                                                         | 0x0011 |
 | * UniqueID                                                          | 0x0012 |
+| * CapabilityMinima                                                  | 0x0013 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -6501,6 +6747,85 @@ public:
                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
                                                  }
                                              }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute CapabilityMinima
+ */
+class ReadBasicCapabilityMinima : public ModelCommand {
+public:
+    ReadBasicCapabilityMinima()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "capability-minima");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBasicCapabilityMinima() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeCapabilityMinimaWithCompletionHandler:^(
+            CHIPBasicClusterCapabilityMinimaStruct * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Basic.CapabilityMinima response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "Basic CapabilityMinima Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeBasicCapabilityMinima : public ModelCommand {
+public:
+    SubscribeAttributeBasicCapabilityMinima()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "capability-minima");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeBasicCapabilityMinima() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeCapabilityMinimaWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                            params:params
+                                           subscriptionEstablished:nullptr
+                                                     reportHandler:^(CHIPBasicClusterCapabilityMinimaStruct * _Nullable value,
+                                                         NSError * _Nullable error) {
+                                                         NSLog(@"Basic.CapabilityMinima response %@", [value description]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
+                                                     }];
 
         return CHIP_NO_ERROR;
     }
@@ -76661,6 +76986,12 @@ void registerClusterAccessControl(Commands & commands)
         make_unique<ReadAccessControlExtension>(), //
         make_unique<WriteAccessControlExtension>(), //
         make_unique<SubscribeAttributeAccessControlExtension>(), //
+        make_unique<ReadAccessControlSubjectsPerAccessControlEntry>(), //
+        make_unique<SubscribeAttributeAccessControlSubjectsPerAccessControlEntry>(), //
+        make_unique<ReadAccessControlTargetsPerAccessControlEntry>(), //
+        make_unique<SubscribeAttributeAccessControlTargetsPerAccessControlEntry>(), //
+        make_unique<ReadAccessControlAccessControlEntriesPerFabric>(), //
+        make_unique<SubscribeAttributeAccessControlAccessControlEntriesPerFabric>(), //
         make_unique<ReadAccessControlGeneratedCommandList>(), //
         make_unique<SubscribeAttributeAccessControlGeneratedCommandList>(), //
         make_unique<ReadAccessControlAcceptedCommandList>(), //
@@ -76873,6 +77204,8 @@ void registerClusterBasic(Commands & commands)
         make_unique<SubscribeAttributeBasicReachable>(), //
         make_unique<ReadBasicUniqueID>(), //
         make_unique<SubscribeAttributeBasicUniqueID>(), //
+        make_unique<ReadBasicCapabilityMinima>(), //
+        make_unique<SubscribeAttributeBasicCapabilityMinima>(), //
         make_unique<ReadBasicGeneratedCommandList>(), //
         make_unique<SubscribeAttributeBasicGeneratedCommandList>(), //
         make_unique<ReadBasicAcceptedCommandList>(), //

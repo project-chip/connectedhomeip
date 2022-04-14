@@ -64,6 +64,12 @@ CHIP_ERROR DeviceInfoProvider::AppendUserLabel(EndpointId endpoint, const UserLa
     return CHIP_NO_ERROR;
 }
 
+void DeviceInfoProvider::SetStorageDelegate(PersistentStorageDelegate * storage)
+{
+    VerifyOrDie(storage != nullptr);
+    mStorage = storage;
+}
+
 /**
  * Instance getter for the global DeviceInfoProvider.
  *
