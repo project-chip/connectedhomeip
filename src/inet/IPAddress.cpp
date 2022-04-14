@@ -272,11 +272,13 @@ CHIP_ERROR IPAddress::GetIPAddressFromSockAddr(const SockAddr & sockaddr, IPAddr
 #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 IPAddress::IPAddress(const otIp6Address & ipv6Addr)
 {
+    static_assert(sizeof(ipv6Addr.mFields.m32) == sizeof(Addr), "otIp6Address size mismatch");
     memcpy(Addr, ipv6Addr.mFields.m32, sizeof(Addr));
 }
 otIp6Address IPAddress::ToIPv6() const
 {
     otIp6Address otAddr;
+    static_assert(sizeof(otAddr.mFields.m32) == sizeof(Addr), "otIp6Address size mismatch");
     memcpy(otAddr.mFields.m32, Addr, sizeof(otAddr.mFields.m32));
     return otAddr;
 }
@@ -284,6 +286,7 @@ otIp6Address IPAddress::ToIPv6() const
 IPAddress IPAddress::FromOtAddr(otIp6Address & address)
 {
     IPAddress addr;
+    static_assert(sizeof(address.mFields.m32) == sizeof(addr), "otIp6Address size mismatch");
     memcpy(addr.Addr, address.mFields.m32, sizeof(addr.Addr));
     return addr;
 }

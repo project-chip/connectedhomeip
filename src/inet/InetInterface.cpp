@@ -85,7 +85,7 @@ CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & i
     {
         return INET_ERROR_UNKNOWN_INTERFACE;
     }
-    char * parseEnd;
+    char * parseEnd       = nullptr;
     unsigned long intfNum = strtoul(intfName + 2, &parseEnd, 10);
     if (*parseEnd != 0 || intfNum > UINT8_MAX)
     {
@@ -128,11 +128,8 @@ CHIP_ERROR InterfaceAddressIterator::GetAddress(IPAddress & outIPAddress)
 
 uint8_t InterfaceAddressIterator::GetPrefixLength()
 {
-    if (HasCurrent())
-    {
-        return 64;
-    }
-    return 0;
+    // Only 64 bits prefix are supported
+    return 64;
 }
 
 #endif
