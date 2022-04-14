@@ -254,7 +254,7 @@ public:
      * fabric with the given fabric index. Evict it when the fabric uses more resources than the per fabric quota or aForceEvict is
      * true.
      */
-    bool CheckResourceAndEvictExceededSubscription(FabricIndex aFabricIndex, bool aForceEvict);
+    bool EvictOneSubscriptionForCompliance(FabricIndex aFabricIndex, bool aForceEvict);
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     //

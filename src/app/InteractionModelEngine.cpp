@@ -540,7 +540,7 @@ void InteractionModelEngine::AddReadClient(ReadClient * apReadClient)
     mpActiveReadClientList = apReadClient;
 }
 
-bool InteractionModelEngine::CheckResourceAndEvictExceededSubscription(FabricIndex aFabricIndex, bool aForceEvict)
+bool InteractionModelEngine::EvictOneSubscriptionForCompliance(FabricIndex aFabricIndex, bool aForceEvict)
 {
     const int32_t pathPoolCapacity        = GetPathPoolCapacity();
     const int32_t readHandlerPoolCapacity = GetReadHandlerPoolCapacity();
@@ -660,7 +660,7 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
     bool didEvictHandler = true;
 
     const auto evictAndUpdateResourceUsage = [&](FabricIndex fabricIndex, bool forceEvict) {
-        bool ret           = CheckResourceAndEvictExceededSubscription(fabricIndex, forceEvict);
+        bool ret           = EvictOneSubscriptionForCompliance(fabricIndex, forceEvict);
         usedAttributePaths = static_cast<int32_t>(mAttributePathPool.Allocated());
         usedEventPaths     = static_cast<int32_t>(mEventPathPool.Allocated());
         usedReadHandlers   = static_cast<int32_t>(mReadHandlers.Allocated());
