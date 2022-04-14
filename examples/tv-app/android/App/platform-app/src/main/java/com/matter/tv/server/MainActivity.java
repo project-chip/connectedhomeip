@@ -11,8 +11,6 @@ import chip.setuppayload.DiscoveryCapability;
 import chip.setuppayload.SetupPayload;
 import chip.setuppayload.SetupPayloadParser;
 import com.matter.tv.server.service.MatterServant;
-import com.matter.tv.server.R;
-
 import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
