@@ -260,7 +260,7 @@ function getTests()
     'Test_TC_WNCV_3_5',
     'Test_TC_WNCV_4_3',
     'Test_TC_WNCV_4_4',
-    'Test_TC_WNCV_4_5',
+    //'Test_TC_WNCV_4_5', Disable this Test for now as Darwin does not support reboot commands currently
   ];
 
   const Others = [
