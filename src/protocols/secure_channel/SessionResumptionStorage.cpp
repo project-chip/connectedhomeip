@@ -115,7 +115,7 @@ CHIP_ERROR SessionResumptionStorage::Delete(const ScopedNodeId & node)
         if (found)
         {
             // index.mSize was decreased by 1 when found was set to true.
-            // Such that the (i+1)th element isn't ouf of bound
+            // So the (i+1)th element isn't out of bounds.
             index.mNodes[i] = index.mNodes[i + 1];
         }
         else
