@@ -288,7 +288,6 @@ private:
     Transport::MessageCounterManagerInterface * mMessageCounterManager = nullptr;
 
     GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;
-    GlobalEncryptedMessageCounter mGlobalEncryptedMessageCounter;
 
     friend class SessionHandle;
 
@@ -318,16 +317,6 @@ private:
     {
         return payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
             payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp);
-    }
-
-    MessageCounter & GetSendCounterForPacket(PayloadHeader & payloadHeader, Transport::SecureSession & state)
-    {
-        if (IsControlMessage(payloadHeader))
-        {
-            return mGlobalEncryptedMessageCounter;
-        }
-
-        return state.GetSessionMessageCounter().GetLocalMessageCounter();
     }
 };
 

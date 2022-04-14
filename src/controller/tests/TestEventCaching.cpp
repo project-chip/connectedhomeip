@@ -165,7 +165,7 @@ void TestReadEvents::TestBasicCaching(nlTestSuite * apSuite, void * apContext)
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage));
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
     chip::EventNumber firstEventNumber;
     chip::EventNumber lastEventNumber;
@@ -289,7 +289,7 @@ void TestReadEvents::TestBasicCaching(nlTestSuite * apSuite, void * apContext)
                 generationCount++;
                 return CHIP_NO_ERROR;
             },
-            app::EventPathParams(kInvalidEndpointId, TestCluster::Id, kInvalidEventId), app::EventPathParams(), 1);
+            app::EventPathParams(kInvalidEndpointId, TestCluster::Id, kInvalidEventId), 1);
 
         NL_TEST_ASSERT(apSuite, generationCount == 5);
     }
@@ -320,7 +320,7 @@ void TestReadEvents::TestBasicCaching(nlTestSuite * apSuite, void * apContext)
 
                 TestCluster::Events::TestEvent::DecodableType eventData;
                 NL_TEST_ASSERT(apSuite, readCallback.mClusterCacheAdapter.Get(header.mEventNumber, eventData) == CHIP_NO_ERROR);
-
+                
                 NL_TEST_ASSERT(apSuite, eventData.arg1 == generationCount);
                 generationCount++;
 

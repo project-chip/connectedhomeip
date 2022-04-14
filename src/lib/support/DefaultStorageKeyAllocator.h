@@ -58,8 +58,8 @@ public:
     {
         return Format("f/%x/s/%08" PRIX32 "%08" PRIX32, fabric, static_cast<uint32_t>(nodeId >> 32), static_cast<uint32_t>(nodeId));
     }
-    const char * SessionResumptionIndex() { return Format("f/sri"); }
-    const char * SessionResumption(const char * resumptionIdBase64) { return Format("s/%s", resumptionIdBase64); }
+    const char * SessionResumptionIndex() { return Format("g/sri"); }
+    const char * SessionResumption(const char * resumptionIdBase64) { return Format("g/s/%s", resumptionIdBase64); }
 
     // Access Control
     const char * AccessControlExtensionEntry(FabricIndex fabric) { return Format("f/%x/ac/1", fabric); }

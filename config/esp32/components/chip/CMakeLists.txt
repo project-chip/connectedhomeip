@@ -103,6 +103,10 @@ if (CONFIG_ENABLE_CHIP_SHELL)
     chip_gn_arg_append("chip_build_libshell"                "true")
 endif()
 
+if (CONFIG_IDF_TARGET_ESP32H2)
+    chip_gn_arg_append("chip_enable_wifi"                       "false")
+endif()
+
 if (CONFIG_OPENTHREAD_ENABLED)
     chip_gn_arg_append("chip_enable_openthread"                 "true")
 endif()

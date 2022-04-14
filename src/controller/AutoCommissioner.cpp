@@ -71,6 +71,21 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         mParams.SetWiFiCredentials(
             WiFiCredentials(ByteSpan(mSsid, creds.ssid.size()), ByteSpan(mCredentials, creds.credentials.size())));
     }
+
+    if (params.GetCountryCode().HasValue())
+    {
+        auto & code = params.GetCountryCode().Value();
+        MutableCharSpan copiedCode(mCountryCode);
+        if (CopyCharSpanToMutableCharSpan(code, copiedCode) == CHIP_NO_ERROR)
+        {
+            mParams.SetCountryCode(copiedCode);
+        }
+        else
+        {
+            ChipLogError(Controller, "Country code is too large: %u", static_cast<unsigned>(code.size()));
+        }
+    }
+
     // If the AttestationNonce is passed in, using that else using a random one..
     if (params.GetAttestationNonce().HasValue())
     {
