@@ -246,6 +246,7 @@ def HostTargets():
             'ota-provider', app=HostApp.OTA_PROVIDER, enable_ble=False))
         app_targets.append(target.Extend(
             'ota-requestor', app=HostApp.OTA_REQUESTOR, enable_ble=False))
+        app_targets.append(target.Extend('python-bindings', app=HostApp.PYTHON_BINDINGS))
 
     builder = VariantBuilder()
 
@@ -270,8 +271,8 @@ def HostTargets():
     builder.WhitelistVariantNameForGlob('ipv6only')
 
     for target in app_targets:
-        if 'rpc-console' in target.name:
-            # rpc console  has only one build variant right now
+        if ('-rpc-console' in target.name) or ('-python-bindings' in target.name):
+            # Single-variant builds
             yield target
         else:
             builder.targets.append(target)
