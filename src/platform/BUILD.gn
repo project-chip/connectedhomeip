@@ -117,7 +117,10 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     }
 
     if (chip_enable_nfc) {
-      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_NFC=1" ]
+      defines += [
+        "CHIP_DEVICE_CONFIG_ENABLE_NFC=1",
+        "CONFIG_CHIP_NFC_COMMISSIONING=1",
+        ]
     }
 
     if (chip_enable_ota_requestor) {
