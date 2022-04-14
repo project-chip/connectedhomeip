@@ -627,6 +627,68 @@ void Instance::OnFailSafeTimerExpired()
     mAsyncCommandHandle.Release();
 }
 
+CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+{
+    using namespace Clusters::NetworkCommissioning::Commands;
+
+    constexpr CommandId acceptedCommandsListWiFi[] = {
+        ScanNetworks::Id, AddOrUpdateWiFiNetwork::Id, RemoveNetwork::Id, ConnectNetwork::Id, ReorderNetwork::Id,
+    };
+    constexpr CommandId acceptedCommandsListThread[] = {
+        ScanNetworks::Id, AddOrUpdateThreadNetwork::Id, RemoveNetwork::Id, ConnectNetwork::Id, ReorderNetwork::Id,
+    };
+
+    if (mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface))
+    {
+        for (const auto & cmd : acceptedCommandsListThread)
+        {
+            if (callback(cmd, context) != Loop::Continue)
+            {
+                break;
+            }
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    if (mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface))
+    {
+        for (const auto & cmd : acceptedCommandsListWiFi)
+        {
+            if (callback(cmd, context) != Loop::Continue)
+            {
+                break;
+            }
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+{
+    using namespace Clusters::NetworkCommissioning::Commands;
+
+    constexpr CommandId generatedCommandsListWireless[] = { ScanNetworksResponse::Id, NetworkConfigResponse::Id,
+                                                            ConnectNetworkResponse::Id };
+
+    if (mFeatureFlags.HasAny(NetworkCommissioningFeature::kWiFiNetworkInterface,
+                             NetworkCommissioningFeature::kThreadNetworkInterface))
+    {
+        for (const auto & cmd : generatedCommandsListWireless)
+        {
+            if (callback(cmd, context) != Loop::Continue)
+            {
+                break;
+            }
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 bool NullNetworkDriver::GetEnabled()
 {
     // Disable the interface and it cannot be enabled since there are no physical interfaces.
