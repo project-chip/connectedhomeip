@@ -540,7 +540,7 @@ void InteractionModelEngine::AddReadClient(ReadClient * apReadClient)
     mpActiveReadClientList = apReadClient;
 }
 
-bool InteractionModelEngine::EvictOneSubscriptionForCompliance(FabricIndex aFabricIndex, bool aForceEvict)
+bool InteractionModelEngine::CheckResourceAndEvictExceededSubscription(FabricIndex aFabricIndex, bool aForceEvict)
 {
     const int32_t pathPoolCapacity        = GetPathPoolCapacity();
     const int32_t readHandlerPoolCapacity = GetReadHandlerPoolCapacity();
@@ -660,7 +660,7 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
     bool didEvictHandler = true;
 
     const auto evictAndUpdateResourceUsage = [&](FabricIndex fabricIndex, bool forceEvict) {
-        bool ret           = EvictOneSubscriptionForCompliance(fabricIndex, forceEvict);
+        bool ret           = CheckResourceAndEvictExceededSubscription(fabricIndex, forceEvict);
         usedAttributePaths = static_cast<int32_t>(mAttributePathPool.Allocated());
         usedEventPaths     = static_cast<int32_t>(mEventPathPool.Allocated());
         usedReadHandlers   = static_cast<int32_t>(mReadHandlers.Allocated());
@@ -1095,6 +1095,22 @@ bool InteractionModelEngine::HasActiveRead()
 
         return Loop::Continue;
     }) == Loop::Break));
+}
+
+uint16_t InteractionModelEngine::GetMinSubscriptionsPerFabric() const
+{
+    uint8_t fabricCount                   = mpFabricTable->FabricCount();
+    const int32_t readHandlerPoolCapacity = GetReadHandlerPoolCapacity();
+
+    if (fabricCount == 0)
+    {
+        return kMinSupportedSubscriptionPerFabric;
+    }
+
+    int32_t perFabricSubscriptionCapacity =
+        (readHandlerPoolCapacity - static_cast<int32_t>(kReservedPathsForReads)) / static_cast<int32_t>(fabricCount);
+
+    return static_cast<uint16_t>(perFabricSubscriptionCapacity);
 }
 
 } // namespace app

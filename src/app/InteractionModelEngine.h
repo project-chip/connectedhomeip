@@ -256,6 +256,8 @@ public:
      */
     bool EvictOneSubscriptionForCompliance(FabricIndex aFabricIndex, bool aForceEvict);
 
+    uint16_t GetMinSubscriptionsPerFabric() const;
+
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     //
     // Get direct access to the underlying read handler pool
