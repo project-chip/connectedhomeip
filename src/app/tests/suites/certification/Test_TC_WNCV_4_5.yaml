@@ -20,6 +20,9 @@ config:
     nodeId: 0x12344321
     cluster: "Window Covering"
     endpoint: 1
+    discriminator:
+        type: INT16U
+        defaultValue: 3840
 
 tests:
     ################ Init Phase #############
@@ -37,7 +40,7 @@ tests:
 
     ######## Command GoTo 1 #######
     ### Step 1x -> Check GoToLiftPercentage NVM effects
-    - label: "1a: If (PA_LF & LF) TH sends GoToLiftPercentage command with 90% to DUT"
+    - label: "1a: If (PA_LF & LF) TH sends GoToLiftPercentage command with 90%% to DUT"
       command: "GoToLiftPercentage"
       PICS: WNCV_LF && WNCV_PA_LF
       arguments:
@@ -68,7 +71,7 @@ tests:
 
     ######## Command GoTo 2 ######
     ### Step 2x -> Check GoToTiltPercentage NVM effects
-    - label: "2a: If (PA_TL & TL) TH sends GoToTiltPercentage command with 90% to DUT"
+    - label: "2a: If (PA_TL & TL) TH sends GoToTiltPercentage command with 90%% to DUT"
       command: "GoToTiltPercentage"
       PICS: WNCV_TL && WNCV_PA_TL
       arguments:
