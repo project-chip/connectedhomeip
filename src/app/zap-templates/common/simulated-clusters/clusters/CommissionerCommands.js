@@ -24,13 +24,6 @@
  *
  */
 
-const PairDevice = {
-  name : 'PairDevice',
-  arguments :
-      [ { type : 'NODE_ID', name : 'nodeId' }, { type : 'CHAR_STRING', name : 'payload' }, { type : 'INT16U', name : 'timeout' } ],
-  response : { arguments : [] }
-};
-
 const PairWithQRCode = {
   name : 'PairWithQRCode',
   arguments : [ { type : 'NODE_ID', name : 'nodeId' }, { type : 'CHAR_STRING', name : 'payload' } ],
@@ -50,7 +43,7 @@ const Unpair = {
 };
 
 const name     = 'CommissionerCommands';
-const commands = [ PairDevice, PairWithQRCode, PairWithManualCode, Unpair ];
+const commands = [ PairWithQRCode, PairWithManualCode, Unpair ];
 
 const CommissionerCommands = {
   name,

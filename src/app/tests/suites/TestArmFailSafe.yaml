@@ -16,9 +16,6 @@ name: ArmFailSafe Tests
 
 config:
     nodeId: 0x12344321
-    nodeId2:
-        type: NODE_ID
-        defaultValue: 0xCAFE
     endpoint: 0
     discriminator:
         type: INT16U
@@ -44,15 +41,6 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Opens a commissioning window on alpha device"
-      cluster: "AdministratorCommissioning"
-      command: "OpenBasicCommissioningWindow"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "CommissioningTimeout"
-                value: 180
-
     - label: "Query fabrics list"
       command: "readAttribute"
       cluster: "Operational Credentials"
@@ -62,17 +50,23 @@ tests:
           constraints:
               type: list
 
-    - label: "Commission from beta device"
-      identity: "beta"
-      cluster: "CommissionerCommands"
-      command: "PairDevice"
+    - label: "ArmFailSafe on target device with timeout 0"
+      cluster: "General Commissioning"
+      command: "ArmFailSafe"
       arguments:
           values:
-              - name: "nodeId"
-                value: nodeId2
-              - name: "payload"
-                value: payload
-              - name: "timeout"
+              - name: "expiryLengthSeconds"
+                value: 0
+              - name: "breadcrumb"
                 value: 0
       response:
-          error: UNSUPPORTED_ACCESS
+          values:
+              - name: "errorCode"
+                value: 0
+
+    - label: "Reads NodeLabel mandatory attribute of target device"
+      command: "readAttribute"
+      cluster: "Basic"
+      attribute: "NodeLabel"
+      response:
+          value: ""
