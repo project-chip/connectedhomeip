@@ -2389,22 +2389,6 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE      CHIP_CORE_ERROR(0xe1)
 
 /**
- * @def CHIP_ERROR_MAX_RETRY_EXCEEDED
- *
- * @brief
- *   The maximum retry limit has been exceeded.
- */
-#define CHIP_ERROR_MAX_RETRY_EXCEEDED   CHIP_CORE_ERROR(0xdc)
-
-/**
- * @def CHIP_ERROR_PROVIDER_LIST_EXHAUSTED
- *
- * @brief
- *   The provider list has been exhausted.
- */
-#define CHIP_ERROR_PROVIDER_LIST_EXHAUSTED   CHIP_CORE_ERROR(0xdd)
-
-/**
  *  @}
  */
 
