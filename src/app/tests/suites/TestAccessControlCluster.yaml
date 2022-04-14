@@ -450,3 +450,24 @@ tests:
                       Targets: null,
                   },
               ]
+
+    - label: "Validate resource minima (SubjectsPerAccessControlEntry)"
+      command: "readAttribute"
+      attribute: "SubjectsPerAccessControlEntry"
+      response:
+          constraints:
+              minValue: 4
+
+    - label: "Validate resource minima (TargetsPerAccessControlEntry)"
+      command: "readAttribute"
+      attribute: "TargetsPerAccessControlEntry"
+      response:
+          constraints:
+              minValue: 3
+
+    - label: "Validate resource minima (AccessControlEntriesPerFabric)"
+      command: "readAttribute"
+      attribute: "AccessControlEntriesPerFabric"
+      response:
+          constraints:
+              minValue: 3

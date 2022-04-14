@@ -225,6 +225,31 @@ public class ChipStructs {
     }
   }
 
+  public static class BasicClusterCapabilityMinimaStruct {
+    public Integer caseSessionsPerFabric;
+    public Integer subscriptionsPerFabric;
+
+    public BasicClusterCapabilityMinimaStruct(
+        Integer caseSessionsPerFabric, Integer subscriptionsPerFabric) {
+      this.caseSessionsPerFabric = caseSessionsPerFabric;
+      this.subscriptionsPerFabric = subscriptionsPerFabric;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("BasicClusterCapabilityMinimaStruct {\n");
+      output.append("\tcaseSessionsPerFabric: ");
+      output.append(caseSessionsPerFabric);
+      output.append("\n");
+      output.append("\tsubscriptionsPerFabric: ");
+      output.append(subscriptionsPerFabric);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class BindingClusterTargetStruct {
     public Optional<Long> node;
     public Optional<Integer> group;

@@ -66,6 +66,7 @@ private:
     uint8_t mSsid[CommissioningParameters::kMaxSsidLen];
     uint8_t mCredentials[CommissioningParameters::kMaxCredentialsLen];
     uint8_t mThreadOperationalDataset[CommissioningParameters::kMaxThreadDatasetLen];
+    char mCountryCode[CommissioningParameters::kMaxCountryCodeLen];
 
     bool mNeedsNetworkSetup = false;
     ReadCommissioningInfo mDeviceCommissioningInfo;
