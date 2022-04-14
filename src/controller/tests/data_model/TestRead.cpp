@@ -18,7 +18,7 @@
 
 #include "transport/SecureSession.h"
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeCache.h>
+#include <app/ClusterStateCache.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/mock/Constants.h>
@@ -221,7 +221,7 @@ private:
 
 TestReadInteraction gTestReadInteraction;
 
-class MockInteractionModelApp : public chip::app::AttributeCache::Callback
+class MockInteractionModelApp : public chip::app::ClusterStateCache::Callback
 {
 public:
     void OnEventData(const chip::app::EventHeader & aEventHeader, chip::TLV::TLVReader * apData,
@@ -361,7 +361,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
     responseDirective = kSendDataResponse;
 
     MockInteractionModelApp delegate;
-    chip::app::AttributeCache cache(delegate);
+    chip::app::ClusterStateCache cache(delegate);
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -388,7 +388,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
     // Expect no versions would be cached.
     {
         testId++;
-        ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
         chip::app::AttributePathParams attributePathParams1[3];
@@ -424,7 +424,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
     // previous test. Expect cache E2C2 version
     {
         testId++;
-        ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
         chip::app::AttributePathParams attributePathParams2[2];
@@ -457,7 +457,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
     // path intersects with previous cached data version Expect no E2C3 attributes in report, only E3C2A1 attribute in report
     {
         testId++;
-        ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
         chip::app::AttributePathParams attributePathParams1[3];
@@ -494,7 +494,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
     // intersects with previous cached data version Expect no C1 attributes in report, only E3C2A2 attribute in report
     {
         testId++;
-        ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
         chip::app::AttributePathParams attributePathParams2[2];
@@ -529,7 +529,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
     // report, and invalidate the cached pending and committed data version since no wildcard attributes exists in mRequestPathSet.
     {
         testId++;
-        ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
         chip::app::AttributePathParams attributePathParams1[3];
@@ -566,7 +566,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
     // cache any committed data version. Expect E2C3A1, E2C3A2 and E3C2A2 attribute in report
     {
         testId++;
-        ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
         chip::app::AttributePathParams attributePathParams1[3];
@@ -603,7 +603,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
     // Expect E2C3A* attributes in report, and E3C2A2 attribute in report and cache latest data version
     {
         testId++;
-        ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
         chip::app::AttributePathParams attributePathParams2[2];
@@ -636,7 +636,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
     // E2C3A* attributes in report, and E3C2A2 attribute in report
     {
         testId++;
-        ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
         chip::app::AttributePathParams attributePathParams2[2];
@@ -676,7 +676,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
     // changed in server. Expect E1C2A* and C2C3A* and E2C2A* attributes in report, and cache their versions
     {
         testId++;
-        ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
 
@@ -720,7 +720,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
     // filter with only C2. Expect E1C2A*, E2C2A* attributes(7 attributes) in report,
     {
         testId++;
-        ChipLogProgress(DataManagement, "\t -- Running Read with AttributeCache Test ID %d", testId);
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
 

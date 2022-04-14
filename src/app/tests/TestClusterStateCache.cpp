@@ -23,7 +23,7 @@
 #include "system/SystemPacketBuffer.h"
 #include "system/TLVPacketBufferBackingStore.h"
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeCache.h>
+#include <app/ClusterStateCache.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
 #include <app/tests/AppTestContext.h>
@@ -270,7 +270,7 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
     callback->OnReportEnd();
 }
 
-class CacheValidator : public AttributeCache::Callback
+class CacheValidator : public ClusterStateCache::Callback
 {
 public:
     CacheValidator(AttributeInstructionListType & instructionList, ForwardedDataCallbackValidator & dataCallbackValidator);
@@ -301,7 +301,7 @@ private:
         }
     }
 
-    void DecodeAttribute(const AttributeInstruction & instruction, const ConcreteAttributePath & path, AttributeCache * cache)
+    void DecodeAttribute(const AttributeInstruction & instruction, const ConcreteAttributePath & path, ClusterStateCache * cache)
     {
         CHIP_ERROR err;
         bool gotStatus = false;
@@ -401,9 +401,10 @@ private:
         }
     }
 
-    void DecodeClusterObject(const AttributeInstruction & instruction, const ConcreteAttributePath & path, AttributeCache * cache)
+    void DecodeClusterObject(const AttributeInstruction & instruction, const ConcreteAttributePath & path,
+                             ClusterStateCache * cache)
     {
-        std::list<AttributeCache::AttributeStatus> statusList;
+        std::list<ClusterStateCache::AttributeStatus> statusList;
         NL_TEST_ASSERT(gSuite, cache->Get(path.mEndpointId, path.mClusterId, clusterValue, statusList) == CHIP_NO_ERROR);
 
         if (instruction.mValueType == AttributeInstruction::kData)
@@ -454,7 +455,7 @@ private:
         }
     }
 
-    void OnAttributeChanged(AttributeCache * cache, const ConcreteAttributePath & path) override
+    void OnAttributeChanged(ClusterStateCache * cache, const ConcreteAttributePath & path) override
     {
         StatusIB status;
 
@@ -482,14 +483,14 @@ private:
         }
     }
 
-    void OnClusterChanged(AttributeCache * cache, EndpointId endpointId, ClusterId clusterId) override
+    void OnClusterChanged(ClusterStateCache * cache, EndpointId endpointId, ClusterId clusterId) override
     {
         auto iter = mExpectedClusters.find(std::make_tuple(endpointId, clusterId));
         NL_TEST_ASSERT(gSuite, iter != mExpectedClusters.end());
         mExpectedClusters.erase(iter);
     }
 
-    void OnEndpointAdded(AttributeCache * cache, EndpointId endpointId) override
+    void OnEndpointAdded(ClusterStateCache * cache, EndpointId endpointId) override
     {
         auto iter = mExpectedEndpoints.find(endpointId);
         NL_TEST_ASSERT(gSuite, iter != mExpectedEndpoints.end());
@@ -538,7 +539,7 @@ void RunAndValidateSequence(AttributeInstructionListType list)
 {
     ForwardedDataCallbackValidator dataCallbackValidator;
     CacheValidator client(list, dataCallbackValidator);
-    AttributeCache cache(client);
+    ClusterStateCache cache(client);
     DataSeriesGenerator generator(&cache.GetBufferedCallback(), list);
     generator.Generate(dataCallbackValidator);
 }
@@ -622,7 +623,7 @@ const nlTest sTests[] =
 
 nlTestSuite theSuite =
 {
-    "TestAttributeCache",
+    "TestClusterStateCache",
     &sTests[0],
     TestContext::InitializeAsync,
     TestContext::Finalize
@@ -631,7 +632,7 @@ nlTestSuite theSuite =
 }
 // clang-format on
 
-int TestAttributeCache()
+int TestClusterStateCache()
 {
     TestContext gContext;
     gSuite = &theSuite;
@@ -639,4 +640,4 @@ int TestAttributeCache()
     return (nlTestRunnerStats(&theSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestAttributeCache)
+CHIP_REGISTER_TEST_SUITE(TestClusterStateCache)

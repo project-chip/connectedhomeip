@@ -17,14 +17,15 @@
  */
 
 #include "system/SystemPacketBuffer.h"
-#include <app/AttributeCache.h>
+#include <app/ClusterStateCache.h>
 #include <app/InteractionModelEngine.h>
 #include <tuple>
 
 namespace chip {
 namespace app {
 
-CHIP_ERROR AttributeCache::UpdateCache(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
+CHIP_ERROR ClusterStateCache::UpdateCache(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+                                          const StatusIB & aStatus)
 {
     AttributeState state;
     System::PacketBufferHandle handle;
@@ -85,6 +86,7 @@ CHIP_ERROR AttributeCache::UpdateCache(const ConcreteDataAttributePath & aPath, 
         {
             mCache[aPath.mEndpointId][aPath.mClusterId].mPendingDataVersion = aPath.mDataVersion;
         }
+
         mLastReportDataPath = aPath;
     }
     else
@@ -106,7 +108,49 @@ CHIP_ERROR AttributeCache::UpdateCache(const ConcreteDataAttributePath & aPath, 
     return CHIP_NO_ERROR;
 }
 
-void AttributeCache::OnReportBegin()
+CHIP_ERROR ClusterStateCache::UpdateEventCache(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus)
+{
+    if (apData)
+    {
+        //
+        // If we've already seen this event before, there's no more work to be done.
+        //
+        if (mHighestReceivedEventNumber.HasValue() && aEventHeader.mEventNumber <= mHighestReceivedEventNumber.Value())
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        System::PacketBufferHandle handle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+
+        System::PacketBufferTLVWriter writer;
+        writer.Init(std::move(handle), false);
+
+        ReturnErrorOnFailure(writer.CopyElement(TLV::AnonymousTag(), *apData));
+        ReturnErrorOnFailure(writer.Finalize(&handle));
+
+        //
+        // Compact the buffer down to a more reasonably sized packet buffer
+        // if we can.
+        //
+        handle.RightSize();
+
+        EventData eventData;
+        eventData.first  = aEventHeader;
+        eventData.second = std::move(handle);
+
+        mEventDataCache.insert(std::move(eventData));
+
+        mHighestReceivedEventNumber.SetValue(aEventHeader.mEventNumber);
+    }
+    else if (apStatus)
+    {
+        mEventStatusCache[aEventHeader.mPath] = *apStatus;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void ClusterStateCache::OnReportBegin()
 {
     mLastReportDataPath = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
     mChangedAttributeSet.clear();
@@ -114,7 +158,7 @@ void AttributeCache::OnReportBegin()
     mCallback.OnReportBegin();
 }
 
-void AttributeCache::CommitPendingDataVersion()
+void ClusterStateCache::CommitPendingDataVersion()
 {
     if (!mLastReportDataPath.IsValidConcreteClusterPath())
     {
@@ -129,7 +173,7 @@ void AttributeCache::CommitPendingDataVersion()
     }
 }
 
-void AttributeCache::OnReportEnd()
+void ClusterStateCache::OnReportEnd()
 {
     CommitPendingDataVersion();
     mLastReportDataPath = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
@@ -158,7 +202,112 @@ void AttributeCache::OnReportEnd()
     mCallback.OnReportEnd();
 }
 
-void AttributeCache::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
+CHIP_ERROR ClusterStateCache::Get(const ConcreteAttributePath & path, TLV::TLVReader & reader)
+{
+    CHIP_ERROR err;
+
+    auto attributeState = GetAttributeState(path.mEndpointId, path.mClusterId, path.mAttributeId, err);
+    ReturnErrorOnFailure(err);
+
+    if (attributeState->Is<StatusIB>())
+    {
+        return CHIP_ERROR_IM_STATUS_CODE_RECEIVED;
+    }
+
+    System::PacketBufferTLVReader bufReader;
+
+    bufReader.Init(attributeState->Get<System::PacketBufferHandle>().Retain());
+    ReturnErrorOnFailure(bufReader.Next());
+
+    reader.Init(bufReader);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterStateCache::Get(EventNumber eventNumber, TLV::TLVReader & reader)
+{
+    CHIP_ERROR err;
+
+    auto eventData = GetEventData(eventNumber, err);
+    ReturnErrorOnFailure(err);
+
+    System::PacketBufferTLVReader bufReader;
+
+    bufReader.Init(eventData->second.Retain());
+    ReturnErrorOnFailure(bufReader.Next());
+
+    reader.Init(bufReader);
+    return CHIP_NO_ERROR;
+}
+
+ClusterStateCache::EndpointState * ClusterStateCache::GetEndpointState(EndpointId endpointId, CHIP_ERROR & err)
+{
+    auto endpointIter = mCache.find(endpointId);
+    if (endpointIter == mCache.end())
+    {
+        err = CHIP_ERROR_KEY_NOT_FOUND;
+        return nullptr;
+    }
+
+    err = CHIP_NO_ERROR;
+    return &endpointIter->second;
+}
+
+ClusterStateCache::ClusterState * ClusterStateCache::GetClusterState(EndpointId endpointId, ClusterId clusterId, CHIP_ERROR & err)
+{
+    auto endpointState = GetEndpointState(endpointId, err);
+    if (err != CHIP_NO_ERROR)
+    {
+        return nullptr;
+    }
+
+    auto clusterState = endpointState->find(clusterId);
+    if (clusterState == endpointState->end())
+    {
+        err = CHIP_ERROR_KEY_NOT_FOUND;
+        return nullptr;
+    }
+
+    err = CHIP_NO_ERROR;
+    return &clusterState->second;
+}
+
+const ClusterStateCache::AttributeState * ClusterStateCache::GetAttributeState(EndpointId endpointId, ClusterId clusterId,
+                                                                               AttributeId attributeId, CHIP_ERROR & err)
+{
+    auto clusterState = GetClusterState(endpointId, clusterId, err);
+    if (err != CHIP_NO_ERROR)
+    {
+        return nullptr;
+    }
+
+    auto attributeState = clusterState->mAttributes.find(attributeId);
+    if (attributeState == clusterState->mAttributes.end())
+    {
+        err = CHIP_ERROR_KEY_NOT_FOUND;
+        return nullptr;
+    }
+
+    err = CHIP_NO_ERROR;
+    return &attributeState->second;
+}
+
+const ClusterStateCache::EventData * ClusterStateCache::GetEventData(EventNumber eventNumber, CHIP_ERROR & err)
+{
+    EventData compareKey;
+
+    compareKey.first.mEventNumber = eventNumber;
+    auto eventData                = mEventDataCache.find(std::move(compareKey));
+    if (eventData == mEventDataCache.end())
+    {
+        err = CHIP_ERROR_KEY_NOT_FOUND;
+        return nullptr;
+    }
+
+    err = CHIP_NO_ERROR;
+    return &(*eventData);
+}
+
+void ClusterStateCache::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
 {
     //
     // Since the cache itself is a ReadClient::Callback, it may be incorrectly passed in directly when registering with the
@@ -188,28 +337,7 @@ void AttributeCache::OnAttributeData(const ConcreteDataAttributePath & aPath, TL
     mCallback.OnAttributeData(aPath, apData ? &dataSnapshot : nullptr, aStatus);
 }
 
-CHIP_ERROR AttributeCache::Get(const ConcreteAttributePath & path, TLV::TLVReader & reader)
-{
-    CHIP_ERROR err;
-
-    auto attributeState = GetAttributeState(path.mEndpointId, path.mClusterId, path.mAttributeId, err);
-    ReturnErrorOnFailure(err);
-
-    if (attributeState->Is<StatusIB>())
-    {
-        return CHIP_ERROR_IM_STATUS_CODE_RECEIVED;
-    }
-
-    System::PacketBufferTLVReader bufReader;
-
-    bufReader.Init(attributeState->Get<System::PacketBufferHandle>().Retain());
-    ReturnErrorOnFailure(bufReader.Next());
-
-    reader.Init(bufReader);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR AttributeCache::GetVersion(EndpointId mEndpointId, ClusterId mClusterId, Optional<DataVersion> & aVersion)
+CHIP_ERROR ClusterStateCache::GetVersion(EndpointId mEndpointId, ClusterId mClusterId, Optional<DataVersion> & aVersion)
 {
     CHIP_ERROR err;
     auto clusterState = GetClusterState(mEndpointId, mClusterId, err);
@@ -218,59 +346,21 @@ CHIP_ERROR AttributeCache::GetVersion(EndpointId mEndpointId, ClusterId mCluster
     return CHIP_NO_ERROR;
 }
 
-AttributeCache::EndpointState * AttributeCache::GetEndpointState(EndpointId endpointId, CHIP_ERROR & err)
+void ClusterStateCache::OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus)
 {
-    auto endpointIter = mCache.find(endpointId);
-    if (endpointIter == mCache.end())
+    VerifyOrDie(apData != nullptr || apStatus != nullptr);
+
+    TLV::TLVReader dataSnapshot;
+    if (apData)
     {
-        err = CHIP_ERROR_KEY_NOT_FOUND;
-        return nullptr;
+        dataSnapshot.Init(*apData);
     }
 
-    err = CHIP_NO_ERROR;
-    return &endpointIter->second;
+    UpdateEventCache(aEventHeader, apData, apStatus);
+    mCallback.OnEventData(aEventHeader, apData ? &dataSnapshot : nullptr, apStatus);
 }
 
-AttributeCache::ClusterState * AttributeCache::GetClusterState(EndpointId endpointId, ClusterId clusterId, CHIP_ERROR & err)
-{
-    auto endpointState = GetEndpointState(endpointId, err);
-    if (err != CHIP_NO_ERROR)
-    {
-        return nullptr;
-    }
-
-    auto clusterState = endpointState->find(clusterId);
-    if (clusterState == endpointState->end())
-    {
-        err = CHIP_ERROR_KEY_NOT_FOUND;
-        return nullptr;
-    }
-
-    err = CHIP_NO_ERROR;
-    return &clusterState->second;
-}
-
-AttributeCache::AttributeState * AttributeCache::GetAttributeState(EndpointId endpointId, ClusterId clusterId,
-                                                                   AttributeId attributeId, CHIP_ERROR & err)
-{
-    auto clusterState = GetClusterState(endpointId, clusterId, err);
-    if (err != CHIP_NO_ERROR)
-    {
-        return nullptr;
-    }
-
-    auto attributeState = clusterState->mAttributes.find(attributeId);
-    if (attributeState == clusterState->mAttributes.end())
-    {
-        err = CHIP_ERROR_KEY_NOT_FOUND;
-        return nullptr;
-    }
-
-    err = CHIP_NO_ERROR;
-    return &attributeState->second;
-}
-
-CHIP_ERROR AttributeCache::GetStatus(const ConcreteAttributePath & path, StatusIB & status)
+CHIP_ERROR ClusterStateCache::GetStatus(const ConcreteAttributePath & path, StatusIB & status)
 {
     CHIP_ERROR err;
 
@@ -286,7 +376,19 @@ CHIP_ERROR AttributeCache::GetStatus(const ConcreteAttributePath & path, StatusI
     return CHIP_NO_ERROR;
 }
 
-void AttributeCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter, size_t>> & aVector)
+CHIP_ERROR ClusterStateCache::GetStatus(const ConcreteEventPath & path, StatusIB & status)
+{
+    auto statusIter = mEventStatusCache.find(path);
+    if (statusIter == mEventStatusCache.end())
+    {
+        return CHIP_ERROR_KEY_NOT_FOUND;
+    }
+
+    status = statusIter->second;
+    return CHIP_NO_ERROR;
+}
+
+void ClusterStateCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter, size_t>> & aVector)
 {
     for (auto const & endpointIter : mCache)
     {
@@ -342,9 +444,9 @@ void AttributeCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter, s
               });
 }
 
-CHIP_ERROR AttributeCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                                         const Span<AttributePathParams> & aAttributePaths,
-                                                         bool & aEncodedDataVersionList)
+CHIP_ERROR ClusterStateCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                                            const Span<AttributePathParams> & aAttributePaths,
+                                                            bool & aEncodedDataVersionList)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVWriter backup;
