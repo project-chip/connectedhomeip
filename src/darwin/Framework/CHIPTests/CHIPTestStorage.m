@@ -17,36 +17,36 @@
 #import "CHIPTestStorage.h"
 
 @interface CHIPTestStorage ()
-@property (strong, nonatomic) NSMutableDictionary<NSString*, NSString*> * values;
+@property (strong, nonatomic) NSMutableDictionary<NSString *, NSString *> * values;
 @end
 
 @implementation CHIPTestStorage
 
 - (NSString *)CHIPGetKeyValue:(NSString *)key
 {
-  return _values[key];
+    return _values[key];
 }
 - (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value
 {
-  _values[key] = value;
+    _values[key] = value;
 }
 - (void)CHIPDeleteKeyValue:(NSString *)key
 {
-  [_values removeObjectForKey:key];
+    [_values removeObjectForKey:key];
 }
 
--(instancetype)init
+- (instancetype)init
 {
-  if (!(self = [super init])) {
+    if (!(self = [super init])) {
         return nil;
     }
 
-  _values = [[NSMutableDictionary alloc] init];
-  if (_values == nil) {
-    return nil;
-  }
+    _values = [[NSMutableDictionary alloc] init];
+    if (_values == nil) {
+        return nil;
+    }
 
-  return self;
+    return self;
 }
 
 @end

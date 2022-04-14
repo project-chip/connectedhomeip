@@ -14,12 +14,12 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
 #import <CHIP/CHIP.h>
+#import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIPTestStorage : NSObject<CHIPPersistentStorageDelegate>
+@interface CHIPTestStorage : NSObject <CHIPPersistentStorageDelegate>
 - (NSString *)CHIPGetKeyValue:(NSString *)key;
 - (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value;
 - (void)CHIPDeleteKeyValue:(NSString *)key;
