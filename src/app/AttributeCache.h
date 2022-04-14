@@ -34,7 +34,6 @@
 
 namespace chip {
 namespace app {
-
 /*
  * This implements an attribute cache designed to aggregate attribute data received by a client
  * from either read or subscribe interactions and keep it resident and available for clients to
@@ -57,7 +56,9 @@ namespace app {
  * through to a registered callback. In addition, it provides its own enhancements to the base ReadClient::Callback
  * to make it easier to know what has changed in the cache.
  *
- * **NOTE** This already includes the BufferedReadCallback, so there is no need to add that to the ReadClient callback chain.
+ * **NOTE**
+ * 1. This already includes the BufferedReadCallback, so there is no need to add that to the ReadClient callback chain.
+ * 2. The same cache cannot be used by multiple subscribe/read interactions at the same time.
  *
  */
 class AttributeCache : protected ReadClient::Callback
@@ -218,6 +219,14 @@ public:
     CHIP_ERROR Get(const ConcreteAttributePath & path, TLV::TLVReader & reader);
 
     /*
+     * Retrieve the data version for the given cluster.  If there is no data for the specified path in the cache,
+     * CHIP_ERROR_KEY_NOT_FOUND shall be returned.  Otherwise aVersion will be set to the
+     * current data version for the cluster (which may have no value if we don't have a known data version
+     * for it, for example because none of our paths were wildcards that covered the whole cluster).
+     */
+    CHIP_ERROR GetVersion(EndpointId mEndpointId, ClusterId mClusterId, Optional<DataVersion> & aVersion);
+
+    /*
      * Execute an iterator function that is called for every attribute
      * in a given endpoint and cluster. The function when invoked is provided a concrete attribute path
      * to every attribute that matches in the cache.
@@ -241,7 +250,7 @@ public:
         auto clusterState = GetClusterState(endpointId, clusterId, err);
         ReturnErrorOnFailure(err);
 
-        for (auto & attributeIter : *clusterState)
+        for (auto & attributeIter : clusterState->mAttributes)
         {
             const ConcreteAttributePath path(endpointId, clusterId, attributeIter.first);
             ReturnErrorOnFailure(func(path));
@@ -272,7 +281,7 @@ public:
             {
                 if (clusterIter.first == clusterId)
                 {
-                    for (auto & attributeIter : clusterIter.second)
+                    for (auto & attributeIter : clusterIter.second.mAttributes)
                     {
                         const ConcreteAttributePath path(endpointIter.first, clusterId, attributeIter.first);
                         ReturnErrorOnFailure(func(path));
@@ -312,10 +321,27 @@ public:
 
 private:
     using AttributeState = Variant<System::PacketBufferHandle, StatusIB>;
-    using ClusterState   = std::map<AttributeId, AttributeState>;
-    using EndpointState  = std::map<ClusterId, ClusterState>;
-    using NodeState      = std::map<EndpointId, EndpointState>;
+    // mPendingDataVersion represents a tentative data version for a cluster that we have gotten some reports for.
+    //
+    // mCurrentDataVersion represents a known data version for a cluster.  In order for this to have a
+    // value the cluster must be included in a path in mRequestPathSet that has a wildcard attribute
+    // and we must not be in the middle of receiving reports for that cluster.
+    struct ClusterState
+    {
+        std::map<AttributeId, AttributeState> mAttributes;
+        Optional<DataVersion> mPendingDataVersion;
+        Optional<DataVersion> mCommittedDataVersion;
+    };
+    using EndpointState = std::map<ClusterId, ClusterState>;
+    using NodeState     = std::map<EndpointId, EndpointState>;
 
+    struct Comparator
+    {
+        bool operator()(const AttributePathParams & x, const AttributePathParams & y) const
+        {
+            return x.mEndpointId < y.mEndpointId || x.mClusterId < y.mClusterId;
+        }
+    };
     /*
      * These functions provide a way to index into the cached state with different sub-sets of a path, returning
      * appropriate slices of the data as requested.
@@ -344,26 +370,45 @@ private:
     void OnReportBegin() override;
     void OnReportEnd() override;
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
-    void OnError(CHIP_ERROR aError) override { return mCallback.OnError(aError); }
+    void OnError(CHIP_ERROR aError) override { mCallback.OnError(aError); }
 
     void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override
     {
-        return mCallback.OnEventData(aEventHeader, apData, apStatus);
+        mCallback.OnEventData(aEventHeader, apData, apStatus);
     }
 
-    void OnDone() override { return mCallback.OnDone(); }
+    void OnDone() override
+    {
+        mRequestPathSet.clear();
+        return mCallback.OnDone();
+    }
+
     void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mCallback.OnSubscriptionEstablished(aSubscriptionId); }
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
     {
-        return mCallback.OnDeallocatePaths(std::move(aReadPrepareParams));
+        mCallback.OnDeallocatePaths(std::move(aReadPrepareParams));
     }
+
+    virtual CHIP_ERROR OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                                     const Span<AttributePathParams> & aAttributePaths,
+                                                     bool & aEncodedDataVersionList) override;
+
+    // Commit the pending cluster data version, if there is one.
+    void CommitPendingDataVersion();
+
+    // Get our list of data version filters, sorted from larges to smallest by the total size of the TLV
+    // payload for the filter's cluster.  Applying filters in this order should maximize space savings
+    // on the wire if not all filters can be applied.
+    void GetSortedFilters(std::vector<std::pair<DataVersionFilter, size_t>> & aVector);
 
     Callback & mCallback;
     NodeState mCache;
     std::set<ConcreteAttributePath> mChangedAttributeSet;
+    std::set<AttributePathParams, Comparator> mRequestPathSet; // wildcard attribute request path only
     std::vector<EndpointId> mAddedEndpoints;
     BufferedReadCallback mBufferedReader;
+    ConcreteClusterPath mLastReportDataPath = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
 };
 
 }; // namespace app
