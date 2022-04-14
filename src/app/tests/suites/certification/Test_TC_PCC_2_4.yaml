@@ -71,7 +71,6 @@ tests:
           value: 1
 
     - label: "Reads the attribute: LifetimeEnergyConsumed"
-      disabled: true
       command: "readAttribute"
       attribute: "LifetimeEnergyConsumed"
       response:
