@@ -115,7 +115,7 @@ CHIP_ERROR ClusterStateCache::UpdateEventCache(const EventHeader & aEventHeader,
         //
         // If we've already seen this event before, there's no more work to be done.
         //
-        if (aEventHeader.mEventNumber < mHighestReceivedEventNumber)
+        if (mHighestReceivedEventNumber.HasValue() && aEventHeader.mEventNumber <= mHighestReceivedEventNumber.Value())
         {
             return CHIP_NO_ERROR;
         }
@@ -140,7 +140,7 @@ CHIP_ERROR ClusterStateCache::UpdateEventCache(const EventHeader & aEventHeader,
 
         mEventDataCache.insert(std::move(eventData));
 
-        mHighestReceivedEventNumber = aEventHeader.mEventNumber;
+        mHighestReceivedEventNumber.SetValue(aEventHeader.mEventNumber);
     }
     else if (apStatus)
     {
@@ -445,8 +445,8 @@ void ClusterStateCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter
 }
 
 CHIP_ERROR ClusterStateCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                                         const Span<AttributePathParams> & aAttributePaths,
-                                                         bool & aEncodedDataVersionList)
+                                                            const Span<AttributePathParams> & aAttributePaths,
+                                                            bool & aEncodedDataVersionList)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVWriter backup;

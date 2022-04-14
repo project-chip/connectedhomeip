@@ -320,7 +320,7 @@ void TestReadEvents::TestBasicCaching(nlTestSuite * apSuite, void * apContext)
 
                 TestCluster::Events::TestEvent::DecodableType eventData;
                 NL_TEST_ASSERT(apSuite, readCallback.mClusterCacheAdapter.Get(header.mEventNumber, eventData) == CHIP_NO_ERROR);
-                
+
                 NL_TEST_ASSERT(apSuite, eventData.arg1 == generationCount);
                 generationCount++;
 
@@ -337,6 +337,40 @@ void TestReadEvents::TestBasicCaching(nlTestSuite * apSuite, void * apContext)
         });
 
         NL_TEST_ASSERT(apSuite, generationCount == 0);
+    }
+
+    //
+    // Clear out the event cache and set its highest received event number to a non zero value. Validate that
+    // we don't receive events lower than that value.
+    //
+    {
+        app::ReadClient readClient(engine, &ctx.GetExchangeManager(), readCallback.mClusterCacheAdapter.GetBufferedCallback(),
+                                   app::ReadClient::InteractionType::Read);
+
+        readCallback.mClusterCacheAdapter.ClearEventCache();
+        readCallback.mClusterCacheAdapter.SetHighestReceivedEventNumber(3);
+
+        NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+
+        uint8_t generationCount = 4;
+        readCallback.mClusterCacheAdapter.ForEachEventData(
+            [&apSuite, &readCallback, &generationCount](const app::EventHeader & header) {
+                NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == TestCluster::Id);
+                NL_TEST_ASSERT(apSuite, header.mPath.mEventId == TestCluster::Events::TestEvent::Id);
+                NL_TEST_ASSERT(apSuite, header.mPath.mEndpointId == kTestEndpointId);
+
+                TestCluster::Events::TestEvent::DecodableType eventData;
+                NL_TEST_ASSERT(apSuite, readCallback.mClusterCacheAdapter.Get(header.mEventNumber, eventData) == CHIP_NO_ERROR);
+
+                NL_TEST_ASSERT(apSuite, eventData.arg1 == generationCount);
+                generationCount++;
+
+                return CHIP_NO_ERROR;
+            });
+
+        NL_TEST_ASSERT(apSuite, generationCount == 10);
     }
 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);

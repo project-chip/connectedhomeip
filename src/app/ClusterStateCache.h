@@ -86,7 +86,16 @@ public:
         virtual void OnEndpointAdded(ClusterStateCache * cache, EndpointId endpointId){};
     };
 
-    ClusterStateCache(Callback & callback) : mCallback(callback), mBufferedReader(*this) {}
+    ClusterStateCache(Callback & callback, Optional<EventNumber> highestReceivedEventNumber = Optional<EventNumber>::Missing()) :
+        mCallback(callback), mBufferedReader(*this)
+    {
+        mHighestReceivedEventNumber = highestReceivedEventNumber;
+    }
+
+    void SetHighestReceivedEventNumber(EventNumber highestReceivedEventNumber)
+    {
+        mHighestReceivedEventNumber.SetValue(highestReceivedEventNumber);
+    }
 
     /*
      * When registering as a callback to the ReadClient, the ClusterStateCache cannot not be passed as a callback
@@ -220,8 +229,8 @@ public:
      *
      */
     CHIP_ERROR Get(const ConcreteAttributePath & path, TLV::TLVReader & reader);
-	
-	/*
+
+    /*
      * Retrieve the data version for the given cluster.  If there is no data for the specified path in the cache,
      * CHIP_ERROR_KEY_NOT_FOUND shall be returned.  Otherwise aVersion will be set to the
      * current data version for the cluster (which may have no value if we don't have a known data version
@@ -458,7 +467,7 @@ public:
         mEventDataCache.clear();
         if (resetTrackedEventCounters)
         {
-            mHighestReceivedEventNumber = 0;
+            mHighestReceivedEventNumber.ClearValue();
         }
 
         mEventStatusCache.clear();
@@ -577,7 +586,7 @@ private:
     std::vector<EndpointId> mAddedEndpoints;
 
     std::set<EventData, EventDataCompare> mEventDataCache;
-    EventNumber mHighestReceivedEventNumber = 0;
+    Optional<EventNumber> mHighestReceivedEventNumber;
     std::map<ConcreteEventPath, StatusIB> mEventStatusCache;
     BufferedReadCallback mBufferedReader;
     ConcreteClusterPath mLastReportDataPath = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
