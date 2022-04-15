@@ -657,8 +657,6 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
         return false;
     }
 
-    bool didEvictHandler = true;
-
     const auto evictAndUpdateResourceUsage = [&](FabricIndex fabricIndex, bool forceEvict) {
         bool ret           = TrimFabric(fabricIndex, forceEvict);
         usedAttributePaths = static_cast<int32_t>(mAttributePathPool.Allocated());
@@ -672,13 +670,13 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
     // means that we definitely have handlers on existing fabrics that are over limits and need to evict at least one of them to
     // make space.
     //
-    while ((usedAttributePaths + aRequestedAttributePathCount > attributePathCap ||
-            usedEventPaths + aRequestedEventPathCount > eventPathCap || usedReadHandlers >= readHandlerCap) &&
-           didEvictHandler)
+    // There might be cases that one fabric has lots of subscriptions with one interested path, while the other fabrics are not
+    // using excess resources. So we need to do this multiple times until we have enough room or no fabrics are using excess
+    // resources.
+    //
+    bool didEvictHandler = true;
+    while (didEvictHandler)
     {
-        // There might be cases that one fabric has lots of subscriptions with one interested path, while the other fabrics are not
-        // using excess resources. So we need to do this multiple times until we have enough room or no fabrics are using excess
-        // resources.
         didEvictHandler = false;
         for (const auto & fabric : *mpFabricTable)
         {
@@ -691,8 +689,9 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
         }
     }
 
-    // We either have enough resources, or the resource usage from all fabrics are within the quota, so evict one (possibly the
-    // oldest) subscription from the current fabric.
+    // The above loop cannot gurantee the resources for the new subscriptions when the resource usage from all fabrics are exactly
+    // within the quota (which means we have exactly used all resources). Evict (from the large subscriptions first then from
+    // oldest) subscriptions from the current fabric until we have enough resource for the new subscription.
     didEvictHandler = true;
     while ((usedAttributePaths + aRequestedAttributePathCount > attributePathCap ||
             usedEventPaths + aRequestedEventPathCount > eventPathCap || usedReadHandlers >= readHandlerCap) &&
@@ -702,13 +701,9 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
         didEvictHandler = evictAndUpdateResourceUsage(aFabricIndex, true);
     }
 
-    if (!didEvictHandler)
-    {
-        // This should never happen, since we should always be able to serve the request after evicting all subscriptions on the
-        // current fabric.
-        ChipLogError(DataManagement, "Failed to get required resources by evicting existing subscriptions.");
-        return false;
-    }
+    // If didEvictHandler is false, means the loop above evicted all subscriptions from the current fabric but we still don't have
+    // enough resources for the new subscription, this should never happen.
+    VerifyOrDieWithMsg(didEvictHandler, DataManagement, "Failed to get required resources by evicting existing subscriptions.");
 
     // We have ensured enough resources by the logic above.
     return true;

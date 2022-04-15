@@ -246,6 +246,9 @@ public:
     /**
      * We only allow one active read transactions per fabric, we only allow 3 attribute paths, 3 event paths and 3 data version
      * filters per fabric. This function will check if the given ReadHandler will exceed the limitations for the fabric accessed.
+     *
+     * TODO: (#17418) We are now reserving resources for read requests, could be changed to similar algorithm for read resources
+     * minimas.
      */
     bool CanEstablishReadTransaction(const ReadHandler * apReadHandler);
 
