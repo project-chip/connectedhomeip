@@ -187,4 +187,3 @@ tests:
     - label: "3g: TH send DownOrClose command to the DUT"
       command: "DownOrClose"
       PICS: "WNCV_MAINTENANCE"
-
