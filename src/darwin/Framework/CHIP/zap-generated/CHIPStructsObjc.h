@@ -92,6 +92,24 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPAccessControlClusterAccessControlEntryChangedEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nullable adminNodeID;
+@property (strong, nonatomic) NSNumber * _Nullable adminPasscodeID;
+@property (strong, nonatomic) NSNumber * _Nonnull changeType;
+@property (strong, nonatomic) CHIPAccessControlClusterAccessControlEntry * _Nullable latestValue;
+@property (strong, nonatomic) NSNumber * _Nonnull adminFabricIndex;
+@end
+
+@interface CHIPAccessControlClusterAccessControlExtensionChangedEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nullable adminNodeID;
+@property (strong, nonatomic) NSNumber * _Nullable adminPasscodeID;
+@property (strong, nonatomic) NSNumber * _Nonnull changeType;
+@property (strong, nonatomic) CHIPAccessControlClusterExtensionEntry * _Nullable latestValue;
+@property (strong, nonatomic) NSNumber * _Nonnull adminFabricIndex;
+@end
+
 @interface CHIPBridgedActionsClusterActionStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull actionID;
 @property (strong, nonatomic) NSString * _Nonnull name;
@@ -110,10 +128,43 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPBridgedActionsClusterStateChangedEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull actionID;
+@property (strong, nonatomic) NSNumber * _Nonnull invokeID;
+@property (strong, nonatomic, getter=getNewState) NSNumber * _Nonnull newState;
+@end
+
+@interface CHIPBridgedActionsClusterActionFailedEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull actionID;
+@property (strong, nonatomic) NSNumber * _Nonnull invokeID;
+@property (strong, nonatomic, getter=getNewState) NSNumber * _Nonnull newState;
+@property (strong, nonatomic) NSNumber * _Nonnull error;
+@end
+
 @interface CHIPBasicClusterCapabilityMinimaStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull caseSessionsPerFabric;
 @property (strong, nonatomic) NSNumber * _Nonnull subscriptionsPerFabric;
 - (instancetype)init;
+@end
+
+@interface CHIPBasicClusterStartUpEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull softwareVersion;
+@end
+
+@interface CHIPBasicClusterShutDownEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@end
+
+@interface CHIPBasicClusterLeaveEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@end
+
+@interface CHIPBasicClusterReachableChangedEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull reachableNewValue;
 @end
 
 @interface CHIPOtaSoftwareUpdateRequestorClusterProviderLocation : NSObject
@@ -121,6 +172,28 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull endpoint;
 @property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 - (instancetype)init;
+@end
+
+@interface CHIPOtaSoftwareUpdateRequestorClusterStateTransitionEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull previousState;
+@property (strong, nonatomic, getter=getNewState) NSNumber * _Nonnull newState;
+@property (strong, nonatomic) NSNumber * _Nonnull reason;
+@property (strong, nonatomic) NSNumber * _Nullable targetSoftwareVersion;
+@end
+
+@interface CHIPOtaSoftwareUpdateRequestorClusterVersionAppliedEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull softwareVersion;
+@property (strong, nonatomic) NSNumber * _Nonnull productID;
+@end
+
+@interface CHIPOtaSoftwareUpdateRequestorClusterDownloadErrorEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull softwareVersion;
+@property (strong, nonatomic) NSNumber * _Nonnull bytesDownloaded;
+@property (strong, nonatomic) NSNumber * _Nullable progressPercent;
+@property (strong, nonatomic) NSNumber * _Nullable platformCode;
 @end
 
 @interface CHIPPowerSourceClusterBatChargeFaultChangeType : NSObject
@@ -186,6 +259,29 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPGeneralDiagnosticsClusterHardwareFaultChangeEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSArray * _Nonnull current;
+@property (strong, nonatomic) NSArray * _Nonnull previous;
+@end
+
+@interface CHIPGeneralDiagnosticsClusterRadioFaultChangeEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSArray * _Nonnull current;
+@property (strong, nonatomic) NSArray * _Nonnull previous;
+@end
+
+@interface CHIPGeneralDiagnosticsClusterNetworkFaultChangeEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSArray * _Nonnull current;
+@property (strong, nonatomic) NSArray * _Nonnull previous;
+@end
+
+@interface CHIPGeneralDiagnosticsClusterBootReasonEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull bootReason;
+@end
+
 @interface CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull id;
 @property (strong, nonatomic) NSString * _Nonnull name;
@@ -200,6 +296,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull stackFreeMinimum;
 @property (strong, nonatomic) NSNumber * _Nonnull stackSize;
 - (instancetype)init;
+@end
+
+@interface CHIPSoftwareDiagnosticsClusterSoftwareFaultEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct * _Nonnull softwareFault;
 @end
 
 @interface CHIPThreadNetworkDiagnosticsClusterNeighborTable : NSObject
@@ -254,6 +355,82 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull rotationTime;
 @property (strong, nonatomic) NSNumber * _Nonnull flags;
 - (instancetype)init;
+@end
+
+@interface CHIPThreadNetworkDiagnosticsClusterConnectionStatusEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull connectionStatus;
+@end
+
+@interface CHIPWiFiNetworkDiagnosticsClusterDisconnectionEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull reasonCode;
+@end
+
+@interface CHIPWiFiNetworkDiagnosticsClusterAssociationFailureEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull associationFailure;
+@property (strong, nonatomic) NSNumber * _Nonnull status;
+@end
+
+@interface CHIPWiFiNetworkDiagnosticsClusterConnectionStatusEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull connectionStatus;
+@end
+
+@interface CHIPBridgedDeviceBasicClusterStartUpEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull softwareVersion;
+@end
+
+@interface CHIPBridgedDeviceBasicClusterShutDownEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@end
+
+@interface CHIPBridgedDeviceBasicClusterLeaveEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@end
+
+@interface CHIPBridgedDeviceBasicClusterReachableChangedEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull reachableNewValue;
+@end
+
+@interface CHIPSwitchClusterSwitchLatchedEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic, getter=getNewPosition) NSNumber * _Nonnull newPosition;
+@end
+
+@interface CHIPSwitchClusterInitialPressEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic, getter=getNewPosition) NSNumber * _Nonnull newPosition;
+@end
+
+@interface CHIPSwitchClusterLongPressEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic, getter=getNewPosition) NSNumber * _Nonnull newPosition;
+@end
+
+@interface CHIPSwitchClusterShortReleaseEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull previousPosition;
+@end
+
+@interface CHIPSwitchClusterLongReleaseEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull previousPosition;
+@end
+
+@interface CHIPSwitchClusterMultiPressOngoingEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic, getter=getNewPosition) NSNumber * _Nonnull newPosition;
+@property (strong, nonatomic) NSNumber * _Nonnull currentNumberOfPressesCounted;
+@end
+
+@interface CHIPSwitchClusterMultiPressCompleteEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic, getter=getNewPosition) NSNumber * _Nonnull newPosition;
+@property (strong, nonatomic) NSNumber * _Nonnull totalNumberOfPressesCounted;
 @end
 
 @interface CHIPOperationalCredentialsClusterFabricDescriptor : NSObject
@@ -312,6 +489,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPBooleanStateClusterStateChangeEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull stateValue;
+@end
+
 @interface CHIPModeSelectClusterModeOptionStruct : NSObject
 @property (strong, nonatomic) NSString * _Nonnull label;
 @property (strong, nonatomic) NSNumber * _Nonnull mode;
@@ -329,6 +511,116 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull credentialType;
 @property (strong, nonatomic) NSNumber * _Nonnull credentialIndex;
 - (instancetype)init;
+@end
+
+@interface CHIPDoorLockClusterDoorLockAlarmEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull alarmCode;
+@end
+
+@interface CHIPDoorLockClusterDoorStateChangeEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull doorState;
+@end
+
+@interface CHIPDoorLockClusterLockOperationEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull lockOperationType;
+@property (strong, nonatomic) NSNumber * _Nonnull operationSource;
+@property (strong, nonatomic) NSNumber * _Nullable userIndex;
+@property (strong, nonatomic) NSNumber * _Nullable fabricIndex;
+@property (strong, nonatomic) NSNumber * _Nullable sourceNode;
+@property (strong, nonatomic) NSArray * _Nullable credentials;
+@end
+
+@interface CHIPDoorLockClusterLockOperationErrorEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull lockOperationType;
+@property (strong, nonatomic) NSNumber * _Nonnull operationSource;
+@property (strong, nonatomic) NSNumber * _Nonnull operationError;
+@property (strong, nonatomic) NSNumber * _Nullable userIndex;
+@property (strong, nonatomic) NSNumber * _Nullable fabricIndex;
+@property (strong, nonatomic) NSNumber * _Nullable sourceNode;
+@property (strong, nonatomic) NSArray * _Nullable credentials;
+@end
+
+@interface CHIPDoorLockClusterLockUserChangeEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull lockDataType;
+@property (strong, nonatomic) NSNumber * _Nonnull dataOperationType;
+@property (strong, nonatomic) NSNumber * _Nonnull operationSource;
+@property (strong, nonatomic) NSNumber * _Nullable userIndex;
+@property (strong, nonatomic) NSNumber * _Nullable fabricIndex;
+@property (strong, nonatomic) NSNumber * _Nullable sourceNode;
+@property (strong, nonatomic) NSNumber * _Nullable dataIndex;
+@end
+
+@interface CHIPPumpConfigurationAndControlClusterSupplyVoltageLowEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@end
+
+@interface CHIPPumpConfigurationAndControlClusterSupplyVoltageHighEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@end
+
+@interface CHIPPumpConfigurationAndControlClusterPowerMissingPhaseEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@end
+
+@interface CHIPPumpConfigurationAndControlClusterSystemPressureLowEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@end
+
+@interface CHIPPumpConfigurationAndControlClusterSystemPressureHighEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@end
+
+@interface CHIPPumpConfigurationAndControlClusterDryRunningEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@end
+
+@interface CHIPPumpConfigurationAndControlClusterMotorTemperatureHighEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@end
+
+@interface CHIPPumpConfigurationAndControlClusterPumpMotorFatalFailureEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@end
+
+@interface CHIPPumpConfigurationAndControlClusterElectronicTemperatureHighEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@end
+
+@interface CHIPPumpConfigurationAndControlClusterPumpBlockedEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@end
+
+@interface CHIPPumpConfigurationAndControlClusterSensorFailureEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@end
+
+@interface CHIPPumpConfigurationAndControlClusterElectronicNonFatalFailureEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@end
+
+@interface CHIPPumpConfigurationAndControlClusterElectronicFatalFailureEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@end
+
+@interface CHIPPumpConfigurationAndControlClusterGeneralFaultEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@end
+
+@interface CHIPPumpConfigurationAndControlClusterLeakageEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@end
+
+@interface CHIPPumpConfigurationAndControlClusterAirDetectionEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@end
+
+@interface CHIPPumpConfigurationAndControlClusterTurbineOperationEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
 @end
 
 @interface CHIPIasAceClusterIasAceZoneStatusResult : NSObject
@@ -508,6 +800,21 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSData * _Nonnull operationalCert;
 - (instancetype)init;
+@end
+
+@interface CHIPTestClusterClusterTestEventEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull arg1;
+@property (strong, nonatomic) NSNumber * _Nonnull arg2;
+@property (strong, nonatomic) NSNumber * _Nonnull arg3;
+@property (strong, nonatomic) CHIPTestClusterClusterSimpleStruct * _Nonnull arg4;
+@property (strong, nonatomic) NSArray * _Nonnull arg5;
+@property (strong, nonatomic) NSArray * _Nonnull arg6;
+@end
+
+@interface CHIPTestClusterClusterTestFabricScopedEventEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull priorityLevel;
+@property (strong, nonatomic) NSNumber * _Nonnull arg1;
 @end
 
 NS_ASSUME_NONNULL_END

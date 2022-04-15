@@ -101,6 +101,11 @@
             "path": "CHIPAttributeTLVValueDecoder-src.zapt",
             "name": "Decode TLV attribute values into Objc objects",
             "output": "src/darwin/Framework/CHIP/zap-generated/CHIPAttributeTLVValueDecoder.mm"
+        },
+        {
+            "path": "CHIPEventTLVValueDecoder-src.zapt",
+            "name": "Decode TLV event values into Objc objects",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPEventTLVValueDecoder.mm"
         }
     ]
 }
