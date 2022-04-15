@@ -779,10 +779,13 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *
  * The default value comes from 3sub per fabric * max number of fabrics, then reserve 1 read client for each fabric.
  *
- * TODO: (#17085) Should be changed to CHIP_CONFIG_MAX_FABRICS * 4 after we can hold more read handlers on more concise devices.
+ * Note that there is one fabric for rotation slack, so the actual number of fabrics should be CHIP_CONFIG_MAX_FABRICS - 1.
+ *
+ * TODO: (#17085) Should be changed to (CHIP_CONFIG_MAX_FABRICS - 1) * 4 after we can hold more read handlers on more concise
+ * devices.
  */
 #ifndef CHIP_IM_MAX_NUM_READ_HANDLER
-#define CHIP_IM_MAX_NUM_READ_HANDLER (CHIP_CONFIG_MAX_FABRICS * 3)
+#define CHIP_IM_MAX_NUM_READ_HANDLER ((CHIP_CONFIG_MAX_FABRICS - 1) * 3)
 #endif
 
 /**
