@@ -248,18 +248,11 @@ function getTests()
     // some failures on darwin supposely because the ReadClient stays open for the
     // whole duration of the tests and that goes past some internal limits.
     // Because of this, some of the tests are disabled on darwin.
-    'Test_TC_WNCV_1_1',
-    'Test_TC_WNCV_2_1',
-    'Test_TC_WNCV_2_2',
-    'Test_TC_WNCV_2_4',
-    'Test_TC_WNCV_2_5',
+    'Test_TC_WNCV_1_1', 'Test_TC_WNCV_2_1', 'Test_TC_WNCV_2_2', 'Test_TC_WNCV_2_4', 'Test_TC_WNCV_2_5',
     //'Test_TC_WNCV_3_1',
     //'Test_TC_WNCV_3_2',
     //'Test_TC_WNCV_3_3',
-    'Test_TC_WNCV_3_4',
-    'Test_TC_WNCV_3_5',
-    'Test_TC_WNCV_4_3',
-    'Test_TC_WNCV_4_4',
+    'Test_TC_WNCV_3_4', 'Test_TC_WNCV_3_5', 'Test_TC_WNCV_4_3', 'Test_TC_WNCV_4_4',
     //'Test_TC_WNCV_4_5', Disable this Test for now as Darwin does not support reboot commands currently
   ];
 
