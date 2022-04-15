@@ -332,6 +332,10 @@ private:
 class TargetVideoPlayerInfo
 {
 public:
+    TargetVideoPlayerInfo() :
+        mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
+    {}
+
     bool IsInitialized() { return mInitialized; }
 
     CHIP_ERROR Initialize(NodeId nodeId, FabricIndex fabricIndex)
@@ -359,21 +363,30 @@ public:
             .clientPool               = &gCASEClientPool,
         };
 
-        PeerId peerID           = fabric->GetPeerIdForNode(nodeId);
-        mOperationalDeviceProxy = chip::Platform::New<chip::OperationalDeviceProxy>(initParams, peerID);
+        PeerId peerID = fabric->GetPeerIdForNode(nodeId);
 
-        // TODO: figure out why this doesn't work so that we can remove OperationalDeviceProxy creation above,
-        // and remove the FindSecureSessionForNode and SetConnectedSession calls below
-        // mOperationalDeviceProxy = server->GetCASESessionManager()->FindExistingSession(nodeId);
+        //
+        // TODO: The code here is assuming that we can create an OperationalDeviceProxy instance and attach it immediately
+        //       to a CASE session that just got established to us by the tv-app. While this will work most of the time,
+        //       this is a dangerous assumption to make since it is entirely possible for that secure session to have been
+        //       evicted in the time since that session was established to the point here when we desire to interact back
+        //       with that peer. If that is the case, our `OnConnected` callback will not get invoked syncronously and
+        //       mOperationalDeviceProxy will still have a value of null, triggering the check below to fail.
+        //
+        mOperationalDeviceProxy = nullptr;
+        CHIP_ERROR err =
+            server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Could not establish a session to the peer");
+            return err;
+        }
+
         if (mOperationalDeviceProxy == nullptr)
         {
-            ChipLogError(AppServer, "Failed in creating an instance of OperationalDeviceProxy");
+            ChipLogError(AppServer, "Failed to find an existing instance of OperationalDeviceProxy to the peer");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        ChipLogError(AppServer, "Created an instance of OperationalDeviceProxy");
-
-        SessionHandle handle = server->GetSecureSessionManager().FindSecureSessionForNode(nodeId);
-        mOperationalDeviceProxy->SetConnectedSession(handle);
 
         mInitialized = true;
         return CHIP_NO_ERROR;
@@ -451,11 +464,26 @@ public:
     }
 
 private:
+    static void HandleDeviceConnected(void * context, OperationalDeviceProxy * device)
+    {
+        TargetVideoPlayerInfo * _this  = static_cast<TargetVideoPlayerInfo *>(context);
+        _this->mOperationalDeviceProxy = device;
+    }
+
+    static void HandleDeviceConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error)
+    {
+        TargetVideoPlayerInfo * _this  = static_cast<TargetVideoPlayerInfo *>(context);
+        _this->mOperationalDeviceProxy = nullptr;
+    }
+
     static constexpr size_t kMaxNumberOfEndpoints = 5;
     TargetEndpointInfo mEndpoints[kMaxNumberOfEndpoints];
     NodeId mNodeId;
     FabricIndex mFabricIndex;
     OperationalDeviceProxy * mOperationalDeviceProxy;
+
+    Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
+    Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 
     bool mInitialized = false;
 };
