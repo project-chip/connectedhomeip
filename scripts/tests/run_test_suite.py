@@ -186,8 +186,8 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, tv_app, pics_file):
     if all_clusters_app is None:
         all_clusters_app = FindBinaryPath('chip-all-clusters-app')
 
-    if door_lock_app is None:
-        door_lock_app = FindBinaryPath('chip-lock-app')
+    if lock_app is None:
+        lock_app = FindBinaryPath('chip-lock-app')
 
     if tv_app is None:
         tv_app = FindBinaryPath('chip-tv-app')
