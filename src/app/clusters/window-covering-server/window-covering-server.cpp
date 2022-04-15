@@ -673,7 +673,7 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
 EmberAfStatus GetMotionLockStatus(chip::EndpointId endpoint)
 {
     BitFlags<Mode> mode = ModeGet(endpoint);
-    BitFlags<ConfigStatus> configStatus = ConfigStatus(endpoint);
+    BitFlags<ConfigStatus> configStatus = ConfigStatusGet(endpoint);
 
     // Does the device is locked ?
     if (!configStatus.Has(ConfigStatus::kOperational))
