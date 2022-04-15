@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,26 +14,15 @@
  *    limitations under the License.
  */
 
+#import <CHIP/CHIP.h>
 #import <Foundation/Foundation.h>
-#import <Security/Security.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol CHIPKeypair <NSObject>
-@required
-
-/**
- * @brief A function to sign a hash using ECDSA
- * @param hash Hash that needs to be signed
- *
- * @return Returns A signature that consists of: 2 EC elements (r and s), in raw <r,s> point form (see SEC1).
- **/
-- (NSData *)ECDSA_sign_hash:(NSData *)hash;
-
-/** @brief Return public key for the keypair.
- **/
-- (SecKeyRef)pubkey;
-
+@interface CHIPTestStorage : NSObject <CHIPPersistentStorageDelegate>
+- (NSString *)CHIPGetKeyValue:(NSString *)key;
+- (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value;
+- (void)CHIPDeleteKeyValue:(NSString *)key;
 @end
 
 NS_ASSUME_NONNULL_END
