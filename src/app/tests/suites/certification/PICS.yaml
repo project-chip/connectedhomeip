@@ -242,7 +242,6 @@ PICS:
     - label: "Does the device support a maintenance mode?"
       id: WNCV_MAINTENANCE
 
-
       # On/Off Cluster
     - label: "Does the device implement the OnOff attribute?"
       id: A_ONOFF

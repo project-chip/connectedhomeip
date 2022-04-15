@@ -88,7 +88,9 @@ tests:
               maxValue: 0x7F
 
     ## If (ConfigStatus bit0 == 0) Verify DUT responds with FAILURE (value 0x01) status response
-    - label: "2c: If (ConfigStatus bit0 == 0) TH send DownOrClose command to the DUT"
+    - label:
+          "2c: If (ConfigStatus bit0 == 0) TH send DownOrClose command to the
+          DUT"
       command: "DownOrClose"
       PICS: "WNCV_CALIBRATION"
       response:
