@@ -186,7 +186,7 @@ class AndroidBuilder(Builder):
             libs = ['libCHIPController.so',
                     'libc++_shared.so', 'libTvCastingApp.so']
         else:
-            libs = ['libCHIPController.so', 'libSetupPayloadParser.so',
+            libs = ['libSetupPayloadParser.so',
                     'libc++_shared.so', 'libTvApp.so']
         for libName in libs:
             self._Execute(['cp', os.path.join(self.output_dir, 'lib', 'jni', self.board.AbiName(
@@ -204,7 +204,6 @@ class AndroidBuilder(Builder):
                 'SetupPayloadParser.jar': 'third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar',
                 'AndroidPlatform.jar': 'third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar',
                 'CHIPAppServer.jar': 'third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar',
-                'CHIPController.jar': 'third_party/connectedhomeip/src/controller/java/CHIPController.jar',
                 'TvApp.jar': 'TvApp.jar',
             }
         for jarName in jars.keys():
