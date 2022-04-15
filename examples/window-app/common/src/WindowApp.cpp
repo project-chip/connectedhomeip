@@ -324,7 +324,7 @@ void WindowApp::DispatchEventAttributeChange(chip::EndpointId endpoint, chip::At
         chip::DeviceLayer::PlatformMgr().LockChipStack();
         mode = ModeGet(endpoint);
         ModePrint(mode);
-        ModeSet(endpoint, mode); //refilter mode if needed
+        ModeSet(endpoint, mode); // refilter mode if needed
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         break;
     /* RO ConfigStatus: set by WC server */

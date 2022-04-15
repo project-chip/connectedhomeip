@@ -170,20 +170,16 @@ Type TypeGet(chip::EndpointId endpoint)
     return value;
 }
 
-
 void ConfigStatusPrint(const chip::BitFlags<ConfigStatus> & configStatus)
 {
-    emberAfWindowCoveringClusterPrint("ConfigStatus 0x%02X Operational=%u OnlineReserved=%u",
-        configStatus.Raw(),
-        configStatus.Has(ConfigStatus::kOperational),
-        configStatus.Has(ConfigStatus::kOnlineReserved));
+    emberAfWindowCoveringClusterPrint("ConfigStatus 0x%02X Operational=%u OnlineReserved=%u", configStatus.Raw(),
+                                      configStatus.Has(ConfigStatus::kOperational),
+                                      configStatus.Has(ConfigStatus::kOnlineReserved));
 
-    emberAfWindowCoveringClusterPrint("Lift(PA=%u Encoder=%u Reversed=%u) Tilt(PA=%u Encoder=%u)",
-        configStatus.Has(ConfigStatus::kLiftPositionAware),
-        configStatus.Has(ConfigStatus::kLiftEncoderControlled),
-        configStatus.Has(ConfigStatus::kLiftMovementReversed),
-        configStatus.Has(ConfigStatus::kTiltPositionAware),
-        configStatus.Has(ConfigStatus::kTiltEncoderControlled));
+    emberAfWindowCoveringClusterPrint(
+        "Lift(PA=%u Encoder=%u Reversed=%u) Tilt(PA=%u Encoder=%u)", configStatus.Has(ConfigStatus::kLiftPositionAware),
+        configStatus.Has(ConfigStatus::kLiftEncoderControlled), configStatus.Has(ConfigStatus::kLiftMovementReversed),
+        configStatus.Has(ConfigStatus::kTiltPositionAware), configStatus.Has(ConfigStatus::kTiltEncoderControlled));
 }
 
 void ConfigStatusSet(chip::EndpointId endpoint, const chip::BitFlags<ConfigStatus> & configStatus)
@@ -266,12 +262,9 @@ EndProductType EndProductTypeGet(chip::EndpointId endpoint)
 
 void ModePrint(const chip::BitFlags<Mode> & mode)
 {
-    emberAfWindowCoveringClusterPrint("Mode 0x%02X MotorDirReversed=%u LedFeedback=%u Maintenance=%u Calibration=%u",
-        mode.Raw(),
-        mode.Has(Mode::kMotorDirectionReversed),
-        mode.Has(Mode::kLedFeedback),
-        mode.Has(Mode::kMaintenanceMode),
-        mode.Has(Mode::kCalibrationMode));
+    emberAfWindowCoveringClusterPrint("Mode 0x%02X MotorDirReversed=%u LedFeedback=%u Maintenance=%u Calibration=%u", mode.Raw(),
+                                      mode.Has(Mode::kMotorDirectionReversed), mode.Has(Mode::kLedFeedback),
+                                      mode.Has(Mode::kMaintenanceMode), mode.Has(Mode::kCalibrationMode));
 }
 
 void ModeSet(chip::EndpointId endpoint, chip::BitFlags<Mode> & newMode)
@@ -279,7 +272,7 @@ void ModeSet(chip::EndpointId endpoint, chip::BitFlags<Mode> & newMode)
     chip::BitFlags<ConfigStatus> newStatus;
 
     chip::BitFlags<ConfigStatus> oldStatus = ConfigStatusGet(endpoint);
-    chip::BitFlags<Mode> oldMode = ModeGet(endpoint);
+    chip::BitFlags<Mode> oldMode           = ModeGet(endpoint);
 
     newStatus = oldStatus;
 
@@ -655,7 +648,7 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
     case Attributes::Mode::Id:
         mode = ModeGet(endpoint);
         ModePrint(mode);
-        ModeSet(endpoint, mode); //refilter mode if needed
+        ModeSet(endpoint, mode); // refilter mode if needed
         break;
     case Attributes::ConfigStatus::Id:
         configStatus = ConfigStatusGet(endpoint);
@@ -672,7 +665,7 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
 
 EmberAfStatus GetMotionLockStatus(chip::EndpointId endpoint)
 {
-    BitFlags<Mode> mode = ModeGet(endpoint);
+    BitFlags<Mode> mode                 = ModeGet(endpoint);
     BitFlags<ConfigStatus> configStatus = ConfigStatusGet(endpoint);
 
     // Does the device is locked ?
@@ -853,7 +846,8 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
 {
     auto & liftPercentageValue    = commandData.liftPercentageValue;
     auto & liftPercent100thsValue = commandData.liftPercent100thsValue;
-    Percent100ths liftPercent100ths = liftPercent100thsValue.ValueOr(static_cast<Percent100ths>(liftPercentageValue * WC_PERCENT100THS_COEF));
+    Percent100ths liftPercent100ths =
+        liftPercent100thsValue.ValueOr(static_cast<Percent100ths>(liftPercentageValue * WC_PERCENT100THS_COEF));
 
     EndpointId endpoint = commandPath.mEndpointId;
 
@@ -930,7 +924,8 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
 {
     auto & tiltPercentageValue    = commandData.tiltPercentageValue;
     auto & tiltPercent100thsValue = commandData.tiltPercent100thsValue;
-    Percent100ths tiltPercent100ths = tiltPercent100thsValue.ValueOr(static_cast<Percent100ths>(tiltPercentageValue * WC_PERCENT100THS_COEF));
+    Percent100ths tiltPercent100ths =
+        tiltPercent100thsValue.ValueOr(static_cast<Percent100ths>(tiltPercentageValue * WC_PERCENT100THS_COEF));
 
     EndpointId endpoint = commandPath.mEndpointId;
 
