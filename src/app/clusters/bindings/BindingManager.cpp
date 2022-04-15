@@ -19,6 +19,7 @@
 #include <app/util/binding-table.h>
 #include <credentials/FabricTable.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
 
 namespace {
 
@@ -203,6 +204,10 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
 {
     VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mBoundDeviceChangedHandler, CHIP_NO_ERROR);
+    VerifyOrReturnError(mBoundDeviceContextReleaseHandler, CHIP_NO_ERROR);
+
+    CHIP_ERROR error              = CHIP_NO_ERROR;
+    bool pendingNotificationAdded = false;
 
     for (auto iter = BindingTable::GetInstance().begin(); iter != BindingTable::GetInstance().end(); ++iter)
     {
@@ -218,22 +223,28 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
                 {
                     // We already have an active connection
                     mBoundDeviceChangedHandler(*iter, peerDevice, context);
-                    mBoundDeviceContextReleaseHandler(context);
                 }
                 else
                 {
                     mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), context);
-                    ReturnErrorOnFailure(EstablishConnection(iter->fabricIndex, iter->nodeId));
+                    pendingNotificationAdded = true;
+                    error                    = EstablishConnection(iter->fabricIndex, iter->nodeId);
+                    SuccessOrExit(error == CHIP_NO_ERROR);
                 }
             }
             else if (iter->type == EMBER_MULTICAST_BINDING)
             {
                 mBoundDeviceChangedHandler(*iter, nullptr, context);
-                mBoundDeviceContextReleaseHandler(context);
             }
         }
     }
-    return CHIP_NO_ERROR;
+
+exit:
+    // Call release context handler only if any pending notification is not going to use it.
+    if (!pendingNotificationAdded)
+        mBoundDeviceContextReleaseHandler(context);
+
+    return error;
 }
 
 } // namespace chip
