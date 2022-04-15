@@ -40,8 +40,6 @@
 
 // ==================== Security Adaptations ====================
 
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY 2
-
 #define CHIP_CONFIG_SHA256_CONTEXT_SIZE (sizeof(unsigned int) * 76)
 
 // ==================== General Configuration Overrides ====================

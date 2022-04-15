@@ -18,27 +18,29 @@
  */
 #include "PersistedCounter.h"
 
+#include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/PersistedStorage.h>
 
 #include <stdlib.h>
 #include <string.h>
 
 namespace chip {
 
-PersistedCounter::PersistedCounter() : mId(chip::Platform::PersistedStorage::kEmptyKey), mEpoch(0), mNextEpoch(0) {}
+PersistedCounter::PersistedCounter() {}
 
 PersistedCounter::~PersistedCounter() {}
 
 CHIP_ERROR
-PersistedCounter::Init(const chip::Platform::PersistedStorage::Key aId, uint32_t aEpoch)
+PersistedCounter::Init(PersistentStorageDelegate * aStorage, KeyType aKey, uint32_t aEpoch)
 {
+    VerifyOrReturnError(aStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aKey != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aEpoch > 0, CHIP_ERROR_INVALID_INTEGER_VALUE);
 
-    // Store the ID.
-    mId    = aId;
-    mEpoch = aEpoch;
+    mStorage = aStorage;
+    mKey     = aKey;
+    mEpoch   = aEpoch;
 
     uint32_t startValue;
 
@@ -58,7 +60,8 @@ PersistedCounter::Init(const chip::Platform::PersistedStorage::Key aId, uint32_t
 CHIP_ERROR
 PersistedCounter::Advance()
 {
-    VerifyOrReturnError(mId != chip::Platform::PersistedStorage::kEmptyKey, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mKey != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(MonotonicallyIncreasingCounter::Advance());
 
@@ -83,15 +86,20 @@ PersistedCounter::PersistNextEpochStart(uint32_t aStartValue)
     ChipLogDetail(EventLogging, "PersistedCounter::WriteStartValue() aStartValue 0x%x", aStartValue);
 #endif
 
-    return chip::Platform::PersistedStorage::Write(mId, aStartValue);
+    uint32_t valueLE = Encoding::LittleEndian::HostSwap32(aStartValue);
+
+    DefaultStorageKeyAllocator keyAlloc;
+    return mStorage->SyncSetKeyValue((keyAlloc.*mKey)(), &valueLE, sizeof(valueLE));
 }
 
 CHIP_ERROR
 PersistedCounter::ReadStartValue(uint32_t & aStartValue)
 {
-    aStartValue = 0;
+    DefaultStorageKeyAllocator keyAlloc;
+    uint32_t valueLE = 0;
+    uint16_t size    = sizeof(valueLE);
 
-    CHIP_ERROR err = chip::Platform::PersistedStorage::Read(mId, aStartValue);
+    CHIP_ERROR err = mStorage->SyncGetKeyValue((keyAlloc.*mKey)(), &valueLE, size);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         // No previously-stored value, no worries, the counter is initialized to zero.
@@ -100,8 +108,18 @@ PersistedCounter::ReadStartValue(uint32_t & aStartValue)
     }
     else
     {
+        // TODO: Figure out how to avoid a bootloop here.  Maybe we should just
+        // init to 0?  Or a random value?
         ReturnErrorOnFailure(err);
     }
+
+    if (size != sizeof(valueLE))
+    {
+        // TODO: Again, figure out whether this could lead to bootloops.
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    aStartValue = Encoding::LittleEndian::HostSwap32(valueLE);
 
 #if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
     ChipLogDetail(EventLogging, "PersistedCounter::ReadStartValue() aStartValue 0x%x", aStartValue);

@@ -32,6 +32,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/tests/integration/common.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/support/CHIPCounter.h>
 #include <lib/support/ErrorStr.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -160,8 +161,12 @@ uint8_t gInfoEventBuffer[2048];
 uint8_t gCritEventBuffer[2048];
 chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
-void InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
+chip::MonotonicallyIncreasingCounter gEventCounter;
+
+CHIP_ERROR InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
 {
+    ReturnErrorOnFailure(gEventCounter.Init(0));
+
     chip::app::LogStorageResources logStorageResources[] = {
         { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
         { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
@@ -169,7 +174,8 @@ void InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
     };
 
     chip::app::EventManagement::CreateEventManagement(apMgr, sizeof(logStorageResources) / sizeof(logStorageResources[0]),
-                                                      gCircularEventBuffer, logStorageResources, nullptr, 0, nullptr);
+                                                      gCircularEventBuffer, logStorageResources, &gEventCounter);
+    return CHIP_NO_ERROR;
 }
 
 } // namespace
@@ -202,7 +208,8 @@ int main(int argc, char * argv[])
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager);
     SuccessOrExit(err);
 
-    InitializeEventLogging(&gExchangeManager);
+    err = InitializeEventLogging(&gExchangeManager);
+    SuccessOrExit(err);
 
     gTestPairing.Init(gSessionManager);
     err = gSessionManager.NewPairing(gSession, peer, chip::kTestControllerNodeId, &gTestPairing,
