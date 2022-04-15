@@ -30,7 +30,6 @@ namespace {
 static constexpr uint32_t kDACPrivateKeySize = 32;
 static constexpr uint32_t kDACPublicKeySize  = 65;
 
-// TODO: This should be moved to a method of P256Keypair
 CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair)
 {
     Crypto::P256SerializedKeypair serializedKeypair;
@@ -108,7 +107,7 @@ CHIP_ERROR ESP32FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan
 
 CHIP_ERROR ESP32FactoryDataProvider::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)
 {
-    // TODO: We need a real example FirmwareInformation to be populated.
+    // We do not provide any FirmwareInformation.
     out_firmware_info_buffer.reduce_size(0);
     return CHIP_NO_ERROR;
 }
@@ -149,8 +148,6 @@ CHIP_ERROR ESP32FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan
         ESP32Config::ReadConfigValueBin(ESP32Config::kConfigKey_DACPrivateKey, privKeyBuf, privKeyLen, privKeyLen));
     ReturnErrorOnFailure(ESP32Config::ReadConfigValueBin(ESP32Config::kConfigKey_DACPublicKey, pubKeyBuf, pubKeyLen, pubKeyLen));
 
-    // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
-    // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
     ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan(privKeyBuf, privKeyLen), ByteSpan(pubKeyBuf, pubKeyLen), keypair));
     ReturnErrorOnFailure(keypair.ECDSA_sign_hash(digestToSign.data(), digestToSign.size(), signature));
 

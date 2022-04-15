@@ -22,15 +22,13 @@
 namespace chip {
 namespace DeviceLayer {
 
+/**
+ * @brief This class provides Commissionable data and Device Attestation Credentials.
+ */
+
 class ESP32FactoryDataProvider : public CommissionableDataProvider, public chip::Credentials::DeviceAttestationCredentialsProvider
 {
 public:
-    static ESP32FactoryDataProvider & GetInstance()
-    {
-        static ESP32FactoryDataProvider instance;
-        return instance;
-    }
-
     // ===== Members functions that implement the CommissionableDataProvider
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
 
@@ -56,9 +54,6 @@ public:
     CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & outBuffer) override;
 
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer) override;
-
-private:
-    ESP32FactoryDataProvider() = default;
 };
 
 } // namespace DeviceLayer

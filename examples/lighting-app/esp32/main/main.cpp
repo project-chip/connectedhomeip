@@ -66,6 +66,10 @@ namespace {
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
 #endif
+
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+ESP32FactoryDataProvider sFactoryDataProvider;
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 } // namespace
 
 static void InitOTARequestor(void)
@@ -91,7 +95,7 @@ static void InitServer(intptr_t context)
 
     // Initialize device attestation config
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-    SetDeviceAttestationCredentialsProvider(&ESP32FactoryDataProvider::GetInstance());
+    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
@@ -125,7 +129,7 @@ extern "C" void app_main()
     ESP_LOGI(TAG, "==================================================");
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-    SetCommissionableDataProvider(&ESP32FactoryDataProvider::GetInstance());
+    SetCommissionableDataProvider(&sFactoryDataProvider);
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
 #if CONFIG_ENABLE_CHIP_SHELL

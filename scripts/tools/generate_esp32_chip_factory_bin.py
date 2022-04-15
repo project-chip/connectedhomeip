@@ -84,6 +84,11 @@ def gen_raw_ec_keypair_from_der(key_file, pubkey_raw_file, privkey_raw_file):
     with open(key_file, 'rb') as f:
         key_data = f.read()
 
+    logging.warning('Leaking of DAC private keys may lead to attestation chain revokation')
+    logging.warning('Please make sure the DAC private is key protected using a password')
+
+    # WARNING: Below line assumes that the DAC private key is not protected by a password,
+    #          please be careful and use the password-protected key if reusing this code
     key_der = cryptography.hazmat.primitives.serialization.load_der_private_key(key_data, None)
 
     private_number_val = key_der.private_numbers().private_value
