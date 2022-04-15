@@ -820,6 +820,13 @@ CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, cons
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR PASESession::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate)
+{
+    // Handle messages by myself
+    newDelegate = this;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const PayloadHeader & payloadHeader,
                                           System::PacketBufferHandle && msg)
 {

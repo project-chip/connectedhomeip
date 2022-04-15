@@ -53,7 +53,11 @@ namespace chip {
 #define CASE_EPHEMERAL_KEY 0xCA5EECD0
 #endif
 
-class DLL_EXPORT CASESession : public Messaging::ExchangeDelegate, public PairingSession
+// TODO: temporary derive from Messaging::UnsolicitedMessageHandler, actually the CASEServer should be the umh, it will be fixed
+// when implementing concurrent CASE session.
+class DLL_EXPORT CASESession : public Messaging::UnsolicitedMessageHandler,
+                               public Messaging::ExchangeDelegate,
+                               public PairingSession
 {
 public:
     CASESession();
@@ -140,6 +144,13 @@ public:
      * @return CHIP_ERROR The result of session derivation
      */
     CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override;
+
+    //// UnsolicitedMessageHandler Implementation ////
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
+    {
+        newDelegate = this;
+        return CHIP_NO_ERROR;
+    }
 
     //// ExchangeDelegate Implementation ////
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,

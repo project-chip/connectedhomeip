@@ -203,7 +203,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
     SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());
-    ReturnErrorOnFailure(DeviceInfoProviderImpl::GetDefaultInstance().Init());
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.

@@ -211,7 +211,7 @@ bool SlWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
     bool scanStarted = false;
     ChipLogProgress(DeviceLayer, "Start Scan WiFi Networks");
-    if (ssid.size()) // ssid is given, only scan this network
+    if (!ssid.empty()) // ssid is given, only scan this network
     {
         char cSsid[DeviceLayer::Internal::kMaxWiFiSSIDLength] = {};
         memcpy(cSsid, ssid.data(), ssid.size());

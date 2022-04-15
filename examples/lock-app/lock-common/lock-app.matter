@@ -46,7 +46,7 @@ server cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  info event AccessControlEntryChanged = 0 {
+  info event access(read: administer) AccessControlEntryChanged = 0 {
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
@@ -54,7 +54,7 @@ server cluster AccessControl = 31 {
     fabric_idx adminFabricIndex = 254;
   }
 
-  info event AccessControlExtensionChanged = 1 {
+  info event access(read: administer) AccessControlExtensionChanged = 1 {
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
@@ -62,8 +62,11 @@ server cluster AccessControl = 31 {
     fabric_idx adminFabricIndex = 254;
   }
 
-  attribute AccessControlEntry acl[] = 0;
-  attribute ExtensionEntry extension[] = 1;
+  attribute access(read: administer, write: administer) AccessControlEntry acl[] = 0;
+  attribute access(read: administer, write: administer) ExtensionEntry extension[] = 1;
+  readonly attribute int16u subjectsPerAccessControlEntry = 2;
+  readonly attribute int16u targetsPerAccessControlEntry = 3;
+  readonly attribute int16u accessControlEntriesPerFabric = 4;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -98,12 +101,17 @@ server cluster AdministratorCommissioning = 60 {
     INT16U commissioningTimeout = 0;
   }
 
-  timed command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
-  timed command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
-  timed command RevokeCommissioning(): DefaultSuccess = 2;
+  timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
+  timed command access(invoke: administer) OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
+  timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 
 server cluster Basic = 40 {
+  struct CapabilityMinimaStruct {
+    int16u caseSessionsPerFabric = 0;
+    int16u subscriptionsPerFabric = 1;
+  }
+
   critical event StartUp = 0 {
     INT32U softwareVersion = 0;
   }
@@ -123,8 +131,8 @@ server cluster Basic = 40 {
   readonly attribute vendor_id vendorID = 2;
   readonly attribute char_string<32> productName = 3;
   readonly attribute int16u productID = 4;
-  attribute char_string<32> nodeLabel = 5;
-  attribute char_string<2> location = 6;
+  attribute access(write: manage) char_string<32> nodeLabel = 5;
+  attribute access(write: administer) char_string<2> location = 6;
   readonly attribute int16u hardwareVersion = 7;
   readonly attribute char_string<64> hardwareVersionString = 8;
   readonly attribute int32u softwareVersion = 9;
@@ -134,9 +142,10 @@ server cluster Basic = 40 {
   readonly attribute long_char_string<256> productURL = 13;
   readonly attribute char_string<64> productLabel = 14;
   readonly attribute char_string<32> serialNumber = 15;
-  attribute boolean localConfigDisabled = 16;
+  attribute access(write: manage) boolean localConfigDisabled = 16;
   readonly attribute boolean reachable = 17;
   readonly attribute char_string<32> uniqueID = 18;
+  readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -181,6 +190,533 @@ server cluster DiagnosticLogs = 50 {
   }
 
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
+}
+
+server cluster DoorLock = 257 {
+  enum DlAlarmCode : ENUM8 {
+    kLockJammed = 0;
+    kLockFactoryReset = 1;
+    kLockRadioPowerCycled = 3;
+    kWrongCodeEntryLimit = 4;
+    kFrontEsceutcheonRemoved = 5;
+    kDoorForcedOpen = 6;
+    kDoorAjar = 7;
+    kForcedUser = 8;
+  }
+
+  enum DlCredentialRule : ENUM8 {
+    kSingle = 0;
+    kDouble = 1;
+    kTri = 2;
+  }
+
+  enum DlCredentialType : ENUM8 {
+    kProgrammingPIN = 0;
+    kPin = 1;
+    kRfid = 2;
+    kFingerprint = 3;
+    kFingerVein = 4;
+    kFace = 5;
+  }
+
+  enum DlDataOperationType : ENUM8 {
+    kAdd = 0;
+    kClear = 1;
+    kModify = 2;
+  }
+
+  enum DlDoorState : ENUM8 {
+    kDoorOpen = 0;
+    kDoorClosed = 1;
+    kDoorJammed = 2;
+    kDoorForcedOpen = 3;
+    kDoorUnspecifiedError = 4;
+    kDoorAjar = 5;
+  }
+
+  enum DlLockDataType : ENUM8 {
+    kUnspecified = 0;
+    kProgrammingCode = 1;
+    kUserIndex = 2;
+    kWeekDaySchedule = 3;
+    kYearDaySchedule = 4;
+    kHolidaySchedule = 5;
+    kPin = 6;
+    kRfid = 7;
+    kFingerprint = 8;
+  }
+
+  enum DlLockOperationType : ENUM8 {
+    kLock = 0;
+    kUnlock = 1;
+    kNonAccessUserEvent = 2;
+    kForcedUserEvent = 3;
+  }
+
+  enum DlLockState : ENUM8 {
+    kNotFullyLocked = 0;
+    kLocked = 1;
+    kUnlocked = 2;
+  }
+
+  enum DlLockType : ENUM8 {
+    kDeadBolt = 0;
+    kMagnetic = 1;
+    kOther = 2;
+    kMortise = 3;
+    kRim = 4;
+    kLatchBolt = 5;
+    kCylindricalLock = 6;
+    kTubularLock = 7;
+    kInterconnectedLock = 8;
+    kDeadLatch = 9;
+    kDoorFurniture = 10;
+  }
+
+  enum DlOperatingMode : ENUM8 {
+    kNormal = 0;
+    kVacation = 1;
+    kPrivacy = 2;
+    kNoRemoteLockUnlock = 3;
+    kPassage = 4;
+  }
+
+  enum DlOperationError : ENUM8 {
+    kUnspecified = 0;
+    kInvalidCredential = 1;
+    kDisabledUserDenied = 2;
+    kRestricted = 3;
+    kInsufficientBattery = 4;
+  }
+
+  enum DlOperationSource : ENUM8 {
+    kUnspecified = 0;
+    kManual = 1;
+    kProprietaryRemote = 2;
+    kKeypad = 3;
+    kAuto = 4;
+    kButton = 5;
+    kSchedule = 6;
+    kRemote = 7;
+    kRfid = 8;
+    kBiometric = 9;
+  }
+
+  enum DlStatus : ENUM8 {
+    kSuccess = 0;
+    kFailure = 1;
+    kDuplicate = 2;
+    kOccupied = 3;
+    kInvalidField = 133;
+    kNotFound = 139;
+  }
+
+  enum DlUserStatus : ENUM8 {
+    kAvailable = 0;
+    kOccupiedEnabled = 1;
+    kOccupiedDisabled = 3;
+  }
+
+  enum DlUserType : ENUM8 {
+    kUnrestrictedUser = 0;
+    kYearDayScheduleUser = 1;
+    kWeekDayScheduleUser = 2;
+    kProgrammingUser = 3;
+    kNonAccessUser = 4;
+    kForcedUser = 5;
+    kDisposableUser = 6;
+    kExpiringUser = 7;
+    kScheduleRestrictedUser = 8;
+    kRemoteOnlyUser = 9;
+  }
+
+  enum DoorLockOperationEventCode : ENUM8 {
+    kUnknownOrMfgSpecific = 0;
+    kLock = 1;
+    kUnlock = 2;
+    kLockInvalidPinOrId = 3;
+    kLockInvalidSchedule = 4;
+    kUnlockInvalidPinOrId = 5;
+    kUnlockInvalidSchedule = 6;
+    kOneTouchLock = 7;
+    kKeyLock = 8;
+    kKeyUnlock = 9;
+    kAutoLock = 10;
+    kScheduleLock = 11;
+    kScheduleUnlock = 12;
+    kManualLock = 13;
+    kManualUnlock = 14;
+  }
+
+  enum DoorLockProgrammingEventCode : ENUM8 {
+    kUnknownOrMfgSpecific = 0;
+    kMasterCodeChanged = 1;
+    kPinAdded = 2;
+    kPinDeleted = 3;
+    kPinChanged = 4;
+    kIdAdded = 5;
+    kIdDeleted = 6;
+  }
+
+  enum DoorLockSetPinOrIdStatus : ENUM8 {
+    kSuccess = 0;
+    kGeneralFailure = 1;
+    kMemoryFull = 2;
+    kDuplicateCodeError = 3;
+  }
+
+  enum DoorLockUserStatus : ENUM8 {
+    kAvailable = 0;
+    kOccupiedEnabled = 1;
+    kOccupiedDisabled = 3;
+    kNotSupported = 255;
+  }
+
+  enum DoorLockUserType : ENUM8 {
+    kUnrestricted = 0;
+    kYearDayScheduleUser = 1;
+    kWeekDayScheduleUser = 2;
+    kMasterUser = 3;
+    kNonAccessUser = 4;
+    kNotSupported = 255;
+  }
+
+  bitmap DlAlarmMask : BITMAP16 {
+    kLockingMechanismJammed = 0x1;
+    kLockResetToFactoryDefaults = 0x2;
+    kReserved = 0x4;
+    kRFModulePowerCycled = 0x8;
+    kWrongCodeEntryLimit = 0x10;
+    kFrontEscutcheonRemovedFromMain = 0x20;
+    kForcedDoorOpenUnderDoorLockedCondition = 0x40;
+  }
+
+  bitmap DlCredentialRuleMask : BITMAP8 {
+    kSingle = 0x1;
+    kDual = 0x2;
+    kTri = 0x4;
+  }
+
+  bitmap DlCredentialRulesSupport : BITMAP8 {
+    kSingle = 0x1;
+    kDual = 0x2;
+    kTri = 0x4;
+  }
+
+  bitmap DlDaysMaskMap : BITMAP8 {
+    kSunday = 0x1;
+    kMonday = 0x2;
+    kTuesday = 0x4;
+    kWednesday = 0x8;
+    kThursday = 0x10;
+    kFriday = 0x20;
+    kSaturday = 0x40;
+  }
+
+  bitmap DlDefaultConfigurationRegister : BITMAP16 {
+    kEnableLocalProgrammingEnabled = 0x1;
+    kKeypadInterfaceDefaultAccessEnabled = 0x2;
+    kRemoteInterfaceDefaultAccessIsEnabled = 0x4;
+    kSoundEnabled = 0x20;
+    kAutoRelockTimeSet = 0x40;
+    kLEDSettingsSet = 0x80;
+  }
+
+  bitmap DlKeypadOperationEventMask : BITMAP16 {
+    kUnknown = 0x1;
+    kLock = 0x2;
+    kUnlock = 0x4;
+    kLockInvalidPIN = 0x8;
+    kLockInvalidSchedule = 0x10;
+    kUnlockInvalidCode = 0x20;
+    kUnlockInvalidSchedule = 0x40;
+    kNonAccessUserOpEvent = 0x80;
+  }
+
+  bitmap DlKeypadProgrammingEventMask : BITMAP16 {
+    kUnknown = 0x1;
+    kProgrammingPINChanged = 0x2;
+    kPINAdded = 0x4;
+    kPINCleared = 0x8;
+    kPINChanged = 0x10;
+  }
+
+  bitmap DlLocalProgrammingFeatures : BITMAP8 {
+    kAddUsersCredentialsSchedulesLocally = 0x1;
+    kModifyUsersCredentialsSchedulesLocally = 0x2;
+    kClearUsersCredentialsSchedulesLocally = 0x4;
+    kAdjustLockSettingsLocally = 0x8;
+  }
+
+  bitmap DlManualOperationEventMask : BITMAP16 {
+    kUnknown = 0x1;
+    kThumbturnLock = 0x2;
+    kThumbturnUnlock = 0x4;
+    kOneTouchLock = 0x8;
+    kKeyLock = 0x10;
+    kKeyUnlock = 0x20;
+    kAutoLock = 0x40;
+    kScheduleLock = 0x80;
+    kScheduleUnlock = 0x100;
+    kManualLock = 0x200;
+    kManualUnlock = 0x400;
+  }
+
+  bitmap DlRFIDOperationEventMask : BITMAP16 {
+    kUnknown = 0x1;
+    kLock = 0x2;
+    kUnlock = 0x4;
+    kLockInvalidRFID = 0x8;
+    kLockInvalidSchedule = 0x10;
+    kUnlockInvalidRFID = 0x20;
+    kUnlockInvalidSchedule = 0x40;
+  }
+
+  bitmap DlRFIDProgrammingEventMask : BITMAP16 {
+    kUnknown = 0x1;
+    kRFIDCodeAdded = 0x20;
+    kRFIDCodeCleared = 0x40;
+  }
+
+  bitmap DlRemoteOperationEventMask : BITMAP16 {
+    kUnknown = 0x1;
+    kLock = 0x2;
+    kUnlock = 0x4;
+    kLockInvalidCode = 0x8;
+    kLockInvalidSchedule = 0x10;
+    kUnlockInvalidCode = 0x20;
+    kUnlockInvalidSchedule = 0x40;
+  }
+
+  bitmap DlRemoteProgrammingEventMask : BITMAP16 {
+    kUnknown = 0x1;
+    kProgrammingPINChanged = 0x2;
+    kPINAdded = 0x4;
+    kPINCleared = 0x8;
+    kPINChanged = 0x10;
+    kRFIDCodeAdded = 0x20;
+    kRFIDCodeCleared = 0x40;
+  }
+
+  bitmap DlSupportedOperatingModes : BITMAP16 {
+    kNormal = 0x1;
+    kVacation = 0x2;
+    kPrivacy = 0x4;
+    kNoRemoteLockUnlock = 0x8;
+    kPassage = 0x10;
+  }
+
+  bitmap DoorLockDayOfWeek : BITMAP8 {
+    kSunday = 0x1;
+    kMonday = 0x2;
+    kTuesday = 0x4;
+    kWednesday = 0x8;
+    kThursday = 0x10;
+    kFriday = 0x20;
+    kSaturday = 0x40;
+  }
+
+  bitmap DoorLockFeature : BITMAP32 {
+    kPINCredentials = 0x1;
+    kRFIDCredentials = 0x2;
+    kFingerCredentials = 0x4;
+    kLogging = 0x8;
+    kAccessSchedules = 0x10;
+    kDoorPositionSensor = 0x20;
+    kFaceCredentials = 0x40;
+    kCredentialsOTA = 0x80;
+    kUsersManagement = 0x100;
+    kNotifications = 0x200;
+  }
+
+  struct DlCredential {
+    DlCredentialType credentialType = 0;
+    INT16U credentialIndex = 1;
+  }
+
+  critical event DoorLockAlarm = 0 {
+    DlAlarmCode alarmCode = 0;
+  }
+
+  critical event DoorStateChange = 1 {
+    DlDoorState doorState = 0;
+  }
+
+  critical event LockOperation = 2 {
+    DlLockOperationType lockOperationType = 0;
+    DlOperationSource operationSource = 1;
+    nullable INT16U userIndex = 2;
+    nullable fabric_idx fabricIndex = 3;
+    nullable NODE_ID sourceNode = 4;
+    optional nullable DlCredential credentials[] = 5;
+  }
+
+  critical event LockOperationError = 3 {
+    DlLockOperationType lockOperationType = 0;
+    DlOperationSource operationSource = 1;
+    DlOperationError operationError = 2;
+    nullable INT16U userIndex = 3;
+    nullable fabric_idx fabricIndex = 4;
+    nullable NODE_ID sourceNode = 5;
+    optional nullable DlCredential credentials[] = 6;
+  }
+
+  info event LockUserChange = 4 {
+    DlLockDataType lockDataType = 0;
+    DlDataOperationType dataOperationType = 1;
+    DlOperationSource operationSource = 2;
+    nullable INT16U userIndex = 3;
+    nullable fabric_idx fabricIndex = 4;
+    nullable NODE_ID sourceNode = 5;
+    nullable INT16U dataIndex = 6;
+  }
+
+  readonly attribute nullable DlLockState lockState = 0;
+  readonly attribute DlLockType lockType = 1;
+  readonly attribute nullable DlDoorState doorState = 3;
+  attribute access(write: manage) int32u autoRelockTime = 35;
+  attribute access(write: administer) boolean requirePINforRemoteOperation = 51;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct LockDoorRequest {
+    optional OCTET_STRING pinCode = 0;
+  }
+
+  request struct UnlockDoorRequest {
+    optional OCTET_STRING pinCode = 0;
+  }
+
+  request struct SetWeekDayScheduleRequest {
+    INT8U weekDayIndex = 0;
+    INT16U userIndex = 1;
+    DlDaysMaskMap daysMask = 2;
+    INT8U startHour = 3;
+    INT8U startMinute = 4;
+    INT8U endHour = 5;
+    INT8U endMinute = 6;
+  }
+
+  request struct GetWeekDayScheduleRequest {
+    INT8U weekDayIndex = 0;
+    INT16U userIndex = 1;
+  }
+
+  request struct ClearWeekDayScheduleRequest {
+    INT8U weekDayIndex = 0;
+    INT16U userIndex = 1;
+  }
+
+  request struct SetYearDayScheduleRequest {
+    INT8U yearDayIndex = 0;
+    INT16U userIndex = 1;
+    epoch_s localStartTime = 2;
+    epoch_s localEndTime = 3;
+  }
+
+  request struct GetYearDayScheduleRequest {
+    INT8U yearDayIndex = 0;
+    INT16U userIndex = 1;
+  }
+
+  request struct ClearYearDayScheduleRequest {
+    INT8U yearDayIndex = 0;
+    INT16U userIndex = 1;
+  }
+
+  request struct SetUserRequest {
+    DlDataOperationType operationType = 0;
+    INT16U userIndex = 1;
+    nullable CHAR_STRING userName = 2;
+    nullable INT32U userUniqueId = 3;
+    nullable DlUserStatus userStatus = 4;
+    nullable DlUserType userType = 5;
+    nullable DlCredentialRule credentialRule = 6;
+  }
+
+  request struct GetUserRequest {
+    INT16U userIndex = 0;
+  }
+
+  request struct ClearUserRequest {
+    INT16U userIndex = 0;
+  }
+
+  request struct SetCredentialRequest {
+    DlDataOperationType operationType = 0;
+    DlCredential credential = 1;
+    LONG_OCTET_STRING credentialData = 2;
+    nullable INT16U userIndex = 3;
+    nullable DlUserStatus userStatus = 4;
+    nullable DlUserType userType = 5;
+  }
+
+  request struct GetCredentialStatusRequest {
+    DlCredential credential = 0;
+  }
+
+  request struct ClearCredentialRequest {
+    nullable DlCredential credential = 0;
+  }
+
+  response struct GetWeekDayScheduleResponse {
+    INT8U weekDayIndex = 0;
+    INT16U userIndex = 1;
+    DlStatus status = 2;
+    optional DlDaysMaskMap daysMask = 3;
+    optional INT8U startHour = 4;
+    optional INT8U startMinute = 5;
+    optional INT8U endHour = 6;
+    optional INT8U endMinute = 7;
+  }
+
+  response struct GetYearDayScheduleResponse {
+    INT8U yearDayIndex = 0;
+    INT16U userIndex = 1;
+    DlStatus status = 2;
+    optional epoch_s localStartTime = 3;
+    optional epoch_s localEndTime = 4;
+  }
+
+  response struct GetUserResponse {
+    INT16U userIndex = 0;
+    nullable CHAR_STRING userName = 1;
+    nullable INT32U userUniqueId = 2;
+    nullable DlUserStatus userStatus = 3;
+    nullable DlUserType userType = 4;
+    nullable DlCredentialRule credentialRule = 5;
+    nullable DlCredential credentials[] = 6;
+    nullable fabric_idx creatorFabricIndex = 7;
+    nullable fabric_idx lastModifiedFabricIndex = 8;
+    nullable INT16U nextUserIndex = 9;
+  }
+
+  response struct SetCredentialResponse {
+    DlStatus status = 0;
+    nullable INT16U userIndex = 1;
+    nullable INT16U nextCredentialIndex = 2;
+  }
+
+  response struct GetCredentialStatusResponse {
+    boolean credentialExists = 0;
+    nullable INT16U userIndex = 1;
+    nullable INT16U nextCredentialIndex = 2;
+  }
+
+  timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
+  timed command UnlockDoor(UnlockDoorRequest): DefaultSuccess = 1;
+  command access(invoke: administer) SetWeekDaySchedule(SetWeekDayScheduleRequest): DefaultSuccess = 11;
+  command access(invoke: administer) GetWeekDaySchedule(GetWeekDayScheduleRequest): GetWeekDayScheduleResponse = 12;
+  command access(invoke: administer) ClearWeekDaySchedule(ClearWeekDayScheduleRequest): DefaultSuccess = 13;
+  command access(invoke: administer) SetYearDaySchedule(SetYearDayScheduleRequest): DefaultSuccess = 14;
+  command access(invoke: administer) GetYearDaySchedule(GetYearDayScheduleRequest): GetYearDayScheduleResponse = 15;
+  command access(invoke: administer) ClearYearDaySchedule(ClearYearDayScheduleRequest): DefaultSuccess = 16;
+  timed command access(invoke: administer) SetUser(SetUserRequest): DefaultSuccess = 26;
+  command access(invoke: administer) GetUser(GetUserRequest): GetUserResponse = 27;
+  timed command access(invoke: administer) ClearUser(ClearUserRequest): DefaultSuccess = 29;
+  timed command access(invoke: administer) SetCredential(SetCredentialRequest): SetCredentialResponse = 34;
+  command access(invoke: administer) GetCredentialStatus(GetCredentialStatusRequest): GetCredentialStatusResponse = 36;
+  timed command access(invoke: administer) ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
 }
 
 server cluster EthernetNetworkDiagnostics = 55 {
@@ -236,7 +772,7 @@ server cluster GeneralCommissioning = 48 {
     INT16U failSafeExpiryLengthSeconds = 0;
   }
 
-  attribute int64u breadcrumb = 0;
+  attribute access(write: administer) int64u breadcrumb = 0;
   readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
   readonly attribute RegulatoryLocationType regulatoryConfig = 2;
   readonly attribute RegulatoryLocationType locationCapability = 3;
@@ -270,9 +806,9 @@ server cluster GeneralCommissioning = 48 {
     CHAR_STRING debugText = 1;
   }
 
-  command ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
-  command SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
-  command CommissioningComplete(): CommissioningCompleteResponse = 4;
+  command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
+  command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
+  command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
 }
 
 server cluster GeneralDiagnostics = 51 {
@@ -436,14 +972,14 @@ server cluster NetworkCommissioning = 49 {
     INT8U lqi = 7;
   }
 
-  readonly attribute int8u maxNetworks = 0;
-  readonly attribute NetworkInfo networks[] = 1;
+  readonly attribute access(read: administer) int8u maxNetworks = 0;
+  readonly attribute access(read: administer) NetworkInfo networks[] = 1;
   readonly attribute int8u scanMaxTimeSeconds = 2;
   readonly attribute int8u connectMaxTimeSeconds = 3;
-  attribute boolean interfaceEnabled = 4;
-  readonly attribute nullable NetworkCommissioningStatus lastNetworkingStatus = 5;
-  readonly attribute nullable octet_string<32> lastNetworkID = 6;
-  readonly attribute nullable int32s lastConnectErrorValue = 7;
+  attribute access(write: administer) boolean interfaceEnabled = 4;
+  readonly attribute access(read: administer) nullable NetworkCommissioningStatus lastNetworkingStatus = 5;
+  readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
+  readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -498,12 +1034,12 @@ server cluster NetworkCommissioning = 49 {
     nullable INT32S errorValue = 2;
   }
 
-  command ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
-  command AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): NetworkConfigResponse = 2;
-  command AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
-  command RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
-  command ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
-  command ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
+  command access(invoke: administer) ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
+  command access(invoke: administer) AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): NetworkConfigResponse = 2;
+  command access(invoke: administer) AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
+  command access(invoke: administer) RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
+  command access(invoke: administer) ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
+  command access(invoke: administer) ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
 }
 
 client cluster OtaSoftwareUpdateProvider = 41 {
@@ -674,7 +1210,7 @@ server cluster OnOff = 6 {
   readonly attribute boolean globalSceneControl = 16384;
   attribute int16u onTime = 16385;
   attribute int16u offWaitTime = 16386;
-  attribute nullable OnOffStartUpOnOff startUpOnOff = 16387;
+  attribute access(write: manage) nullable OnOffStartUpOnOff startUpOnOff = 16387;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -712,7 +1248,7 @@ server cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
-  readonly attribute NOCStruct NOCs[] = 0;
+  readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptor fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
@@ -781,15 +1317,15 @@ server cluster OperationalCredentials = 62 {
     optional CHAR_STRING debugText = 2;
   }
 
-  command AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
-  command CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
-  command CSRRequest(CSRRequestRequest): CSRResponse = 4;
-  command AddNOC(AddNOCRequest): NOCResponse = 6;
-  command UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
-  command UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
-  command RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
-  command AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-  command RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
+  command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
+  command access(invoke: administer) CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
+  command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
+  command access(invoke: administer) AddNOC(AddNOCRequest): NOCResponse = 6;
+  command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
+  command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
+  command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
+  command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
+  command access(invoke: administer) RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
 }
 
 server cluster PowerSource = 47 {
@@ -1079,7 +1615,7 @@ server cluster TimeFormatLocalization = 44 {
 }
 
 server cluster UserLabel = 65 {
-  attribute LabelStruct labelList[] = 0;
+  attribute access(write: manage) LabelStruct labelList[] = 0;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -1173,6 +1709,7 @@ endpoint 0 {
 
 endpoint 1 {
   server  cluster Descriptor;
+  server  cluster DoorLock;
   server  cluster OnOff;
   server  cluster PowerSource;
 }

@@ -40,11 +40,6 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <controller-clusters/zap-generated/CHIPClusters.h>
 
-#if CONFIG_DEVICE_LAYER
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/ConfigurationManager.h>
-#endif
-
 #include <app/server/Dnssd.h>
 
 #include <app/InteractionModelEngine.h>
@@ -1577,7 +1572,7 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
     }
 }
 
-// AttributeCache::Callback impl
+// ClusterStateCache::Callback impl
 void DeviceCommissioner::OnDone()
 {
     CHIP_ERROR err;
@@ -1777,8 +1772,15 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                                                   CommissioningDelegate * delegate, EndpointId endpoint,
                                                   Optional<System::Clock::Timeout> timeout)
 {
-    ChipLogProgress(Controller, "Performing next commissioning step '%s' with completion status = '%s'", StageToString(step),
-                    params.GetCompletionStatus().err.AsString());
+    if (params.GetCompletionStatus().err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Controller, "Performing next commissioning step '%s'", StageToString(step));
+    }
+    else
+    {
+        ChipLogProgress(Controller, "Performing next commissioning step '%s' with completion status = '%s'", StageToString(step),
+                        params.GetCompletionStatus().err.AsString());
+    }
 
     // For now, we ignore errors coming in from the device since not all commissioning clusters are implemented on the device
     // side.
@@ -1833,7 +1835,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         {
             readParams.mTimeout = timeout.Value();
         }
-        auto attributeCache = Platform::MakeUnique<app::AttributeCache>(*this);
+        auto attributeCache = Platform::MakeUnique<app::ClusterStateCache>(*this);
         auto readClient     = chip::Platform::MakeUnique<app::ReadClient>(
             engine, proxy->GetExchangeManager(), attributeCache->GetBufferedCallback(), app::ReadClient::InteractionType::Read);
         CHIP_ERROR err = readClient->SendRequest(readParams);
@@ -1888,23 +1890,18 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             ChipLogProgress(Controller, "Device does not support configurable regulatory location");
             regulatoryConfig = capability;
         }
-        static constexpr size_t kMaxCountryCodeSize = 3;
-        char countryCodeStr[kMaxCountryCodeSize]    = "XX";
-        size_t actualCountryCodeSize                = 2;
 
-#if CONFIG_DEVICE_LAYER
-        CHIP_ERROR status =
-            DeviceLayer::ConfigurationMgr().GetCountryCode(countryCodeStr, kMaxCountryCodeSize, actualCountryCodeSize);
-#else
-        CHIP_ERROR status = CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
-        if (status != CHIP_NO_ERROR)
+        CharSpan countryCode;
+        const auto & providedCountryCode = params.GetCountryCode();
+        if (providedCountryCode.HasValue())
         {
-            actualCountryCodeSize = 2;
-            memset(countryCodeStr, 'X', actualCountryCodeSize);
-            ChipLogError(Controller, "Unable to find country code, defaulting to %s", countryCodeStr);
+            countryCode = providedCountryCode.Value();
         }
-        chip::CharSpan countryCode(countryCodeStr, actualCountryCodeSize);
+        else
+        {
+            // Default to "XX", for lack of anything better.
+            countryCode = CharSpan::fromCharString("XX");
+        }
 
         GeneralCommissioning::Commands::SetRegulatoryConfig::Type request;
         request.newRegulatoryConfig = regulatoryConfig;

@@ -45,6 +45,12 @@ struct ConcreteEventPath : public ConcreteClusterPath
 
     bool operator!=(const ConcreteEventPath & aOther) const { return !(*this == aOther); }
 
+    bool operator<(const ConcreteEventPath & path) const
+    {
+        return (mEndpointId < path.mEndpointId) || ((mEndpointId == path.mEndpointId) && (mClusterId < path.mClusterId)) ||
+            ((mEndpointId == path.mEndpointId) && (mClusterId == path.mClusterId) && (mEventId < path.mEventId));
+    }
+
     EventId mEventId = 0;
 };
 } // namespace app

@@ -25,6 +25,7 @@
 #import <CHIP/CHIPTestClustersObjc.h>
 
 #import "CHIPErrorTestUtils.h"
+#import "CHIPTestStorage.h"
 
 #import <app/util/af-enums.h>
 
@@ -49,6 +50,9 @@ static uint16_t kTestVendorId = 0xFFF1u;
 // The following global variable holds the reference to the device object.
 static CHIPDevice * mConnectedDevice;
 
+// Singleton controller we use.
+static CHIPDeviceController * sController = nil;
+
 // Test Util APIs
 void WaitForMs(XCTestExpectation * expectation, dispatch_queue_t queue, unsigned int ms)
 {
@@ -71,7 +75,7 @@ void Reboot(XCTestExpectation * expectation, dispatch_queue_t queue, uint16_t di
 
 void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_t queue, uint64_t deviceId)
 {
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    CHIPDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
     [controller getConnectedDevice:deviceId
@@ -139,17 +143,30 @@ CHIPDevice * GetConnectedDevice(void)
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
 
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    __auto_type * factory = [MatterControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * storage = [[CHIPTestStorage alloc] init];
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
+    factoryParams.port = @(kLocalPort);
+
+    BOOL ok = [factory startup:factoryParams];
+    XCTAssertTrue(ok);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nil];
+    params.vendorId = kTestVendorId;
+    params.fabricId = 1;
+
+    // TODO: Once we have a non-nil keypair, use startControllerOnNewFabric.
+    CHIPDeviceController * controller = [factory startControllerOnExistingFabric:params];
     XCTAssertNotNil(controller);
+
+    sController = controller;
 
     CHIPToolPairingDelegate * pairing = [[CHIPToolPairingDelegate alloc] initWithExpectation:expectation];
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
 
-    [controller setListenPort:kLocalPort];
     [controller setPairingDelegate:pairing queue:callbackQueue];
-
-    BOOL started = [controller startup:nil vendorId:kTestVendorId nocSigner:nil];
-    XCTAssertTrue(started);
 
     NSError * error;
     [controller pairDevice:nodeId
@@ -175,16 +192,19 @@ CHIPDevice * GetConnectedDevice(void)
 
 - (void)testShutdownStack
 {
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    CHIPDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
-    BOOL stopped = [controller shutdown];
-    XCTAssertTrue(stopped);
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    [[MatterControllerFactory sharedInstance] shutdown];
+    XCTAssertFalse([[MatterControllerFactory sharedInstance] isRunning]);
 }
 
 - (void)testReuseChipClusterObject
 {
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    CHIPDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
     __block CHIPDevice * device;
@@ -1348,6 +1368,86 @@ CHIPDevice * GetConnectedDevice(void)
 
                      [expectation fulfill];
                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestAccessControlCluster_000019_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate resource minima (SubjectsPerAccessControlEntry)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster
+        readAttributeSubjectsPerAccessControlEntryWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate resource minima (SubjectsPerAccessControlEntry) Error: %@", err);
+
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+            {
+                id actualValue = value;
+                if (actualValue != nil) {
+                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 4U);
+                }
+            }
+
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestAccessControlCluster_000020_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate resource minima (TargetsPerAccessControlEntry)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeTargetsPerAccessControlEntryWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Validate resource minima (TargetsPerAccessControlEntry) Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 3U);
+            }
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestAccessControlCluster_000021_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate resource minima (AccessControlEntriesPerFabric)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster
+        readAttributeAccessControlEntriesPerFabricWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate resource minima (AccessControlEntriesPerFabric) Error: %@", err);
+
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+            {
+                id actualValue = value;
+                if (actualValue != nil) {
+                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 3U);
+                }
+            }
+
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -47858,7 +47958,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue count], 23);
+            XCTAssertEqual([actualValue count], 24);
             XCTAssertEqual([actualValue[0] unsignedIntValue], 0UL);
             XCTAssertEqual([actualValue[1] unsignedIntValue], 1UL);
             XCTAssertEqual([actualValue[2] unsignedIntValue], 2UL);
@@ -47878,10 +47978,11 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
             XCTAssertEqual([actualValue[16] unsignedIntValue], 16UL);
             XCTAssertEqual([actualValue[17] unsignedIntValue], 17UL);
             XCTAssertEqual([actualValue[18] unsignedIntValue], 18UL);
-            XCTAssertEqual([actualValue[19] unsignedIntValue], 65528UL);
-            XCTAssertEqual([actualValue[20] unsignedIntValue], 65529UL);
-            XCTAssertEqual([actualValue[21] unsignedIntValue], 65531UL);
-            XCTAssertEqual([actualValue[22] unsignedIntValue], 65533UL);
+            XCTAssertEqual([actualValue[19] unsignedIntValue], 19UL);
+            XCTAssertEqual([actualValue[20] unsignedIntValue], 65528UL);
+            XCTAssertEqual([actualValue[21] unsignedIntValue], 65529UL);
+            XCTAssertEqual([actualValue[22] unsignedIntValue], 65531UL);
+            XCTAssertEqual([actualValue[23] unsignedIntValue], 65533UL);
         }
 
         [expectation fulfill];
