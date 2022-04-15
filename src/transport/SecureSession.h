@@ -97,15 +97,15 @@ public:
      *   PASE, setting internal state according to the parameters used and
      *   discovered during session establishment.
      */
-    void Activate(Type secureSessionType, NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric,
+    void Activate(Type secureSessionType, const ScopedNodeId & peer, CATValues peerCATs, uint16_t peerSessionId,
                   const ReliableMessageProtocolConfig & config)
     {
         mSecureSessionType = secureSessionType;
-        mPeerNodeId        = peerNodeId;
+        mPeerNodeId        = peer.GetNodeId();
         mPeerCATs          = peerCATs;
         mPeerSessionId     = peerSessionId;
         mMRPConfig         = config;
-        SetFabricIndex(fabric);
+        SetFabricIndex(peer.GetFabricIndex());
     }
     ~SecureSession() override { NotifySessionReleased(); }
 

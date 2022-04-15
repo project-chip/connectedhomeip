@@ -71,15 +71,14 @@ class DLL_EXPORT PASESession : public Messaging::UnsolicitedMessageHandler,
                                public PairingSession
 {
 public:
-    PASESession();
-    PASESession(PASESession &&)      = default;
-    PASESession(const PASESession &) = delete;
-
     ~PASESession() override;
 
-    // TODO: The SetPeerNodeId method should not be exposed; PASE sessions
-    // should not need to be told their peer node ID
-    using PairingSession::SetPeerNodeId;
+    Transport::SecureSession::Type GetSecureSessionType() const override { return Transport::SecureSession::Type::kPASE; }
+    ScopedNodeId GetPeer() const override
+    {
+        return ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex);
+    }
+    CATValues GetPeerCATs() const override { return CATValues(); };
 
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
 
@@ -104,7 +103,6 @@ public:
      *   Create a pairing request using peer's setup PIN code.
      *
      * @param sessionManager      session manager from which to allocate a secure session object
-     * @param peerAddress         Address of peer to pair
      * @param peerSetUpPINCode    Setup PIN code of the peer device
      * @param exchangeCtxt        The exchange context to send and receive messages with the peer
      *                            Note: It's expected that the caller of this API hands over the
@@ -114,9 +112,8 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR Pair(SessionManager & sessionManager, const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode,
-                    Optional<ReliableMessageProtocolConfig> mrpConfig, Messaging::ExchangeContext * exchangeCtxt,
-                    SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Pair(SessionManager & sessionManager, uint32_t peerSetUpPINCode, Optional<ReliableMessageProtocolConfig> mrpConfig,
+                    Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -143,7 +140,7 @@ public:
      * @param role        Role of the new session (initiator or responder)
      * @return CHIP_ERROR The result of session derivation
      */
-    CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override;
+    CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) const override;
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     /** @brief This function zeroes out and resets the memory used by the object.
@@ -207,6 +204,9 @@ private:
     void OnSuccessStatusReport() override;
     CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
 
+    // TODO: pull up Finish to PairingSession class
+    void Finish();
+
     void CloseExchange();
 
     /**
@@ -239,8 +239,6 @@ private:
     uint8_t * mSalt          = nullptr;
 
     Messaging::ExchangeContext * mExchangeCtxt = nullptr;
-
-    Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
 
     struct Spake2pErrorMsg
     {

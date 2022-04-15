@@ -349,10 +349,10 @@ void SessionManager::ExpirePairing(const SessionHandle & sessionHandle)
     mSecureSessions.ReleaseSession(sessionHandle->AsSecureSession());
 }
 
-void SessionManager::ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric)
+void SessionManager::ExpireAllPairings(const ScopedNodeId & node)
 {
     mSecureSessions.ForEachSession([&](auto session) {
-        if (session->GetPeerNodeId() == peerNodeId && session->GetFabricIndex() == fabric)
+        if (session->GetPeer() == node)
         {
             mSecureSessions.ReleaseSession(session);
         }
@@ -389,18 +389,6 @@ Optional<SessionHandle> SessionManager::AllocateSession()
     return mSecureSessions.CreateNewSecureSession();
 }
 
-Optional<SessionHandle> SessionManager::AllocateSession(uint16_t sessionId)
-{
-    // If we forego SessionManager session ID allocation, we can have a
-    // collission.  In case of such a collission, we must evict first.
-    Optional<SessionHandle> oldSession = mSecureSessions.FindSecureSessionByLocalKey(sessionId);
-    if (oldSession.HasValue())
-    {
-        mSecureSessions.ReleaseSession(oldSession.Value()->AsSecureSession());
-    }
-    return mSecureSessions.CreateNewSecureSession(sessionId);
-}
-
 CHIP_ERROR SessionManager::InjectPaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, NodeId peerNodeId,
                                                         uint16_t peerSessionId, FabricIndex fabric,
                                                         const Transport::PeerAddress & peerAddress, CryptoContext::SessionRole role)
@@ -418,46 +406,6 @@ CHIP_ERROR SessionManager::InjectPaseSessionWithTestKey(SessionHolder & sessionH
         secret, ByteSpan(nullptr, 0), CryptoContext::SessionInfoType::kSessionEstablishment, role));
     secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
     sessionHolder.Grab(session.Value());
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR SessionManager::NewPairing(SessionHolder & sessionHolder, const Optional<Transport::PeerAddress> & peerAddr,
-                                      NodeId peerNodeId, PairingSession * pairing, CryptoContext::SessionRole direction,
-                                      FabricIndex fabric)
-{
-    uint16_t peerSessionId = pairing->GetPeerSessionId();
-    SecureSession * secureSession;
-    auto handle = pairing->GetSecureSessionHandle();
-    VerifyOrReturnError(handle.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(handle.Value()->IsSecureSession(), CHIP_ERROR_INCORRECT_STATE);
-    secureSession = handle.Value()->AsSecureSession();
-
-    ChipLogDetail(Inet, "New secure session created for device 0x" ChipLogFormatX64 ", LSID:%d PSID:%d!",
-                  ChipLogValueX64(peerNodeId), secureSession->GetLocalSessionId(), peerSessionId);
-    secureSession->Activate(pairing->GetSecureSessionType(), peerNodeId, pairing->GetPeerCATs(), peerSessionId, fabric,
-                            pairing->GetMRPConfig());
-
-    if (peerAddr.HasValue() && peerAddr.Value().GetIPAddress() != Inet::IPAddress::Any)
-    {
-        secureSession->SetPeerAddress(peerAddr.Value());
-    }
-    else if (peerAddr.HasValue() && peerAddr.Value().GetTransportType() == Transport::Type::kBle)
-    {
-        secureSession->SetPeerAddress(peerAddr.Value());
-    }
-    else if (peerAddr.HasValue() &&
-             (peerAddr.Value().GetTransportType() == Transport::Type::kTcp ||
-              peerAddr.Value().GetTransportType() == Transport::Type::kUdp))
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    ReturnErrorOnFailure(pairing->DeriveSecureSession(secureSession->GetCryptoContext(), direction));
-
-    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
-
-    sessionHolder.Grab(handle.Value());
-
     return CHIP_NO_ERROR;
 }
 
