@@ -160,14 +160,41 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
+# Generating android-x64-chip-tvserver
+gn gen --check --fail-on-unused-args {out}/android-x64-chip-tvserver '--args=target_os="android" target_cpu="x64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-app/android/
+
+# Accepting NDK licenses @ tools
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
+# Generating JARs for Java build rules test
+python3 build/chip/java/tests/generate_jars_for_test.py
+
+# Setting up Android deps through Gradle
+python3 third_party/android_deps/set_up_android_deps.py
+
 # Generating android-x86-chip-tool
 gn gen --check --fail-on-unused-args {out}/android-x86-chip-tool '--args=target_os="android" target_cpu="x86" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" '
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
+# Generating JARs for Java build rules test
+python3 build/chip/java/tests/generate_jars_for_test.py
+
+# Setting up Android deps through Gradle
+python3 third_party/android_deps/set_up_android_deps.py
+
+# Generating android-x86-chip-tvserver
+gn gen --check --fail-on-unused-args {out}/android-x86-chip-tvserver '--args=target_os="android" target_cpu="x86" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-app/android/
+
+# Accepting NDK licenses @ tools
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
 # Generating bl602-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=bl602_board="BL-HWC-G1"' {out}/bl602-light
+
+# Generating cc13x2x7_26x2x7-all-clusters
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-all-clusters
 
 # Generating cc13x2x7_26x2x7-lock-ftd
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT" chip_openthread_ftd=true' {out}/cc13x2x7_26x2x7-lock-ftd
@@ -1138,6 +1165,29 @@ cp {out}/android-x64-chip-tool/lib/src/platform/android/AndroidPlatform.jar {roo
 # Building APP android-x64-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-x64-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x64-chip-tool assembleDebug
 
+# Building JNI android-x64-chip-tvserver
+ninja -C {out}/android-x64-chip-tvserver
+
+# Prepare Native libs android-x64-chip-tvserver
+mkdir -p {root}/examples/tv-app/android/App/app/libs/jniLibs/x86_64
+
+cp {out}/android-x64-chip-tvserver/lib/jni/x86_64/libSetupPayloadParser.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86_64/libSetupPayloadParser.so
+
+cp {out}/android-x64-chip-tvserver/lib/jni/x86_64/libc++_shared.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86_64/libc++_shared.so
+
+cp {out}/android-x64-chip-tvserver/lib/jni/x86_64/libTvApp.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86_64/libTvApp.so
+
+cp {out}/android-x64-chip-tvserver/lib/third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar {root}/examples/tv-app/android/App/app/libs/SetupPayloadParser.jar
+
+cp {out}/android-x64-chip-tvserver/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-app/android/App/app/libs/AndroidPlatform.jar
+
+cp {out}/android-x64-chip-tvserver/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-app/android/App/app/libs/CHIPAppServer.jar
+
+cp {out}/android-x64-chip-tvserver/lib/TvApp.jar {root}/examples/tv-app/android/App/app/libs/TvApp.jar
+
+# Building Example android-x64-chip-tvserver
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x64-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x64-chip-tvserver assembleDebug
+
 # Building JNI android-x86-chip-tool
 ninja -C {out}/android-x86-chip-tool
 
@@ -1159,8 +1209,34 @@ cp {out}/android-x86-chip-tool/lib/src/platform/android/AndroidPlatform.jar {roo
 # Building APP android-x86-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-x86-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tool assembleDebug
 
+# Building JNI android-x86-chip-tvserver
+ninja -C {out}/android-x86-chip-tvserver
+
+# Prepare Native libs android-x86-chip-tvserver
+mkdir -p {root}/examples/tv-app/android/App/app/libs/jniLibs/x86
+
+cp {out}/android-x86-chip-tvserver/lib/jni/x86/libSetupPayloadParser.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86/libSetupPayloadParser.so
+
+cp {out}/android-x86-chip-tvserver/lib/jni/x86/libc++_shared.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86/libc++_shared.so
+
+cp {out}/android-x86-chip-tvserver/lib/jni/x86/libTvApp.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86/libTvApp.so
+
+cp {out}/android-x86-chip-tvserver/lib/third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar {root}/examples/tv-app/android/App/app/libs/SetupPayloadParser.jar
+
+cp {out}/android-x86-chip-tvserver/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-app/android/App/app/libs/AndroidPlatform.jar
+
+cp {out}/android-x86-chip-tvserver/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-app/android/App/app/libs/CHIPAppServer.jar
+
+cp {out}/android-x86-chip-tvserver/lib/TvApp.jar {root}/examples/tv-app/android/App/app/libs/TvApp.jar
+
+# Building Example android-x86-chip-tvserver
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x86-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tvserver assembleDebug
+
 # Building bl602-light
 ninja -C {out}/bl602-light
+
+# Building cc13x2x7_26x2x7-all-clusters
+ninja -C {out}/cc13x2x7_26x2x7-all-clusters
 
 # Building cc13x2x7_26x2x7-lock-ftd
 ninja -C {out}/cc13x2x7_26x2x7-lock-ftd

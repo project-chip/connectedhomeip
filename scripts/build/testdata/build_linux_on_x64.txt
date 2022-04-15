@@ -56,6 +56,11 @@ bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
  gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-ota-requestor-ipv6only'
 
+# Generating linux-arm64-python-bindings
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '"'"'--args=enable_rtti=false chip_project_config_include_dirs=["//config/python"] target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-python-bindings'
+
 # Generating linux-arm64-shell
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
@@ -112,6 +117,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating linux-x64-minmdns-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/minimal-mdns --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-minmdns-ipv6only
 
+# Generating linux-x64-nl-test-runner
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 {out}/linux-x64-nl-test-runner
+
 # Generating linux-x64-ota-provider
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-provider-app/linux --args=chip_config_network_layer_ble=false {out}/linux-x64-ota-provider
 
@@ -123,6 +131,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 # Generating linux-x64-ota-requestor-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/linux '--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false' {out}/linux-x64-ota-requestor-ipv6only
+
+# Generating linux-x64-python-bindings
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=enable_rtti=false chip_project_config_include_dirs=["//config/python"]' {out}/linux-x64-python-bindings
 
 # Generating linux-x64-rpc-console
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/common/pigweed/rpc_console {out}/linux-x64-rpc-console
@@ -181,6 +192,9 @@ ninja -C {out}/linux-arm64-ota-requestor
 # Building linux-arm64-ota-requestor-ipv6only
 ninja -C {out}/linux-arm64-ota-requestor-ipv6only
 
+# Building linux-arm64-python-bindings
+ninja -C {out}/linux-arm64-python-bindings python
+
 # Building linux-arm64-shell
 ninja -C {out}/linux-arm64-shell
 
@@ -229,6 +243,9 @@ ninja -C {out}/linux-x64-minmdns
 # Building linux-x64-minmdns-ipv6only
 ninja -C {out}/linux-x64-minmdns-ipv6only
 
+# Building linux-x64-nl-test-runner
+ninja -C {out}/linux-x64-nl-test-runner runner
+
 # Building linux-x64-ota-provider
 ninja -C {out}/linux-x64-ota-provider
 
@@ -240,6 +257,9 @@ ninja -C {out}/linux-x64-ota-requestor
 
 # Building linux-x64-ota-requestor-ipv6only
 ninja -C {out}/linux-x64-ota-requestor-ipv6only
+
+# Building linux-x64-python-bindings
+ninja -C {out}/linux-x64-python-bindings python
 
 # Building linux-x64-rpc-console
 ninja -C {out}/linux-x64-rpc-console

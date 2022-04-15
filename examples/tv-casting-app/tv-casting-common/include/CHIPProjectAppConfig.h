@@ -28,6 +28,9 @@
 #pragma once
 
 // include the CHIPProjectConfig from config/standalone
+
+#define CHIP_CONFIG_KVS_PATH "/tmp/chip_casting_kvs"
+
 #include <CHIPProjectConfig.h>
 
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY 0

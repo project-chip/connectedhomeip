@@ -66,6 +66,9 @@ void Log(XCTestExpectation * expectation, dispatch_queue_t queue, NSString * mes
 // Stub for User Prompts for XCTests to run.
 void UserPrompt(XCTestExpectation * expectation, dispatch_queue_t queue, NSString * message) { [expectation fulfill]; }
 
+// Stub for reboot target device.
+void Reboot(XCTestExpectation * expectation, dispatch_queue_t queue, uint16_t discriminator) { [expectation fulfill]; }
+
 void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_t queue, uint64_t deviceId)
 {
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
@@ -1345,6 +1348,86 @@ CHIPDevice * GetConnectedDevice(void)
 
                      [expectation fulfill];
                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestAccessControlCluster_000019_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate resource minima (SubjectsPerAccessControlEntry)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster
+        readAttributeSubjectsPerAccessControlEntryWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate resource minima (SubjectsPerAccessControlEntry) Error: %@", err);
+
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+            {
+                id actualValue = value;
+                if (actualValue != nil) {
+                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 4U);
+                }
+            }
+
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestAccessControlCluster_000020_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate resource minima (TargetsPerAccessControlEntry)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeTargetsPerAccessControlEntryWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Validate resource minima (TargetsPerAccessControlEntry) Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 3U);
+            }
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestAccessControlCluster_000021_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate resource minima (AccessControlEntriesPerFabric)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster
+        readAttributeAccessControlEntriesPerFabricWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Validate resource minima (AccessControlEntriesPerFabric) Error: %@", err);
+
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+            {
+                id actualValue = value;
+                if (actualValue != nil) {
+                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 3U);
+                }
+            }
+
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -14759,7 +14842,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
         {
             id actualValue = value;
             XCTAssertFalse(actualValue == nil);
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
+            XCTAssertEqual([actualValue unsignedCharValue], 50);
         }
 
         [expectation fulfill];
@@ -47855,7 +47938,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue count], 23);
+            XCTAssertEqual([actualValue count], 24);
             XCTAssertEqual([actualValue[0] unsignedIntValue], 0UL);
             XCTAssertEqual([actualValue[1] unsignedIntValue], 1UL);
             XCTAssertEqual([actualValue[2] unsignedIntValue], 2UL);
@@ -47875,10 +47958,11 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
             XCTAssertEqual([actualValue[16] unsignedIntValue], 16UL);
             XCTAssertEqual([actualValue[17] unsignedIntValue], 17UL);
             XCTAssertEqual([actualValue[18] unsignedIntValue], 18UL);
-            XCTAssertEqual([actualValue[19] unsignedIntValue], 65528UL);
-            XCTAssertEqual([actualValue[20] unsignedIntValue], 65529UL);
-            XCTAssertEqual([actualValue[21] unsignedIntValue], 65531UL);
-            XCTAssertEqual([actualValue[22] unsignedIntValue], 65533UL);
+            XCTAssertEqual([actualValue[19] unsignedIntValue], 19UL);
+            XCTAssertEqual([actualValue[20] unsignedIntValue], 65528UL);
+            XCTAssertEqual([actualValue[21] unsignedIntValue], 65529UL);
+            XCTAssertEqual([actualValue[22] unsignedIntValue], 65531UL);
+            XCTAssertEqual([actualValue[23] unsignedIntValue], 65533UL);
         }
 
         [expectation fulfill];
@@ -49702,6 +49786,153 @@ NSNumber * _Nonnull ourFabricIndex;
 
                          [expectation fulfill];
                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTestUserLabelCluster_000000_WaitForCommissionee
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForCommissionee(expectation, queue, 305414945);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestUserLabelCluster_000001_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Clear User Label List"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestUserLabel * cluster = [[CHIPTestUserLabel alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id labelListArgument;
+    {
+        NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+        labelListArgument = temp_0;
+    }
+    [cluster writeAttributeLabelListWithValue:labelListArgument
+                            completionHandler:^(NSError * _Nullable err) {
+                                NSLog(@"Clear User Label List Error: %@", err);
+
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                [expectation fulfill];
+                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestUserLabelCluster_000002_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read User Label List"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestUserLabel * cluster = [[CHIPTestUserLabel alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeLabelListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read User Label List Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue count], 0);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestUserLabelCluster_000003_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write User Label List"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestUserLabel * cluster = [[CHIPTestUserLabel alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id labelListArgument;
+    {
+        NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+        temp_0[0] = [[CHIPUserLabelClusterLabelStruct alloc] init];
+        ((CHIPUserLabelClusterLabelStruct *) temp_0[0]).label = @"room";
+        ((CHIPUserLabelClusterLabelStruct *) temp_0[0]).value = @"bedroom 2";
+
+        temp_0[1] = [[CHIPUserLabelClusterLabelStruct alloc] init];
+        ((CHIPUserLabelClusterLabelStruct *) temp_0[1]).label = @"orientation";
+        ((CHIPUserLabelClusterLabelStruct *) temp_0[1]).value = @"North";
+
+        temp_0[2] = [[CHIPUserLabelClusterLabelStruct alloc] init];
+        ((CHIPUserLabelClusterLabelStruct *) temp_0[2]).label = @"floor";
+        ((CHIPUserLabelClusterLabelStruct *) temp_0[2]).value = @"5";
+
+        temp_0[3] = [[CHIPUserLabelClusterLabelStruct alloc] init];
+        ((CHIPUserLabelClusterLabelStruct *) temp_0[3]).label = @"direction";
+        ((CHIPUserLabelClusterLabelStruct *) temp_0[3]).value = @"up";
+
+        labelListArgument = temp_0;
+    }
+    [cluster writeAttributeLabelListWithValue:labelListArgument
+                            completionHandler:^(NSError * _Nullable err) {
+                                NSLog(@"Write User Label List Error: %@", err);
+
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                [expectation fulfill];
+                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestUserLabelCluster_000004_Reboot
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reboot target device"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Reboot(expectation, queue, 3840);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestUserLabelCluster_000005_WaitForCommissionee
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForCommissionee(expectation, queue, 305414945);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestUserLabelCluster_000006_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Verify"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestUserLabel * cluster = [[CHIPTestUserLabel alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeLabelListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Verify Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue count], 4);
+            XCTAssertTrue([((CHIPUserLabelClusterLabelStruct *) actualValue[0]).label isEqualToString:@"room"]);
+            XCTAssertTrue([((CHIPUserLabelClusterLabelStruct *) actualValue[0]).value isEqualToString:@"bedroom 2"]);
+            XCTAssertTrue([((CHIPUserLabelClusterLabelStruct *) actualValue[1]).label isEqualToString:@"orientation"]);
+            XCTAssertTrue([((CHIPUserLabelClusterLabelStruct *) actualValue[1]).value isEqualToString:@"North"]);
+            XCTAssertTrue([((CHIPUserLabelClusterLabelStruct *) actualValue[2]).label isEqualToString:@"floor"]);
+            XCTAssertTrue([((CHIPUserLabelClusterLabelStruct *) actualValue[2]).value isEqualToString:@"5"]);
+            XCTAssertTrue([((CHIPUserLabelClusterLabelStruct *) actualValue[3]).label isEqualToString:@"direction"]);
+            XCTAssertTrue([((CHIPUserLabelClusterLabelStruct *) actualValue[3]).value isEqualToString:@"up"]);
+        }
+
+        [expectation fulfill];
+    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }

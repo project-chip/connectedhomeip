@@ -137,7 +137,6 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         factoryParams.groupDataProvider = &gGroupDataProvider;
 
         commissionerParams.pairingDelegate = &gPairingDelegate;
-        commissionerParams.storageDelegate = &gServerStorage;
 
         err = ephemeralKey.Initialize();
         SuccessOrExit(err);

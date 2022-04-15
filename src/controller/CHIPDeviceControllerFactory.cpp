@@ -253,7 +253,6 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
     controllerParams.controllerNOC                  = params.controllerNOC;
     controllerParams.controllerICAC                 = params.controllerICAC;
     controllerParams.controllerRCAC                 = params.controllerRCAC;
-    controllerParams.storageDelegate                = params.storageDelegate;
 
     controllerParams.systemState        = mSystemState;
     controllerParams.controllerVendorId = params.controllerVendorId;

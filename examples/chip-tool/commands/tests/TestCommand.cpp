@@ -72,9 +72,9 @@ void TestCommand::Exit(std::string message)
     SetCommandExitStatus(CHIP_ERROR_INTERNAL);
 }
 
-void TestCommand::ThrowFailureResponse()
+void TestCommand::ThrowFailureResponse(CHIP_ERROR error)
 {
-    Exit("Expecting success response but got a failure response");
+    Exit(std::string("Expecting success response but got a failure response: ") + chip::ErrorStr(error));
 }
 
 void TestCommand::ThrowSuccessResponse()

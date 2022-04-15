@@ -456,7 +456,6 @@ CHIP_ERROR InitCommissioner()
     ReturnErrorOnFailure(gGroupDataProvider.Init());
     factoryParams.groupDataProvider = &gGroupDataProvider;
 
-    params.storageDelegate                = &gServerStorage;
     params.operationalCredentialsDelegate = &gOpCredsIssuer;
 
     ReturnErrorOnFailure(gOpCredsIssuer.Initialize(gServerStorage));

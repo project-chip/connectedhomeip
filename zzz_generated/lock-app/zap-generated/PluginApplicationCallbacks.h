@@ -27,6 +27,7 @@
     MatterBasicPluginServerInitCallback();                                                                                         \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
     MatterDiagnosticLogsPluginServerInitCallback();                                                                                \
+    MatterDoorLockPluginServerInitCallback();                                                                                      \
     MatterEthernetNetworkDiagnosticsPluginServerInitCallback();                                                                    \
     MatterFixedLabelPluginServerInitCallback();                                                                                    \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \

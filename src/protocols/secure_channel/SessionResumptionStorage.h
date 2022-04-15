@@ -31,9 +31,9 @@
 namespace chip {
 
 /**
- * @brief Stores assets for sessoin resumption. The resumption data are indexed by 2 indexes: ScopedNodeId and <FabricIndex,
- * ResumptionId>. The index of ScopedNodeId is used when initiating a CASE session, it will look up the storage and check whether it
- * is able to resume a previous session. The index of ResumptionId is used when receiving a Sigma1 with ResumptionId.
+ * @brief Stores assets for session resumption. The resumption data are indexed by 2 indexes: ScopedNodeId and ResumptionId. The
+ *   index of ScopedNodeId is used when initiating a CASE session, it will look up the storage and check whether it is able to
+ *   resume a previous session. The index of ResumptionId is used when receiving a Sigma1 with ResumptionId.
  *
  *   The implementation saves 2 maps:
  *     * <FabricIndex, PeerNodeId>   => <ResumptionId, ShareSecret, PeerCATs>

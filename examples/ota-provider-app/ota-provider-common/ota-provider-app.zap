@@ -801,6 +801,51 @@
               "reportableChange": 0
             },
             {
+              "name": "SubjectsPerAccessControlEntry",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "4",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "TargetsPerAccessControlEntry",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "3",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AccessControlEntriesPerFabric",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "3",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "AttributeList",
               "code": 65531,
               "mfgCode": null,
@@ -868,7 +913,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "InteractionModelVersion",
+              "name": "DataModelRevision",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -1150,6 +1195,21 @@
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "CapabilityMinima",
+              "code": 19,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
               "reportableChange": 0
             },
             {
@@ -1629,7 +1689,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BasicCommissioningInfoList",
+              "name": "BasicCommissioningInfo",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -1850,7 +1910,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -2122,7 +2182,7 @@
               "reportableChange": 0
             },
             {
-              "name": "fabrics list",
+              "name": "Fabrics",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -4264,6 +4324,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 22
     }
-  ],
-  "log": []
+  ]
 }
