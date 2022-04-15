@@ -340,7 +340,7 @@ public:
         //       with that peer. If that is the case, our `OnConnected` callback will not get invoked syncronously and
         //       mOperationalDeviceProxy will still have a value of null, triggering the check below to fail.
         //
-        mOperationalDeviceProxy = nullptr; 
+        mOperationalDeviceProxy = nullptr;
         CHIP_ERROR err = server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnConnectedCallback, &mOnConnectionFailureCallback);
         if (err != CHIP_NO_ERROR) {
             ChipLogError(AppServer, "Could not establish a session to the peer");
