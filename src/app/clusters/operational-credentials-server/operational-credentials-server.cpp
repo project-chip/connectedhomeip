@@ -921,11 +921,11 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
     // Prepare NOCSRElements structure
     {
-    #ifdef ENABLE_HSM_CASE_OPS_KEY
+#ifdef ENABLE_HSM_CASE_OPS_KEY
         Crypto::P256KeypairHSM keypair;
-    #else
+#else
         Crypto::P256Keypair keypair;
-    #endif
+#endif
         size_t csrLength           = Crypto::kMAX_CSR_Length;
         size_t nocsrLengthEstimate = 0;
         ByteSpan kNoVendorReserved;
