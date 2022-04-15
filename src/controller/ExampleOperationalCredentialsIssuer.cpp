@@ -124,9 +124,12 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
                       err = mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen));
     if (err == CHIP_NO_ERROR)
     {
+        uint64_t rcacId;
         // Found root certificate in the storage.
         rcac.reduce_size(rcacBufLen);
         ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(rcac, rcac_dn));
+        ReturnErrorOnFailure(rcac_dn.GetCertChipId(rcacId));
+        VerifyOrReturnError(rcacId == mIssuerId, CHIP_ERROR_INTERNAL);
     }
     // If root certificate not found in the storage, generate new root certificate.
     else
