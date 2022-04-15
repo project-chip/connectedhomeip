@@ -151,9 +151,12 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
                       err = mStorage->SyncGetKeyValue(key, icac.data(), icacBufLen));
     if (err == CHIP_NO_ERROR)
     {
+        uint64_t icacId;
         // Found intermediate certificate in the storage.
         icac.reduce_size(icacBufLen);
         ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(icac, icac_dn));
+        ReturnErrorOnFailure(icac_dn.GetCertChipId(icacId));
+        VerifyOrReturnError(icacId == mIntermediateIssuerId, CHIP_ERROR_INTERNAL);
     }
     // If intermediate certificate not found in the storage, generate new intermediate certificate.
     else
