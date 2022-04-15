@@ -64,9 +64,23 @@ TransferSession::TransferSession()
     mSuppportedXferOpts.ClearAll();
 }
 
-void TransferSession::PollOutput(OutputEvent & event)
+void TransferSession::PollOutput(OutputEvent & event, System::Clock::Timestamp curTime)
 {
     event = OutputEvent(OutputEventType::kNone);
+
+    if (mShouldInitTimeoutStart)
+    {
+        mTimeoutStartTime       = curTime;
+        mShouldInitTimeoutStart = false;
+    }
+
+    if (mAwaitingResponse && ((curTime - mTimeoutStartTime) >= mTimeout))
+    {
+        event             = OutputEvent(OutputEventType::kTransferTimeout);
+        mState            = TransferState::kErrorState;
+        mAwaitingResponse = false;
+        return;
+    }
 
     switch (mPendingOutput)
     {
@@ -80,7 +94,8 @@ void TransferSession::PollOutput(OutputEvent & event)
         event = OutputEvent::StatusReportEvent(OutputEventType::kStatusReceived, mStatusReportData);
         break;
     case OutputEventType::kMsgToSend:
-        event = OutputEvent::MsgToSendEvent(mMsgTypeData, std::move(mPendingMsgHandle));
+        event             = OutputEvent::MsgToSendEvent(mMsgTypeData, std::move(mPendingMsgHandle));
+        mTimeoutStartTime = curTime;
         break;
     case OutputEventType::kInitReceived:
         event = OutputEvent::TransferInitEvent(mTransferRequestData, std::move(mPendingMsgHandle));
@@ -123,7 +138,8 @@ CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitD
 {
     VerifyOrReturnError(mState == TransferState::kUnitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    mRole = role;
+    mRole    = role;
+    mTimeout = timeout;
 
     // Set transfer parameters. They may be overridden later by an Accept message
     mSuppportedXferOpts    = initData.TransferCtlFlags;
@@ -167,6 +183,7 @@ CHIP_ERROR TransferSession::WaitForTransfer(TransferRole role, BitFlags<Transfer
 
     // Used to determine compatibility with any future TransferInit parameters
     mRole                  = role;
+    mTimeout               = timeout;
     mSuppportedXferOpts    = xferControlOpts;
     mMaxSupportedBlockSize = maxBlockSize;
 
@@ -405,16 +422,22 @@ void TransferSession::Reset()
     mLastQueryNum      = 0;
     mNextQueryNum      = 0;
 
-    mAwaitingResponse = false;
+    mTimeout                = System::Clock::kZero;
+    mTimeoutStartTime       = System::Clock::kZero;
+    mShouldInitTimeoutStart = true;
+    mAwaitingResponse       = false;
 }
 
-CHIP_ERROR TransferSession::HandleMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle msg)
+CHIP_ERROR TransferSession::HandleMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle msg,
+                                                  System::Clock::Timestamp curTime)
 {
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
     if (payloadHeader.HasProtocol(Protocols::BDX::Id))
     {
         ReturnErrorOnFailure(HandleBdxMessage(payloadHeader, std::move(msg)));
+
+        mTimeoutStartTime = curTime;
     }
     else if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
     {

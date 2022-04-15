@@ -25,6 +25,7 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/bdx/BdxMessages.h>
+#include <system/SystemClock.h> /* TODO:(#12520) remove */
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -80,7 +81,8 @@ bool BDXDownloader::HasTransferTimedOut()
 void BDXDownloader::OnMessageReceived(const chip::PayloadHeader & payloadHeader, chip::System::PacketBufferHandle msg)
 {
     VerifyOrReturn(mState == State::kInProgress, ChipLogError(BDX, "Can't accept messages, no transfer in progress"));
-    CHIP_ERROR err = mBdxTransfer.HandleMessageReceived(payloadHeader, std::move(msg));
+    CHIP_ERROR err =
+        mBdxTransfer.HandleMessageReceived(payloadHeader, std::move(msg), /* TODO:(#12520) */ chip::System::Clock::Seconds16(0));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(BDX, "unable to handle message: %" CHIP_ERROR_FORMAT, err.Format());
@@ -217,7 +219,7 @@ void BDXDownloader::PollTransferSession()
     // allow that?
     do
     {
-        mBdxTransfer.PollOutput(outEvent);
+        mBdxTransfer.PollOutput(outEvent, /* TODO:(#12520) */ chip::System::Clock::Seconds16(0));
         CHIP_ERROR err = HandleBdxEvent(outEvent);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(BDX, "HandleBDXEvent: %" CHIP_ERROR_FORMAT, err.Format()));
     } while (outEvent.EventType != TransferSession::OutputEventType::kNone);
