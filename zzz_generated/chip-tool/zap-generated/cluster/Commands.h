@@ -10721,6 +10721,15 @@ private:
 | Attributes:                                                         |        |
 | * FanMode                                                           | 0x0000 |
 | * FanModeSequence                                                   | 0x0001 |
+| * PercentSetting                                                    | 0x0002 |
+| * PercentCurrent                                                    | 0x0003 |
+| * SpeedMax                                                          | 0x0004 |
+| * SpeedSetting                                                      | 0x0005 |
+| * SpeedCurrent                                                      | 0x0006 |
+| * RockSupport                                                       | 0x0007 |
+| * RockSetting                                                       | 0x0008 |
+| * WindSupport                                                       | 0x0009 |
+| * WindSetting                                                       | 0x000A |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -10777,6 +10786,111 @@ public:
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000202, 0x00000001, mValue);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class WriteFanControlPercentSetting : public WriteAttribute
+{
+public:
+    WriteFanControlPercentSetting(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("PercentSetting", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "percent-setting");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteFanControlPercentSetting() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000202, 0x00000002, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000202, 0x00000002, mValue);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class WriteFanControlSpeedSetting : public WriteAttribute
+{
+public:
+    WriteFanControlSpeedSetting(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("SpeedSetting", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "speed-setting");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteFanControlSpeedSetting() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000202, 0x00000005, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000202, 0x00000005, mValue);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class WriteFanControlRockSetting : public WriteAttribute
+{
+public:
+    WriteFanControlRockSetting(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("RockSetting", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "rock-setting");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteFanControlRockSetting() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000202, 0x00000008, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000202, 0x00000008, mValue);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class WriteFanControlWindSetting : public WriteAttribute
+{
+public:
+    WriteFanControlWindSetting(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("WindSetting", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "wind-setting");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteFanControlWindSetting() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000202, 0x0000000A, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000202, 0x0000000A, mValue);
     }
 
 private:
@@ -22655,6 +22769,15 @@ void registerClusterFanControl(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                      //
         make_unique<ReadAttribute>(Id, "fan-mode", Attributes::FanMode::Id, credsIssuerConfig),                                 //
         make_unique<ReadAttribute>(Id, "fan-mode-sequence", Attributes::FanModeSequence::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "percent-setting", Attributes::PercentSetting::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "percent-current", Attributes::PercentCurrent::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "speed-max", Attributes::SpeedMax::Id, credsIssuerConfig),                               //
+        make_unique<ReadAttribute>(Id, "speed-setting", Attributes::SpeedSetting::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "speed-current", Attributes::SpeedCurrent::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "rock-support", Attributes::RockSupport::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, "rock-setting", Attributes::RockSetting::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, "wind-support", Attributes::WindSupport::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, "wind-setting", Attributes::WindSetting::Id, credsIssuerConfig),                         //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),      //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                     //
@@ -22663,9 +22786,22 @@ void registerClusterFanControl(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                     //
         make_unique<WriteFanControlFanMode>(credsIssuerConfig),                                                                 //
         make_unique<WriteFanControlFanModeSequence>(credsIssuerConfig),                                                         //
+        make_unique<WriteFanControlPercentSetting>(credsIssuerConfig),                                                          //
+        make_unique<WriteFanControlSpeedSetting>(credsIssuerConfig),                                                            //
+        make_unique<WriteFanControlRockSetting>(credsIssuerConfig),                                                             //
+        make_unique<WriteFanControlWindSetting>(credsIssuerConfig),                                                             //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "fan-mode", Attributes::FanMode::Id, credsIssuerConfig),                            //
         make_unique<SubscribeAttribute>(Id, "fan-mode-sequence", Attributes::FanModeSequence::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "percent-setting", Attributes::PercentSetting::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "percent-current", Attributes::PercentCurrent::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "speed-max", Attributes::SpeedMax::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "speed-setting", Attributes::SpeedSetting::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "speed-current", Attributes::SpeedCurrent::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "rock-support", Attributes::RockSupport::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "rock-setting", Attributes::RockSetting::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "wind-support", Attributes::WindSupport::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "wind-setting", Attributes::WindSetting::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
