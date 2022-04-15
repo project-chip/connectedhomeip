@@ -189,7 +189,7 @@ public:
      *
      * This stores the session details in the session manager.
      */
-    CHIP_ERROR SetConnected();
+    CHIP_ERROR SetConnected(const SessionHandle & session);
 
     bool IsSecureConnected() const override { return IsActive() && mState == ConnectionState::SecureConnected; }
 

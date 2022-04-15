@@ -49,5 +49,6 @@ def _RedirectToPythonLogging(category, module, message):
 def RedirectToPythonLogging():
     """Redireects CHIP logging to python logging module."""
 
-    handle = _GetLoggingLibraryHandle()
-    handle.pychip_logging_set_callback(_RedirectToPythonLogging)
+    #handle = _GetLoggingLibraryHandle()
+    #handle.pychip_logging_set_callback(_RedirectToPythonLogging)
+    pass

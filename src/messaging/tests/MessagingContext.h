@@ -126,6 +126,9 @@ public:
     SessionHandle GetSessionAliceToBob();
     SessionHandle GetSessionBobToFriends();
 
+    const Transport::PeerAddress & GetAliceAddress() { return mAliceAddress; }
+    const Transport::PeerAddress & GetBobAddress() { return mBobAddress; }
+
     Messaging::ExchangeContext * NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate);
     Messaging::ExchangeContext * NewUnauthenticatedExchangeToBob(Messaging::ExchangeDelegate * delegate);
 
