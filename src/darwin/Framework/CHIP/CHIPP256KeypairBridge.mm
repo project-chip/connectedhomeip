@@ -38,7 +38,8 @@ CHIP_ERROR CHIPP256KeypairBridge::Initialize()
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    return ([mKeypair initialize]) ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    // Our keypair is always initialized.
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CHIPP256KeypairBridge::Serialize(P256SerializedKeypair & output) const

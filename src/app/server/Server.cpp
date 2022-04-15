@@ -34,7 +34,9 @@
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/PersistedCounter.h>
 #include <lib/support/TestGroupData.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeMgr.h>
@@ -194,10 +196,11 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
 #if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
     // Initialize event logging subsystem
-    {
-        ::chip::Platform::PersistedStorage::Key globalEventIdCounterStorageKey =
-            CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY;
+    err = sGlobalEventIdCounter.Init(mDeviceStorage, &DefaultStorageKeyAllocator::IMEventNumber,
+                                     CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH);
+    SuccessOrExit(err);
 
+    {
         ::chip::app::LogStorageResources logStorageResources[] = {
             { &sDebugEventBuffer[0], sizeof(sDebugEventBuffer), ::chip::app::PriorityLevel::Debug },
             { &sInfoEventBuffer[0], sizeof(sInfoEventBuffer), ::chip::app::PriorityLevel::Info },
@@ -205,8 +208,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         };
 
         chip::app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
-                                                       &logStorageResources[0], &globalEventIdCounterStorageKey,
-                                                       CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH, &sGlobalEventIdCounter);
+                                                       &logStorageResources[0], &sGlobalEventIdCounter);
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
