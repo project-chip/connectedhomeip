@@ -31,8 +31,8 @@ AppContentLauncherManager::AppContentLauncherManager(list<std::string> acceptHea
 }
 
 void AppContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
-                                                 const DecodableList<ParameterType> & parameterList, bool autoplay,
-                                                 const CharSpan & data)
+                                                    const DecodableList<ParameterType> & parameterList, bool autoplay,
+                                                    const CharSpan & data)
 {
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleLaunchContent for endpoint %d", mEndpointId);
     string dataString(data.data(), data.size());
@@ -45,7 +45,7 @@ void AppContentLauncherManager::HandleLaunchContent(CommandResponseHelper<Launch
 }
 
 void AppContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
-                                             const CharSpan & displayString, const BrandingInformationType & brandingInformation)
+                                                const CharSpan & displayString, const BrandingInformationType & brandingInformation)
 {
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleLaunchUrl");
 
