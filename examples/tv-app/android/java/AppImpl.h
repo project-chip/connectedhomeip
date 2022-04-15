@@ -33,11 +33,11 @@
 #include "../include/account-login/AccountLoginManager.h"
 #include "../include/application-basic/ApplicationBasicManager.h"
 #include "../include/application-launcher/ApplicationLauncherManager.h"
-#include "ChannelManager.h"
 #include "../include/content-launcher/AppContentLauncherManager.h"
+#include "../include/target-navigator/TargetNavigatorManager.h"
+#include "ChannelManager.h"
 #include "KeypadInputManager.h"
 #include "MediaPlaybackManager.h"
-#include "../include/target-navigator/TargetNavigatorManager.h"
 #include <app/clusters/account-login-server/account-login-delegate.h>
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-delegate.h>
