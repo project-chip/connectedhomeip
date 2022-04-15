@@ -22938,6 +22938,114 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FanModeSequence
+namespace PercentSetting {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PercentSetting::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PercentSetting
+namespace PercentCurrent {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PercentCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PercentCurrent
+namespace SpeedMax {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SpeedMax::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SpeedMax
+namespace SpeedSetting {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SpeedSetting::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SpeedSetting
+namespace SpeedCurrent {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SpeedCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SpeedCurrent
+namespace RockSupport {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RockSupport::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace RockSupport
+namespace RockSetting {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RockSetting::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace RockSetting
+namespace WindSupport {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::WindSupport::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace WindSupport
+namespace WindSetting {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::WindSetting::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace WindSetting
 namespace GeneratedCommandList {
 struct TypeInfo
 {
@@ -23009,6 +23117,15 @@ struct TypeInfo
 
         Attributes::FanMode::TypeInfo::DecodableType fanMode                 = static_cast<uint8_t>(0);
         Attributes::FanModeSequence::TypeInfo::DecodableType fanModeSequence = static_cast<uint8_t>(0);
+        Attributes::PercentSetting::TypeInfo::DecodableType percentSetting   = static_cast<uint8_t>(0);
+        Attributes::PercentCurrent::TypeInfo::DecodableType percentCurrent   = static_cast<uint8_t>(0);
+        Attributes::SpeedMax::TypeInfo::DecodableType speedMax               = static_cast<uint8_t>(0);
+        Attributes::SpeedSetting::TypeInfo::DecodableType speedSetting       = static_cast<uint8_t>(0);
+        Attributes::SpeedCurrent::TypeInfo::DecodableType speedCurrent       = static_cast<uint8_t>(0);
+        Attributes::RockSupport::TypeInfo::DecodableType rockSupport         = static_cast<uint8_t>(0);
+        Attributes::RockSetting::TypeInfo::DecodableType rockSetting         = static_cast<uint8_t>(0);
+        Attributes::WindSupport::TypeInfo::DecodableType windSupport         = static_cast<uint8_t>(0);
+        Attributes::WindSetting::TypeInfo::DecodableType windSetting         = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

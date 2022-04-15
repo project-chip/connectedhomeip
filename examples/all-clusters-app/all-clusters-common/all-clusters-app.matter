@@ -1317,8 +1317,59 @@ server cluster EthernetNetworkDiagnostics = 55 {
 }
 
 server cluster FanControl = 514 {
+  enum FanMode : ENUM8 {
+    kOff = 0;
+    kLow = 1;
+    kMedium = 2;
+    kHigh = 3;
+    kOn = 4;
+    kAuto = 5;
+    kSmart = 6;
+  }
+
+  enum FanModeSequence : ENUM8 {
+    kOffLowMedHigh = 0;
+    kOffLowHigh = 1;
+    kOffLowMedHighAuto = 2;
+    kOffLowHighAuto = 3;
+    kOffOnAuto = 4;
+    kOffOn = 5;
+  }
+
+  bitmap FanControlFeature : BITMAP32 {
+    kMultiSpeed = 0x1;
+    kAuto = 0x2;
+    kRocking = 0x4;
+    kWind = 0x8;
+  }
+
+  bitmap RockSupportMask : BITMAP8 {
+    kRockLeftRight = 0x1;
+    kRockUpDown = 0x2;
+    kRockRound = 0x4;
+  }
+
+  bitmap WindSettingMask : BITMAP8 {
+    kSleepWind = 0x1;
+    kNaturalWind = 0x2;
+  }
+
+  bitmap WindSupportMask : BITMAP8 {
+    kSleepWind = 0x1;
+    kNaturalWind = 0x2;
+  }
+
   attribute enum8 fanMode = 0;
   attribute enum8 fanModeSequence = 1;
+  attribute int8u percentSetting = 2;
+  readonly attribute int8u percentCurrent = 3;
+  readonly attribute int8u speedMax = 4;
+  attribute int8u speedSetting = 5;
+  readonly attribute int8u speedCurrent = 6;
+  readonly attribute bitmap8 rockSupport = 7;
+  attribute bitmap8 rockSetting = 8;
+  readonly attribute bitmap8 windSupport = 9;
+  attribute bitmap8 windSetting = 10;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
