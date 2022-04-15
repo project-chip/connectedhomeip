@@ -184,6 +184,13 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
                 MoveToState(HandlerState::GeneratingReports);
                 mpExchangeCtx = nullptr;
             }
+
+            //
+            // Schedule execution of the ReportingEngine to drive further report generation activity if needed
+            // on this and other subscription that have already full-filled their minimum reporting hold-off requirements
+            // (i.e OnUnblockHoldReportCallback was already called before we got this status response).
+            //
+            SuccessOrExit(err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun());
         }
         else
         {
