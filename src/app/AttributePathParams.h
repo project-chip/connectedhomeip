@@ -51,6 +51,12 @@ struct AttributePathParams
 
     bool HasAttributeWildcard() const { return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardAttributeId(); }
 
+    bool operator==(const AttributePathParams & aOther) const
+    {
+        return mEndpointId == aOther.mEndpointId && mClusterId == aOther.mClusterId && mAttributeId == aOther.mAttributeId &&
+            mListIndex == aOther.mListIndex;
+    }
+
     /**
      * SPEC 8.9.2.2
      * Check that the path meets some basic constraints of an attribute path: If list index is not wildcard, then field id must not
