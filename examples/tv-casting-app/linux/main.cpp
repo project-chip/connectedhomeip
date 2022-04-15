@@ -40,12 +40,6 @@
 #include <transport/raw/PeerAddress.h>
 #include <zap-generated/CHIPClusters.h>
 
-#if defined(ENABLE_CHIP_SHELL)
-#include "CastingShellCommands.h"
-#include <lib/shell/Engine.h>
-#include <thread>
-#endif
-
 #include <list>
 #include <string>
 
@@ -56,10 +50,6 @@ using chip::ArgParser::HelpOptions;
 using chip::ArgParser::OptionDef;
 using chip::ArgParser::OptionSet;
 using namespace chip::app::Clusters::ContentLauncher::Commands;
-
-#if defined(ENABLE_CHIP_SHELL)
-using chip::Shell::Engine;
-#endif
 
 struct TVExampleDeviceType
 {
@@ -139,17 +129,6 @@ CHIP_ERROR InitBindingHandlers()
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-void HandleUDCSendExpiration(System::Layer * aSystemLayer, void * context)
-{
-    Dnssd::DiscoveredNodeData * selectedCommissioner = (Dnssd::DiscoveredNodeData *) context;
-
-    // Send User Directed commissioning request
-    ReturnOnFailure(Server::GetInstance().SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
-        selectedCommissioner->ipAddress[0], selectedCommissioner->port, selectedCommissioner->interfaceId)));
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-
 /**
  * Enters commissioning mode, opens commissioning window, logs onboarding payload.
  * If non-null selectedCommissioner is provided, sends user directed commissioning
@@ -179,25 +158,31 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
     if (selectedCommissioner != nullptr)
     {
         // Send User Directed commissioning request
-        // Wait 1 second to allow our commissionee DNS records to publish (needed on Mac)
-        int32_t expiration = 1;
-        ReturnOnFailure(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(expiration), HandleUDCSendExpiration,
-                                                              (void *) selectedCommissioner));
-    }
-    else
-    {
-        ChipLogProgress(AppServer, "To run discovery again, enter: cast discover");
+        ReturnOnFailure(Server::GetInstance().SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
+            selectedCommissioner->ipAddress[0], selectedCommissioner->port, selectedCommissioner->interfaceId)));
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-CHIP_ERROR SendUDC(chip::Transport::PeerAddress commissioner)
+/**
+ * Accepts user input of selected commissioner and calls PrepareForCommissioning with
+ * the selected commissioner
+ */
+void RequestUserDirectedCommissioning(System::SocketEvents events, intptr_t data)
 {
-    PrepareForCommissioning();
-    return Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner);
+    // Accept user selection for commissioner to request commissioning from.
+    // Assuming kernel has line buffering, this will unblock on '\n' character
+    // on stdin i.e. when user hits 'Enter'
+    int selectedCommissionerNumber = CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES;
+    scanf("%d", &selectedCommissionerNumber);
+    printf("%d\n", selectedCommissionerNumber);
+    chip::DeviceLayer::SystemLayerSockets().StopWatchingSocket(&gToken);
+
+    const Dnssd::DiscoveredNodeData * selectedCommissioner =
+        gCommissionableNodeController.GetDiscoveredCommissioner(selectedCommissionerNumber - 1);
+    VerifyOrReturn(selectedCommissioner != nullptr, ChipLogError(AppServer, "No such commissioner!"));
+    PrepareForCommissioning(selectedCommissioner);
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
 void InitCommissioningFlow(intptr_t commandArg)
 {
@@ -209,7 +194,7 @@ void InitCommissioningFlow(intptr_t commandArg)
         const Dnssd::DiscoveredNodeData * commissioner = gCommissionableNodeController.GetDiscoveredCommissioner(i);
         if (commissioner != nullptr)
         {
-            ChipLogProgress(AppServer, "Discovered Commissioner #%d", commissionerCount++);
+            ChipLogProgress(AppServer, "Discovered Commissioner #%d", ++commissionerCount);
             commissioner->LogDetail();
         }
     }
@@ -219,36 +204,20 @@ void InitCommissioningFlow(intptr_t commandArg)
         ChipLogProgress(AppServer, "%d commissioner(s) discovered. Select one (by number# above) to request commissioning from: ",
                         commissionerCount);
 
-        ChipLogProgress(AppServer, "Example: cast request 0");
+        // Setup for async/non-blocking user input from stdin
+        int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+        VerifyOrReturn(fcntl(0, F_SETFL, flags | O_NONBLOCK) == 0,
+                       ChipLogError(AppServer, "Could not set non-blocking mode for user input!"));
+        ReturnOnFailure(chip::DeviceLayer::SystemLayerSockets().StartWatchingSocket(STDIN_FILENO, &gToken));
+        ReturnOnFailure(
+            chip::DeviceLayer::SystemLayerSockets().SetCallback(gToken, RequestUserDirectedCommissioning, (intptr_t) NULL));
+        ReturnOnFailure(chip::DeviceLayer::SystemLayerSockets().RequestCallbackOnPendingRead(gToken));
     }
     else
     {
         ChipLogError(AppServer, "No commissioner discovered, commissioning must be initiated manually!");
         PrepareForCommissioning();
     }
-}
-
-CHIP_ERROR DiscoverCommissioners()
-{
-    // Send discover commissioners request
-    ReturnErrorOnFailure(gCommissionableNodeController.DiscoverCommissioners(gDiscoveryFilter));
-
-    // Give commissioners some time to respond and then ScheduleWork to initiate commissioning
-    return DeviceLayer::SystemLayer().StartTimer(
-        chip::System::Clock::Milliseconds32(kCommissionerDiscoveryTimeoutInMs),
-        [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
-}
-
-CHIP_ERROR RequestCommissioning(int index)
-{
-    const Dnssd::DiscoveredNodeData * selectedCommissioner = gCommissionableNodeController.GetDiscoveredCommissioner(index);
-    if (selectedCommissioner == nullptr)
-    {
-        ChipLogError(AppServer, "No such commissioner with index %d exists", index);
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    PrepareForCommissioning(selectedCommissioner);
-    return CHIP_NO_ERROR;
 }
 
 void OnContentLauncherSuccessResponse(void * context, const LaunchResponse::DecodableType & response)
@@ -332,6 +301,8 @@ private:
 class TargetVideoPlayerInfo
 {
 public:
+    TargetVideoPlayerInfo() : mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this) {}
+
     bool IsInitialized() { return mInitialized; }
 
     CHIP_ERROR Initialize(NodeId nodeId, FabricIndex fabricIndex)
@@ -361,7 +332,21 @@ public:
 
         PeerId peerID = fabric->GetPeerIdForNode(nodeId);
 
-        mOperationalDeviceProxy = server->GetCASESessionManager()->FindExistingSession(peerID);
+        //
+        // TODO: The code here is assuming that we can create an OperationalDeviceProxy instance and attach it immediately
+        //       to a CASE session that just got established to us by the tv-app. While this will work most of the time,
+        //       this is a dangerous assumption to make since it is entirely possible for that secure session to have been
+        //       evicted in the time since that session was established to the point here when we desire to interact back
+        //       with that peer. If that is the case, our `OnConnected` callback will not get invoked syncronously and
+        //       mOperationalDeviceProxy will still have a value of null, triggering the check below to fail.
+        //
+        mOperationalDeviceProxy = nullptr; 
+        CHIP_ERROR err = server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+        if (err != CHIP_NO_ERROR) {
+            ChipLogError(AppServer, "Could not establish a session to the peer");
+            return err;
+        }
+
         if (mOperationalDeviceProxy == nullptr)
         {
             ChipLogError(AppServer, "Failed to find an existing instance of OperationalDeviceProxy to the peer");
@@ -444,11 +429,24 @@ public:
     }
 
 private:
+    static void HandleDeviceConnected(void * context, OperationalDeviceProxy * device) {
+        TargetVideoPlayerInfo *_this = static_cast<TargetVideoPlayerInfo *>(context);
+        _this->mOperationalDeviceProxy = device;
+    }
+
+    static void HandleDeviceConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error) {
+        TargetVideoPlayerInfo *_this = static_cast<TargetVideoPlayerInfo *>(context);
+        _this->mOperationalDeviceProxy = nullptr;
+    }
+
     static constexpr size_t kMaxNumberOfEndpoints = 5;
     TargetEndpointInfo mEndpoints[kMaxNumberOfEndpoints];
     NodeId mNodeId;
     FabricIndex mFabricIndex;
     OperationalDeviceProxy * mOperationalDeviceProxy;
+
+    Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
+    Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 
     bool mInitialized = false;
 };
@@ -506,7 +504,6 @@ void ReadServerClusters(EndpointId endpointId)
 
 void ReadServerClustersForNode(NodeId nodeId)
 {
-    ChipLogProgress(NotSpecified, "ReadServerClustersForNode nodeId=0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
     for (const auto & binding : BindingTable::GetInstance())
     {
         ChipLogProgress(NotSpecified,
@@ -520,40 +517,8 @@ void ReadServerClustersForNode(NodeId nodeId)
             {
                 ReadServerClusters(binding.remote);
             }
-            else
-            {
-                TargetEndpointInfo * endpointInfo = gTargetVideoPlayerInfo.GetEndpoint(binding.remote);
-                if (endpointInfo != nullptr && endpointInfo->IsInitialized())
-                {
-                    endpointInfo->PrintInfo();
-                }
-            }
         }
     }
-}
-
-CHIP_ERROR ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr)
-{
-    OperationalDeviceProxy * operationalDeviceProxy = gTargetVideoPlayerInfo.GetOperationalDeviceProxy();
-    if (operationalDeviceProxy == nullptr)
-    {
-        ChipLogError(AppServer, "Failed in getting an instance of OperationalDeviceProxy");
-        return CHIP_ERROR_PEER_NODE_NOT_FOUND;
-    }
-
-    ContentLauncherCluster cluster;
-    CHIP_ERROR err = cluster.Associate(operationalDeviceProxy, kTvEndpoint);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Associate() failed: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
-    }
-    LaunchURL::Type request;
-    request.contentURL          = chip::CharSpan::fromCharString(contentUrl);
-    request.displayString       = Optional<CharSpan>(chip::CharSpan::fromCharString(contentDisplayStr));
-    request.brandingInformation = MakeOptional(chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type());
-    cluster.InvokeCommand(request, nullptr, OnContentLauncherSuccessResponse, OnContentLauncherFailureResponse);
-    return CHIP_NO_ERROR;
 }
 
 void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
@@ -570,7 +535,26 @@ void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t ar
         ReturnOnFailure(gTargetVideoPlayerInfo.Initialize(event->CommissioningComplete.PeerNodeId,
                                                           event->CommissioningComplete.PeerFabricIndex));
 
-        ContentLauncherLaunchURL(kContentUrl, kContentDisplayStr);
+        OperationalDeviceProxy * operationalDeviceProxy = gTargetVideoPlayerInfo.GetOperationalDeviceProxy();
+        if (operationalDeviceProxy == nullptr)
+        {
+            ChipLogError(AppServer, "Failed in getting an instance of OperationalDeviceProxy");
+            return;
+        }
+
+        ContentLauncherCluster cluster;
+        CHIP_ERROR err = cluster.Associate(operationalDeviceProxy, kTvEndpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Associate() failed: %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+        LaunchURL::Type request;
+        request.contentURL          = chip::CharSpan::fromCharString(kContentUrl);
+        request.displayString       = Optional<CharSpan>(chip::CharSpan::fromCharString(kContentDisplayStr));
+        request.brandingInformation = Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type>(
+            chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type());
+        cluster.InvokeCommand(request, nullptr, OnContentLauncherSuccessResponse, OnContentLauncherFailureResponse);
     }
 }
 
@@ -620,12 +604,6 @@ LinuxCommissionableDataProvider gCommissionableDataProvider;
 
 int main(int argc, char * argv[])
 {
-#if defined(ENABLE_CHIP_SHELL)
-    Engine::Root().Init();
-    std::thread shellThread([]() { Engine::Root().RunMainLoop(); });
-    Shell::RegisterCastingCommands();
-#endif
-
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     SuccessOrExit(err = chip::Platform::MemoryInit());
@@ -665,9 +643,6 @@ int main(int argc, char * argv[])
 
     DeviceLayer::PlatformMgr().RunEventLoop();
 exit:
-#if defined(ENABLE_CHIP_SHELL)
-    shellThread.join();
-#endif
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to run TV Casting App: %s", ErrorStr(err));
