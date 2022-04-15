@@ -400,7 +400,7 @@ inline CHIP_ERROR SetSingleIpkEpochKey(GroupDataProvider * provider, FabricIndex
  *
  * Callers have to externally synchronize usage of this function.
  *
- * @return The global Group Data Provider. Assume never null.
+ * @return The global Group Data Provider
  */
 GroupDataProvider * GetGroupDataProvider();
 
@@ -409,9 +409,9 @@ GroupDataProvider * GetGroupDataProvider();
  *
  * Callers have to externally synchronize usage of this function.
  *
- * If the `provider` is nullptr, no change is done.
+ * The `provider` can be set to nullptr if the owner is done with it fully.
  *
- * @param[in] provider the Group Data Provider
+ * @param[in] provider pointer to the Group Data Provider global isntance to use
  */
 void SetGroupDataProvider(GroupDataProvider * provider);
 
