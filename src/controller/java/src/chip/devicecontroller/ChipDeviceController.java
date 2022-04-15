@@ -369,6 +369,10 @@ public class ChipDeviceController {
     return computePaseVerifier(deviceControllerPtr, devicePtr, setupPincode, iterations, salt);
   }
 
+  public void shutdownCommissioning() {
+      shutdownCommissioning(deviceControllerPtr);
+  }
+
   private native PaseVerifierParams computePaseVerifier(
       long deviceControllerPtr, long devicePtr, long setupPincode, long iterations, byte[] salt);
 
@@ -451,6 +455,8 @@ public class ChipDeviceController {
   private native byte[] getAttestationChallenge(long deviceControllerPtr, long devicePtr);
 
   private native void shutdownSubscriptions(long deviceControllerPtr, long devicePtr);
+
+  private native void shutdownCommissioning(long deviceControllerPtr);
 
   static {
     System.loadLibrary("CHIPController");
