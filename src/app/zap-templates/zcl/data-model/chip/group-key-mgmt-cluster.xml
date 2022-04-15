@@ -56,7 +56,11 @@ limitations under the License.
     <code>0x003F</code>
     <define>GROUP_KEY_MANAGEMENT_CLUSTER</define>
     <description>The Group Key Management Cluster is the mechanism by which group keys are managed.</description>
-    <attribute side="server" code="0x0000" define="GROUP_KEY_MAP" type="ARRAY" length="254" entryType="GroupKeyMapStruct" writable="true" optional="false">GroupKeyMap</attribute>
+    <attribute side="server" code="0x0000" define="GROUP_KEY_MAP" type="ARRAY" length="254" entryType="GroupKeyMapStruct" writable="true" optional="false">
+      <description>GroupKeyMap</description>
+      <access op="read" privilege="view"/>
+      <access op="write" privilege="manage"/>
+    </attribute>
     <attribute side="server" code="0x0001" define="GROUP_TABLE" type="ARRAY" length="254" entryType="GroupInfoMapStruct" writable="false" optional="false">GroupTable</attribute>
     <attribute side="server" code="0x0002" define="MAX_GROUPS_PER_FABRIC" type="INT16U" writable="false" optional="false">MaxGroupsPerFabric</attribute>
     <attribute side="server" code="0x0003" define="MAX_GROUP_KEYS_PER_FABRIC" type="INT16U" writable="false" optional="false">MaxGroupKeysPerFabric</attribute>
@@ -64,11 +68,13 @@ limitations under the License.
     <command source="client" code="0x00" name="KeySetWrite" optional="false" cli="zcl GroupKeyManagement KeySetWrite">
       <description>Revoke a Root Key from a Group</description>
       <arg name="GroupKeySet" type="GroupKeySetStruct"/>
+      <access op="invoke" privilege="administer"/>
     </command>
 
     <command source="client" code="0x01" name="KeySetRead" response="KeySetReadResponse" optional="false" cli="zcl GroupKeyManagement KeySetRead">
       <description>Revoke a Root Key from a Group</description>
       <arg name="GroupKeySetID" type="INT16U"/>
+      <access op="invoke" privilege="administer"/>
     </command>
 
     <command source="server" code="0x02" name="KeySetReadResponse" optional="false" disableDefaultResponse="true">
@@ -81,11 +87,13 @@ limitations under the License.
     <command source="client" code="0x03" name="KeySetRemove" optional="false" cli="zcl GroupKeyManagement KeySetRemove">
       <description>Revoke a Root Key from a Group</description>
       <arg name="GroupKeySetID" type="INT16U"/>
+      <access op="invoke" privilege="administer"/>
     </command>
 
     <command source="client" code="0x04" name="KeySetReadAllIndices" response="KeySetReadAllIndicesResponse" optional="false" cli="zcl GroupKeyManagement KeySetReadAllIndices">
       <description>Return the list of Group Key Sets associated with the accessing fabric</description>
       <arg name="GroupKeySetIDs" type="INT16U" array="true"/>
+      <access op="invoke" privilege="administer"/>
     </command>
 
     <command source="server" code="0x05" name="KeySetReadAllIndicesResponse" optional="false" disableDefaultResponse="true">

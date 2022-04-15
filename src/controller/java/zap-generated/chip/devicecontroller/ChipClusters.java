@@ -206,6 +206,36 @@ public class ChipClusters {
       subscribeExtensionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readSubjectsPerAccessControlEntryAttribute(IntegerAttributeCallback callback) {
+      readSubjectsPerAccessControlEntryAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeSubjectsPerAccessControlEntryAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeSubjectsPerAccessControlEntryAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readTargetsPerAccessControlEntryAttribute(IntegerAttributeCallback callback) {
+      readTargetsPerAccessControlEntryAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeTargetsPerAccessControlEntryAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeTargetsPerAccessControlEntryAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAccessControlEntriesPerFabricAttribute(IntegerAttributeCallback callback) {
+      readAccessControlEntriesPerFabricAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAccessControlEntriesPerFabricAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAccessControlEntriesPerFabricAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
       readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
@@ -264,6 +294,24 @@ public class ChipClusters {
 
     private native void subscribeExtensionAttribute(
         long chipClusterPtr, ExtensionAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readSubjectsPerAccessControlEntryAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeSubjectsPerAccessControlEntryAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readTargetsPerAccessControlEntryAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeTargetsPerAccessControlEntryAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAccessControlEntriesPerFabricAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeAccessControlEntriesPerFabricAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(
         long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
@@ -5866,6 +5914,15 @@ public class ChipClusters {
       clearCredential(chipClusterPtr, callback, credential, timedInvokeTimeoutMs);
     }
 
+    public void clearHolidaySchedule(DefaultClusterCallback callback, Integer holidayIndex) {
+      clearHolidaySchedule(chipClusterPtr, callback, holidayIndex, null);
+    }
+
+    public void clearHolidaySchedule(
+        DefaultClusterCallback callback, Integer holidayIndex, int timedInvokeTimeoutMs) {
+      clearHolidaySchedule(chipClusterPtr, callback, holidayIndex, timedInvokeTimeoutMs);
+    }
+
     public void clearUser(
         DefaultClusterCallback callback, Integer userIndex, int timedInvokeTimeoutMs) {
       clearUser(chipClusterPtr, callback, userIndex, timedInvokeTimeoutMs);
@@ -5908,6 +5965,18 @@ public class ChipClusters {
         ChipStructs.DoorLockClusterDlCredential credential,
         int timedInvokeTimeoutMs) {
       getCredentialStatus(chipClusterPtr, callback, credential, timedInvokeTimeoutMs);
+    }
+
+    public void getHolidaySchedule(
+        GetHolidayScheduleResponseCallback callback, Integer holidayIndex) {
+      getHolidaySchedule(chipClusterPtr, callback, holidayIndex, null);
+    }
+
+    public void getHolidaySchedule(
+        GetHolidayScheduleResponseCallback callback,
+        Integer holidayIndex,
+        int timedInvokeTimeoutMs) {
+      getHolidaySchedule(chipClusterPtr, callback, holidayIndex, timedInvokeTimeoutMs);
     }
 
     public void getUser(GetUserResponseCallback callback, Integer userIndex) {
@@ -5968,6 +6037,39 @@ public class ChipClusters {
           userIndex,
           userStatus,
           userType,
+          timedInvokeTimeoutMs);
+    }
+
+    public void setHolidaySchedule(
+        DefaultClusterCallback callback,
+        Integer holidayIndex,
+        Long localStartTime,
+        Long localEndTime,
+        Integer operatingMode) {
+      setHolidaySchedule(
+          chipClusterPtr,
+          callback,
+          holidayIndex,
+          localStartTime,
+          localEndTime,
+          operatingMode,
+          null);
+    }
+
+    public void setHolidaySchedule(
+        DefaultClusterCallback callback,
+        Integer holidayIndex,
+        Long localStartTime,
+        Long localEndTime,
+        Integer operatingMode,
+        int timedInvokeTimeoutMs) {
+      setHolidaySchedule(
+          chipClusterPtr,
+          callback,
+          holidayIndex,
+          localStartTime,
+          localEndTime,
+          operatingMode,
           timedInvokeTimeoutMs);
     }
 
@@ -6085,6 +6187,12 @@ public class ChipClusters {
         @Nullable ChipStructs.DoorLockClusterDlCredential credential,
         @Nullable Integer timedInvokeTimeoutMs);
 
+    private native void clearHolidaySchedule(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        Integer holidayIndex,
+        @Nullable Integer timedInvokeTimeoutMs);
+
     private native void clearUser(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
@@ -6109,6 +6217,12 @@ public class ChipClusters {
         long chipClusterPtr,
         GetCredentialStatusResponseCallback Callback,
         ChipStructs.DoorLockClusterDlCredential credential,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void getHolidaySchedule(
+        long chipClusterPtr,
+        GetHolidayScheduleResponseCallback Callback,
+        Integer holidayIndex,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void getUser(
@@ -6146,6 +6260,15 @@ public class ChipClusters {
         @Nullable Integer userIndex,
         @Nullable Integer userStatus,
         @Nullable Integer userType,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void setHolidaySchedule(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        Integer holidayIndex,
+        Long localStartTime,
+        Long localEndTime,
+        Integer operatingMode,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void setUser(
@@ -6199,6 +6322,17 @@ public class ChipClusters {
           Boolean credentialExists,
           @Nullable Integer userIndex,
           @Nullable Integer nextCredentialIndex);
+
+      void onError(Exception error);
+    }
+
+    public interface GetHolidayScheduleResponseCallback {
+      void onSuccess(
+          Integer holidayIndex,
+          Integer status,
+          Optional<Long> localStartTime,
+          Optional<Long> localEndTime,
+          Optional<Integer> operatingMode);
 
       void onError(Exception error);
     }

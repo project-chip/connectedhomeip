@@ -100,5 +100,43 @@ public:
     virtual ExchangeMessageDispatch & GetMessageDispatch() { return ApplicationExchangeDispatch::Instance(); }
 };
 
+/**
+ * @brief
+ *   This class handles unsolicited messages. The implementation can select an exchange delegate to use based on the payload header
+ * of the incoming message.
+ */
+class DLL_EXPORT UnsolicitedMessageHandler
+{
+public:
+    virtual ~UnsolicitedMessageHandler() {}
+
+    /**
+     * @brief
+     *   This function handles an unsolicited CHIP message.
+     *
+     *   If the implementation returns CHIP_NO_ERROR, it is expected to set newDelegate to the delegate to use for the exchange
+     *   handling the message.  The message layer will handle creating the exchange with this delegate.
+     *
+     *   If the implementation returns an error, message processing will be aborted for this message.
+     *
+     *  @param[in]  payloadHeader A reference to the PayloadHeader object for the unsolicited message.  The protocol and message
+     *                            type of this header match the UnsolicitedMessageHandler.
+     *  @param[out] newDelegate   A new exchange delegate to be used by the new exchange created to handle the message.
+     */
+    virtual CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) = 0;
+
+    /**
+     * @brief
+     *   This function is called when OnUnsolicitedMessageReceived successfully returns a new delegate, but the session manager
+     *   fails to assign the delegate to a new exchange.  It can be used to free the delegate as needed.
+     *
+     *   Once an exchange is created with the delegate, the OnExchangeClosing notification can be used to free the delegate as
+     *   needed.
+     *
+     *  @param[in] delegate   The exchange delegate to be released.
+     */
+    virtual void OnExchangeCreationFailed(ExchangeDelegate * delegate) {}
+};
+
 } // namespace Messaging
 } // namespace chip

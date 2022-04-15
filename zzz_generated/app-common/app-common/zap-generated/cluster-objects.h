@@ -6755,6 +6755,42 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Extension
+namespace SubjectsPerAccessControlEntry {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SubjectsPerAccessControlEntry::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SubjectsPerAccessControlEntry
+namespace TargetsPerAccessControlEntry {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TargetsPerAccessControlEntry::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TargetsPerAccessControlEntry
+namespace AccessControlEntriesPerFabric {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AccessControlEntriesPerFabric::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AccessControlEntriesPerFabric
 namespace GeneratedCommandList {
 struct TypeInfo
 {
@@ -6826,6 +6862,9 @@ struct TypeInfo
 
         Attributes::Acl::TypeInfo::DecodableType acl;
         Attributes::Extension::TypeInfo::DecodableType extension;
+        Attributes::SubjectsPerAccessControlEntry::TypeInfo::DecodableType subjectsPerAccessControlEntry = static_cast<uint16_t>(0);
+        Attributes::TargetsPerAccessControlEntry::TypeInfo::DecodableType targetsPerAccessControlEntry   = static_cast<uint16_t>(0);
+        Attributes::AccessControlEntriesPerFabric::TypeInfo::DecodableType accessControlEntriesPerFabric = static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -8074,6 +8113,31 @@ public:
 } // namespace Events
 } // namespace BridgedActions
 namespace Basic {
+namespace Structs {
+namespace CapabilityMinimaStruct {
+enum class Fields
+{
+    kCaseSessionsPerFabric  = 0,
+    kSubscriptionsPerFabric = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t caseSessionsPerFabric  = static_cast<uint16_t>(0);
+    uint16_t subscriptionsPerFabric = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace CapabilityMinimaStruct
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -8358,6 +8422,18 @@ struct TypeInfo
     static constexpr size_t MaxLength() { return 32; }
 };
 } // namespace UniqueID
+namespace CapabilityMinima {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::Type;
+    using DecodableType    = chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::DecodableType &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CapabilityMinima::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CapabilityMinima
 namespace GeneratedCommandList {
 struct TypeInfo
 {
@@ -8446,6 +8522,7 @@ struct TypeInfo
         Attributes::LocalConfigDisabled::TypeInfo::DecodableType localConfigDisabled = static_cast<bool>(0);
         Attributes::Reachable::TypeInfo::DecodableType reachable                     = static_cast<bool>(0);
         Attributes::UniqueID::TypeInfo::DecodableType uniqueID;
+        Attributes::CapabilityMinima::TypeInfo::DecodableType capabilityMinima;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -22649,7 +22726,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcRefrigerantType
-namespace AcCompressor {
+namespace AcCompressorType {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -22657,10 +22734,10 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcCompressor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcCompressorType::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace AcCompressor
+} // namespace AcCompressorType
 namespace AcErrorCode {
 struct TypeInfo
 {
@@ -22819,7 +22896,7 @@ struct TypeInfo
         Attributes::AcType::TypeInfo::DecodableType acType                                               = static_cast<uint8_t>(0);
         Attributes::AcCapacity::TypeInfo::DecodableType acCapacity                                       = static_cast<uint16_t>(0);
         Attributes::AcRefrigerantType::TypeInfo::DecodableType acRefrigerantType                         = static_cast<uint8_t>(0);
-        Attributes::AcCompressor::TypeInfo::DecodableType acCompressor                                   = static_cast<uint8_t>(0);
+        Attributes::AcCompressorType::TypeInfo::DecodableType acCompressorType                           = static_cast<uint8_t>(0);
         Attributes::AcErrorCode::TypeInfo::DecodableType acErrorCode                                     = static_cast<uint32_t>(0);
         Attributes::AcLouverPosition::TypeInfo::DecodableType acLouverPosition                           = static_cast<uint8_t>(0);
         Attributes::AcCoilTemperature::TypeInfo::DecodableType acCoilTemperature                         = static_cast<int16_t>(0);

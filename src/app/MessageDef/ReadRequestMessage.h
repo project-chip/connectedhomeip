@@ -36,10 +36,10 @@ namespace ReadRequestMessage {
 enum class Tag : uint8_t
 {
     kAttributeRequests  = 0,
-    kDataVersionFilters = 1,
-    kEventRequests      = 2,
-    kEventFilters       = 3,
-    kIsFabricFiltered   = 4,
+    kEventRequests      = 1,
+    kEventFilters       = 2,
+    kIsFabricFiltered   = 3,
+    kDataVersionFilters = 4,
 };
 
 class Parser : public MessageParser

@@ -92,8 +92,6 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
 
     mSecureSessions.Init();
 
-    // TODO: Handle error from mGlobalEncryptedMessageCounter! Unit tests currently crash if you do!
-    (void) mGlobalEncryptedMessageCounter.Init();
     mGlobalUnencryptedMessageCounter.Init();
 
     ReturnErrorOnFailure(mGroupClientCounter.Init(storageDelegate));
@@ -194,7 +192,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             return CHIP_ERROR_NOT_CONNECTED;
         }
 
-        MessageCounter & counter = GetSendCounterForPacket(payloadHeader, *session);
+        MessageCounter & counter = session->GetSessionMessageCounter().GetLocalMessageCounter();
         uint32_t messageCounter  = counter.Value();
         packetHeader
             .SetMessageCounter(messageCounter)         //
@@ -556,7 +554,7 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & packetH
     unsecuredSession->SetPeerAddress(peerAddress);
     SessionMessageDelegate::DuplicateMessage isDuplicate = SessionMessageDelegate::DuplicateMessage::No;
 
-    unsecuredSession->MarkActive();
+    unsecuredSession->MarkActiveRx();
 
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
@@ -640,7 +638,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
         return;
     }
 
-    secureSession->MarkActive();
+    secureSession->MarkActiveRx();
 
     if (isDuplicate == SessionMessageDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
     {

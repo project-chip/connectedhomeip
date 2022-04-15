@@ -25,7 +25,6 @@
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPEventLoggingConfig.h>
-#include <lib/core/CHIPTimeConfig.h>
 
 #if CHIP_CONFIG_TEST && CHIP_WITH_NLFAULTINJECTION
 

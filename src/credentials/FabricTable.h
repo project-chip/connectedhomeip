@@ -380,6 +380,7 @@ public:
      * can release the memory associated with input parameter after the call is complete.
      *
      * If the call is successful, the assigned fabric index is returned as output parameter.
+     * The fabric information will also be persisted to storage.
      */
     CHIP_ERROR AddNewFabric(FabricInfo & fabric, FabricIndex * assignedIndex);
 

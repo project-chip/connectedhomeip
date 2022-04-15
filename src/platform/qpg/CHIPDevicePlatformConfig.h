@@ -42,8 +42,6 @@
 
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
 
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY 2
-
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to the platform.

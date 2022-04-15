@@ -49,10 +49,8 @@ const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStor
     {
         return &attestationTrustStore;
     }
-    else
-    {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 } // namespace
 
@@ -118,7 +116,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     chip::FabricId fabricId = strtoull(name.c_str(), nullptr, 0);
     if (fabricId >= kIdentityOtherFabricId)
     {
-        ReturnLogErrorOnFailure(InitializeCommissioner(name.c_str(), fabricId, trustStore));
+        ReturnLogErrorOnFailure(InitializeCommissioner(name, fabricId, trustStore));
     }
 
     // Initialize Group Data, including IPK
@@ -168,7 +166,7 @@ CHIP_ERROR CHIPCommand::MaybeTearDownStack()
     chip::FabricId fabricId = strtoull(name.c_str(), nullptr, 0);
     if (fabricId >= kIdentityOtherFabricId)
     {
-        ReturnLogErrorOnFailure(ShutdownCommissioner(name.c_str()));
+        ReturnLogErrorOnFailure(ShutdownCommissioner(name));
     }
 
     StopTracing();
@@ -286,7 +284,7 @@ chip::FabricId CHIPCommand::CurrentCommissionerId()
 chip::Controller::DeviceCommissioner & CHIPCommand::CurrentCommissioner()
 {
     auto item = mCommissioners.find(GetIdentity());
-    return *item->second.get();
+    return *item->second;
 }
 
 CHIP_ERROR CHIPCommand::ShutdownCommissioner(std::string key)
@@ -327,16 +325,15 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
         chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
 
         ReturnLogErrorOnFailure(ephemeralKey.Initialize());
-        ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(mCommissionerStorage.GetLocalNodeId(), fabricId,
-                                                                            mCommissionerStorage.GetCommissionerCATs(),
-                                                                            ephemeralKey, rcacSpan, icacSpan, nocSpan));
+        chip::NodeId nodeId = mCommissionerNodeId.ValueOr(mCommissionerStorage.GetLocalNodeId());
+        ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(
+            nodeId, fabricId, mCommissionerStorage.GetCommissionerCATs(), ephemeralKey, rcacSpan, icacSpan, nocSpan));
         commissionerParams.operationalKeypair = &ephemeralKey;
         commissionerParams.controllerRCAC     = rcacSpan;
         commissionerParams.controllerICAC     = icacSpan;
         commissionerParams.controllerNOC      = nocSpan;
     }
 
-    commissionerParams.storageDelegate = &mCommissionerStorage;
     // TODO: Initialize IPK epoch key in ExampleOperationalCredentials issuer rather than relying on DefaultIpkValue
     commissionerParams.operationalCredentialsDelegate = mCredIssuerCmds->GetCredentialIssuer();
     commissionerParams.controllerVendorId             = chip::VendorId::TestVendor1;

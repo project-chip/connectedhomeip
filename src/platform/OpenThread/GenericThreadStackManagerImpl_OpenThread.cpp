@@ -65,7 +65,9 @@
 #include <app/data-model/Encode.h>
 
 #include <limits>
-
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#include <app/server/Server.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 extern "C" void otSysProcessDrivers(otInstance * aInstance);
 
 #if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
@@ -215,6 +217,32 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
 
 #endif // CHIP_DETAIL_LOGGING
 
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+        if (event->ThreadStateChange.RoleChanged || event->ThreadStateChange.AddressChanged)
+        {
+            bool isInterfaceUp;
+            isInterfaceUp = GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadInterfaceUpNoLock();
+            // Post an event signaling the change in Thread interface connectivity state.
+            {
+                ChipDeviceEvent event;
+                event.Clear();
+                event.Type                            = DeviceEventType::kThreadConnectivityChange;
+                event.ThreadConnectivityChange.Result = (isInterfaceUp) ? kConnectivity_Established : kConnectivity_Lost;
+                CHIP_ERROR status                     = PlatformMgr().PostEvent(&event);
+                if (status != CHIP_NO_ERROR)
+                {
+                    ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
+                }
+            }
+
+            // Refresh Multicast listening
+            if (GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadAttachedNoLock())
+            {
+                ChipLogDetail(DeviceLayer, "Thread Attached updating Multicast address");
+                Server::GetInstance().RejoinExistingMulticastGroups();
+            }
+        }
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
         Impl()->UnlockThreadStack();
     }
 }
@@ -336,14 +364,19 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadAttached(void
 
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadNetwork(
-    ByteSpan netInfo, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
+    const Thread::OperationalDataset & dataset, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
 {
-    // There is another ongoing connect request, reject the new one.
-    VerifyOrReturnError(mpConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    // Reset the previously set callback since it will never be called in case incorrect dataset was supplied.
+    mpConnectCallback = nullptr;
     ReturnErrorOnFailure(Impl()->SetThreadEnabled(false));
-    ReturnErrorOnFailure(Impl()->SetThreadProvision(netInfo));
-    ReturnErrorOnFailure(Impl()->SetThreadEnabled(true));
-    mpConnectCallback = callback;
+    ReturnErrorOnFailure(Impl()->SetThreadProvision(dataset.AsByteSpan()));
+
+    if (dataset.IsCommissioned())
+    {
+        ReturnErrorOnFailure(Impl()->SetThreadEnabled(true));
+        mpConnectCallback = callback;
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -353,6 +386,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnThreadAttachFinishe
     if (mpConnectCallback != nullptr)
     {
         DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+            VerifyOrReturn(mpConnectCallback != nullptr);
             mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
             mpConnectCallback = nullptr;
         });

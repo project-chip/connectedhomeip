@@ -1881,6 +1881,32 @@ void CHIPBarrierControlAttributeListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
+void CHIPBasicCapabilityMinimaStructAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::DecodableType & value)
+{
+    CHIPBasicClusterCapabilityMinimaStruct * _Nonnull objCValue;
+    objCValue = [CHIPBasicClusterCapabilityMinimaStruct new];
+    objCValue.caseSessionsPerFabric = [NSNumber numberWithUnsignedShort:value.caseSessionsPerFabric];
+    objCValue.subscriptionsPerFabric = [NSNumber numberWithUnsignedShort:value.subscriptionsPerFabric];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPBasicGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -10614,6 +10640,40 @@ void CHIPDoorLockClusterGetCredentialStatusResponseCallbackBridge::OnSuccessFn(
             response.nextCredentialIndex = nil;
         } else {
             response.nextCredentialIndex = [NSNumber numberWithUnsignedShort:data.nextCredentialIndex.Value()];
+        }
+    }
+    DispatchSuccess(context, response);
+};
+
+void CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data)
+{
+    auto * response = [CHIPDoorLockClusterGetHolidayScheduleResponseParams new];
+    {
+        response.holidayIndex = [NSNumber numberWithUnsignedChar:data.holidayIndex];
+    }
+    {
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
+    }
+    {
+        if (data.localStartTime.HasValue()) {
+            response.localStartTime = [NSNumber numberWithUnsignedInt:data.localStartTime.Value()];
+        } else {
+            response.localStartTime = nil;
+        }
+    }
+    {
+        if (data.localEndTime.HasValue()) {
+            response.localEndTime = [NSNumber numberWithUnsignedInt:data.localEndTime.Value()];
+        } else {
+            response.localEndTime = nil;
+        }
+    }
+    {
+        if (data.operatingMode.HasValue()) {
+            response.operatingMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.operatingMode.Value())];
+        } else {
+            response.operatingMode = nil;
         }
     }
     DispatchSuccess(context, response);

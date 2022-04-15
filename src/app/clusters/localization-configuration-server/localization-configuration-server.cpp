@@ -198,10 +198,8 @@ void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpoi
                     err = CHIP_ERROR_WRITE_FAILED;
                     break;
                 }
-                else
-                {
-                    validLocaleCached = true;
-                }
+
+                validLocaleCached = true;
             }
         }
 

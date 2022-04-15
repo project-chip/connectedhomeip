@@ -4,10 +4,8 @@ The nRF All Clusters Example Application implements various ZCL clusters
 populated on three endpoints. You can use this example as a reference for
 creating your own application.
 
-<p align="center">
-  <img src="../../platform/nrfconnect/doc/images/Logo_RGB_H-small.png" alt="Nordic Semiconductor logo"/>
-  <img src="../../platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
-</p>
+![Nordic Smiconductor logo](../../platform/nrfconnect/doc/images/Logo_RGB_H-small.png)
+![nRF52840 DK](../../platform/nrfconnect/doc/images/nRF52840-DK-small.png)
 
 The example is based on
 [Matter](https://github.com/project-chip/connectedhomeip) and Nordic
@@ -37,6 +35,8 @@ into an existing Matter network and can be controlled by this network.
 -   [Configuring the example](#configuring-the-example)
     -   [Example build types](#example-build-types)
 -   [Flashing and debugging](#flashing-and-debugging)
+    -   [Flashing on the development kits](#nrfdks_flashing)
+    -   [Flashing on the nRF52840 Dongle](#nrf52840dongle_flashing)
 -   [Testing the example](#testing-the-example)
     -   [Testing using CHIPTool](#testing-using-chiptool)
 
@@ -98,10 +98,11 @@ more information.
 
 The example supports building and running on the following devices:
 
-| Hardware platform                                                                         | Build target               | Platform image                                                                                                                                   |
-| ----------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk_nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details> |
-| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)   | `nrf5340dk_nrf5340_cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>    |
+| Hardware platform                                                                                 | Build target               | Platform image                                                                                                                                          |
+| ------------------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK)         | `nrf52840dk_nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details>        |
+| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)           | `nrf5340dk_nrf5340_cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>           |
+| [nRF52840 Dongle](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-Dongle) | `nrf52840dongle_nrf52840`  | <details><summary>nRF52840 Dongle</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_Dongle-medium.jpg" alt="nRF52840 Dongle"/></details> |
 
 <hr>
 
@@ -112,6 +113,15 @@ The example supports building and running on the following devices:
 This section lists the User Interface elements that you can use to control and
 monitor the state of the device. These correspond to PCB components on the
 platform image.
+
+> **Note**:
+>
+> The following Device UI elements are missing on the nRF52840 Dongle: **Button
+> 2**, **Button 3**, **Button 4**, **SEGGER J-Link USB port**, and **NFC port
+> with antenna attached**. You can collect logs from the nRF52840 Dongle using
+> the **nRF USB port** instead of the **SEGGER J-Link USB port**.
+> Functionalities associated with the remaining missing elements are
+> inaccessible.
 
 **LED 1** shows the overall state of the device and its connectivity. The
 following states are possible:
@@ -294,11 +304,11 @@ To build for the low-power configuration, run the following command with
 _build-target_ replaced with the build target name of the Nordic Semiconductor's
 kit you own (for example `nrf52840dk_nrf52840`):
 
-    $ west build -b build-target -- -DOVERLAY_CONFIG=../../overlay-low_power.conf
+    $ west build -b build-target -- -DOVERLAY_CONFIG=overlay-low_power.conf
 
 For example, use the following command for `nrf52840dk_nrf52840`:
 
-    $ west build -b nrf52840dk_nrf52840 -- -DOVERLAY_CONFIG=../../overlay-low_power.conf
+    $ west build -b nrf52840dk_nrf52840 -- -DOVERLAY_CONFIG=overlay-low_power.conf
 
 ### Building with Device Firmware Upgrade support
 
@@ -323,11 +333,8 @@ Semiconductor kit you are using (for example `nrf52840dk_nrf52840`):
 
 #### Changing bootloader configuration
 
-To change the default MCUboot configuration, edit the `mcuboot.conf` or
-`mcuboot_release.conf` overlay files depending on whether you build the target
-with debug or release configuration. The files are located in the
-`configuration/build-target/child_image` directory (_build-target_ is your board
-name, for example `nrf52840dk_nrf52840`).
+To change the default MCUboot configuration, edit the `prj.conf` file located in
+the `child_image/mcuboot` directory.
 
 #### Changing flash memory settings
 
@@ -366,7 +373,7 @@ To make them persistent, save the configuration options in the `prj.conf` file.
 
 The example uses different configuration files depending on the supported
 features. Configuration files are provided for different build types and they
-are located in the `configuration/build-target` directory.
+are located in the application root directory.
 
 The `prj.conf` file represents a debug build type. Other build types are covered
 by dedicated files with the build type added as a suffix to the prj part, as per
@@ -384,9 +391,11 @@ depending on the selected board:
     command-line shell.
 -   release -- Release version of the application - can be used to enable only
     the necessary application functionalities to optimize its performance. It
-    has Device Firmware Upgrade feature enabled.
+    has Device Firmware Upgrade feature enabled. It can be used only for the
+    nRF52840 DK and nRF5340 DK, as only those platforms support the DFU.
 -   dfu -- Debug version of the application with Device Firmware Upgrade feature
-    support.
+    support. It can be used only for the nRF52840 DK and nRF5340 DK, as only
+    those platforms support the DFU.
 
 For more information, see the
 [Configuring nRF Connect SDK examples](../../../docs/guides/nrfconnect_examples_configuration.md)
@@ -397,6 +406,13 @@ page.
 <a name="flashing"></a>
 
 ## Flashing and debugging
+
+The flashing and debugging procedure is different for the development kits and
+the nRF52840 Dongle.
+
+<a name="nrfdks_flashing"></a>
+
+### Flashing on the development kits
 
 To flash the application to the device, use the west tool and run the following
 command from the example directory:
@@ -410,6 +426,14 @@ To debug the application on target, run the following command from the example
 directory:
 
         $ west debug
+
+<a name="nrf52840dongle_flashing"></a>
+
+### Flashing on the nRF52840 Dongle
+
+Visit
+[Programming and Debugging nRF52840 Dongle](https://docs.zephyrproject.org/latest/boards/arm/nrf52840dongle_nrf52840/doc/index.html#programming-and-debugging)
+to read more about flashing on the nRF52840 Dongle.
 
 <hr>
 

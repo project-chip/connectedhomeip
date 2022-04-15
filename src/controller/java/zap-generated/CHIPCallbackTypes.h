@@ -27,6 +27,12 @@ typedef void (*CHIPAccessControlClusterAclAttributeCallbackType)(
     void *, const chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo::DecodableType &);
 typedef void (*CHIPAccessControlClusterExtensionAttributeCallbackType)(
     void *, const chip::app::Clusters::AccessControl::Attributes::Extension::TypeInfo::DecodableType &);
+typedef void (*CHIPAccessControlClusterSubjectsPerAccessControlEntryAttributeCallbackType)(
+    void *, chip::app::Clusters::AccessControl::Attributes::SubjectsPerAccessControlEntry::TypeInfo::DecodableArgType);
+typedef void (*CHIPAccessControlClusterTargetsPerAccessControlEntryAttributeCallbackType)(
+    void *, chip::app::Clusters::AccessControl::Attributes::TargetsPerAccessControlEntry::TypeInfo::DecodableArgType);
+typedef void (*CHIPAccessControlClusterAccessControlEntriesPerFabricAttributeCallbackType)(
+    void *, chip::app::Clusters::AccessControl::Attributes::AccessControlEntriesPerFabric::TypeInfo::DecodableArgType);
 typedef void (*CHIPAccessControlClusterGeneratedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::AccessControl::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPAccessControlClusterAcceptedCommandListAttributeCallbackType)(
@@ -170,6 +176,8 @@ typedef void (*CHIPBasicClusterReachableAttributeCallbackType)(
     void *, chip::app::Clusters::Basic::Attributes::Reachable::TypeInfo::DecodableArgType);
 typedef void (*CHIPBasicClusterUniqueIDAttributeCallbackType)(
     void *, chip::app::Clusters::Basic::Attributes::UniqueID::TypeInfo::DecodableArgType);
+typedef void (*CHIPBasicClusterCapabilityMinimaAttributeCallbackType)(
+    void *, chip::app::Clusters::Basic::Attributes::CapabilityMinima::TypeInfo::DecodableArgType);
 typedef void (*CHIPBasicClusterGeneratedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::Basic::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPBasicClusterAcceptedCommandListAttributeCallbackType)(
@@ -442,6 +450,8 @@ typedef void (*CHIPDiagnosticLogsClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::DiagnosticLogs::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetCredentialStatusResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetUserResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType)(

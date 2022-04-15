@@ -149,10 +149,8 @@ private:
                 ChipLogError(BDX, "BDXDownloader instance is null, can't pass message");
                 return CHIP_NO_ERROR;
             }
-            else
-            {
-                mDownloader->OnMessageReceived(payloadHeader, payload.Retain());
-            }
+
+            mDownloader->OnMessageReceived(payloadHeader, payload.Retain());
 
             // For a receiver using BDX Protocol, all received messages will require a response except for a StatusReport
             if (!payloadHeader.HasMessageType(chip::Protocols::SecureChannel::MsgType::StatusReport))
@@ -198,10 +196,9 @@ private:
     void RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error = CHIP_NO_ERROR);
 
     /**
-     * Record the error update state by informing the driver of the error and calling `RecordNewUpdateState`
+     * Record the error update state and transition to the idle state
      */
-    void RecordErrorUpdateState(UpdateFailureState failureState, CHIP_ERROR error,
-                                OTAChangeReasonEnum reason = OTAChangeReasonEnum::kFailure);
+    void RecordErrorUpdateState(CHIP_ERROR error, OTAChangeReasonEnum reason = OTAChangeReasonEnum::kFailure);
 
     /**
      * Generate an update token using the operational node ID in case of token lost, received in QueryImageResponse

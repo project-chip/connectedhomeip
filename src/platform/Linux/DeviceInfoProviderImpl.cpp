@@ -33,11 +33,6 @@ constexpr TLV::Tag kLabelNameTag  = TLV::ContextTag(0);
 constexpr TLV::Tag kLabelValueTag = TLV::ContextTag(1);
 } // anonymous namespace
 
-CHIP_ERROR DeviceInfoProviderImpl::Init()
-{
-    return mStorage.Init(CHIP_DEVICE_INFO_PATH);
-}
-
 DeviceInfoProviderImpl & DeviceInfoProviderImpl::GetDefaultInstance()
 {
     static DeviceInfoProviderImpl sInstance;
@@ -62,6 +57,8 @@ size_t DeviceInfoProviderImpl::FixedLabelIteratorImpl::Count()
 
 bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & output)
 {
+    bool retval = true;
+
     // In Linux Simulation, use the following hardcoded labelList on all endpoints.
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -108,26 +105,29 @@ bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & outpu
 
         mIndex++;
 
-        return true;
+        retval = true;
     }
     else
     {
-        return false;
+        retval = false;
     }
+
+    return retval;
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelLength(EndpointId endpoint, size_t val)
 {
     DefaultStorageKeyAllocator keyAlloc;
 
-    return mStorage.WriteValue(keyAlloc.UserLabelLengthKey(endpoint), val);
+    return mStorage->SyncSetKeyValue(keyAlloc.UserLabelLengthKey(endpoint), &val, static_cast<uint16_t>(sizeof(val)));
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::GetUserLabelLength(EndpointId endpoint, size_t & val)
 {
     DefaultStorageKeyAllocator keyAlloc;
+    uint16_t len = static_cast<uint16_t>(sizeof(val));
 
-    return mStorage.ReadValue(keyAlloc.UserLabelLengthKey(endpoint), val);
+    return mStorage->SyncGetKeyValue(keyAlloc.UserLabelLengthKey(endpoint), &val, len);
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel)
@@ -142,9 +142,9 @@ CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t in
     ReturnErrorOnFailure(writer.PutString(kLabelNameTag, userLabel.label));
     ReturnErrorOnFailure(writer.PutString(kLabelValueTag, userLabel.value));
     ReturnErrorOnFailure(writer.EndContainer(outerType));
-    ReturnErrorOnFailure(mStorage.WriteValueBin(keyAlloc.UserLabelIndexKey(endpoint, index), buf, writer.GetLengthWritten()));
 
-    return mStorage.Commit();
+    return mStorage->SyncSetKeyValue(keyAlloc.UserLabelIndexKey(endpoint, index), buf,
+                                     static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
 DeviceInfoProvider::UserLabelIterator * DeviceInfoProviderImpl::IterateUserLabel(EndpointId endpoint)
@@ -170,8 +170,9 @@ bool DeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
 
     DefaultStorageKeyAllocator keyAlloc;
     uint8_t buf[UserLabelTLVMaxSize()];
-    size_t outLen;
-    err = mProvider.mStorage.ReadValueBin(keyAlloc.UserLabelIndexKey(mEndpoint, mIndex), buf, sizeof(buf), outLen);
+    uint16_t len = static_cast<uint16_t>(sizeof(buf));
+
+    err = mProvider.mStorage->SyncGetKeyValue(keyAlloc.UserLabelIndexKey(mEndpoint, mIndex), buf, len);
     VerifyOrReturnError(err == CHIP_NO_ERROR, false);
 
     TLV::ContiguousBufferTLVReader reader;
@@ -220,6 +221,8 @@ size_t DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
 
 bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & output)
 {
+    bool retval = true;
+
     // In Linux simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -268,12 +271,14 @@ bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & outpu
 
         mIndex++;
 
-        return true;
+        retval = true;
     }
     else
     {
-        return false;
+        retval = false;
     }
+
+    return retval;
 }
 
 DeviceInfoProvider::SupportedCalendarTypesIterator * DeviceInfoProviderImpl::IterateSupportedCalendarTypes()
@@ -292,6 +297,8 @@ size_t DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Count()
 
 bool DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarType & output)
 {
+    bool retval = true;
+
     // In Linux Simulation, return following hardcoded list of Strings that are valid values for the Calendar Types.
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -343,12 +350,14 @@ bool DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarTy
     if (err == CHIP_NO_ERROR)
     {
         mIndex++;
-        return true;
+        retval = true;
     }
     else
     {
-        return false;
+        retval = false;
     }
+
+    return retval;
 }
 
 } // namespace DeviceLayer

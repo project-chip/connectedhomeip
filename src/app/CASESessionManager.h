@@ -23,7 +23,6 @@
 #include <app/OperationalDeviceProxyPool.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/dnssd/DnssdCache.h>
 #include <lib/support/Pool.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <transport/SessionDelegate.h>
@@ -35,9 +34,6 @@ namespace chip {
 struct CASESessionManagerConfig
 {
     DeviceProxyInitParams sessionInitParams;
-#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-    Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> * dnsCache = nullptr;
-#endif
     OperationalDeviceProxyPoolDelegate * devicePool = nullptr;
 };
 

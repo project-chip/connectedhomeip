@@ -22,6 +22,7 @@
 #import "DefaultsUtils.h"
 #import "DeviceSelector.h"
 #import <CHIP/CHIP.h>
+#import <CHIP/CHIPDeviceAttestationDelegate.h>
 #import <CHIP/CHIPSetupPayload.h>
 
 // system imports
@@ -82,6 +83,14 @@
 @property (strong, nonatomic) NFCNDEFReaderSession * session;
 @property (strong, nonatomic) CHIPSetupPayload * setupPayload;
 @property (strong, nonatomic) DeviceSelector * deviceList;
+@end
+
+@interface CHIPToolDeviceAttestationDelegate : NSObject <CHIPDeviceAttestationDelegate>
+
+@property (weak, nonatomic) QRCodeViewController * viewController;
+
+- (instancetype)initWithViewController:(QRCodeViewController *)viewController;
+
 @end
 
 @implementation QRCodeViewController {
@@ -423,11 +432,7 @@
                         NSURL * payloadURI = [payload wellKnownTypeURIPayload];
                         NSLog(@"Payload text:%@", payloadURI);
                         if (payloadURI) {
-                            /* CHIP Issue #415
-                             Once #415 goes in, there will b no need to replace _ with spaces.
-                            */
-                            NSString * qrCode = [[payloadURI absoluteString] stringByReplacingOccurrencesOfString:@"_"
-                                                                                                       withString:@" "];
+                            NSString * qrCode = [payloadURI absoluteString];
                             NSLog(@"Scanned code string:%@", qrCode);
                             [self scannedQRCode:qrCode];
                         }
@@ -479,7 +484,7 @@
     if (error != nil) {
         NSLog(@"Got pairing error back %@", error);
     } else {
-        CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+        CHIPDeviceController * controller = InitializeCHIP();
         uint64_t deviceId = CHIPGetLastPairedDeviceId();
         if ([controller deviceBeingCommissionedOverBLE:deviceId]) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -488,6 +493,8 @@
             });
         } else {
             CHIPCommissioningParameters * params = [[CHIPCommissioningParameters alloc] init];
+            params.deviceAttestationDelegate = [[CHIPToolDeviceAttestationDelegate alloc] initWithViewController:self];
+            params.failSafeExpiryTimeoutSecs = @600;
             NSError * error;
             if (![controller commissionDevice:deviceId commissioningParams:params error:&error]) {
                 NSLog(@"Failed to commission Device %llu, with error %@", deviceId, error);
@@ -648,12 +655,14 @@
 {
 
     NSError * error;
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    CHIPDeviceController * controller = InitializeCHIP();
     // create commissioning params in ObjC. Pass those in here with network credentials.
     // maybe this just becomes the new norm
     CHIPCommissioningParameters * params = [[CHIPCommissioningParameters alloc] init];
     params.wifiSSID = [ssid dataUsingEncoding:NSUTF8StringEncoding];
     params.wifiCredentials = [password dataUsingEncoding:NSUTF8StringEncoding];
+    params.deviceAttestationDelegate = [[CHIPToolDeviceAttestationDelegate alloc] initWithViewController:self];
+    params.failSafeExpiryTimeoutSecs = @600;
 
     uint64_t deviceId = CHIPGetNextAvailableDeviceID() - 1;
 
@@ -692,7 +701,7 @@
     }
 
     uint64_t deviceId = CHIPGetNextAvailableDeviceID() - 1;
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    CHIPDeviceController * controller = InitializeCHIP();
     [controller updateDevice:deviceId fabricId:0];
 }
 
@@ -800,7 +809,9 @@
 
 - (void)_restartMatterStack
 {
-    CHIPRestartController(self.chipController);
+    self.chipController = CHIPRestartController(self.chipController);
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
+    [self.chipController setPairingDelegate:self queue:callbackQueue];
 }
 
 - (void)handleRendezVousDefault:(NSString *)payload
@@ -1083,5 +1094,47 @@
 }
 
 @synthesize description;
+
+@end
+
+@implementation CHIPToolDeviceAttestationDelegate
+
+- (instancetype)initWithViewController:(QRCodeViewController *)viewController
+{
+    if (self = [super init]) {
+        _viewController = viewController;
+    }
+    return self;
+}
+
+- (void)deviceAttestation:(CHIPDeviceController *)controller failedForDevice:(void *)device error:(NSError * _Nonnull)error
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController * alertController = [UIAlertController
+            alertControllerWithTitle:@"Device Attestation"
+                             message:@"Device Attestion failed for device under commissioning. Do you wish to continue pairing?"
+                      preferredStyle:UIAlertControllerStyleAlert];
+
+        [alertController addAction:[UIAlertAction actionWithTitle:@"No"
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * action) {
+                                                              NSError * err;
+                                                              [controller continueCommissioningDevice:device
+                                                                             ignoreAttestationFailure:NO
+                                                                                                error:&err];
+                                                          }]];
+
+        [alertController addAction:[UIAlertAction actionWithTitle:@"Continue"
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * action) {
+                                                              NSError * err;
+                                                              [controller continueCommissioningDevice:device
+                                                                             ignoreAttestationFailure:YES
+                                                                                                error:&err];
+                                                          }]];
+
+        [self.viewController presentViewController:alertController animated:YES completion:nil];
+    });
+}
 
 @end

@@ -30,7 +30,14 @@
 
   {{/chip_cluster_specific_structs}}
   {{#zcl_events}}
-  {{priority}} event {{asUpperCamelCase name}} = {{code}} {
+  {{priority}} event {{!ensure space}}
+  {{~#chip_access_elements entity="event"~}}
+      {{~#first~}}access({{~/first~}}
+      {{~#not_first~}}, {{/not_first~}}
+        {{operation}}: {{role}} 
+      {{~#last}}) {{/last~}}
+  {{~/chip_access_elements~}}
+  {{asUpperCamelCase name}} = {{code}} {
     {{#zcl_event_fields}}
     {{>idl_structure_member label=name}}
 
@@ -41,14 +48,18 @@
   {{#chip_server_cluster_attributes}}
   {{! ensure indent }}{{#unless isWritableAttribute~}}
     readonly {{!marker to place a space even with whitespace removal~}}
-  {{~/unless~}}{{#if isGlobalAttribute~}}
-    global {{!marker to place a space even with whitespace removal~}}
-  {{~/if~}}
+  {{~/unless~}}
   {{~!TODO: write only attributes should also be supported~}}
   {{~#unless isReportableAttribute~}}
     nosubscribe {{!marker to place a space even with whitespace removal~}}
   {{~/unless~}}
   {{~!Removes spaces~}} attribute {{!ensure space}}
+    {{~#chip_access_elements entity="attribute"~}}
+      {{~#first~}}access({{~/first~}}
+      {{~#not_first~}}, {{/not_first~}}
+        {{operation}}: {{role}} 
+      {{~#last}}) {{/last~}}
+    {{~/chip_access_elements~}}
     {{~#if isNullable~}}
       nullable {{!marker to place a space even with whitespace removal~}}
     {{~/if~}} {{type}}

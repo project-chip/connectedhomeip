@@ -263,8 +263,25 @@ CHIP_ERROR ComputeAttestationSignature(app::CommandHandler * commandObj,
 FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
 {
     FabricIndex index = aCommandHandler->GetAccessingFabricIndex();
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding fabric with fabricIndex %d", index);
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding fabric with fabricIndex 0x%x", static_cast<unsigned>(index));
     return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
+}
+
+CHIP_ERROR DeleteFabricFromTable(FabricIndex fabricIndex)
+{
+    ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().Delete(fabricIndex));
+
+    // We need to withdraw the advertisement for the now-removed fabric, so need
+    // to restart advertising altogether.
+    app::DnssdServer::Instance().StartServer();
+
+    return CHIP_NO_ERROR;
+}
+
+void CleanupFabricContext(SessionManager & sessionMgr, FabricIndex fabricIndex)
+{
+    InteractionModelEngine::GetInstance()->CloseTransactionsFromFabricIndex(fabricIndex);
+    sessionMgr.ExpireAllPairingsForFabric(fabricIndex);
 }
 
 void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
@@ -287,7 +304,8 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
             caseSessionManager->ReleaseSessionsForFabric(fabricInfo->GetCompressedId());
         }
 
-        Server::GetInstance().GetSecureSessionManager().ExpireAllPairingsForFabric(fabricIndex);
+        SessionManager & sessionMgr = Server::GetInstance().GetSecureSessionManager();
+        CleanupFabricContext(sessionMgr, fabricIndex);
     }
 
     // If an AddNOC command had been successfully invoked, achieve the equivalent effect of invoking the RemoveFabric command
@@ -295,7 +313,7 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     // command.
     if (event->FailSafeTimerExpired.AddNocCommandHasBeenInvoked)
     {
-        Server::GetInstance().GetFabricTable().Delete(fabricIndex);
+        DeleteFabricFromTable(fabricIndex);
     }
 
     // If an UpdateNOC command had been successfully invoked, revert the state of operational key pair, NOC and ICAC for that
@@ -341,9 +359,10 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
 {
 
     // Gets called when a fabric is deleted from KVS store
-    void OnFabricDeletedFromStorage(CompressedFabricId compressedFabricId, FabricIndex fabricId) override
+    void OnFabricDeletedFromStorage(CompressedFabricId compressedFabricId, FabricIndex fabricIndex) override
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric 0x%u was deleted from fabric storage.", fabricId);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric index 0x%x was deleted from fabric storage.",
+                       static_cast<unsigned>(fabricIndex));
         fabricListChanged();
 
         // The Leave event SHOULD be emitted by a Node prior to permanently
@@ -361,24 +380,24 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
         }
     }
 
-    // Gets called when a fabric is loaded into the FabricTable from KVS store.
+    // Gets called when a fabric is loaded into the FabricTable from storage
     void OnFabricRetrievedFromStorage(FabricInfo * fabric) override
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "OpCreds: Fabric 0x%u was retrieved from storage. FabricId 0x" ChipLogFormatX64
+                       "OpCreds: Fabric index 0x%x was retrieved from storage. FabricId 0x" ChipLogFormatX64
                        ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
-                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
+                       static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         fabricListChanged();
     }
 
-    // Gets called when a fabric in FabricTable is persisted to KVS store.
+    // Gets called when a fabric in FabricTable is persisted to storage
     void OnFabricPersistedToStorage(FabricInfo * fabric) override
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "OpCreds: Fabric %X was persisted to storage. FabricId " ChipLogFormatX64 ", NodeId " ChipLogFormatX64
-                       ", VendorId 0x%04" PRIX16,
-                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
+                       "OpCreds: Fabric  index 0x%x was persisted to storage. FabricId " ChipLogFormatX64
+                       ", NodeId " ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
+                       static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         fabricListChanged();
     }
@@ -409,9 +428,9 @@ public:
     void OnResponseTimeout(chip::Messaging::ExchangeContext * ec) override {}
     void OnExchangeClosing(chip::Messaging::ExchangeContext * ec) override
     {
-        FabricIndex currentFabricIndex = ec->GetSessionHandle()->GetFabricIndex();
-        InteractionModelEngine::GetInstance()->CloseTransactionsFromFabricIndex(currentFabricIndex);
-        ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(currentFabricIndex);
+        SessionManager * sessionManager = ec->GetExchangeMgr()->GetSessionManager();
+        FabricIndex currentFabricIndex  = ec->GetSessionHandle()->GetFabricIndex();
+        CleanupFabricContext(*sessionManager, currentFabricIndex);
     }
 };
 
@@ -428,12 +447,8 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandle
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: RemoveFabric"); // TODO: Generate emberAfFabricClusterPrintln
 
-    CHIP_ERROR err = Server::GetInstance().GetFabricTable().Delete(fabricBeingRemoved);
+    CHIP_ERROR err = DeleteFabricFromTable(fabricBeingRemoved);
     SuccessOrExit(err);
-
-    // We need to withdraw the advertisement for the now-removed fabric, so need
-    // to restart advertising altogether.
-    app::DnssdServer::Instance().StartServer();
 
 exit:
     fabricListChanged();
@@ -470,8 +485,8 @@ exit:
         }
         else
         {
-            InteractionModelEngine::GetInstance()->CloseTransactionsFromFabricIndex(fabricBeingRemoved);
-            ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(fabricBeingRemoved);
+            SessionManager * sessionManager = ec->GetExchangeMgr()->GetSessionManager();
+            CleanupFabricContext(*sessionManager, fabricBeingRemoved);
         }
     }
     return true;
@@ -548,27 +563,27 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
     {
         return OperationalCertStatus::kSuccess;
     }
-    else if (err == CHIP_ERROR_INVALID_PUBLIC_KEY)
+    if (err == CHIP_ERROR_INVALID_PUBLIC_KEY)
     {
         return OperationalCertStatus::kInvalidPublicKey;
     }
-    else if (err == CHIP_ERROR_INVALID_FABRIC_ID || err == CHIP_ERROR_WRONG_NODE_ID)
+    if (err == CHIP_ERROR_INVALID_FABRIC_ID || err == CHIP_ERROR_WRONG_NODE_ID)
     {
         return OperationalCertStatus::kInvalidNodeOpId;
     }
-    else if (err == CHIP_ERROR_CA_CERT_NOT_FOUND || err == CHIP_ERROR_CERT_PATH_LEN_CONSTRAINT_EXCEEDED ||
-             err == CHIP_ERROR_CERT_PATH_TOO_LONG || err == CHIP_ERROR_CERT_USAGE_NOT_ALLOWED || err == CHIP_ERROR_CERT_EXPIRED ||
-             err == CHIP_ERROR_CERT_NOT_VALID_YET || err == CHIP_ERROR_UNSUPPORTED_CERT_FORMAT ||
-             err == CHIP_ERROR_UNSUPPORTED_ELLIPTIC_CURVE || err == CHIP_ERROR_CERT_LOAD_FAILED ||
-             err == CHIP_ERROR_CERT_NOT_TRUSTED || err == CHIP_ERROR_WRONG_CERT_DN)
+    if (err == CHIP_ERROR_CA_CERT_NOT_FOUND || err == CHIP_ERROR_CERT_PATH_LEN_CONSTRAINT_EXCEEDED ||
+        err == CHIP_ERROR_CERT_PATH_TOO_LONG || err == CHIP_ERROR_CERT_USAGE_NOT_ALLOWED || err == CHIP_ERROR_CERT_EXPIRED ||
+        err == CHIP_ERROR_CERT_NOT_VALID_YET || err == CHIP_ERROR_UNSUPPORTED_CERT_FORMAT ||
+        err == CHIP_ERROR_UNSUPPORTED_ELLIPTIC_CURVE || err == CHIP_ERROR_CERT_LOAD_FAILED || err == CHIP_ERROR_CERT_NOT_TRUSTED ||
+        err == CHIP_ERROR_WRONG_CERT_DN)
     {
         return OperationalCertStatus::kInvalidNOC;
     }
-    else if (err == CHIP_ERROR_NO_MEMORY)
+    if (err == CHIP_ERROR_NO_MEMORY)
     {
         return OperationalCertStatus::kTableFull;
     }
-    else if (err == CHIP_ERROR_FABRIC_EXISTS)
+    if (err == CHIP_ERROR_FABRIC_EXISTS)
     {
         return OperationalCertStatus::kFabricConflict;
     }
@@ -583,24 +598,26 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
                                                         const Commands::AddNOC::DecodableType & commandData)
 {
     MATTER_TRACE_EVENT_SCOPE("AddNOC", "OperationalCredentials");
-    auto & NOCValue      = commandData.NOCValue;
-    auto & ICACValue     = commandData.ICACValue;
-    auto & adminVendorId = commandData.adminVendorId;
-    auto & ipkValue      = commandData.IPKValue;
-    auto * groups        = Credentials::GetGroupDataProvider();
-    auto nocResponse     = OperationalCertStatus::kSuccess;
+    auto & NOCValue          = commandData.NOCValue;
+    auto & ICACValue         = commandData.ICACValue;
+    auto & adminVendorId     = commandData.adminVendorId;
+    auto & ipkValue          = commandData.IPKValue;
+    auto * groupDataProvider = Credentials::GetGroupDataProvider();
+    auto nocResponse         = OperationalCertStatus::kSuccess;
 
     CHIP_ERROR err          = CHIP_NO_ERROR;
     FabricIndex fabricIndex = 0;
     Credentials::GroupDataProvider::KeySet keyset;
     FabricInfo * newFabricInfo = nullptr;
 
+    auto * secureSession = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession();
+
     uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
     MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a NOC");
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Received AddNOC command");
 
-    if (nullptr == groups)
+    if (nullptr == groupDataProvider)
     {
         LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::Failure));
         return true;
@@ -631,9 +648,6 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     err = Server::GetInstance().GetFabricTable().AddNewFabric(gFabricBeingCommissioned, &fabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-    err = Server::GetInstance().GetFabricTable().Store(fabricIndex);
-    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
-
     // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
     // Index just allocated.
     err = failSafeContext.SetAddNocCommandInvoked(fabricIndex);
@@ -649,9 +663,6 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     err = CreateAccessControlEntryForNewFabricAdministrator(fabricIndex, commandData.caseAdminNode);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-    // Notify the secure session of the new fabric.
-    commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->NewFabric(fabricIndex);
-
     // Set the Identity Protection Key (IPK)
     VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES,
                  nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_ARGUMENT));
@@ -666,8 +677,26 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     err = newFabricInfo->GetCompressedId(compressed_fabric_id);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-    err = groups->SetKeySet(fabricIndex, compressed_fabric_id, keyset);
+    err = groupDataProvider->SetKeySet(fabricIndex, compressed_fabric_id, keyset);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
+    /**
+     * . If the current secure session was established with PASE,
+     *   the receiver SHALL:
+     *     .. Augment the secure session context with the `FabricIndex` generated above
+     *        such that subsequent interactions have the proper accessing fabric.
+     *
+     * . If the current secure session was established with CASE, subsequent configuration
+     *   of the newly installed Fabric requires the opening of a new CASE session from the
+     *   Administrator from the Fabric just installed. This Administrator is the one listed
+     *   in the `CaseAdminNode` argument.
+     *
+     */
+    if (secureSession->GetSecureSessionType() == SecureSession::Type::kPASE)
+    {
+        err = secureSession->AdoptFabricIndex(fabricIndex);
+        VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+    }
 
     // We might have a new operational identity, so we should start advertising it right away.
     app::DnssdServer::Instance().AdvertiseOperational();
@@ -683,7 +712,8 @@ exit:
     }
     else
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: successfully added a NOC");
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: successfully created fabric index %u via AddNOC",
+                       static_cast<unsigned>(fabricIndex));
     }
 
     return true;

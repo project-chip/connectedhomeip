@@ -33,9 +33,9 @@ test runner.
 
 -   Install some additional tools(likely already present for CHIP developers):
 
-#Linux \$ sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
+#Linux `sudo apt-get install git libwebkitgtk-1.0-0 ninja-build`
 
-#Mac OS X \$ brew install ninja
+#Mac OS X `brew install ninja`
 
 -   Supported hardware:
 
@@ -59,17 +59,21 @@ test runner.
 
 OR use GN/Ninja directly
 
-          $ cd ~/connectedhomeip/src/test_driver/efr32/
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export EFR32_BOARD=BRD4161A
-          $ gn gen out/debug
-          $ ninja -C out/debug
+          ```
+          cd ~/connectedhomeip/src/test_driver/efr32/
+          git submodule update --init
+          source third_party/connectedhomeip/scripts/activate.sh
+          export EFR32_BOARD=BRD4161A
+          gn gen out/debug
+          ninja -C out/debug
+          ```
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/src/test_driver/efr32/
-          $ rm -rf out/
+          ```
+          cd ~/connectedhomeip/src/test_driver/efr32/
+          rm -rf out/
+          ```
 
 <a name="running-the-tests"></a>
 
@@ -77,13 +81,24 @@ OR use GN/Ninja directly
 
 Build the runner using gn:
 
-    $ gn gen out/debug
-    $ ninja -C out/debug runner
+    ```
+    cd <connectedhomeip>/src/test_driver/efr32
+    gn gen out/debug
+    ninja -C out/debug runner
+    ```
+
+Or build using build script from the root
+
+    ```
+    cd <connectedhomeip>
+    ./scripts/build/build_examples.py --target-glob '*nl-test-runner' build
+    ```
 
 The runner will be installed into the venv and python wheels will be packaged in
 the output folder for deploying.
 
 -   To run the tests:
 
-    \$ python -m nl_test_runner.nl_test_runner -d /dev/ttyACM1 -f
-    out/debug/chip-efr32-device_tests.s37 -o out.log
+    ```
+    python -m nl_test_runner.nl_test_runner -d /dev/ttyACM1 -f out/debug/chip-efr32-device_tests.s37 -o out.log
+    ```

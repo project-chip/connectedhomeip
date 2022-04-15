@@ -76,11 +76,15 @@ static Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 
 // Device types for dynamic endpoints: TODO Need a generated file from ZAP to define these!
 // (taken from chip-devices.xml)
-#define DEVICE_TYPE_CHIP_BRIDGE 0x0a0b
+#define DEVICE_TYPE_BRIDGED_NODE 0x0013
 // (taken from lo-devices.xml)
 #define DEVICE_TYPE_LO_ON_OFF_LIGHT 0x0100
 // (taken from lo-devices.xml)
 #define DEVICE_TYPE_LO_ON_OFF_LIGHT_SWITCH 0x0103
+// (taken from chip-devices.xml)
+#define DEVICE_TYPE_ROOT_NODE 0x0016
+// (taken from chip-devices.xml)
+#define DEVICE_TYPE_BRIDGE 0x000e
 
 // Device Version for dynamic endpoints:
 #define DEVICE_VERSION_DEFAULT 1
@@ -201,27 +205,27 @@ DataVersion gSwitch2DataVersions[ArraySize(bridgedSwitchClusters)];
 
 // ---------------------------------------------------------------------------
 
-int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, uint16_t deviceType, const Span<DataVersion> & dataVersionStorage)
+int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
+                      const Span<DataVersion> & dataVersionStorage)
 {
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
-        if (NULL == gDevices[index])
+        if (nullptr == gDevices[index])
         {
             gDevices[index] = dev;
             EmberAfStatus ret;
             while (1)
             {
                 dev->SetEndpointId(gCurrentEndpointId);
-                ret = emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, deviceType, DEVICE_VERSION_DEFAULT,
-                                                dataVersionStorage);
+                ret = emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList);
                 if (ret == EMBER_ZCL_STATUS_SUCCESS)
                 {
                     ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", dev->GetName(),
                                     gCurrentEndpointId, index);
                     return index;
                 }
-                else if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
+                if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
                 {
                     return -1;
                 }
@@ -246,7 +250,7 @@ int RemoveDeviceEndpoint(Device * dev)
         if (gDevices[index] == dev)
         {
             EndpointId ep   = emberAfClearDynamicEndpoint(index);
-            gDevices[index] = NULL;
+            gDevices[index] = nullptr;
             ChipLogProgress(DeviceLayer, "Removed device %s from dynamic endpoint %d (index=%d)", dev->GetName(), ep, index);
             // Silence complaints about unused ep when progress logging
             // disabled.
@@ -482,7 +486,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
 
     EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
 
-    if ((endpointIndex < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT) && (gDevices[endpointIndex] != NULL))
+    if ((endpointIndex < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT) && (gDevices[endpointIndex] != nullptr))
     {
         Device * dev = gDevices[endpointIndex];
 
@@ -591,6 +595,15 @@ exit:
 
 void ApplicationInit() {}
 
+const EmberAfDeviceType gBridgedRootDeviceTypes[] = { { DEVICE_TYPE_ROOT_NODE, DEVICE_VERSION_DEFAULT },
+                                                      { DEVICE_TYPE_BRIDGE, DEVICE_VERSION_DEFAULT } };
+
+const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT, DEVICE_VERSION_DEFAULT },
+                                                       { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
+
+const EmberAfDeviceType gBridgedSwitchDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT_SWITCH, DEVICE_VERSION_DEFAULT },
+                                                        { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
+
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -671,24 +684,35 @@ int main(int argc, char * argv[])
     // supported clusters so that ZAP will generated the requisite code.
     emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
 
+    //
+    // By default, ZAP only supports specifying a single device type in the UI. However for bridges, they are both
+    // a Bridge and Matter Root Node device on EP0. Consequently, over-ride the generated value to correct this.
+    //
+    emberAfSetDeviceTypeList(0, Span<const EmberAfDeviceType>(gBridgedRootDeviceTypes));
+
     // Add lights 1..3 --> will be mapped to ZCL endpoints 2, 3, 4
-    AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, Span<DataVersion>(gLight1DataVersions));
-    AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, Span<DataVersion>(gLight2DataVersions));
-    AddDeviceEndpoint(&Light3, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, Span<DataVersion>(gLight3DataVersions));
+    AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gLight1DataVersions));
+    AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gLight2DataVersions));
+    AddDeviceEndpoint(&Light3, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gLight3DataVersions));
 
     // Remove Light 2 -- Lights 1 & 3 will remain mapped to endpoints 2 & 4
     RemoveDeviceEndpoint(&Light2);
 
     // Add Light 4 -- > will be mapped to ZCL endpoint 5
-    AddDeviceEndpoint(&Light4, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, Span<DataVersion>(gLight4DataVersions));
+    AddDeviceEndpoint(&Light4, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gLight4DataVersions));
 
     // Re-add Light 2 -- > will be mapped to ZCL endpoint 6
-    AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, Span<DataVersion>(gLight2DataVersions));
+    AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gLight2DataVersions));
 
     // Add switch 1..2 --> will be mapped to ZCL endpoints 7,8
-    AddDeviceEndpoint(&Switch1, &bridgedSwitchEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT_SWITCH,
+    AddDeviceEndpoint(&Switch1, &bridgedSwitchEndpoint, Span<const EmberAfDeviceType>(gBridgedSwitchDeviceTypes),
                       Span<DataVersion>(gSwitch1DataVersions));
-    AddDeviceEndpoint(&Switch2, &bridgedSwitchEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT_SWITCH,
+    AddDeviceEndpoint(&Switch2, &bridgedSwitchEndpoint, Span<const EmberAfDeviceType>(gBridgedSwitchDeviceTypes),
                       Span<DataVersion>(gSwitch2DataVersions));
 
     // Run CHIP

@@ -17,11 +17,14 @@
 
 #include <app/util/af.h>
 
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::PumpConfigurationAndControl::Attributes;
 
 void emberAfPumpConfigurationAndControlClusterServerInitCallback(EndpointId endpoint)
 {
@@ -33,7 +36,24 @@ void MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback(cons
 {
     emberAfDebugPrintln("PCC Server Cluster Attribute changed [EP:%d, ID:0x%x]", attributePath.mEndpointId,
                         (unsigned int) attributePath.mAttributeId);
-    // TODO
+
+    switch (attributePath.mAttributeId)
+    {
+    case ControlMode::Id: {
+        uint8_t value;
+        ControlMode::Get(attributePath.mEndpointId, &value);
+        EffectiveControlMode::Set(attributePath.mEndpointId, value);
+    }
+    break;
+    case OperationMode::Id: {
+        uint8_t value;
+        OperationMode::Get(attributePath.mEndpointId, &value);
+        EffectiveOperationMode::Set(attributePath.mEndpointId, value);
+    }
+    break;
+    default:
+        emberAfDebugPrintln("PCC Server: unhandled attribute ID");
+    }
 }
 
 void MatterPumpConfigurationAndControlPluginServerInitCallback() {}

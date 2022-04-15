@@ -233,6 +233,8 @@ def HostTargets():
         target_native.Extend('rpc-console', app=HostApp.RPC_CONSOLE))
     app_targets.append(
         target_native.Extend('tv-app', app=HostApp.TV_APP))
+    app_targets.append(
+        target_native.Extend('nl-test-runner', app=HostApp.NL_TEST_RUNNER))
 
     for target in targets:
         app_targets.append(target.Extend(
@@ -246,6 +248,7 @@ def HostTargets():
             'ota-provider', app=HostApp.OTA_PROVIDER, enable_ble=False))
         app_targets.append(target.Extend(
             'ota-requestor', app=HostApp.OTA_REQUESTOR, enable_ble=False))
+        app_targets.append(target.Extend('python-bindings', app=HostApp.PYTHON_BINDINGS))
 
     builder = VariantBuilder()
 
@@ -266,12 +269,12 @@ def HostTargets():
                           "clang"], use_libfuzzer=True),
     builder.AppendVariant(name="clang", use_clang=True),
 
-    builder.WhitelistVariantNameForGlob('no-interactive')
+    builder.WhitelistVariantNameForGlob('no-interactive-ipv6only')
     builder.WhitelistVariantNameForGlob('ipv6only')
 
     for target in app_targets:
-        if 'rpc-console' in target.name:
-            # rpc console  has only one build variant right now
+        if ('-rpc-console' in target.name) or ('-python-bindings' in target.name) or ('nl-test-runner' in target.name):
+            # Single-variant builds
             yield target
         else:
             builder.targets.append(target)
@@ -382,10 +385,12 @@ def NrfTargets():
         target.Extend('nrf52840dk', board=NrfBoard.NRF52840DK),
     ]
 
-    # Enable nrf52840dongle for lighting app only
+    # Enable nrf52840dongle for all-clusters and lighting app only
+    yield target.Extend('nrf52840dongle-all-clusters', board=NrfBoard.NRF52840DONGLE, app=NrfApp.ALL_CLUSTERS)
     yield target.Extend('nrf52840dongle-light', board=NrfBoard.NRF52840DONGLE, app=NrfApp.LIGHT)
 
     for target in targets:
+        yield target.Extend('all-clusters', app=NrfApp.ALL_CLUSTERS)
         yield target.Extend('lock', app=NrfApp.LOCK)
         yield target.Extend('light', app=NrfApp.LIGHT)
         yield target.Extend('shell', app=NrfApp.SHELL)
@@ -416,6 +421,8 @@ def AndroidTargets():
     yield target.Extend('androidstudio-x64-chip-tool', board=AndroidBoard.AndroidStudio_X64, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('arm64-chip-tvserver', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TVServer)
     yield target.Extend('arm-chip-tvserver', board=AndroidBoard.ARM, app=AndroidApp.CHIP_TVServer)
+    yield target.Extend('x86-chip-tvserver', board=AndroidBoard.X86, app=AndroidApp.CHIP_TVServer)
+    yield target.Extend('x64-chip-tvserver', board=AndroidBoard.X64, app=AndroidApp.CHIP_TVServer)
     yield target.Extend('arm64-chip-tv-casting-app', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TV_CASTING_APP)
     yield target.Extend('arm-chip-tv-casting-app', board=AndroidBoard.ARM, app=AndroidApp.CHIP_TV_CASTING_APP)
 
@@ -481,6 +488,7 @@ def cc13x2x7_26x2x7Targets():
     yield target.Extend('lock-mtd', app=cc13x2x7_26x2x7App.LOCK, openthread_ftd=False)
     yield target.Extend('pump', app=cc13x2x7_26x2x7App.PUMP)
     yield target.Extend('pump-controller', app=cc13x2x7_26x2x7App.PUMP_CONTROLLER)
+    yield target.Extend('all-clusters', app=cc13x2x7_26x2x7App.ALL_CLUSTERS)
 
 
 def Cyw30739Targets():

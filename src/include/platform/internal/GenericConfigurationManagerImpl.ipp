@@ -243,16 +243,13 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
     char uniqueId[kMaxUniqueIDLength + 1];
 
     // Generate Unique ID only if it is not present in the storage.
-    if (GetUniqueId(uniqueId, sizeof(uniqueId)) == CHIP_NO_ERROR)
-        return CHIP_NO_ERROR;
+    if (GetUniqueId(uniqueId, sizeof(uniqueId)) != CHIP_NO_ERROR)
+    {
+        ReturnErrorOnFailure(GenerateUniqueId(uniqueId, sizeof(uniqueId)));
+        ReturnErrorOnFailure(StoreUniqueId(uniqueId, strlen(uniqueId)));
+    }
 
-    err = GenerateUniqueId(uniqueId, sizeof(uniqueId));
-    ReturnErrorOnFailure(err);
-
-    err = StoreUniqueId(uniqueId, strlen(uniqueId));
-    ReturnErrorOnFailure(err);
-
-    bool failSafeArmed;
+    bool failSafeArmed = false;
 
     // If the fail-safe was armed when the device last shutdown, initiate cleanup based on the pending Fail Safe Context with
     // which the fail-safe timer was armed.
@@ -265,12 +262,19 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
         ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot");
 
         err = FailSafeContext::LoadFromStorage(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
-        SuccessOrExit(err);
-
-        DeviceControlServer::DeviceControlSvr().GetFailSafeContext().ScheduleFailSafeCleanup(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
+        if (err == CHIP_NO_ERROR)
+        {
+            DeviceControlServer::DeviceControlSvr().GetFailSafeContext().ScheduleFailSafeCleanup(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
+        }
+        else
+        {
+            // This should not happen, but we should not fail system init based on it!
+            ChipLogError(DeviceLayer, "Failed to load fail-safe context from storage (err= %" CHIP_ERROR_FORMAT "), cleaning-up!", err.Format());
+            (void)SetFailSafeArmed(false);
+            err = CHIP_NO_ERROR;
+        }
     }
 
-exit:
     return err;
 }
 

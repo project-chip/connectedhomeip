@@ -42,6 +42,8 @@ typedef void (*CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType)(
     void *, const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetCredentialStatusResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetUserResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType)(
@@ -569,6 +571,8 @@ typedef void (*ApplicationBasicApplicationStructAttributeCallback)(
 typedef void (*ApplicationLauncherCurrentAppStructAttributeCallback)(
     void *,
     const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> &);
+typedef void (*BasicCapabilityMinimaStructAttributeCallback)(
+    void *, const chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::DecodableType &);
 typedef void (*ChannelLineupStructAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> &);
 typedef void (*ChannelCurrentChannelStructAttributeCallback)(
@@ -2112,6 +2116,35 @@ public:
                                                                            CHIPActionBlock action,
                                                                            SubscriptionEstablishedHandler establishedHandler) :
         CHIPBarrierControlAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPBasicCapabilityMinimaStructAttributeCallbackBridge
+    : public CHIPCallbackBridge<BasicCapabilityMinimaStructAttributeCallback>
+{
+public:
+    CHIPBasicCapabilityMinimaStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                           bool keepAlive = false) :
+        CHIPCallbackBridge<BasicCapabilityMinimaStructAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::DecodableType & value);
+};
+
+class CHIPBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge
+    : public CHIPBasicCapabilityMinimaStructAttributeCallbackBridge
+{
+public:
+    CHIPBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action,
+                                                                       SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBasicCapabilityMinimaStructAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -8226,6 +8259,19 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & data);
+};
+
+class CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType>
+{
+public:
+    CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data);
 };
 
 class CHIPDoorLockClusterGetUserResponseCallbackBridge : public CHIPCallbackBridge<CHIPDoorLockClusterGetUserResponseCallbackType>

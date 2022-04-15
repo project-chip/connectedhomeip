@@ -293,14 +293,14 @@ CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t inte
 
     if (CHIP_NO_ERROR == MdnsContexts::GetInstance().GetRegisterType(type, &sdCtx))
     {
-        err = DNSServiceUpdateRecord(sdCtx->serviceRef, NULL, 0 /* flags */, recordLen, recordBytesPtr, 0 /* ttl */);
+        err = DNSServiceUpdateRecord(sdCtx->serviceRef, nullptr, 0 /* flags */, recordLen, recordBytesPtr, 0 /* ttl */);
         TXTRecordDeallocate(recordRef);
         VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err), CHIP_ERROR_INTERNAL);
         return CHIP_NO_ERROR;
     }
 
     sdCtx = chip::Platform::New<RegisterContext>(type, callback, context);
-    err   = DNSServiceRegister(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDot, NULL, ntohs(port), recordLen,
+    err   = DNSServiceRegister(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDot, nullptr, ntohs(port), recordLen,
                              recordBytesPtr, OnRegister, sdCtx);
     TXTRecordDeallocate(recordRef);
 
@@ -501,24 +501,22 @@ static CHIP_ERROR GetAddrInfo(void * context, DnssdResolveCallback callback, uin
 
         return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
     }
-    else
-    {
-        sockaddr_in6 sockaddr;
-        memset(&sockaddr, 0, sizeof(sockaddr));
-        sockaddr.sin6_len    = sizeof(sockaddr);
-        sockaddr.sin6_family = AF_INET6;
-        sockaddr.sin6_addr   = in6addr_loopback;
-        sockaddr.sin6_port   = htons((unsigned short) port);
-        uint32_t ttl         = 120; // default TTL for records with hostnames is 120 seconds
-        uint32_t interface   = 0;   // Set interface to ANY (0) - network stack can decide how to route this.
-        OnGetAddrInfo(nullptr, 0 /* flags */, interface, kDNSServiceErr_NoError, hostname,
-                      reinterpret_cast<struct sockaddr *>(&sockaddr), ttl, sdCtx);
 
-        // Don't leak memory.
-        sdCtx->serviceRef = nullptr;
-        MdnsContexts::GetInstance().Delete(sdCtx);
-        return CHIP_NO_ERROR;
-    }
+    sockaddr_in6 sockaddr;
+    memset(&sockaddr, 0, sizeof(sockaddr));
+    sockaddr.sin6_len    = sizeof(sockaddr);
+    sockaddr.sin6_family = AF_INET6;
+    sockaddr.sin6_addr   = in6addr_loopback;
+    sockaddr.sin6_port   = htons((unsigned short) port);
+    uint32_t ttl         = 120; // default TTL for records with hostnames is 120 seconds
+    uint32_t interface   = 0;   // Set interface to ANY (0) - network stack can decide how to route this.
+    OnGetAddrInfo(nullptr, 0 /* flags */, interface, kDNSServiceErr_NoError, hostname,
+                  reinterpret_cast<struct sockaddr *>(&sockaddr), ttl, sdCtx);
+
+    // Don't leak memory.
+    sdCtx->serviceRef = nullptr;
+    MdnsContexts::GetInstance().Delete(sdCtx);
+    return CHIP_NO_ERROR;
 }
 
 static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceId, DNSServiceErrorType err,
@@ -544,6 +542,8 @@ static CHIP_ERROR Resolve(void * context, DnssdResolveCallback callback, uint32_
     DNSServiceErrorType err;
     DNSServiceRef sdRef;
     ResolveContext * sdCtx;
+
+    ChipLogProgress(Controller, "Resolve type=%s name=%s", type, name);
 
     sdCtx = chip::Platform::New<ResolveContext>(context, callback, name, addressType);
     err   = DNSServiceResolve(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDot, OnResolve, sdCtx);
