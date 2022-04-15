@@ -2015,33 +2015,14 @@ GroupDataProvider * gGroupsProvider = nullptr;
 
 } // namespace
 
-/**
- * Instance getter for the global GroupDataProvider.
- *
- * Callers have to externally synchronize usage of this function.
- *
- * @return The global device attestation credentials provider. Assume never null.
- */
 GroupDataProvider * GetGroupDataProvider()
 {
     return gGroupsProvider;
 }
 
-/**
- * Instance setter for the global GroupDataProvider.
- *
- * Callers have to externally synchronize usage of this function.
- *
- * If the `provider` is nullptr, no change is done.
- *
- * @param[in] provider the GroupDataProvider to start returning with the getter
- */
 void SetGroupDataProvider(GroupDataProvider * provider)
 {
-    if (provider)
-    {
-        gGroupsProvider = provider;
-    }
+    gGroupsProvider = provider;
 }
 
 } // namespace Credentials

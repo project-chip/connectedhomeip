@@ -28,7 +28,7 @@
 #include <string>
 
 using namespace ::chip;
-//#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+// #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
@@ -220,7 +220,7 @@ exit:
 CHIP_ERROR ESPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
     esp_err_t err = ESP_OK;
-    if (ssid.data())
+    if (!ssid.empty())
     {
         wifi_scan_config_t scan_config = { 0 };
         memset(WiFiSSIDStr, 0, sizeof(WiFiSSIDStr));
@@ -368,4 +368,4 @@ bool BLWiFiDriver::WiFiNetworkIterator::Next(Network & item)
 } // namespace NetworkCommissioning
 } // namespace DeviceLayer
 } // namespace chip
-//#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+// #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI

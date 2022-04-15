@@ -65,11 +65,11 @@ public:
     bool CanConsent() override;
     uint16_t GetMaxDownloadBlockSize() override;
     void SetMaxDownloadBlockSize(uint16_t maxDownloadBlockSize) override;
-    void HandleError(UpdateFailureState state, CHIP_ERROR error) override;
+
     void HandleIdleStateExit() override;
-    void HandleIdleState(IdleStateReason reason) override;
+    void HandleIdleStateEnter(IdleStateReason reason) override;
     void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) override;
-    void UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay) override;
+    CHIP_ERROR UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay) override;
     void UpdateDownloaded() override;
     void UpdateConfirmed(System::Clock::Seconds32 delay) override;
     void UpdateSuspended(System::Clock::Seconds32 delay) override;
@@ -92,6 +92,8 @@ protected:
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
     void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState);
     bool ProviderLocationsEqual(const ProviderLocationType & a, const ProviderLocationType & b);
+    // Return value of CHIP_NO_ERROR indicates a query retry has been successfully scheduled.
+    CHIP_ERROR ScheduleQueryRetry(bool trySameProvider);
 
     OTARequestorInterface * mRequestor           = nullptr;
     OTAImageProcessorInterface * mImageProcessor = nullptr;

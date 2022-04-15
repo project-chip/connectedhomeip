@@ -19,10 +19,12 @@
 #pragma once
 
 #include <app/ConcreteAttributePath.h>
+#include <app/DataVersionFilter.h>
 #include <app/util/basic-types.h>
 
 namespace chip {
 namespace app {
+class ReadClient;
 struct AttributePathParams
 {
     //
@@ -79,6 +81,22 @@ struct AttributePathParams
         VerifyOrReturnError(HasWildcardAttributeId() || mAttributeId == other.mAttributeId, false);
 
         return true;
+    }
+
+    bool IncludesAttributesInCluster(const DataVersionFilter & other) const
+    {
+        VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
+
+        return true;
+    }
+
+    // check if input concrete cluster path is subset of current wildcard attribute
+    bool IncludesAllAttributesInCluster(const ConcreteClusterPath & aOther) const
+    {
+        VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == aOther.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || mClusterId == aOther.mClusterId, false);
+        return HasWildcardAttributeId();
     }
 
     ClusterId mClusterId     = kInvalidClusterId;   // uint32

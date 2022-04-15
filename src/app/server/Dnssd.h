@@ -168,11 +168,14 @@ private:
     int16_t mDiscoveryTimeoutSecs                 = CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS;
     System::Clock::Timestamp mDiscoveryExpiration = kTimeoutCleared;
 
+    Optional<int32_t> mExtendedDiscoveryTimeoutSecs = NullOptional;
+
     /// return true if expirationMs is valid (not cleared and not in the future)
     bool OnExpiration(System::Clock::Timestamp expiration);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    /// get the current extended discovery timeout (from persistent storage)
+    /// Get the current extended discovery timeout (set by
+    /// SetExtendedDiscoveryTimeoutSecs, or the configuration default if not set).
     int32_t GetExtendedDiscoveryTimeoutSecs();
 
     /// schedule next extended discovery expiration

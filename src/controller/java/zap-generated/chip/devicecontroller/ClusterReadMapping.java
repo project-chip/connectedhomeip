@@ -3501,6 +3501,114 @@ public class ClusterReadMapping {
             readFanControlFanModeSequenceCommandParams);
     readFanControlInteractionInfo.put(
         "readFanModeSequenceAttribute", readFanControlFanModeSequenceAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlPercentSettingCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlPercentSettingAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readPercentSettingAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlPercentSettingCommandParams);
+    readFanControlInteractionInfo.put(
+        "readPercentSettingAttribute", readFanControlPercentSettingAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlPercentCurrentCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlPercentCurrentAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readPercentCurrentAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlPercentCurrentCommandParams);
+    readFanControlInteractionInfo.put(
+        "readPercentCurrentAttribute", readFanControlPercentCurrentAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlSpeedMaxCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlSpeedMaxAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readSpeedMaxAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlSpeedMaxCommandParams);
+    readFanControlInteractionInfo.put(
+        "readSpeedMaxAttribute", readFanControlSpeedMaxAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlSpeedSettingCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlSpeedSettingAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readSpeedSettingAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlSpeedSettingCommandParams);
+    readFanControlInteractionInfo.put(
+        "readSpeedSettingAttribute", readFanControlSpeedSettingAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlSpeedCurrentCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlSpeedCurrentAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readSpeedCurrentAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlSpeedCurrentCommandParams);
+    readFanControlInteractionInfo.put(
+        "readSpeedCurrentAttribute", readFanControlSpeedCurrentAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlRockSupportCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlRockSupportAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readRockSupportAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlRockSupportCommandParams);
+    readFanControlInteractionInfo.put(
+        "readRockSupportAttribute", readFanControlRockSupportAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlRockSettingCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlRockSettingAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readRockSettingAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlRockSettingCommandParams);
+    readFanControlInteractionInfo.put(
+        "readRockSettingAttribute", readFanControlRockSettingAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlWindSupportCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlWindSupportAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readWindSupportAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlWindSupportCommandParams);
+    readFanControlInteractionInfo.put(
+        "readWindSupportAttribute", readFanControlWindSupportAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlWindSettingCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlWindSettingAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readWindSettingAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlWindSettingCommandParams);
+    readFanControlInteractionInfo.put(
+        "readWindSettingAttribute", readFanControlWindSettingAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readFanControlGeneratedCommandListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readFanControlGeneratedCommandListAttributeInteractionInfo =

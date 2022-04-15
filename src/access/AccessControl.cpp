@@ -16,6 +16,11 @@
  *    limitations under the License.
  */
 
+// Included for the default AccessControlDelegate logging enables/disables.
+// See `chip_access_control_policy_logging_verbosity` in `src/app/BUILD.gn` for
+// the levels available.
+#include <app/AppBuildConfig.h>
+
 #include "AccessControl.h"
 
 namespace {
@@ -71,7 +76,7 @@ constexpr bool IsValidGroupNodeId(NodeId aNodeId)
     return chip::IsGroupId(aNodeId) && chip::IsValidGroupId(chip::GroupIdFromNodeId(aNodeId));
 }
 
-#if CHIP_PROGRESS_LOGGING
+#if CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
 char GetAuthModeStringForLogging(AuthMode authMode)
 {
@@ -152,7 +157,7 @@ char GetPrivilegeStringForLogging(Privilege privilege)
     return 'u';
 }
 
-#endif // CHIP_PROGRESS_LOGGING
+#endif // CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
 } // namespace
 
@@ -209,7 +214,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-#if CHIP_PROGRESS_LOGGING
+#if CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
     {
         constexpr size_t kMaxCatsToLog = 6;
         char catLogBuf[kMaxCatsToLog * kCharsPerCatForLogging];
@@ -220,14 +225,22 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                         GetCatStringForLogging(catLogBuf, sizeof(catLogBuf), subjectDescriptor.cats),
                         ChipLogValueMEI(requestPath.cluster), requestPath.endpoint, GetPrivilegeStringForLogging(requestPrivilege));
     }
-#endif
+#endif // CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
     {
         CHIP_ERROR result = mDelegate->Check(subjectDescriptor, requestPath, requestPrivilege);
         if (result != CHIP_ERROR_NOT_IMPLEMENTED)
         {
+#if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
             ChipLogProgress(DataManagement, "AccessControl: %s (delegate)",
                             (result == CHIP_NO_ERROR) ? "allowed" : (result == CHIP_ERROR_ACCESS_DENIED) ? "denied" : "error");
+#else
+            if (result != CHIP_NO_ERROR)
+            {
+                ChipLogProgress(DataManagement, "AccessControl: %s (delegate)",
+                                (result == CHIP_ERROR_ACCESS_DENIED) ? "denied" : "error");
+            }
+#endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
             return result;
         }
     }
@@ -235,7 +248,9 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     // Operational PASE not supported for v1.0, so PASE implies commissioning, which has highest privilege.
     if (subjectDescriptor.authMode == AuthMode::kPase)
     {
+#if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
         ChipLogProgress(DataManagement, "AccessControl: implicit admin (PASE)");
+#endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
         return CHIP_NO_ERROR;
     }
 
@@ -339,9 +354,12 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                 continue;
             }
         }
-
         // Entry passed all checks: access is allowed.
+
+#if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
         ChipLogProgress(DataManagement, "AccessControl: allowed");
+#endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
+
         return CHIP_NO_ERROR;
     }
 
@@ -367,9 +385,11 @@ bool AccessControl::IsValid(const Entry & entry)
     SuccessOrExit(entry.GetSubjectCount(subjectCount));
     SuccessOrExit(entry.GetTargetCount(targetCount));
 
+#if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
     ChipLogProgress(DataManagement, "AccessControl: validating f=%u p=%c a=%c s=%d t=%d", fabricIndex,
                     GetPrivilegeStringForLogging(privilege), GetAuthModeStringForLogging(authMode), static_cast<int>(subjectCount),
                     static_cast<int>(targetCount));
+#endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
     // Fabric index must be defined.
     VerifyOrExit(fabricIndex != kUndefinedFabricIndex, log = "invalid fabric index");
@@ -389,7 +409,9 @@ bool AccessControl::IsValid(const Entry & entry)
         SuccessOrExit(entry.GetSubject(i, subject));
         const bool kIsCase  = authMode == AuthMode::kCase;
         const bool kIsGroup = authMode == AuthMode::kGroup;
+#if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
         ChipLogProgress(DataManagement, "  validating subject 0x" ChipLogFormatX64, ChipLogValueX64(subject));
+#endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
         VerifyOrExit((kIsCase && IsValidCaseNodeId(subject)) || (kIsGroup && IsValidGroupNodeId(subject)), log = "invalid subject");
     }
 

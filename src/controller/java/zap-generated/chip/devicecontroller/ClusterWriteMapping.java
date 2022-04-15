@@ -572,6 +572,72 @@ public class ClusterWriteMapping {
             writeFanControlFanModeSequenceCommandParams);
     writeFanControlInteractionInfo.put(
         "writeFanModeSequenceAttribute", writeFanControlFanModeSequenceAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeFanControlPercentSettingCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo fanControlpercentSettingCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class);
+    writeFanControlPercentSettingCommandParams.put(
+        "value", fanControlpercentSettingCommandParameterInfo);
+    InteractionInfo writeFanControlPercentSettingAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .writePercentSettingAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeFanControlPercentSettingCommandParams);
+    writeFanControlInteractionInfo.put(
+        "writePercentSettingAttribute", writeFanControlPercentSettingAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeFanControlSpeedSettingCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo fanControlspeedSettingCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class);
+    writeFanControlSpeedSettingCommandParams.put(
+        "value", fanControlspeedSettingCommandParameterInfo);
+    InteractionInfo writeFanControlSpeedSettingAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .writeSpeedSettingAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeFanControlSpeedSettingCommandParams);
+    writeFanControlInteractionInfo.put(
+        "writeSpeedSettingAttribute", writeFanControlSpeedSettingAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeFanControlRockSettingCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo fanControlrockSettingCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class);
+    writeFanControlRockSettingCommandParams.put("value", fanControlrockSettingCommandParameterInfo);
+    InteractionInfo writeFanControlRockSettingAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .writeRockSettingAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeFanControlRockSettingCommandParams);
+    writeFanControlInteractionInfo.put(
+        "writeRockSettingAttribute", writeFanControlRockSettingAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeFanControlWindSettingCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo fanControlwindSettingCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class);
+    writeFanControlWindSettingCommandParams.put("value", fanControlwindSettingCommandParameterInfo);
+    InteractionInfo writeFanControlWindSettingAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .writeWindSettingAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeFanControlWindSettingCommandParams);
+    writeFanControlInteractionInfo.put(
+        "writeWindSettingAttribute", writeFanControlWindSettingAttributeInteractionInfo);
     writeAttributeMap.put("fanControl", writeFanControlInteractionInfo);
     Map<String, InteractionInfo> writeFixedLabelInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("fixedLabel", writeFixedLabelInteractionInfo);

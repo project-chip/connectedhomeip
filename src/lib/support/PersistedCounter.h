@@ -22,13 +22,14 @@
  *
  * @brief
  *   Class declarations for a monotonically-increasing counter that is periodically
- *   saved in the platform's persistent storage.
+ *   saved to the provided storage.
  */
 
 #pragma once
 
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/CHIPCounter.h>
-#include <platform/PersistedStorage.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 
 namespace chip {
 
@@ -59,21 +60,22 @@ public:
     PersistedCounter();
     ~PersistedCounter() override;
 
+    typedef const char * (DefaultStorageKeyAllocator::*KeyType)();
+
     /**
      *  @brief
      *    Initialize a PersistedCounter object.
      *
-     *  @param[in] aId     The identifier of this PersistedCounter instance.
+     *  @param[in] aStorage the storage to use for the counter values.
+     *  @param[in] aKey the key to use for storing the counter values.
      *  @param[in] aEpoch  On bootup, values we vend will start at a
      *                     multiple of this parameter.
      *
-     *  @return CHIP_ERROR_INVALID_ARGUMENT if aId is NULL
-     *          CHIP_ERROR_INVALID_STRING_LENGTH if aId is longer than
-     *          CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH.
+     *  @return CHIP_ERROR_INVALID_ARGUMENT if aStorageDelegate or aKey is NULL
      *          CHIP_ERROR_INVALID_INTEGER_VALUE if aEpoch is 0.
      *          CHIP_NO_ERROR otherwise
      */
-    CHIP_ERROR Init(chip::Platform::PersistedStorage::Key aId, uint32_t aEpoch);
+    CHIP_ERROR Init(PersistentStorageDelegate * aStorage, KeyType aKey, uint32_t aEpoch);
 
     /**
      *  @brief
@@ -105,9 +107,10 @@ private:
      */
     CHIP_ERROR ReadStartValue(uint32_t & aStartValue);
 
-    chip::Platform::PersistedStorage::Key mId; // start value is stored here
-    uint32_t mEpoch;                           // epoch modulus value
-    uint32_t mNextEpoch;                       // next epoch start
+    PersistentStorageDelegate * mStorage = nullptr; // start value is stored here
+    KeyType mKey                         = nullptr;
+    uint32_t mEpoch                      = 0; // epoch modulus value
+    uint32_t mNextEpoch                  = 0; // next epoch start
 };
 
 } // namespace chip

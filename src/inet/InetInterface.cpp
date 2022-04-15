@@ -34,7 +34,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 #include <lwip/netif.h>
 #include <lwip/sys.h>
 #include <lwip/tcpip.h>
@@ -63,7 +63,78 @@
 namespace chip {
 namespace Inet {
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) const
+{
+    if (mPlatformInterface && nameBufSize >= kMaxIfNameLength)
+    {
+        nameBuf[0] = 'o';
+        nameBuf[1] = 't';
+        nameBuf[2] = 0;
+    }
+    else
+    {
+        nameBuf[0] = 0;
+    }
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & interface)
+{
+    if (strlen(intfName) < 3)
+    {
+        return INET_ERROR_UNKNOWN_INTERFACE;
+    }
+    char * parseEnd       = nullptr;
+    unsigned long intfNum = strtoul(intfName + 2, &parseEnd, 10);
+    if (*parseEnd != 0 || intfNum > UINT8_MAX)
+    {
+        return INET_ERROR_UNKNOWN_INTERFACE;
+    }
+
+    interface = InterfaceId(intfNum);
+    if (intfNum == 0)
+    {
+        return INET_ERROR_UNKNOWN_INTERFACE;
+    }
+    return CHIP_NO_ERROR;
+}
+
+bool InterfaceIterator::Next()
+{
+    // TODO : Cleanup #17346
+    return false;
+}
+bool InterfaceAddressIterator::HasCurrent()
+{
+    return mIntfIter.HasCurrent();
+}
+
+bool InterfaceAddressIterator::Next()
+{
+    // TODO : Cleanup #17346
+    return false;
+}
+CHIP_ERROR InterfaceAddressIterator::GetAddress(IPAddress & outIPAddress)
+{
+    if (!HasCurrent())
+    {
+        return CHIP_ERROR_SENTINEL;
+    }
+
+    outIPAddress = IPAddress((*(mAddrInfoList[mCurAddrIndex].mAddress)));
+    return CHIP_NO_ERROR;
+}
+
+uint8_t InterfaceAddressIterator::GetPrefixLength()
+{
+    // Only 64 bits prefix are supported
+    return 64;
+}
+
+#endif
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) const
 {
