@@ -301,7 +301,9 @@ private:
 class TargetVideoPlayerInfo
 {
 public:
-    TargetVideoPlayerInfo() : mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this) {}
+    TargetVideoPlayerInfo() :
+        mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
+    {}
 
     bool IsInitialized() { return mInitialized; }
 
@@ -341,8 +343,10 @@ public:
         //       mOperationalDeviceProxy will still have a value of null, triggering the check below to fail.
         //
         mOperationalDeviceProxy = nullptr;
-        CHIP_ERROR err = server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnConnectedCallback, &mOnConnectionFailureCallback);
-        if (err != CHIP_NO_ERROR) {
+        CHIP_ERROR err =
+            server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+        if (err != CHIP_NO_ERROR)
+        {
             ChipLogError(AppServer, "Could not establish a session to the peer");
             return err;
         }
@@ -429,13 +433,15 @@ public:
     }
 
 private:
-    static void HandleDeviceConnected(void * context, OperationalDeviceProxy * device) {
-        TargetVideoPlayerInfo *_this = static_cast<TargetVideoPlayerInfo *>(context);
+    static void HandleDeviceConnected(void * context, OperationalDeviceProxy * device)
+    {
+        TargetVideoPlayerInfo * _this  = static_cast<TargetVideoPlayerInfo *>(context);
         _this->mOperationalDeviceProxy = device;
     }
 
-    static void HandleDeviceConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error) {
-        TargetVideoPlayerInfo *_this = static_cast<TargetVideoPlayerInfo *>(context);
+    static void HandleDeviceConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error)
+    {
+        TargetVideoPlayerInfo * _this  = static_cast<TargetVideoPlayerInfo *>(context);
         _this->mOperationalDeviceProxy = nullptr;
     }
 
