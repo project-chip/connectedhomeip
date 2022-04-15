@@ -744,7 +744,7 @@ exit:
 CHIP_ERROR P256KeypairHSM::CreateOperationalKey(FabricIndex fabricIdx)
 {
     (void) fabricIdx;
-    //TBD - Map fabric index to operational keys
+    // TBD - Map fabric index to operational keys
     SetKeyId(kKeyId_operational_key_keyid);
     if (Initialize() == CHIP_NO_ERROR)
     {
@@ -753,7 +753,6 @@ CHIP_ERROR P256KeypairHSM::CreateOperationalKey(FabricIndex fabricIdx)
     }
     return CHIP_ERROR_INTERNAL;
 }
-
 
 } // namespace Crypto
 } // namespace chip
