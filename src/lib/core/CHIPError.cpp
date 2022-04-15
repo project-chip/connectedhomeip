@@ -408,7 +408,7 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         desc = "Too many connections";
         break;
     case CHIP_ERROR_SHUT_DOWN.AsInteger():
-        desc = "The operation cancelled because a shut down was initiated";
+        desc = "The operation was cancelled because a shut down was initiated";
         break;
     case CHIP_ERROR_CANCELLED.AsInteger():
         desc = "The operation has been cancelled";
@@ -639,7 +639,7 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         desc = "Termination signal is received";
         break;
     case CHIP_ERROR_NO_SHARED_TRUSTED_ROOT.AsInteger():
-        desc = "No shated trusted root";
+        desc = "No shared trusted root";
         break;
     case CHIP_ERROR_IM_STATUS_CODE_RECEIVED.AsInteger():
         desc = "Interaction Model Error";
