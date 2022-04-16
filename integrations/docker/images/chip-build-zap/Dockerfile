@@ -1,25 +1,44 @@
-FROM alpine:3.14
+ARG VERSION=latest
+FROM connectedhomeip/chip-build:${VERSION}
 
-RUN apk add --no-cache \
-  nodejs=14.19.0-r0 \
-  openjdk11=11.0.14_p9-r0 \
-  npm=7.17.0-r0 \
-  python3=3.9.5-r2 \
-  pixman-dev=0.40.0-r2 \
-  cairo-dev=1.16.0-r3 \
-  pango-dev=1.48.5-r0 \
-  make=4.3-r0 \
-  g++=10.3.1_git20210424-r2 \
-  libjpeg-turbo-dev=2.1.0-r0 \
-  giflib-dev=5.2.1-r0 \
-  git=2.32.0-r0 \
-  clang-dev=11.1.0-r1 \
-  py3-pip=20.3.4-r1
+ENV ZAP_COMMIT=7ab717d08dfe9b0ba9de907fc7c6eb6549c86bf7
 
-# Generator dependencies
-RUN pip3 install --no-cache-dir \
-    click==8.0.3                \
-    coloredlogs==15.0.1         \
-    jinja2==3.0.3               \
-    lark==1.0.0                 \
-    stringcase==1.2.0
+ENV CHIP_ORIGIN=https://github.com/abozowski/connectedhomeip
+ENV ZAP_ORIGIN=https://github.com/project-chip/zap.git
+
+RUN echo "Must be built in a CHIP repo with the included build script and on a commit found in $CHIP_ORIGIN"
+
+ENV LOCAL_COMMIT_CACHE_FILE=/local_chip_commit.txt
+ENV REMOTE_ZAP_CACHE_FILE=/remote_zap_commit.txt
+ENV REMOTE_DOCKERFILE_CACHE_FILE=/remote_dockerfile_commit.txt
+ENV VERIFY_SCRIPT=zapverify.sh
+
+# Check zap in chip origin
+RUN echo 'If you receive a "file not found in build context" error, ensure you are building with the included build.sh to populate the build context'
+COPY context.txt $LOCAL_COMMIT_CACHE_FILE
+WORKDIR /tmp
+RUN git clone $CHIP_ORIGIN
+WORKDIR ./connectedhomeip
+RUN echo 'If you receive the error "fatal: reference is not a tree:", you are on a commit not found in' $CHIP_ORIGIN
+RUN git checkout $(cat $LOCAL_COMMIT_CACHE_FILE)
+RUN git ls-tree master third_party/zap/repo | awk '{print $3}'> $REMOTE_ZAP_CACHE_FILE
+RUN cat $REMOTE_ZAP_CACHE_FILE
+
+# Check the dockerfile in chip origin
+WORKDIR ./integrations/docker/images/chip-build-zap
+RUN dfc=$(cat Dockerfile | grep -m 1 'ENV ZAP_COMMIT'); echo ${dfc#*=} > $REMOTE_DOCKERFILE_CACHE_FILE;
+RUN cat $REMOTE_DOCKERFILE_CACHE_FILE
+
+# Verify local against origin
+WORKDIR /
+COPY $VERIFY_SCRIPT $VERIFY_SCRIPT
+RUN chmod +x $VERIFY_SCRIPT
+RUN ./$VERIFY_SCRIPT
+RUN rm -R /tmp/connectedhomeip
+
+# Build zap at the correct commit
+WORKDIR /opt
+RUN git clone $ZAP_ORIGIN
+WORKDIR ./zap
+RUN git checkout $ZAP_COMMIT
+RUN npm ci
