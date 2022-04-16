@@ -67,12 +67,12 @@ static_library("framework") {
     "MatterControllerFactory.mm",
     "MatterControllerFactory_Internal.h",
     "zap-generated/CHIPAttributeTLVValueDecoder.mm",
-    "zap-generated/CHIPEventTLVValueDecoder.mm",
     "zap-generated/CHIPCallbackBridge.mm",
     "zap-generated/CHIPClustersObjc.h",
     "zap-generated/CHIPClustersObjc.mm",
     "zap-generated/CHIPCommandPayloadsObjc.h",
     "zap-generated/CHIPCommandPayloadsObjc.mm",
+    "zap-generated/CHIPEventTLVValueDecoder.mm",
     "zap-generated/CHIPStructsObjc.h",
     "zap-generated/CHIPStructsObjc.mm",
   ]
