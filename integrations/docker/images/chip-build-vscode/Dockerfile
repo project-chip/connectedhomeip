@@ -49,11 +49,6 @@ COPY --from=ti /opt/ti/sysconfig_1.11.0 /opt/ti/sysconfig_1.11.0
 
 COPY --from=zap /opt/zap /opt/zap
 
-WORKDIR /opt/zap
-RUN mkdir ../zapout
-RUN node ./src-script/zap-generate.js -z ./zcl-builtin/silabs/zcl.json -g ./test/gen-template/zigbee/gen-templates.json -i ./test/resource/three-endpoint-device.zap -o ../zapout
-WORKDIR /
-
 # Android license file "acceping" is done by writing license hashes
 # into the 'licenses' subfolder. This allows any user (in particular
 # 'vscode' to accept licenses)

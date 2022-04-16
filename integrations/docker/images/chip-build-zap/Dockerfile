@@ -3,7 +3,7 @@ FROM connectedhomeip/chip-build:${VERSION}
 
 ENV ZAP_COMMIT=7ab717d08dfe9b0ba9de907fc7c6eb6549c86bf7
 
-ENV CHIP_ORIGIN=https://github.com/abozowski/connectedhomeip
+ENV CHIP_ORIGIN=https://github.com/project-chip/connectedhomeip
 ENV ZAP_ORIGIN=https://github.com/project-chip/zap.git
 
 RUN echo "Must be built in a CHIP repo with the included build script and on a commit found in $CHIP_ORIGIN"
