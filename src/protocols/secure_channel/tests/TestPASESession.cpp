@@ -259,17 +259,21 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
     if (mrpCommissionerConfig.HasValue())
     {
         NL_TEST_ASSERT(inSuite,
-                       pairingAccessory.GetRemoteMRPConfig().mIdleRetransTimeout == mrpCommissionerConfig.Value().mIdleRetransTimeout);
-        NL_TEST_ASSERT(
-            inSuite, pairingAccessory.GetRemoteMRPConfig().mActiveRetransTimeout == mrpCommissionerConfig.Value().mActiveRetransTimeout);
+                       pairingAccessory.GetRemoteMRPConfig().mIdleRetransTimeout ==
+                           mrpCommissionerConfig.Value().mIdleRetransTimeout);
+        NL_TEST_ASSERT(inSuite,
+                       pairingAccessory.GetRemoteMRPConfig().mActiveRetransTimeout ==
+                           mrpCommissionerConfig.Value().mActiveRetransTimeout);
     }
 
     if (mrpAccessoryConfig.HasValue())
     {
         NL_TEST_ASSERT(inSuite,
-                       pairingCommissioner.GetRemoteMRPConfig().mIdleRetransTimeout == mrpAccessoryConfig.Value().mIdleRetransTimeout);
-        NL_TEST_ASSERT(
-            inSuite, pairingCommissioner.GetRemoteMRPConfig().mActiveRetransTimeout == mrpAccessoryConfig.Value().mActiveRetransTimeout);
+                       pairingCommissioner.GetRemoteMRPConfig().mIdleRetransTimeout ==
+                           mrpAccessoryConfig.Value().mIdleRetransTimeout);
+        NL_TEST_ASSERT(inSuite,
+                       pairingCommissioner.GetRemoteMRPConfig().mActiveRetransTimeout ==
+                           mrpAccessoryConfig.Value().mActiveRetransTimeout);
     }
 }
 
