@@ -132,13 +132,13 @@ extern NSString * const kCHIPArrayValueType;
     subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;
 
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-               minInterval:(uint16_t)minInterval
-               maxInterval:(uint16_t)maxInterval
-                    params:(nullable CHIPSubscribeParams *)params
-            cacheContainer:(CHIPAttributeCacheContainer * _Nullable)attributeCacheContainer
-    attributeReportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))attributeReportHandler
-        eventReportHandler:(nullable void (^)(NSArray * _Nullable value, NSError * _Nullable error))eventReportHandler
-   subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;
+                minInterval:(uint16_t)minInterval
+                maxInterval:(uint16_t)maxInterval
+                     params:(nullable CHIPSubscribeParams *)params
+             cacheContainer:(CHIPAttributeCacheContainer * _Nullable)attributeCacheContainer
+     attributeReportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))attributeReportHandler
+         eventReportHandler:(nullable void (^)(NSArray * _Nullable value, NSError * _Nullable error))eventReportHandler
+    subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;
 
 /**
  * Read attribute in a designated attribute path
@@ -233,9 +233,7 @@ extern NSString * const kCHIPArrayValueType;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * event;
 
-+ (instancetype)eventPathWithEndpointId:(NSNumber *)endpoint
-                              clusterId:(NSNumber *)clusterId
-                                eventId:(NSNumber *)eventId;
++ (instancetype)eventPathWithEndpointId:(NSNumber *)endpoint clusterId:(NSNumber *)clusterId eventId:(NSNumber *)eventId;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -264,9 +262,9 @@ extern NSString * const kCHIPArrayValueType;
 
 @interface CHIPEventReport : NSObject
 @property (nonatomic, readonly, strong, nonnull) CHIPEventPath * path;
-@property (nonatomic, readonly, strong, nonnull) NSNumber * eventNumber;    // chip::EventNumber type (uint64_t)
-@property (nonatomic, readonly, strong, nonnull) NSNumber * priority;       // chip::app::PriorityLevel type (uint8_t)
-@property (nonatomic, readonly, strong, nonnull) NSNumber * timestamp;      // chip::app::Timestamp.mValue type (uint64_t)
+@property (nonatomic, readonly, strong, nonnull) NSNumber * eventNumber; // chip::EventNumber type (uint64_t)
+@property (nonatomic, readonly, strong, nonnull) NSNumber * priority; // chip::app::PriorityLevel type (uint8_t)
+@property (nonatomic, readonly, strong, nonnull) NSNumber * timestamp; // chip::app::Timestamp.mValue type (uint64_t)
 @property (nonatomic, readonly, strong, nullable) id value;
 // If this specific path resulted in an error, the error (in the
 // MatterInteractionErrorDomain or CHIPErrorDomain) that corresponds to this
