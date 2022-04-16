@@ -3,7 +3,7 @@
 - This Dockerfile builds https://github.com/project-chip/zap.git, which gets copied into `chip-build-vscode`
 - This image must be built in a working tree of the `CHIP` repo with a commit found in https://github.com/project-chip/connectedhomeip
 - This image must be built using the included `build.sh`.
-  - `build.sh` will check for the precense of `buildcontext.sh` in the build context and will execute the script before calling `docker build` if it exists.
+  - `build.sh` will check for the presence of `buildcontext.sh` in the build context and will execute the script before calling `docker build` if it exists.
 - In the case of `zap`, `buildcontext.sh` will get the commit of the current working tree and store it in `context.txt`.
 - At build time:
   - The `CHIP` repo will be cloned from https://github.com/project-chip/connectedhomeip

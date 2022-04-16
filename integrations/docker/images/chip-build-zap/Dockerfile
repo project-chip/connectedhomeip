@@ -21,7 +21,7 @@ RUN git clone $CHIP_ORIGIN
 WORKDIR ./connectedhomeip
 RUN echo 'If you receive the error "fatal: reference is not a tree:", you are on a commit not found in' $CHIP_ORIGIN
 RUN git checkout $(cat $LOCAL_COMMIT_CACHE_FILE)
-RUN git ls-tree master third_party/zap/repo | awk '{print $3}'> $REMOTE_ZAP_CACHE_FILE
+RUN git ls-tree master third_party/zap/repo | awk '{print $3}' > $REMOTE_ZAP_CACHE_FILE
 RUN cat $REMOTE_ZAP_CACHE_FILE
 
 # Check the dockerfile in chip origin
