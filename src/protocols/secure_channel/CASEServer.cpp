@@ -129,7 +129,8 @@ void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 
 void CASEServer::OnSessionEstablished(const SessionHandle & session)
 {
-    ChipLogProgress(Inet, "CASE Session established to peer: " ChipLogFormatScopedNodeId, ChipLogValueScopedNodeId(session->GetPeer()));
+    ChipLogProgress(Inet, "CASE Session established to peer: " ChipLogFormatScopedNodeId,
+                    ChipLogValueScopedNodeId(session->GetPeer()));
     Cleanup();
 }
 } // namespace chip
