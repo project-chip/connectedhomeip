@@ -326,7 +326,7 @@ void TestReadEvents::TestEventChunking(nlTestSuite * apSuite, void * apContext)
 
     readParams.mpEventPathParamsList    = &eventPath;
     readParams.mEventPathParamsListSize = 1;
-    readParams.mEventNumber             = firstEventNumber;
+    readParams.mEventNumber.SetValue(firstEventNumber);
 
     // Since we will always read from the first event, we only generate event once.
 
@@ -397,7 +397,7 @@ void TestReadEvents::TestMixedEventsAndAttributesChunking(nlTestSuite * apSuite,
     readParams.mAttributePathParamsListSize = 1;
     readParams.mpEventPathParamsList        = &eventPath;
     readParams.mEventPathParamsListSize     = 1;
-    readParams.mEventNumber                 = firstEventNumber;
+    readParams.mEventNumber.SetValue(firstEventNumber);
 
     //
     // We've empirically determined that by reserving 950 bytes in the packet buffer, we can fit 2
@@ -476,7 +476,7 @@ void TestReadEvents::TestMixedEventsAndLargeAttributesChunking(nlTestSuite * apS
     readParams.mAttributePathParamsListSize = 1;
     readParams.mpEventPathParamsList        = &eventPath;
     readParams.mEventPathParamsListSize     = 1;
-    readParams.mEventNumber                 = firstEventNumber;
+    readParams.mEventNumber.SetValue(firstEventNumber);
 
     //
     // We've empirically determined that by reserving 950 bytes in the packet buffer, we can fit 2
