@@ -395,7 +395,8 @@ void TestReadEvents::TestBasicCaching(nlTestSuite * apSuite, void * apContext)
     }
 
     //
-    // Set user-provided event number, then read client would use user-provided event number and not use the cached one in read client
+    // Set user-provided event number, then read client would use user-provided event number and not use the cached one in read
+    // client
     //
 
     {
@@ -413,19 +414,19 @@ void TestReadEvents::TestBasicCaching(nlTestSuite * apSuite, void * apContext)
 
         uint8_t generationCount = 5;
         readCallback.mClusterCacheAdapter.ForEachEventData(
-                [&apSuite, &readCallback, &generationCount](const app::EventHeader & header) {
-                    NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == TestCluster::Id);
-                    NL_TEST_ASSERT(apSuite, header.mPath.mEventId == TestCluster::Events::TestEvent::Id);
-                    NL_TEST_ASSERT(apSuite, header.mPath.mEndpointId == kTestEndpointId);
+            [&apSuite, &readCallback, &generationCount](const app::EventHeader & header) {
+                NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == TestCluster::Id);
+                NL_TEST_ASSERT(apSuite, header.mPath.mEventId == TestCluster::Events::TestEvent::Id);
+                NL_TEST_ASSERT(apSuite, header.mPath.mEndpointId == kTestEndpointId);
 
-                    TestCluster::Events::TestEvent::DecodableType eventData;
-                    NL_TEST_ASSERT(apSuite, readCallback.mClusterCacheAdapter.Get(header.mEventNumber, eventData) == CHIP_NO_ERROR);
+                TestCluster::Events::TestEvent::DecodableType eventData;
+                NL_TEST_ASSERT(apSuite, readCallback.mClusterCacheAdapter.Get(header.mEventNumber, eventData) == CHIP_NO_ERROR);
 
-                    NL_TEST_ASSERT(apSuite, eventData.arg1 == generationCount);
-                    generationCount++;
+                NL_TEST_ASSERT(apSuite, eventData.arg1 == generationCount);
+                generationCount++;
 
-                    return CHIP_NO_ERROR;
-                });
+                return CHIP_NO_ERROR;
+            });
 
         NL_TEST_ASSERT(apSuite, generationCount == 10);
 

@@ -238,7 +238,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
         ReturnErrorOnFailure(GetMinEventNumber(aReadPrepareParams, eventMin));
         if (eventMin.HasValue())
         {
-            EventFilterIBs::Builder &eventFilters = request.CreateEventFilters();
+            EventFilterIBs::Builder & eventFilters = request.CreateEventFilters();
             ReturnErrorOnFailure(err = request.GetError());
             ReturnErrorOnFailure(eventFilters.GenerateEventFilter(eventMin.Value()));
         }
@@ -882,7 +882,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
         ReturnErrorOnFailure(GetMinEventNumber(aReadPrepareParams, eventMin));
         if (eventMin.HasValue())
         {
-            EventFilterIBs::Builder &eventFilters = request.CreateEventFilters();
+            EventFilterIBs::Builder & eventFilters = request.CreateEventFilters();
             ReturnErrorOnFailure(err = request.GetError());
             ReturnErrorOnFailure(eventFilters.GenerateEventFilter(eventMin.Value()));
         }

@@ -85,7 +85,7 @@ EventFilterIBs::Builder & EventFilterIBs::Builder::EndOfEventFilters()
 
 CHIP_ERROR EventFilterIBs::Builder::GenerateEventFilter(EventNumber aEventNumber)
 {
-    EventFilterIB::Builder &eventFilter = CreateEventFilter();
+    EventFilterIB::Builder & eventFilter = CreateEventFilter();
     ReturnErrorOnFailure(GetError());
     ReturnErrorOnFailure(eventFilter.EventMin(aEventNumber).EndOfEventFilterIB().GetError());
     ReturnErrorOnFailure(EndOfEventFilters().GetError());
