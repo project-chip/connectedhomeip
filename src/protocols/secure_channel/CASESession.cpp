@@ -92,11 +92,9 @@ using namespace Messaging;
 using namespace Encoding;
 using namespace Protocols::SecureChannel;
 
-constexpr uint8_t kKDFSR2Info[]   = { 0x53, 0x69, 0x67, 0x6d, 0x61, 0x32 };
-constexpr uint8_t kKDFSR3Info[]   = { 0x53, 0x69, 0x67, 0x6d, 0x61, 0x33 };
-constexpr size_t kKDFInfoLength   = sizeof(kKDFSR2Info);
-constexpr uint8_t kKDFSEInfo[]    = { 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x4b, 0x65, 0x79, 0x73 };
-constexpr size_t kKDFSEInfoLength = sizeof(kKDFSEInfo);
+constexpr uint8_t kKDFSR2Info[] = { 0x53, 0x69, 0x67, 0x6d, 0x61, 0x32 };
+constexpr uint8_t kKDFSR3Info[] = { 0x53, 0x69, 0x67, 0x6d, 0x61, 0x33 };
+constexpr size_t kKDFInfoLength = sizeof(kKDFSR2Info);
 
 constexpr uint8_t kKDFS1RKeyInfo[] = { 0x53, 0x69, 0x67, 0x6d, 0x61, 0x31, 0x5f, 0x52, 0x65, 0x73, 0x75, 0x6d, 0x65 };
 constexpr uint8_t kKDFS2RKeyInfo[] = { 0x53, 0x69, 0x67, 0x6d, 0x61, 0x32, 0x5f, 0x52, 0x65, 0x73, 0x75, 0x6d, 0x65 };
@@ -125,42 +123,52 @@ static constexpr ExchangeContext::Timeout kSigma_Response_Timeout = System::Cloc
 
 CASESession::~CASESession()
 {
-    // Let's clear out any security state stored in the object, before destroying it.
-    Clear();
+    // This function zeroes out and resets the memory used by the object.
+    // It's done so that no security related information will be leaked.
+    mCommissioningHash.Clear();
+    PairingSession::Clear();
+    Crypto::ClearSecretData(mIPK);
+    AbortExchange();
+}
+
+bool CASESession::SanityCheck() const
+{
+    // This is called after handling a message, the session must be in a state of available or waiting for another message,
+    // otherwise the object may be leaked.
+    if (Available())
+        return true;
+
+    if (mRole == CryptoContext::SessionRole::kInitiator)
+    {
+        return mState == State::kSentSigma1 || mState == State::kSentSigma1Resume || mState == State::kSentSigma3;
+    }
+
+    if (mRole == CryptoContext::SessionRole::kResponder)
+    {
+        return mState == State::kSentSigma2 || mState == State::kSentSigma2Resume;
+    }
+
+    return false;
 }
 
 void CASESession::Finish()
 {
-    mCASESessionEstablished = true;
-
     Transport::PeerAddress address = mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress();
 
     // Discard the exchange so that Clear() doesn't try closing it. The exchange will handle that.
     DiscardExchange();
 
     CHIP_ERROR err = ActivateSecureSession(address);
+    // Do this last in case the delegate frees us.
     if (err == CHIP_NO_ERROR)
     {
         mDelegate->OnSessionEstablished(mSecureSessionHolder.Get());
     }
     else
     {
+        mState = State::kError;
         mDelegate->OnSessionEstablishmentError(err);
     }
-}
-
-void CASESession::Clear()
-{
-    // This function zeroes out and resets the memory used by the object.
-    // It's done so that no security related information will be leaked.
-    mCommissioningHash.Clear();
-    mCASESessionEstablished = false;
-    PairingSession::Clear();
-
-    mState = kInitialized;
-    Crypto::ClearSecretData(mIPK);
-
-    AbortExchange();
 }
 
 void CASESession::AbortExchange()
@@ -194,8 +202,6 @@ CHIP_ERROR CASESession::Init(SessionManager & sessionManager, SessionEstablishme
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    Clear();
-
     ReturnErrorOnFailure(mCommissioningHash.Begin());
 
     mDelegate = delegate;
@@ -214,6 +220,8 @@ CASESession::ListenForSessionEstablishment(SessionManager & sessionManager, Fabr
                                            SessionEstablishmentDelegate * delegate,
                                            Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
+    VerifyOrReturnError(mState == State::kInitial, CHIP_ERROR_INCORRECT_STATE);
+
     VerifyOrReturnError(fabrics != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(Init(sessionManager, delegate));
 
@@ -222,9 +230,8 @@ CASESession::ListenForSessionEstablishment(SessionManager & sessionManager, Fabr
     mSessionResumptionStorage = sessionResumptionStorage;
     mLocalMRPConfig           = mrpConfig;
 
-    mCASESessionEstablished = false;
-
     ChipLogDetail(SecureChannel, "Waiting for Sigma1 msg");
+    mState = State::kListening;
 
     return CHIP_NO_ERROR;
 }
@@ -233,6 +240,7 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
                                          ExchangeContext * exchangeCtxt, SessionResumptionStorage * sessionResumptionStorage,
                                          SessionEstablishmentDelegate * delegate, Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
+    VerifyOrReturnError(mState == State::kInitial, CHIP_ERROR_INCORRECT_STATE);
     MATTER_TRACE_EVENT_SCOPE("EstablishSession", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -252,8 +260,9 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     // been initialized
     SuccessOrExit(err);
 
-    mFabricInfo     = fabric;
-    mLocalMRPConfig = mrpConfig;
+    mFabricInfo               = fabric;
+    mSessionResumptionStorage = sessionResumptionStorage;
+    mLocalMRPConfig           = mrpConfig;
 
     mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
     mPeerNodeId = peerNodeId;
@@ -263,51 +272,69 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
 
 exit:
     if (err != CHIP_NO_ERROR)
-    {
-        Clear();
-    }
+        mState = State::kError;
+    VerifyOrDie(SanityCheck());
     return err;
 }
 
 void CASESession::OnResponseTimeout(ExchangeContext * ec)
 {
-    VerifyOrReturn(ec != nullptr, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout was called by null exchange"));
-    VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
-    ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %u", mState);
-    // Discard the exchange so that Clear() doesn't try closing it.  The
-    // exchange will handle that.
-    DiscardExchange();
-    Clear();
+    ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %u",
+                 static_cast<uint8_t>(mState));
+    AbortExchange();
+    mState = State::kError;
+    VerifyOrDie(SanityCheck());
     // Do this last in case the delegate frees us.
     mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
 }
 
 CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session) const
 {
-    size_t saltlen;
-
-    (void) kKDFSEInfo;
-    (void) kKDFSEInfoLength;
-
-    VerifyOrReturnError(mCASESessionEstablished, CHIP_ERROR_INCORRECT_STATE);
-
-    // Generate Salt for Encryption keys
-    saltlen = sizeof(mIPK) + kSHA256_Hash_Length;
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> msg_salt;
-    ReturnErrorCodeIf(!msg_salt.Alloc(saltlen), CHIP_ERROR_NO_MEMORY);
+    switch (mState)
     {
-        Encoding::LittleEndian::BufferWriter bbuf(msg_salt.Get(), saltlen);
-        bbuf.Put(mIPK, sizeof(mIPK));
-        bbuf.Put(mMessageDigest, sizeof(mMessageDigest));
+    case State::kFinished: {
+        // Generate Salt for Encryption keys
+        size_t saltlen = sizeof(mIPK) + kSHA256_Hash_Length;
 
-        VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        chip::Platform::ScopedMemoryBuffer<uint8_t> msg_salt;
+        ReturnErrorCodeIf(!msg_salt.Alloc(saltlen), CHIP_ERROR_NO_MEMORY);
+        {
+            Encoding::LittleEndian::BufferWriter bbuf(msg_salt.Get(), saltlen);
+            bbuf.Put(mIPK, sizeof(mIPK));
+            bbuf.Put(mMessageDigest, sizeof(mMessageDigest));
+
+            VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        }
+
+        ReturnErrorOnFailure(session.InitFromSecret(ByteSpan(mSharedSecret, mSharedSecret.Length()),
+                                                    ByteSpan(msg_salt.Get(), saltlen),
+                                                    CryptoContext::SessionInfoType::kSessionEstablishment, mRole));
+
+        return CHIP_NO_ERROR;
     }
+    case State::kFinishedResumed: {
+        // Generate Salt for Encryption keys
+        size_t saltlen = mInitiatorRandom.size() + mResumeResumptionId.size();
 
-    ReturnErrorOnFailure(session.InitFromSecret(ByteSpan(mSharedSecret, mSharedSecret.Length()), ByteSpan(msg_salt.Get(), saltlen),
-                                                CryptoContext::SessionInfoType::kSessionEstablishment, mRole));
+        chip::Platform::ScopedMemoryBuffer<uint8_t> msg_salt;
+        ReturnErrorCodeIf(!msg_salt.Alloc(saltlen), CHIP_ERROR_NO_MEMORY);
+        {
+            Encoding::LittleEndian::BufferWriter bbuf(msg_salt.Get(), saltlen);
+            bbuf.Put(mInitiatorRandom.data(), mInitiatorRandom.size());
+            bbuf.Put(mResumeResumptionId.data(), mResumeResumptionId.size());
 
-    return CHIP_NO_ERROR;
+            VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        }
+
+        ReturnErrorOnFailure(session.InitFromSecret(ByteSpan(mSharedSecret, mSharedSecret.Length()),
+                                                    ByteSpan(msg_salt.Get(), saltlen),
+                                                    CryptoContext::SessionInfoType::kSessionResumption, mRole));
+
+        return CHIP_NO_ERROR;
+    }
+    default:
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 }
 
 CHIP_ERROR CASESession::RecoverInitiatorIpk()
@@ -365,7 +392,7 @@ CHIP_ERROR CASESession::SendSigma1()
     ReturnErrorOnFailure(mEphemeralKey.Initialize());
 
     // Fill in the random value
-    ReturnErrorOnFailure(DRBG_get_bytes(mInitiatorRandom, sizeof(mInitiatorRandom)));
+    ReturnErrorOnFailure(DRBG_get_bytes(mInitiatorRandom.data(), mInitiatorRandom.size()));
 
     // Construct Sigma1 Msg
     msg_R1 = System::PacketBufferHandle::New(data_len);
@@ -408,17 +435,16 @@ CHIP_ERROR CASESession::SendSigma1()
     bool resuming = false;
     if (mSessionResumptionStorage != nullptr)
     {
-        SessionResumptionStorage::ResumptionIdStorage resumptionId;
         CHIP_ERROR err = mSessionResumptionStorage->FindByScopedNodeId(mFabricInfo->GetScopedNodeIdForNode(mPeerNodeId),
-                                                                       resumptionId, mSharedSecret, mPeerCATs);
+                                                                       mResumeResumptionId, mSharedSecret, mPeerCATs);
         if (err == CHIP_NO_ERROR)
         {
             // Found valid resumption state, try to resume the session.
-            ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(6), resumptionId));
+            ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(6), mResumeResumptionId));
 
             uint8_t initiatorResume1MIC[CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
             MutableByteSpan resumeMICSpan(initiatorResume1MIC);
-            ReturnErrorOnFailure(GenerateSigmaResumeMIC(ByteSpan(mInitiatorRandom), ByteSpan(resumptionId),
+            ReturnErrorOnFailure(GenerateSigmaResumeMIC(ByteSpan(mInitiatorRandom), ByteSpan(mResumeResumptionId),
                                                         ByteSpan(kKDFS1RKeyInfo), ByteSpan(kResume1MIC_Nonce), resumeMICSpan));
 
             ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(7), resumeMICSpan));
@@ -435,7 +461,7 @@ CHIP_ERROR CASESession::SendSigma1()
     ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma1, std::move(msg_R1),
                                                     SendFlags(SendMessageFlags::kExpectResponse)));
 
-    mState = resuming ? kSentSigma1Resume : kSentSigma1;
+    mState = resuming ? State::kSentSigma1Resume : State::kSentSigma1;
 
     ChipLogProgress(SecureChannel, "Sent Sigma1 msg");
 
@@ -559,8 +585,11 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
         CHIP_NO_ERROR ==
             TryResumeSession(SessionResumptionStorage::ConstResumptionIdView(resumptionId.data()), resume1MIC, initiatorRandom))
     {
+        std::copy(initiatorRandom.begin(), initiatorRandom.end(), mInitiatorRandom.begin());
+        std::copy(resumptionId.begin(), resumptionId.end(), mResumeResumptionId.begin());
+
         // Send Sigma2Resume message to the initiator
-        SuccessOrExit(err = SendSigma2Resume(initiatorRandom));
+        SuccessOrExit(err = SendSigma2Resume());
 
         mDelegate->OnSessionEstablishmentStarted();
 
@@ -593,17 +622,15 @@ exit:
     if (err == CHIP_ERROR_KEY_NOT_FOUND)
     {
         SendStatusReport(mExchangeCtxt, kProtocolCodeNoSharedRoot);
-        mState = kInitialized;
     }
     else if (err != CHIP_NO_ERROR)
     {
         SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
-        mState = kInitialized;
     }
     return err;
 }
 
-CHIP_ERROR CASESession::SendSigma2Resume(const ByteSpan & initiatorRandom)
+CHIP_ERROR CASESession::SendSigma2Resume()
 {
     MATTER_TRACE_EVENT_SCOPE("SendSigma2Resume", "CASESession");
     const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
@@ -623,14 +650,14 @@ CHIP_ERROR CASESession::SendSigma2Resume(const ByteSpan & initiatorRandom)
     tlvWriter.Init(std::move(msg_R2_resume));
 
     // Generate a new resumption ID
-    ReturnErrorOnFailure(DRBG_get_bytes(mResumptionId.data(), mResumptionId.size()));
+    ReturnErrorOnFailure(DRBG_get_bytes(mNewResumptionId.data(), mNewResumptionId.size()));
 
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), mResumptionId));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), mNewResumptionId));
 
     uint8_t sigma2ResumeMIC[CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
     MutableByteSpan resumeMICSpan(sigma2ResumeMIC);
-    ReturnErrorOnFailure(GenerateSigmaResumeMIC(initiatorRandom, mResumptionId, ByteSpan(kKDFS2RKeyInfo),
+    ReturnErrorOnFailure(GenerateSigmaResumeMIC(mInitiatorRandom, mNewResumptionId, ByteSpan(kKDFS2RKeyInfo),
                                                 ByteSpan(kResume2MIC_Nonce), resumeMICSpan));
 
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), resumeMICSpan));
@@ -650,7 +677,7 @@ CHIP_ERROR CASESession::SendSigma2Resume(const ByteSpan & initiatorRandom)
     ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma2Resume, std::move(msg_R2_resume),
                                                     SendFlags(SendMessageFlags::kExpectResponse)));
 
-    mState = kSentSigma2Resume;
+    mState = State::kSentSigma2Resume;
 
     ChipLogDetail(SecureChannel, "Sent Sigma2Resume msg");
 
@@ -734,8 +761,8 @@ CHIP_ERROR CASESession::SendSigma2()
                                             static_cast<uint32_t>(tbsData2Signature.Length())));
 
     // Generate a new resumption ID
-    ReturnErrorOnFailure(DRBG_get_bytes(mResumptionId.data(), mResumptionId.size()));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kTag_TBEData_ResumptionID), mResumptionId));
+    ReturnErrorOnFailure(DRBG_get_bytes(mNewResumptionId.data(), mNewResumptionId.size()));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kTag_TBEData_ResumptionID), mNewResumptionId));
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize());
@@ -780,7 +807,7 @@ CHIP_ERROR CASESession::SendSigma2()
     ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma2, std::move(msg_R2),
                                                     SendFlags(SendMessageFlags::kExpectResponse)));
 
-    mState = kSentSigma2;
+    mState = State::kSentSigma2;
 
     ChipLogProgress(SecureChannel, "Sent Sigma2 msg");
 
@@ -841,7 +868,9 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
 
     SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess);
 
+    mState = State::kFinishedResumed;
     Finish();
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -999,7 +1028,7 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
 
     // Retrieve session resumption ID
     SuccessOrExit(err = decryptedDataTlvReader.Next(TLV::kTLVType_ByteString, TLV::ContextTag(kTag_TBEData_ResumptionID)));
-    SuccessOrExit(err = decryptedDataTlvReader.GetBytes(mResumptionId.data(), mResumptionId.size()));
+    SuccessOrExit(err = decryptedDataTlvReader.GetBytes(mNewResumptionId.data(), mNewResumptionId.size()));
 
     // Retrieve peer CASE Authenticated Tags (CATs) from peer's NOC.
     SuccessOrExit(err = ExtractCATsFromOpCert(responderNOC, mPeerCATs));
@@ -1138,14 +1167,13 @@ CHIP_ERROR CASESession::SendSigma3()
     err = mCommissioningHash.Finish(messageDigestSpan);
     SuccessOrExit(err);
 
-    mState = kSentSigma3;
+    mState = State::kSentSigma3;
 
 exit:
 
     if (err != CHIP_NO_ERROR)
     {
         SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
-        mState = kInitialized;
     }
     return err;
 }
@@ -1288,14 +1316,16 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
 
     if (mSessionResumptionStorage != nullptr)
     {
-        CHIP_ERROR err2 = mSessionResumptionStorage->Save(GetPeer(), mResumptionId, mSharedSecret, mPeerCATs);
+        CHIP_ERROR err2 = mSessionResumptionStorage->Save(GetPeer(), mNewResumptionId, mSharedSecret, mPeerCATs);
         if (err2 != CHIP_NO_ERROR)
             ChipLogError(SecureChannel, "Unable to save session resumption state: %" CHIP_ERROR_FORMAT, err2.Format());
     }
 
     SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess);
 
+    mState = State::kFinished;
     Finish();
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -1486,16 +1516,27 @@ CHIP_ERROR CASESession::SetEffectiveTime()
 void CASESession::OnSuccessStatusReport()
 {
     ChipLogProgress(SecureChannel, "Success status report received. Session was established");
-    mCASESessionEstablished = true;
 
     if (mSessionResumptionStorage != nullptr)
     {
-        CHIP_ERROR err2 = mSessionResumptionStorage->Save(GetPeer(), mResumptionId, mSharedSecret, mPeerCATs);
+        CHIP_ERROR err2 = mSessionResumptionStorage->Save(GetPeer(), mNewResumptionId, mSharedSecret, mPeerCATs);
         if (err2 != CHIP_NO_ERROR)
             ChipLogError(SecureChannel, "Unable to save session resumption state: %" CHIP_ERROR_FORMAT, err2.Format());
     }
 
-    mState = kInitialized;
+    switch (mState)
+    {
+    case State::kSentSigma3:
+        mState = State::kFinished;
+        break;
+    case State::kSentSigma2Resume:
+        mState = State::kFinishedResumed;
+        break;
+    default:
+        VerifyOrDie(false);
+        break;
+    }
+
     Finish();
 }
 
@@ -1516,7 +1557,7 @@ CHIP_ERROR CASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralS
         err = CHIP_ERROR_INTERNAL;
         break;
     };
-    mState = kInitialized;
+    mState = State::kError;
     ChipLogError(SecureChannel, "Received error (protocol code %d) during pairing process. %s", protocolCode, ErrorStr(err));
     return err;
 }
@@ -1644,13 +1685,13 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
 
     switch (mState)
     {
-    case kInitialized:
+    case State::kListening:
         if (msgType == Protocols::SecureChannel::MsgType::CASE_Sigma1)
         {
             err = HandleSigma1_and_SendSigma2(std::move(msg));
         }
         break;
-    case kSentSigma1:
+    case State::kSentSigma1:
         switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
         {
         case Protocols::SecureChannel::MsgType::CASE_Sigma2:
@@ -1666,7 +1707,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
             break;
         };
         break;
-    case kSentSigma1Resume:
+    case State::kSentSigma1Resume:
         switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
         {
         case Protocols::SecureChannel::MsgType::CASE_Sigma2:
@@ -1686,7 +1727,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
             break;
         };
         break;
-    case kSentSigma2:
+    case State::kSentSigma2:
         switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
         {
         case Protocols::SecureChannel::MsgType::CASE_Sigma3:
@@ -1702,8 +1743,8 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
             break;
         };
         break;
-    case kSentSigma3:
-    case kSentSigma2Resume:
+    case State::kSentSigma3:
+    case State::kSentSigma2Resume:
         if (msgType == Protocols::SecureChannel::MsgType::StatusReport)
         {
             err = HandleStatusReport(std::move(msg), /* successExpected*/ true);
@@ -1718,16 +1759,21 @@ exit:
 
     if (err == CHIP_ERROR_INVALID_MESSAGE_TYPE)
     {
-        ChipLogError(SecureChannel, "Received message (type %d) cannot be handled in %d state.", to_underlying(msgType), mState);
+        ChipLogError(SecureChannel, "Received message (type %d) cannot be handled in %d state.", to_underlying(msgType),
+                     static_cast<uint8_t>(mState));
     }
 
-    // Call delegate to indicate session establishment failure.
     if (err != CHIP_NO_ERROR)
     {
         // Discard the exchange so that Clear() doesn't try closing it.  The
         // exchange will handle that.
         DiscardExchange();
-        Clear();
+        mState = State::kError;
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        // Call delegate to indicate session establishment failure.
         // Do this last in case the delegate frees us.
         mDelegate->OnSessionEstablishmentError(err);
     }

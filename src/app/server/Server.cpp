@@ -260,7 +260,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mCASESessionManager.Init(&DeviceLayer::SystemLayer(), caseSessionManagerConfig);
     SuccessOrExit(err);
 
-    err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mTransports,
+    err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr,
 #if CONFIG_NETWORK_LAYER_BLE
                                                     chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
 #endif
