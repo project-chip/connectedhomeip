@@ -587,6 +587,7 @@ hciattach
 hciconfig
 hdlc
 HKDF
+HMAC
 hoc
 homebrew
 hostapd
