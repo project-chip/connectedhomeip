@@ -55,6 +55,11 @@ void OperationalDeviceProxy::MoveToState(State aTargetState)
                       ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()), to_underlying(mState),
                       to_underlying(aTargetState));
         mState = aTargetState;
+
+        if (aTargetState != State::Connecting)
+        {
+            CleanupCASEClient();
+        }
     }
 }
 
@@ -211,7 +216,11 @@ CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
     ReturnErrorCodeIf(mCASEClient == nullptr, CHIP_ERROR_NO_MEMORY);
     CHIP_ERROR err =
         mCASEClient->EstablishSession(mPeerId, mDeviceAddress, mMRPConfig, HandleCASEConnected, HandleCASEConnectionFailure, this);
-    ReturnErrorOnFailure(err);
+    if (err != CHIP_NO_ERROR)
+    {
+        CleanupCASEClient();
+        return err;
+    }
 
     MoveToState(State::Connecting);
 
@@ -287,7 +296,6 @@ void OperationalDeviceProxy::HandleCASEConnectionFailure(void * context, CASECli
     //
     device->MoveToState(State::Initialized);
 
-    device->CloseCASESession();
     device->DequeueConnectionCallbacks(error);
 
     //
@@ -311,7 +319,6 @@ void OperationalDeviceProxy::HandleCASEConnected(void * context, CASEClient * cl
     else
     {
         device->MoveToState(State::SecureConnected);
-        device->CloseCASESession();
         device->DequeueConnectionCallbacks(CHIP_NO_ERROR);
     }
 
@@ -329,27 +336,17 @@ CHIP_ERROR OperationalDeviceProxy::Disconnect()
         mInitParams.sessionManager->ExpirePairing(mSecureSession.Get());
     }
     MoveToState(State::Initialized);
-    if (mCASEClient)
-    {
-        mInitParams.clientPool->Release(mCASEClient);
-        mCASEClient = nullptr;
-    }
+
     return CHIP_NO_ERROR;
 }
 
 void OperationalDeviceProxy::Clear()
 {
-    if (mCASEClient)
-    {
-        mInitParams.clientPool->Release(mCASEClient);
-        mCASEClient = nullptr;
-    }
-
     MoveToState(State::Uninitialized);
     mInitParams = DeviceProxyInitParams();
 }
 
-void OperationalDeviceProxy::CloseCASESession()
+void OperationalDeviceProxy::CleanupCASEClient()
 {
     if (mCASEClient)
     {

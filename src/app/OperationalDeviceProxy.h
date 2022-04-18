@@ -241,6 +241,8 @@ private:
     FabricInfo * mFabricInfo;
     System::Layer * mSystemLayer;
 
+    // mCASEClient is only non-null if we are in State::Connecting or just
+    // allocated it as part of an attempt to enter State::Connecting.
     CASEClient * mCASEClient = nullptr;
 
     PeerId mPeerId;
@@ -277,9 +279,7 @@ private:
     static void HandleCASEConnected(void * context, CASEClient * client);
     static void HandleCASEConnectionFailure(void * context, CASEClient * client, CHIP_ERROR error);
 
-    static void CloseCASESessionTask(System::Layer * layer, void * context);
-
-    void CloseCASESession();
+    void CleanupCASEClient();
 
     void EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
                                     Callback::Callback<OnDeviceConnectionFailure> * onFailure);
