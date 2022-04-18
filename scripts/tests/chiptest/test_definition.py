@@ -234,7 +234,7 @@ class TestDefinition:
             # so it will be commissionable again.
             app.factoryReset()
             # Create dictionary for command line options for starting the App
-            commandLineOptions = {"--discriminator" : str(randrange(1, 4096))}
+            commandLineOptions = {"--discriminator": str(randrange(1, 4096))}
             app.start(commandLineOptions)
 
             runner.RunSubprocess(
