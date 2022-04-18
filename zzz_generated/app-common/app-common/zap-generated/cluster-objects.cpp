@@ -15723,6 +15723,33 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::FanModeSequence::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, fanModeSequence));
         break;
+    case Attributes::PercentSetting::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, percentSetting));
+        break;
+    case Attributes::PercentCurrent::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, percentCurrent));
+        break;
+    case Attributes::SpeedMax::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, speedMax));
+        break;
+    case Attributes::SpeedSetting::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, speedSetting));
+        break;
+    case Attributes::SpeedCurrent::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, speedCurrent));
+        break;
+    case Attributes::RockSupport::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, rockSupport));
+        break;
+    case Attributes::RockSetting::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, rockSetting));
+        break;
+    case Attributes::WindSupport::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, windSupport));
+        break;
+    case Attributes::WindSetting::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, windSetting));
+        break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;

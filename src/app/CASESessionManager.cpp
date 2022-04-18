@@ -39,7 +39,7 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::C
     OperationalDeviceProxy * session = FindExistingSession(peerId);
     if (session == nullptr)
     {
-        ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing session found");
+        ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing OperationalDeviceProxy instance found");
 
         session = mConfig.devicePool->Allocate(mConfig.sessionInitParams, peerId);
 
