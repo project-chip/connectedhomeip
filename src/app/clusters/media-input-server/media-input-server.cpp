@@ -24,8 +24,8 @@
 #include "media-input-server.h"
 #include "media-input-delegate.h"
 
-#include <app/AttributeAccessInterface.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>

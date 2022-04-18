@@ -25,8 +25,8 @@
 #include <app/clusters/audio-output-server/audio-output-delegate.h>
 #include <app/clusters/audio-output-server/audio-output-server.h>
 
-#include <app/AttributeAccessInterface.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
