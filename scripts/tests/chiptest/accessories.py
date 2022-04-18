@@ -57,10 +57,13 @@ class AppsRegister:
         for accessory in self.__accessories.values():
             accessory.kill()
 
-    def start(self, name, discriminator):
+    def start(self, name, args):
         accessory = self.__accessories[name]
         if accessory:
-            return accessory.start(discriminator)
+            # The args param comes directly from the sys.argv[1:] Start.py and should contain a list of strings in
+            # key-value pair, e.g. [option1, value1, option2, value2, ...]
+            commandLineOptions = self.__createCommandLineOptions(args)
+            return accessory.start(commandLineOptions)
         return False
 
     def stop(self, name):
@@ -69,10 +72,13 @@ class AppsRegister:
             return accessory.stop()
         return False
 
-    def reboot(self, name, discriminator):
+    def reboot(self, name, args):
         accessory = self.__accessories[name]
         if accessory:
-            return accessory.stop() and accessory.start(discriminator)
+            # The args param comes directly from the sys.argv[1:] Reboot.py and should contain a list of strings in
+            # key-value pair, e.g. [option1, value1, option2, value2, ...]
+            commandLineOptions = self.__createCommandLineOptions(args)
+            return accessory.stop() and accessory.start(commandLineOptions)
         return False
 
     def factoryResetAll(self):
@@ -116,3 +122,13 @@ class AppsRegister:
 
     def __stopXMLRPCServer(self):
         self.server.shutdown()
+
+    def __createCommandLineOptions(self, args):
+        # args should contain a list of strings in key-value pair, e.g. [option1, value1, option2, value2, ...]
+        commandLineOptions = {}
+        i = 0
+        while (i + 1) < len(args):
+            commandLineOptions[args[i]] = args[i + 1]
+            i += 2
+
+        return commandLineOptions
