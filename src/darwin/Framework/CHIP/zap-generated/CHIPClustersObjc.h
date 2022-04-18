@@ -16661,8 +16661,8 @@ typedef NS_ENUM(uint8_t, CHIPAudioOutputOutputType) {
     CHIPAudioOutputOutputTypeOther = 0x05,
 };
 
-typedef NS_OPTIONS(uint32_t, CHIPAudioOutputAudiouOutputFeature) {
-    CHIPAudioOutputAudiouOutputFeatureNameUpdates = 0x1,
+typedef NS_OPTIONS(uint32_t, CHIPAudioOutputFeature) {
+    CHIPAudioOutputFeatureNameUpdates = 0x1,
 };
 
 typedef NS_ENUM(uint8_t, CHIPApplicationLauncherStatus) {

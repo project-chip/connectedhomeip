@@ -2384,8 +2384,8 @@ enum class OutputTypeEnum : uint8_t
     kOther     = 0x05,
 };
 
-// Bitmap for AudiouOutputFeature
-enum class AudiouOutputFeature : uint32_t
+// Bitmap for AudioOutputFeature
+enum class AudioOutputFeature : uint32_t
 {
     kNameUpdates = 0x1,
 };
