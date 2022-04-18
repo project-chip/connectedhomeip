@@ -27,9 +27,7 @@
 
 namespace chip {
 
-class CASEServer : public SessionEstablishmentDelegate,
-                   public Messaging::UnsolicitedMessageHandler,
-                   public Messaging::ExchangeDelegate
+class CASEServer : public SessionEstablishmentDelegate, public Messaging::UnsolicitedMessageHandler
 {
 public:
     CASEServer() {}
@@ -41,7 +39,7 @@ public:
         }
     }
 
-    CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
+    CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager,
 #if CONFIG_NETWORK_LAYER_BLE
                                              Ble::BleLayer * bleLayer,
 #endif
@@ -54,21 +52,15 @@ public:
     void OnSessionEstablished(const SessionHandle & session) override;
 
     //// UnsolicitedMessageHandler Implementation ////
-    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
-
-    //// ExchangeDelegate Implementation ////
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                 System::PacketBufferHandle && payload) override;
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
-    Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return GetSession().GetMessageDispatch(); }
-
-    virtual CASESession & GetSession() { return mPairingSession; }
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader,
+                                            Messaging::ExchangeDelegate *& newDelegate) override;
+    void OnExchangeCreationFailed(Messaging::ExchangeDelegate * delegate) override;
 
 private:
     Messaging::ExchangeManager * mExchangeManager        = nullptr;
     SessionResumptionStorage * mSessionResumptionStorage = nullptr;
 
-    CASESession mPairingSession;
+    Optional<CASESession> mPairingSession; // TOOD: use a pool to enable concurrent CASE session.
     SessionManager * mSessionManager = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
@@ -78,8 +70,6 @@ private:
     Credentials::GroupDataProvider * mGroupDataProvider = nullptr;
 
     CHIP_ERROR InitCASEHandshake(Messaging::ExchangeContext * ec);
-
-    void Cleanup();
 };
 
 } // namespace chip
