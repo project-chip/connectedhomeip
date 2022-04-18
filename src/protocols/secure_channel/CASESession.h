@@ -55,16 +55,27 @@ namespace chip {
 
 // TODO: temporary derive from Messaging::UnsolicitedMessageHandler, actually the CASEServer should be the umh, it will be fixed
 // when implementing concurrent CASE session.
-class DLL_EXPORT CASESession : public Messaging::UnsolicitedMessageHandler,
-                               public Messaging::ExchangeDelegate,
-                               public PairingSession
+class DLL_EXPORT CASESession : public Messaging::ExchangeDelegate, public PairingSession
 {
 public:
     ~CASESession() override;
 
+    using InitiatorRandomStorage                 = std::array<uint8_t, kSigmaParamRandomNumberSize>;
+    using InitiatorRandomView                    = FixedSpan<uint8_t, kSigmaParamRandomNumberSize>;
+    using ConstInitiatorRandomView               = FixedSpan<const uint8_t, kSigmaParamRandomNumberSize>;
+
     Transport::SecureSession::Type GetSecureSessionType() const override { return Transport::SecureSession::Type::kCASE; }
     ScopedNodeId GetPeer() const override { return ScopedNodeId(mPeerNodeId, GetFabricIndex()); }
     CATValues GetPeerCATs() const override { return mPeerCATs; };
+
+    /**
+     * @brief
+     *   Return whether this session object is ready for use.
+     *   When a new session request comes, CASE server will recycle an available session to serve the new request.
+     */
+    bool Available() const { return IsFinished() || mState == State::kListening || mState == State::kError; }
+
+    bool IsFinished() const { return mState == State::kFinished || mState == State::kFinishedResumed; }
 
     /**
      * @brief
@@ -139,17 +150,9 @@ public:
      *
      * @param session     Reference to the secure session that will be
      *                    initialized once session establishment is complete
-     * @param role        Role of the new session (initiator or responder)
      * @return CHIP_ERROR The result of session derivation
      */
-    CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) const override;
-
-    //// UnsolicitedMessageHandler Implementation ////
-    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
-    {
-        newDelegate = this;
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR DeriveSecureSession(CryptoContext & session) const override;
 
     //// ExchangeDelegate Implementation ////
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
@@ -159,20 +162,19 @@ public:
 
     FabricIndex GetFabricIndex() const { return mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : kUndefinedFabricIndex; }
 
-    // TODO: remove Clear, we should create a new instance instead reset the old instance.
-    /** @brief This function zeroes out and resets the memory used by the object.
-     **/
-    void Clear();
-
 private:
-    enum State : uint8_t
+    enum class State : uint8_t
     {
-        kInitialized      = 0,
+        kInitial          = 0,
+        kListening        = 0,
         kSentSigma1       = 1,
         kSentSigma2       = 2,
         kSentSigma3       = 3,
         kSentSigma1Resume = 4,
         kSentSigma2Resume = 5,
+        kFinished         = 6,
+        kFinishedResumed  = 7,
+        kError            = 8,
     };
 
     CHIP_ERROR Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate);
@@ -195,7 +197,7 @@ private:
     CHIP_ERROR SendSigma3();
     CHIP_ERROR HandleSigma3(System::PacketBufferHandle && msg);
 
-    CHIP_ERROR SendSigma2Resume(const ByteSpan & initiatorRandom);
+    CHIP_ERROR SendSigma2Resume();
 
     CHIP_ERROR ConstructSaltSigma2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                    MutableByteSpan & salt);
@@ -212,6 +214,8 @@ private:
                                       const ByteSpan & nonce, MutableByteSpan & resumeMIC);
     CHIP_ERROR ValidateSigmaResumeMIC(const ByteSpan & resumeMIC, const ByteSpan & initiatorRandom, const ByteSpan & resumptionID,
                                       const ByteSpan & skInfo, const ByteSpan & nonce);
+
+    bool SanityCheck() const;
 
     void OnSuccessStatusReport() override;
     CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
@@ -258,15 +262,12 @@ private:
     NodeId mPeerNodeId             = kUndefinedNodeId;
     CATValues mPeerCATs;
 
-    // This field is only used for CASE responder, when during sending sigma2 and waiting for sigma3
-    SessionResumptionStorage::ResumptionIdStorage mResumptionId;
+    SessionResumptionStorage::ResumptionIdStorage mResumeResumptionId; // ResumptionId which is used to resume this session
+    SessionResumptionStorage::ResumptionIdStorage mNewResumptionId; // ResumptionId which is stored to resume future session
     // Sigma1 initiator random, maintained to be reused post-Sigma1, such as when generating Sigma2 S2RK key
-    uint8_t mInitiatorRandom[kSigmaParamRandomNumberSize];
+    InitiatorRandomStorage mInitiatorRandom;
 
-    State mState;
-
-protected:
-    bool mCASESessionEstablished = false;
+    State mState = State::kInitial;
 };
 
 } // namespace chip

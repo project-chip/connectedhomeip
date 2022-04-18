@@ -47,7 +47,7 @@ public:
 
     const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteMRPConfig; }
 
-    CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) const override
+    CHIP_ERROR DeriveSecureSession(CryptoContext & session) const override
     {
         return CHIP_NO_ERROR;
     }

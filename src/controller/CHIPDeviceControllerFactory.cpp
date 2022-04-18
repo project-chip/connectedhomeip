@@ -186,7 +186,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         // especially since it will interrupt other potential usages of BLE by the controller acting in a commissioning capacity.
         //
         ReturnErrorOnFailure(stateParams.caseServer->ListenForSessionEstablishment(
-            stateParams.exchangeMgr, stateParams.transportMgr,
+            stateParams.exchangeMgr,
 #if CONFIG_NETWORK_LAYER_BLE
             nullptr,
 #endif

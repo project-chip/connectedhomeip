@@ -29,7 +29,7 @@ using namespace ::chip::Credentials;
 
 namespace chip {
 
-CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
+CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager,
 #if CONFIG_NETWORK_LAYER_BLE
                                                      Ble::BleLayer * bleLayer,
 #endif
@@ -37,9 +37,7 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
                                                      SessionResumptionStorage * sessionResumptionStorage,
                                                      Credentials::GroupDataProvider * responderGroupDataProvider)
 {
-    VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(responderGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -52,14 +50,13 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
     mExchangeManager          = exchangeManager;
     mGroupDataProvider        = responderGroupDataProvider;
 
-    Cleanup();
+    ChipLogProgress(Inet, "CASE Server enabling CASE session setups");
+    mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1, this);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
+CHIP_ERROR CASEServer::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, Messaging::ExchangeDelegate *& newDelegate)
 {
-    ReturnErrorCodeIf(ec == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
 #if CONFIG_NETWORK_LAYER_BLE
     // Close all BLE connections now since a CASE handshake has been initiated.
     if (mBleLayer != nullptr)
@@ -69,68 +66,39 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
     }
 #endif
 
-    // Setup CASE state machine using the credentials for the current fabric.
-    GetSession().SetGroupDataProvider(mGroupDataProvider);
-    ReturnErrorOnFailure(
-        GetSession().ListenForSessionEstablishment(*mSessionManager, mFabrics, mSessionResumptionStorage, this,
-                                                   Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig())));
-
-    // Hand over the exchange context to the CASE session.
-    ec->SetDelegate(&GetSession());
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR CASEServer::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate)
-{
-    // TODO: assign newDelegate to CASESession, let CASESession handle future messages.
-    newDelegate = this;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                         System::PacketBufferHandle && payload)
-{
-    ChipLogProgress(Inet, "CASE Server received Sigma1 message. Starting handshake. EC %p", ec);
-    CHIP_ERROR err = InitCASEHandshake(ec);
-    SuccessOrExit(err);
-
-    // TODO - Enable multiple concurrent CASE session establishment
-    // https://github.com/project-chip/connectedhomeip/issues/8342
-    ChipLogProgress(Inet, "CASE Server disabling CASE session setups");
-    mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1);
-
-    err = GetSession().OnMessageReceived(ec, payloadHeader, std::move(payload));
-    SuccessOrExit(err);
-
-exit:
-    if (err != CHIP_NO_ERROR)
+    if (!mPairingSession.HasValue() || mPairingSession.Value().Available())
     {
-        Cleanup();
+        CASESession * session = &mPairingSession.Emplace();
+
+        // Setup CASE state machine using the credentials for the current fabric.
+        session->SetGroupDataProvider(mGroupDataProvider);
+        ReturnErrorOnFailure(
+            session->ListenForSessionEstablishment(*mSessionManager, mFabrics, mSessionResumptionStorage, this,
+                Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig())));
+        newDelegate = session;
+
+        return CHIP_NO_ERROR;
     }
-    return err;
+    else
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
 }
 
-void CASEServer::Cleanup()
+void CASEServer::OnExchangeCreationFailed(Messaging::ExchangeDelegate * delegate)
 {
-    // Let's re-register for CASE Sigma1 message, so that the next CASE session setup request can be processed.
-    // https://github.com/project-chip/connectedhomeip/issues/8342
-    ChipLogProgress(Inet, "CASE Server enabling CASE session setups");
-    mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1, this);
-
-    GetSession().Clear();
+    mPairingSession.ClearValue();
 }
 
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 {
     ChipLogError(Inet, "CASE Session establishment failed: %s", ErrorStr(err));
-    Cleanup();
 }
 
 void CASEServer::OnSessionEstablished(const SessionHandle & session)
 {
     ChipLogProgress(Inet, "CASE Session established to peer: " ChipLogFormatScopedNodeId,
                     ChipLogValueScopedNodeId(session->GetPeer()));
-    Cleanup();
 }
+
 } // namespace chip
