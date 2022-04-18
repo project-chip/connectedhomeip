@@ -23,5 +23,8 @@ PORT = 9000
 if sys.platform == 'linux':
     IP = '10.10.10.5'
 
+# Remove the script name
+app = sys.argv.pop(0)
+
 with xmlrpc.client.ServerProxy('http://' + IP + ':' + str(PORT) + '/', allow_none=True) as proxy:
-    proxy.reboot('default', sys.argv[1])
+    proxy.reboot('default', sys.argv)
