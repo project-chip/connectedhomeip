@@ -24,9 +24,9 @@
 #include <app/clusters/keypad-input-server/keypad-input-delegate.h>
 #include <app/clusters/keypad-input-server/keypad-input-server.h>
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/app-platform/ContentAppPlatform.h>
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED

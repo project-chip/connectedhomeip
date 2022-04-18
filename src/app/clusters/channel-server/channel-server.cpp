@@ -38,8 +38,8 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/AttributeAccessInterface.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED

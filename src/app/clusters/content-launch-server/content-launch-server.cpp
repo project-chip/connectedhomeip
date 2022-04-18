@@ -41,8 +41,8 @@
 #include <app/clusters/content-launch-server/content-launch-delegate.h>
 #include <app/clusters/content-launch-server/content-launch-server.h>
 
-#include <app/AttributeAccessInterface.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
