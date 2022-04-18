@@ -37,13 +37,14 @@ class App:
         self.cv_stopped = threading.Condition()
         self.stopped = False
         self.lastLogIndex = 0
+        self.kvs = '/tmp/chip_kvs'
 
-    def start(self, discriminator):
+    def start(self, options):
         if not self.process:
             # Make sure to assign self.process before we do any operations that
             # might fail, so attempts to kill us on failure actually work.
             self.process, self.outpipe, errpipe = self.__startServer(
-                self.runner, self.command, discriminator)
+                self.runner, self.command, options)
             self.waitForAnyAdvertisement()
             self.__updateSetUpCode()
             with self.cv_stopped:
@@ -64,18 +65,9 @@ class App:
             return True
         return False
 
-    def reboot(self, discriminator):
-        if self.process:
-            self.stop()
-            self.start(discriminator)
-            return True
-        return False
-
     def factoryReset(self):
-        storage = '/tmp/chip_kvs'
-        if os.path.exists(storage):
-            os.unlink(storage)
-
+        if os.path.exists(self.kvs):
+            os.unlink(self.kvs)
         return True
 
     def waitForAnyAdvertisement(self):
@@ -107,12 +99,15 @@ class App:
                 while self.stopped:
                     self.cv_stopped.wait()
 
-    def __startServer(self, runner, command, discriminator):
-        logging.debug(
-            'Executing application under test with discriminator %s.' %
-            discriminator)
-        app_cmd = command + ['--discriminator', str(discriminator)]
-        app_cmd = app_cmd + ['--interface-id', str(-1)]
+    def __startServer(self, runner, command, options):
+        app_cmd = command + ['--interface-id', str(-1)]
+
+        logging.debug('Executing application under test with the following args:')
+        for key, value in options.items():
+            logging.debug('   %s: %s' % (key, value))
+            app_cmd = app_cmd + [key, value]
+            if key == '--KVS':
+                self.kvs = value
         return runner.RunSubprocess(app_cmd, name='APP ', wait=False)
 
     def __waitFor(self, waitForString, server_process, outpipe):
@@ -238,7 +233,7 @@ class TestDefinition:
             # Remove server application storage (factory reset),
             # so it will be commissionable again.
             app.factoryReset()
-            app.start(str(randrange(1, 4096)))
+            app.start({})
 
             runner.RunSubprocess(
                 tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode] +

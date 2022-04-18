@@ -32,7 +32,7 @@ CHIP_ERROR SystemCommands::Start(uint16_t discriminator)
     constexpr const char * scriptName = "Start.py";
 
     char command[128];
-    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s %u", scriptDir, scriptName, discriminator) >= 0,
+    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s --discriminator %u", scriptDir, scriptName, discriminator) >= 0,
                         CHIP_ERROR_INTERNAL);
     return RunInternal(command);
 }
@@ -53,7 +53,7 @@ CHIP_ERROR SystemCommands::Reboot(uint16_t discriminator)
     constexpr const char * scriptName = "Reboot.py";
 
     char command[128];
-    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s %u", scriptDir, scriptName, discriminator) >= 0,
+    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s --discriminator %u", scriptDir, scriptName, discriminator) >= 0,
                         CHIP_ERROR_INTERNAL);
     return RunInternal(command);
 }
