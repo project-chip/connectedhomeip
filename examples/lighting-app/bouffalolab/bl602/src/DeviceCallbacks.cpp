@@ -122,7 +122,7 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
     }
 
     // TODO
-    // log_info("Current free heap: %zu\r\n\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+    // log_info("Current free heap: %u\r\n\n", (unsigned int)heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }
 
 void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event)

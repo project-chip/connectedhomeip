@@ -445,8 +445,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
         }
 
         ChipLogDetail(DataManagement,
-                      "Received group attribute write for Group=%" PRIu16 " Cluster=" ChipLogFormatMEI
-                      " attribute=" ChipLogFormatMEI,
+                      "Received group attribute write for Group=%u Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
                       groupId, ChipLogValueMEI(dataAttributePath.mClusterId), ChipLogValueMEI(dataAttributePath.mAttributeId));
 
         iterator = groupDataProvider->IterateEndpoints(fabric);
@@ -499,7 +498,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             if (InteractionModelEngine::GetInstance()->HasConflictWriteRequests(this, dataAttributePath))
             {
                 ChipLogDetail(DataManagement,
-                              "Writing attribute endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI
+                              "Writing attribute endpoint=%u Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI
                               " is conflict with other write transactions.",
                               mapping.endpoint_id, ChipLogValueMEI(dataAttributePath.mClusterId),
                               ChipLogValueMEI(dataAttributePath.mAttributeId));
@@ -512,7 +511,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             }
 
             ChipLogDetail(DataManagement,
-                          "Processing group attribute write for endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
+                          "Processing group attribute write for endpoint=%u Cluster=" ChipLogFormatMEI
                           " attribute=" ChipLogFormatMEI,
                           mapping.endpoint_id, ChipLogValueMEI(dataAttributePath.mClusterId),
                           ChipLogValueMEI(dataAttributePath.mAttributeId));
@@ -525,7 +524,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(DataManagement,
-                             "WriteSingleClusterData Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Attribute =" ChipLogFormatMEI
+                             "WriteSingleClusterData Endpoint=%u Cluster=" ChipLogFormatMEI " Attribute =" ChipLogFormatMEI
                              " failed: %" CHIP_ERROR_FORMAT,
                              mapping.endpoint_id, ChipLogValueMEI(dataAttributePath.mClusterId),
                              ChipLogValueMEI(dataAttributePath.mAttributeId), err.Format());

@@ -668,7 +668,7 @@ void CheckAddressQuartet(nlTestSuite * inSuite, const uint32_t & inFirstAddressQ
 
     if (!lResult)
     {
-        fprintf(stdout, "Address quartet %zu mismatch: actual 0x%08" PRIX32 ", expected: 0x%08" PRIX32 "\n", inWhich,
+        fprintf(stdout, "Address quartet %u mismatch: actual 0x%08" PRIX32 ", expected: 0x%08" PRIX32 "\n", (unsigned int) inWhich,
                 inFirstAddressQuartet, inSecondAddressQuartet);
     }
 }

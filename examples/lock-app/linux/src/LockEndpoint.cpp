@@ -60,11 +60,11 @@ bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & u
 
     ChipLogDetail(Zcl,
                   "Found occupied user "
-                  "[endpoint=%d,adjustedIndex=%hu,name=\"%.*s\",credentialsCount=%zu,uniqueId=%x,type=%u,credentialRule=%u,"
+                  "[endpoint=%d,adjustedIndex=%hu,name=\"%.*s\",credentialsCount=%u,uniqueId=%x,type=%u,credentialRule=%u,"
                   "createdBy=%d,lastModifiedBy=%d]",
                   mEndpointId, adjustedUserIndex, static_cast<int>(user.userName.size()), user.userName.data(),
-                  user.credentials.size(), user.userUniqueId, to_underlying(user.userType), to_underlying(user.credentialRule),
-                  user.createdBy, user.lastModifiedBy);
+                  static_cast<unsigned int>(user.credentials.size()), user.userUniqueId, to_underlying(user.userType),
+                  to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
 
     return true;
 }
@@ -75,17 +75,17 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
 {
     ChipLogProgress(Zcl,
                     "Lock App: LockEndpoint::SetUser "
-                    "[endpoint=%d,userIndex=%" PRIu16 ",creator=%d,modifier=%d,userName=\"%.*s\",uniqueId=%" PRIx32
+                    "[endpoint=%d,userIndex=%u,creator=%d,modifier=%d,userName=\"%.*s\",uniqueId=%" PRIx32
                     ",userStatus=%u,userType=%u,"
-                    "credentialRule=%u,credentials=%p,totalCredentials=%zu]",
+                    "credentialRule=%u,credentials=%p,totalCredentials=%u]",
                     mEndpointId, userIndex, creator, modifier, static_cast<int>(userName.size()), userName.data(), uniqueId,
                     to_underlying(userStatus), to_underlying(usertype), to_underlying(credentialRule), credentials,
-                    totalCredentials);
+                    (unsigned int) totalCredentials);
 
     uint16_t adjustedUserIndex = static_cast<uint16_t>(userIndex - 1);
     if (adjustedUserIndex > mLockUsers.size())
     {
-        ChipLogError(Zcl, "Cannot set user - index out of range [endpoint=%d,index=%d,adjustedUserIndex=%" PRIu16 "]", mEndpointId,
+        ChipLogError(Zcl, "Cannot set user - index out of range [endpoint=%d,index=%d,adjustedUserIndex=%u]", mEndpointId,
                      userIndex, adjustedUserIndex);
         return false;
     }
@@ -94,17 +94,17 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
 
     if (userName.size() > DOOR_LOCK_MAX_USER_NAME_SIZE)
     {
-        ChipLogError(Zcl, "Cannot set user - user name is too long [endpoint=%d,index=%d,adjustedUserIndex=%" PRIu16 "]",
-                     mEndpointId, userIndex, adjustedUserIndex);
+        ChipLogError(Zcl, "Cannot set user - user name is too long [endpoint=%d,index=%d,adjustedUserIndex=%u]", mEndpointId,
+                     userIndex, adjustedUserIndex);
         return false;
     }
 
     if (totalCredentials > sizeof(DOOR_LOCK_MAX_CREDENTIALS_PER_USER))
     {
         ChipLogError(Zcl,
-                     "Cannot set user - total number of credentials is too big [endpoint=%d,index=%d,adjustedUserIndex=%" PRIu16
-                     ",totalCredentials=%zu]",
-                     mEndpointId, userIndex, adjustedUserIndex, totalCredentials);
+                     "Cannot set user - total number of credentials is too big [endpoint=%d,index=%d,adjustedUserIndex=%u"
+                     ",totalCredentials=%u]",
+                     mEndpointId, userIndex, adjustedUserIndex, (unsigned int) totalCredentials);
         return false;
     }
 
@@ -132,7 +132,7 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
 bool LockEndpoint::GetCredential(uint16_t credentialIndex, DlCredentialType credentialType,
                                  EmberAfPluginDoorLockCredentialInfo & credential) const
 {
-    ChipLogProgress(Zcl, "Lock App: LockEndpoint::GetCredential [endpoint=%d,credentialIndex=%" PRIu16 ",credentialType=%u]",
+    ChipLogProgress(Zcl, "Lock App: LockEndpoint::GetCredential [endpoint=%d,credentialIndex=%u,credentialType=%u]",
                     mEndpointId, credentialIndex, to_underlying(credentialType));
 
     if (credentialIndex >= mLockCredentials.size() || (0 == credentialIndex && DlCredentialType::kProgrammingPIN != credentialType))
@@ -146,14 +146,14 @@ bool LockEndpoint::GetCredential(uint16_t credentialIndex, DlCredentialType cred
     credential.status = credentialInStorage.status;
     if (DlCredentialStatus::kAvailable == credential.status)
     {
-        ChipLogDetail(Zcl, "Found unoccupied credential [endpoint=%d,index=%" PRIu16 "]", mEndpointId, credentialIndex);
+        ChipLogDetail(Zcl, "Found unoccupied credential [endpoint=%d,index=%u]", mEndpointId, credentialIndex);
         return true;
     }
     credential.credentialType = credentialInStorage.credentialType;
     credential.credentialData = chip::ByteSpan(credentialInStorage.credentialData, credentialInStorage.credentialDataSize);
 
-    ChipLogDetail(Zcl, "Found occupied credential [endpoint=%d,index=%" PRIu16 ",type=%u,dataSize=%zu]", mEndpointId,
-                  credentialIndex, to_underlying(credential.credentialType), credential.credentialData.size());
+    ChipLogDetail(Zcl, "Found occupied credential [endpoint=%d,index=%u,type=%u,dataSize=%u]", mEndpointId, credentialIndex,
+                  to_underlying(credential.credentialType), static_cast<unsigned int>(credential.credentialData.size()));
 
     return true;
 }
@@ -163,9 +163,9 @@ bool LockEndpoint::SetCredential(uint16_t credentialIndex, DlCredentialStatus cr
 {
     ChipLogProgress(Zcl,
                     "Lock App: LockEndpoint::SetCredential "
-                    "[endpoint=%d,credentialIndex=%" PRIu16 ",credentialStatus=%u,credentialType=%u,credentialDataSize=%zu]",
+                    "[endpoint=%d,credentialIndex=%u,credentialStatus=%u,credentialType=%u,credentialDataSize=%u]",
                     mEndpointId, credentialIndex, to_underlying(credentialStatus), to_underlying(credentialType),
-                    credentialData.size());
+                    static_cast<unsigned int>(credentialData.size()));
 
     if (credentialIndex >= mLockCredentials.size() || (0 == credentialIndex && DlCredentialType::kProgrammingPIN != credentialType))
     {
@@ -178,8 +178,9 @@ bool LockEndpoint::SetCredential(uint16_t credentialIndex, DlCredentialStatus cr
     {
         ChipLogError(Zcl,
                      "Cannot get the credential - data size exceeds limit "
-                     "[endpoint=%d,index=%d,dataSize=%zu,maxDataSize=%zu]",
-                     mEndpointId, credentialIndex, credentialData.size(), DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE);
+                     "[endpoint=%d,index=%d,dataSize=%u,maxDataSize=%u]",
+                     mEndpointId, credentialIndex, static_cast<unsigned int>(credentialData.size()),
+                     (unsigned int) DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE);
         return false;
     }
     credentialInStorage.status         = credentialStatus;

@@ -489,16 +489,17 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
     ReturnErrorOnFailure(ChipDnssdPublishService(&service, HandleDnssdPublish, this));
 
 #ifdef DETAIL_LOGGING
-    printf("printEntries port=%u, mTextEntrySize=%zu, mSubTypeSize=%zu\n", port, textEntrySize, subTypeSize);
+    printf("printEntries port=%u, mTextEntrySize=%u, mSubTypeSize=%u\n", port, (unsigned int) textEntrySize,
+           (unsigned int) subTypeSize);
 
-    for (size_t i = 0; i < textEntrySize; i++)
+    for (unsigned int i = 0; i < textEntrySize; i++)
     {
-        printf(" entry [%zu] : %s %s\n", i, textEntries[i].mKey, (char *) (textEntries[i].mData));
+        printf(" entry [%u] : %s %s\n", i, textEntries[i].mKey, (char *) (textEntries[i].mData));
     }
 
-    for (size_t i = 0; i < subTypeSize; i++)
+    for (unsigned int i = 0; i < subTypeSize; i++)
     {
-        printf(" type [%zu] : %s\n", i, subTypes[i]);
+        printf(" type [%u] : %s\n", i, subTypes[i]);
     }
 #endif
 

@@ -58,7 +58,7 @@ bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
 {
     if (delegate == nullptr)
     {
-        ChipLogError(Zcl, "Audio Output has no delegate set for endpoint:%" PRIu16, endpoint);
+        ChipLogError(Zcl, "Audio Output has no delegate set for endpoint:%u", endpoint);
         return true;
     }
     return false;

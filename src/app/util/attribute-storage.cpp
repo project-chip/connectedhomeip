@@ -1225,11 +1225,10 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                     }
                     else
                     {
-                        ChipLogDetail(DataManagement,
-                                      "Failed to read stored attribute (%" PRIu16 ", " ChipLogFormatMEI ", " ChipLogFormatMEI
-                                      ": %" CHIP_ERROR_FORMAT,
-                                      de->endpoint, ChipLogValueMEI(cluster->clusterId), ChipLogValueMEI(am->attributeId),
-                                      err.Format());
+                        ChipLogDetail(
+                            DataManagement,
+                            "Failed to read stored attribute (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
+                            de->endpoint, ChipLogValueMEI(cluster->clusterId), ChipLogValueMEI(am->attributeId), err.Format());
                         // Just fall back to default value.
                     }
                 }

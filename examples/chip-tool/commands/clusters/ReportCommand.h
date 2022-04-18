@@ -114,10 +114,10 @@ protected:
                                uint16_t maxInterval                                                = 0,
                                const chip::Optional<std::vector<chip::DataVersion>> & dataVersions = chip::NullOptional)
     {
-        const size_t clusterCount      = clusterIds.size();
-        const size_t attributeCount    = attributeIds.size();
-        const size_t endpointCount     = endpointIds.size();
-        const size_t dataVersionsCount = dataVersions.HasValue() ? dataVersions.Value().size() : 0;
+        const unsigned int clusterCount      = (unsigned int) (clusterIds.size());
+        const unsigned int attributeCount    = (unsigned int) (attributeIds.size());
+        const unsigned int endpointCount     = (unsigned int) (endpointIds.size());
+        const unsigned int dataVersionsCount = (unsigned int) (dataVersions.HasValue() ? dataVersions.Value().size() : 0);
 
         VerifyOrReturnError(clusterCount > 0 && clusterCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(attributeCount > 0 && attributeCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
@@ -161,8 +161,8 @@ protected:
                 chipTool,
                 "\n%sAttribute commands targetting multiple paths needs to have: \n \t * One element with multiple ids (for "
                 "example 1 cluster id, 1 attribute id, 2 endpoint ids)\n\t * Or the same "
-                "number of ids (for examples 2 cluster ids, 2 attribute ids and 2 endpoint ids).\n The current command has %zu "
-                "cluster ids, %zu attribute ids, %zu endpoint ids.",
+                "number of ids (for examples 2 cluster ids, 2 attribute ids and 2 endpoint ids).\n The current command has %u "
+                "cluster ids, %u attribute ids, %u endpoint ids.",
                 interactionType == chip::app::ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read", clusterCount,
                 attributeCount, endpointCount);
             return CHIP_ERROR_INVALID_ARGUMENT;
@@ -179,7 +179,7 @@ protected:
             chip::AttributeId attributeId = attributeIds.at((hasSameIdsCount || multipleAttributes) ? i : 0);
             chip::EndpointId endpointId   = endpointIds.at((hasSameIdsCount || multipleEndpoints) ? i : 0);
 
-            ChipLogProgress(chipTool, "\tcluster " ChipLogFormatMEI ", attribute: " ChipLogFormatMEI ", endpoint %" PRIu16,
+            ChipLogProgress(chipTool, "\tcluster " ChipLogFormatMEI ", attribute: " ChipLogFormatMEI ", endpoint %u",
                             ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId), endpointId);
             attributePathParams[i].mClusterId   = clusterId;
             attributePathParams[i].mAttributeId = attributeId;
@@ -230,9 +230,9 @@ protected:
                            std::vector<chip::EventId> eventIds, chip::app::ReadClient::InteractionType interactionType,
                            uint16_t minInterval = 0, uint16_t maxInterval = 0)
     {
-        const size_t clusterCount  = clusterIds.size();
-        const size_t eventCount    = eventIds.size();
-        const size_t endpointCount = endpointIds.size();
+        const unsigned int clusterCount  = (unsigned int) (clusterIds.size());
+        const unsigned int eventCount    = (unsigned int) (eventIds.size());
+        const unsigned int endpointCount = (unsigned int) (endpointIds.size());
 
         VerifyOrReturnError(clusterCount > 0 && clusterCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(eventCount > 0 && eventCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
@@ -262,14 +262,13 @@ protected:
         }
         else
         {
-            ChipLogError(
-                chipTool,
-                "\n%sEvent command targetting multiple paths needs to have: \n \t * One element with multiple ids (for "
-                "example 1 cluster id, 1 event id, 2 endpoint ids)\n\t * Or the same "
-                "number of ids (for examples 2 cluster ids, 2 event ids and 2 endpoint ids).\n The current command has %zu "
-                "cluster ids, %zu event ids, %zu endpoint ids.",
-                interactionType == chip::app::ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read", clusterCount,
-                eventCount, endpointCount);
+            ChipLogError(chipTool,
+                         "\n%sEvent command targetting multiple paths needs to have: \n \t * One element with multiple ids (for "
+                         "example 1 cluster id, 1 event id, 2 endpoint ids)\n\t * Or the same "
+                         "number of ids (for examples 2 cluster ids, 2 event ids and 2 endpoint ids).\n The current command has %u "
+                         "cluster ids, %u event ids, %u endpoint ids.",
+                         interactionType == chip::app::ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read", clusterCount,
+                         eventCount, endpointCount);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
@@ -283,7 +282,7 @@ protected:
             chip::EventId eventId       = eventIds.at((hasSameIdsCount || multipleEvents) ? i : 0);
             chip::EndpointId endpointId = endpointIds.at((hasSameIdsCount || multipleEndpoints) ? i : 0);
 
-            ChipLogProgress(chipTool, "\tcluster " ChipLogFormatMEI ", event: " ChipLogFormatMEI ", endpoint %" PRIu16,
+            ChipLogProgress(chipTool, "\tcluster " ChipLogFormatMEI ", event: " ChipLogFormatMEI ", endpoint %u",
                             ChipLogValueMEI(clusterId), ChipLogValueMEI(eventId), endpointId);
             eventPathParams[i].mClusterId  = clusterId;
             eventPathParams[i].mEventId    = eventId;
