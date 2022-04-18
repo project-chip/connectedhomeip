@@ -52,13 +52,13 @@ public:
     void OnSessionEstablished(const SessionHandle & session) override;
 
     //// UnsolicitedMessageHandler Implementation ////
-    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, Messaging::ExchangeDelegate *& newDelegate) override;
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader,
+                                            Messaging::ExchangeDelegate *& newDelegate) override;
     void OnExchangeCreationFailed(Messaging::ExchangeDelegate * delegate) override;
 
 private:
     Messaging::ExchangeManager * mExchangeManager        = nullptr;
     SessionResumptionStorage * mSessionResumptionStorage = nullptr;
-
 
     Optional<CASESession> mPairingSession; // TOOD: use a pool to enable concurrent CASE session.
     SessionManager * mSessionManager = nullptr;

@@ -74,7 +74,7 @@ CHIP_ERROR CASEServer::OnUnsolicitedMessageReceived(const PayloadHeader & payloa
         session->SetGroupDataProvider(mGroupDataProvider);
         ReturnErrorOnFailure(
             session->ListenForSessionEstablishment(*mSessionManager, mFabrics, mSessionResumptionStorage, this,
-                Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig())));
+                                                   Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig())));
         newDelegate = session;
 
         return CHIP_NO_ERROR;

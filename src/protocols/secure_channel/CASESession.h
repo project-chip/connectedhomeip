@@ -60,9 +60,9 @@ class DLL_EXPORT CASESession : public Messaging::ExchangeDelegate, public Pairin
 public:
     ~CASESession() override;
 
-    using InitiatorRandomStorage                 = std::array<uint8_t, kSigmaParamRandomNumberSize>;
-    using InitiatorRandomView                    = FixedSpan<uint8_t, kSigmaParamRandomNumberSize>;
-    using ConstInitiatorRandomView               = FixedSpan<const uint8_t, kSigmaParamRandomNumberSize>;
+    using InitiatorRandomStorage   = std::array<uint8_t, kSigmaParamRandomNumberSize>;
+    using InitiatorRandomView      = FixedSpan<uint8_t, kSigmaParamRandomNumberSize>;
+    using ConstInitiatorRandomView = FixedSpan<const uint8_t, kSigmaParamRandomNumberSize>;
 
     Transport::SecureSession::Type GetSecureSessionType() const override { return Transport::SecureSession::Type::kCASE; }
     ScopedNodeId GetPeer() const override { return ScopedNodeId(mPeerNodeId, GetFabricIndex()); }
@@ -263,7 +263,7 @@ private:
     CATValues mPeerCATs;
 
     SessionResumptionStorage::ResumptionIdStorage mResumeResumptionId; // ResumptionId which is used to resume this session
-    SessionResumptionStorage::ResumptionIdStorage mNewResumptionId; // ResumptionId which is stored to resume future session
+    SessionResumptionStorage::ResumptionIdStorage mNewResumptionId;    // ResumptionId which is stored to resume future session
     // Sigma1 initiator random, maintained to be reused post-Sigma1, such as when generating Sigma2 S2RK key
     InitiatorRandomStorage mInitiatorRandom;
 

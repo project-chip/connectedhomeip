@@ -89,9 +89,9 @@ using namespace Messaging;
 using namespace Encoding;
 using namespace Protocols::SecureChannel;
 
-constexpr uint8_t kKDFSR2Info[]   = { 0x53, 0x69, 0x67, 0x6d, 0x61, 0x32 };
-constexpr uint8_t kKDFSR3Info[]   = { 0x53, 0x69, 0x67, 0x6d, 0x61, 0x33 };
-constexpr size_t kKDFInfoLength   = sizeof(kKDFSR2Info);
+constexpr uint8_t kKDFSR2Info[] = { 0x53, 0x69, 0x67, 0x6d, 0x61, 0x32 };
+constexpr uint8_t kKDFSR3Info[] = { 0x53, 0x69, 0x67, 0x6d, 0x61, 0x33 };
+constexpr size_t kKDFInfoLength = sizeof(kKDFSR2Info);
 
 constexpr uint8_t kKDFS1RKeyInfo[] = { 0x53, 0x69, 0x67, 0x6d, 0x61, 0x31, 0x5f, 0x52, 0x65, 0x73, 0x75, 0x6d, 0x65 };
 constexpr uint8_t kKDFS2RKeyInfo[] = { 0x53, 0x69, 0x67, 0x6d, 0x61, 0x32, 0x5f, 0x52, 0x65, 0x73, 0x75, 0x6d, 0x65 };
@@ -130,8 +130,10 @@ CASESession::~CASESession()
 
 bool CASESession::SanityCheck() const
 {
-    // This is called after handling a message, the session must be in a state of available or waiting for another message, otherwise the object may be leaked.
-    if (Available()) return true;
+    // This is called after handling a message, the session must be in a state of available or waiting for another message,
+    // otherwise the object may be leaked.
+    if (Available())
+        return true;
 
     if (mRole == CryptoContext::SessionRole::kInitiator)
     {
@@ -255,9 +257,9 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     // been initialized
     SuccessOrExit(err);
 
-    mFabricInfo     = fabric;
+    mFabricInfo               = fabric;
     mSessionResumptionStorage = sessionResumptionStorage;
-    mLocalMRPConfig = mrpConfig;
+    mLocalMRPConfig           = mrpConfig;
 
     mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
     mPeerNodeId = peerNodeId;
@@ -274,7 +276,8 @@ exit:
 
 void CASESession::OnResponseTimeout(ExchangeContext * ec)
 {
-    ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %u", static_cast<uint8_t>(mState));
+    ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %u",
+                 static_cast<uint8_t>(mState));
     AbortExchange();
     mState = State::kError;
     VerifyOrDie(SanityCheck());
@@ -286,48 +289,48 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session) const
 {
     switch (mState)
     {
-        case State::kFinished:
-            {
-                // Generate Salt for Encryption keys
-                size_t saltlen = sizeof(mIPK) + kSHA256_Hash_Length;
+    case State::kFinished: {
+        // Generate Salt for Encryption keys
+        size_t saltlen = sizeof(mIPK) + kSHA256_Hash_Length;
 
-                chip::Platform::ScopedMemoryBuffer<uint8_t> msg_salt;
-                ReturnErrorCodeIf(!msg_salt.Alloc(saltlen), CHIP_ERROR_NO_MEMORY);
-                {
-                    Encoding::LittleEndian::BufferWriter bbuf(msg_salt.Get(), saltlen);
-                    bbuf.Put(mIPK, sizeof(mIPK));
-                    bbuf.Put(mMessageDigest, sizeof(mMessageDigest));
+        chip::Platform::ScopedMemoryBuffer<uint8_t> msg_salt;
+        ReturnErrorCodeIf(!msg_salt.Alloc(saltlen), CHIP_ERROR_NO_MEMORY);
+        {
+            Encoding::LittleEndian::BufferWriter bbuf(msg_salt.Get(), saltlen);
+            bbuf.Put(mIPK, sizeof(mIPK));
+            bbuf.Put(mMessageDigest, sizeof(mMessageDigest));
 
-                    VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
-                }
+            VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        }
 
-                ReturnErrorOnFailure(session.InitFromSecret(ByteSpan(mSharedSecret, mSharedSecret.Length()), ByteSpan(msg_salt.Get(), saltlen),
-                        CryptoContext::SessionInfoType::kSessionEstablishment, mRole));
+        ReturnErrorOnFailure(session.InitFromSecret(ByteSpan(mSharedSecret, mSharedSecret.Length()),
+                                                    ByteSpan(msg_salt.Get(), saltlen),
+                                                    CryptoContext::SessionInfoType::kSessionEstablishment, mRole));
 
-                return CHIP_NO_ERROR;
-            }
-        case State::kFinishedResumed:
-            {
-                // Generate Salt for Encryption keys
-                size_t saltlen = mInitiatorRandom.size() + mResumeResumptionId.size();
+        return CHIP_NO_ERROR;
+    }
+    case State::kFinishedResumed: {
+        // Generate Salt for Encryption keys
+        size_t saltlen = mInitiatorRandom.size() + mResumeResumptionId.size();
 
-                chip::Platform::ScopedMemoryBuffer<uint8_t> msg_salt;
-                ReturnErrorCodeIf(!msg_salt.Alloc(saltlen), CHIP_ERROR_NO_MEMORY);
-                {
-                    Encoding::LittleEndian::BufferWriter bbuf(msg_salt.Get(), saltlen);
-                    bbuf.Put(mInitiatorRandom.data(), mInitiatorRandom.size());
-                    bbuf.Put(mResumeResumptionId.data(), mResumeResumptionId.size());
+        chip::Platform::ScopedMemoryBuffer<uint8_t> msg_salt;
+        ReturnErrorCodeIf(!msg_salt.Alloc(saltlen), CHIP_ERROR_NO_MEMORY);
+        {
+            Encoding::LittleEndian::BufferWriter bbuf(msg_salt.Get(), saltlen);
+            bbuf.Put(mInitiatorRandom.data(), mInitiatorRandom.size());
+            bbuf.Put(mResumeResumptionId.data(), mResumeResumptionId.size());
 
-                    VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
-                }
+            VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        }
 
-                ReturnErrorOnFailure(session.InitFromSecret(ByteSpan(mSharedSecret, mSharedSecret.Length()), ByteSpan(msg_salt.Get(), saltlen),
-                        CryptoContext::SessionInfoType::kSessionResumption, mRole));
+        ReturnErrorOnFailure(session.InitFromSecret(ByteSpan(mSharedSecret, mSharedSecret.Length()),
+                                                    ByteSpan(msg_salt.Get(), saltlen),
+                                                    CryptoContext::SessionInfoType::kSessionResumption, mRole));
 
-                return CHIP_NO_ERROR;
-            }
-        default:
-            return CHIP_ERROR_INCORRECT_STATE;
+        return CHIP_NO_ERROR;
+    }
+    default:
+        return CHIP_ERROR_INCORRECT_STATE;
     }
 }
 
@@ -1511,15 +1514,15 @@ void CASESession::OnSuccessStatusReport()
 
     switch (mState)
     {
-        case State::kSentSigma3:
-            mState = State::kFinished;
-            break;
-        case State::kSentSigma2Resume:
-            mState = State::kFinishedResumed;
-            break;
-        default:
-            VerifyOrDie(false);
-            break;
+    case State::kSentSigma3:
+        mState = State::kFinished;
+        break;
+    case State::kSentSigma2Resume:
+        mState = State::kFinishedResumed;
+        break;
+    default:
+        VerifyOrDie(false);
+        break;
     }
 
     Finish();
@@ -1744,7 +1747,8 @@ exit:
 
     if (err == CHIP_ERROR_INVALID_MESSAGE_TYPE)
     {
-        ChipLogError(SecureChannel, "Received message (type %d) cannot be handled in %d state.", to_underlying(msgType), static_cast<uint8_t>(mState));
+        ChipLogError(SecureChannel, "Received message (type %d) cannot be handled in %d state.", to_underlying(msgType),
+                     static_cast<uint8_t>(mState));
     }
 
     if (err != CHIP_NO_ERROR)

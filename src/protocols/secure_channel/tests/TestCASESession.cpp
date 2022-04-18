@@ -259,13 +259,13 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite,
                    pairingAccessory.ListenForSessionEstablishment(&ctx.GetExchangeManager(),
 #if CONFIG_NETWORK_LAYER_BLE
-                       nullptr,
+                                                                  nullptr,
 #endif
-                       &ctx.GetSecureSessionManager(), &gDeviceFabrics, nullptr, &gDeviceGroupDataProvider) ==
-                       CHIP_NO_ERROR);
+                                                                  &ctx.GetSecureSessionManager(), &gDeviceFabrics, nullptr,
+                                                                  &gDeviceGroupDataProvider) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.EstablishSession(ctx.GetSecureSessionManager(), fabric, Node01_01, contextCommissioner, nullptr,
-                                                        &delegateCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner.EstablishSession(ctx.GetSecureSessionManager(), fabric, Node01_01, contextCommissioner,
+                                                        nullptr, &delegateCommissioner) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 5);

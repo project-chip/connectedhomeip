@@ -47,10 +47,7 @@ public:
 
     const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteMRPConfig; }
 
-    CHIP_ERROR DeriveSecureSession(CryptoContext & session) const override
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR DeriveSecureSession(CryptoContext & session) const override { return CHIP_NO_ERROR; }
 
     CHIP_ERROR DecodeMRPParametersIfPresent(TLV::Tag expectedTag, System::PacketBufferTLVReader & tlvReader)
     {
