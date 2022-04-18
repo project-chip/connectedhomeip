@@ -364,9 +364,6 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
 
     MockInteractionModelApp delegate;
     chip::app::ClusterStateCache cache(delegate);
-    auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager());
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     chip::app::EventPathParams eventPathParams[100];
     for (uint32_t index = 0; index < 100; index++)
@@ -762,8 +759,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         readPrepareParams.mEventPathParamsListSize = 0;
     }
 
-    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
-    engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
@@ -1690,9 +1686,8 @@ void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * 
     // The following check will trigger the logic in im to kill the read handlers that uses more paths than the limit per fabric.
     {
         TestReadCallback callback;
-        std::vector<std::unique_ptr<app::ReadClient>> outReadClient;
         EstablishSubscriptions(apSuite, apContext, 1, app::InteractionModelEngine::kMinSupportedPathPerSubscription, &callback,
-                               outReadClient);
+                               readClients);
 
         ctx.DrainAndServiceIO();
 

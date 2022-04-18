@@ -567,7 +567,7 @@ bool InteractionModelEngine::TrimFabric(FabricIndex aFabricIndex, bool aForceEvi
     int32_t perFabricPathCapacity =
         (pathPoolCapacity - static_cast<int32_t>(kReservedPathsForReads)) / static_cast<int32_t>(fabricCount);
     int32_t perFabricSubscriptionCapacity =
-        (readHandlerPoolCapacity - static_cast<int32_t>(kReservedPathsForReads)) / static_cast<int32_t>(fabricCount);
+        (readHandlerPoolCapacity - static_cast<int32_t>(kReservedHandlerForReads)) / static_cast<int32_t>(fabricCount);
 
     ReadHandler * candidate            = nullptr;
     int32_t candicateAttributePathUsed = 0;
@@ -689,12 +689,13 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
         didEvictHandler = false;
         for (const auto & fabric : *mpFabricTable)
         {
-            didEvictHandler = didEvictHandler || evictAndUpdateResourceUsage(fabric.GetFabricIndex(), false);
+            // The resources are enough to serve this request, do not evict anything.
             if (usedAttributePaths + aRequestedAttributePathCount <= attributePathCap &&
                 usedEventPaths + aRequestedEventPathCount <= eventPathCap && usedReadHandlers < readHandlerCap)
             {
                 break;
             }
+            didEvictHandler = didEvictHandler || evictAndUpdateResourceUsage(fabric.GetFabricIndex(), false);
         }
     }
 
