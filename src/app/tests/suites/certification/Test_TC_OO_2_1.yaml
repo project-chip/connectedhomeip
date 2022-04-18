@@ -36,6 +36,7 @@ tests:
               type: bool
 
     - label: "read LT attribute: GlobalSceneControl"
+      optional: true
       command: "readAttribute"
       attribute: "GlobalSceneControl"
       response:
@@ -43,6 +44,7 @@ tests:
               type: bool
 
     - label: "read LT attribute: OnTime"
+      optional: true
       command: "readAttribute"
       attribute: "OnTime"
       response:
@@ -50,6 +52,7 @@ tests:
               type: uint16
 
     - label: "read LT attribute: OffWaitTime"
+      optional: true
       command: "readAttribute"
       attribute: "OffWaitTime"
       response:
@@ -57,6 +60,7 @@ tests:
               type: uint16
 
     - label: "read LT attribute: StartUpOnOff"
+      optional: true
       command: "readAttribute"
       attribute: "StartUpOnOff"
       response:
