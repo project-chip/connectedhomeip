@@ -75,7 +75,7 @@ void SignalHandler(int signum)
     case SIGHUP:
         PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::RadioFaultChange::Id);
         break;
-    case SIGTERM:
+    case SIGTTIN:
         PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::NetworkFaultChange::Id);
         break;
     case SIGTSTP:
@@ -179,7 +179,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     memset(&action, 0, sizeof(action));
     action.sa_handler = SignalHandler;
     sigaction(SIGHUP, &action, nullptr);
-    sigaction(SIGTERM, &action, nullptr);
+    sigaction(SIGTTIN, &action, nullptr);
     sigaction(SIGUSR1, &action, nullptr);
     sigaction(SIGUSR2, &action, nullptr);
     sigaction(SIGTSTP, &action, nullptr);
