@@ -84,10 +84,7 @@ typedef void (*OnDeviceConnectionFailure)(void * context, PeerId peerId, CHIP_ER
  *    - Establish a secure channel to it via CASE
  *    - Expose to consumers the secure session for talking to the device.
  */
-class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy,
-                                          SessionReleaseDelegate,
-                                          public SessionEstablishmentDelegate,
-                                          public AddressResolve::NodeListener
+class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy, SessionReleaseDelegate, public AddressResolve::NodeListener
 {
 public:
     ~OperationalDeviceProxy() override;
