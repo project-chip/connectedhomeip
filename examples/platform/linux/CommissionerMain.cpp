@@ -187,6 +187,9 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     gCommissionerDiscoveryController.SetUserDirectedCommissioningServer(gCommissioner.GetUserDirectedCommissioningServer());
     gCommissionerDiscoveryController.SetCommissionerCallback(&gCommissionerCallback);
 
+    ChipLogProgress(Support, "InitCommissioner nodeId=0x" ChipLogFormatX64 " fabricIndex=%d",
+                    ChipLogValueX64(gCommissioner.GetNodeId()), fabricInfo->GetFabricIndex());
+
     return CHIP_NO_ERROR;
 }
 

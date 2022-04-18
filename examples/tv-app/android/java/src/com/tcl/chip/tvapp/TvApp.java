@@ -37,8 +37,11 @@ public class TvApp {
 
   public native void nativeInit();
 
-  // post native init after platform is inited
-  public native void postInit();
+  // called before Matter server is inited
+  public native void preServerInit();
+
+  // called after Matter server is inited
+  public native void postServerInit();
 
   public native void setKeypadInputManager(int endpoint, KeypadInputManager manager);
 

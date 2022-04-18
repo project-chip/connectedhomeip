@@ -81,6 +81,7 @@ constexpr EndpointId kTvEndpoint = 1;
 CommissionableNodeController gCommissionableNodeController;
 chip::System::SocketWatchToken gToken;
 Dnssd::DiscoveryFilter gDiscoveryFilter = Dnssd::DiscoveryFilter();
+bool gInited                            = false;
 
 CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> gCASEClientPool;
 
@@ -150,13 +151,12 @@ void HandleUDCSendExpiration(System::Layer * aSystemLayer, void * context)
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-/**
- * Enters commissioning mode, opens commissioning window, logs onboarding payload.
- * If non-null selectedCommissioner is provided, sends user directed commissioning
- * request to the selectedCommissioner and advertises self as commissionable node over DNS-SD
- */
-void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissioner = nullptr)
+void InitServer()
 {
+    if (gInited)
+    {
+        return;
+    }
     // DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init("/tmp/chip_tv_casting_kvs");
     DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 
@@ -165,15 +165,27 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 
+    // Initialize binding handlers
+    ReturnOnFailure(InitBindingHandlers());
+
+    gInited = true;
+}
+
+/**
+ * Enters commissioning mode, opens commissioning window, logs onboarding payload.
+ * If non-null selectedCommissioner is provided, sends user directed commissioning
+ * request to the selectedCommissioner and advertises self as commissionable node over DNS-SD
+ */
+void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissioner = nullptr)
+{
+    InitServer();
+
     Server::GetInstance().GetFabricTable().DeleteAllFabrics();
     ReturnOnFailure(
         Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(kCommissioningWindowTimeout));
 
     // Display onboarding payload
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
-
-    // Initialize binding handlers
-    ReturnOnFailure(InitBindingHandlers());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     if (selectedCommissioner != nullptr)
@@ -332,10 +344,16 @@ private:
 class TargetVideoPlayerInfo
 {
 public:
+    TargetVideoPlayerInfo() :
+        mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
+    {}
+
     bool IsInitialized() { return mInitialized; }
 
     CHIP_ERROR Initialize(NodeId nodeId, FabricIndex fabricIndex)
     {
+        ChipLogProgress(NotSpecified, "TargetVideoPlayerInfo nodeId=0x" ChipLogFormatX64 " fabricIndex=%d", ChipLogValueX64(nodeId),
+                        fabricIndex);
         mNodeId      = nodeId;
         mFabricIndex = fabricIndex;
         for (auto & endpointInfo : mEndpoints)
@@ -359,8 +377,25 @@ public:
             .clientPool               = &gCASEClientPool,
         };
 
-        PeerId peerID           = fabric->GetPeerIdForNode(nodeId);
-        mOperationalDeviceProxy = chip::Platform::New<chip::OperationalDeviceProxy>(initParams, peerID);
+        PeerId peerID = fabric->GetPeerIdForNode(nodeId);
+        // mOperationalDeviceProxy = chip::Platform::New<chip::OperationalDeviceProxy>(initParams, peerID);
+
+        //
+        // TODO: The code here is assuming that we can create an OperationalDeviceProxy instance and attach it immediately
+        //       to a CASE session that just got established to us by the tv-app. While this will work most of the time,
+        //       this is a dangerous assumption to make since it is entirely possible for that secure session to have been
+        //       evicted in the time since that session was established to the point here when we desire to interact back
+        //       with that peer. If that is the case, our `OnConnected` callback will not get invoked syncronously and
+        //       mOperationalDeviceProxy will still have a value of null, triggering the check below to fail.
+        //
+        mOperationalDeviceProxy = nullptr;
+        CHIP_ERROR err =
+            server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Could not establish a session to the peer");
+            return err;
+        }
 
         // TODO: figure out why this doesn't work so that we can remove OperationalDeviceProxy creation above,
         // and remove the FindSecureSessionForNode and SetConnectedSession calls below
@@ -371,9 +406,6 @@ public:
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         ChipLogError(AppServer, "Created an instance of OperationalDeviceProxy");
-
-        SessionHandle handle = server->GetSecureSessionManager().FindSecureSessionForNode(nodeId);
-        mOperationalDeviceProxy->SetConnectedSession(handle);
 
         mInitialized = true;
         return CHIP_NO_ERROR;
@@ -451,11 +483,28 @@ public:
     }
 
 private:
+    static void HandleDeviceConnected(void * context, OperationalDeviceProxy * device)
+    {
+        TargetVideoPlayerInfo * _this  = static_cast<TargetVideoPlayerInfo *>(context);
+        _this->mOperationalDeviceProxy = device;
+        _this->mInitialized            = true;
+        ChipLogError(AppServer, "HandleDeviceConnected created an instance of OperationalDeviceProxy");
+    }
+
+    static void HandleDeviceConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error)
+    {
+        TargetVideoPlayerInfo * _this  = static_cast<TargetVideoPlayerInfo *>(context);
+        _this->mOperationalDeviceProxy = nullptr;
+    }
+
     static constexpr size_t kMaxNumberOfEndpoints = 5;
     TargetEndpointInfo mEndpoints[kMaxNumberOfEndpoints];
     NodeId mNodeId;
     FabricIndex mFabricIndex;
     OperationalDeviceProxy * mOperationalDeviceProxy;
+
+    Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
+    Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 
     bool mInitialized = false;
 };
@@ -561,6 +610,12 @@ CHIP_ERROR ContentLauncherLaunchURL(const char * contentUrl, const char * conten
     request.brandingInformation = MakeOptional(chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type());
     cluster.InvokeCommand(request, nullptr, OnContentLauncherSuccessResponse, OnContentLauncherFailureResponse);
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TargetVideoPlayerInfoInit(NodeId nodeId, FabricIndex fabricIndex)
+{
+    InitServer();
+    return gTargetVideoPlayerInfo.Initialize(nodeId, fabricIndex);
 }
 
 void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)

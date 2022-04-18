@@ -43,9 +43,106 @@
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
+using namespace chip::AppPlatform;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+class MyUserPrompter : public UserPrompter
+{
+    // tv should override this with a dialog prompt
+    inline void PromptForCommissionOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
+    {
+        /*
+         *   Called to prompt the user for consent to allow the given commissioneeName/vendorId/productId to be commissioned.
+         * For example "[commissioneeName] is requesting permission to cast to this TV, approve?"
+         *
+         * If user responds with OK then implementor should call CommissionerRespondOk();
+         * If user responds with Cancel then implementor should call CommissionerRespondCancel();
+         *
+         */
+        GetCommissionerDiscoveryController()->Ok();
+
+        /**
+         * For Demo: Launch Prime Video App
+         */
+        return;
+    }
+
+    // tv should override this with a dialog prompt
+    inline void PromptForCommissionPincode(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
+    {
+        /*
+         *   Called to prompt the user to enter the setup pincode displayed by the given commissioneeName/vendorId/productId to be
+         * commissioned. For example "Please enter pin displayed in casting app."
+         *
+         * If user enters with pin then implementor should call CommissionerRespondPincode(uint32_t pincode);
+         * If user responds with Cancel then implementor should call CommissionerRespondCancel();
+         */
+
+        GetCommissionerDiscoveryController()->CommissionWithPincode(20202021); // dummy pin code
+
+        /**
+         * For Demo: Launch Prime Video App
+         */
+        return;
+    }
+
+    // tv should override this with a dialog prompt
+    inline void PromptCommissioningSucceeded(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
+    {
+        return;
+    }
+
+    // tv should override this with a dialog prompt
+    inline void PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error) override { return; }
+};
+
+MyUserPrompter gMyUserPrompter;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-using namespace chip::AppPlatform;
+class MyPincodeService : public PincodeService
+{
+    uint32_t FetchCommissionPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
+    {
+        return ContentAppPlatform::GetInstance().GetPincodeFromContentApp(vendorId, productId, rotatingId);
+    }
+};
+MyPincodeService gMyPincodeService;
+
+class MyPostCommissioningListener : public PostCommissioningListener
+{
+    void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, OperationalDeviceProxy * device) override
+    {
+
+        ContentAppPlatform::GetInstance().ManageClientAccess(device, vendorId, GetDeviceCommissioner()->GetNodeId(),
+                                                             OnSuccessResponse, OnFailureResponse);
+    }
+
+    /* Callback when command results in success */
+    static void OnSuccessResponse(void * context)
+    {
+        ChipLogProgress(Controller, "OnSuccessResponse - Binding Add Successfully");
+        CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+        if (cdc != nullptr)
+        {
+            cdc->PostCommissioningSucceeded();
+        }
+    }
+
+    /* Callback when command results in failure */
+    static void OnFailureResponse(void * context, CHIP_ERROR error)
+    {
+        ChipLogProgress(Controller, "OnFailureResponse - Binding Add Failed");
+        CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+        if (cdc != nullptr)
+        {
+            cdc->PostCommissioningFailed(error);
+        }
+    }
+};
+
+MyPostCommissioningListener gMyPostCommissioningListener;
+ContentAppFactoryImpl gFactory;
 
 namespace chip {
 namespace AppPlatform {
@@ -292,3 +389,40 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
 } // namespace chip
 
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
+CHIP_ERROR InitVideoPlayerPlatform()
+{
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ContentAppPlatform::GetInstance().SetupAppPlatform();
+    ContentAppPlatform::GetInstance().SetContentAppFactory(&gFactory);
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+    if (cdc != nullptr)
+    {
+        cdc->SetPincodeService(&gMyPincodeService);
+        cdc->SetUserPrompter(&gMyUserPrompter);
+        cdc->SetPostCommissioningListener(&gMyPostCommissioningListener);
+    }
+
+    ChipLogProgress(AppServer, "Starting commissioner");
+    ReturnErrorOnFailure(InitCommissioner(CHIP_PORT + 2 + 10, CHIP_UDC_PORT));
+    ChipLogProgress(AppServer, "Started commissioner");
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PreServerInit()
+{
+    /**
+     * Apply any user-defined configurations prior to initializing Server.
+     *
+     * Ex.
+     *   DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(userTimeoutSecs);
+     *
+     */
+
+    return CHIP_NO_ERROR;
+}

@@ -36,6 +36,7 @@
 #include "../include/content-launcher/AppContentLauncherManager.h"
 #include "../include/target-navigator/TargetNavigatorManager.h"
 #include "ChannelManager.h"
+#include "CommissionerMain.h"
 #include "KeypadInputManager.h"
 #include "MediaPlaybackManager.h"
 #include <app/clusters/account-login-server/account-login-delegate.h>
@@ -46,6 +47,9 @@
 #include <app/clusters/keypad-input-server/keypad-input-delegate.h>
 #include <app/clusters/media-playback-server/media-playback-delegate.h>
 #include <app/clusters/target-navigator-server/target-navigator-delegate.h>
+
+CHIP_ERROR InitVideoPlayerPlatform();
+CHIP_ERROR PreServerInit();
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
