@@ -4,15 +4,15 @@ This example demonstrates the Matter Lighting application on ESP platforms.
 
 ---
 
-- [Matter ESP32 Lighting Example](#matter-esp32-lighting-example)
-  - [Supported Devices](#supported-devices)
-  - [Building the Example Application](#building-the-example-application)
-  - [Commissioning over BLE using chip-tool](#commissioning-over-ble-using-chip-tool)
-  - [Commissioning over softAP using chip-tool](#commissioning-over-softap-using-chip-tool)
-  - [Cluster Control](#cluster-control)
-- [Steps to Try Lighting app OTA Requestor](#steps-to-try-lighting-app-ota-requestor)
-  - [Query for an OTA Image](#query-for-an-ota-image)
-  - [Apply update](#apply-update)
+-   [Matter ESP32 Lighting Example](#matter-esp32-lighting-example)
+    -   [Supported Devices](#supported-devices)
+    -   [Building the Example Application](#building-the-example-application)
+    -   [Commissioning over BLE using chip-tool](#commissioning-over-ble-using-chip-tool)
+    -   [Commissioning over softAP using chip-tool](#commissioning-over-softap-using-chip-tool)
+    -   [Cluster Control](#cluster-control)
+-   [Steps to Try Lighting app OTA Requestor](#steps-to-try-lighting-app-ota-requestor)
+    -   [Query for an OTA Image](#query-for-an-ota-image)
+    -   [Apply update](#apply-update)
 
 ---
 
