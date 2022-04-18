@@ -285,6 +285,12 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
     mNeedsNetworkSetup =
         mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType() ==
         Transport::Type::kBle;
+    // if we have the WiFiCredentials ,we need to set up the network
+    if (mParams.GetWiFiCredentials().HasValue())
+    {
+        // only when mNeedsNetworkSetup is true can we enter stage CommissioningStage::kWiFiNetworkSetup
+        mNeedsNetworkSetup = true;
+    }
     CHIP_ERROR err               = CHIP_NO_ERROR;
     CommissioningStage nextStage = GetNextCommissioningStage(CommissioningStage::kSecurePairing, err);
     mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, nextStage, mParams, this, GetEndpoint(nextStage),
