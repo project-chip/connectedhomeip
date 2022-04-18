@@ -144,6 +144,16 @@ public:
      */
     virtual CHIP_ERROR Shutdown();
 
+    SessionManager * SessionMgr()
+    {
+        if (mSystemState)
+        {
+            return mSystemState->SessionMgr();
+        }
+
+        return nullptr;
+    }
+
     CHIP_ERROR GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port);
 
     /**

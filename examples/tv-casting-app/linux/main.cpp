@@ -378,7 +378,6 @@ public:
         };
 
         PeerId peerID = fabric->GetPeerIdForNode(nodeId);
-        // mOperationalDeviceProxy = chip::Platform::New<chip::OperationalDeviceProxy>(initParams, peerID);
 
         //
         // TODO: The code here is assuming that we can create an OperationalDeviceProxy instance and attach it immediately
@@ -397,15 +396,12 @@ public:
             return err;
         }
 
-        // TODO: figure out why this doesn't work so that we can remove OperationalDeviceProxy creation above,
-        // and remove the FindSecureSessionForNode and SetConnectedSession calls below
-        // mOperationalDeviceProxy = server->GetCASESessionManager()->FindExistingSession(nodeId);
         if (mOperationalDeviceProxy == nullptr)
         {
-            ChipLogError(AppServer, "Failed in creating an instance of OperationalDeviceProxy");
+            ChipLogError(AppServer, "Failed to find an existing instance of OperationalDeviceProxy to the peer");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        ChipLogError(AppServer, "Created an instance of OperationalDeviceProxy");
+        ChipLogProgress(AppServer, "Created an instance of OperationalDeviceProxy");
 
         mInitialized = true;
         return CHIP_NO_ERROR;
@@ -488,7 +484,7 @@ private:
         TargetVideoPlayerInfo * _this  = static_cast<TargetVideoPlayerInfo *>(context);
         _this->mOperationalDeviceProxy = device;
         _this->mInitialized            = true;
-        ChipLogError(AppServer, "HandleDeviceConnected created an instance of OperationalDeviceProxy");
+        ChipLogProgress(AppServer, "HandleDeviceConnected created an instance of OperationalDeviceProxy");
     }
 
     static void HandleDeviceConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error)
