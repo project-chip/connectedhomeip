@@ -111,6 +111,50 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
         $ idf.py -p /dev/tty.SLAB_USBtoUART monitor
 
+## Using ESP32 Factory Data Provider
+
+This application uses test-mode CommissionableDataProvider and Example
+DeviceAttestationCredentialsProvider.
+
+Enabled config option `CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER` to use ESP32
+specific implementation of CommissionableDataProvider and
+DeviceAttestationCredentialsProvider.
+
+ESP32 implementation reads factory data from nvs partition, chip-factory data
+must be flashed into the configure nvs partition. Factory partition can be
+configured using CONFIG_CHIP_FACTORY_NAMESPACE_PARTITION_LABEL option, default
+is "nvs".
+
+`scripts/tools/generate_esp32_chip_factory_bin.py` script generates the
+chip-factory NVS image `partition.bin`.
+
+Below mentioned command generates the nvs image with test DAC with VID:0xFFF2
+and PID:8001
+
+```
+cd third_party/connectedhomeip/scripts/tools
+
+./generate_esp32_chip_factory_bin.py -d 3434 -p 99663300 \
+                                    --dac-cert ../../credentials/test/attestation/Chip-Test-DAC-FFF2-8001-0008-Cert.der \
+                                    --dac-key ../../credentials/test/attestation/Chip-Test-DAC-FFF2-8001-0008-Key.der \
+                                    --pai-cert ../../credentials/test/attestation/Chip-Test-PAI-FFF2-8001-Cert.der \
+                                    --cd ../../credentials/test/certification-declaration/Chip-Test-CD-FFF2-8001.der
+cd -
+```
+
+This project uses VID:0xFFF1 and PID:0x8000, if you are planning to use the
+above command as is please change the VID/PID using menuconfig options.
+
+Use the following command to flash the NVS image. `0x9000` is default address
+for `nvs` partition.
+
+```
+esptool.py -p <port> write_flash 0x9000 third_party/connectedhomeip/scripts/tools/partition.bin
+```
+
+NOTE: Please commission the device using above specified discriminator and
+passcode
+
 ## Commissioning over BLE using chip-tool
 
 -   Please build the standalone chip-tool as described [here](../../chip-tool)
