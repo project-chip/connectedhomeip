@@ -1418,9 +1418,6 @@ xFFFF
 xfffff
 xtensa
 xwayland
-xxxxx
-XXXX
-XXXXXXXX
 xyz
 xz
 xzvf
