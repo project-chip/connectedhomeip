@@ -343,9 +343,17 @@ public:
             internal::HeapObjectListNode * node = mObjects.FindNode(object);
             if (node != nullptr)
             {
-                // Note that the node is not removed here; that is deferred until the end of the next pool iteration.
                 node->mObject = nullptr;
                 Platform::Delete(object);
+
+                // Note need to be released immediately if not in the middle of iteration, otherwise cleanup is deferred
+                // until the end of the next pool iteration.
+                if (mObjects.mIterationDepth == 0)
+                {
+                    node->Remove();
+                    Platform::Delete(node);
+                }
+
                 DecreaseUsage();
             }
         }
