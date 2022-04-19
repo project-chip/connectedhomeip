@@ -56,7 +56,6 @@ struct LockCredentialInfo
 class LockManager
 {
 public:
-
     enum Action_t
     {
         LOCK_ACTION = 0,
@@ -100,7 +99,6 @@ public:
     const char * lockStateToString(DlLockState lockState) const;
 
 private:
-
     friend LockManager & LockMgr();
     chip::EndpointId mEndpointId;
     State_t mState;
