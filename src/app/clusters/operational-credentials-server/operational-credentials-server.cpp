@@ -51,6 +51,9 @@
 #include <platform/DeviceControlServer.h>
 #include <string.h>
 #include <trace/trace.h>
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
@@ -918,7 +921,11 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
     // Prepare NOCSRElements structure
     {
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+        Crypto::P256KeypairHSM keypair;
+#else
         Crypto::P256Keypair keypair;
+#endif
         size_t csrLength           = Crypto::kMAX_CSR_Length;
         size_t nocsrLengthEstimate = 0;
         ByteSpan kNoVendorReserved;
@@ -929,7 +936,11 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
             gFabricBeingCommissioned.GetOperationalKey()->Clear();
         }
 
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+        keypair.CreateOperationalKey(gFabricBeingCommissioned.GetFabricIndex());
+#else
         keypair.Initialize();
+#endif
         SuccessOrExit(err = gFabricBeingCommissioned.SetOperationalKeypair(&keypair));
 
         // Generate the actual CSR from the ephemeral key

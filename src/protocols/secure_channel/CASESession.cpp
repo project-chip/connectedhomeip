@@ -43,6 +43,9 @@
 #include <trace/trace.h>
 #include <transport/PairingSession.h>
 #include <transport/SessionManager.h>
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
 
 namespace {
 
@@ -1265,7 +1268,16 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
     //        current flow of code, a malicious node can trigger a DoS style attack on the device.
     //        The same change should be made in Sigma2 processing.
     // Step 7 - Validate Signature
+#ifdef ENABLE_HSM_ECDSA_VERIFY
+    {
+        P256PublicKeyHSM initiatorPublicKeyHSM;
+        memcpy(Uint8::to_uchar(initiatorPublicKeyHSM), initiatorPublicKey.Bytes(), initiatorPublicKey.Length());
+        SuccessOrExit(
+            err = initiatorPublicKeyHSM.ECDSA_validate_msg_signature(msg_R3_Signed.Get(), msg_r3_signed_len, tbsData3Signature));
+    }
+#else
     SuccessOrExit(err = initiatorPublicKey.ECDSA_validate_msg_signature(msg_R3_Signed.Get(), msg_r3_signed_len, tbsData3Signature));
+#endif
 
     SuccessOrExit(err = mCommissioningHash.Finish(messageDigestSpan));
 

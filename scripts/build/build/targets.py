@@ -233,6 +233,8 @@ def HostTargets():
         target_native.Extend('rpc-console', app=HostApp.RPC_CONSOLE))
     app_targets.append(
         target_native.Extend('tv-app', app=HostApp.TV_APP))
+    app_targets.append(
+        target_native.Extend('nl-test-runner', app=HostApp.NL_TEST_RUNNER))
 
     for target in targets:
         app_targets.append(target.Extend(
@@ -240,7 +242,7 @@ def HostTargets():
         app_targets.append(target.Extend('chip-tool', app=HostApp.CHIP_TOOL))
         app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
         app_targets.append(target.Extend('minmdns', app=HostApp.MIN_MDNS))
-        app_targets.append(target.Extend('door-lock', app=HostApp.LOCK))
+        app_targets.append(target.Extend('lock', app=HostApp.LOCK))
         app_targets.append(target.Extend('shell', app=HostApp.SHELL))
         app_targets.append(target.Extend(
             'ota-provider', app=HostApp.OTA_PROVIDER, enable_ble=False))
@@ -271,7 +273,7 @@ def HostTargets():
     builder.WhitelistVariantNameForGlob('ipv6only')
 
     for target in app_targets:
-        if ('-rpc-console' in target.name) or ('-python-bindings' in target.name):
+        if ('-rpc-console' in target.name) or ('-python-bindings' in target.name) or ('nl-test-runner' in target.name):
             # Single-variant builds
             yield target
         else:
@@ -419,6 +421,8 @@ def AndroidTargets():
     yield target.Extend('androidstudio-x64-chip-tool', board=AndroidBoard.AndroidStudio_X64, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('arm64-chip-tvserver', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TVServer)
     yield target.Extend('arm-chip-tvserver', board=AndroidBoard.ARM, app=AndroidApp.CHIP_TVServer)
+    yield target.Extend('x86-chip-tvserver', board=AndroidBoard.X86, app=AndroidApp.CHIP_TVServer)
+    yield target.Extend('x64-chip-tvserver', board=AndroidBoard.X64, app=AndroidApp.CHIP_TVServer)
     yield target.Extend('arm64-chip-tv-casting-app', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TV_CASTING_APP)
     yield target.Extend('arm-chip-tv-casting-app', board=AndroidBoard.ARM, app=AndroidApp.CHIP_TV_CASTING_APP)
 

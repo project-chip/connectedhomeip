@@ -20,6 +20,7 @@
 
 using namespace std;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ApplicationLauncher;
 using namespace chip::Uint8;
 
@@ -38,8 +39,10 @@ CHIP_ERROR ApplicationLauncherManager::HandleGetCatalogList(AttributeValueEncode
 void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
                                                  const ApplicationType & application)
 {
+    ChipLogProgress(Zcl, "ApplicationLauncherManager::HandleLaunchApp");
+
     // TODO: Insert code here
-    Commands::LauncherResponse::Type response;
+    LauncherResponseType response;
     const char * buf = "data";
     response.data    = ByteSpan(from_const_char(buf), strlen(buf));
     response.status  = StatusEnum::kSuccess;
@@ -49,8 +52,10 @@ void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherR
 void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper,
                                                const ApplicationType & application)
 {
+    ChipLogProgress(Zcl, "ApplicationLauncherManager::HandleStopApp");
+
     // TODO: Insert code here
-    Commands::LauncherResponse::Type response;
+    LauncherResponseType response;
     const char * buf = "data";
     response.data    = ByteSpan(from_const_char(buf), strlen(buf));
     response.status  = StatusEnum::kSuccess;
@@ -60,8 +65,10 @@ void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherRes
 void ApplicationLauncherManager::HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper,
                                                const ApplicationType & application)
 {
+    ChipLogProgress(Zcl, "ApplicationLauncherManager::HandleHideApp");
+
     // TODO: Insert code here
-    Commands::LauncherResponse::Type response;
+    LauncherResponseType response;
     const char * buf = "data";
     response.data    = ByteSpan(from_const_char(buf), strlen(buf));
     response.status  = StatusEnum::kSuccess;

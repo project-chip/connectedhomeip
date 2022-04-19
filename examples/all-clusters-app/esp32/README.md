@@ -32,6 +32,20 @@ the [M5Stack](http://m5stack.com), and the
 Note: M5Stack Core 2 display is not supported in the tft component, while other
 functionality can still work fine.
 
+## VCP Drivers
+
+Some users might have to install the
+[VCP driver](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
+before the device shows up on `/dev/tty`.
+
+In addition, if the following error is encountered during M5Stack flashing, the
+[CH9102 VCP driver](https://docs.m5stack.com/en/download) would also need to be
+installed:
+
+```
+Failed to write to target RAM (result was 01070000)
+```
+
 ## Building the Example Application
 
 Building the example application requires the use of the Espressif ESP32 IoT
@@ -154,10 +168,6 @@ that are currently supported include `ESP32-DevKitC` (default),
           ```
           $ idf.py -p /dev/tty.SLAB_USBtoUART flash monitor
           ```
-
-    Note: Some users might have to install the
-    [VCP driver](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
-    before the device shows up on `/dev/tty`.
 
 -   Quit the monitor by hitting `Ctrl+]`.
 

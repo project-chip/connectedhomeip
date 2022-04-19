@@ -157,7 +157,7 @@ server cluster AudioOutput = 1291 {
     kOther = 5;
   }
 
-  bitmap AudiouOutputFeature : BITMAP32 {
+  bitmap AudioOutputFeature : BITMAP32 {
     kNameUpdates = 0x1;
   }
 
@@ -1317,8 +1317,59 @@ server cluster EthernetNetworkDiagnostics = 55 {
 }
 
 server cluster FanControl = 514 {
+  enum FanMode : ENUM8 {
+    kOff = 0;
+    kLow = 1;
+    kMedium = 2;
+    kHigh = 3;
+    kOn = 4;
+    kAuto = 5;
+    kSmart = 6;
+  }
+
+  enum FanModeSequence : ENUM8 {
+    kOffLowMedHigh = 0;
+    kOffLowHigh = 1;
+    kOffLowMedHighAuto = 2;
+    kOffLowHighAuto = 3;
+    kOffOnAuto = 4;
+    kOffOn = 5;
+  }
+
+  bitmap FanControlFeature : BITMAP32 {
+    kMultiSpeed = 0x1;
+    kAuto = 0x2;
+    kRocking = 0x4;
+    kWind = 0x8;
+  }
+
+  bitmap RockSupportMask : BITMAP8 {
+    kRockLeftRight = 0x1;
+    kRockUpDown = 0x2;
+    kRockRound = 0x4;
+  }
+
+  bitmap WindSettingMask : BITMAP8 {
+    kSleepWind = 0x1;
+    kNaturalWind = 0x2;
+  }
+
+  bitmap WindSupportMask : BITMAP8 {
+    kSleepWind = 0x1;
+    kNaturalWind = 0x2;
+  }
+
   attribute enum8 fanMode = 0;
   attribute enum8 fanModeSequence = 1;
+  attribute int8u percentSetting = 2;
+  readonly attribute int8u percentCurrent = 3;
+  readonly attribute int8u speedMax = 4;
+  attribute int8u speedSetting = 5;
+  readonly attribute int8u speedCurrent = 6;
+  readonly attribute bitmap8 rockSupport = 7;
+  attribute bitmap8 rockSetting = 8;
+  readonly attribute bitmap8 windSupport = 9;
+  attribute bitmap8 windSetting = 10;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -3569,14 +3620,21 @@ server cluster WindowCovering = 258 {
     kUnknown = 255;
   }
 
-  bitmap WcConfigStatus : BITMAP8 {
+  bitmap ConfigStatus : BITMAP8 {
     kOperational = 0x1;
-    kOnline = 0x2;
-    kOpenAndUpCommandsReversed = 0x4;
+    kOnlineReserved = 0x2;
+    kLiftMovementReversed = 0x4;
     kLiftPositionAware = 0x8;
     kTiltPositionAware = 0x10;
     kLiftEncoderControlled = 0x20;
     kTiltEncoderControlled = 0x40;
+  }
+
+  bitmap Mode : BITMAP8 {
+    kMotorDirectionReversed = 0x1;
+    kCalibrationMode = 0x2;
+    kMaintenanceMode = 0x4;
+    kLedFeedback = 0x8;
   }
 
   bitmap WcFeature : BITMAP32 {
@@ -3585,13 +3643,6 @@ server cluster WindowCovering = 258 {
     kPositionAwareLift = 0x4;
     kAbsolutePosition = 0x8;
     kPositionAwareTilt = 0x10;
-  }
-
-  bitmap WcMode : BITMAP8 {
-    kMotorDirectionReversed = 0x1;
-    kCalibrationMode = 0x2;
-    kMaintenanceMode = 0x4;
-    kLedFeedback = 0x8;
   }
 
   bitmap WcOperationalStatus : BITMAP8 {
@@ -3618,7 +3669,7 @@ server cluster WindowCovering = 258 {
   readonly attribute Type type = 0;
   readonly attribute nullable int16u currentPositionLift = 3;
   readonly attribute nullable int16u currentPositionTilt = 4;
-  readonly attribute bitmap8 configStatus = 7;
+  readonly attribute ConfigStatus configStatus = 7;
   readonly attribute nullable Percent currentPositionLiftPercentage = 8;
   readonly attribute nullable Percent currentPositionTiltPercentage = 9;
   readonly attribute bitmap8 operationalStatus = 10;
@@ -3631,7 +3682,7 @@ server cluster WindowCovering = 258 {
   readonly attribute int16u installedClosedLimitLift = 17;
   readonly attribute int16u installedOpenLimitTilt = 18;
   readonly attribute int16u installedClosedLimitTilt = 19;
-  attribute access(write: manage) bitmap8 mode = 23;
+  attribute access(write: manage) Mode mode = 23;
   readonly attribute bitmap16 safetyStatus = 26;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -3642,7 +3693,7 @@ server cluster WindowCovering = 258 {
 
   request struct GoToLiftPercentageRequest {
     Percent liftPercentageValue = 0;
-    Percent100ths liftPercent100thsValue = 1;
+    optional Percent100ths liftPercent100thsValue = 1;
   }
 
   request struct GoToTiltValueRequest {
@@ -3651,7 +3702,7 @@ server cluster WindowCovering = 258 {
 
   request struct GoToTiltPercentageRequest {
     Percent tiltPercentageValue = 0;
-    Percent100ths tiltPercent100thsValue = 1;
+    optional Percent100ths tiltPercent100thsValue = 1;
   }
 
   command UpOrOpen(): DefaultSuccess = 0;

@@ -6549,6 +6549,51 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("fan mode sequence", 1, value);
         }
+        case FanControl::Attributes::PercentSetting::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("percent setting", 1, value);
+        }
+        case FanControl::Attributes::PercentCurrent::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("percent current", 1, value);
+        }
+        case FanControl::Attributes::SpeedMax::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("speed max", 1, value);
+        }
+        case FanControl::Attributes::SpeedSetting::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("speed setting", 1, value);
+        }
+        case FanControl::Attributes::SpeedCurrent::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("speed current", 1, value);
+        }
+        case FanControl::Attributes::RockSupport::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("rock support", 1, value);
+        }
+        case FanControl::Attributes::RockSetting::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("rock setting", 1, value);
+        }
+        case FanControl::Attributes::WindSupport::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("wind support", 1, value);
+        }
+        case FanControl::Attributes::WindSetting::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("wind setting", 1, value);
+        }
         case FanControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -9883,7 +9928,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("NumberOfActuationsTilt", 1, value);
         }
         case WindowCovering::Attributes::ConfigStatus::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ConfigStatus", 1, value);
         }
@@ -9948,7 +9993,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("InstalledClosedLimitTilt", 1, value);
         }
         case WindowCovering::Attributes::Mode::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Mode", 1, value);
         }

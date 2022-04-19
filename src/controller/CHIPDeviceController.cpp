@@ -1553,12 +1553,6 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
         ChipLogError(Controller, "Device connection failed without a valid error code. Making one up.");
         error = CHIP_ERROR_INTERNAL;
     }
-    // TODO: Determine if we really want the PASE session removed here. See #16089.
-    CommissioneeDeviceProxy * commissionee = commissioner->FindCommissioneeDevice(peerId.GetNodeId());
-    if (commissionee != nullptr)
-    {
-        commissioner->ReleaseCommissioneeDevice(commissionee);
-    }
 
     commissioner->mSystemState->CASESessionMgr()->ReleaseSession(peerId);
     if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational &&
@@ -1570,9 +1564,16 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
     {
         commissioner->mPairingDelegate->OnPairingComplete(error);
     }
+
+    CommissioneeDeviceProxy * commissionee = commissioner->FindCommissioneeDevice(peerId.GetNodeId());
+    // TODO: Determine if we really want the PASE session removed here. See #16089.
+    if (commissionee != nullptr)
+    {
+        commissioner->ReleaseCommissioneeDevice(commissionee);
+    }
 }
 
-// AttributeCache::Callback impl
+// ClusterStateCache::Callback impl
 void DeviceCommissioner::OnDone()
 {
     CHIP_ERROR err;
@@ -1835,7 +1836,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         {
             readParams.mTimeout = timeout.Value();
         }
-        auto attributeCache = Platform::MakeUnique<app::AttributeCache>(*this);
+        auto attributeCache = Platform::MakeUnique<app::ClusterStateCache>(*this);
         auto readClient     = chip::Platform::MakeUnique<app::ReadClient>(
             engine, proxy->GetExchangeManager(), attributeCache->GetBufferedCallback(), app::ReadClient::InteractionType::Read);
         CHIP_ERROR err = readClient->SendRequest(readParams);

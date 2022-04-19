@@ -7564,6 +7564,123 @@ public class ChipClusters {
       subscribeFanModeSequenceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readPercentSettingAttribute(IntegerAttributeCallback callback) {
+      readPercentSettingAttribute(chipClusterPtr, callback);
+    }
+
+    public void writePercentSettingAttribute(DefaultClusterCallback callback, Integer value) {
+      writePercentSettingAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writePercentSettingAttribute(
+        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writePercentSettingAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribePercentSettingAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePercentSettingAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPercentCurrentAttribute(IntegerAttributeCallback callback) {
+      readPercentCurrentAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePercentCurrentAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePercentCurrentAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readSpeedMaxAttribute(IntegerAttributeCallback callback) {
+      readSpeedMaxAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeSpeedMaxAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeSpeedMaxAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readSpeedSettingAttribute(IntegerAttributeCallback callback) {
+      readSpeedSettingAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeSpeedSettingAttribute(DefaultClusterCallback callback, Integer value) {
+      writeSpeedSettingAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeSpeedSettingAttribute(
+        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeSpeedSettingAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeSpeedSettingAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeSpeedSettingAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readSpeedCurrentAttribute(IntegerAttributeCallback callback) {
+      readSpeedCurrentAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeSpeedCurrentAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeSpeedCurrentAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readRockSupportAttribute(IntegerAttributeCallback callback) {
+      readRockSupportAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeRockSupportAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeRockSupportAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readRockSettingAttribute(IntegerAttributeCallback callback) {
+      readRockSettingAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeRockSettingAttribute(DefaultClusterCallback callback, Integer value) {
+      writeRockSettingAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeRockSettingAttribute(
+        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeRockSettingAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeRockSettingAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeRockSettingAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readWindSupportAttribute(IntegerAttributeCallback callback) {
+      readWindSupportAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeWindSupportAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeWindSupportAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readWindSettingAttribute(IntegerAttributeCallback callback) {
+      readWindSettingAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeWindSettingAttribute(DefaultClusterCallback callback, Integer value) {
+      writeWindSettingAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeWindSettingAttribute(
+        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeWindSettingAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeWindSettingAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeWindSettingAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
       readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
@@ -7631,6 +7748,84 @@ public class ChipClusters {
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeFanModeSequenceAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readPercentSettingAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writePercentSettingAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribePercentSettingAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readPercentCurrentAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribePercentCurrentAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readSpeedMaxAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeSpeedMaxAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readSpeedSettingAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeSpeedSettingAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeSpeedSettingAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readSpeedCurrentAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeSpeedCurrentAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readRockSupportAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeRockSupportAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readRockSettingAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeRockSettingAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeRockSettingAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readWindSupportAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeWindSupportAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readWindSettingAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeWindSettingAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeWindSettingAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(
@@ -21780,7 +21975,7 @@ public class ChipClusters {
     public void goToLiftPercentage(
         DefaultClusterCallback callback,
         Integer liftPercentageValue,
-        Integer liftPercent100thsValue) {
+        Optional<Integer> liftPercent100thsValue) {
       goToLiftPercentage(
           chipClusterPtr, callback, liftPercentageValue, liftPercent100thsValue, null);
     }
@@ -21788,7 +21983,7 @@ public class ChipClusters {
     public void goToLiftPercentage(
         DefaultClusterCallback callback,
         Integer liftPercentageValue,
-        Integer liftPercent100thsValue,
+        Optional<Integer> liftPercent100thsValue,
         int timedInvokeTimeoutMs) {
       goToLiftPercentage(
           chipClusterPtr,
@@ -21810,7 +22005,7 @@ public class ChipClusters {
     public void goToTiltPercentage(
         DefaultClusterCallback callback,
         Integer tiltPercentageValue,
-        Integer tiltPercent100thsValue) {
+        Optional<Integer> tiltPercent100thsValue) {
       goToTiltPercentage(
           chipClusterPtr, callback, tiltPercentageValue, tiltPercent100thsValue, null);
     }
@@ -21818,7 +22013,7 @@ public class ChipClusters {
     public void goToTiltPercentage(
         DefaultClusterCallback callback,
         Integer tiltPercentageValue,
-        Integer tiltPercent100thsValue,
+        Optional<Integer> tiltPercent100thsValue,
         int timedInvokeTimeoutMs) {
       goToTiltPercentage(
           chipClusterPtr,
@@ -21864,7 +22059,7 @@ public class ChipClusters {
         long chipClusterPtr,
         DefaultClusterCallback Callback,
         Integer liftPercentageValue,
-        Integer liftPercent100thsValue,
+        Optional<Integer> liftPercent100thsValue,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void goToLiftValue(
@@ -21877,7 +22072,7 @@ public class ChipClusters {
         long chipClusterPtr,
         DefaultClusterCallback Callback,
         Integer tiltPercentageValue,
-        Integer tiltPercent100thsValue,
+        Optional<Integer> tiltPercent100thsValue,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void goToTiltValue(

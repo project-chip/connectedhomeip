@@ -23,6 +23,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 
+CHIP_ERROR TargetVideoPlayerInfoInit(chip::NodeId nodeId, chip::FabricIndex fabricIndex);
 CHIP_ERROR DiscoverCommissioners();
 CHIP_ERROR RequestCommissioning(int index);
 void ReadServerClustersForNode(chip::NodeId nodeId);
