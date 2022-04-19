@@ -40,11 +40,6 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <controller-clusters/zap-generated/CHIPClusters.h>
 
-#if CONFIG_DEVICE_LAYER
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/ConfigurationManager.h>
-#endif
-
 #include <app/server/Dnssd.h>
 
 #include <app/InteractionModelEngine.h>
@@ -651,7 +646,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     exchangeCtxt = mSystemState->ExchangeMgr()->NewContext(session.Value(), &device->GetPairing());
     VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
 
-    err = device->GetPairing().Pair(*mSystemState->SessionMgr(), params.GetPeerAddress(), params.GetSetupPINCode(),
+    err = device->GetPairing().Pair(*mSystemState->SessionMgr(), params.GetSetupPINCode(),
                                     Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), exchangeCtxt, this);
     SuccessOrExit(err);
 
@@ -832,7 +827,7 @@ void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
     RendezvousCleanup(err);
 }
 
-void DeviceCommissioner::OnSessionEstablished()
+void DeviceCommissioner::OnSessionEstablished(const SessionHandle & session)
 {
     // PASE session established.
     CommissioneeDeviceProxy * device = mDeviceInPASEEstablishment;
@@ -842,12 +837,7 @@ void DeviceCommissioner::OnSessionEstablished()
 
     VerifyOrReturn(device != nullptr, OnSessionEstablishmentError(CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR));
 
-    PASESession * pairing = &device->GetPairing();
-
-    // TODO: the session should know which peer we are trying to connect to when started
-    pairing->SetPeerNodeId(device->GetDeviceId());
-
-    CHIP_ERROR err = device->SetConnected();
+    CHIP_ERROR err = device->SetConnected(session);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
@@ -1558,12 +1548,6 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
         ChipLogError(Controller, "Device connection failed without a valid error code. Making one up.");
         error = CHIP_ERROR_INTERNAL;
     }
-    // TODO: Determine if we really want the PASE session removed here. See #16089.
-    CommissioneeDeviceProxy * commissionee = commissioner->FindCommissioneeDevice(peerId.GetNodeId());
-    if (commissionee != nullptr)
-    {
-        commissioner->ReleaseCommissioneeDevice(commissionee);
-    }
 
     commissioner->mSystemState->CASESessionMgr()->ReleaseSession(peerId);
     if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational &&
@@ -1575,9 +1559,16 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
     {
         commissioner->mPairingDelegate->OnPairingComplete(error);
     }
+
+    CommissioneeDeviceProxy * commissionee = commissioner->FindCommissioneeDevice(peerId.GetNodeId());
+    // TODO: Determine if we really want the PASE session removed here. See #16089.
+    if (commissionee != nullptr)
+    {
+        commissioner->ReleaseCommissioneeDevice(commissionee);
+    }
 }
 
-// AttributeCache::Callback impl
+// ClusterStateCache::Callback impl
 void DeviceCommissioner::OnDone()
 {
     CHIP_ERROR err;
@@ -1777,8 +1768,15 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                                                   CommissioningDelegate * delegate, EndpointId endpoint,
                                                   Optional<System::Clock::Timeout> timeout)
 {
-    ChipLogProgress(Controller, "Performing next commissioning step '%s' with completion status = '%s'", StageToString(step),
-                    params.GetCompletionStatus().err.AsString());
+    if (params.GetCompletionStatus().err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Controller, "Performing next commissioning step '%s'", StageToString(step));
+    }
+    else
+    {
+        ChipLogProgress(Controller, "Performing next commissioning step '%s' with completion status = '%s'", StageToString(step),
+                        params.GetCompletionStatus().err.AsString());
+    }
 
     // For now, we ignore errors coming in from the device since not all commissioning clusters are implemented on the device
     // side.
@@ -1833,7 +1831,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         {
             readParams.mTimeout = timeout.Value();
         }
-        auto attributeCache = Platform::MakeUnique<app::AttributeCache>(*this);
+        auto attributeCache = Platform::MakeUnique<app::ClusterStateCache>(*this);
         auto readClient     = chip::Platform::MakeUnique<app::ReadClient>(
             engine, proxy->GetExchangeManager(), attributeCache->GetBufferedCallback(), app::ReadClient::InteractionType::Read);
         CHIP_ERROR err = readClient->SendRequest(readParams);
@@ -1888,23 +1886,18 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             ChipLogProgress(Controller, "Device does not support configurable regulatory location");
             regulatoryConfig = capability;
         }
-        static constexpr size_t kMaxCountryCodeSize = 3;
-        char countryCodeStr[kMaxCountryCodeSize]    = "XX";
-        size_t actualCountryCodeSize                = 2;
 
-#if CONFIG_DEVICE_LAYER
-        CHIP_ERROR status =
-            DeviceLayer::ConfigurationMgr().GetCountryCode(countryCodeStr, kMaxCountryCodeSize, actualCountryCodeSize);
-#else
-        CHIP_ERROR status = CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
-        if (status != CHIP_NO_ERROR)
+        CharSpan countryCode;
+        const auto & providedCountryCode = params.GetCountryCode();
+        if (providedCountryCode.HasValue())
         {
-            actualCountryCodeSize = 2;
-            memset(countryCodeStr, 'X', actualCountryCodeSize);
-            ChipLogError(Controller, "Unable to find country code, defaulting to %s", countryCodeStr);
+            countryCode = providedCountryCode.Value();
         }
-        chip::CharSpan countryCode(countryCodeStr, actualCountryCodeSize);
+        else
+        {
+            // Default to "XX", for lack of anything better.
+            countryCode = CharSpan::fromCharString("XX");
+        }
 
         GeneralCommissioning::Commands::SetRegulatoryConfig::Type request;
         request.newRegulatoryConfig = regulatoryConfig;

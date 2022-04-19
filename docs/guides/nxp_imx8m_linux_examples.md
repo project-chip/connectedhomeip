@@ -45,23 +45,29 @@ to be generated.
     This document is tested with the i.MX Yocto 5.10.35_2.0.0 release. Run the
     commands below to download this release:
 
-          $ mkdir ~/bin
-          $ curl http://commondatastorage.googleapis.com/git-repo-downloads/repo  > ~/bin/repo
-          $ chmod a+x ~/bin/repo
-          $ export PATH=${PATH}:~/bin
+          ```
+          mkdir ~/bin
+          curl http://commondatastorage.googleapis.com/git-repo-downloads/repo  > ~/bin/repo
+          chmod a+x ~/bin/repo
+          export PATH=${PATH}:~/bin
+          ```
 
-          $ mkdir yocto            # this directory will be the top directory of the Yocto source code
-          $ cd yocto
-          $ repo init -u https://source.codeaurora.org/external/imx/imx-manifest  -b imx-linux-hardknott -m imx-5.10.35-2.0.0.xml
-          $ repo sync
+          ```
+          mkdir yocto            # this directory will be the top directory of the Yocto source code
+          cd yocto
+          repo init -u https://source.codeaurora.org/external/imx/imx-manifest  -b imx-linux-hardknott -m imx-5.10.35-2.0.0.xml
+          repo sync
+          ```
 
     To build the Yocto Project, some packages need to be installed. The list of
     packages required are:
 
-          $ sudo apt-get install gawk wget git-core diffstat unzip texinfo gcc-multilib \
-            build-essential chrpath socat cpio python3 python3-pip python3-pexpect \
-            xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev \
-            pylint3 xterm
+          ```
+          sudo apt-get install gawk wget git-core diffstat unzip texinfo gcc-multilib \
+          build-essential chrpath socat cpio python3 python3-pip python3-pexpect \
+          xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev \
+          pylint3 xterm
+          ```
 
     More information about the downloaded Yocto release can be found in the
     corresponding i.MX Yocto Project User’s Guide which can be found at
@@ -70,8 +76,10 @@ to be generated.
     Change the current directory to the top directory of the Yocto source code
     and execute the commands below to generate the Yocto SDK:
 
-          $ MACHINE=imx8mmevk DISTRO=fsl-imx-xwayland source ./imx-setup-release.sh -b bld-xwayland
-          $ bitbake imx-image-core -c populate_sdk
+          ```
+          MACHINE=imx8mmevk DISTRO=fsl-imx-xwayland source ./imx-setup-release.sh -b bld-xwayland
+          bitbake imx-image-core -c populate_sdk
+          ```
 
     After the execution of the previous two commands, the SDK installation file
     can be found at tmp/deploy/sdk as a shell script. With the test environment
@@ -82,9 +90,11 @@ to be generated.
     Change the current directory to the top directory of the Yocto source code
     and execute the commands below to generate the Yocto SD card image:
 
-          $ MACHINE=imx8mmevk DISTRO=fsl-imx-xwayland source ./imx-setup-release.sh -b bld-xwayland
-          $ echo "IMAGE_INSTALL_append += \"libavahi-client\"" >> conf/local.conf
-          $ bitbake imx-image-core
+          ```
+          MACHINE=imx8mmevk DISTRO=fsl-imx-xwayland source ./imx-setup-release.sh -b bld-xwayland
+          echo "IMAGE_INSTALL_append += \"libavahi-client\"" >> conf/local.conf
+          bitbake imx-image-core
+          ```
 
     The Yocto image can be found at
     tmp/deploy/images/imx8mmevk/imx-image-core-imx8mmevk.wic.bz2. The `bzip2`
@@ -97,49 +107,57 @@ to be generated.
     represents a microSD card connected to the host machine with a USB adapter,
     however the output device name may vary.
 
-          $ bzip2 -d imx-image-core-imx8mmevk-20210812084502.rootfs.wic.bz2
-          $ sudo dd if=imx-image-core-imx8mmevk-20210812084502.rootfs.wic of=/dev/sdc bs=4M conv=fsync
+          ```
+          bzip2 -d imx-image-core-imx8mmevk-20210812084502.rootfs.wic.bz2
+          sudo dd if=imx-image-core-imx8mmevk-20210812084502.rootfs.wic of=/dev/sdc bs=4M conv=fsync
+          ```
 
 -   Install the NXP Yocto SDK and set toolchain environment variables.
 
     Execute the SDK installation file with root permission.
 
-          $ sudo tmp/deploy/sdk/fsl-imx-xwayland-glibc-x86_64-imx-image-full-cortexa53-crypto-imx8mmevk-toolchain-5.10-hardknott.sh
+          ```
+          sudo tmp/deploy/sdk/fsl-imx-xwayland-glibc-x86_64-imx-image-full-cortexa53-crypto-imx8mmevk-toolchain-5.10-hardknott.sh
+          ```
 
     After the Yocto SDK is installed on the host machine, an environment setup
     script is also generated, and there are prompt lines telling the user to
     source the script each time when using the SDK in a new shell, for example:
 
-          $ . /opt/fsl-imx-xwayland/5.10-hardknott/environment-setup-cortexa53-crypto-poky-linux
+          ```
+          . /opt/fsl-imx-xwayland/5.10-hardknott/environment-setup-cortexa53-crypto-poky-linux
+          ```
 
 -   Build the example application:
 
     Assuming that the working directory has been changed the CHIP Linux Examples
     code, all the other steps are the same.
 
+          ```
           # If the all-clusters example is to be built
-          $ cd ~/connectedhomeip/examples/all-clusters-app/linux
+          cd ~/connectedhomeip/examples/all-clusters-app/linux
 
           # If the lighting example is to be built
-          $ cd ~/connectedhomeip/examples/lighting-app/linux
+          cd ~/connectedhomeip/examples/lighting-app/linux
 
           # If the thermostat example is to be built
-          $ cd ~/connectedhomeip/examples/thermostat/linux
+          cd ~/connectedhomeip/examples/thermostat/linux
 
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
-          $ PLATFORM_CFLAGS='-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"'
-          $ PKG_CONFIG_SYSROOT_DIR=${PKG_CONFIG_SYSROOT_DIR} \
-            PKG_CONFIG_LIBDIR=${PKG_CONFIG_PATH} \
-            gn gen out/aarch64 --args="target_os=\"linux\" target_cpu=\"arm64\" arm_arch=\"armv8-a\"
-                import(\"//build_overrides/build.gni\")
-                target_cflags=[ \"--sysroot=${SDKTARGETSYSROOT}\", \"${PLATFORM_CFLAGS}\" ]
-                target_ldflags = [ \"--sysroot=${SDKTARGETSYSROOT}\" ]
-                custom_toolchain=\"\${build_root}/toolchain/custom\"
-                target_cc=\"${OECORE_NATIVE_SYSROOT}/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc\"
-                target_cxx=\"${OECORE_NATIVE_SYSROOT}/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++\"
-                target_ar=\"${OECORE_NATIVE_SYSROOT}/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar\""
-          $ ninja -C out/aarch64
+          git submodule update --init
+          source third_party/connectedhomeip/scripts/activate.sh
+          PLATFORM_CFLAGS='-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"'
+          PKG_CONFIG_SYSROOT_DIR=${PKG_CONFIG_SYSROOT_DIR} \
+          PKG_CONFIG_LIBDIR=${PKG_CONFIG_PATH} \
+          gn gen out/aarch64 --args="target_os=\"linux\" target_cpu=\"arm64\" arm_arch=\"armv8-a\"
+              import(\"//build_overrides/build.gni\")
+              target_cflags=[ \"--sysroot=${SDKTARGETSYSROOT}\", \"${PLATFORM_CFLAGS}\" ]
+              target_ldflags = [ \"--sysroot=${SDKTARGETSYSROOT}\" ]
+              custom_toolchain=\"\${build_root}/toolchain/custom\"
+              target_cc=\"${OECORE_NATIVE_SYSROOT}/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc\"
+              target_cxx=\"${OECORE_NATIVE_SYSROOT}/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++\"
+              target_ar=\"${OECORE_NATIVE_SYSROOT}/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar\""
+          ninja -C out/aarch64
+          ```
 
     The executable file is built under out/aarch64, it can be executed on the
     **i.MX 8M Mini EVK** which running the Yocto image previously generated as
@@ -229,31 +247,39 @@ Thermostat-app is used as an example below.
 
     -   Initialize the BT device on the **i.MX 8M Mini EVK** board
 
-              $ modprobe moal mod_para=nxp/wifi_mod_para.conf       # Load the Wi-Fi/BT firmware
-              $ hciattach /dev/ttymxc0 any 115200 flow              # Initialize the BT device
+              ```
+              modprobe moal mod_para=nxp/wifi_mod_para.conf       # Load the Wi-Fi/BT firmware
+              hciattach /dev/ttymxc0 any 115200 flow              # Initialize the BT device
+              ```
 
     -   Find the Bluetooth device id for **i.MX 8M Mini EVK** by executing the
         command below. The number following string `hci` is the Bluetooth device
         id, `0` in this example.
 
+              ```
               $ hciconfig
               hci0:   Type: Primary  Bus: USB
                       BD Address: 00:1A:7D:DA:71:13  ACL MTU: 310:10  SCO MTU: 64:8
                       UP RUNNING
                       RX bytes:73311 acl:1527 sco:0 events:3023 errors:0
                       TX bytes:48805 acl:1459 sco:0 commands:704 errors:0
+              ```
 
     -   Run the Linux Example App
 
-              $ /home/root/thermostat-app --ble-device 0 --wifi  # The bluetooth device used is hci0 and support wifi network
+              ```
+              /home/root/thermostat-app --ble-device 0 --wifi  # The bluetooth device used is hci0 and support wifi network
+              ```
 
     -   Run [ChipDeviceController](../../src/controller/python) on the
         controller device to communicate with **i.MX 8M Mini EVK** running the
         example.
 
+              ```
               $ sudo out/python_env/bin/chip-device-ctrl                                          # execute the tool
                 chip-device-ctrl > connect -ble 3840 20202021 8889                                # connect to i.MX 8M Mini EVK
                 chip-device-ctrl > zcl Thermostat SetpointRaiseLower 8889 1 0 mode=1 amount=10    # send command to i.MX 8M Mini EVK via BLE
+              ```
 
         (Note that the last two commands `connect -ble 3840 20202021 8889` and
         `zcl Thermostat SetpointRaiseLower 8889 1 0 mode=1 amount=10` are Python

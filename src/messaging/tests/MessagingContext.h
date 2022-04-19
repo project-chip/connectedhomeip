@@ -71,9 +71,7 @@ class MessagingContext : public PlatformMemoryUser
 public:
     MessagingContext() :
         mInitialized(false), mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
-        mBobAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)),
-        mPairingAliceToBob(kBobKeyId, kAliceKeyId, GetSecureSessionManager()),
-        mPairingBobToAlice(kAliceKeyId, kBobKeyId, GetSecureSessionManager())
+        mBobAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT))
     {}
     ~MessagingContext() { VerifyOrDie(mInitialized == false); }
 
@@ -128,6 +126,9 @@ public:
     SessionHandle GetSessionAliceToBob();
     SessionHandle GetSessionBobToFriends();
 
+    const Transport::PeerAddress & GetAliceAddress() { return mAliceAddress; }
+    const Transport::PeerAddress & GetBobAddress() { return mBobAddress; }
+
     Messaging::ExchangeContext * NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate);
     Messaging::ExchangeContext * NewUnauthenticatedExchangeToBob(Messaging::ExchangeDelegate * delegate);
 
@@ -152,8 +153,6 @@ private:
     GroupId mFriendsGroupId       = 0x0101;
     Transport::PeerAddress mAliceAddress;
     Transport::PeerAddress mBobAddress;
-    SecurePairingUsingTestSecret mPairingAliceToBob;
-    SecurePairingUsingTestSecret mPairingBobToAlice;
     SessionHolder mSessionAliceToBob;
     SessionHolder mSessionBobToAlice;
     Optional<Transport::OutgoingGroupSession> mSessionBobToFriends;

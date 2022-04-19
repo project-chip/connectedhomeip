@@ -76,7 +76,7 @@ CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddres
 
     // Initialize PASE session state with any MRP parameters that DNS-SD has provided.
     // It can be overridden by PASE session protocol messages that include MRP parameters.
-    mPairing.SetMRPConfig(mMRPConfig);
+    mPairing.SetRemoteMRPConfig(mMRPConfig);
 
     if (!mSecureSession)
     {
@@ -93,26 +93,12 @@ CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddres
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommissioneeDeviceProxy::SetConnected()
+CHIP_ERROR CommissioneeDeviceProxy::SetConnected(const SessionHandle & session)
 {
-    if (mState != ConnectionState::Connecting)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    CHIP_ERROR err = mSessionManager->NewPairing(mSecureSession, Optional<Transport::PeerAddress>::Value(mDeviceAddress),
-                                                 GetDeviceId(), &mPairing, CryptoContext::SessionRole::kInitiator, mFabricIndex);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        mState = ConnectionState::SecureConnected;
-    }
-    else
-    {
-        ChipLogError(Controller, "NewPairing returning error %" CHIP_ERROR_FORMAT, err.Format());
-        mState = ConnectionState::NotConnected;
-    }
-    return err;
+    VerifyOrReturnError(mState == ConnectionState::Connecting, CHIP_ERROR_INCORRECT_STATE);
+    mState = ConnectionState::SecureConnected;
+    mSecureSession.Grab(session);
+    return CHIP_NO_ERROR;
 }
 
 void CommissioneeDeviceProxy::Reset()

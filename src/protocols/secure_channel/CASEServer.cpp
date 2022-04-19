@@ -60,13 +60,6 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
 {
     ReturnErrorCodeIf(ec == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    // Mark any PASE sessions used for commissioning as stale.
-    // This is a workaround, as we currently don't have a way to identify
-    // secure sessions established via PASE protocol.
-    // TODO - Identify which PASE base secure channel was used
-    //        for commissioning and drop it once commissioning is complete.
-    mSessionManager->ExpireAllPairings(kUndefinedNodeId, kUndefinedFabricIndex);
-
 #if CONFIG_NETWORK_LAYER_BLE
     // Close all BLE connections now since a CASE handshake has been initiated.
     if (mBleLayer != nullptr)
@@ -85,6 +78,13 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
     // Hand over the exchange context to the CASE session.
     ec->SetDelegate(&GetSession());
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CASEServer::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate)
+{
+    // TODO: assign newDelegate to CASESession, let CASESession handle future messages.
+    newDelegate = this;
     return CHIP_NO_ERROR;
 }
 
@@ -127,23 +127,10 @@ void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
     Cleanup();
 }
 
-void CASEServer::OnSessionEstablished()
+void CASEServer::OnSessionEstablished(const SessionHandle & session)
 {
-    ChipLogProgress(Inet, "CASE Session established. Setting up the secure channel.");
-    mSessionManager->ExpireAllPairings(GetSession().GetPeerNodeId(), GetSession().GetFabricIndex());
-
-    SessionHolder sessionHolder;
-    CHIP_ERROR err = mSessionManager->NewPairing(
-        sessionHolder, Optional<Transport::PeerAddress>::Value(GetSession().GetPeerAddress()), GetSession().GetPeerNodeId(),
-        &GetSession(), CryptoContext::SessionRole::kResponder, GetSession().GetFabricIndex());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Inet, "Failed in setting up secure channel: err %s", ErrorStr(err));
-        OnSessionEstablishmentError(err);
-        return;
-    }
-
-    ChipLogProgress(Inet, "CASE secure channel is available now.");
+    ChipLogProgress(Inet, "CASE Session established to peer: " ChipLogFormatScopedNodeId,
+                    ChipLogValueScopedNodeId(session->GetPeer()));
     Cleanup();
 }
 } // namespace chip

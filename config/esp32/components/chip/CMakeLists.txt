@@ -103,6 +103,10 @@ if (CONFIG_ENABLE_CHIP_SHELL)
     chip_gn_arg_append("chip_build_libshell"                "true")
 endif()
 
+if (CONFIG_IDF_TARGET_ESP32H2)
+    chip_gn_arg_append("chip_enable_wifi"                       "false")
+endif()
+
 if (CONFIG_OPENTHREAD_ENABLED)
     chip_gn_arg_append("chip_enable_openthread"                 "true")
 endif()
@@ -123,6 +127,10 @@ endif()
 if (CONFIG_CHIP_ENABLE_EXTERNAL_PLATFORM)
     chip_gn_arg_append("chip_device_platform"   "\"external\"")
     chip_gn_arg_append("chip_platform_target"   "\"${CONFIG_CHIP_EXTERNAL_PLATFORM_TARGET}\"")
+endif()
+
+if (CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER)
+    chip_gn_arg_append("chip_use_transitional_commissionable_data_provider" "false")
 endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")

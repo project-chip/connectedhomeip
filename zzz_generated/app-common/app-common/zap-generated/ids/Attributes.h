@@ -994,6 +994,18 @@ namespace Extension {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace Extension
 
+namespace SubjectsPerAccessControlEntry {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace SubjectsPerAccessControlEntry
+
+namespace TargetsPerAccessControlEntry {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace TargetsPerAccessControlEntry
+
+namespace AccessControlEntriesPerFabric {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace AccessControlEntriesPerFabric
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -1187,6 +1199,10 @@ static constexpr AttributeId Id = 0x00000011;
 namespace UniqueID {
 static constexpr AttributeId Id = 0x00000012;
 } // namespace UniqueID
+
+namespace CapabilityMinima {
+static constexpr AttributeId Id = 0x00000013;
+} // namespace CapabilityMinima
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -3469,6 +3485,42 @@ static constexpr AttributeId Id = 0x00000000;
 namespace FanModeSequence {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace FanModeSequence
+
+namespace PercentSetting {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace PercentSetting
+
+namespace PercentCurrent {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PercentCurrent
+
+namespace SpeedMax {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace SpeedMax
+
+namespace SpeedSetting {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace SpeedSetting
+
+namespace SpeedCurrent {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace SpeedCurrent
+
+namespace RockSupport {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace RockSupport
+
+namespace RockSetting {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace RockSetting
+
+namespace WindSupport {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace WindSupport
+
+namespace WindSetting {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace WindSetting
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

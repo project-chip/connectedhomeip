@@ -1150,7 +1150,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPWindowCoveringClusterGoToLiftPercentageParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull liftPercentageValue;
-@property (strong, nonatomic) NSNumber * _Nonnull liftPercent100thsValue;
+@property (strong, nonatomic) NSNumber * _Nullable liftPercent100thsValue;
 - (instancetype)init;
 @end
 
@@ -1161,7 +1161,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPWindowCoveringClusterGoToTiltPercentageParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull tiltPercentageValue;
-@property (strong, nonatomic) NSNumber * _Nonnull tiltPercent100thsValue;
+@property (strong, nonatomic) NSNumber * _Nullable tiltPercent100thsValue;
 - (instancetype)init;
 @end
 

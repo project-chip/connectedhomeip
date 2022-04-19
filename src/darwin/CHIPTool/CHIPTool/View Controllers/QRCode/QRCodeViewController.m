@@ -432,11 +432,7 @@
                         NSURL * payloadURI = [payload wellKnownTypeURIPayload];
                         NSLog(@"Payload text:%@", payloadURI);
                         if (payloadURI) {
-                            /* CHIP Issue #415
-                             Once #415 goes in, there will b no need to replace _ with spaces.
-                            */
-                            NSString * qrCode = [[payloadURI absoluteString] stringByReplacingOccurrencesOfString:@"_"
-                                                                                                       withString:@" "];
+                            NSString * qrCode = [payloadURI absoluteString];
                             NSLog(@"Scanned code string:%@", qrCode);
                             [self scannedQRCode:qrCode];
                         }
@@ -488,7 +484,7 @@
     if (error != nil) {
         NSLog(@"Got pairing error back %@", error);
     } else {
-        CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+        CHIPDeviceController * controller = InitializeCHIP();
         uint64_t deviceId = CHIPGetLastPairedDeviceId();
         if ([controller deviceBeingCommissionedOverBLE:deviceId]) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -659,7 +655,7 @@
 {
 
     NSError * error;
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    CHIPDeviceController * controller = InitializeCHIP();
     // create commissioning params in ObjC. Pass those in here with network credentials.
     // maybe this just becomes the new norm
     CHIPCommissioningParameters * params = [[CHIPCommissioningParameters alloc] init];
@@ -705,7 +701,7 @@
     }
 
     uint64_t deviceId = CHIPGetNextAvailableDeviceID() - 1;
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    CHIPDeviceController * controller = InitializeCHIP();
     [controller updateDevice:deviceId fabricId:0];
 }
 
@@ -813,7 +809,9 @@
 
 - (void)_restartMatterStack
 {
-    CHIPRestartController(self.chipController);
+    self.chipController = CHIPRestartController(self.chipController);
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
+    [self.chipController setPairingDelegate:self queue:callbackQueue];
 }
 
 - (void)handleRendezVousDefault:(NSString *)payload

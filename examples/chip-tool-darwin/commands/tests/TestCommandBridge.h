@@ -82,7 +82,7 @@ public:
 
     void WaitForCommissionee(chip::NodeId nodeId)
     {
-        CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+        CHIPDeviceController * controller = CurrentCommissioner();
         VerifyOrReturn(controller != nil, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
 
         [controller getConnectedDevice:nodeId

@@ -70,7 +70,7 @@ IPAddress & IPAddress::operator=(const IPAddress & other)
     return *this;
 }
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 IPAddress::IPAddress(const ip6_addr_t & ipv6Addr)
 {
@@ -268,6 +268,29 @@ CHIP_ERROR IPAddress::GetIPAddressFromSockAddr(const SockAddr & sockaddr, IPAddr
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+IPAddress::IPAddress(const otIp6Address & ipv6Addr)
+{
+    static_assert(sizeof(ipv6Addr.mFields.m32) == sizeof(Addr), "otIp6Address size mismatch");
+    memcpy(Addr, ipv6Addr.mFields.m32, sizeof(Addr));
+}
+otIp6Address IPAddress::ToIPv6() const
+{
+    otIp6Address otAddr;
+    static_assert(sizeof(otAddr.mFields.m32) == sizeof(Addr), "otIp6Address size mismatch");
+    memcpy(otAddr.mFields.m32, Addr, sizeof(otAddr.mFields.m32));
+    return otAddr;
+}
+
+IPAddress IPAddress::FromOtAddr(otIp6Address & address)
+{
+    IPAddress addr;
+    static_assert(sizeof(address.mFields.m32) == sizeof(addr), "otIp6Address size mismatch");
+    memcpy(addr.Addr, address.mFields.m32, sizeof(addr.Addr));
+    return addr;
+}
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 // Is address an IPv4 address encoded in IPv6 format?
 bool IPAddress::IsIPv4() const
