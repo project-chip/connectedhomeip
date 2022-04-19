@@ -143,7 +143,7 @@ CHIP_ERROR ChannelManager::HandleGetLineup(AttributeValueEncoder & aEncoder)
         jobject channelLineupObject = env->CallObjectMethod(mChannelManagerObject, mGetLineupMethod);
         if (channelLineupObject != nullptr)
         {
-            jclass channelLineupClazz   = env->GetObjectClass(channelLineupObject);
+            jclass channelLineupClazz = env->GetObjectClass(channelLineupObject);
 
             jfieldID operatorNameFild = env->GetFieldID(channelLineupClazz, "operatorName", "Ljava/lang/String;");
             jstring joperatorName     = static_cast<jstring>(env->GetObjectField(channelLineupObject, operatorNameFild));
@@ -174,7 +174,7 @@ CHIP_ERROR ChannelManager::HandleGetLineup(AttributeValueEncoder & aEncoder)
             lineupInfo.lineupInfoType   = static_cast<app::Clusters::Channel::LineupInfoTypeEnum>(jlineupInfoType);
 
             err = aEncoder.Encode(lineupInfo);
-        } 
+        }
         else
         {
             err = aEncoder.EncodeNull();
@@ -204,7 +204,7 @@ CHIP_ERROR ChannelManager::HandleGetCurrentChannel(AttributeValueEncoder & aEnco
         jobject channelInfoObject = env->CallObjectMethod(mChannelManagerObject, mGetCurrentChannelMethod);
         if (channelInfoObject != nullptr)
         {
-            jclass channelClass       = env->GetObjectClass(channelInfoObject);
+            jclass channelClass = env->GetObjectClass(channelInfoObject);
 
             jfieldID getCallSignField = env->GetFieldID(channelClass, "callSign", "Ljava/lang/String;");
             jstring jcallSign         = static_cast<jstring>(env->GetObjectField(channelInfoObject, getCallSignField));
