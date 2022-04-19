@@ -254,7 +254,7 @@ public:
      * object that can be decoded using the DataModel::Decode machinery will work.
      *
      * Notable return values:
-     *      - If the provided attribute object's Cluster and Event IDs don't match those of the event in the cache,
+     *      - If the provided event object's Cluster and Event IDs don't match those of the event in the cache,
      *        a CHIP_ERROR_SCHEMA_MISMATCH shall be returned.
      *
      *      - If event doesn't exist in the cache, CHIP_ERROR_KEY_NOT_FOUND
