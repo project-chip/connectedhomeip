@@ -57,7 +57,7 @@ public class ChannelManagerStub implements ChannelManager {
     if (mCurrentChannel == 100) {
       return null;
     }
-    
+
     return new ChannelInfo(1, 1, "HDMI", "callSign", "affiliateCallSign");
   }
 

@@ -174,7 +174,7 @@ CHIP_ERROR ChannelManager::HandleGetLineup(AttributeValueEncoder & aEncoder)
             lineupInfo.lineupInfoType   = static_cast<app::Clusters::Channel::LineupInfoTypeEnum>(jlineupInfoType);
 
             err = aEncoder.Encode(lineupInfo);
-        } 
+        }
         else
         {
             err = aEncoder.EncodeNull();
