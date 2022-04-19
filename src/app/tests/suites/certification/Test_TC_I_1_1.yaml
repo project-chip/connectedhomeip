@@ -47,7 +47,7 @@ tests:
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0,1]
+          value: [0, 1]
           constraints:
               type: list
 
@@ -55,7 +55,7 @@ tests:
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
-          value: [0,1,64]
+          value: [0, 1, 64]
           constraints:
               type: list
 
