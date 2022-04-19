@@ -44,8 +44,8 @@
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
+#include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
 #include <platform/Ameba/AmebaOTAImageProcessor.h>
 #endif
 
