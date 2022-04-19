@@ -33,14 +33,14 @@ tests:
       attribute: "ClusterRevision"
       response:
           value: 3
-    
+
     - label: "Read the global attribute constraints : ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
           constraints:
               type: uint16
-    
+
     #issue #17482
     - label: "Read the global attribute: AttributeList"
       PICS: PICS_SKIP_SAMPLE_APP
@@ -82,7 +82,7 @@ tests:
           value: []
           constraints:
               type: list
-    
+
     #issue #17483
     - label:
           "Read FeatureMap attribute from the DUT and Verify that the DUT

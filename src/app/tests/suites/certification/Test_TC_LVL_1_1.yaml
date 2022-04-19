@@ -33,14 +33,14 @@ tests:
       attribute: "ClusterRevision"
       response:
           value: 5
-    
+
     - label: "Read the global attribute constraints : ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
           constraints:
               type: uint16
-    
+
     - label: "Read the global attribute: AttributeList"
       PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
@@ -65,7 +65,7 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-    
+
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"

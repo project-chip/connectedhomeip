@@ -63,8 +63,8 @@ tests:
       response:
           constraints:
               type: list
-    
-    #issue #15011  
+
+    #issue #15011
     - label:
           "Read EventList attribute from the DUT and Verify that the DUT
           response provides a list of supported events."
@@ -79,7 +79,7 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-    
+
     #issue #17484
     - label:
           "Read AcceptedCommandList attribute from the DUT and Verify that the DUT
@@ -106,8 +106,8 @@ tests:
       verification: |
           ./chip-tool pressuremeasurement read generated-command-list 1 1
 
-            Verify response:   
-            [1650367913.285053][4120:4125] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0403 Attribute 0x0000_FFF8 DataVersion: 2248280323 
+            Verify response:
+            [1650367913.285053][4120:4125] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0403 Attribute 0x0000_FFF8 DataVersion: 2248280323
             [1650367913.285193][4120:4125] CHIP:TOO:   GeneratedCommandList: 0 entries
       cluster: "LogCommands"
       command: "UserPrompt"
@@ -118,7 +118,7 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-    
+
     #issue #17483
     - label:
           "Read FeatureMap attribute from the DUT and Verify that the DUT

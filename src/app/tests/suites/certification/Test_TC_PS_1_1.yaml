@@ -33,7 +33,7 @@ tests:
       attribute: "ClusterRevision"
       response:
           value: 1
-    
+
     - label: "Read the global attribute constraints: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
@@ -50,7 +50,7 @@ tests:
           constraints:
               type: list
 
-    #issue #11053   
+    #issue #11053
     - label:
           "Read EventList attribute from the DUT and Verify that the DUT
           response provides a list of supported events."
@@ -65,7 +65,7 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-    
+
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -81,7 +81,7 @@ tests:
           value: []
           constraints:
               type: list
-    
+
     - label: "read the optional global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
