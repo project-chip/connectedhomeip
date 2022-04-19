@@ -1053,10 +1053,10 @@ client cluster PumpConfigurationAndControl = 512 {
   readonly attribute nullable int16s maxPressure = 0;
   readonly attribute nullable int16u maxSpeed = 1;
   readonly attribute nullable int16u maxFlow = 2;
-  readonly attribute enum8 effectiveOperationMode = 17;
-  readonly attribute enum8 effectiveControlMode = 18;
+  readonly attribute PumpOperationMode effectiveOperationMode = 17;
+  readonly attribute PumpControlMode effectiveControlMode = 18;
   readonly attribute nullable int16s capacity = 19;
-  attribute access(write: manage) enum8 operationMode = 32;
+  attribute access(write: manage) PumpOperationMode operationMode = 32;
   readonly attribute int16u clusterRevision = 65533;
 }
 
