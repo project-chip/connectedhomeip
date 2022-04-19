@@ -18,21 +18,21 @@
 
 /**
  *    @file
- *      This file implements LayerImplLwIP using LwIP.
+ *      This file implements LayerImplFreeRTOS. Used by LwIP implementation and OpenThread
  */
 
 #include <lib/support/CodeUtils.h>
 #include <system/PlatformEventSupport.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemLayer.h>
-#include <system/SystemLayerImplLwIP.h>
+#include <system/SystemLayerImplFreeRTOS.h>
 
 namespace chip {
 namespace System {
 
-LayerImplLwIP::LayerImplLwIP() : mHandlingTimerComplete(false) {}
+LayerImplFreeRTOS::LayerImplFreeRTOS() : mHandlingTimerComplete(false) {}
 
-CHIP_ERROR LayerImplLwIP::Init()
+CHIP_ERROR LayerImplFreeRTOS::Init()
 {
     VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -44,13 +44,13 @@ CHIP_ERROR LayerImplLwIP::Init()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LayerImplLwIP::Shutdown()
+CHIP_ERROR LayerImplFreeRTOS::Shutdown()
 {
     VerifyOrReturnError(mLayerState.ResetFromInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LayerImplLwIP::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
+CHIP_ERROR LayerImplFreeRTOS::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
 {
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -74,7 +74,7 @@ CHIP_ERROR LayerImplLwIP::StartTimer(Clock::Timeout delay, TimerCompleteCallback
     return CHIP_NO_ERROR;
 }
 
-void LayerImplLwIP::CancelTimer(TimerCompleteCallback onComplete, void * appState)
+void LayerImplFreeRTOS::CancelTimer(TimerCompleteCallback onComplete, void * appState)
 {
     VerifyOrReturn(mLayerState.IsInitialized());
 
@@ -85,7 +85,7 @@ void LayerImplLwIP::CancelTimer(TimerCompleteCallback onComplete, void * appStat
     }
 }
 
-CHIP_ERROR LayerImplLwIP::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
+CHIP_ERROR LayerImplFreeRTOS::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
 {
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -98,7 +98,7 @@ CHIP_ERROR LayerImplLwIP::ScheduleWork(TimerCompleteCallback onComplete, void * 
 /**
  * Start the platform timer with specified millsecond duration.
  */
-CHIP_ERROR LayerImplLwIP::StartPlatformTimer(System::Clock::Timeout aDelay)
+CHIP_ERROR LayerImplFreeRTOS::StartPlatformTimer(System::Clock::Timeout aDelay)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR status = PlatformEventing::StartTimer(*this, aDelay);
@@ -120,7 +120,7 @@ CHIP_ERROR LayerImplLwIP::StartPlatformTimer(System::Clock::Timeout aDelay)
  *  @return CHIP_NO_ERROR on success, error code otherwise.
  *
  */
-CHIP_ERROR LayerImplLwIP::HandlePlatformTimer()
+CHIP_ERROR LayerImplFreeRTOS::HandlePlatformTimer()
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
