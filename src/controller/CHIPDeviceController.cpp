@@ -1550,8 +1550,8 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDevicePr
         {
             commissioner->mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
         }
-        // Only release the pase session if we're not commissioning. If we're commissioning, we're going to hold onto that pase
-        // session until we send the commissioning complete command just in case it fails and we need to go back to the pase
+        // Only release the PASE session if we're not commissioning. If we're commissioning, we're going to hold onto that PASE
+        // session until we send the commissioning complete command just in case it fails and we need to go back to the PASE
         // connection to re-setup the network. This is unlikely, given that we just connected over the operational network, but is
         // required by the spec.
         CommissioneeDeviceProxy * commissionee = commissioner->FindCommissioneeDevice(device->GetDeviceId());
