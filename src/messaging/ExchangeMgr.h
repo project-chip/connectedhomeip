@@ -194,6 +194,11 @@ public:
 
     size_t GetNumActiveExchanges() { return mContextPool.Allocated(); }
 
+    static ExchangeMessageDispatch & GetDispatchForDelegate(ExchangeDelegate * delegate)
+    {
+        return (delegate != nullptr) ? delegate->GetMessageDispatch() : ApplicationExchangeDispatch::Instance();
+    }
+
 private:
     enum class State
     {

@@ -77,8 +77,6 @@ public:
      */
     bool IsInitiator() const;
 
-    bool IsEncryptionRequired() const { return mDispatch.IsEncryptionRequired(); }
-
     bool IsGroupExchangeContext() const { return mSession && mSession->IsGroupSession(); }
 
     // Implement SessionReleaseDelegate

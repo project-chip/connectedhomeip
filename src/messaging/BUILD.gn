@@ -44,7 +44,6 @@ static_library("messaging") {
     "ExchangeContext.cpp",
     "ExchangeContext.h",
     "ExchangeDelegate.h",
-    "ExchangeMessageDispatch.cpp",
     "ExchangeMessageDispatch.h",
     "ExchangeMgr.cpp",
     "ExchangeMgr.h",

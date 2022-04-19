@@ -288,6 +288,12 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             }
         }
 
+        if (GetDispatchForDelegate(delegate).IsEncryptionRequired() != session->IsEncrypted())
+        {
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER));
+            return;
+        }
+
         // If rcvd msg is from initiator then this exchange is created as not Initiator.
         // If rcvd msg is not from initiator then this exchange is created as Initiator.
         // Note that if matchingUMH is not null then rcvd msg if from initiator.
@@ -309,13 +315,6 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
         ChipLogDetail(ExchangeManager, "Handling via exchange: " ChipLogFormatExchange ", Delegate: %p", ChipLogValueExchange(ec),
                       ec->GetDelegate());
-
-        if (ec->IsEncryptionRequired() != packetHeader.IsEncrypted())
-        {
-            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_INVALID_MESSAGE_TYPE));
-            ec->Close();
-            return;
-        }
 
         CHIP_ERROR err = ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
         if (err != CHIP_NO_ERROR)

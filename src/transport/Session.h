@@ -90,6 +90,8 @@ public:
 
     bool IsSecureSession() const { return GetSessionType() == SessionType::kSecure; }
 
+    bool IsEncrypted() const { return IsSecureSession() || IsGroupSession(); }
+
 protected:
     // This should be called by sub-classes at the very beginning of the destructor, before any data field is disposed, such that
     // the session is still functional during the callback.

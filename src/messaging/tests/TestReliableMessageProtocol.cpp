@@ -135,14 +135,8 @@ public:
 class MockSessionEstablishmentExchangeDispatch : public Messaging::ApplicationExchangeDispatch
 {
 public:
-    bool IsReliableTransmissionAllowed() const override { return mRetainMessageOnSend; }
-
     bool MessagePermitted(uint16_t protocol, uint8_t type) override { return true; }
-
     bool IsEncryptionRequired() const override { return mRequireEncryption; }
-
-    bool mRetainMessageOnSend = true;
-
     bool mRequireEncryption = false;
 };
 
@@ -332,6 +326,7 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     MockSessionEstablishmentDelegate mockSender;
+    mockSender.mMessageDispatch.mRequireEncryption = true;
     ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
@@ -343,7 +338,6 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
         64_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
 
-    mockSender.mMessageDispatch.mRetainMessageOnSend = false;
     // Let's drop the initial message
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 1;
@@ -391,6 +385,7 @@ void CheckUnencryptedMessageReceiveFailure(nlTestSuite * inSuite, void * inConte
     gLoopback.mNumMessagesToDrop   = 0;
     gLoopback.mDroppedMessageCount = 0;
 
+    // Send a plaintext message targeting a encrypted unsolicited message handler
     // We are sending a malicious packet, doesn't expect an ack
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendFlags(SendMessageFlags::kNoAutoRequestAck));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
