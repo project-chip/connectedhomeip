@@ -128,5 +128,5 @@ class AppsRegister:
         options = {}
         if (len(args) % 2) == 0:
             # Create a dictionary from the key-value pair list
-            options = { args[i]: args[i+1] for i in range(0, len(args), 2)}
+            options = {args[i]: args[i+1] for i in range(0, len(args), 2)}
         return options
