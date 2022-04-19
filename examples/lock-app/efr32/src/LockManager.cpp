@@ -51,7 +51,7 @@ CHIP_ERROR LockManager::Init()
     if(state == true)
         mState = kState_UnlockCompleted;
     else
-        mState = kState_LockCompleted;        
+        mState = kState_LockCompleted;
 
     mAutoTurnOffTimerArmed = false;
     mAutoTurnOff           = false;
@@ -343,7 +343,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, DlCredentialType cr
     credential.credentialType = credentialInStorage.credentialType;
     credential.credentialData = chip::ByteSpan(credentialInStorage.credentialData);
 
-    ChipLogDetail(Zcl, "Found occupied credential [type=%u,dataSize=%zu]", 
+    ChipLogDetail(Zcl, "Found occupied credential [type=%u,dataSize=%zu]",
                   to_underlying(credential.credentialType), credential.credentialData.size());
 
     return true;
@@ -374,7 +374,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, DlCredentialStatus 
 
     credentialInStorage.credentialDataSize = credentialData.size();
 
-    ChipLogProgress(Zcl, "Successfully set the credential [credentialType=%u]", 
+    ChipLogProgress(Zcl, "Successfully set the credential [credentialType=%u]",
                     to_underlying(credentialType));
 
     return true;
@@ -433,7 +433,7 @@ bool LockManager::setLockState(DlLockState lockState, const Optional<chip::ByteS
                 lockStateToString(lockState), mEndpointId);
 
             curState = lockState;
- 
+
             return true;
         }
     }

@@ -377,7 +377,7 @@ struct EmberAfPluginDoorLockCredentialInfo
     DlCredentialStatus status;       /**< Indicates if credential slot is occupied or not. */
     DlCredentialType credentialType; /**< Specifies the type of the credential (PIN, RFID, etc.). */
     chip::ByteSpan credentialData;   /**< Credential data bytes. */
-    size_t credentialDataSize;    
+    size_t credentialDataSize;
 };
 
 /**

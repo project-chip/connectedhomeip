@@ -31,4 +31,3 @@
 #include <lib/support/Span.h>
 
 // List specific responses
-
