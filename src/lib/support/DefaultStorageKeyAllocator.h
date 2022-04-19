@@ -111,6 +111,7 @@ public:
     static const char * OTAUpdateToken() { return "g/o/ut"; }
     static const char * OTACurrentUpdateState() { return "g/o/us"; }
     static const char * OTATargetVersion() { return "g/o/tv"; }
+    static const char * OTATripVersion() { return "g/o/tr"; }
 
     // Event number counter.
     const char * IMEventNumber() { return Format("g/im/e"); }

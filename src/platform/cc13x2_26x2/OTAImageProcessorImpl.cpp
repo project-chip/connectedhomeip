@@ -85,6 +85,41 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
+bool OTAImageProcessorImpl::IsFirstImageRun()
+{
+    CHIP_ERROR err;
+    uint32_t runningSwVer;
+    uint32_t otaTripSwVer;
+
+    err = ConfigurationMgr().GetSoftwareVersion(runningSwVer);
+    SuccessOrExit(err);
+    err = KeyValueStoreMgr().Get(DefaultStorageKeyAllocator::OTATripVersion(), &otaTripSwVer);
+    if (CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == err)
+    {
+        // Trip version does not exist, place the current version in KVS
+        // This is the first run of the device with no persisted data, likely a
+        // factory reset
+        err = KeyValueStoreMgr().Put(DefaultStorageKeyAllocator::OTATripVersion(), runningSwVer);
+        SuccessOrExit(err);
+        return false;
+    }
+    SuccessOrExit(err);
+
+    if (runningSwVer != otaTripSwVer)
+    {
+        // The version stored in the KVS does not match the version reported by
+        // the Configuration Manager
+        // This is the first time this version has run.
+        err = KeyValueStoreMgr().Put(DefaultStorageKeyAllocator::OTATripVersion(), runningSwVer);
+        SuccessOrExit(err);
+        return true;
+    }
+
+exit:
+    return false;
+
+}
+
 /* DESIGN NOTE: The Boot Image Manager will search external flash for an
  * `ExtImageInfo_t` structure every 4K for 1M. This structure points to where
  * the executable image is in external flash with a uint32_t. It is possible to
