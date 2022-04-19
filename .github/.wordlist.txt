@@ -1327,7 +1327,6 @@ ureverse
 URI
 urlrequest
 usbmodem
-usbmodemXXXXXXX
 usbserial
 USBtoUART
 uscif
