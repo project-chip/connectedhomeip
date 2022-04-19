@@ -246,7 +246,7 @@ bool LockManager::Unlock(chip::EndpointId endpointId, const Optional<chip::ByteS
 
 bool LockManager::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const
 {
-    ChipLogProgress(Zcl, "Door Lock App: LockManager::GetUser [endpoint=%d,userIndex=%hu]", mEndpointId, userIndex);
+    ChipLogProgress(Zcl, "Lock App: LockManager::GetUser [endpoint=%d,userIndex=%hu]", mEndpointId, userIndex);
 
     const auto & userInDb = mLockUser;
     user.userStatus       = userInDb.userStatus;
@@ -280,7 +280,7 @@ bool LockManager::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::F
                            DlCredentialRule credentialRule, const DlCredential * credentials, size_t totalCredentials)
 {
     ChipLogProgress(Zcl,
-                    "Door Lock App: LockManager::SetUser "
+                    "Lock App: LockManager::SetUser "
                     "[endpoint=%d,userIndex=%" PRIu16 ",creator=%d,modifier=%d,userName=\"%.*s\",uniqueId=%" PRIx32
                     ",userStatus=%u,userType=%u,"
                     "credentialRule=%u,credentials=%p,totalCredentials=%zu]",
@@ -329,7 +329,7 @@ bool LockManager::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::F
 bool LockManager::GetCredential(chip::EndpointId endpointId, DlCredentialType credentialType,
                                  EmberAfPluginDoorLockCredentialInfo & credential) const
 {
-    ChipLogProgress(Zcl, "Door Lock App: LockManager::GetCredential [credentialType=%u]",
+    ChipLogProgress(Zcl, "Lock App: LockManager::GetCredential [credentialType=%u]",
                     to_underlying(credentialType));
 
     const auto & credentialInStorage = mLockCredentials;
@@ -353,7 +353,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, DlCredentialStatus 
                                  const chip::ByteSpan & credentialData)
 {
     ChipLogProgress(Zcl,
-                    "Door Lock App: LockManager::SetCredential "
+                    "Lock App: LockManager::SetCredential "
                     "[credentialStatus=%u,credentialType=%u,credentialDataSize=%zu]",
                     to_underlying(credentialStatus), to_underlying(credentialType),
                     credentialData.size());
@@ -402,14 +402,14 @@ bool LockManager::setLockState(DlLockState lockState, const Optional<chip::ByteS
     DlLockState curState = state ? DlLockState::kUnlocked : DlLockState::kLocked;
     if (curState == lockState)
     {
-        ChipLogDetail(Zcl, "Door Lock App: door is already locked, ignoring command to set lock state to \"%s\" [endpointId=%d]",
+        ChipLogDetail(Zcl, "Lock App: door is already locked, ignoring command to set lock state to \"%s\" [endpointId=%d]",
                       lockStateToString(lockState), mEndpointId);
         return false;
     }
 
     if (!pin.HasValue())
     {
-        ChipLogDetail(Zcl, "Door Lock App: PIN code is not specified, setting door lock state to \"%s\" [endpointId=%d]",
+        ChipLogDetail(Zcl, "Lock App: PIN code is not specified, setting lock state to \"%s\" [endpointId=%d]",
                       lockStateToString(lockState), mEndpointId);
         curState = lockState;
 
@@ -429,7 +429,7 @@ bool LockManager::setLockState(DlLockState lockState, const Optional<chip::ByteS
         {
             ChipLogDetail(
                 Zcl,
-                "Door Lock App: specified PIN code was found in the database, setting door lock state to \"%s\" [endpointId=%d]",
+                "Lock App: specified PIN code was found in the database, setting lock state to \"%s\" [endpointId=%d]",
                 lockStateToString(lockState), mEndpointId);
 
             curState = lockState;
@@ -439,7 +439,7 @@ bool LockManager::setLockState(DlLockState lockState, const Optional<chip::ByteS
     }
 
     ChipLogDetail(Zcl,
-                  "Door Lock App: specified PIN code was not found in the database, ignoring command to set lock state to \"%s\" "
+                  "Lock App: specified PIN code was not found in the database, ignoring command to set lock state to \"%s\" "
                   "[endpointId=%d]",
                   lockStateToString(lockState), mEndpointId);
 
