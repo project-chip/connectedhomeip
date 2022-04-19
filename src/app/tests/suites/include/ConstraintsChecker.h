@@ -275,11 +275,12 @@ protected:
     {
         if (expected.IsNull() && current.IsNull())
         {
-            Exit(std::string(itemName) + " got NULL for both values, but expected not equal");
+            Exit(std::string(itemName) + " got null for both values, but expected not equal");
             return false;
         }
 
-        if ((expected.IsNull() && !current.IsNull()) || (!expected.IsNull() && current.IsNull())){
+        if (expected.IsNull() != current.IsNull())
+        {
             return true;
         }
 

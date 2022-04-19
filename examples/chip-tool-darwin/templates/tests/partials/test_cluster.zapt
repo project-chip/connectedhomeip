@@ -196,10 +196,10 @@ class {{filename}}: public TestCommandBridge
 
             {{#chip_tests_item_responses}}
             {{#if error}}
-              VerifyOrReturn(CheckValue("status", err, {{error}}));
+              VerifyOrReturn(CheckValue("status", err ? err.code : 0, {{error}}));
               NextTest();
             {{else}}
-              VerifyOrReturn(CheckValue("status", err, 0));
+              VerifyOrReturn(CheckValue("status", err ? err.code : 0, 0));
             {{#unless isSubscribeAttribute}}
 
             {{#chip_tests_item_response_parameters}}

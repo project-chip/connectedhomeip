@@ -3,10 +3,7 @@
     {{#chip_tests_item_response_parameters}}
     {{#if saveAs}}
         {{~#if (isString type)}}
-            {{#if isNullable}}
-            {{else}}
-                {{#if (isOctetString type)}}uint8_t{{else}}char{{/if}} * {{saveAs}}Buffer = nullptr;
-            {{/if}}
+            {{#if (isOctetString type)}}uint8_t{{else}}char{{/if}} * {{saveAs}}Buffer = nullptr;
         {{/if~}}
         {{zapTypeToDecodableClusterObjectType type ns=../cluster}} {{saveAs}};
     {{/if}}

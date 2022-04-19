@@ -3,14 +3,11 @@
     {{#chip_tests_item_response_parameters}}
     {{#if saveAs}}
         {{#if (isString type)}}
-            {{#if isNullable}}
-            {{else}}
-                if ({{saveAs}}Buffer != nullptr)
-                {
-                    chip::Platform::MemoryFree({{saveAs}}Buffer);
-                    {{saveAs}}Buffer = nullptr;
-                }
-            {{/if}}
+            if ({{saveAs}}Buffer != nullptr)
+            {
+                chip::Platform::MemoryFree({{saveAs}}Buffer);
+                {{saveAs}}Buffer = nullptr;
+            }
         {{/if}}
     {{/if}}
     {{/chip_tests_item_response_parameters}}
