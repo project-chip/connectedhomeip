@@ -46,7 +46,7 @@ tests:
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0,1,2,3,4,5,6,10,11,12,13,14,15,16384]
+          value: [0, 1, 2, 3, 4, 5, 6, 10, 11, 12, 13, 14, 15, 16384]
           constraints:
               type: list
 
@@ -70,7 +70,7 @@ tests:
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
-          value: [0,1,2,3,4,5,6,7]
+          value: [0, 1, 2, 3, 4, 5, 6, 7]
           constraints:
               type: list
 
