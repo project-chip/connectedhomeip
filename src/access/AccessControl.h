@@ -216,6 +216,8 @@ public:
          */
         CHIP_ERROR RemoveTarget(size_t index) { return mDelegate->RemoveTarget(index); }
 
+        bool HasDefaultDelegate() const { return mDelegate == &mDefaultDelegate; }
+
         const Delegate & GetDelegate() const { return *mDelegate; }
 
         Delegate & GetDelegate() { return *mDelegate; }
@@ -550,12 +552,14 @@ public:
         Entry * p = nullptr;
         if (mEntryListener != nullptr && ReadEntry(fabric, index, entry) == CHIP_NO_ERROR)
         {
-            // TEMP: idea is to read entry before delete, but also delete entry before notify.
-            // However, can't use the entry after deleting it. Really we want a copy.
-            // For now, don't attempt to use the entry.
-            // p = &entry;
+            p = &entry;
         }
         ReturnErrorOnFailure(mDelegate->DeleteEntry(index, &fabric));
+        if (p && p->HasDefaultDelegate())
+        {
+            // Best effort to preserve read entry upon deletion failed, regretable but OK.
+            p = nullptr;
+        }
         NotifyEntryChanged(subjectDescriptor, fabric, index, p, EntryListener::ChangeType::kRemoved);
         return CHIP_NO_ERROR;
     }

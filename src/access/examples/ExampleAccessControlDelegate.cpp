@@ -725,6 +725,15 @@ public:
 
     EntryStorage * GetStorage() { return mStorage; }
 
+    void FixBeforeDelete(EntryStorage & storage)
+    {
+        if (mStorage == &storage)
+        {
+            // Best effort, OK if it fails.
+            EnsureStorageInPool();
+        }
+    }
+
     void FixAfterDelete(EntryStorage & storage)
     {
         constexpr auto & acl = EntryStorage::acl;
@@ -1056,9 +1065,15 @@ public:
     {
         if (auto * storage = EntryStorage::FindUsedInAcl(index, fabricIndex))
         {
+            // Best effort attempt to preserve any outstanding delegates...
+            for (auto & delegate : EntryDelegate::pool)
+            {
+                delegate.FixBeforeDelete(*storage);
+            }
+
+            // ...then go through the access control list starting at the deleted storage...
             constexpr auto & acl = EntryStorage::acl;
             constexpr auto * end = acl + ArraySize(acl);
-            // Go through the access control list starting at the deleted storage...
             for (auto * next = storage + 1; storage < end; ++storage, ++next)
             {
                 // ...copying over each storage with its next one...
@@ -1073,6 +1088,7 @@ public:
                     break;
                 }
             }
+
             // ...then fix up all the delegates so they still use the proper storage.
             storage = acl + index;
             for (auto & delegate : EntryDelegate::pool)
@@ -1083,8 +1099,10 @@ public:
             {
                 delegate.FixAfterDelete(*storage);
             }
+
             return CHIP_NO_ERROR;
         }
+
         return CHIP_ERROR_SENTINEL;
     }
 
