@@ -2840,7 +2840,7 @@ tests:
       attribute: "nullable_octet_string"
       response:
           value: ""
-    
+
     - label: "Read attribute NULLABLE_OCTET_STRING not TestValue"
       command: "readAttribute"
       attribute: "nullable_octet_string"
