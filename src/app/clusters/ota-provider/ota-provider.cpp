@@ -87,7 +87,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 
     ChipLogProgress(Zcl, "OTA Provider received ApplyUpdateRequest");
-    ChipLogDetail(Zcl, "  Update Token: %u", (unsigned int) (commandData.updateToken.size()));
+    ChipLogDetail(Zcl, "  Update Token: %u", static_cast<unsigned int>(commandData.updateToken.size()));
     ChipLogDetail(Zcl, "  New Version: %" PRIu32, commandData.newVersion);
 
     if (SendStatusIfDelegateNull(commandObj, commandPath))
@@ -97,8 +97,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
 
     if (updateToken.size() > kUpdateTokenMaxLength || updateToken.size() < kUpdateTokenMinLength)
     {
-        ChipLogError(Zcl, "expected size %u for UpdateToken, got %u", (unsigned int) kUpdateTokenMaxLength,
-                     (unsigned int) (updateToken.size()));
+        ChipLogError(Zcl, "expected size %u for UpdateToken, got %u", static_cast<unsigned int> kUpdateTokenMaxLength,
+                     static_cast<unsigned int>(updateToken.size()));
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
@@ -120,7 +120,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 
     ChipLogProgress(Zcl, "OTA Provider received NotifyUpdateApplied");
-    ChipLogDetail(Zcl, "  Update Token: %u", (unsigned int) (commandData.updateToken.size()));
+    ChipLogDetail(Zcl, "  Update Token: %u", static_cast<unsigned int>(commandData.updateToken.size()));
     ChipLogDetail(Zcl, "  Software Version: %" PRIu32, commandData.softwareVersion);
 
     if (SendStatusIfDelegateNull(commandObj, commandPath))
@@ -130,8 +130,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
 
     if (updateToken.size() > kUpdateTokenMaxLength || updateToken.size() < kUpdateTokenMinLength)
     {
-        ChipLogError(Zcl, "expected size %u for UpdateToken, got %u", (unsigned int) kUpdateTokenMaxLength,
-                     (unsigned int) (updateToken.size()));
+        ChipLogError(Zcl, "expected size %u for UpdateToken, got %u", static_cast<unsigned int> kUpdateTokenMaxLength,
+                     static_cast<unsigned int>(updateToken.size()));
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
@@ -194,21 +194,21 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     }
     if (metadataForProvider.HasValue())
     {
-        ChipLogDetail(Zcl, "  MetadataForProvider: %u", (unsigned int) (metadataForProvider.Value().size()));
+        ChipLogDetail(Zcl, "  MetadataForProvider: %u", static_cast<unsigned int>(metadataForProvider.Value().size()));
     }
 
     if (location.HasValue() && location.Value().size() != kLocationLen)
     {
-        ChipLogError(Zcl, "location param length %u != expected length %u", (unsigned int) (location.Value().size()),
-                     (unsigned int) kLocationLen);
+        ChipLogError(Zcl, "location param length %u != expected length %u", static_cast<unsigned int>(location.Value().size()),
+                     static_cast<unsigned int> kLocationLen);
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
 
     if (metadataForProvider.HasValue() && metadataForProvider.Value().size() > kMaxMetadataLen)
     {
-        ChipLogError(Zcl, "metadata size %u exceeds max %u", (unsigned int) (metadataForProvider.Value().size()),
-                     (unsigned int) kMaxMetadataLen);
+        ChipLogError(Zcl, "metadata size %u exceeds max %u", static_cast<unsigned int>(metadataForProvider.Value().size()),
+                     static_cast<unsigned int> kMaxMetadataLen);
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }

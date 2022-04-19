@@ -116,7 +116,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         break;
     }
 
-    ESP_LOGI(TAG, "Current free heap: %u\n", (unsigned int) heap_caps_get_free_size(MALLOC_CAP_8BIT));
+    ESP_LOGI(TAG, "Current free heap: %u\n", static_cast<unsigned int> heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }
 
 void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
@@ -146,7 +146,7 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
         break;
     }
 
-    ESP_LOGI(TAG, "Current free heap: %u\n", (unsigned int) heap_caps_get_free_size(MALLOC_CAP_8BIT));
+    ESP_LOGI(TAG, "Current free heap: %u\n", static_cast<unsigned int> heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }
 
 void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event)

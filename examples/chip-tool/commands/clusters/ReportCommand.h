@@ -114,10 +114,10 @@ protected:
                                uint16_t maxInterval                                                = 0,
                                const chip::Optional<std::vector<chip::DataVersion>> & dataVersions = chip::NullOptional)
     {
-        const unsigned int clusterCount      = (unsigned int) (clusterIds.size());
-        const unsigned int attributeCount    = (unsigned int) (attributeIds.size());
-        const unsigned int endpointCount     = (unsigned int) (endpointIds.size());
-        const unsigned int dataVersionsCount = (unsigned int) (dataVersions.HasValue() ? dataVersions.Value().size() : 0);
+        const size_t clusterCount      = clusterIds.size();
+        const size_t attributeCount    = attributeIds.size();
+        const size_t endpointCount     = endpointIds.size();
+        const size_t dataVersionsCount = dataVersions.HasValue() ? dataVersions.Value().size() : 0;
 
         VerifyOrReturnError(clusterCount > 0 && clusterCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(attributeCount > 0 && attributeCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
@@ -163,8 +163,9 @@ protected:
                 "example 1 cluster id, 1 attribute id, 2 endpoint ids)\n\t * Or the same "
                 "number of ids (for examples 2 cluster ids, 2 attribute ids and 2 endpoint ids).\n The current command has %u "
                 "cluster ids, %u attribute ids, %u endpoint ids.",
-                interactionType == chip::app::ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read", clusterCount,
-                attributeCount, endpointCount);
+                interactionType == chip::app::ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read",
+                static_cast<unsigned int> clusterCount, static_cast<unsigned int> attributeCount,
+                static_cast<unsigned int> endpointCount);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
@@ -230,9 +231,9 @@ protected:
                            std::vector<chip::EventId> eventIds, chip::app::ReadClient::InteractionType interactionType,
                            uint16_t minInterval = 0, uint16_t maxInterval = 0)
     {
-        const unsigned int clusterCount  = (unsigned int) (clusterIds.size());
-        const unsigned int eventCount    = (unsigned int) (eventIds.size());
-        const unsigned int endpointCount = (unsigned int) (endpointIds.size());
+        const size_t clusterCount  = clusterIds.size();
+        const size_t eventCount    = eventIds.size();
+        const size_t endpointCount = endpointIds.size();
 
         VerifyOrReturnError(clusterCount > 0 && clusterCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(eventCount > 0 && eventCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
@@ -267,8 +268,9 @@ protected:
                          "example 1 cluster id, 1 event id, 2 endpoint ids)\n\t * Or the same "
                          "number of ids (for examples 2 cluster ids, 2 event ids and 2 endpoint ids).\n The current command has %u "
                          "cluster ids, %u event ids, %u endpoint ids.",
-                         interactionType == chip::app::ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read", clusterCount,
-                         eventCount, endpointCount);
+                         interactionType == chip::app::ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read",
+                         static_cast<unsigned int> clusterCount, static_cast<unsigned int> eventCount,
+                         static_cast<unsigned int> endpointCount);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 

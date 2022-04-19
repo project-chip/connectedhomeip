@@ -39,10 +39,10 @@ bool Command::InitArguments(int argc, char ** argv)
 {
     bool isValidCommand = false;
 
-    unsigned int argvExtraArgsCount = (unsigned int) argc;
-    unsigned int mandatoryArgsCount = 0;
-    unsigned int optionalArgsCount  = 0;
-    for (unsigned int i = 0; i < (unsigned int) (mArgs.size()); i++)
+    size_t argvExtraArgsCount = (size_t) argc;
+    size_t mandatoryArgsCount = 0;
+    size_t optionalArgsCount  = 0;
+    for (size_t i = 0; i < mArgs.size(); i++)
     {
         if (mArgs[i].isOptional())
         {
@@ -55,12 +55,12 @@ bool Command::InitArguments(int argc, char ** argv)
         }
     }
 
-    VerifyOrExit((unsigned int) (argc) >= mandatoryArgsCount &&
-                     (argvExtraArgsCount == 0 || (argvExtraArgsCount && optionalArgsCount)),
-                 ChipLogError(chipTool, "InitArgs: Wrong arguments number: %d instead of %u", argc, mandatoryArgsCount));
+    VerifyOrExit((size_t)(argc) >= mandatoryArgsCount && (argvExtraArgsCount == 0 || (argvExtraArgsCount && optionalArgsCount)),
+                 ChipLogError(chipTool, "InitArgs: Wrong arguments number: %d instead of %u", argc,
+                              static_cast<unsigned int> mandatoryArgsCount));
 
     // Initialize mandatory arguments
-    for (unsigned int i = 0; i < mandatoryArgsCount; i++)
+    for (size_t i = 0; i < mandatoryArgsCount; i++)
     {
         char * arg = argv[i];
         if (!InitArgument(i, arg))
@@ -71,10 +71,10 @@ bool Command::InitArguments(int argc, char ** argv)
 
     // Initialize optional arguments
     // Optional arguments expect a name and a value, so i is increased by 2 on every step.
-    for (unsigned int i = mandatoryArgsCount; i < (unsigned int) argc; i += 2)
+    for (size_t i = mandatoryArgsCount; i < (size_t) argc; i += 2)
     {
         bool found = false;
-        for (unsigned int j = mandatoryArgsCount; j < mandatoryArgsCount + optionalArgsCount; j++)
+        for (size_t j = mandatoryArgsCount; j < mandatoryArgsCount + optionalArgsCount; j++)
         {
             // optional arguments starts with kOptionalArgumentPrefix
             if (strlen(argv[i]) <= kOptionalArgumentPrefixLength &&
@@ -87,7 +87,7 @@ bool Command::InitArguments(int argc, char ** argv)
             {
                 found = true;
 
-                VerifyOrExit((unsigned int) argc > (i + 1),
+                VerifyOrExit((size_t) argc > (i + 1),
                              ChipLogError(chipTool, "InitArgs: Optional argument %s missing value.", argv[i]));
                 if (!InitArgument(j, argv[i + 1]))
                 {

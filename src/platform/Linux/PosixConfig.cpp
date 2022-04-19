@@ -407,7 +407,8 @@ CHIP_ERROR PosixConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_
         err = storage->Commit();
         SuccessOrExit(err);
 
-        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = (blob length %u)", key.Namespace, key.Name, (unsigned int) dataLen);
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = (blob length %u)", key.Namespace, key.Name,
+                        static_cast<unsigned int> dataLen);
     }
     else
     {

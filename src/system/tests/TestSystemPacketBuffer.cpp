@@ -291,8 +291,8 @@ void PacketBufferTest::PrepareTestBuffer(BufferConfiguration * config, int flags
         config->handle = PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
         if (config->handle.IsNull())
         {
-            printf("NewPacketBuffer: Failed to allocate packet buffer (%u retained): %s\n", (unsigned int) (handles.size()),
-                   strerror(errno));
+            printf("NewPacketBuffer: Failed to allocate packet buffer (%u retained): %s\n",
+                   static_cast<unsigned int>(handles.size()), strerror(errno));
             exit(EXIT_FAILURE);
         }
         if (flags & kRecordHandle)
@@ -340,17 +340,17 @@ bool PacketBufferTest::ResetHandles()
     // Check against leaks or double-frees in tests: every handle obtained through
     // PacketBufferTest::NewPacketBuffer should have a reference count of 1.
     bool handles_ok = true;
-    for (unsigned int i = 0; i < (unsigned int) (handles.size()); ++i)
+    for (size_t i = 0; i < handles.size(); ++i)
     {
         const PacketBufferHandle & handle = handles[i];
         if (handle.Get() == nullptr)
         {
-            printf("TestTerminate: handle %u null\n", i);
+            printf("TestTerminate: handle %u null\n", static_cast<unsigned int> i);
             handles_ok = false;
         }
         else if (handle->ref != 1)
         {
-            printf("TestTerminate: handle %u buffer=%p ref=%u\n", i, handle.Get(), handle->ref);
+            printf("TestTerminate: handle %u buffer=%p ref=%u\n", static_cast<unsigned int> i, handle.Get(), handle->ref);
             handles_ok = false;
             while (handle->ref > 1)
             {

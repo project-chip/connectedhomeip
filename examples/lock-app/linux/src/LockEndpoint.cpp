@@ -80,7 +80,7 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
                     "credentialRule=%u,credentials=%p,totalCredentials=%u]",
                     mEndpointId, userIndex, creator, modifier, static_cast<int>(userName.size()), userName.data(), uniqueId,
                     to_underlying(userStatus), to_underlying(usertype), to_underlying(credentialRule), credentials,
-                    (unsigned int) totalCredentials);
+                    static_cast<unsigned int> totalCredentials);
 
     uint16_t adjustedUserIndex = static_cast<uint16_t>(userIndex - 1);
     if (adjustedUserIndex > mLockUsers.size())
@@ -104,7 +104,7 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
         ChipLogError(Zcl,
                      "Cannot set user - total number of credentials is too big [endpoint=%d,index=%d,adjustedUserIndex=%u"
                      ",totalCredentials=%u]",
-                     mEndpointId, userIndex, adjustedUserIndex, (unsigned int) totalCredentials);
+                     mEndpointId, userIndex, adjustedUserIndex, static_cast<unsigned int> totalCredentials);
         return false;
     }
 
@@ -180,7 +180,7 @@ bool LockEndpoint::SetCredential(uint16_t credentialIndex, DlCredentialStatus cr
                      "Cannot get the credential - data size exceeds limit "
                      "[endpoint=%d,index=%d,dataSize=%u,maxDataSize=%u]",
                      mEndpointId, credentialIndex, static_cast<unsigned int>(credentialData.size()),
-                     (unsigned int) DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE);
+                     static_cast<unsigned int> DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE);
         return false;
     }
     credentialInStorage.status         = credentialStatus;

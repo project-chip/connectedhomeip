@@ -74,7 +74,7 @@ static void LogQueryImageResponse(const QueryImageResponse::DecodableType & resp
     }
     if (response.updateToken.HasValue())
     {
-        ChipLogDetail(SoftwareUpdate, "  updateToken: %u", (unsigned int) (response.updateToken.Value().size()));
+        ChipLogDetail(SoftwareUpdate, "  updateToken: %u", static_cast<unsigned int>(response.updateToken.Value().size()));
     }
     if (response.userConsentNeeded.HasValue())
     {
@@ -82,7 +82,8 @@ static void LogQueryImageResponse(const QueryImageResponse::DecodableType & resp
     }
     if (response.metadataForRequestor.HasValue())
     {
-        ChipLogDetail(SoftwareUpdate, "  metadataForRequestor: %u", (unsigned int) (response.metadataForRequestor.Value().size()));
+        ChipLogDetail(SoftwareUpdate, "  metadataForRequestor: %u",
+                      static_cast<unsigned int>(response.metadataForRequestor.Value().size()));
     }
 }
 
@@ -199,7 +200,7 @@ void DefaultOTARequestor::OnQueryImageResponse(void * context, const QueryImageR
             if (update.fileDesignator.size() > fileDesignator.size())
             {
                 ChipLogError(SoftwareUpdate, "File designator size %u is too large to store",
-                             (unsigned int) (update.fileDesignator.size()));
+                             static_cast<unsigned int>(update.fileDesignator.size()));
                 requestorCore->RecordErrorUpdateState(CHIP_ERROR_BUFFER_TOO_SMALL);
                 return;
             }
@@ -339,7 +340,8 @@ void DefaultOTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comman
     ChipLogDetail(SoftwareUpdate, "  AnnouncementReason: %u", to_underlying(announcementReason));
     if (commandData.metadataForNode.HasValue())
     {
-        ChipLogDetail(SoftwareUpdate, "  MetadataForNode: %u", (unsigned int) (commandData.metadataForNode.Value().size()));
+        ChipLogDetail(SoftwareUpdate, "  MetadataForNode: %u",
+                      static_cast<unsigned int>(commandData.metadataForNode.Value().size()));
     }
     ChipLogDetail(SoftwareUpdate, "  Endpoint: %u", providerLocation.endpoint);
 
