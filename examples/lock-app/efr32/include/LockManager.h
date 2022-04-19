@@ -56,7 +56,6 @@ struct LockCredentialInfo
 class LockManager
 {
 public:
-
     enum Action_t
     {
         LOCK_ACTION = 0,
