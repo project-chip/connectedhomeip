@@ -32,7 +32,7 @@ bool LockEndpoint::Unlock(const Optional<chip::ByteSpan> & pin, DlOperationError
 
 bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const
 {
-    ChipLogProgress(Zcl, "Door Lock App: LockEndpoint::GetUser [endpoint=%d,userIndex=%hu]", mEndpointId, userIndex);
+    ChipLogProgress(Zcl, "Lock App: LockEndpoint::GetUser [endpoint=%d,userIndex=%hu]", mEndpointId, userIndex);
 
     uint16_t adjustedUserIndex = static_cast<uint16_t>(userIndex - 1);
     if (adjustedUserIndex > mLockUsers.size())
@@ -74,7 +74,7 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
                            DlCredentialRule credentialRule, const DlCredential * credentials, size_t totalCredentials)
 {
     ChipLogProgress(Zcl,
-                    "Door Lock App: LockEndpoint::SetUser "
+                    "Lock App: LockEndpoint::SetUser "
                     "[endpoint=%d,userIndex=%" PRIu16 ",creator=%d,modifier=%d,userName=\"%.*s\",uniqueId=%" PRIx32
                     ",userStatus=%u,userType=%u,"
                     "credentialRule=%u,credentials=%p,totalCredentials=%zu]",
@@ -132,7 +132,7 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
 bool LockEndpoint::GetCredential(uint16_t credentialIndex, DlCredentialType credentialType,
                                  EmberAfPluginDoorLockCredentialInfo & credential) const
 {
-    ChipLogProgress(Zcl, "Door Lock App: LockEndpoint::GetCredential [endpoint=%d,credentialIndex=%" PRIu16 ",credentialType=%u]",
+    ChipLogProgress(Zcl, "Lock App: LockEndpoint::GetCredential [endpoint=%d,credentialIndex=%" PRIu16 ",credentialType=%u]",
                     mEndpointId, credentialIndex, to_underlying(credentialType));
 
     if (credentialIndex >= mLockCredentials.size() || (0 == credentialIndex && DlCredentialType::kProgrammingPIN != credentialType))
@@ -162,7 +162,7 @@ bool LockEndpoint::SetCredential(uint16_t credentialIndex, DlCredentialStatus cr
                                  const chip::ByteSpan & credentialData)
 {
     ChipLogProgress(Zcl,
-                    "Door Lock App: LockEndpoint::SetCredential "
+                    "Lock App: LockEndpoint::SetCredential "
                     "[endpoint=%d,credentialIndex=%" PRIu16 ",credentialStatus=%u,credentialType=%u,credentialDataSize=%zu]",
                     mEndpointId, credentialIndex, to_underlying(credentialStatus), to_underlying(credentialType),
                     credentialData.size());
@@ -289,14 +289,14 @@ bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::Byte
 {
     if (mLockState == lockState)
     {
-        ChipLogDetail(Zcl, "Door Lock App: door is already locked, ignoring command to set lock state to \"%s\" [endpointId=%d]",
+        ChipLogDetail(Zcl, "Lock App: door is already locked, ignoring command to set lock state to \"%s\" [endpointId=%d]",
                       lockStateToString(lockState), mEndpointId);
         return true;
     }
 
     if (!pin.HasValue())
     {
-        ChipLogDetail(Zcl, "Door Lock App: PIN code is not specified, setting door lock state to \"%s\" [endpointId=%d]",
+        ChipLogDetail(Zcl, "Lock App: PIN code is not specified, setting door lock state to \"%s\" [endpointId=%d]",
                       lockStateToString(lockState), mEndpointId);
         mLockState = lockState;
         return true;
@@ -314,8 +314,7 @@ bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::Byte
         if (credentialData.data_equal(pin.Value()))
         {
             ChipLogDetail(
-                Zcl,
-                "Door Lock App: specified PIN code was found in the database, setting door lock state to \"%s\" [endpointId=%d]",
+                Zcl, "Lock App: specified PIN code was found in the database, setting door lock state to \"%s\" [endpointId=%d]",
                 lockStateToString(lockState), mEndpointId);
 
             mLockState = lockState;
@@ -324,7 +323,7 @@ bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::Byte
     }
 
     ChipLogDetail(Zcl,
-                  "Door Lock App: specified PIN code was not found in the database, ignoring command to set lock state to \"%s\" "
+                  "Lock App: specified PIN code was not found in the database, ignoring command to set lock state to \"%s\" "
                   "[endpointId=%d]",
                   lockStateToString(lockState), mEndpointId);
 

@@ -23,9 +23,9 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
-    "${chip_root}/examples/door-lock-app/linux/src/LockEndpoint.cpp",
-    "${chip_root}/examples/door-lock-app/linux/src/LockManager.cpp",
-    "${chip_root}/examples/door-lock-app/linux/src/ZCLDoorLockCallbacks.cpp",
+    "${chip_root}/examples/lock-app/linux/src/LockEndpoint.cpp",
+    "${chip_root}/examples/lock-app/linux/src/LockManager.cpp",
+    "${chip_root}/examples/lock-app/linux/src/ZCLDoorLockCallbacks.cpp",
     "AppOptions.cpp",
     "include/tv-callbacks.cpp",
     "include/tv-callbacks.h",
@@ -41,7 +41,7 @@ source_set("chip-all-clusters-common") {
 
   include_dirs = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
-    "${chip_root}/examples/door-lock-app/linux/include",
+    "${chip_root}/examples/lock-app/linux/include",
   ]
 
   cflags = [ "-Wconversion" ]
