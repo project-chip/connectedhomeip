@@ -482,7 +482,6 @@ public:
     /**
      * Reads an entry in the access control list.
      *
-     * @param [in] subjectDescriptor Optional subject descriptor for this operation.
      * @param [in] fabric            Index of fabric in which to read entry.
      * @param [in] index             Index of entry to read (relative to fabric).
      * @param [in] entry             Entry into which read entry is copied.
@@ -576,8 +575,8 @@ public:
     /**
      * Iterates over entries in the access control list.
      *
-     * @param [out] iterator    Iterator controlling the iteration.
-     * @param [in]  fabricIndex Iteration is confined to fabric, if not null.
+     * @param [in]  fabric   Fabric over which to iterate entries.
+     * @param [out] iterator Iterator controlling the iteration.
      */
     CHIP_ERROR Entries(FabricIndex fabric, EntryIterator & iterator) const
     {
