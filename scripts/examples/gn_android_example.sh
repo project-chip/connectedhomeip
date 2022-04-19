@@ -16,7 +16,7 @@
 #    limitations under the License.
 #
 
-set -e
+set -ex
 
 # Build script for GN examples GitHub workflow.
 
@@ -74,8 +74,8 @@ gn gen --check --fail-on-unused-args --root="$EXAMPLE_DIR" "$OUTPUT_DIR" --args=
 
 ninja -C "$OUTPUT_DIR" "${NINJA_ARGS[@]}"
 
-cp -rf "$OUTPUT_DIR/lib/jni/." "$EXAMPLE_DIR/App/app/libs/jniLibs/"
-cp -f "$OUTPUT_DIR/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar" "$EXAMPLE_DIR/App/app/libs/"
-cp -f "$OUTPUT_DIR/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar" "$EXAMPLE_DIR/App/app/libs/"
-cp -f "$OUTPUT_DIR/lib/third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar" "$EXAMPLE_DIR/App/app/libs/"
-cp -f "$OUTPUT_DIR/lib/TvApp.jar" "$EXAMPLE_DIR/App/app/libs/"
+cp -rf "$OUTPUT_DIR/lib/jni/." "$EXAMPLE_DIR/App/platform-app/libs/jniLibs/"
+cp -f "$OUTPUT_DIR/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar" "$EXAMPLE_DIR/App/platform-app/libs/"
+cp -f "$OUTPUT_DIR/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar" "$EXAMPLE_DIR/App/platform-app/libs/"
+cp -f "$OUTPUT_DIR/lib/third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar" "$EXAMPLE_DIR/App/platform-app/libs/"
+cp -f "$OUTPUT_DIR/lib/TvApp.jar" "$EXAMPLE_DIR/App/platform-app/libs/"
