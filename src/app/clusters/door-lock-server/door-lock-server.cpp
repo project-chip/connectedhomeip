@@ -1514,7 +1514,7 @@ EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::Fabr
         ChipLogError(Zcl, "[createUser] Unable to get the user from app [endpointId=%d,userIndex=%d]", endpointId, userIndex);
         return EMBER_ZCL_STATUS_FAILURE;
     }
-
+    
     // appclusters, 5.2.4.34: to modify user its status should be set to Available. If it is we should return OCCUPIED.
     if (DlUserStatus::kAvailable != user.userStatus)
     {
@@ -1873,7 +1873,6 @@ DlStatus DoorLockServer::modifyCredentialForUser(chip::EndpointId endpointId, ch
     }
 
     // TODO: Do we need to check the modifier fabric here? Discuss with Spec team and add it if necessary.
-
     for (size_t i = 0; i < user.credentials.size(); ++i)
     {
         // appclusters, 5.2.4.40: user should already be associated with given credentialIndex
