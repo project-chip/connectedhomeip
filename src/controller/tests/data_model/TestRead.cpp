@@ -1624,11 +1624,11 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
                    app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() <=
                        static_cast<size_t>(kExpectedParallelSubs));
 
-    // Shutdown all clients
-    readClients.clear();
-
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     ctx.DrainAndServiceIO();
+
+    // Shutdown all clients
+    readClients.clear();
 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
     app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
@@ -1685,15 +1685,18 @@ void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * 
 
     // The following check will trigger the logic in im to kill the read handlers that uses more paths than the limit per fabric.
     {
-        TestReadCallback callback;
-        EstablishSubscriptions(apSuite, apContext, 1, app::InteractionModelEngine::kMinSupportedPathPerSubscription, &callback,
+        EstablishSubscriptions(apSuite, apContext, 1, app::InteractionModelEngine::kMinSupportedPathPerSubscription, &readCallback,
                                readClients);
+        readCallback.ClearCounters();
 
         ctx.DrainAndServiceIO();
 
         // This read handler should evict some existing subscriptions for enough space
-        NL_TEST_ASSERT(apSuite, callback.mOnSubscriptionEstablishedCount == 1);
-        NL_TEST_ASSERT(apSuite, callback.mAttributeCount == app::InteractionModelEngine::kMinSupportedPathPerSubscription);
+        NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablishedCount == 1);
+        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == app::InteractionModelEngine::kMinSupportedPathPerSubscription);
+        NL_TEST_ASSERT(apSuite,
+                       app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() ==
+                           static_cast<size_t>(kExpectedParallelSubs));
     }
 
     {
@@ -1707,15 +1710,12 @@ void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * 
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount <= kExpectedParallelPaths);
-    NL_TEST_ASSERT(apSuite,
-                   app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() ==
-                       static_cast<size_t>(kExpectedParallelSubs));
-
-    // Shutdown all clients
-    readClients.clear();
 
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     ctx.DrainAndServiceIO();
+
+    // Shutdown all clients
+    readClients.clear();
 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
     app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
