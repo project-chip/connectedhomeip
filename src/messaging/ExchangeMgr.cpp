@@ -290,7 +290,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
         if (GetDispatchForDelegate(delegate).IsEncryptionRequired() != session->IsEncrypted())
         {
-            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER));
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s",
+                         ErrorStr(CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER));
             return;
         }
 

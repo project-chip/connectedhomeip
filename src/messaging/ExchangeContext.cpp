@@ -204,10 +204,11 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
             }
 
             SessionManager * sessionManager = GetExchangeMgr()->GetSessionManager();
-            SessionHandle session = GetSessionHandle();
+            SessionHandle session           = GetSessionHandle();
 
             // If session requires MRP, NoAutoRequestAck send flag is not specified, request reliable transmission.
-            if (mSession->RequireMRP() && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck) && reliableMessageContext->AutoRequestAck())
+            if (mSession->RequireMRP() && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck) &&
+                reliableMessageContext->AutoRequestAck())
             {
                 auto * reliableMessageMgr = reliableMessageContext->GetReliableMessageMgr();
 
@@ -222,7 +223,8 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
                 };
                 std::unique_ptr<ReliableMessageMgr::RetransTableEntry, decltype(deleter)> entryOwner(entry, deleter);
 
-                ReturnErrorOnFailure(sessionManager->PrepareMessage(session, payloadHeader, std::move(msgBuf), entryOwner->retainedBuf));
+                ReturnErrorOnFailure(
+                    sessionManager->PrepareMessage(session, payloadHeader, std::move(msgBuf), entryOwner->retainedBuf));
                 CHIP_ERROR err2 = sessionManager->SendPreparedMessage(session, entryOwner->retainedBuf);
                 if (err2 == CHIP_ERROR_POSIX(ENOBUFS))
                 {
@@ -336,7 +338,8 @@ void ExchangeContextDeletor::Release(ExchangeContext * ec)
 
 ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
                                  ExchangeDelegate * delegate) :
-    mDispatch(ExchangeManager::GetDispatchForDelegate(delegate)), mSession(*this)
+    mDispatch(ExchangeManager::GetDispatchForDelegate(delegate)),
+    mSession(*this)
 {
     VerifyOrDie(mExchangeMgr == nullptr);
     VerifyOrDie(mDispatch.IsEncryptionRequired() == session->IsEncrypted());
@@ -515,7 +518,8 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         MessageHandled();
     });
 
-    VerifyOrReturnError(mDispatch.MessagePermitted(payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType()), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mDispatch.MessagePermitted(payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType()),
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
     if (mSession->RequireMRP())
     {

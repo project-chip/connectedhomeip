@@ -327,7 +327,7 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
 
     MockSessionEstablishmentDelegate mockSender;
     mockSender.mMessageDispatch.mRequireEncryption = true;
-    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
+    ExchangeContext * exchange                     = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
