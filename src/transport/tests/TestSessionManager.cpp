@@ -465,113 +465,6 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     sessionManager.Shutdown();
 }
 
-class SecurePairingUsingTestSecret : public PairingSession
-{
-public:
-    SecurePairingUsingTestSecret() : PairingSession(Transport::SecureSession::Type::kPASE)
-    {
-        // Do not set to 0 to prevent an unwanted unsecured session
-        // since the session type is unknown.
-        SetPeerSessionId(1);
-    }
-
-    void Init(SessionManager & sessionManager)
-    {
-        // Do not set to 0 to prevent an unwanted unsecured session
-        // since the session type is unknown.
-        AllocateSecureSession(sessionManager, mLocalSessionId);
-    }
-
-    SecurePairingUsingTestSecret(uint16_t peerSessionId, uint16_t localSessionId, SessionManager & sessionManager) :
-        PairingSession(Transport::SecureSession::Type::kPASE), mLocalSessionId(localSessionId)
-    {
-        AllocateSecureSession(sessionManager, localSessionId);
-        SetPeerSessionId(peerSessionId);
-    }
-
-    CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override
-    {
-        size_t secretLen = strlen(kTestSecret);
-        return session.InitFromSecret(ByteSpan(reinterpret_cast<const uint8_t *>(kTestSecret), secretLen), ByteSpan(nullptr, 0),
-                                      CryptoContext::SessionInfoType::kSessionEstablishment, role);
-    }
-
-private:
-    // Do not set to 0 to prevent an unwanted unsecured session
-    // since the session type is unknown.
-    uint16_t mLocalSessionId = 1;
-    const char * kTestSecret = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
-};
-
-void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
-{
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    constexpr NodeId kSourceNodeId = 123654;
-
-    IPAddress addr;
-    IPAddress::FromString("::1", addr);
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    TransportMgr<LoopbackTransport> transportMgr;
-    FabricTable fabricTable;
-    SessionManager sessionManager;
-    secure_channel::MessageCounterManager gMessageCounterManager;
-    chip::TestPersistentStorageDelegate deviceStorage;
-
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
-    NL_TEST_ASSERT(
-        inSuite,
-        CHIP_NO_ERROR ==
-            sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager, &deviceStorage, &fabricTable));
-
-    Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
-    TestSessionReleaseCallback callback;
-    SessionHolderWithDelegate session1(callback);
-    SessionHolderWithDelegate session2(callback);
-    SessionHolderWithDelegate session3(callback);
-    SessionHolderWithDelegate session4(callback);
-    SessionHolderWithDelegate session5(callback);
-
-    // First pairing
-    callback.mOldConnectionDropped = false;
-    SecurePairingUsingTestSecret pairing1(1, 1, sessionManager);
-    err = sessionManager.NewPairing(session1, peer, kSourceNodeId, &pairing1, CryptoContext::SessionRole::kInitiator, 1);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
-
-    // New pairing with different peer node ID and different local key ID (same peer key ID)
-    callback.mOldConnectionDropped = false;
-    SecurePairingUsingTestSecret pairing2(1, 2, sessionManager);
-    err = sessionManager.NewPairing(session2, peer, kSourceNodeId, &pairing2, CryptoContext::SessionRole::kResponder, 0);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
-
-    // New pairing with undefined node ID and different local key ID (same peer key ID)
-    callback.mOldConnectionDropped = false;
-    SecurePairingUsingTestSecret pairing3(1, 3, sessionManager);
-    err = sessionManager.NewPairing(session3, peer, kUndefinedNodeId, &pairing3, CryptoContext::SessionRole::kResponder, 0);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
-
-    // New pairing with same local key ID, and a given node ID
-    callback.mOldConnectionDropped = false;
-    SecurePairingUsingTestSecret pairing4(1, 2, sessionManager);
-    err = sessionManager.NewPairing(session4, peer, kSourceNodeId, &pairing4, CryptoContext::SessionRole::kResponder, 0);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, callback.mOldConnectionDropped);
-
-    // New pairing with same local key ID, and undefined node ID
-    callback.mOldConnectionDropped = false;
-    SecurePairingUsingTestSecret pairing5(1, 1, sessionManager);
-    err = sessionManager.NewPairing(session5, peer, kUndefinedNodeId, &pairing5, CryptoContext::SessionRole::kResponder, 0);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, callback.mOldConnectionDropped);
-
-    sessionManager.Shutdown();
-}
-
 void SendPacketWithOldCounterTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
@@ -829,14 +722,6 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
         sessionId1 = session->AsSecureSession()->GetLocalSessionId();
     }
 
-    // Allocate a session at a colliding ID, verify eviction.
-    {
-        callback.mOldConnectionDropped = false;
-        auto handle                    = sessionManager.AllocateSession(sessionId1);
-        NL_TEST_ASSERT(inSuite, handle.HasValue());
-        SessionHolderWithDelegate session(handle.Value(), callback);
-    }
-
     // Verify that we increment session ID by 1 for each allocation, except for
     // the wraparound case where we skip session ID 0.
     auto prevSessionId = sessionId1;
@@ -932,7 +817,6 @@ const nlTest sTests[] =
     NL_TEST_DEF("Message Self Test",              CheckMessageTest),
     NL_TEST_DEF("Send Encrypted Packet Test",     SendEncryptedPacketTest),
     NL_TEST_DEF("Send Bad Encrypted Packet Test", SendBadEncryptedPacketTest),
-    NL_TEST_DEF("Drop stale connection Test",     StaleConnectionDropTest),
     NL_TEST_DEF("Old counter Test",               SendPacketWithOldCounterTest),
     NL_TEST_DEF("Too-old counter Test",           SendPacketWithTooOldCounterTest),
     NL_TEST_DEF("Session Allocation Test",        SessionAllocationTest),
