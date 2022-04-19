@@ -279,7 +279,8 @@ protected:
             return false;
         }
 
-        if ((expected.IsNull() && !current.IsNull()) || (!expected.IsNull() && current.IsNull())){
+        if ((expected.IsNull() && !current.IsNull()) || (!expected.IsNull() && current.IsNull()))
+        {
             return true;
         }
 
