@@ -64,15 +64,12 @@ public:
 
     /**
      * @brief
-     *   Derive a secure session from the paired session. The API will return error
-     *   if called before pairing is established.
+     *   Derive a secure session from the paired session. The API will return error if called before pairing is established.
      *
-     * @param session     Reference to the secure session that will be
-     *                    initialized once pairing is complete
-     * @param role        Role of the new session (initiator or responder)
+     * @param session     Reference to the secure session that will be initialized once pairing is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    virtual CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) const = 0;
+    virtual CHIP_ERROR DeriveSecureSession(CryptoContext & session) const = 0;
 
     const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteMRPConfig; }
     void SetRemoteMRPConfig(const ReliableMessageProtocolConfig & config) { mRemoteMRPConfig = config; }

@@ -282,7 +282,7 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
     mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
 }
 
-CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) const
+CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session) const
 {
     size_t saltlen;
 
@@ -305,7 +305,7 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session, CryptoConte
     }
 
     ReturnErrorOnFailure(session.InitFromSecret(ByteSpan(mSharedSecret, mSharedSecret.Length()), ByteSpan(msg_salt.Get(), saltlen),
-                                                CryptoContext::SessionInfoType::kSessionEstablishment, role));
+                                                CryptoContext::SessionInfoType::kSessionEstablishment, mRole));
 
     return CHIP_NO_ERROR;
 }

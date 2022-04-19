@@ -134,15 +134,12 @@ public:
 
     /**
      * @brief
-     *   Derive a secure session from the established session. The API will return error
-     *   if called before session is established.
+     *   Derive a secure session from the established session. The API will return error if called before session is established.
      *
-     * @param session     Reference to the secure session that will be
-     *                    initialized once session establishment is complete
-     * @param role        Role of the new session (initiator or responder)
+     * @param session     Reference to the secure session that will be initialized once session establishment is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) const override;
+    CHIP_ERROR DeriveSecureSession(CryptoContext & session) const override;
 
     //// UnsolicitedMessageHandler Implementation ////
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override

@@ -40,7 +40,7 @@ CHIP_ERROR PairingSession::ActivateSecureSession(const Transport::PeerAddress & 
                   ChipLogValueScopedNodeId(GetPeer()), secureSession->GetLocalSessionId(), peerSessionId);
     secureSession->Activate(GetSecureSessionType(), GetPeer(), GetPeerCATs(), peerSessionId, mRemoteMRPConfig);
     secureSession->SetPeerAddress(peerAddress);
-    ReturnErrorOnFailure(DeriveSecureSession(secureSession->GetCryptoContext(), mRole));
+    ReturnErrorOnFailure(DeriveSecureSession(secureSession->GetCryptoContext()));
     secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
 
     return CHIP_NO_ERROR;

@@ -275,11 +275,11 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
     mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
 }
 
-CHIP_ERROR PASESession::DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) const
+CHIP_ERROR PASESession::DeriveSecureSession(CryptoContext & session) const
 {
     VerifyOrReturnError(mPairingComplete, CHIP_ERROR_INCORRECT_STATE);
     return session.InitFromSecret(ByteSpan(mKe, mKeLen), ByteSpan(nullptr, 0),
-                                  CryptoContext::SessionInfoType::kSessionEstablishment, role);
+                                  CryptoContext::SessionInfoType::kSessionEstablishment, mRole);
 }
 
 CHIP_ERROR PASESession::SendPBKDFParamRequest()
