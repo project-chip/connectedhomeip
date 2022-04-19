@@ -93,8 +93,8 @@ tests:
       response:
           constraints:
               type: list
-    
-    #issue #17483    
+
+    #issue #17483
     - label:
           "Read FeatureMap attribute from the DUT and Verify that the DUT
           response indicates FeatureMap attribute has the value 0"
@@ -109,4 +109,3 @@ tests:
                 value: "Please enter '0' for success"
               - name: "expectedValue"
                 value: 0
-    

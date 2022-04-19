@@ -64,7 +64,7 @@ tests:
           constraints:
               type: list
 
-    #issue #15011    
+    #issue #15011
     - label:
           "Read EventList attribute from the DUT and Verify that the DUT
           response provides a list of supported events."
@@ -94,7 +94,7 @@ tests:
           constraints:
               type: list
 
-    #issue #17483    
+    #issue #17483
     - label:
           "Read FeatureMap attribute from the DUT and Verify that the DUT
           response indicates FeatureMap attribute has the value 0"
