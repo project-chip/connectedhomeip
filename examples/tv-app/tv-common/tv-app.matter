@@ -209,7 +209,7 @@ server cluster AudioOutput = 1291 {
     kOther = 5;
   }
 
-  bitmap AudiouOutputFeature : BITMAP32 {
+  bitmap AudioOutputFeature : BITMAP32 {
     kNameUpdates = 0x1;
   }
 
@@ -221,6 +221,7 @@ server cluster AudioOutput = 1291 {
 
   readonly attribute OutputInfo outputList[] = 0;
   readonly attribute int8u currentOutput = 1;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SelectOutputRequest {
@@ -339,6 +340,7 @@ server cluster Channel = 1284 {
   readonly attribute ChannelInfo channelList[] = 0;
   readonly attribute nullable LineupInfo lineup = 1;
   readonly attribute nullable ChannelInfo currentChannel = 2;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct ChangeChannelRequest {
@@ -440,6 +442,7 @@ server cluster ContentLauncher = 1290 {
 
   readonly attribute CHAR_STRING acceptHeader[] = 0;
   attribute bitmap32 supportedStreamingProtocols = 1;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct LaunchContentRequest {
@@ -871,6 +874,7 @@ server cluster KeypadInput = 1289 {
     kNumberKeys = 0x4;
   }
 
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SendKeyRequest {
@@ -1008,6 +1012,7 @@ server cluster MediaInput = 1287 {
 
   readonly attribute InputInfo inputList[] = 0;
   readonly attribute int8u currentInput = 1;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SelectInputRequest {
@@ -1706,6 +1711,7 @@ server cluster TargetNavigator = 1285 {
 
   readonly attribute TargetInfo targetList[] = 0;
   readonly attribute int8u currentTarget = 1;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct NavigateTargetRequest {
