@@ -408,7 +408,7 @@ using P256ECDSASignatureSpan = FixedByteSpan<Crypto::kP256_ECDSA_Signature_Lengt
 /**
  *  @brief  A data structure for holding a P256 Public Key, without the ownership of it.
  */
-using P256PublicKeySpan = FixedByteSpan<Crypto::kP256_Point_Length>;
+using P256PublicKeySpan = FixedByteSpan<Crypto::kP256_PublicKey_Length>;
 
 /**
  *  @brief  A data structure for holding a P256 Integer, without the ownership of it.

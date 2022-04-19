@@ -40,7 +40,7 @@ constexpr AttributeId MockAttributeId(const uint16_t & id)
     return (0xFFF1'0000 | id);
 }
 
-constexpr AttributeId MockClusterId(const uint16_t & id)
+constexpr ClusterId MockClusterId(const uint16_t & id)
 {
     return (0xFFF1'0000 | id);
 }

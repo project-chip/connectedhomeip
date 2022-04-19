@@ -160,6 +160,9 @@
 | Attributes:                                                         |        |
 | * Acl                                                               | 0x0000 |
 | * Extension                                                         | 0x0001 |
+| * SubjectsPerAccessControlEntry                                     | 0x0002 |
+| * TargetsPerAccessControlEntry                                      | 0x0003 |
+| * AccessControlEntriesPerFabric                                     | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -452,6 +455,248 @@ public:
                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
                                                   }
                                               }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute SubjectsPerAccessControlEntry
+ */
+class ReadAccessControlSubjectsPerAccessControlEntry : public ModelCommand {
+public:
+    ReadAccessControlSubjectsPerAccessControlEntry()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "subjects-per-access-control-entry");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAccessControlSubjectsPerAccessControlEntry() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeSubjectsPerAccessControlEntryWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AccessControl.SubjectsPerAccessControlEntry response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "AccessControl SubjectsPerAccessControlEntry Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeAccessControlSubjectsPerAccessControlEntry : public ModelCommand {
+public:
+    SubscribeAttributeAccessControlSubjectsPerAccessControlEntry()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "subjects-per-access-control-entry");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeAccessControlSubjectsPerAccessControlEntry() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeSubjectsPerAccessControlEntryWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                    params:params
+                                                   subscriptionEstablished:nullptr
+                                                             reportHandler:^(
+                                                                 NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                                 NSLog(@"AccessControl.SubjectsPerAccessControlEntry response %@",
+                                                                     [value description]);
+                                                                 if (error || !mWait) {
+                                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                 }
+                                                             }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute TargetsPerAccessControlEntry
+ */
+class ReadAccessControlTargetsPerAccessControlEntry : public ModelCommand {
+public:
+    ReadAccessControlTargetsPerAccessControlEntry()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "targets-per-access-control-entry");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAccessControlTargetsPerAccessControlEntry() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeTargetsPerAccessControlEntryWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AccessControl.TargetsPerAccessControlEntry response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "AccessControl TargetsPerAccessControlEntry Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeAccessControlTargetsPerAccessControlEntry : public ModelCommand {
+public:
+    SubscribeAttributeAccessControlTargetsPerAccessControlEntry()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "targets-per-access-control-entry");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeAccessControlTargetsPerAccessControlEntry() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeTargetsPerAccessControlEntryWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                   params:params
+                                                  subscriptionEstablished:nullptr
+                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                                NSLog(@"AccessControl.TargetsPerAccessControlEntry response %@",
+                                                                    [value description]);
+                                                                if (error || !mWait) {
+                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                }
+                                                            }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute AccessControlEntriesPerFabric
+ */
+class ReadAccessControlAccessControlEntriesPerFabric : public ModelCommand {
+public:
+    ReadAccessControlAccessControlEntriesPerFabric()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "access-control-entries-per-fabric");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAccessControlAccessControlEntriesPerFabric() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeAccessControlEntriesPerFabricWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AccessControl.AccessControlEntriesPerFabric response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "AccessControl AccessControlEntriesPerFabric Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeAccessControlAccessControlEntriesPerFabric : public ModelCommand {
+public:
+    SubscribeAttributeAccessControlAccessControlEntriesPerFabric()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "access-control-entries-per-fabric");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeAccessControlAccessControlEntriesPerFabric() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeAccessControlEntriesPerFabricWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                    params:params
+                                                   subscriptionEstablished:nullptr
+                                                             reportHandler:^(
+                                                                 NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                                 NSLog(@"AccessControl.AccessControlEntriesPerFabric response %@",
+                                                                     [value description]);
+                                                                 if (error || !mWait) {
+                                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                 }
+                                                             }];
 
         return CHIP_NO_ERROR;
     }
@@ -4931,6 +5176,7 @@ private:
 | * LocalConfigDisabled                                               | 0x0010 |
 | * Reachable                                                         | 0x0011 |
 | * UniqueID                                                          | 0x0012 |
+| * CapabilityMinima                                                  | 0x0013 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -6501,6 +6747,85 @@ public:
                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
                                                  }
                                              }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute CapabilityMinima
+ */
+class ReadBasicCapabilityMinima : public ModelCommand {
+public:
+    ReadBasicCapabilityMinima()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "capability-minima");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBasicCapabilityMinima() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeCapabilityMinimaWithCompletionHandler:^(
+            CHIPBasicClusterCapabilityMinimaStruct * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Basic.CapabilityMinima response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "Basic CapabilityMinima Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeBasicCapabilityMinima : public ModelCommand {
+public:
+    SubscribeAttributeBasicCapabilityMinima()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "capability-minima");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeBasicCapabilityMinima() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeCapabilityMinimaWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                            params:params
+                                           subscriptionEstablished:nullptr
+                                                     reportHandler:^(CHIPBasicClusterCapabilityMinimaStruct * _Nullable value,
+                                                         NSError * _Nullable error) {
+                                                         NSLog(@"Basic.CapabilityMinima response %@", [value description]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
+                                                     }];
 
         return CHIP_NO_ERROR;
     }
@@ -24947,6 +25272,15 @@ private:
 | Attributes:                                                         |        |
 | * FanMode                                                           | 0x0000 |
 | * FanModeSequence                                                   | 0x0001 |
+| * PercentSetting                                                    | 0x0002 |
+| * PercentCurrent                                                    | 0x0003 |
+| * SpeedMax                                                          | 0x0004 |
+| * SpeedSetting                                                      | 0x0005 |
+| * SpeedCurrent                                                      | 0x0006 |
+| * RockSupport                                                       | 0x0007 |
+| * RockSetting                                                       | 0x0008 |
+| * WindSupport                                                       | 0x0009 |
+| * WindSetting                                                       | 0x000A |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -25163,6 +25497,835 @@ public:
                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
                                                         }
                                                     }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute PercentSetting
+ */
+class ReadFanControlPercentSetting : public ModelCommand {
+public:
+    ReadFanControlPercentSetting()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "percent-setting");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlPercentSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributePercentSettingWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.PercentSetting response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl PercentSetting Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class WriteFanControlPercentSetting : public ModelCommand {
+public:
+    WriteFanControlPercentSetting()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "percent-setting");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteFanControlPercentSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) WriteAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block chipError = CHIP_NO_ERROR;
+
+        NSNumber * _Nonnull value = [NSNumber numberWithUnsignedChar:mValue];
+
+        [cluster writeAttributePercentSettingWithValue:value
+                                     completionHandler:^(NSError * _Nullable error) {
+                                         chipError = [CHIPError errorToCHIPErrorCode:error];
+                                         ChipLogError(chipTool, "FanControl PercentSetting Error: %s", chip::ErrorStr(chipError));
+                                         SetCommandExitStatus(chipError);
+                                     }];
+        return chipError;
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class SubscribeAttributeFanControlPercentSetting : public ModelCommand {
+public:
+    SubscribeAttributeFanControlPercentSetting()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "percent-setting");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlPercentSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributePercentSettingWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:nullptr
+                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"FanControl.PercentSetting response %@", [value description]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
+                                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute PercentCurrent
+ */
+class ReadFanControlPercentCurrent : public ModelCommand {
+public:
+    ReadFanControlPercentCurrent()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "percent-current");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlPercentCurrent() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributePercentCurrentWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.PercentCurrent response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl PercentCurrent Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeFanControlPercentCurrent : public ModelCommand {
+public:
+    SubscribeAttributeFanControlPercentCurrent()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "percent-current");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlPercentCurrent() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributePercentCurrentWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:nullptr
+                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"FanControl.PercentCurrent response %@", [value description]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
+                                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute SpeedMax
+ */
+class ReadFanControlSpeedMax : public ModelCommand {
+public:
+    ReadFanControlSpeedMax()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "speed-max");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlSpeedMax() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeSpeedMaxWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.SpeedMax response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl SpeedMax Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeFanControlSpeedMax : public ModelCommand {
+public:
+    SubscribeAttributeFanControlSpeedMax()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "speed-max");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlSpeedMax() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeSpeedMaxWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                    params:params
+                                   subscriptionEstablished:nullptr
+                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                 NSLog(@"FanControl.SpeedMax response %@", [value description]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
+                                             }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute SpeedSetting
+ */
+class ReadFanControlSpeedSetting : public ModelCommand {
+public:
+    ReadFanControlSpeedSetting()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "speed-setting");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlSpeedSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeSpeedSettingWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.SpeedSetting response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl SpeedSetting Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class WriteFanControlSpeedSetting : public ModelCommand {
+public:
+    WriteFanControlSpeedSetting()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "speed-setting");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteFanControlSpeedSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) WriteAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block chipError = CHIP_NO_ERROR;
+
+        NSNumber * _Nonnull value = [NSNumber numberWithUnsignedChar:mValue];
+
+        [cluster writeAttributeSpeedSettingWithValue:value
+                                   completionHandler:^(NSError * _Nullable error) {
+                                       chipError = [CHIPError errorToCHIPErrorCode:error];
+                                       ChipLogError(chipTool, "FanControl SpeedSetting Error: %s", chip::ErrorStr(chipError));
+                                       SetCommandExitStatus(chipError);
+                                   }];
+        return chipError;
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class SubscribeAttributeFanControlSpeedSetting : public ModelCommand {
+public:
+    SubscribeAttributeFanControlSpeedSetting()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "speed-setting");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlSpeedSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeSpeedSettingWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                        params:params
+                                       subscriptionEstablished:nullptr
+                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                     NSLog(@"FanControl.SpeedSetting response %@", [value description]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
+                                                 }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute SpeedCurrent
+ */
+class ReadFanControlSpeedCurrent : public ModelCommand {
+public:
+    ReadFanControlSpeedCurrent()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "speed-current");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlSpeedCurrent() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeSpeedCurrentWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.SpeedCurrent response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl SpeedCurrent Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeFanControlSpeedCurrent : public ModelCommand {
+public:
+    SubscribeAttributeFanControlSpeedCurrent()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "speed-current");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlSpeedCurrent() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeSpeedCurrentWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                        params:params
+                                       subscriptionEstablished:nullptr
+                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                     NSLog(@"FanControl.SpeedCurrent response %@", [value description]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
+                                                 }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute RockSupport
+ */
+class ReadFanControlRockSupport : public ModelCommand {
+public:
+    ReadFanControlRockSupport()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "rock-support");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlRockSupport() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeRockSupportWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.RockSupport response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl RockSupport Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeFanControlRockSupport : public ModelCommand {
+public:
+    SubscribeAttributeFanControlRockSupport()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "rock-support");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlRockSupport() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeRockSupportWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                       params:params
+                                      subscriptionEstablished:nullptr
+                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                    NSLog(@"FanControl.RockSupport response %@", [value description]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
+                                                }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute RockSetting
+ */
+class ReadFanControlRockSetting : public ModelCommand {
+public:
+    ReadFanControlRockSetting()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "rock-setting");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlRockSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeRockSettingWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.RockSetting response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl RockSetting Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class WriteFanControlRockSetting : public ModelCommand {
+public:
+    WriteFanControlRockSetting()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "rock-setting");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteFanControlRockSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) WriteAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block chipError = CHIP_NO_ERROR;
+
+        NSNumber * _Nonnull value = [NSNumber numberWithUnsignedChar:mValue];
+
+        [cluster writeAttributeRockSettingWithValue:value
+                                  completionHandler:^(NSError * _Nullable error) {
+                                      chipError = [CHIPError errorToCHIPErrorCode:error];
+                                      ChipLogError(chipTool, "FanControl RockSetting Error: %s", chip::ErrorStr(chipError));
+                                      SetCommandExitStatus(chipError);
+                                  }];
+        return chipError;
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class SubscribeAttributeFanControlRockSetting : public ModelCommand {
+public:
+    SubscribeAttributeFanControlRockSetting()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "rock-setting");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlRockSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeRockSettingWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                       params:params
+                                      subscriptionEstablished:nullptr
+                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                    NSLog(@"FanControl.RockSetting response %@", [value description]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
+                                                }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute WindSupport
+ */
+class ReadFanControlWindSupport : public ModelCommand {
+public:
+    ReadFanControlWindSupport()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "wind-support");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlWindSupport() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeWindSupportWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.WindSupport response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl WindSupport Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeFanControlWindSupport : public ModelCommand {
+public:
+    SubscribeAttributeFanControlWindSupport()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "wind-support");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlWindSupport() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeWindSupportWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                       params:params
+                                      subscriptionEstablished:nullptr
+                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                    NSLog(@"FanControl.WindSupport response %@", [value description]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
+                                                }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute WindSetting
+ */
+class ReadFanControlWindSetting : public ModelCommand {
+public:
+    ReadFanControlWindSetting()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "wind-setting");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlWindSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeWindSettingWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.WindSetting response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl WindSetting Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class WriteFanControlWindSetting : public ModelCommand {
+public:
+    WriteFanControlWindSetting()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "wind-setting");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteFanControlWindSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) WriteAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block chipError = CHIP_NO_ERROR;
+
+        NSNumber * _Nonnull value = [NSNumber numberWithUnsignedChar:mValue];
+
+        [cluster writeAttributeWindSettingWithValue:value
+                                  completionHandler:^(NSError * _Nullable error) {
+                                      chipError = [CHIPError errorToCHIPErrorCode:error];
+                                      ChipLogError(chipTool, "FanControl WindSetting Error: %s", chip::ErrorStr(chipError));
+                                      SetCommandExitStatus(chipError);
+                                  }];
+        return chipError;
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class SubscribeAttributeFanControlWindSetting : public ModelCommand {
+public:
+    SubscribeAttributeFanControlWindSetting()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "wind-setting");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlWindSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeWindSettingWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                       params:params
+                                      subscriptionEstablished:nullptr
+                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                    NSLog(@"FanControl.WindSetting response %@", [value description]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
+                                                }];
 
         return CHIP_NO_ERROR;
     }
@@ -76661,6 +77824,12 @@ void registerClusterAccessControl(Commands & commands)
         make_unique<ReadAccessControlExtension>(), //
         make_unique<WriteAccessControlExtension>(), //
         make_unique<SubscribeAttributeAccessControlExtension>(), //
+        make_unique<ReadAccessControlSubjectsPerAccessControlEntry>(), //
+        make_unique<SubscribeAttributeAccessControlSubjectsPerAccessControlEntry>(), //
+        make_unique<ReadAccessControlTargetsPerAccessControlEntry>(), //
+        make_unique<SubscribeAttributeAccessControlTargetsPerAccessControlEntry>(), //
+        make_unique<ReadAccessControlAccessControlEntriesPerFabric>(), //
+        make_unique<SubscribeAttributeAccessControlAccessControlEntriesPerFabric>(), //
         make_unique<ReadAccessControlGeneratedCommandList>(), //
         make_unique<SubscribeAttributeAccessControlGeneratedCommandList>(), //
         make_unique<ReadAccessControlAcceptedCommandList>(), //
@@ -76873,6 +78042,8 @@ void registerClusterBasic(Commands & commands)
         make_unique<SubscribeAttributeBasicReachable>(), //
         make_unique<ReadBasicUniqueID>(), //
         make_unique<SubscribeAttributeBasicUniqueID>(), //
+        make_unique<ReadBasicCapabilityMinima>(), //
+        make_unique<SubscribeAttributeBasicCapabilityMinima>(), //
         make_unique<ReadBasicGeneratedCommandList>(), //
         make_unique<SubscribeAttributeBasicGeneratedCommandList>(), //
         make_unique<ReadBasicAcceptedCommandList>(), //
@@ -77448,6 +78619,28 @@ void registerClusterFanControl(Commands & commands)
         make_unique<ReadFanControlFanModeSequence>(), //
         make_unique<WriteFanControlFanModeSequence>(), //
         make_unique<SubscribeAttributeFanControlFanModeSequence>(), //
+        make_unique<ReadFanControlPercentSetting>(), //
+        make_unique<WriteFanControlPercentSetting>(), //
+        make_unique<SubscribeAttributeFanControlPercentSetting>(), //
+        make_unique<ReadFanControlPercentCurrent>(), //
+        make_unique<SubscribeAttributeFanControlPercentCurrent>(), //
+        make_unique<ReadFanControlSpeedMax>(), //
+        make_unique<SubscribeAttributeFanControlSpeedMax>(), //
+        make_unique<ReadFanControlSpeedSetting>(), //
+        make_unique<WriteFanControlSpeedSetting>(), //
+        make_unique<SubscribeAttributeFanControlSpeedSetting>(), //
+        make_unique<ReadFanControlSpeedCurrent>(), //
+        make_unique<SubscribeAttributeFanControlSpeedCurrent>(), //
+        make_unique<ReadFanControlRockSupport>(), //
+        make_unique<SubscribeAttributeFanControlRockSupport>(), //
+        make_unique<ReadFanControlRockSetting>(), //
+        make_unique<WriteFanControlRockSetting>(), //
+        make_unique<SubscribeAttributeFanControlRockSetting>(), //
+        make_unique<ReadFanControlWindSupport>(), //
+        make_unique<SubscribeAttributeFanControlWindSupport>(), //
+        make_unique<ReadFanControlWindSetting>(), //
+        make_unique<WriteFanControlWindSetting>(), //
+        make_unique<SubscribeAttributeFanControlWindSetting>(), //
         make_unique<ReadFanControlGeneratedCommandList>(), //
         make_unique<SubscribeAttributeFanControlGeneratedCommandList>(), //
         make_unique<ReadFanControlAcceptedCommandList>(), //

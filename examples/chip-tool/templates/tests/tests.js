@@ -145,7 +145,6 @@ function getManualTests()
     'Test_TC_MF_1_2',
     'Test_TC_MF_1_3',
     'Test_TC_MF_1_5',
-    'Test_TC_MF_1_6',
     'Test_TC_MF_1_7',
     'Test_TC_MF_1_8',
     'Test_TC_MF_1_9',
@@ -423,6 +422,7 @@ function getTests()
 
   const MultipleFabrics = [
     'Test_TC_MF_1_4',
+    'Test_TC_MF_1_6',
   ];
 
   const OnOff = [

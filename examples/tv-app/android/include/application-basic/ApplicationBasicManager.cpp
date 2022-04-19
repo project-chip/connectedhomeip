@@ -19,33 +19,32 @@
 #include "ApplicationBasicManager.h"
 
 using namespace std;
-using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::ApplicationBasic;
 
 CHIP_ERROR ApplicationBasicManager::HandleGetVendorName(AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.Encode(CharSpan::fromCharString("exampleVendorName1"));
+    return aEncoder.Encode(CharSpan::fromCharString(mVendorName));
 }
 
 uint16_t ApplicationBasicManager::HandleGetVendorId()
 {
-    return 1;
+    return mVendorId;
 }
 
 CHIP_ERROR ApplicationBasicManager::HandleGetApplicationName(AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.Encode(CharSpan::fromCharString("exampleName1"));
+    return aEncoder.Encode(CharSpan::fromCharString(mApplicationName));
 }
 
 uint16_t ApplicationBasicManager::HandleGetProductId()
 {
-    return 1;
+    return mProductId;
 }
 
 CHIP_ERROR ApplicationBasicManager::HandleGetApplicationVersion(AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.Encode(CharSpan::fromCharString("exampleVersion"));
+    return aEncoder.Encode(CharSpan::fromCharString(mApplicationVersion));
 }
 
 CHIP_ERROR ApplicationBasicManager::HandleGetAllowedVendorList(AttributeValueEncoder & aEncoder)

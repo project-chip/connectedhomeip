@@ -35,6 +35,7 @@
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/CHIPCounter.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
@@ -60,9 +61,6 @@ chip::EndpointId kInvalidTestEndpointId = 3;
 chip::DataVersion kTestDataVersion1     = 3;
 chip::DataVersion kTestDataVersion2     = 5;
 
-chip::Test::AppContext sContext;
-auto & sLoopback = sContext.GetLoopback();
-
 class TestContext : public chip::Test::AppContext
 {
 public:
@@ -75,6 +73,11 @@ public:
 
         auto * ctx = static_cast<TestContext *>(context);
 
+        if (ctx->mEventCounter.Init(0) != CHIP_NO_ERROR)
+        {
+            return FAILURE;
+        }
+
         chip::app::LogStorageResources logStorageResources[] = {
             { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
             { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
@@ -82,7 +85,7 @@ public:
         };
 
         chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(), ArraySize(logStorageResources),
-                                                          gCircularEventBuffer, logStorageResources, nullptr, 0, nullptr);
+                                                          gCircularEventBuffer, logStorageResources, &ctx->mEventCounter);
 
         return SUCCESS;
     }
@@ -96,7 +99,13 @@ public:
 
         return SUCCESS;
     }
+
+private:
+    chip::MonotonicallyIncreasingCounter mEventCounter;
 };
+
+TestContext sContext;
+auto & sLoopback = sContext.GetLoopback();
 
 class TestEventGenerator : public chip::app::EventLoggingDelegate
 {
@@ -485,11 +494,14 @@ void TestReadInteraction::TestReadClientGenerateAttributePathList(nlTestSuite * 
                                chip::app::ReadClient::InteractionType::Read);
 
     AttributePathParams attributePathParams[2];
-    attributePathParams[0].mAttributeId                  = 0;
-    attributePathParams[1].mAttributeId                  = 0;
-    attributePathParams[1].mListIndex                    = 0;
+    attributePathParams[0].mAttributeId = 0;
+    attributePathParams[1].mAttributeId = 0;
+    attributePathParams[1].mListIndex   = 0;
+
+    Span<AttributePathParams> attributePaths(attributePathParams, 2 /*aAttributePathParamsListSize*/);
+
     AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributeRequests();
-    err = readClient.GenerateAttributePathList(attributePathListBuilder, attributePathParams, 2 /*aAttributePathParamsListSize*/);
+    err = readClient.GenerateAttributePaths(attributePathListBuilder, attributePaths);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -512,10 +524,13 @@ void TestReadInteraction::TestReadClientGenerateInvalidAttributePathList(nlTestS
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     AttributePathParams attributePathParams[2];
-    attributePathParams[0].mAttributeId                  = 0;
-    attributePathParams[1].mListIndex                    = 0;
+    attributePathParams[0].mAttributeId = 0;
+    attributePathParams[1].mListIndex   = 0;
+
+    Span<AttributePathParams> attributePaths(attributePathParams, 2 /*aAttributePathParamsListSize*/);
+
     AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributeRequests();
-    err = readClient.GenerateAttributePathList(attributePathListBuilder, attributePathParams, 2 /*aAttributePathParamsListSize*/);
+    err = readClient.GenerateAttributePaths(attributePathListBuilder, attributePaths);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 }
 
@@ -625,7 +640,8 @@ void TestReadInteraction::TestReadClientGenerateOneEventPaths(nlTestSuite * apSu
     eventPathParams[0].mEventId    = 4;
 
     EventPathIBs::Builder & eventPathListBuilder = request.CreateEventRequests();
-    err = readClient.GenerateEventPaths(eventPathListBuilder, eventPathParams, 1 /*aEventPathParamsListSize*/);
+    Span<EventPathParams> eventPaths(eventPathParams, 1 /*aEventPathParamsListSize*/);
+    err = readClient.GenerateEventPaths(eventPathListBuilder, eventPaths);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     request.IsFabricFiltered(false).EndOfReadRequestMessage();
@@ -676,7 +692,8 @@ void TestReadInteraction::TestReadClientGenerateTwoEventPaths(nlTestSuite * apSu
     eventPathParams[1].mEventId    = 5;
 
     EventPathIBs::Builder & eventPathListBuilder = request.CreateEventRequests();
-    err = readClient.GenerateEventPaths(eventPathListBuilder, eventPathParams, 2 /*aEventPathParamsListSize*/);
+    Span<EventPathParams> eventPaths(eventPathParams, 2 /*aEventPathParamsListSize*/);
+    err = readClient.GenerateEventPaths(eventPathListBuilder, eventPaths);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     request.IsFabricFiltered(false).EndOfReadRequestMessage();

@@ -1026,16 +1026,6 @@
 #define CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH (0x10000)
 #endif
 
-/**
- *  @def CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY
- *
- *  @brief
- *    The Global event id counter (eidc) persisted storage key.
- */
-#ifndef CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY "global-eidc"
-#endif
-
 // -------------------- Software Update Manager Configuration --------------------
 
 /**

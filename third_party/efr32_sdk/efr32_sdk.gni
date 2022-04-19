@@ -284,6 +284,13 @@ template("efr32_sdk") {
       "-Wno-shadow",
     ]
 
+    if (defined(invoker.use_rs911x)) {
+      if (invoker.use_rs911x == true) {
+        #add compilation flags for rs991x build. This will be addressed directly in wiseconnect sdk in the next version release of that sdk
+        cflags += invoker.rs911x_cflags
+      }
+    }
+
     if (defined(invoker.defines)) {
       defines += invoker.defines
     }
