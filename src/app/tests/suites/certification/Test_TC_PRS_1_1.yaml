@@ -82,8 +82,8 @@ tests:
 
     #issue #17484
     - label:
-          "Read AcceptedCommandList attribute from the DUT and Verify that the DUT
-          response"
+          "Read AcceptedCommandList attribute from the DUT and Verify that the
+          DUT response"
       verification: |
           ./chip-tool pressuremeasurement read accepted-command-list 1 1
 
@@ -101,8 +101,8 @@ tests:
                 value: "y"
 
     - label:
-          "Read GeneratedCommandList attribute from the DUT and Verify that the DUT
-          response"
+          "Read GeneratedCommandList attribute from the DUT and Verify that the
+          DUT response"
       verification: |
           ./chip-tool pressuremeasurement read generated-command-list 1 1
 
