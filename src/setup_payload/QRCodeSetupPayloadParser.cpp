@@ -47,7 +47,7 @@ static CHIP_ERROR readBits(std::vector<uint8_t> buf, size_t & index, uint64_t & 
     if (index + numberOfBitsToRead > buf.size() * 8 || numberOfBitsToRead > sizeof(uint64_t) * 8)
     {
         ChipLogError(SetupPayload, "Error parsing QR code. startIndex %u numberOfBitsToLoad %u buf_len %u ",
-                     static_cast<unsigned int> index, static_cast<unsigned int> numberOfBitsToRead,
+                     static_cast<unsigned int>(index), static_cast<unsigned int>(numberOfBitsToRead),
                      static_cast<unsigned int>(buf.size()));
         return CHIP_ERROR_INVALID_ARGUMENT;
     }

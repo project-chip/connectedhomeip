@@ -504,8 +504,8 @@ void DoorLockServer::SetCredentialCommandHandler(
     {
         emberAfDoorLockClusterPrintln("[SetCredential] Credential data size is out of range "
                                       "[endpointId=%d,credentialType=%u,minLength=%u,maxLength=%u,length=%u]",
-                                      commandPath.mEndpointId, to_underlying(credentialType), static_cast<unsigned int> minSize,
-                                      static_cast<unsigned int> maxSize, static_cast<unsigned int>(credentialData.size()));
+                                      commandPath.mEndpointId, to_underlying(credentialType), static_cast<unsigned int>(minSize),
+                                      static_cast<unsigned int>(maxSize), static_cast<unsigned int>(credentialData.size()));
         sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
         return;
     }
@@ -1546,7 +1546,7 @@ EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::Fabr
                                       "userType=%u,credentialRule=%u,totalCredentials=%u]",
                                       endpointId, creatorFabricIdx, userIndex, static_cast<int>(newUserName.size()),
                                       newUserName.data(), newUserUniqueId, to_underlying(newUserStatus), to_underlying(newUserType),
-                                      to_underlying(newCredentialRule), static_cast<unsigned int> newTotalCredentials);
+                                      to_underlying(newCredentialRule), static_cast<unsigned int>(newTotalCredentials));
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
@@ -1556,7 +1556,7 @@ EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::Fabr
                                   "userType=%u,credentialRule=%u,totalCredentials=%u]",
                                   endpointId, creatorFabricIdx, userIndex, static_cast<int>(newUserName.size()), newUserName.data(),
                                   newUserUniqueId, to_underlying(newUserStatus), to_underlying(newUserType),
-                                  to_underlying(newCredentialRule), static_cast<unsigned int> newTotalCredentials);
+                                  to_underlying(newCredentialRule), static_cast<unsigned int>(newTotalCredentials));
 
     sendRemoteLockUserChange(endpointId, DlLockDataType::kUserIndex, DlDataOperationType::kAdd, sourceNodeId, creatorFabricIdx,
                              userIndex, userIndex);
@@ -2403,7 +2403,7 @@ EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip:
                      "[endpointId=%d,credentialType=%u"
                      ",credentialIndex=%d,modifier=%d,userIndex=%d,newCredentialsCount=%u]",
                      endpointId, to_underlying(credentialType), credentialIndex, modifier, relatedUserIndex,
-                     static_cast<unsigned int> newCredentialsCount);
+                     static_cast<unsigned int>(newCredentialsCount));
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
@@ -2411,7 +2411,7 @@ EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip:
         "[clearCredential] Successfully clear credential and related user "
         "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=%d,userIndex=%d,newCredentialsCount=%u]",
         endpointId, to_underlying(credentialType), credentialIndex, modifier, relatedUserIndex,
-        static_cast<unsigned int> newCredentialsCount);
+        static_cast<unsigned int>(newCredentialsCount));
 
     if (sendUserChangeEvent)
     {

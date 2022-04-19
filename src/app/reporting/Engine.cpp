@@ -370,7 +370,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
         eventReportIBs.EndOfEventReports();
         SuccessOrExit(err = eventReportIBs.GetError());
     }
-    ChipLogDetail(DataManagement, "Fetched %u events", static_cast<unsigned int> eventCount);
+    ChipLogDetail(DataManagement, "Fetched %u events", static_cast<unsigned int>(eventCount));
 
 exit:
     if (apHasEncodedData != nullptr)

@@ -169,7 +169,7 @@ void CommandHandler::Close()
     // in reasonable time or there is a bug. The only case for releasing CommandHandler without CommandHandler::Handle releasing its
     // reference is the stack shutting down, in which case Close() is not called. So the below check should always pass.
     VerifyOrDieWithMsg(mPendingWork == 0, DataManagement, "CommandHandler::Close() called with %u unfinished async work items",
-                       static_cast<unsigned int> mPendingWork);
+                       static_cast<unsigned int>(mPendingWork));
 
     // OnDone below can destroy us before we unwind all the way back into the
     // exchange code and it tries to close itself.  Make sure that it doesn't
@@ -198,7 +198,7 @@ void CommandHandler::DecrementHoldOff()
 {
     mPendingWork--;
     ChipLogDetail(DataManagement, "Decreasing reference count for CommandHandler, remaining %u",
-                  static_cast<unsigned int> mPendingWork);
+                  static_cast<unsigned int>(mPendingWork));
     if (mPendingWork != 0)
     {
         return;

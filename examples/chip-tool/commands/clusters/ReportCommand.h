@@ -164,8 +164,8 @@ protected:
                 "number of ids (for examples 2 cluster ids, 2 attribute ids and 2 endpoint ids).\n The current command has %u "
                 "cluster ids, %u attribute ids, %u endpoint ids.",
                 interactionType == chip::app::ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read",
-                static_cast<unsigned int> clusterCount, static_cast<unsigned int> attributeCount,
-                static_cast<unsigned int> endpointCount);
+                static_cast<unsigned int>(clusterCount), static_cast<unsigned int>(attributeCount),
+                static_cast<unsigned int>(endpointCount));
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
@@ -269,8 +269,8 @@ protected:
                          "number of ids (for examples 2 cluster ids, 2 event ids and 2 endpoint ids).\n The current command has %u "
                          "cluster ids, %u event ids, %u endpoint ids.",
                          interactionType == chip::app::ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read",
-                         static_cast<unsigned int> clusterCount, static_cast<unsigned int> eventCount,
-                         static_cast<unsigned int> endpointCount);
+                         static_cast<unsigned int>(clusterCount), static_cast<unsigned int>(eventCount),
+                         static_cast<unsigned int>(endpointCount));
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 

@@ -345,12 +345,12 @@ bool PacketBufferTest::ResetHandles()
         const PacketBufferHandle & handle = handles[i];
         if (handle.Get() == nullptr)
         {
-            printf("TestTerminate: handle %u null\n", static_cast<unsigned int> i);
+            printf("TestTerminate: handle %u null\n", static_cast<unsigned int>(i));
             handles_ok = false;
         }
         else if (handle->ref != 1)
         {
-            printf("TestTerminate: handle %u buffer=%p ref=%u\n", static_cast<unsigned int> i, handle.Get(), handle->ref);
+            printf("TestTerminate: handle %u buffer=%p ref=%u\n", static_cast<unsigned int>(i), handle.Get(), handle->ref);
             handles_ok = false;
             while (handle->ref > 1)
             {

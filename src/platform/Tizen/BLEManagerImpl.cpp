@@ -807,7 +807,7 @@ void BLEManagerImpl::HandleC1CharWriteEvent(BLE_CONNECTION_OBJECT conId, const u
     System::PacketBufferHandle buf;
 
     ChipLogProgress(DeviceLayer, "Write request received for CHIPoBLE Client TX characteristic (data len %u)",
-                    static_cast<unsigned int> len);
+                    static_cast<unsigned int>(len));
     // Copy the data to a packet buffer.
     buf = System::PacketBufferHandle::NewWithData(value, len);
     VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
@@ -826,7 +826,7 @@ void BLEManagerImpl::HandleRXCharChanged(BLE_CONNECTION_OBJECT conId, const uint
     System::PacketBufferHandle buf;
 
     ChipLogProgress(DeviceLayer, "Notification received on CHIPoBLE Client RX characteristic (data len %u)",
-                    static_cast<unsigned int> len);
+                    static_cast<unsigned int>(len));
     // Copy the data to a packet buffer.
     buf = System::PacketBufferHandle::NewWithData(value, len);
     VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);

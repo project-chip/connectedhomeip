@@ -555,7 +555,7 @@ void DataBlock::LogMessage(bdx::MessageType messageType) const
     }
 
     ChipLogAutomation("  Block Counter: %" PRIu32, BlockCounter);
-    ChipLogAutomation("  Data Length: %u", static_cast<unsigned int> DataLength);
+    ChipLogAutomation("  Data Length: %u", static_cast<unsigned int>(DataLength));
 }
 #endif // CHIP_AUTOMATION_LOGGING
 

@@ -59,7 +59,7 @@ CHIP_ERROR ManualSetupPayloadParser::CheckCodeLengthValidity(const std::string &
     if (decimalString.length() != expectedCharLength)
     {
         ChipLogError(SetupPayload, "Failed decoding base10. Input length %u was not expected length %u",
-                     static_cast<unsigned int>(decimalString.length()), static_cast<unsigned int> expectedCharLength);
+                     static_cast<unsigned int>(decimalString.length()), static_cast<unsigned int>(expectedCharLength));
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
     return CHIP_NO_ERROR;

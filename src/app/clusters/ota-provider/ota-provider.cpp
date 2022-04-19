@@ -97,7 +97,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
 
     if (updateToken.size() > kUpdateTokenMaxLength || updateToken.size() < kUpdateTokenMinLength)
     {
-        ChipLogError(Zcl, "expected size %u for UpdateToken, got %u", static_cast<unsigned int> kUpdateTokenMaxLength,
+        ChipLogError(Zcl, "expected size %u for UpdateToken, got %u", static_cast<unsigned int>(kUpdateTokenMaxLength),
                      static_cast<unsigned int>(updateToken.size()));
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
@@ -130,7 +130,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
 
     if (updateToken.size() > kUpdateTokenMaxLength || updateToken.size() < kUpdateTokenMinLength)
     {
-        ChipLogError(Zcl, "expected size %u for UpdateToken, got %u", static_cast<unsigned int> kUpdateTokenMaxLength,
+        ChipLogError(Zcl, "expected size %u for UpdateToken, got %u", static_cast<unsigned int>(kUpdateTokenMaxLength),
                      static_cast<unsigned int>(updateToken.size()));
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
@@ -200,7 +200,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     if (location.HasValue() && location.Value().size() != kLocationLen)
     {
         ChipLogError(Zcl, "location param length %u != expected length %u", static_cast<unsigned int>(location.Value().size()),
-                     static_cast<unsigned int> kLocationLen);
+                     static_cast<unsigned int>(kLocationLen));
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
@@ -208,7 +208,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     if (metadataForProvider.HasValue() && metadataForProvider.Value().size() > kMaxMetadataLen)
     {
         ChipLogError(Zcl, "metadata size %u exceeds max %u", static_cast<unsigned int>(metadataForProvider.Value().size()),
-                     static_cast<unsigned int> kMaxMetadataLen);
+                     static_cast<unsigned int>(kMaxMetadataLen));
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }

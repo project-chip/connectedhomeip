@@ -162,7 +162,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::LoadRootCertKeysFromKeyChain()
 
     chip::Crypto::P256SerializedKeypair serialized;
     if ([keypairData length] != serialized.Capacity()) {
-        NSLog(@"Keypair length %u does not match expected length %u", static_cast<unsigned int>[keypairData length],
+        NSLog(@"Keypair length %u does not match expected length %u", static_cast<unsigned int>([keypairData length]),
             static_cast<unsigned int>(serialized.Capacity()));
         ClearSecretData(keypairData);
         return CHIP_ERROR_INTERNAL;
@@ -200,7 +200,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::LoadIPKFromKeyChain()
 
     NSMutableData * ipkData = [[NSMutableData alloc] initWithBase64EncodedData:keyData options:0];
     if ([ipkData length] != mIPK.Length()) {
-        NSLog(@"IPK length %u does not match expected length %u", static_cast<unsigned int>[ipkData length],
+        NSLog(@"IPK length %u does not match expected length %u", static_cast<unsigned int>([ipkData length]),
             static_cast<unsigned int>(mIPK.Length()));
         ClearSecretData(ipkData);
         return CHIP_ERROR_INTERNAL;
