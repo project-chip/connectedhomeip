@@ -72,11 +72,6 @@ if [[ ${*/--no-cache//} != "${*}" ]]; then
     BUILD_ARGS+=(--no-cache)
 fi
 
-# Prepare context if required
-if [[ -f './buildcontext.sh' ]]; then
-    source './buildcontext.sh'
-fi
-
 docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$VERSION" .
 docker image prune --force
 
