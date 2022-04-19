@@ -26,9 +26,15 @@
 #include "qrcodegen.h"
 #endif // DISPLAY_ENABLED
 #include "sl_simple_led_instances.h"
+#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
+
+#include <app/clusters/door-lock-server/door-lock-server.h>
+#include <app/clusters/identify-server/identify-server.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -165,7 +171,12 @@ CHIP_ERROR AppTask::Init()
     sStatusLED.Init(SYSTEM_STATE_LED);
 
     sLockLED.Init(LOCK_STATE_LED);
-    sLockLED.Set(!BoltLockMgr().IsUnlocked());
+
+    bool state;
+    chip::DeviceLayer::Internal::EFR32Config::ReadConfigValue(chip::DeviceLayer::Internal::EFR32Config::kConfigKey_LockState,
+                                                              state);
+    sLockLED.Set(state);
+
     chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 
     ConfigurationMgr().LogDeviceConfig();
@@ -409,7 +420,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
             // Set lock status LED back to show state of lock.
-            sLockLED.Set(!BoltLockMgr().IsUnlocked());
+            // sLockLED.Set(LockMgr().isLocked(1));
 
             sAppTask.CancelTimer();
 
@@ -471,7 +482,6 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
         sAppTask.mSyncClusterToButtonAction = true;
     }
 
-    sLockLED.Blink(50, 50);
 }
 
 void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
@@ -551,7 +561,14 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 
 void AppTask::UpdateClusterState(intptr_t context)
 {
-    uint8_t newValue = !BoltLockMgr().IsUnlocked();
+    bool unlocked        = LockMgr().IsUnlocked();
+    DlLockState newState = unlocked ? DlLockState::kLocked : DlLockState::kUnlocked;
+
+    DlOperationSource source = DlOperationSource::kUnspecified;
+
+    // write the new lock value
+    EmberAfStatus status =
+        DoorLockServer::Instance().SetLockState(1, newState, source) ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
 
     // write the new on/off value
     EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
