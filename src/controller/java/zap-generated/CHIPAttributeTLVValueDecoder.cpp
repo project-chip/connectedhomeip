@@ -10626,7 +10626,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          static_cast<uint8_t>(cppValue), value);
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::EffectiveControlMode::Id: {
@@ -10641,7 +10641,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          static_cast<uint8_t>(cppValue), value);
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::Capacity::Id: {
@@ -10766,7 +10766,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          static_cast<uint8_t>(cppValue), value);
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::ControlMode::Id: {
@@ -10781,7 +10781,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          static_cast<uint8_t>(cppValue), value);
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::AlarmMask::Id: {

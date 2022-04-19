@@ -34868,14 +34868,12 @@ using namespace chip::app::Clusters;
 - (void)readAttributeEffectiveOperationModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler
 {
-    new CHIPPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo;
-            auto successFn
-                = Callback<PumpConfigurationAndControlClusterPumpOperationModeAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo;
+        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
 }
 
 - (void)subscribeAttributeEffectiveOperationModeWithMinInterval:(NSNumber * _Nonnull)minInterval
@@ -34886,7 +34884,7 @@ using namespace chip::app::Clusters;
                                                   reportHandler:
                                                       (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge(
+    new CHIPInt8uAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
@@ -34894,13 +34892,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo;
-            auto successFn
-                = Callback<PumpConfigurationAndControlClusterPumpOperationModeAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -34913,37 +34909,34 @@ using namespace chip::app::Clusters;
                                             completionHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge(
-        queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            if (attributeCacheContainer.cppAttributeCache) {
-                chip::app::ConcreteAttributePath path;
-                using TypeInfo = PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo;
-                path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
-                path.mClusterId = TypeInfo::GetClusterId();
-                path.mAttributeId = TypeInfo::GetAttributeId();
-                TypeInfo::DecodableType value;
-                CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<PumpConfigurationAndControlClusterPumpOperationModeAttributeCallback>::FromCancelable(success);
-                if (err == CHIP_NO_ERROR) {
-                    successFn->mCall(successFn->mContext, value);
-                }
-                return err;
+    new CHIPInt8uAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
             }
-            return CHIP_ERROR_NOT_FOUND;
-        });
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
 }
 
 - (void)readAttributeEffectiveControlModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler
 {
-    new CHIPPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo;
-            auto successFn = Callback<PumpConfigurationAndControlClusterPumpControlModeAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo;
+        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
 }
 
 - (void)subscribeAttributeEffectiveControlModeWithMinInterval:(NSNumber * _Nonnull)minInterval
@@ -34954,7 +34947,7 @@ using namespace chip::app::Clusters;
                                                 reportHandler:
                                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge(
+    new CHIPInt8uAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
@@ -34962,11 +34955,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo;
-            auto successFn = Callback<PumpConfigurationAndControlClusterPumpControlModeAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -34979,25 +34972,23 @@ using namespace chip::app::Clusters;
                                           completionHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge(
-        queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            if (attributeCacheContainer.cppAttributeCache) {
-                chip::app::ConcreteAttributePath path;
-                using TypeInfo = PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo;
-                path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
-                path.mClusterId = TypeInfo::GetClusterId();
-                path.mAttributeId = TypeInfo::GetAttributeId();
-                TypeInfo::DecodableType value;
-                CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<PumpConfigurationAndControlClusterPumpControlModeAttributeCallback>::FromCancelable(success);
-                if (err == CHIP_NO_ERROR) {
-                    successFn->mCall(successFn->mContext, value);
-                }
-                return err;
+    new CHIPInt8uAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
             }
-            return CHIP_ERROR_NOT_FOUND;
-        });
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
 }
 
 - (void)readAttributeCapacityWithCompletionHandler:(void (^)(
@@ -35360,14 +35351,12 @@ using namespace chip::app::Clusters;
 - (void)readAttributeOperationModeWithCompletionHandler:(void (^)(
                                                             NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo;
-            auto successFn
-                = Callback<PumpConfigurationAndControlClusterPumpOperationModeAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo;
+        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
 }
 
 - (void)writeAttributeOperationModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -35381,7 +35370,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -35395,7 +35384,7 @@ using namespace chip::app::Clusters;
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge(
+    new CHIPInt8uAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
@@ -35403,13 +35392,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo;
-            auto successFn
-                = Callback<PumpConfigurationAndControlClusterPumpOperationModeAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished,
+                CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -35422,37 +35409,34 @@ using namespace chip::app::Clusters;
                                    completionHandler:
                                        (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge(
-        queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            if (attributeCacheContainer.cppAttributeCache) {
-                chip::app::ConcreteAttributePath path;
-                using TypeInfo = PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo;
-                path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
-                path.mClusterId = TypeInfo::GetClusterId();
-                path.mAttributeId = TypeInfo::GetAttributeId();
-                TypeInfo::DecodableType value;
-                CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<PumpConfigurationAndControlClusterPumpOperationModeAttributeCallback>::FromCancelable(success);
-                if (err == CHIP_NO_ERROR) {
-                    successFn->mCall(successFn->mContext, value);
-                }
-                return err;
+    new CHIPInt8uAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
             }
-            return CHIP_ERROR_NOT_FOUND;
-        });
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
 }
 
 - (void)readAttributeControlModeWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo;
-            auto successFn = Callback<PumpConfigurationAndControlClusterPumpControlModeAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo;
+        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
 }
 
 - (void)writeAttributeControlModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -35466,7 +35450,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -35479,7 +35463,7 @@ using namespace chip::app::Clusters;
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge(
+    new CHIPInt8uAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
@@ -35487,11 +35471,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo;
-            auto successFn = Callback<PumpConfigurationAndControlClusterPumpControlModeAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -35504,25 +35488,23 @@ using namespace chip::app::Clusters;
                                  completionHandler:
                                      (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge(
-        queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            if (attributeCacheContainer.cppAttributeCache) {
-                chip::app::ConcreteAttributePath path;
-                using TypeInfo = PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo;
-                path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
-                path.mClusterId = TypeInfo::GetClusterId();
-                path.mAttributeId = TypeInfo::GetAttributeId();
-                TypeInfo::DecodableType value;
-                CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-                auto successFn
-                    = Callback<PumpConfigurationAndControlClusterPumpControlModeAttributeCallback>::FromCancelable(success);
-                if (err == CHIP_NO_ERROR) {
-                    successFn->mCall(successFn->mContext, value);
-                }
-                return err;
+    new CHIPInt8uAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
             }
-            return CHIP_ERROR_NOT_FOUND;
-        });
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
 }
 
 - (void)readAttributeAlarmMaskWithCompletionHandler:(void (^)(

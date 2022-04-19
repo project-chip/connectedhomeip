@@ -8176,12 +8176,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("PumpStatus", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::EffectiveOperationMode::Id: {
-            chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value;
+            uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EffectiveOperationMode", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::EffectiveControlMode::Id: {
-            chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
+            uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EffectiveControlMode", 1, value);
         }
@@ -8211,12 +8211,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("LifetimeEnergyConsumed", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::OperationMode::Id: {
-            chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value;
+            uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationMode", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::ControlMode::Id: {
-            chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
+            uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ControlMode", 1, value);
         }

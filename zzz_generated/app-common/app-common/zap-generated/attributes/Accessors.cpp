@@ -17484,9 +17484,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 namespace EffectiveOperationMode {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode * value)
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode>;
+    using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -17499,9 +17499,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurat
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value)
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode>;
+    using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -17516,9 +17516,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurat
 
 namespace EffectiveControlMode {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode * value)
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode>;
+    using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -17531,9 +17531,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurat
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value)
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode>;
+    using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -17828,9 +17828,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 
 namespace OperationMode {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode * value)
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode>;
+    using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -17843,9 +17843,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurat
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value)
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode>;
+    using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -17860,9 +17860,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurat
 
 namespace ControlMode {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode * value)
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode>;
+    using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -17875,9 +17875,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurat
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value)
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode>;
+    using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;

@@ -9818,7 +9818,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode mValue;
+    uint8_t mValue;
 };
 
 class WritePumpConfigurationAndControlControlMode : public WriteAttribute
@@ -9845,7 +9845,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode mValue;
+    uint8_t mValue;
 };
 
 /*----------------------------------------------------------------------------*\
