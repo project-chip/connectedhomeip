@@ -346,8 +346,8 @@ public:
                 node->mObject = nullptr;
                 Platform::Delete(object);
 
-                // Note need to be released immediately if not in the middle of iteration, otherwise cleanup is deferred
-                // until the end of the next pool iteration.
+                // The node needs to be released immediately if we are not in the middle of iteration.
+                // Otherwise cleanup is deferred until all iteration on this pool completes and it's safe to release nodes.
                 if (mObjects.mIterationDepth == 0)
                 {
                     node->Remove();
