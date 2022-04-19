@@ -63,7 +63,8 @@ private:
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
 
-    struct fixedOtaHeader {
+    struct fixedOtaHeader
+    {
         uint32_t fileIdentifier;
         uint64_t totalSize;
         uint32_t headerSize;
