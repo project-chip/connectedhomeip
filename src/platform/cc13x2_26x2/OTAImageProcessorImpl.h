@@ -62,6 +62,12 @@ private:
     uint16_t mMetaPage;
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
+
+    struct fixedOtaHeader {
+        uint32_t fileIdentifier;
+        uint64_t totalSize;
+        uint32_t headerSize;
+    } PACK_STRUCT_STRUCT mFixedOtaHeader;
 };
 
 } // namespace chip

@@ -25,17 +25,18 @@ import("${ti_simplelink_sdk_build_root}/ti_simplelink_sdk.gni")
 
 assert(current_os == "freertos")
 
+declare_args() {
+  device_vid = "0xFFF1"
+  device_pid = "0x800A"
+  software_ver = "0x0001"
+  software_ver_str = "1.0d1"
+}
+
 project_dir = "${chip_root}/examples/pump-app/cc13x2x7_26x2x7"
 
 ti_simplelink_sdk("sdk") {
   include_dirs = [ "${project_dir}/main/include" ]
-
-  defines = []
-  if (is_debug) {
-    defines += [ "BUILD_RELEASE=0" ]
-  } else {
-    defines += [ "BUILD_RELEASE=1" ]
-  }
+  public_configs = [ ":pump_app_config" ]
 }
 
 ti_sysconfig("sysconfig") {
