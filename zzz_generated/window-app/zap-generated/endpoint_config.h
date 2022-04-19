@@ -878,24 +878,24 @@
             /* Endpoint: 1, Cluster: Window Covering (server) */                                                                   \
             { 0x00000000, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* Type */                                            \
             { 0x00000003, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_SIMPLE_DEFAULT(0x0000) }, /* CurrentPositionLift */                                                              \
+              ZAP_SIMPLE_DEFAULT(0) }, /* CurrentPositionLift */                                                                   \
             { 0x00000004, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_SIMPLE_DEFAULT(0x0000) }, /* CurrentPositionTilt */                                                              \
+              ZAP_SIMPLE_DEFAULT(0) }, /* CurrentPositionTilt */                                                                   \
             { 0x00000007, ZAP_TYPE(BITMAP8), 1, ZAP_ATTRIBUTE_MASK(TOKENIZE), ZAP_SIMPLE_DEFAULT(0x03) }, /* ConfigStatus */       \
             { 0x00000008, ZAP_TYPE(PERCENT), 1, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                       \
-              ZAP_SIMPLE_DEFAULT(0xFF) }, /* CurrentPositionLiftPercentage */                                                      \
+              ZAP_SIMPLE_DEFAULT(0) }, /* CurrentPositionLiftPercentage */                                                         \
             { 0x00000009, ZAP_TYPE(PERCENT), 1, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                       \
-              ZAP_SIMPLE_DEFAULT(0xFF) },                                      /* CurrentPositionTiltPercentage */                 \
+              ZAP_SIMPLE_DEFAULT(0) },                                         /* CurrentPositionTiltPercentage */                 \
             { 0x0000000A, ZAP_TYPE(BITMAP8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* OperationalStatus */                             \
             { 0x0000000B, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                \
-              ZAP_SIMPLE_DEFAULT(0xFF) }, /* TargetPositionLiftPercent100ths */                                                    \
+              ZAP_SIMPLE_DEFAULT(0xFFFF) }, /* TargetPositionLiftPercent100ths */                                                  \
             { 0x0000000C, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                \
-              ZAP_SIMPLE_DEFAULT(0xFF) },                                    /* TargetPositionTiltPercent100ths */                 \
+              ZAP_SIMPLE_DEFAULT(0xFFFF) },                                  /* TargetPositionTiltPercent100ths */                 \
             { 0x0000000D, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* EndProductType */                                  \
             { 0x0000000E, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
-              ZAP_SIMPLE_DEFAULT(0xFF) }, /* CurrentPositionLiftPercent100ths */                                                   \
+              ZAP_SIMPLE_DEFAULT(0) }, /* CurrentPositionLiftPercent100ths */                                                      \
             { 0x0000000F, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
-              ZAP_SIMPLE_DEFAULT(0xFF) }, /* CurrentPositionTiltPercent100ths */                                                   \
+              ZAP_SIMPLE_DEFAULT(0) }, /* CurrentPositionTiltPercent100ths */                                                      \
             { 0x00000010, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE),                                                       \
               ZAP_SIMPLE_DEFAULT(0x0000) }, /* InstalledOpenLimitLift */                                                           \
             { 0x00000011, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE),                                                       \
@@ -921,24 +921,24 @@
             /* Endpoint: 2, Cluster: Window Covering (server) */                                                                   \
             { 0x00000000, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* Type */                                            \
             { 0x00000003, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_SIMPLE_DEFAULT(0x0000) }, /* CurrentPositionLift */                                                              \
+              ZAP_SIMPLE_DEFAULT(0) }, /* CurrentPositionLift */                                                                   \
             { 0x00000004, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_SIMPLE_DEFAULT(0x0000) }, /* CurrentPositionTilt */                                                              \
+              ZAP_SIMPLE_DEFAULT(0) }, /* CurrentPositionTilt */                                                                   \
             { 0x00000007, ZAP_TYPE(BITMAP8), 1, ZAP_ATTRIBUTE_MASK(TOKENIZE), ZAP_SIMPLE_DEFAULT(0x03) }, /* ConfigStatus */       \
             { 0x00000008, ZAP_TYPE(PERCENT), 1, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                       \
-              ZAP_SIMPLE_DEFAULT(0xFF) }, /* CurrentPositionLiftPercentage */                                                      \
+              ZAP_SIMPLE_DEFAULT(0) }, /* CurrentPositionLiftPercentage */                                                         \
             { 0x00000009, ZAP_TYPE(PERCENT), 1, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                       \
-              ZAP_SIMPLE_DEFAULT(0xFF) },                                      /* CurrentPositionTiltPercentage */                 \
+              ZAP_SIMPLE_DEFAULT(0) },                                         /* CurrentPositionTiltPercentage */                 \
             { 0x0000000A, ZAP_TYPE(BITMAP8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* OperationalStatus */                             \
             { 0x0000000B, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                \
-              ZAP_SIMPLE_DEFAULT(0xFF) }, /* TargetPositionLiftPercent100ths */                                                    \
+              ZAP_SIMPLE_DEFAULT(0xFFFF) }, /* TargetPositionLiftPercent100ths */                                                  \
             { 0x0000000C, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                \
-              ZAP_SIMPLE_DEFAULT(0xFF) },                                    /* TargetPositionTiltPercent100ths */                 \
+              ZAP_SIMPLE_DEFAULT(0xFFFF) },                                  /* TargetPositionTiltPercent100ths */                 \
             { 0x0000000D, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* EndProductType */                                  \
             { 0x0000000E, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
-              ZAP_SIMPLE_DEFAULT(0xFF) }, /* CurrentPositionLiftPercent100ths */                                                   \
+              ZAP_SIMPLE_DEFAULT(0) }, /* CurrentPositionLiftPercent100ths */                                                      \
             { 0x0000000F, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
-              ZAP_SIMPLE_DEFAULT(0xFF) }, /* CurrentPositionTiltPercent100ths */                                                   \
+              ZAP_SIMPLE_DEFAULT(0) }, /* CurrentPositionTiltPercent100ths */                                                      \
             { 0x00000010, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE),                                                       \
               ZAP_SIMPLE_DEFAULT(0x0000) }, /* InstalledOpenLimitLift */                                                           \
             { 0x00000011, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE),                                                       \
