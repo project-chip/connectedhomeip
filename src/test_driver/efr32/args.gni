@@ -30,3 +30,4 @@ chip_monolithic_tests = true
 #Fix me : Test driver should use same config as examples
 # Problem : Linker issue if set to true
 chip_system_config_use_open_thread_inet_endpoints = false
+chip_with_lwip = true

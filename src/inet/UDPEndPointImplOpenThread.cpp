@@ -82,7 +82,7 @@ void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, 
     payload->SetDataLength(static_cast<uint16_t>(msgLen + sizeof(IPPacketInfo)));
 
     ep->Retain();
-    CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(payload)] {
+    CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, p = payload.Get()] {
         ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p));
         ep->Release();
     });
