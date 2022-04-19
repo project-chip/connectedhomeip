@@ -53,10 +53,10 @@ struct LockCredentialInfo
     uint8_t credentialData[DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE];
     size_t credentialDataSize;
 };
-
 class LockManager
 {
 public:
+
     enum Action_t
     {
         LOCK_ACTION = 0,
@@ -98,6 +98,22 @@ public:
 
     bool setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
     const char * lockStateToString(DlLockState lockState) const;
+    
+private:
+
+    bool GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const;
+    bool SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier, const chip::CharSpan & userName,
+                 uint32_t uniqueId, DlUserStatus userStatus, DlUserType usertype, DlCredentialRule credentialRule,
+                 const DlCredential * credentials, size_t totalCredentials);
+
+    bool GetCredential(chip::EndpointId endpointId, DlCredentialType credentialType,
+                       EmberAfPluginDoorLockCredentialInfo & credential) const;
+
+    bool SetCredential(chip::EndpointId endpointId, DlCredentialStatus credentialStatus, DlCredentialType credentialType,
+                       const chip::ByteSpan & credentialData);
+
+    bool setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
+    const char * lockStateToString(DlLockState lockState) const;
     bool ReadConfigValues();
 
 private:
@@ -118,6 +134,9 @@ private:
     static void TimerEventHandler(TimerHandle_t xTimer);
     static void AutoLockTimerEventHandler(AppEvent * aEvent);
     static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
+
+    LockUserInfo mLockUser;
+    LockCredentialInfo mLockCredentials;
 
     static LockManager sLock;
 };
