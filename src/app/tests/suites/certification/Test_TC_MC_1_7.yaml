@@ -89,7 +89,7 @@ tests:
           supports Variable Speed (PICS_VARIABLESPEED is true)"
       verification: |
           ./chip-tool mediaplayback read feature-map 1 3
-          [1646115004.682978][8139:8144] CHIP:DMG:         SuppressResponse = true, 
+          [1646115004.682978][8139:8144] CHIP:DMG:         SuppressResponse = true,
           [1646115004.682994][8139:8144] CHIP:DMG:         InteractionModelRevision = 1
           [1646115004.683010][8139:8144] CHIP:DMG: }
           [1646115004.683125][8139:8144] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86
