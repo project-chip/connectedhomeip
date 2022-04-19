@@ -202,6 +202,7 @@ efr32_executable("lock_app") {
     defines += [ "EFR32_OTA_ENABLED" ]
     sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
   }
+
   # WiFi Settings
   if (chip_enable_wifi) {
     if (use_rs911x) {
