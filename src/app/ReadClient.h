@@ -186,6 +186,8 @@ public:
 
         /*
          * Get highest received event number.
+         * If application don't have this one, it clear outparam and return CHIP_NO_ERROR.
+         * if any returning error, it will fail the entire read client.
          */
         virtual CHIP_ERROR GetHighestReceivedEventNumber(Optional<EventNumber> & aEventNumber)
         {

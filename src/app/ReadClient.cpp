@@ -984,12 +984,12 @@ CHIP_ERROR ReadClient::GetMinEventNumber(const ReadPrepareParams & aReadPrepareP
     if (aReadPrepareParams.mEventNumber.HasValue())
     {
         aEventMin = aReadPrepareParams.mEventNumber;
-        return CHIP_NO_ERROR;
     }
     else
     {
         return mpCallback.GetHighestReceivedEventNumber(aEventMin);
     }
+    return CHIP_NO_ERROR;
 }
 } // namespace app
 } // namespace chip
