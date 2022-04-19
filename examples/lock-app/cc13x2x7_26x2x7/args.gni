@@ -39,3 +39,5 @@ chip_config_network_layer_ble = true
 # Disable lock tracking, since our FreeRTOS configuration does not set
 # INCLUDE_xSemaphoreGetMutexHolder
 chip_stack_lock_tracking = "none"
+
+chip_openthread_ftd = true
