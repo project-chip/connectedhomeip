@@ -26,21 +26,23 @@ Run `chef.py -h` to see the available commands
 3. Update your the SDK paths on `config.yaml`. TTY is the path used by the
    platform to enumerate its device as a serial port. Typical values are:
 
+```
     # ESP32 macOS
 
-    TTY: `/dev/tty.usbmodemXXXXXXX`
+    TTY: /dev/tty.usbmodemXXXXXXX
 
     # ESP32 Linux
 
-    TTY: `/dev/ttyACM0`
+    TTY: /dev/ttyACM0
 
     # NRFCONNECT macOS
 
-    TTY: `/dev/tty.usbserial-XXXXX`
+    TTY: /dev/tty.usbserial-XXXXX
 
     # NRFCONNECT Linux
 
-    TTY: `/dev/ttyUSB0`
+    TTY: /dev/ttyUSB0
+```
 
 4. Run `$ chef.py -u` to update zap and the toolchain (on selected platforms)
 5. Run `$ chef.py -gzbf -t <platform> -d lighting`. This command will run the
