@@ -98,7 +98,7 @@ public:
 
     bool setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
     const char * lockStateToString(DlLockState lockState) const;
-    
+
 private:
 
     friend LockManager & LockMgr();

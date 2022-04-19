@@ -39,6 +39,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock,
                                      *value ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION);
     }
+
 }
 
 /** @brief OnOff Cluster Init
@@ -59,4 +60,81 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
     // TODO: implement any additional Cluster Server init actions
+}
+
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
+{
+    ChipLogProgress(Zcl, "Door Lock App: Lock Command endpoint=%d", endpointId);
+    bool status = LockMgr().Lock(endpointId, pinCode, err);
+    if(status == true)
+    {
+        LockMgr().InitiateAction(AppEvent::kEventType_Lock, LockManager::LOCK_ACTION);
+        EFR32Config::WriteConfigValue(EFR32Config::kConfigKey_LockState, false);
+    }
+    return status;
+}
+
+bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
+                                              DlOperationError & err)
+{
+    ChipLogProgress(Zcl, "Door Lock App: Unlock Command endpoint=%d", endpointId);
+    bool status = LockMgr().Unlock(endpointId, pinCode, err);
+    if(status == true)
+    {
+        LockMgr().InitiateAction(AppEvent::kEventType_Lock, LockManager::UNLOCK_ACTION);
+        EFR32Config::WriteConfigValue(EFR32Config::kConfigKey_LockState, true);
+    }
+
+    return status;
+}
+
+bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
+                                        EmberAfPluginDoorLockCredentialInfo & credential)
+{
+    return LockMgr().GetCredential(endpointId, credentialType, credential);
+}
+
+bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
+                                        DlCredentialType credentialType, const chip::ByteSpan & credentialData)
+{
+    return LockMgr().SetCredential(endpointId, credentialStatus, credentialType, credentialData);
+}
+
+bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
+{
+    return LockMgr().GetUser(userIndex, user);
+}
+
+bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator,
+                                  chip::FabricIndex modifier, const chip::CharSpan & userName, uint32_t uniqueId,
+                                  DlUserStatus userStatus, DlUserType usertype, DlCredentialRule credentialRule,
+                                  const DlCredential * credentials, size_t totalCredentials)
+{
+
+    return LockMgr().SetUser(userIndex, creator, modifier, userName, uniqueId, userStatus, usertype,
+                                           credentialRule, credentials, totalCredentials);
+}
+
+DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex,
+                                                                uint16_t userIndex, EmberAfPluginDoorLockWeekDaySchedule & schedule)
+{
+    return DlStatus::kSuccess;
+}
+
+DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex,
+                                                                uint16_t userIndex, EmberAfPluginDoorLockYearDaySchedule & schedule)
+{
+    return DlStatus::kSuccess;
+}
+
+DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex, DlScheduleStatus status,
+                                 DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
+{
+    return DlStatus::kSuccess;
+}
+
+DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status,
+                                 uint32_t localStartTime, uint32_t localEndTime)
+{
+    return DlStatus::kSuccess;
 }
