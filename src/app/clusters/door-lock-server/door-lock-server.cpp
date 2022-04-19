@@ -1513,7 +1513,7 @@ EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::Fabr
         ChipLogError(Zcl, "[createUser] Unable to get the user from app [endpointId=%d,userIndex=%d]", endpointId, userIndex);
         return EMBER_ZCL_STATUS_FAILURE;
     }
-    
+
     // appclusters, 5.2.4.34: to modify user its status should be set to Available. If it is we should return OCCUPIED.
     if (DlUserStatus::kAvailable != user.userStatus)
     {
