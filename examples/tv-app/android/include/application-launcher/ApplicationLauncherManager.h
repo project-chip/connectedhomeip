@@ -31,6 +31,9 @@ using LauncherResponseType        = chip::app::Clusters::ApplicationLauncher::Co
 class ApplicationLauncherManager : public ApplicationLauncherDelegate
 {
 public:
+    ApplicationLauncherManager() : ApplicationLauncherDelegate(){};
+    ApplicationLauncherManager(bool featureMapContentPlatform) : ApplicationLauncherDelegate(featureMapContentPlatform){};
+
     CHIP_ERROR HandleGetCatalogList(AttributeValueEncoder & aEncoder) override;
 
     void HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,

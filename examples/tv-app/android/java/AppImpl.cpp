@@ -51,12 +51,38 @@ class MyUserPrompter : public UserPrompter
     // tv should override this with a dialog prompt
     inline void PromptForCommissionOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
     {
+        /*
+         *   Called to prompt the user for consent to allow the given commissioneeName/vendorId/productId to be commissioned.
+         * For example "[commissioneeName] is requesting permission to cast to this TV, approve?"
+         *
+         * If user responds with OK then implementor should call CommissionerRespondOk();
+         * If user responds with Cancel then implementor should call CommissionerRespondCancel();
+         *
+         */
+        GetCommissionerDiscoveryController()->Ok();
+
+        /**
+         * For Demo: Launch Prime Video App
+         */
         return;
     }
 
     // tv should override this with a dialog prompt
     inline void PromptForCommissionPincode(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
     {
+        /*
+         *   Called to prompt the user to enter the setup pincode displayed by the given commissioneeName/vendorId/productId to be
+         * commissioned. For example "Please enter pin displayed in casting app."
+         *
+         * If user enters with pin then implementor should call CommissionerRespondPincode(uint32_t pincode);
+         * If user responds with Cancel then implementor should call CommissionerRespondCancel();
+         */
+
+        GetCommissionerDiscoveryController()->CommissionWithPincode(20202021); // dummy pin code
+
+        /**
+         * For Demo: Launch Prime Video App
+         */
         return;
     }
 
@@ -379,6 +405,24 @@ CHIP_ERROR InitVideoPlayerPlatform()
         cdc->SetUserPrompter(&gMyUserPrompter);
         cdc->SetPostCommissioningListener(&gMyPostCommissioningListener);
     }
+
+    ChipLogProgress(AppServer, "Starting commissioner");
+    ReturnErrorOnFailure(InitCommissioner(CHIP_PORT + 2 + 10, CHIP_UDC_PORT));
+    ChipLogProgress(AppServer, "Started commissioner");
+
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PreServerInit()
+{
+    /**
+     * Apply any user-defined configurations prior to initializing Server.
+     *
+     * Ex.
+     *   DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(userTimeoutSecs);
+     *
+     */
+
     return CHIP_NO_ERROR;
 }

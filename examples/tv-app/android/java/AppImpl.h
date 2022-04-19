@@ -30,15 +30,15 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "../include/account-login/AccountLoginManager.h"
+#include "../include/application-basic/ApplicationBasicManager.h"
+#include "../include/application-launcher/ApplicationLauncherManager.h"
+#include "../include/content-launcher/AppContentLauncherManager.h"
+#include "../include/target-navigator/TargetNavigatorManager.h"
+#include "ChannelManager.h"
 #include "CommissionerMain.h"
-#include "include/account-login/AccountLoginManager.h"
-#include "include/application-basic/ApplicationBasicManager.h"
-#include "include/application-launcher/ApplicationLauncherManager.h"
-#include "include/channel/ChannelManager.h"
-#include "include/content-launcher/ContentLauncherManager.h"
-#include "include/keypad-input/KeypadInputManager.h"
-#include "include/media-playback/MediaPlaybackManager.h"
-#include "include/target-navigator/TargetNavigatorManager.h"
+#include "KeypadInputManager.h"
+#include "MediaPlaybackManager.h"
 #include <app/clusters/account-login-server/account-login-delegate.h>
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-delegate.h>
@@ -49,6 +49,7 @@
 #include <app/clusters/target-navigator-server/target-navigator-delegate.h>
 
 CHIP_ERROR InitVideoPlayerPlatform();
+CHIP_ERROR PreServerInit();
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
@@ -97,7 +98,7 @@ protected:
     AccountLoginManager mAccountLoginDelegate;
     ApplicationLauncherManager mApplicationLauncherDelegate;
     ChannelManager mChannelDelegate;
-    ContentLauncherManager mContentLauncherDelegate;
+    AppContentLauncherManager mContentLauncherDelegate;
     KeypadInputManager mKeypadInputDelegate;
     MediaPlaybackManager mMediaPlaybackDelegate;
     TargetNavigatorManager mTargetNavigatorDelegate;

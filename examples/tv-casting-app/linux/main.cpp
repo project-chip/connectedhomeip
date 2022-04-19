@@ -81,6 +81,7 @@ constexpr EndpointId kTvEndpoint = 1;
 CommissionableNodeController gCommissionableNodeController;
 chip::System::SocketWatchToken gToken;
 Dnssd::DiscoveryFilter gDiscoveryFilter = Dnssd::DiscoveryFilter();
+bool gInited                            = false;
 
 CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> gCASEClientPool;
 
@@ -150,13 +151,12 @@ void HandleUDCSendExpiration(System::Layer * aSystemLayer, void * context)
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-/**
- * Enters commissioning mode, opens commissioning window, logs onboarding payload.
- * If non-null selectedCommissioner is provided, sends user directed commissioning
- * request to the selectedCommissioner and advertises self as commissionable node over DNS-SD
- */
-void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissioner = nullptr)
+void InitServer()
 {
+    if (gInited)
+    {
+        return;
+    }
     // DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init("/tmp/chip_tv_casting_kvs");
     DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 
@@ -165,15 +165,27 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 
+    // Initialize binding handlers
+    ReturnOnFailure(InitBindingHandlers());
+
+    gInited = true;
+}
+
+/**
+ * Enters commissioning mode, opens commissioning window, logs onboarding payload.
+ * If non-null selectedCommissioner is provided, sends user directed commissioning
+ * request to the selectedCommissioner and advertises self as commissionable node over DNS-SD
+ */
+void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissioner = nullptr)
+{
+    InitServer();
+
     Server::GetInstance().GetFabricTable().DeleteAllFabrics();
     ReturnOnFailure(
         Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(kCommissioningWindowTimeout));
 
     // Display onboarding payload
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
-
-    // Initialize binding handlers
-    ReturnOnFailure(InitBindingHandlers());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     if (selectedCommissioner != nullptr)
@@ -340,6 +352,8 @@ public:
 
     CHIP_ERROR Initialize(NodeId nodeId, FabricIndex fabricIndex)
     {
+        ChipLogProgress(NotSpecified, "TargetVideoPlayerInfo nodeId=0x" ChipLogFormatX64 " fabricIndex=%d", ChipLogValueX64(nodeId),
+                        fabricIndex);
         mNodeId      = nodeId;
         mFabricIndex = fabricIndex;
         for (auto & endpointInfo : mEndpoints)
@@ -387,6 +401,7 @@ public:
             ChipLogError(AppServer, "Failed to find an existing instance of OperationalDeviceProxy to the peer");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
+        ChipLogProgress(AppServer, "Created an instance of OperationalDeviceProxy");
 
         mInitialized = true;
         return CHIP_NO_ERROR;
@@ -468,6 +483,8 @@ private:
     {
         TargetVideoPlayerInfo * _this  = static_cast<TargetVideoPlayerInfo *>(context);
         _this->mOperationalDeviceProxy = device;
+        _this->mInitialized            = true;
+        ChipLogProgress(AppServer, "HandleDeviceConnected created an instance of OperationalDeviceProxy");
     }
 
     static void HandleDeviceConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error)
@@ -589,6 +606,12 @@ CHIP_ERROR ContentLauncherLaunchURL(const char * contentUrl, const char * conten
     request.brandingInformation = MakeOptional(chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type());
     cluster.InvokeCommand(request, nullptr, OnContentLauncherSuccessResponse, OnContentLauncherFailureResponse);
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TargetVideoPlayerInfoInit(NodeId nodeId, FabricIndex fabricIndex)
+{
+    InitServer();
+    return gTargetVideoPlayerInfo.Initialize(nodeId, fabricIndex);
 }
 
 void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
