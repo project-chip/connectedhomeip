@@ -35,6 +35,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 
+#include <cinttypes>
 #include <nlunit-test.h>
 
 using TestContext = chip::Test::AppContext;
@@ -251,7 +252,7 @@ void TestReportingEngine::TestMergeAttributePathWhenDirtySetPoolExhausted(nlTest
     }
     NL_TEST_ASSERT(apSuite,
                    CHIP_NO_ERROR ==
-                       InteractionModelEngine::GetInstance()->GetReportingEngine().InsertPathToDirtySet(
+                       InteractionModelEngine::GetInstance()->GetReportingEngine().InsertPathIntoDirtySet(
                            AttributePathParams(kTestEndpointId, kTestClusterId, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET + 1)));
     NL_TEST_ASSERT(apSuite, VerifyDirtySetContent(AttributePathParams(kTestEndpointId, kTestClusterId)));
 
@@ -265,7 +266,7 @@ void TestReportingEngine::TestMergeAttributePathWhenDirtySetPoolExhausted(nlTest
     }
     NL_TEST_ASSERT(apSuite,
                    CHIP_NO_ERROR ==
-                       InteractionModelEngine::GetInstance()->GetReportingEngine().InsertPathToDirtySet(
+                       InteractionModelEngine::GetInstance()->GetReportingEngine().InsertPathIntoDirtySet(
                            AttributePathParams(kTestEndpointId, ClusterId(CHIP_IM_SERVER_MAX_NUM_DIRTY_SET + 1), 1)));
     NL_TEST_ASSERT(apSuite, VerifyDirtySetContent(AttributePathParams(kTestEndpointId, kInvalidClusterId)));
 
@@ -279,7 +280,7 @@ void TestReportingEngine::TestMergeAttributePathWhenDirtySetPoolExhausted(nlTest
     }
     NL_TEST_ASSERT(apSuite,
                    CHIP_NO_ERROR ==
-                       InteractionModelEngine::GetInstance()->GetReportingEngine().InsertPathToDirtySet(
+                       InteractionModelEngine::GetInstance()->GetReportingEngine().InsertPathIntoDirtySet(
                            AttributePathParams(EndpointId(CHIP_IM_SERVER_MAX_NUM_DIRTY_SET + 1), 1, 1)));
     NL_TEST_ASSERT(apSuite, VerifyDirtySetContent(AttributePathParams()));
 
@@ -293,7 +294,7 @@ void TestReportingEngine::TestMergeAttributePathWhenDirtySetPoolExhausted(nlTest
     }
     NL_TEST_ASSERT(apSuite,
                    CHIP_NO_ERROR ==
-                       InteractionModelEngine::GetInstance()->GetReportingEngine().InsertPathToDirtySet(
+                       InteractionModelEngine::GetInstance()->GetReportingEngine().InsertPathIntoDirtySet(
                            AttributePathParams(kTestEndpointId + 1, kTestClusterId + 1, 1)));
     NL_TEST_ASSERT(apSuite,
                    VerifyDirtySetContent(AttributePathParams(kTestEndpointId, kTestClusterId),
@@ -309,7 +310,7 @@ void TestReportingEngine::TestMergeAttributePathWhenDirtySetPoolExhausted(nlTest
     }
     NL_TEST_ASSERT(apSuite,
                    CHIP_NO_ERROR ==
-                       InteractionModelEngine::GetInstance()->GetReportingEngine().InsertPathToDirtySet(
+                       InteractionModelEngine::GetInstance()->GetReportingEngine().InsertPathIntoDirtySet(
                            AttributePathParams(kTestEndpointId + 1, kTestClusterId + 1, 1)));
     NL_TEST_ASSERT(apSuite,
                    VerifyDirtySetContent(AttributePathParams(kTestEndpointId, kInvalidClusterId),

@@ -191,7 +191,7 @@ private:
     /**
      * If we are running out of ObjectPool for the global dirty set, we will try to merge the existing items by clusters.
      *
-     * Returns if we have released any paths.
+     * Returns whether we have released any paths.
      */
     bool MergeDirtyPathsUnderSameCluster();
 
@@ -199,7 +199,7 @@ private:
      * If we are running out of ObjectPool for the global dirty set and we cannot find a slot after merging the existing items by
      * clusters, we will try to merge the existing items by endpoints.
      *
-     * Returns if we have released any paths.
+     * Returns whether we have released any paths.
      */
     bool MergeDirtyPathsUnderSameEndpoint();
 
@@ -207,11 +207,11 @@ private:
      * During the iterating of the paths, releasing the object in the inner loop will cause undefined behavior of the ObjectPool, so
      * we replace the items to be cleared by a tomb first, then clear all the tombs after the iteration.
      *
-     * Returns if we have released any paths.
+     * Returns whether we have released any paths.
      */
     bool ClearTombPaths();
 
-    CHIP_ERROR InsertPathToDirtySet(const AttributePathParams & aAttributePath);
+    CHIP_ERROR InsertPathIntoDirtySet(const AttributePathParams & aAttributePath);
 
     inline void BumpDirtySetGeneration() { mDirtyGeneration++; }
 

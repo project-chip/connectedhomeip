@@ -69,6 +69,13 @@ struct AttributePathParams
     inline bool HasWildcardClusterId() const { return mClusterId == kInvalidClusterId; }
     inline bool HasWildcardAttributeId() const { return mAttributeId == kInvalidAttributeId; }
     inline bool HasWildcardListIndex() const { return mListIndex == kInvalidListIndex; }
+    inline void SetWildcardEndpointId() { mEndpointId = kInvalidEndpointId; }
+    inline void SetWildcardClusterId() { mClusterId = kInvalidClusterId; }
+    inline void SetWildcardAttributeId()
+    {
+        mAttributeId = kInvalidAttributeId;
+        mListIndex   = kInvalidListIndex;
+    }
 
     bool IsAttributePathSupersetOf(const AttributePathParams & other) const
     {

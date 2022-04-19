@@ -675,7 +675,7 @@ bool Engine::ClearTombPaths()
 bool Engine::MergeDirtyPathsUnderSameCluster()
 {
     mGlobalDirtySet.ForEachActiveObject([&](auto * outerPath) {
-        if (outerPath->HasWildcardEndpointId() || outerPath->HasWildcardClusterId() || outerPath->mGeneration == 0)
+        if (outerPath->HasWildcardClusterId() || outerPath->mGeneration == 0)
         {
             return Loop::Continue;
         }
@@ -684,6 +684,8 @@ bool Engine::MergeDirtyPathsUnderSameCluster()
             {
                 return Loop::Continue;
             }
+            // We don't support paths with a wildcard endpoint + a concrete cluster in global dirty set, so we do a simple == check
+            // here.
             if (innerPath->mEndpointId != outerPath->mEndpointId || innerPath->mClusterId != outerPath->mClusterId)
             {
                 return Loop::Continue;
@@ -692,8 +694,7 @@ bool Engine::MergeDirtyPathsUnderSameCluster()
             {
                 outerPath->mGeneration = innerPath->mGeneration;
             }
-            outerPath->mAttributeId = kInvalidAttributeId;
-            outerPath->mListIndex   = kInvalidListIndex;
+            outerPath->SetWildcardAttributeId();
 
             // The object pool does not allow us to release objects in a nested iteration, mark the path as a tomb by setting its
             // generation to 0 and then clear it later.
@@ -726,9 +727,8 @@ bool Engine::MergeDirtyPathsUnderSameEndpoint()
             {
                 outerPath->mGeneration = innerPath->mGeneration;
             }
-            outerPath->mClusterId   = kInvalidClusterId;
-            outerPath->mAttributeId = kInvalidAttributeId;
-            outerPath->mListIndex   = kInvalidListIndex;
+            outerPath->SetWildcardClusterId();
+            outerPath->SetWildcardAttributeId();
 
             // The object pool does not allow us to release objects in a nested iteration, mark the path as a tomb by setting its
             // generation to 0 and then clear it later.
@@ -740,7 +740,7 @@ bool Engine::MergeDirtyPathsUnderSameEndpoint()
     return ClearTombPaths();
 }
 
-CHIP_ERROR Engine::InsertPathToDirtySet(const AttributePathParams & aAttributePath)
+CHIP_ERROR Engine::InsertPathIntoDirtySet(const AttributePathParams & aAttributePath)
 {
     ReturnErrorCodeIf(MergeOverlappedAttributePath(aAttributePath), CHIP_NO_ERROR);
 
@@ -797,7 +797,7 @@ CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
         return CHIP_NO_ERROR;
     }
 
-    ReturnErrorOnFailure(InsertPathToDirtySet(aAttributePath));
+    ReturnErrorOnFailure(InsertPathIntoDirtySet(aAttributePath));
 
     // Schedule work to run asynchronously on the CHIP thread. The scheduled
     // work won't execute until the current execution context has
