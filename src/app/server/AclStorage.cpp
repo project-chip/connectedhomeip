@@ -225,31 +225,21 @@ CHIP_ERROR Convert(const StagingTarget & from, Target & to)
 class : public EntryListener
 {
 public:
-    void OnEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry & entry,
+    void OnEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry * entry,
                         ChangeType changeType) override
     {
+        CHIP_ERROR err;
+
         auto & storage = Server::GetInstance().GetPersistentStorage();
         DefaultStorageKeyAllocator key;
 
         uint8_t buffer[kStorageBufferSize] = { 0 };
 
-        CHIP_ERROR err;
-
         // TODO: may wish to check existence of entry is correct, handle buffer size too small, etc.
 
-        if (changeType != ChangeType::kRemoved)
+        if (changeType == ChangeType::kRemoved)
         {
-            // Added/updated --> write entry at index
-            TLV::TLVWriter writer;
-            writer.Init(buffer);
-            EncodableEntry encodableEntry(entry);
-            SuccessOrExit(err = encodableEntry.Encode(writer, TLV::AnonymousTag()));
-            SuccessOrExit(err = storage.SyncSetKeyValue(key.AccessControlAclEntry(fabric, index), buffer,
-                                                        static_cast<uint16_t>(writer.GetLengthWritten())));
-        }
-        else
-        {
-            // Removed --> shuffle down entries past index, then delete entry at last index
+            // Shuffle down entries past index, then delete entry at last index.
             while (true)
             {
                 uint16_t size = static_cast<uint16_t>(sizeof(buffer));
@@ -264,11 +254,22 @@ public:
             }
             SuccessOrExit(err = storage.SyncDeleteKeyValue(key.AccessControlAclEntry(fabric, index)));
         }
+        else
+        {
+            // Write added/updated entry at index.
+            VerifyOrExit(entry != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+            TLV::TLVWriter writer;
+            writer.Init(buffer);
+            EncodableEntry encodableEntry(*entry);
+            SuccessOrExit(err = encodableEntry.Encode(writer, TLV::AnonymousTag()));
+            SuccessOrExit(err = storage.SyncSetKeyValue(key.AccessControlAclEntry(fabric, index), buffer,
+                                                        static_cast<uint16_t>(writer.GetLengthWritten())));
+        }
 
         return;
 
     exit:
-        ChipLogProgress(DataManagement, "AclStorage: failed %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DataManagement, "AclStorage: failed %" CHIP_ERROR_FORMAT, err.Format());
     }
 } sEntryListener;
 
@@ -405,43 +406,53 @@ CHIP_ERROR AclStorage::EncodableEntry::Stage() const
 
 CHIP_ERROR AclStorage::Init()
 {
-    ChipLogProgress(DataManagement, "###################### AclStorage::Init");
+    ChipLogProgress(DataManagement, "AclStorage: initializing");
+
+    CHIP_ERROR err;
 
     auto & storage = Server::GetInstance().GetPersistentStorage();
     DefaultStorageKeyAllocator key;
+
+    size_t count = 0;
 
     for (auto & info : Server::GetInstance().GetFabricTable())
     {
         auto fabric = info.GetFabricIndex();
         for (size_t index = 0; /**/; ++index)
         {
-            ChipLogProgress(DataManagement, "###################### loading ACL %d %d", (int) fabric, (int) index);
             uint8_t buffer[kStorageBufferSize] = { 0 };
             uint16_t size                      = static_cast<uint16_t>(sizeof(buffer));
-            CHIP_ERROR err                     = storage.SyncGetKeyValue(key.AccessControlAclEntry(fabric, index), buffer, size);
+            err                                = storage.SyncGetKeyValue(key.AccessControlAclEntry(fabric, index), buffer, size);
             if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
             {
                 break;
             }
-            ReturnErrorOnFailure(err);
+            SuccessOrExit(err);
 
             TLV::TLVReader reader;
             reader.Init(buffer, size);
-            ReturnErrorOnFailure(reader.Next());
+            SuccessOrExit(err = reader.Next());
 
             DecodableEntry decodableEntry;
-            ReturnErrorOnFailure(decodableEntry.Decode(reader));
+            SuccessOrExit(err = decodableEntry.Decode(reader));
 
             Entry & entry = decodableEntry.GetEntry();
-            ReturnErrorOnFailure(entry.SetFabricIndex(fabric));
+            SuccessOrExit(err = entry.SetFabricIndex(fabric));
 
-            ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, fabric, nullptr, entry));
+            SuccessOrExit(err = GetAccessControl().CreateEntry(nullptr, fabric, nullptr, entry));
+            count++;
         }
     }
+
+    ChipLogProgress(DataManagement, "AclStorage: %u entries loaded", (unsigned) count);
 
     GetAccessControl().AddEntryListener(sEntryListener);
 
     return CHIP_NO_ERROR;
+
+exit:
+    ChipLogError(DataManagement, "AclStorage: failed %" CHIP_ERROR_FORMAT, err.Format());
+    return err;
 }
 
 } // namespace app

@@ -83,8 +83,6 @@ CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(const Access::Subje
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: ACL entry created for Fabric %X CASE Admin NodeId 0x" ChipLogFormatX64,
                    fabricIndex, ChipLogValueX64(subject));
 
-    // TODO: event notification for newly created ACL entry
-
     return CHIP_NO_ERROR;
 }
 
@@ -656,12 +654,6 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
         SuccessOrExit(err);
     }
 
-    // Keep this after other possible failures, so it doesn't need to be rolled back in case of
-    // subsequent failures. This should only typically fail if there is no space for the new entry.
-    err = CreateAccessControlEntryForNewFabricAdministrator(commandObj->GetSubjectDescriptor(), fabricIndex,
-                                                            commandData.caseAdminNode);
-    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
-
     // Set the Identity Protection Key (IPK)
     VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES,
                  nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_ARGUMENT));
@@ -696,6 +688,12 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
         err = secureSession->AdoptFabricIndex(fabricIndex);
         VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
     }
+
+    // Creating the initial ACL must occur after the PASE session has adopted the fabric index
+    // (see above) so that the concomitant event, which is fabric scoped, is properly handled.
+    err = CreateAccessControlEntryForNewFabricAdministrator(commandObj->GetSubjectDescriptor(), fabricIndex,
+                                                            commandData.caseAdminNode);
+    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // We might have a new operational identity, so we should start advertising it right away.
     app::DnssdServer::Instance().AdvertiseOperational();

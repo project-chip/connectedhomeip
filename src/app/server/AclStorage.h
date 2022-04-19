@@ -69,13 +69,6 @@ public:
     public:
         static constexpr bool kIsFabricScoped = true;
 
-        // FabricIndex GetFabricIndex() const
-        //{
-        //    FabricIndex fabricIndex = kUndefinedFabricIndex;
-        //    mEntry.GetFabricIndex(fabricIndex);
-        //    return fabricIndex;
-        //}
-
         void SetFabricIndex(FabricIndex fabricIndex) { mEntry.SetFabricIndex(fabricIndex); }
 
     private:
@@ -113,6 +106,8 @@ public:
         CHIP_ERROR Stage() const;
 
         StagingEntry & GetStagingEntry() { return mStagingEntry; }
+
+        const StagingEntry & GetStagingEntry() const { return mStagingEntry; }
 
     public:
         static constexpr bool kIsFabricScoped = true;

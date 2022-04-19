@@ -193,23 +193,6 @@ CHIP_ERROR AccessControl::Finish()
     return retval;
 }
 
-CHIP_ERROR AccessControl::RemoveFabric(FabricIndex fabricIndex)
-{
-    ChipLogProgress(DataManagement, "AccessControl: removing fabric %u", fabricIndex);
-
-    CHIP_ERROR err;
-    do
-    {
-        // TODO: switch to delete these in reverse order
-        err = DeleteEntry(0, &fabricIndex);
-    } while (err == CHIP_NO_ERROR);
-
-    // Sentinel error is OK, just means there was no such entry.
-    ReturnErrorCodeIf(err != CHIP_ERROR_SENTINEL, err);
-
-    return CHIP_NO_ERROR;
-}
-
 void AccessControl::AddEntryListener(EntryListener & listener)
 {
     if (mEntryListener == nullptr)
@@ -413,6 +396,84 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     return CHIP_ERROR_ACCESS_DENIED;
 }
 
+#if CHIP_ACCESS_CONTROL_DUMP_ENABLED
+CHIP_ERROR AccessControl::Dump(const Entry & entry)
+{
+    CHIP_ERROR err;
+
+    ChipLogProgress(DataManagement, "----- BEGIN ENTRY -----");
+
+    {
+        FabricIndex fabricIndex;
+        SuccessOrExit(err = entry.GetFabricIndex(fabricIndex));
+        ChipLogProgress(DataManagement, "fabricIndex: %u", fabricIndex);
+    }
+
+    {
+        Privilege privilege;
+        SuccessOrExit(err = entry.GetPrivilege(privilege));
+        ChipLogProgress(DataManagement, "privilege: %d", (int) privilege);
+    }
+
+    {
+        AuthMode authMode;
+        SuccessOrExit(err = entry.GetAuthMode(authMode));
+        ChipLogProgress(DataManagement, "authMode: %d", (int) authMode);
+    }
+
+    {
+        size_t count;
+        SuccessOrExit(err = entry.GetSubjectCount(count));
+        if (count)
+        {
+            ChipLogProgress(DataManagement, "subjects: %u", (unsigned) count);
+            for (size_t i = 0; i < count; ++i)
+            {
+                NodeId subject;
+                SuccessOrExit(err = entry.GetSubject(i, subject));
+                ChipLogProgress(DataManagement, "  %u: 0x" ChipLogFormatX64, (unsigned) i, ChipLogValueX64(subject));
+            }
+        }
+    }
+
+    {
+        size_t count;
+        SuccessOrExit(err = entry.GetTargetCount(count));
+        if (count)
+        {
+            ChipLogProgress(DataManagement, "targets: %u", (unsigned) count);
+            for (size_t i = 0; i < count; ++i)
+            {
+                Entry::Target target;
+                SuccessOrExit(err = entry.GetTarget(i, target));
+                if (target.flags & Entry::Target::kCluster)
+                {
+                    ChipLogProgress(DataManagement, "  %u: cluster: 0x" ChipLogFormatMEI, (unsigned) i,
+                                    ChipLogValueMEI(target.cluster));
+                }
+                if (target.flags & Entry::Target::kEndpoint)
+                {
+                    ChipLogProgress(DataManagement, "  %u: endpoint: %" PRIu16, (unsigned) i, target.endpoint);
+                }
+                if (target.flags & Entry::Target::kDeviceType)
+                {
+                    ChipLogProgress(DataManagement, "  %u: deviceType: 0x" ChipLogFormatMEI, (unsigned) i,
+                                    ChipLogValueMEI(target.deviceType));
+                }
+            }
+        }
+    }
+
+    ChipLogProgress(DataManagement, "----- END ENTRY -----");
+
+    return CHIP_NO_ERROR;
+
+exit:
+    ChipLogError(DataManagement, "AccessControl: dump failed %" CHIP_ERROR_FORMAT, err.Format());
+    return err;
+}
+#endif
+
 bool AccessControl::IsValid(const Entry & entry)
 {
     const char * log = "unexpected error";
@@ -482,11 +543,11 @@ exit:
 }
 
 void AccessControl::NotifyEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index,
-                                       const Entry & entry, EntryListener::ChangeType changeType)
+                                       const Entry * entry, EntryListener::ChangeType changeType)
 {
-    for (EntryListener * l = mEntryListener; l != nullptr; l = l->mNext)
+    for (EntryListener * listener = mEntryListener; listener != nullptr; listener = listener->mNext)
     {
-        l->OnEntryChanged(subjectDescriptor, fabric, index, entry, changeType);
+        listener->OnEntryChanged(subjectDescriptor, fabric, index, entry, changeType);
     }
 }
 

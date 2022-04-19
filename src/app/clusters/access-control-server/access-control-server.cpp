@@ -59,7 +59,7 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 public:
-    void OnEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry & entry,
+    void OnEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry * entry,
                         ChangeType changeType) override;
 
 private:
@@ -198,22 +198,13 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
         DataModel::DecodableList<AclStorage::DecodableEntry> list;
         ReturnErrorOnFailure(aDecoder.Decode(list));
 
-        size_t oldCount = 0;
         size_t allCount;
+        size_t oldCount;
         size_t newCount;
         size_t maxCount;
 
-        {
-            AccessControl::EntryIterator it;
-            AccessControl::Entry entry;
-            ReturnErrorOnFailure(GetAccessControl().Entries(accessingFabricIndex, it));
-            while (it.Next(entry) == CHIP_NO_ERROR)
-            {
-                oldCount++;
-            }
-        }
-
         ReturnErrorOnFailure(GetAccessControl().GetEntryCount(allCount));
+        ReturnErrorOnFailure(GetAccessControl().GetEntryCount(accessingFabricIndex, oldCount));
         ReturnErrorOnFailure(list.ComputeSize(&newCount));
         ReturnErrorOnFailure(GetAccessControl().GetMaxEntryCount(maxCount));
         VerifyOrReturnError(allCount >= oldCount, CHIP_ERROR_INTERNAL);
@@ -337,19 +328,19 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
 }
 
 void AccessControlAttribute::OnEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index,
-                                            const Entry & entry, ChangeType changeType)
+                                            const Entry * entry, ChangeType changeType)
 {
-    ChipLogProgress(DataManagement, "AccessControlCluster: ACL changed, %s subject descriptor", subjectDescriptor ? "HAVE" : "NO");
-
-    // TODO: currently, all cases where we don't have a subject descriptor
-    // are cases where we don't want to send an event.
+    // NOTE: If the entry was changed internally by the system (e.g. creating
+    // entries at startup from persistent storage, or deleting entries when a
+    // fabric is removed), then there won't be a subject descriptor, and also
+    // it won't be appropriate to create an event.
     if (subjectDescriptor == nullptr)
     {
         return;
     }
 
     CHIP_ERROR err;
-    AclEvent event{ .changeType = ChangeTypeEnum::kChanged };
+    AclEvent event{ .changeType = ChangeTypeEnum::kChanged, .adminFabricIndex = subjectDescriptor->fabricIndex };
 
     if (changeType == ChangeType::kAdded)
     {
@@ -360,32 +351,29 @@ void AccessControlAttribute::OnEntryChanged(const SubjectDescriptor * subjectDes
         event.changeType = ChangeTypeEnum::kRemoved;
     }
 
-#if 0
-    if (subjectDescriptor != nullptr)
+    if (subjectDescriptor->authMode == Access::AuthMode::kCase)
     {
-        event.adminFabricIndex = subjectDescriptor->fabricIndex;
-        if (subjectDescriptor->authMode == Access::AuthMode::kCase)
-        {
-            event.adminNodeID.SetNonNull(subjectDescriptor->subject);
-        }
-        else if (subjectDescriptor->authMode == Access::AuthMode::kPase)
-        {
-            event.adminPasscodeID.SetNonNull(PAKEKeyIdFromNodeId(subjectDescriptor->subject));
-        }
+        event.adminNodeID.SetNonNull(subjectDescriptor->subject);
     }
-#endif
-
-    // TODO: handle entry (latestValue) not available (will need to change listener API)
-    // TODO: for now, gonna say if removing, don't do this (issues with having a valid entry)
-    if (changeType != ChangeType::kRemoved)
+    else if (subjectDescriptor->authMode == Access::AuthMode::kPase)
     {
-        AclStorage::EncodableEntry encodableEntry(entry);
-        SuccessOrExit(err = encodableEntry.Stage());
-        event.latestValue.SetNonNull(encodableEntry.GetStagingEntry());
+        event.adminPasscodeID.SetNonNull(PAKEKeyIdFromNodeId(subjectDescriptor->subject));
     }
 
     EventNumber eventNumber;
-    SuccessOrExit(err = LogEvent(event, 0, eventNumber));
+
+    if (entry != nullptr)
+    {
+        // NOTE: don't destroy encodable entry before staging entry is used!
+        AclStorage::EncodableEntry encodableEntry(*entry);
+        SuccessOrExit(err = encodableEntry.Stage());
+        event.latestValue.SetNonNull(encodableEntry.GetStagingEntry());
+        SuccessOrExit(err = LogEvent(event, 0, eventNumber));
+    }
+    else
+    {
+        SuccessOrExit(err = LogEvent(event, 0, eventNumber));
+    }
 
     return;
 

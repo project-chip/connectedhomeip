@@ -303,7 +303,20 @@ private:
             {
                 groupDataProvider->RemoveFabric(fabricIndex);
             }
-            Access::GetAccessControl().RemoveFabric(fabricIndex);
+
+            {
+                // Remove access control entries in reverse order.
+                size_t count = 0;
+                if (Access::GetAccessControl().GetEntryCount(fabricIndex, count) == CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(DataManagement, "################### remove fabric ACL count %d", (int) count);
+                    while (count)
+                    {
+                        ChipLogProgress(DataManagement, "################### remove fabric ACL index %d", (int) count - 1);
+                        Access::GetAccessControl().DeleteEntry(nullptr, fabricIndex, --count);
+                    }
+                }
+            }
         };
         void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
 

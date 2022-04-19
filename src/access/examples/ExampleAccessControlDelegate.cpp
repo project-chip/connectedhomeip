@@ -960,6 +960,23 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    CHIP_ERROR GetEntryCount(FabricIndex fabric, size_t & value) const override
+    {
+        value = 0;
+        for (const auto & storage : EntryStorage::acl)
+        {
+            if (!storage.InUse())
+            {
+                break;
+            }
+            if (storage.mFabricIndex == fabric)
+            {
+                value++;
+            }
+        }
+        return CHIP_NO_ERROR;
+    }
+
     CHIP_ERROR GetEntryCount(size_t & value) const override
     {
         value = 0;
