@@ -189,15 +189,15 @@ class ClusterObjectTests:
 
     @classmethod
     @base.test_case
-    ''' 
+    async def TestSubscribeZeroMinInterval(cls, devCtrl):
+        '''
         This validates receiving subscription reports for two attributes at a time in quick succession after issuing a command that results in attribute side-effects.
         Specifically, it relies on the fact that the second attribute is changed in a different execution context than the first. This ensures that we pick-up the first
         attribute change and generate a notification, and validating that shortly after that, we generate a second report for the second change.
 
         This is done using subscriptions with a min reporting interval of 0 to ensure timely notification of the above. An On() command is sent to the OnOff cluster
         which should simultaneously set the state to On as well as set the level to 254.
-    '''
-    async def TestSubscribeZeroMinInterval(cls, devCtrl):
+        '''
         logger.info("Test Subscription With MinInterval of 0")
         sub = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[Clusters.OnOff, Clusters.LevelControl], reportInterval=(0, 60))
         data = sub.GetAttributes()
