@@ -28,6 +28,7 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
@@ -235,7 +236,10 @@ CHIP_ERROR AppTask::Init()
     LEDWidget::InitGpio();
     sStatusLED.Init(SYSTEM_STATE_LED);
     sLockLED.Init(LOCK_STATE_LED);
-    sLockLED.Set(false);
+
+    bool state;
+    chip::DeviceLayer::Internal::EFR32Config::ReadConfigValue(chip::DeviceLayer::Internal::EFR32Config::kConfigKey_LockState, state);
+    sLockLED.Set(state);
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 
