@@ -27,3 +27,8 @@ chip_build_libshell = true
 chip_stack_lock_tracking = "none"
 
 chip_openthread_ftd = false
+
+#Fix me : shell app should use same config as examples
+#Problem : Linker issue if set to true
+chip_system_config_use_open_thread_inet_endpoints = false
+chip_with_lwip = true
