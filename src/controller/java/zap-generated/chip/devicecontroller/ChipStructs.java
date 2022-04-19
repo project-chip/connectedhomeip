@@ -225,6 +225,31 @@ public class ChipStructs {
     }
   }
 
+  public static class BasicClusterCapabilityMinimaStruct {
+    public Integer caseSessionsPerFabric;
+    public Integer subscriptionsPerFabric;
+
+    public BasicClusterCapabilityMinimaStruct(
+        Integer caseSessionsPerFabric, Integer subscriptionsPerFabric) {
+      this.caseSessionsPerFabric = caseSessionsPerFabric;
+      this.subscriptionsPerFabric = subscriptionsPerFabric;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("BasicClusterCapabilityMinimaStruct {\n");
+      output.append("\tcaseSessionsPerFabric: ");
+      output.append(caseSessionsPerFabric);
+      output.append("\n");
+      output.append("\tsubscriptionsPerFabric: ");
+      output.append(subscriptionsPerFabric);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class BindingClusterTargetStruct {
     public Optional<Long> node;
     public Optional<Integer> group;
@@ -1043,22 +1068,22 @@ public class ChipStructs {
   }
 
   public static class NetworkCommissioningClusterThreadInterfaceScanResult {
-    public Long panId;
+    public Integer panId;
     public Long extendedPanId;
     public String networkName;
     public Integer channel;
     public Integer version;
-    public Long extendedAddress;
+    public byte[] extendedAddress;
     public Integer rssi;
     public Integer lqi;
 
     public NetworkCommissioningClusterThreadInterfaceScanResult(
-        Long panId,
+        Integer panId,
         Long extendedPanId,
         String networkName,
         Integer channel,
         Integer version,
-        Long extendedAddress,
+        byte[] extendedAddress,
         Integer rssi,
         Integer lqi) {
       this.panId = panId;
@@ -1091,7 +1116,7 @@ public class ChipStructs {
       output.append(version);
       output.append("\n");
       output.append("\textendedAddress: ");
-      output.append(extendedAddress);
+      output.append(Arrays.toString(extendedAddress));
       output.append("\n");
       output.append("\trssi: ");
       output.append(rssi);

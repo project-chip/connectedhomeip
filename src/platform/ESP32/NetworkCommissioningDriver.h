@@ -40,7 +40,7 @@ public:
             return false;
         }
 
-        item.security = mpScanResults[mIternum].authmode;
+        item.security.SetRaw(mpScanResults[mIternum].authmode);
         item.ssidLen =
             strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
         item.channel  = mpScanResults[mIternum].primary;

@@ -104,8 +104,10 @@ public:
     void ScanNetworks(ThreadDriver::ScanCallback * callback) override;
 
 private:
+    Status MatchesNetworkId(const Thread::OperationalDataset & dataset, const ByteSpan & networkId) const;
+    CHIP_ERROR BackupConfiguration();
+
     ThreadNetworkIterator mThreadIterator      = ThreadNetworkIterator(this);
-    Thread::OperationalDataset mSavedNetwork   = {};
     Thread::OperationalDataset mStagingNetwork = {};
     Optional<Status> mScanStatus;
 };

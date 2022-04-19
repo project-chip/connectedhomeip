@@ -54,7 +54,9 @@ public:
 
     UnauthenticatedSession(SessionRole sessionRole, NodeId ephemeralInitiatorNodeID, const ReliableMessageProtocolConfig & config) :
         mEphemeralInitiatorNodeId(ephemeralInitiatorNodeID), mSessionRole(sessionRole),
-        mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
+        mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()),
+        mLastPeerActivityTime(System::Clock::kZero), // Start at zero to default to IDLE state
+        mMRPConfig(config)
     {}
     ~UnauthenticatedSession() override { NotifySessionReleased(); }
 
@@ -64,7 +66,13 @@ public:
     UnauthenticatedSession & operator=(UnauthenticatedSession &&) = delete;
 
     System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
+    System::Clock::Timestamp GetLastPeerActivityTime() const { return mLastPeerActivityTime; }
     void MarkActive() { mLastActivityTime = System::SystemClock().GetMonotonicTimestamp(); }
+    void MarkActiveRx()
+    {
+        mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp();
+        MarkActive();
+    }
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kUnauthenticated; }
 #if CHIP_PROGRESS_LOGGING
@@ -112,6 +120,13 @@ public:
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & peerAddress) { mPeerAddress = peerAddress; }
 
+    bool IsPeerActive() { return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) < kMinActiveTime); }
+
+    System::Clock::Timestamp GetMRPBaseTimeout() override
+    {
+        return IsPeerActive() ? GetMRPConfig().mActiveRetransTimeout : GetMRPConfig().mIdleRetransTimeout;
+    }
+
     void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
 
     const ReliableMessageProtocolConfig & GetMRPConfig() const override { return mMRPConfig; }
@@ -122,7 +137,8 @@ private:
     const NodeId mEphemeralInitiatorNodeId;
     const SessionRole mSessionRole;
     PeerAddress mPeerAddress;
-    System::Clock::Timestamp mLastActivityTime;
+    System::Clock::Timestamp mLastActivityTime;     ///< Timestamp of last tx or rx
+    System::Clock::Timestamp mLastPeerActivityTime; ///< Timestamp of last rx
     ReliableMessageProtocolConfig mMRPConfig;
     PeerMessageCounter mPeerMessageCounter;
 };

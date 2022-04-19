@@ -23,6 +23,7 @@
 #pragma once
 
 #include "CHIPCryptoPALHsm_config.h"
+#include <lib/core/DataModelTypes.h>
 
 #if CHIP_CRYPTO_HSM_NXP
 #include <fsl_sss_se05x_apis.h>
@@ -145,6 +146,8 @@ public:
     void SetKeyId(uint32_t id) { keyid = id; }
 
     uint32_t GetKeyId(void) { return keyid; }
+
+    CHIP_ERROR CreateOperationalKey(FabricIndex fabricIdx);
 
 private:
     uint32_t keyid;

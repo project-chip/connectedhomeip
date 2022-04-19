@@ -232,7 +232,7 @@ MatterIasZoneClusterServerPreAttributeChangedCallback(const app::ConcreteAttribu
 
     // If this is not a CIE Address write, the CIE address has already been
     // written, or the IAS Zone server is already enrolled, do nothing.
-    if (attributePath.mAttributeId != ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID || emberAfCurrentCommand() == NULL)
+    if (attributePath.mAttributeId != ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID || emberAfCurrentCommand() == nullptr)
     {
         return Protocols::InteractionModel::Status::Success;
     }

@@ -31,6 +31,7 @@ public:
     AutoCommissioner();
     ~AutoCommissioner() override;
     CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params) override;
+    const CommissioningParameters & GetCommissioningParameters() const override;
     void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) override;
 
     CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy) override;
@@ -65,6 +66,7 @@ private:
     uint8_t mSsid[CommissioningParameters::kMaxSsidLen];
     uint8_t mCredentials[CommissioningParameters::kMaxCredentialsLen];
     uint8_t mThreadOperationalDataset[CommissioningParameters::kMaxThreadDatasetLen];
+    char mCountryCode[CommissioningParameters::kMaxCountryCodeLen];
 
     bool mNeedsNetworkSetup = false;
     ReadCommissioningInfo mDeviceCommissioningInfo;

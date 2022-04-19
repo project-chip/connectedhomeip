@@ -2037,6 +2037,47 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedGetHolidayScheduleResponseCallback
+      implements ChipClusters.DoorLockCluster.GetHolidayScheduleResponseCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(
+        Integer holidayIndex,
+        Integer status,
+        Optional<Long> localStartTime,
+        Optional<Long> localEndTime,
+        Optional<Integer> operatingMode) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo holidayIndexResponseValue =
+          new CommandResponseInfo("holidayIndex", "Integer");
+      responseValues.put(holidayIndexResponseValue, holidayIndex);
+      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
+      responseValues.put(statusResponseValue, status);
+      CommandResponseInfo localStartTimeResponseValue =
+          new CommandResponseInfo("localStartTime", "Optional<Long>");
+      responseValues.put(localStartTimeResponseValue, localStartTime);
+      CommandResponseInfo localEndTimeResponseValue =
+          new CommandResponseInfo("localEndTime", "Optional<Long>");
+      responseValues.put(localEndTimeResponseValue, localEndTime);
+      CommandResponseInfo operatingModeResponseValue =
+          new CommandResponseInfo("operatingMode", "Optional<Integer>");
+      responseValues.put(operatingModeResponseValue, operatingMode);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
   public static class DelegatedGetUserResponseCallback
       implements ChipClusters.DoorLockCluster.GetUserResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -4132,12 +4173,14 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer NetworkingStatus, String DebugText, Long ErrorValue) {
+    public void onSuccess(
+        Integer NetworkingStatus, Optional<String> DebugText, @Nullable Long ErrorValue) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo NetworkingStatusResponseValue =
           new CommandResponseInfo("NetworkingStatus", "Integer");
       responseValues.put(NetworkingStatusResponseValue, NetworkingStatus);
-      CommandResponseInfo DebugTextResponseValue = new CommandResponseInfo("DebugText", "String");
+      CommandResponseInfo DebugTextResponseValue =
+          new CommandResponseInfo("DebugText", "Optional<String>");
       responseValues.put(DebugTextResponseValue, DebugText);
       CommandResponseInfo ErrorValueResponseValue = new CommandResponseInfo("ErrorValue", "Long");
       responseValues.put(ErrorValueResponseValue, ErrorValue);
@@ -4195,7 +4238,7 @@ public class ClusterInfoMapping {
     @Override
     public void onSuccess(
         Integer NetworkingStatus,
-        String DebugText,
+        Optional<String> DebugText,
         Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
             WiFiScanResults,
         Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>
@@ -4204,7 +4247,8 @@ public class ClusterInfoMapping {
       CommandResponseInfo NetworkingStatusResponseValue =
           new CommandResponseInfo("NetworkingStatus", "Integer");
       responseValues.put(NetworkingStatusResponseValue, NetworkingStatus);
-      CommandResponseInfo DebugTextResponseValue = new CommandResponseInfo("DebugText", "String");
+      CommandResponseInfo DebugTextResponseValue =
+          new CommandResponseInfo("DebugText", "Optional<String>");
       responseValues.put(DebugTextResponseValue, DebugText);
       // WiFiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
       // Conversion from this type to Java is not properly implemented yet
@@ -9117,6 +9161,25 @@ public class ClusterInfoMapping {
             doorLockclearCredentialCommandParams);
     doorLockClusterInteractionInfoMap.put(
         "clearCredential", doorLockclearCredentialInteractionInfo);
+    Map<String, CommandParameterInfo> doorLockclearHolidayScheduleCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLockclearHolidayScheduleholidayIndexCommandParameterInfo =
+        new CommandParameterInfo("holidayIndex", Integer.class);
+    doorLockclearHolidayScheduleCommandParams.put(
+        "holidayIndex", doorLockclearHolidayScheduleholidayIndexCommandParameterInfo);
+
+    InteractionInfo doorLockclearHolidayScheduleInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .clearHolidaySchedule(
+                      (DefaultClusterCallback) callback,
+                      (Integer) commandArguments.get("holidayIndex"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLockclearHolidayScheduleCommandParams);
+    doorLockClusterInteractionInfoMap.put(
+        "clearHolidaySchedule", doorLockclearHolidayScheduleInteractionInfo);
     Map<String, CommandParameterInfo> doorLockclearUserCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockclearUseruserIndexCommandParameterInfo =
@@ -9199,6 +9262,25 @@ public class ClusterInfoMapping {
             doorLockgetCredentialStatusCommandParams);
     doorLockClusterInteractionInfoMap.put(
         "getCredentialStatus", doorLockgetCredentialStatusInteractionInfo);
+    Map<String, CommandParameterInfo> doorLockgetHolidayScheduleCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLockgetHolidayScheduleholidayIndexCommandParameterInfo =
+        new CommandParameterInfo("holidayIndex", Integer.class);
+    doorLockgetHolidayScheduleCommandParams.put(
+        "holidayIndex", doorLockgetHolidayScheduleholidayIndexCommandParameterInfo);
+
+    InteractionInfo doorLockgetHolidayScheduleInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .getHolidaySchedule(
+                      (ChipClusters.DoorLockCluster.GetHolidayScheduleResponseCallback) callback,
+                      (Integer) commandArguments.get("holidayIndex"));
+            },
+            () -> new DelegatedGetHolidayScheduleResponseCallback(),
+            doorLockgetHolidayScheduleCommandParams);
+    doorLockClusterInteractionInfoMap.put(
+        "getHolidaySchedule", doorLockgetHolidayScheduleInteractionInfo);
     Map<String, CommandParameterInfo> doorLockgetUserCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockgetUseruserIndexCommandParameterInfo =
@@ -9328,6 +9410,43 @@ public class ClusterInfoMapping {
             () -> new DelegatedSetCredentialResponseCallback(),
             doorLocksetCredentialCommandParams);
     doorLockClusterInteractionInfoMap.put("setCredential", doorLocksetCredentialInteractionInfo);
+    Map<String, CommandParameterInfo> doorLocksetHolidayScheduleCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLocksetHolidayScheduleholidayIndexCommandParameterInfo =
+        new CommandParameterInfo("holidayIndex", Integer.class);
+    doorLocksetHolidayScheduleCommandParams.put(
+        "holidayIndex", doorLocksetHolidayScheduleholidayIndexCommandParameterInfo);
+
+    CommandParameterInfo doorLocksetHolidaySchedulelocalStartTimeCommandParameterInfo =
+        new CommandParameterInfo("localStartTime", Long.class);
+    doorLocksetHolidayScheduleCommandParams.put(
+        "localStartTime", doorLocksetHolidaySchedulelocalStartTimeCommandParameterInfo);
+
+    CommandParameterInfo doorLocksetHolidaySchedulelocalEndTimeCommandParameterInfo =
+        new CommandParameterInfo("localEndTime", Long.class);
+    doorLocksetHolidayScheduleCommandParams.put(
+        "localEndTime", doorLocksetHolidaySchedulelocalEndTimeCommandParameterInfo);
+
+    CommandParameterInfo doorLocksetHolidayScheduleoperatingModeCommandParameterInfo =
+        new CommandParameterInfo("operatingMode", Integer.class);
+    doorLocksetHolidayScheduleCommandParams.put(
+        "operatingMode", doorLocksetHolidayScheduleoperatingModeCommandParameterInfo);
+
+    InteractionInfo doorLocksetHolidayScheduleInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .setHolidaySchedule(
+                      (DefaultClusterCallback) callback,
+                      (Integer) commandArguments.get("holidayIndex"),
+                      (Long) commandArguments.get("localStartTime"),
+                      (Long) commandArguments.get("localEndTime"),
+                      (Integer) commandArguments.get("operatingMode"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLocksetHolidayScheduleCommandParams);
+    doorLockClusterInteractionInfoMap.put(
+        "setHolidaySchedule", doorLocksetHolidayScheduleInteractionInfo);
     Map<String, CommandParameterInfo> doorLocksetUserCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLocksetUseroperationTypeCommandParameterInfo =
@@ -10516,7 +10635,7 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> networkCommissioningscanNetworksCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo networkCommissioningscanNetworksssidCommandParameterInfo =
-        new CommandParameterInfo("ssid", byte[].class);
+        new CommandParameterInfo("ssid", Optional.class);
     networkCommissioningscanNetworksCommandParams.put(
         "ssid", networkCommissioningscanNetworksssidCommandParameterInfo);
 
@@ -10532,7 +10651,7 @@ public class ClusterInfoMapping {
                   .scanNetworks(
                       (ChipClusters.NetworkCommissioningCluster.ScanNetworksResponseCallback)
                           callback,
-                      (byte[]) commandArguments.get("ssid"),
+                      (Optional<byte[]>) commandArguments.get("ssid"),
                       (Optional<Long>) commandArguments.get("breadcrumb"));
             },
             () -> new DelegatedScanNetworksResponseCallback(),
@@ -11763,7 +11882,7 @@ public class ClusterInfoMapping {
 
     CommandParameterInfo
         windowCoveringgoToLiftPercentageliftPercent100thsValueCommandParameterInfo =
-            new CommandParameterInfo("liftPercent100thsValue", Integer.class);
+            new CommandParameterInfo("liftPercent100thsValue", Optional.class);
     windowCoveringgoToLiftPercentageCommandParams.put(
         "liftPercent100thsValue",
         windowCoveringgoToLiftPercentageliftPercent100thsValueCommandParameterInfo);
@@ -11775,7 +11894,7 @@ public class ClusterInfoMapping {
                   .goToLiftPercentage(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("liftPercentageValue"),
-                      (Integer) commandArguments.get("liftPercent100thsValue"));
+                      (Optional<Integer>) commandArguments.get("liftPercent100thsValue"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             windowCoveringgoToLiftPercentageCommandParams);
@@ -11810,7 +11929,7 @@ public class ClusterInfoMapping {
 
     CommandParameterInfo
         windowCoveringgoToTiltPercentagetiltPercent100thsValueCommandParameterInfo =
-            new CommandParameterInfo("tiltPercent100thsValue", Integer.class);
+            new CommandParameterInfo("tiltPercent100thsValue", Optional.class);
     windowCoveringgoToTiltPercentageCommandParams.put(
         "tiltPercent100thsValue",
         windowCoveringgoToTiltPercentagetiltPercent100thsValueCommandParameterInfo);
@@ -11822,7 +11941,7 @@ public class ClusterInfoMapping {
                   .goToTiltPercentage(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("tiltPercentageValue"),
-                      (Integer) commandArguments.get("tiltPercent100thsValue"));
+                      (Optional<Integer>) commandArguments.get("tiltPercent100thsValue"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             windowCoveringgoToTiltPercentageCommandParams);

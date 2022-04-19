@@ -18,6 +18,7 @@
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <platform/Linux/DeviceInfoProviderImpl.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -26,6 +27,11 @@
 
 namespace chip {
 namespace DeviceLayer {
+
+namespace {
+constexpr TLV::Tag kLabelNameTag  = TLV::ContextTag(0);
+constexpr TLV::Tag kLabelValueTag = TLV::ContextTag(1);
+} // anonymous namespace
 
 DeviceInfoProviderImpl & DeviceInfoProviderImpl::GetDefaultInstance()
 {
@@ -51,6 +57,8 @@ size_t DeviceInfoProviderImpl::FixedLabelIteratorImpl::Count()
 
 bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & output)
 {
+    bool retval = true;
+
     // In Linux Simulation, use the following hardcoded labelList on all endpoints.
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -97,33 +105,46 @@ bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & outpu
 
         mIndex++;
 
-        return true;
+        retval = true;
     }
     else
     {
-        return false;
+        retval = false;
     }
+
+    return retval;
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelLength(EndpointId endpoint, size_t val)
 {
-    // TODO:: store the user label count.
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    DefaultStorageKeyAllocator keyAlloc;
+
+    return mStorage->SyncSetKeyValue(keyAlloc.UserLabelLengthKey(endpoint), &val, static_cast<uint16_t>(sizeof(val)));
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::GetUserLabelLength(EndpointId endpoint, size_t & val)
 {
-    // TODO:: read the user label count. temporarily return the size of hardcoded labelList.
-    val = 4;
+    DefaultStorageKeyAllocator keyAlloc;
+    uint16_t len = static_cast<uint16_t>(sizeof(val));
 
-    return CHIP_NO_ERROR;
+    return mStorage->SyncGetKeyValue(keyAlloc.UserLabelLengthKey(endpoint), &val, len);
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel)
 {
-    // TODO:: store the user labelList, and read back stored user labelList if it has been set.
-    // Add yaml test to verify this.
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    DefaultStorageKeyAllocator keyAlloc;
+    uint8_t buf[UserLabelTLVMaxSize()];
+    TLV::TLVWriter writer;
+    writer.Init(buf);
+
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+    ReturnErrorOnFailure(writer.PutString(kLabelNameTag, userLabel.label));
+    ReturnErrorOnFailure(writer.PutString(kLabelValueTag, userLabel.value));
+    ReturnErrorOnFailure(writer.EndContainer(outerType));
+
+    return mStorage->SyncSetKeyValue(keyAlloc.UserLabelIndexKey(endpoint, index), buf,
+                                     static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
 DeviceInfoProvider::UserLabelIterator * DeviceInfoProviderImpl::IterateUserLabel(EndpointId endpoint)
@@ -143,57 +164,46 @@ DeviceInfoProviderImpl::UserLabelIteratorImpl::UserLabelIteratorImpl(DeviceInfoP
 
 bool DeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
 {
-    // TODO:: get the user labelList from persistent storage, temporarily, use the following
-    // hardcoded labelList on all endpoints.
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    const char * labelPtr = nullptr;
-    const char * valuePtr = nullptr;
 
     VerifyOrReturnError(mIndex < mTotal, false);
 
-    switch (mIndex)
-    {
-    case 0:
-        labelPtr = "room";
-        valuePtr = "bedroom 2";
-        break;
-    case 1:
-        labelPtr = "orientation";
-        valuePtr = "North";
-        break;
-    case 2:
-        labelPtr = "floor";
-        valuePtr = "2";
-        break;
-    case 3:
-        labelPtr = "direction";
-        valuePtr = "up";
-        break;
-    default:
-        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-        break;
-    }
+    DefaultStorageKeyAllocator keyAlloc;
+    uint8_t buf[UserLabelTLVMaxSize()];
+    uint16_t len = static_cast<uint16_t>(sizeof(buf));
 
-    if (err == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(std::strlen(labelPtr) <= kMaxLabelNameLength, false);
-        VerifyOrReturnError(std::strlen(valuePtr) <= kMaxLabelValueLength, false);
+    err = mProvider.mStorage->SyncGetKeyValue(keyAlloc.UserLabelIndexKey(mEndpoint, mIndex), buf, len);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, false);
 
-        Platform::CopyString(mUserLabelNameBuf, kMaxLabelNameLength + 1, labelPtr);
-        Platform::CopyString(mUserLabelValueBuf, kMaxLabelValueLength + 1, valuePtr);
+    TLV::ContiguousBufferTLVReader reader;
+    reader.Init(buf);
+    err = reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag());
+    VerifyOrReturnError(err == CHIP_NO_ERROR, false);
 
-        output.label = CharSpan::fromCharString(mUserLabelNameBuf);
-        output.value = CharSpan::fromCharString(mUserLabelValueBuf);
+    TLV::TLVType containerType;
+    VerifyOrReturnError(reader.EnterContainer(containerType) == CHIP_NO_ERROR, false);
 
-        mIndex++;
+    chip::CharSpan label;
+    chip::CharSpan value;
 
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    VerifyOrReturnError(reader.Next(kLabelNameTag) == CHIP_NO_ERROR, false);
+    VerifyOrReturnError(reader.Get(label) == CHIP_NO_ERROR, false);
+
+    VerifyOrReturnError(reader.Next(kLabelValueTag) == CHIP_NO_ERROR, false);
+    VerifyOrReturnError(reader.Get(value) == CHIP_NO_ERROR, false);
+
+    VerifyOrReturnError(reader.VerifyEndOfContainer() == CHIP_NO_ERROR, false);
+    VerifyOrReturnError(reader.ExitContainer(containerType) == CHIP_NO_ERROR, false);
+
+    Platform::CopyString(mUserLabelNameBuf, label);
+    Platform::CopyString(mUserLabelValueBuf, value);
+
+    output.label = CharSpan::fromCharString(mUserLabelNameBuf);
+    output.value = CharSpan::fromCharString(mUserLabelValueBuf);
+
+    mIndex++;
+
+    return true;
 }
 
 DeviceInfoProvider::SupportedLocalesIterator * DeviceInfoProviderImpl::IterateSupportedLocales()
@@ -211,6 +221,8 @@ size_t DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
 
 bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & output)
 {
+    bool retval = true;
+
     // In Linux simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -259,12 +271,93 @@ bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & outpu
 
         mIndex++;
 
-        return true;
+        retval = true;
     }
     else
     {
-        return false;
+        retval = false;
     }
+
+    return retval;
+}
+
+DeviceInfoProvider::SupportedCalendarTypesIterator * DeviceInfoProviderImpl::IterateSupportedCalendarTypes()
+{
+    return new SupportedCalendarTypesIteratorImpl();
+}
+
+size_t DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Count()
+{
+    // In Linux Simulation, return the size of the hardcoded list of Strings that are valid values for the Calendar Types.
+    // {("kBuddhist"), ("kChinese"), ("kCoptic"), ("kEthiopian"), ("kGregorian"), ("kHebrew"), ("kIndian"), ("kJapanese"),
+    //  ("kKorean"), ("kPersian"), ("kTaiwanese"), ("kIslamic")}
+
+    return 12;
+}
+
+bool DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarType & output)
+{
+    bool retval = true;
+
+    // In Linux Simulation, return following hardcoded list of Strings that are valid values for the Calendar Types.
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrReturnError(mIndex < 12, false);
+
+    switch (mIndex)
+    {
+    case 0:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kBuddhist;
+        break;
+    case 1:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kChinese;
+        break;
+    case 2:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kCoptic;
+        break;
+    case 3:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kEthiopian;
+        break;
+    case 4:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kGregorian;
+        break;
+    case 5:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kHebrew;
+        break;
+    case 6:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kIndian;
+        break;
+    case 7:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kJapanese;
+        break;
+    case 8:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kKorean;
+        break;
+    case 9:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kPersian;
+        break;
+    case 10:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kTaiwanese;
+        break;
+    case 11:
+        output = app::Clusters::TimeFormatLocalization::CalendarType::kIslamic;
+        break;
+    default:
+        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+        break;
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        mIndex++;
+        retval = true;
+    }
+    else
+    {
+        retval = false;
+    }
+
+    return retval;
 }
 
 } // namespace DeviceLayer

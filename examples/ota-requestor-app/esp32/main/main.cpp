@@ -30,9 +30,9 @@
 #include "nvs_flash.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
 #include <app/server/Server.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 
@@ -53,9 +53,9 @@ namespace {
 const char * TAG = "ota-requester-app";
 static DeviceCallbacks EchoCallbacks;
 
-OTARequestor gRequestorCore;
+DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
-GenericOTARequestorDriver gRequestorUser;
+DefaultOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 

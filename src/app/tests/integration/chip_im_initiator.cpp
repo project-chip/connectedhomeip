@@ -429,20 +429,10 @@ CHIP_ERROR SendSubscribeRequest()
 
 CHIP_ERROR EstablishSecureSession()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    chip::SecurePairingUsingTestSecret * testSecurePairingSecret = chip::Platform::New<chip::SecurePairingUsingTestSecret>();
-    VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    testSecurePairingSecret->Init(gSessionManager);
-
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(gSession,
-                                     chip::Optional<chip::Transport::PeerAddress>::Value(
-                                         chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, chip::Inet::InterfaceId::Null())),
-                                     chip::kTestDeviceNodeId, testSecurePairingSecret, chip::CryptoContext::SessionRole::kInitiator,
-                                     gFabricIndex);
-
-exit:
+    chip::Transport::PeerAddress peer = chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, chip::Inet::InterfaceId::Null());
+    CHIP_ERROR err = gSessionManager.InjectPaseSessionWithTestKey(gSession, 1, chip::kTestDeviceNodeId, 1, gFabricIndex, peer,
+                                                                  chip::CryptoContext::SessionRole::kInitiator);
     if (err != CHIP_NO_ERROR)
     {
         printf("Establish secure session failed, err: %s\n", chip::ErrorStr(err));
@@ -451,10 +441,6 @@ exit:
     else
     {
         printf("Establish secure session succeeded\n");
-    }
-    if (testSecurePairingSecret)
-    {
-        chip::Platform::Delete(testSecurePairingSecret);
     }
 
     return err;
@@ -480,12 +466,12 @@ void CommandRequestTimerHandler(chip::System::Layer * systemLayer, void * appSta
         err = SendCommandRequest(std::move(commandSender));
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to send command request with error: %s\n", chip::ErrorStr(err)));
 
-        err = chip::DeviceLayer::SystemLayer().StartTimer(gMessageInterval, CommandRequestTimerHandler, NULL);
+        err = chip::DeviceLayer::SystemLayer().StartTimer(gMessageInterval, CommandRequestTimerHandler, nullptr);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
     }
     else
     {
-        err = chip::DeviceLayer::SystemLayer().StartTimer(gMessageInterval, BadCommandRequestTimerHandler, NULL);
+        err = chip::DeviceLayer::SystemLayer().StartTimer(gMessageInterval, BadCommandRequestTimerHandler, nullptr);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
     }
 
@@ -506,7 +492,7 @@ void BadCommandRequestTimerHandler(chip::System::Layer * systemLayer, void * app
     err = SendBadCommandRequest(std::move(commandSender));
     VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to send bad command request with error: %s\n", chip::ErrorStr(err)));
 
-    err = chip::DeviceLayer::SystemLayer().StartTimer(gMessageInterval, ReadRequestTimerHandler, NULL);
+    err = chip::DeviceLayer::SystemLayer().StartTimer(gMessageInterval, ReadRequestTimerHandler, nullptr);
     VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
 
 exit:
@@ -533,12 +519,12 @@ void ReadRequestTimerHandler(chip::System::Layer * systemLayer, void * appState)
         err = SendReadRequest();
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to send read request with error: %s\n", chip::ErrorStr(err)));
 
-        err = chip::DeviceLayer::SystemLayer().StartTimer(gMessageInterval, ReadRequestTimerHandler, NULL);
+        err = chip::DeviceLayer::SystemLayer().StartTimer(gMessageInterval, ReadRequestTimerHandler, nullptr);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
     }
     else
     {
-        err = chip::DeviceLayer::SystemLayer().StartTimer(gMessageInterval, WriteRequestTimerHandler, NULL);
+        err = chip::DeviceLayer::SystemLayer().StartTimer(gMessageInterval, WriteRequestTimerHandler, nullptr);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
     }
 
@@ -570,12 +556,12 @@ void WriteRequestTimerHandler(chip::System::Layer * systemLayer, void * appState
         err = SendWriteRequest(writeClient);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to send write request with error: %s\n", chip::ErrorStr(err)));
 
-        err = chip::DeviceLayer::SystemLayer().StartTimer(gMessageInterval, WriteRequestTimerHandler, NULL);
+        err = chip::DeviceLayer::SystemLayer().StartTimer(gMessageInterval, WriteRequestTimerHandler, nullptr);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
     }
     else
     {
-        err = chip::DeviceLayer::SystemLayer().StartTimer(gSubscribeRequestMessageTimeout, SubscribeRequestTimerHandler, NULL);
+        err = chip::DeviceLayer::SystemLayer().StartTimer(gSubscribeRequestMessageTimeout, SubscribeRequestTimerHandler, nullptr);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
     }
 
@@ -603,7 +589,8 @@ void SubscribeRequestTimerHandler(chip::System::Layer * systemLayer, void * appS
         err = SendSubscribeRequest();
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to send write request with error: %s\n", chip::ErrorStr(err)));
 
-        err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(20), SubscribeRequestTimerHandler, NULL);
+        err =
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(20), SubscribeRequestTimerHandler, nullptr);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
     }
     else
@@ -652,6 +639,13 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
     attributeStatus.EndOfAttributeStatusIB();
     ReturnErrorOnFailure(attributeStatus.GetError());
     return attributeReport.EndOfAttributeReportIB().GetError();
+}
+
+const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
+{
+    // Note: This test does not make use of the real attribute metadata.
+    static EmberAfAttributeMetadata stub = { .defaultValue = EmberAfDefaultOrMinMaxAttributeValue(uint16_t(0)) };
+    return &stub;
 }
 
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
@@ -730,7 +724,7 @@ int main(int argc, char * argv[])
     err = EstablishSecureSession();
     SuccessOrExit(err);
 
-    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::kZero, CommandRequestTimerHandler, NULL);
+    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::kZero, CommandRequestTimerHandler, nullptr);
     SuccessOrExit(err);
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();

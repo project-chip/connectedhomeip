@@ -58,7 +58,7 @@ OTAProviderDelegate * gDelegateTable[kOtaProviderDelegateTableSize] = { nullptr 
 OTAProviderDelegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, OtaSoftwareUpdateProvider::Id);
-    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+    return (ep == 0xFFFF ? nullptr : gDelegateTable[ep]);
 }
 
 bool SendStatusIfDelegateNull(app::CommandHandler * commandObj, const app::ConcreteCommandPath & path)

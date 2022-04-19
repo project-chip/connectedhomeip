@@ -18,10 +18,10 @@
 
 #include "AppMain.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
 #include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
 #include <platform/Linux/OTAImageProcessorImpl.h>
 
 using chip::BDXDownloader;
@@ -35,10 +35,10 @@ using chip::OnDeviceConnected;
 using chip::OnDeviceConnectionFailure;
 using chip::OTADownloader;
 using chip::OTAImageProcessorImpl;
-using chip::OTARequestor;
 using chip::PeerId;
 using chip::Server;
 using chip::VendorId;
+using chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
 using chip::Callback::Callback;
 using chip::System::Layer;
 using chip::Transport::PeerAddress;
@@ -54,7 +54,7 @@ public:
     void UpdateDownloaded() override;
 };
 
-OTARequestor gRequestorCore;
+DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
 CustomOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
@@ -80,7 +80,7 @@ bool gAutoApplyImage                           = false;
 
 OptionDef cmdLineOptionsDef[] = {
     { "autoApplyImage", chip::ArgParser::kNoArgument, kOptionAutoApplyImage },
-    { "requestorCanConsent", chip::ArgParser::kNoArgument, kOptionRequestorCanConsent },
+    { "requestorCanConsent", chip::ArgParser::kArgumentRequired, kOptionRequestorCanConsent },
     { "otaDownloadPath", chip::ArgParser::kArgumentRequired, kOptionOtaDownloadPath },
     { "periodicQueryTimeout", chip::ArgParser::kArgumentRequired, kOptionPeriodicQueryTimeout },
     { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
@@ -93,10 +93,9 @@ OptionSet cmdLineOptions = {
     "  -a, --autoApplyImage\n"
     "       If supplied, apply the image immediately after download.\n"
     "       Otherwise, the OTA update is complete after image download.\n"
-    "  -c, --requestorCanConsent\n"
-    "       If supplied, the RequestorCanConsent field of the QueryImage command is set to "
-    "true.\n"
-    "       Otherwise, the value is determined by the driver.\n"
+    "  -c, --requestorCanConsent <true | false>\n"
+    "       Value for the RequestorCanConsent field in the QueryImage command.\n"
+    "       If not supplied, the value is determined by the driver.\n"
     "  -f, --otaDownloadPath <file path>\n"
     "       If supplied, the OTA image is downloaded to the given fully-qualified file-path.\n"
     "       Otherwise, the default location for the downloaded image is at /tmp/test.bin\n"
@@ -104,11 +103,13 @@ OptionSet cmdLineOptions = {
     "       The periodic time interval to wait before attempting to query a provider from the default OTA provider list.\n"
     "       If none or zero is supplied, the timeout is determined by the driver.\n"
     "  -u, --userConsentState <granted | denied | deferred>\n"
-    "       The user consent state for the first QueryImage command. For all\n"
-    "       subsequent commands, the value of granted will be used.\n"
+    "       Represents the current user consent status when the OTA Requestor is acting as a user consent\n"
+    "       delegate. This value is only applicable if value of the UserConsentNeeded field in the\n"
+    "       QueryImageResponse is set to true. This value is used for the first attempt to\n"
+    "       download. For all subsequent queries, the value of granted will be used.\n"
     "       granted: Authorize OTA requestor to download an OTA image\n"
     "       denied: Forbid OTA requestor to download an OTA image\n"
-    "       deferred: Defer obtaining user consent \n"
+    "       deferred: Defer obtaining user consent\n"
     "  -w, --watchdogTimeout <time in seconds>\n"
     "       Maximum amount of time allowed for an OTA download before the process is cancelled and state reset to idle.\n"
     "       If none or zero is supplied, the timeout is determined by the driver.\n"
@@ -126,7 +127,7 @@ void CustomOTARequestorDriver::UpdateDownloaded()
     if (gAutoApplyImage)
     {
         // Let the default driver take further action to apply the image
-        GenericOTARequestorDriver::UpdateDownloaded();
+        DefaultOTARequestorDriver::UpdateDownloaded();
     }
     else
     {
@@ -173,18 +174,25 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         gPeriodicQueryTimeoutSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
     case kOptionRequestorCanConsent:
-        gRequestorCanConsent.SetValue(true);
+        if (strcmp(aValue, "true") == 0)
+        {
+            gRequestorCanConsent.SetValue(true);
+        }
+        else if (strcmp(aValue, "false") == 0)
+        {
+            gRequestorCanConsent.SetValue(false);
+        }
+        else
+        {
+            ChipLogError(SoftwareUpdate, "%s: ERROR: Invalid requestorCanConsent parameter: %s\n", aProgram, aValue);
+            retval = false;
+        }
         break;
     case kOptionOtaDownloadPath:
         chip::Platform::CopyString(gOtaDownloadPath, aValue);
         break;
     case kOptionUserConsentState:
-        if (aValue == NULL)
-        {
-            PrintArgError("%s: ERROR: NULL UserConsent parameter\n", aProgram);
-            retval = false;
-        }
-        else if (strcmp(aValue, "granted") == 0)
+        if (strcmp(aValue, "granted") == 0)
         {
             gUserConsentState = chip::ota::UserConsentState::kGranted;
         }
@@ -198,7 +206,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         else
         {
-            PrintArgError("%s: ERROR: Invalid UserConsent parameter:  %s\n", aProgram, aValue);
+            ChipLogError(SoftwareUpdate, "%s: ERROR: Invalid UserConsent parameter: %s\n", aProgram, aValue);
             retval = false;
         }
         break;
@@ -209,7 +217,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         gWatchdogTimeoutSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
     default:
-        PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
+        ChipLogError(SoftwareUpdate, "%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
         break;
     }
@@ -229,7 +237,7 @@ int main(int argc, char * argv[])
     ChipLinuxAppMainLoop();
 
     // If the event loop had been stopped due to an update being applied, boot into the new image
-    if (gRequestorCore.GetCurrentUpdateState() == OTARequestor::OTAUpdateStateEnum::kApplying)
+    if (gRequestorCore.GetCurrentUpdateState() == OTAUpdateStateEnum::kApplying)
     {
         if (kMaxFilePathSize <= strlen(kImageExecPath))
         {

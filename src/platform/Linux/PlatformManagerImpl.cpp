@@ -75,7 +75,7 @@ void SignalHandler(int signum)
     case SIGHUP:
         PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::RadioFaultChange::Id);
         break;
-    case SIGTERM:
+    case SIGTTIN:
         PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::NetworkFaultChange::Id);
         break;
     case SIGTSTP:
@@ -174,13 +174,12 @@ void PlatformManagerImpl::WiFIIPChangeListener()
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
-    CHIP_ERROR err;
     struct sigaction action;
 
     memset(&action, 0, sizeof(action));
     action.sa_handler = SignalHandler;
     sigaction(SIGHUP, &action, nullptr);
-    sigaction(SIGTERM, &action, nullptr);
+    sigaction(SIGTTIN, &action, nullptr);
     sigaction(SIGUSR1, &action, nullptr);
     sigaction(SIGUSR2, &action, nullptr);
     sigaction(SIGTSTP, &action, nullptr);
@@ -200,21 +199,18 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 #endif
 
     // Initialize the configuration system.
-    err = Internal::PosixConfig::Init();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(Internal::PosixConfig::Init());
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
     SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack());
 
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PlatformManagerImpl::_Shutdown()
@@ -240,27 +236,6 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     }
 
     return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
-}
-
-CHIP_ERROR
-PlatformManagerImpl::_GetSupportedCalendarTypes(
-    AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes)
-{
-    // In Linux simulation, return following supported Calendar Types
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kBuddhist);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kChinese);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kCoptic);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kEthiopian);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kGregorian);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kHebrew);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kIndian);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kIslamic);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kJapanese);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kKorean);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kPersian);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kTaiwanese);
-
-    return CHIP_NO_ERROR;
 }
 
 void PlatformManagerImpl::HandleGeneralFault(uint32_t EventId)

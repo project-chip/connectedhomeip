@@ -208,6 +208,18 @@ protected:
     }
 
     template <typename T, typename U>
+    bool CheckConstraintMinValue(const char * itemName, chip::BitFlags<T> current, U expected)
+    {
+        if (current.Raw() < expected)
+        {
+            Exit(std::string(itemName) + " value < minValue: " + std::to_string(current.Raw()) + " < " + std::to_string(expected));
+            return false;
+        }
+
+        return true;
+    }
+
+    template <typename T, typename U>
     bool CheckConstraintMinValue(const char * itemName, const chip::app::DataModel::Nullable<T> & current, U expected)
     {
         if (current.IsNull())
@@ -236,6 +248,18 @@ protected:
     }
 
     template <typename T, typename U>
+    bool CheckConstraintMaxValue(const char * itemName, chip::BitFlags<T> current, U expected)
+    {
+        if (current.Raw() > expected)
+        {
+            Exit(std::string(itemName) + " value > maxValue: " + std::to_string(current.Raw()) + " > " + std::to_string(expected));
+            return false;
+        }
+
+        return true;
+    }
+
+    template <typename T, typename U>
     bool CheckConstraintMaxValue(const char * itemName, const chip::app::DataModel::Nullable<T> & current, U expected)
     {
         if (current.IsNull())
@@ -245,7 +269,7 @@ protected:
         return CheckConstraintMaxValue(itemName, current.Value(), static_cast<T>(expected));
     }
 
-    template <typename T, typename U>
+    template <typename T, typename U, std::enable_if_t<!std::is_enum<T>::value, int> = 0>
     bool CheckConstraintNotValue(const char * itemName, T current, U expected)
     {
         if (current == expected)
@@ -257,11 +281,30 @@ protected:
         return true;
     }
 
+    template <typename T, typename U, std::enable_if_t<std::is_enum<T>::value, int> = 0>
+    bool CheckConstraintNotValue(const char * itemName, T current, U expected)
+    {
+        return CheckConstraintNotValue(itemName, chip::to_underlying(current), expected);
+    }
+
     template <typename T>
     bool CheckConstraintNotValue(const char * itemName, chip::BitFlags<T> current, chip::BitFlags<T> expected)
     {
         if (current == expected)
         {
+            Exit(std::string(itemName) + " got unexpected value: " + std::to_string(current.Raw()));
+            return false;
+        }
+
+        return true;
+    }
+
+    template <typename T, typename U>
+    bool CheckConstraintNotValue(const char * itemName, chip::BitFlags<T> current, U expected)
+    {
+        if (current.Raw() == expected)
+        {
+
             Exit(std::string(itemName) + " got unexpected value: " + std::to_string(current.Raw()));
             return false;
         }

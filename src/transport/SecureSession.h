@@ -75,7 +75,8 @@ public:
                   FabricIndex fabric, const ReliableMessageProtocolConfig & config) :
         mSecureSessionType(secureSessionType),
         mPeerNodeId(peerNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId),
-        mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
+        mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()),
+        mLastPeerActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
     {
         SetFabricIndex(fabric);
     }
@@ -151,25 +152,34 @@ public:
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
     uint16_t GetPeerSessionId() const { return mPeerSessionId; }
 
-    // Should only be called for PASE sessions, which start with undefined fabric,
-    // to migrate to a newly commissioned fabric after successful
-    // OperationalCredentialsCluster::AddNOC
-    CHIP_ERROR NewFabric(FabricIndex fabricIndex)
+    // Called when AddNOC has gone through sufficient success that we need to switch the
+    // session to reflect a new fabric if it was a PASE session
+    CHIP_ERROR AdoptFabricIndex(FabricIndex fabricIndex)
     {
-#if 0
-        // TODO(#13711): this check won't work until the issue is addressed
-        if (mSecureSessionType == Type::kPASE)
+        // It's not legal to augment session type for non-PASE
+        if (mSecureSessionType != Type::kPASE)
         {
-            SetFabricIndex(fabricIndex);
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
-#else
         SetFabricIndex(fabricIndex);
-#endif
         return CHIP_NO_ERROR;
     }
 
     System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
+    System::Clock::Timestamp GetLastPeerActivityTime() const { return mLastPeerActivityTime; }
     void MarkActive() { mLastActivityTime = System::SystemClock().GetMonotonicTimestamp(); }
+    void MarkActiveRx()
+    {
+        mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp();
+        MarkActive();
+    }
+
+    bool IsPeerActive() { return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) < kMinActiveTime); }
+
+    System::Clock::Timestamp GetMRPBaseTimeout() override
+    {
+        return IsPeerActive() ? GetMRPConfig().mActiveRetransTimeout : GetMRPConfig().mIdleRetransTimeout;
+    }
 
     CryptoContext & GetCryptoContext() { return mCryptoContext; }
 
@@ -183,7 +193,8 @@ private:
     uint16_t mPeerSessionId;
 
     PeerAddress mPeerAddress;
-    System::Clock::Timestamp mLastActivityTime;
+    System::Clock::Timestamp mLastActivityTime;     ///< Timestamp of last tx or rx
+    System::Clock::Timestamp mLastPeerActivityTime; ///< Timestamp of last rx
     ReliableMessageProtocolConfig mMRPConfig;
     CryptoContext mCryptoContext;
     SessionMessageCounter mSessionMessageCounter;

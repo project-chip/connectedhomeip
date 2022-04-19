@@ -30,9 +30,9 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
@@ -63,9 +63,9 @@ static Button_Handle sAppRightHandle;
 
 AppTask AppTask::sAppTask;
 
-static OTARequestor sRequestorCore;
+static DefaultOTARequestor sRequestorCore;
 static DefaultOTARequestorStorage sRequestorStorage;
-static GenericOTARequestorDriver sRequestorUser;
+static DefaultOTARequestorDriver sRequestorUser;
 static BDXDownloader sDownloader;
 static OTAImageProcessorImpl sImageProcessor;
 

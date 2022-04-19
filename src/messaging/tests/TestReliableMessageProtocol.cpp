@@ -63,9 +63,16 @@ const char PAYLOAD[] = "Hello!";
 
 auto & gLoopback = sContext.GetLoopback();
 
-class MockAppDelegate : public ExchangeDelegate
+class MockAppDelegate : public UnsolicitedMessageHandler, public ExchangeDelegate
 {
 public:
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
+    {
+        // Handle messages by myself
+        newDelegate = this;
+        return CHIP_NO_ERROR;
+    }
+
     CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && buffer) override
     {
@@ -139,9 +146,16 @@ public:
     bool mRequireEncryption = false;
 };
 
-class MockSessionEstablishmentDelegate : public ExchangeDelegate
+class MockSessionEstablishmentDelegate : public UnsolicitedMessageHandler, public ExchangeDelegate
 {
 public:
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
+    {
+        // Handle messages by myself
+        newDelegate = this;
+        return CHIP_NO_ERROR;
+    }
+
     CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && buffer) override
     {
@@ -1479,7 +1493,7 @@ struct BackoffComplianceTestVector theBackoffComplianceTestVector[] = {
     {
         .sendCount   = 4,
         .backoffBase = System::Clock::Timestamp(300),
-        .backoffMin  = System::Clock::Timestamp(1229),
+        .backoffMin  = System::Clock::Timestamp(1228),
         .backoffMax  = System::Clock::Timestamp(1536),
     },
     {

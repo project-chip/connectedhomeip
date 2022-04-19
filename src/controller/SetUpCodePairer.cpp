@@ -29,12 +29,17 @@
 #include <controller/CHIPDeviceController.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
+#include <system/SystemClock.h>
+
+constexpr uint32_t kDeviceDiscoveredTimeout = CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS * chip::kMillisecondsPerSecond;
 
 namespace chip {
 namespace Controller {
 
 CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, SetupCodePairerBehaviour commission)
 {
+    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     SetupPayload payload;
     mConnectionType = commission;
 
@@ -47,7 +52,10 @@ CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, 
 
     ResetDiscoveryState();
 
-    return Connect(payload);
+    ReturnErrorOnFailure(Connect(payload));
+
+    return mSystemLayer->StartTimer(System::Clock::Milliseconds32(kDeviceDiscoveredTimeout), OnDeviceDiscoveredTimeoutCallback,
+                                    this);
 }
 
 CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
@@ -130,9 +138,26 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverIP(SetupPayload & payload)
                                                       : Dnssd::DiscoveryFilterType::kLongDiscriminator;
     currentFilter.code =
         payload.isShortDiscriminator ? static_cast<uint16_t>((payload.discriminator >> 8) & 0x0F) : payload.discriminator;
+
+    // We're going to ensure that anything we discover matches currentFilter
+    // before we use it, which will do our discriminator checks for us.
+    //
+    // We are using an mdns continuous query for some PTR record to discover
+    // devices.  If the PTR record we use is for one of the discriminator-based
+    // subtypes (based on currentFilter), then we can run into a problem where
+    // we discover a (possibly stale) advertisement for a non-commissionable
+    // (CM=0) node and ignore it, and then when it becomes commissionable we
+    // don't notice because that just updates the TXT record to CM=1 and does
+    // not touch the PTR record we are querying for.
+    //
+    // So instead we query the PTR record for the "_CM" subtype, which will get
+    // added when a node enters commissioning mode.
+    Dnssd::DiscoveryFilter filter;
+    filter.type = Dnssd::DiscoveryFilterType::kCommissioningMode;
+
     // Handle possibly-sync callbacks.
     mWaitingForDiscovery[kIPTransport] = true;
-    CHIP_ERROR err                     = mCommissioner->DiscoverCommissionableNodes(currentFilter);
+    CHIP_ERROR err                     = mCommissioner->DiscoverCommissionableNodes(filter);
     if (err != CHIP_NO_ERROR)
     {
         mWaitingForDiscovery[kIPTransport] = false;
@@ -162,6 +187,8 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverSoftAP()
 
 bool SetUpCodePairer::ConnectToDiscoveredDevice()
 {
+    mSystemLayer->CancelTimer(OnDeviceDiscoveredTimeoutCallback, this);
+
     if (mWaitingForPASE)
     {
         // Nothing to do.  Just wait until we either succeed or fail at that
@@ -405,6 +432,15 @@ void SetUpCodePairer::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error)
     {
         mPairingDelegate->OnCommissioningComplete(deviceId, error);
     }
+}
+
+void SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback(System::Layer * layer, void * context)
+{
+    auto * pairer = static_cast<SetUpCodePairer *>(context);
+    LogErrorOnFailure(pairer->StopConnectOverBle());
+    LogErrorOnFailure(pairer->StopConnectOverIP());
+    LogErrorOnFailure(pairer->StopConnectOverSoftAP());
+    pairer->mCommissioner->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
 }
 
 } // namespace Controller

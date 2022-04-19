@@ -24,7 +24,9 @@
 
 namespace chip {
 
-class CASEServer : public SessionEstablishmentDelegate, public Messaging::ExchangeDelegate
+class CASEServer : public SessionEstablishmentDelegate,
+                   public Messaging::UnsolicitedMessageHandler,
+                   public Messaging::ExchangeDelegate
 {
 public:
     CASEServer() {}
@@ -38,11 +40,15 @@ public:
 
     CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
                                              SessionManager * sessionManager, FabricTable * fabrics,
+                                             SessionResumptionStorage * sessionResumptionStorage,
                                              Credentials::GroupDataProvider * responderGroupDataProvider);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;
+
+    //// UnsolicitedMessageHandler Implementation ////
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
 
     //// ExchangeDelegate Implementation ////
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
@@ -53,7 +59,8 @@ public:
     virtual CASESession & GetSession() { return mPairingSession; }
 
 private:
-    Messaging::ExchangeManager * mExchangeManager = nullptr;
+    Messaging::ExchangeManager * mExchangeManager        = nullptr;
+    SessionResumptionStorage * mSessionResumptionStorage = nullptr;
 
     CASESession mPairingSession;
     SessionManager * mSessionManager = nullptr;

@@ -34,13 +34,10 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
+#include <lib/core/ScopedNodeId.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Span.h>
-
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-#define CASE_OPS_KEY 0xCA5EECC0
-#endif
 
 namespace chip {
 
@@ -85,6 +82,8 @@ public:
     }
 
     NodeId GetNodeId() const { return mOperationalId.GetNodeId(); }
+    ScopedNodeId GetScopedNodeId() const { return ScopedNodeId(mOperationalId.GetNodeId(), mFabricIndex); }
+    ScopedNodeId GetScopedNodeIdForNode(const NodeId node) const { return ScopedNodeId(node, mFabricIndex); }
     // TODO(#15049): Refactor/rename PeerId to OperationalId or OpId throughout source
     PeerId GetPeerId() const { return mOperationalId; }
     PeerId GetPeerIdForNode(const NodeId node) const
@@ -116,14 +115,10 @@ public:
         {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
             mOperationalKey = chip::Platform::New<Crypto::P256KeypairHSM>();
-            mOperationalKey->SetKeyId(CASE_OPS_KEY);
+            mOperationalKey->CreateOperationalKey(mFabricIndex);
 #else
             mOperationalKey = chip::Platform::New<Crypto::P256Keypair>();
-#endif
             mOperationalKey->Initialize();
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-            // Set provisioned_key = true , so that key is not deleted from HSM.
-            mOperationalKey->provisioned_key = true;
 #endif
         }
         return mOperationalKey;
@@ -385,15 +380,13 @@ public:
      * can release the memory associated with input parameter after the call is complete.
      *
      * If the call is successful, the assigned fabric index is returned as output parameter.
+     * The fabric information will also be persisted to storage.
      */
     CHIP_ERROR AddNewFabric(FabricInfo & fabric, FabricIndex * assignedIndex);
 
     FabricInfo * FindFabric(Credentials::P256PublicKeySpan rootPubKey, FabricId fabricId);
     FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
     FabricInfo * FindFabricWithCompressedId(CompressedFabricId fabricId);
-
-    FabricIndex FindDestinationIDCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom,
-                                           const ByteSpan * ipkList, size_t ipkListEntries);
 
     CHIP_ERROR Init(PersistentStorageDelegate * storage);
     CHIP_ERROR AddFabricDelegate(FabricTableDelegate * delegate);

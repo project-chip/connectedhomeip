@@ -1359,7 +1359,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _ssid = [NSData data];
+        _ssid = nil;
 
         _breadcrumb = nil;
     }
@@ -1374,7 +1374,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _networkingStatus = @(0);
 
-        _debugText = @"";
+        _debugText = nil;
 
         _wiFiScanResults = nil;
 
@@ -1460,9 +1460,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _networkingStatus = @(0);
 
-        _debugText = @"";
+        _debugText = nil;
 
-        _errorValue = @(0);
+        _errorValue = nil;
     }
     return self;
 }
@@ -2443,7 +2443,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _liftPercentageValue = @(0);
 
-        _liftPercent100thsValue = @(0);
+        _liftPercent100thsValue = nil;
     }
     return self;
 }
@@ -2467,7 +2467,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _tiltPercentageValue = @(0);
 
-        _tiltPercent100thsValue = @(0);
+        _tiltPercent100thsValue = nil;
     }
     return self;
 }

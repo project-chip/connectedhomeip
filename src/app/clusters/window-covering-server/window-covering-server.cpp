@@ -158,46 +158,57 @@ bool HasFeaturePaTilt(chip::EndpointId endpoint)
     return (HasFeature(endpoint, WcFeature::kTilt) && HasFeature(endpoint, WcFeature::kPositionAwareTilt));
 }
 
-void TypeSet(chip::EndpointId endpoint, EmberAfWcType type)
+void TypeSet(chip::EndpointId endpoint, Type type)
 {
-    Attributes::Type::Set(endpoint, chip::to_underlying(type));
+    Attributes::Type::Set(endpoint, type);
 }
 
-EmberAfWcType TypeGet(chip::EndpointId endpoint)
+Type TypeGet(chip::EndpointId endpoint)
 {
-    std::underlying_type<EmberAfWcType>::type value;
+    Type value;
     Attributes::Type::Get(endpoint, &value);
-    return static_cast<EmberAfWcType>(value);
+    return value;
 }
 
-void ConfigStatusSet(chip::EndpointId endpoint, const ConfigStatus & status)
+void ConfigStatusPrint(const chip::BitFlags<ConfigStatus> & configStatus)
 {
-    /* clang-format off */
-    uint8_t value = (status.operational ? 0x01 : 0)
-                    | (status.online ? 0x02 : 0)
-                    | (status.liftIsReversed ? 0x04 : 0)
-                    | (status.liftIsPA ? 0x08 : 0)
-                    | (status.tiltIsPA ? 0x10 : 0)
-                    | (status.liftIsEncoderControlled ? 0x20 : 0)
-                    | (status.tiltIsEncoderControlled ? 0x40 : 0);
-    /* clang-format on */
-    Attributes::ConfigStatus::Set(endpoint, value);
+    emberAfWindowCoveringClusterPrint("ConfigStatus 0x%02X Operational=%u OnlineReserved=%u", configStatus.Raw(),
+                                      configStatus.Has(ConfigStatus::kOperational),
+                                      configStatus.Has(ConfigStatus::kOnlineReserved));
+
+    emberAfWindowCoveringClusterPrint(
+        "Lift(PA=%u Encoder=%u Reversed=%u) Tilt(PA=%u Encoder=%u)", configStatus.Has(ConfigStatus::kLiftPositionAware),
+        configStatus.Has(ConfigStatus::kLiftEncoderControlled), configStatus.Has(ConfigStatus::kLiftMovementReversed),
+        configStatus.Has(ConfigStatus::kTiltPositionAware), configStatus.Has(ConfigStatus::kTiltEncoderControlled));
 }
 
-const ConfigStatus ConfigStatusGet(chip::EndpointId endpoint)
+void ConfigStatusSet(chip::EndpointId endpoint, const chip::BitFlags<ConfigStatus> & configStatus)
 {
-    uint8_t value = 0;
-    ConfigStatus status;
+    Attributes::ConfigStatus::Set(endpoint, configStatus);
+}
 
-    Attributes::ConfigStatus::Get(endpoint, &value);
-    status.operational             = (value & 0x01) ? 1 : 0;
-    status.online                  = (value & 0x02) ? 1 : 0;
-    status.liftIsReversed          = (value & 0x04) ? 1 : 0;
-    status.liftIsPA                = (value & 0x08) ? 1 : 0;
-    status.tiltIsPA                = (value & 0x10) ? 1 : 0;
-    status.liftIsEncoderControlled = (value & 0x20) ? 1 : 0;
-    status.tiltIsEncoderControlled = (value & 0x40) ? 1 : 0;
-    return status;
+chip::BitFlags<ConfigStatus> ConfigStatusGet(chip::EndpointId endpoint)
+{
+    chip::BitFlags<ConfigStatus> configStatus;
+    Attributes::ConfigStatus::Get(endpoint, &configStatus);
+
+    return configStatus;
+}
+
+void ConfigStatusUpdateFeatures(chip::EndpointId endpoint)
+{
+    chip::BitFlags<ConfigStatus> configStatus = ConfigStatusGet(endpoint);
+
+    configStatus.Set(ConfigStatus::kLiftPositionAware, HasFeaturePaLift(endpoint));
+    configStatus.Set(ConfigStatus::kTiltPositionAware, HasFeaturePaTilt(endpoint));
+
+    if (!HasFeaturePaLift(endpoint))
+        configStatus.Clear(ConfigStatus::kLiftEncoderControlled);
+
+    if (!HasFeaturePaTilt(endpoint))
+        configStatus.Clear(ConfigStatus::kTiltEncoderControlled);
+
+    ConfigStatusSet(endpoint, configStatus);
 }
 
 void OperationalStatusSetWithGlobalUpdated(chip::EndpointId endpoint, OperationalStatus & status)
@@ -236,35 +247,57 @@ const OperationalStatus OperationalStatusGet(chip::EndpointId endpoint)
     return status;
 }
 
-void EndProductTypeSet(chip::EndpointId endpoint, EmberAfWcEndProductType type)
+void EndProductTypeSet(chip::EndpointId endpoint, EndProductType type)
 {
-    Attributes::EndProductType::Set(endpoint, chip::to_underlying(type));
+    Attributes::EndProductType::Set(endpoint, type);
 }
 
-EmberAfWcEndProductType EndProductTypeGet(chip::EndpointId endpoint)
+EndProductType EndProductTypeGet(chip::EndpointId endpoint)
 {
-    std::underlying_type<EmberAfWcType>::type value;
+    EndProductType value;
     Attributes::EndProductType::Get(endpoint, &value);
-    return static_cast<EmberAfWcEndProductType>(value);
+
+    return value;
 }
 
-void ModeSet(chip::EndpointId endpoint, const Mode & mode)
+void ModePrint(const chip::BitFlags<Mode> & mode)
 {
-    uint8_t value = (mode.motorDirReversed ? 0x01 : 0) | (mode.calibrationMode ? 0x02 : 0) | (mode.maintenanceMode ? 0x04 : 0) |
-        (mode.ledDisplay ? 0x08 : 0);
-    Attributes::Mode::Set(endpoint, value);
+    emberAfWindowCoveringClusterPrint("Mode 0x%02X MotorDirReversed=%u LedFeedback=%u Maintenance=%u Calibration=%u", mode.Raw(),
+                                      mode.Has(Mode::kMotorDirectionReversed), mode.Has(Mode::kLedFeedback),
+                                      mode.Has(Mode::kMaintenanceMode), mode.Has(Mode::kCalibrationMode));
 }
 
-const Mode ModeGet(chip::EndpointId endpoint)
+void ModeSet(chip::EndpointId endpoint, chip::BitFlags<Mode> & newMode)
 {
-    uint8_t value = 0;
-    Mode mode;
+    chip::BitFlags<ConfigStatus> newStatus;
 
-    Attributes::Mode::Get(endpoint, &value);
-    mode.motorDirReversed = (value & 0x01) ? 1 : 0;
-    mode.calibrationMode  = (value & 0x02) ? 1 : 0;
-    mode.maintenanceMode  = (value & 0x04) ? 1 : 0;
-    mode.ledDisplay       = (value & 0x08) ? 1 : 0;
+    chip::BitFlags<ConfigStatus> oldStatus = ConfigStatusGet(endpoint);
+    chip::BitFlags<Mode> oldMode           = ModeGet(endpoint);
+
+    newStatus = oldStatus;
+
+    // Attribute: ConfigStatus reflects the following current mode flags
+    newStatus.Set(ConfigStatus::kOperational, !newMode.HasAny(Mode::kMaintenanceMode, Mode::kCalibrationMode));
+    newStatus.Set(ConfigStatus::kLiftMovementReversed, newMode.Has(Mode::kMotorDirectionReversed));
+
+    // Verify only one mode supported at once and maintenance lock goes over calibration
+    if (newMode.HasAll(Mode::kMaintenanceMode, Mode::kCalibrationMode))
+    {
+        newMode.Clear(Mode::kCalibrationMode);
+    }
+
+    if (oldMode != newMode)
+        Attributes::Mode::Set(endpoint, newMode);
+
+    if (oldStatus != newStatus)
+        ConfigStatusSet(endpoint, newStatus);
+}
+
+chip::BitFlags<Mode> ModeGet(chip::EndpointId endpoint)
+{
+    chip::BitFlags<Mode> mode;
+
+    Attributes::Mode::Get(endpoint, &mode);
     return mode;
 }
 
@@ -564,6 +597,8 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
 {
     // all-cluster-app: simulation for the CI testing
     // otherwise it is defined for manufacturer specific implementation */
+    BitFlags<Mode> mode;
+    BitFlags<ConfigStatus> configStatus;
     NPercent100ths current, target;
     OperationalStatus prevOpStatus = OperationalStatusGet(endpoint);
     OperationalStatus opStatus     = prevOpStatus;
@@ -609,6 +644,16 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
         Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, current);
         opStatus.tilt = ComputeOperationalState(target, current);
         break;
+    /* Mode change is either internal from the application or external from a write request */
+    case Attributes::Mode::Id:
+        mode = ModeGet(endpoint);
+        ModePrint(mode);
+        ModeSet(endpoint, mode); // refilter mode if needed
+        break;
+    case Attributes::ConfigStatus::Id:
+        configStatus = ConfigStatusGet(endpoint);
+        ConfigStatusPrint(configStatus);
+        break;
     default:
         break;
     }
@@ -616,6 +661,30 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
     /* This decides and triggers fake motion for the selected endpoint */
     if ((opStatus.lift != prevOpStatus.lift) || (opStatus.tilt != prevOpStatus.tilt))
         OperationalStatusSetWithGlobalUpdated(endpoint, opStatus);
+}
+
+EmberAfStatus GetMotionLockStatus(chip::EndpointId endpoint)
+{
+    BitFlags<Mode> mode                 = ModeGet(endpoint);
+    BitFlags<ConfigStatus> configStatus = ConfigStatusGet(endpoint);
+
+    // Is the device locked?
+    if (!configStatus.Has(ConfigStatus::kOperational))
+    {
+        if (mode.Has(Mode::kMaintenanceMode))
+        {
+            // Mainterance Mode
+            return EMBER_ZCL_STATUS_BUSY;
+        }
+
+        if (mode.Has(Mode::kCalibrationMode))
+        {
+            // Calibration Mode
+            return EMBER_ZCL_STATUS_FAILURE;
+        }
+    }
+
+    return EMBER_ZCL_STATUS_SUCCESS;
 }
 
 } // namespace WindowCovering
@@ -636,6 +705,8 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
 void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint)
 {
     emberAfWindowCoveringClusterPrint("Window Covering Cluster init");
+
+    ConfigStatusUpdateFeatures(endpoint);
 }
 
 /**
@@ -647,6 +718,15 @@ bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandO
     EndpointId endpoint = commandPath.mEndpointId;
 
     emberAfWindowCoveringClusterPrint("UpOrOpen command received");
+
+    EmberAfStatus status = GetMotionLockStatus(endpoint);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        emberAfWindowCoveringClusterPrint("Err device locked");
+        emberAfSendImmediateDefaultResponse(status);
+        return true;
+    }
+
     if (HasFeature(endpoint, WcFeature::kLift))
     {
         Attributes::TargetPositionLiftPercent100ths::Set(endpoint, WC_PERCENT100THS_MIN_OPEN);
@@ -668,6 +748,15 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
     EndpointId endpoint = commandPath.mEndpointId;
 
     emberAfWindowCoveringClusterPrint("DownOrClose command received");
+
+    EmberAfStatus status = GetMotionLockStatus(endpoint);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        emberAfWindowCoveringClusterPrint("Err device locked");
+        emberAfSendImmediateDefaultResponse(status);
+        return true;
+    }
+
     if (HasFeature(endpoint, WcFeature::kLift))
     {
         Attributes::TargetPositionLiftPercent100ths::Set(endpoint, WC_PERCENT100THS_MAX_CLOSED);
@@ -686,9 +775,18 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
 bool emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                     const Commands::StopMotion::DecodableType & fields)
 {
-    emberAfWindowCoveringClusterPrint("StopMotion command received");
     app::DataModel::Nullable<Percent100ths> current;
     chip::EndpointId endpoint = commandPath.mEndpointId;
+
+    emberAfWindowCoveringClusterPrint("StopMotion command received");
+
+    EmberAfStatus status = GetMotionLockStatus(endpoint);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        emberAfWindowCoveringClusterPrint("Err device locked");
+        emberAfSendImmediateDefaultResponse(status);
+        return true;
+    }
 
     if (HasFeaturePaLift(endpoint))
     {
@@ -716,7 +814,16 @@ bool emberAfWindowCoveringClusterGoToLiftValueCallback(app::CommandHandler * com
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("GoToLiftValue Value command received");
+    emberAfWindowCoveringClusterPrint("GoToLiftValue %u command received", liftValue);
+
+    EmberAfStatus status = GetMotionLockStatus(endpoint);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        emberAfWindowCoveringClusterPrint("Err device locked");
+        emberAfSendImmediateDefaultResponse(status);
+        return true;
+    }
+
     if (HasFeature(endpoint, WcFeature::kAbsolutePosition) && HasFeaturePaLift(endpoint))
     {
         Attributes::TargetPositionLiftPercent100ths::Set(endpoint, LiftToPercent100ths(endpoint, liftValue));
@@ -739,15 +846,26 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
 {
     auto & liftPercentageValue    = commandData.liftPercentageValue;
     auto & liftPercent100thsValue = commandData.liftPercent100thsValue;
+    Percent100ths liftPercent100ths =
+        liftPercent100thsValue.ValueOr(static_cast<Percent100ths>(liftPercentageValue * WC_PERCENT100THS_COEF));
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("GoToLiftPercentage %u%% %u command received", liftPercentageValue, liftPercent100thsValue);
+    emberAfWindowCoveringClusterPrint("GoToLiftPercentage %u%% %u command received", liftPercentageValue, liftPercent100ths);
+
+    EmberAfStatus status = GetMotionLockStatus(endpoint);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        emberAfWindowCoveringClusterPrint("Err device locked");
+        emberAfSendImmediateDefaultResponse(status);
+        return true;
+    }
+
     if (HasFeaturePaLift(endpoint))
     {
-        if (IsPercent100thsValid(liftPercent100thsValue))
+        if (IsPercent100thsValid(liftPercent100ths))
         {
-            Attributes::TargetPositionLiftPercent100ths::Set(endpoint, liftPercent100thsValue);
+            Attributes::TargetPositionLiftPercent100ths::Set(endpoint, liftPercent100ths);
             emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
         }
         else
@@ -774,7 +892,16 @@ bool emberAfWindowCoveringClusterGoToTiltValueCallback(app::CommandHandler * com
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("GoToTiltValue command received");
+    emberAfWindowCoveringClusterPrint("GoToTiltValue %u command received", tiltValue);
+
+    EmberAfStatus status = GetMotionLockStatus(endpoint);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        emberAfWindowCoveringClusterPrint("Err device locked");
+        emberAfSendImmediateDefaultResponse(status);
+        return true;
+    }
+
     if (HasFeature(endpoint, WcFeature::kAbsolutePosition) && HasFeaturePaTilt(endpoint))
     {
         Attributes::TargetPositionTiltPercent100ths::Set(endpoint, TiltToPercent100ths(endpoint, tiltValue));
@@ -797,15 +924,26 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
 {
     auto & tiltPercentageValue    = commandData.tiltPercentageValue;
     auto & tiltPercent100thsValue = commandData.tiltPercent100thsValue;
+    Percent100ths tiltPercent100ths =
+        tiltPercent100thsValue.ValueOr(static_cast<Percent100ths>(tiltPercentageValue * WC_PERCENT100THS_COEF));
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("GoToTiltPercentage %u%% %u command received", tiltPercentageValue, tiltPercent100thsValue);
+    emberAfWindowCoveringClusterPrint("GoToTiltPercentage %u%% %u command received", tiltPercentageValue, tiltPercent100ths);
+
+    EmberAfStatus status = GetMotionLockStatus(endpoint);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        emberAfWindowCoveringClusterPrint("Err device locked");
+        emberAfSendImmediateDefaultResponse(status);
+        return true;
+    }
+
     if (HasFeaturePaTilt(endpoint))
     {
-        if (IsPercent100thsValid(tiltPercent100thsValue))
+        if (IsPercent100thsValid(tiltPercent100ths))
         {
-            Attributes::TargetPositionTiltPercent100ths::Set(endpoint, tiltPercent100thsValue);
+            Attributes::TargetPositionTiltPercent100ths::Set(endpoint, tiltPercent100ths);
             emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
         }
         else

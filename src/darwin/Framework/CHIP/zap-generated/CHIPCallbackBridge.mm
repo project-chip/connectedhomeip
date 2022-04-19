@@ -1881,6 +1881,32 @@ void CHIPBarrierControlAttributeListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
+void CHIPBasicCapabilityMinimaStructAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::DecodableType & value)
+{
+    CHIPBasicClusterCapabilityMinimaStruct * _Nonnull objCValue;
+    objCValue = [CHIPBasicClusterCapabilityMinimaStruct new];
+    objCValue.caseSessionsPerFabric = [NSNumber numberWithUnsignedShort:value.caseSessionsPerFabric];
+    objCValue.subscriptionsPerFabric = [NSNumber numberWithUnsignedShort:value.subscriptionsPerFabric];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPBasicGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -10396,6 +10422,54 @@ void CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBri
     }
 }
 
+void CHIPWindowCoveringConfigStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPWindowCoveringModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPWindowCoveringModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPWindowCoveringModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPWindowCoveringGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -10614,6 +10688,40 @@ void CHIPDoorLockClusterGetCredentialStatusResponseCallbackBridge::OnSuccessFn(
             response.nextCredentialIndex = nil;
         } else {
             response.nextCredentialIndex = [NSNumber numberWithUnsignedShort:data.nextCredentialIndex.Value()];
+        }
+    }
+    DispatchSuccess(context, response);
+};
+
+void CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data)
+{
+    auto * response = [CHIPDoorLockClusterGetHolidayScheduleResponseParams new];
+    {
+        response.holidayIndex = [NSNumber numberWithUnsignedChar:data.holidayIndex];
+    }
+    {
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
+    }
+    {
+        if (data.localStartTime.HasValue()) {
+            response.localStartTime = [NSNumber numberWithUnsignedInt:data.localStartTime.Value()];
+        } else {
+            response.localStartTime = nil;
+        }
+    }
+    {
+        if (data.localEndTime.HasValue()) {
+            response.localEndTime = [NSNumber numberWithUnsignedInt:data.localEndTime.Value()];
+        } else {
+            response.localEndTime = nil;
+        }
+    }
+    {
+        if (data.operatingMode.HasValue()) {
+            response.operatingMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.operatingMode.Value())];
+        } else {
+            response.operatingMode = nil;
         }
     }
     DispatchSuccess(context, response);
@@ -11055,12 +11163,20 @@ void CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackBridge::OnSucc
         response.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.networkingStatus)];
     }
     {
-        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
-                                                      length:data.debugText.size()
-                                                    encoding:NSUTF8StringEncoding];
+        if (data.debugText.HasValue()) {
+            response.debugText = [[NSString alloc] initWithBytes:data.debugText.Value().data()
+                                                          length:data.debugText.Value().size()
+                                                        encoding:NSUTF8StringEncoding];
+        } else {
+            response.debugText = nil;
+        }
     }
     {
-        response.errorValue = [NSNumber numberWithInt:data.errorValue];
+        if (data.errorValue.IsNull()) {
+            response.errorValue = nil;
+        } else {
+            response.errorValue = [NSNumber numberWithInt:data.errorValue.Value()];
+        }
     }
     DispatchSuccess(context, response);
 };
@@ -11099,9 +11215,13 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSucces
         response.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.networkingStatus)];
     }
     {
-        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
-                                                      length:data.debugText.size()
-                                                    encoding:NSUTF8StringEncoding];
+        if (data.debugText.HasValue()) {
+            response.debugText = [[NSString alloc] initWithBytes:data.debugText.Value().data()
+                                                          length:data.debugText.Value().size()
+                                                        encoding:NSUTF8StringEncoding];
+        } else {
+            response.debugText = nil;
+        }
     }
     {
         if (data.wiFiScanResults.HasValue()) {
@@ -11112,7 +11232,7 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSucces
                     auto & entry_1 = iter_1.GetValue();
                     CHIPNetworkCommissioningClusterWiFiInterfaceScanResult * newElement_1;
                     newElement_1 = [CHIPNetworkCommissioningClusterWiFiInterfaceScanResult new];
-                    newElement_1.security = [NSNumber numberWithUnsignedChar:entry_1.security];
+                    newElement_1.security = [NSNumber numberWithUnsignedChar:entry_1.security.Raw()];
                     newElement_1.ssid = [NSData dataWithBytes:entry_1.ssid.data() length:entry_1.ssid.size()];
                     newElement_1.bssid = [NSData dataWithBytes:entry_1.bssid.data() length:entry_1.bssid.size()];
                     newElement_1.channel = [NSNumber numberWithUnsignedShort:entry_1.channel];
@@ -11140,14 +11260,15 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSucces
                     auto & entry_1 = iter_1.GetValue();
                     CHIPNetworkCommissioningClusterThreadInterfaceScanResult * newElement_1;
                     newElement_1 = [CHIPNetworkCommissioningClusterThreadInterfaceScanResult new];
-                    newElement_1.panId = [NSNumber numberWithUnsignedLongLong:entry_1.panId];
+                    newElement_1.panId = [NSNumber numberWithUnsignedShort:entry_1.panId];
                     newElement_1.extendedPanId = [NSNumber numberWithUnsignedLongLong:entry_1.extendedPanId];
                     newElement_1.networkName = [[NSString alloc] initWithBytes:entry_1.networkName.data()
                                                                         length:entry_1.networkName.size()
                                                                       encoding:NSUTF8StringEncoding];
                     newElement_1.channel = [NSNumber numberWithUnsignedShort:entry_1.channel];
                     newElement_1.version = [NSNumber numberWithUnsignedChar:entry_1.version];
-                    newElement_1.extendedAddress = [NSNumber numberWithUnsignedLongLong:entry_1.extendedAddress];
+                    newElement_1.extendedAddress = [NSData dataWithBytes:entry_1.extendedAddress.data()
+                                                                  length:entry_1.extendedAddress.size()];
                     newElement_1.rssi = [NSNumber numberWithChar:entry_1.rssi];
                     newElement_1.lqi = [NSNumber numberWithUnsignedChar:entry_1.lqi];
                     [array_1 addObject:newElement_1];
@@ -15910,6 +16031,110 @@ void CHIPNullableDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBri
     }
 }
 
+void CHIPWindowCoveringClusterEndProductTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::WindowCovering::EndProductType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableWindowCoveringClusterEndProductTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WindowCovering::EndProductType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPWindowCoveringClusterTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::WindowCovering::Type value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableWindowCoveringClusterTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WindowCovering::Type> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value)
 {
@@ -16218,6 +16443,110 @@ void CHIPNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge::O
 void CHIPNullableThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPNullableThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPFanControlClusterFanModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::FanControl::FanMode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPFanControlClusterFanModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPFanControlClusterFanModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableFanControlClusterFanModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanMode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableFanControlClusterFanModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableFanControlClusterFanModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPFanControlClusterFanModeSequenceAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::FanControl::FanModeSequence value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPFanControlClusterFanModeSequenceAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPFanControlClusterFanModeSequenceAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableFanControlClusterFanModeSequenceAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeSequence> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableFanControlClusterFanModeSequenceAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableFanControlClusterFanModeSequenceAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }

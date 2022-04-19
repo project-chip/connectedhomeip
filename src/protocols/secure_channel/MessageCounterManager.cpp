@@ -88,6 +88,13 @@ CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(const PacketH
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR MessageCounterManager::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate)
+{
+    // MessageCounterManager do not use an extra context to handle messages
+    newDelegate = this;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR MessageCounterManager::OnMessageReceived(Messaging::ExchangeContext * exchangeContext,
                                                     const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
 {

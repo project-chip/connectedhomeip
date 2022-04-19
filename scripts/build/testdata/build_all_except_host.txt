@@ -160,14 +160,41 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
+# Generating android-x64-chip-tvserver
+gn gen --check --fail-on-unused-args {out}/android-x64-chip-tvserver '--args=target_os="android" target_cpu="x64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-app/android/
+
+# Accepting NDK licenses @ tools
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
+# Generating JARs for Java build rules test
+python3 build/chip/java/tests/generate_jars_for_test.py
+
+# Setting up Android deps through Gradle
+python3 third_party/android_deps/set_up_android_deps.py
+
 # Generating android-x86-chip-tool
 gn gen --check --fail-on-unused-args {out}/android-x86-chip-tool '--args=target_os="android" target_cpu="x86" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" '
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
+# Generating JARs for Java build rules test
+python3 build/chip/java/tests/generate_jars_for_test.py
+
+# Setting up Android deps through Gradle
+python3 third_party/android_deps/set_up_android_deps.py
+
+# Generating android-x86-chip-tvserver
+gn gen --check --fail-on-unused-args {out}/android-x86-chip-tvserver '--args=target_os="android" target_cpu="x86" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-app/android/
+
+# Accepting NDK licenses @ tools
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
 # Generating bl602-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=bl602_board="BL-HWC-G1"' {out}/bl602-light
+
+# Generating cc13x2x7_26x2x7-all-clusters
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-all-clusters
 
 # Generating cc13x2x7_26x2x7-lock-ftd
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT" chip_openthread_ftd=true' {out}/cc13x2x7_26x2x7-lock-ftd
@@ -700,18 +727,13 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 {root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 
-# Generating k32w-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0' {out}/k32w-light
+# Generating k32w-light-ota-se
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 is_debug=false chip_enable_ble=false chip_with_se05x=true' {out}/k32w-light-ota-se
 
 {root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 
-# Generating k32w-light-release
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 is_debug=false' {out}/k32w-light-release
-
-{root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
-
-# Generating k32w-light-tokenizer-release
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 chip_pw_tokenizer_logging=true is_debug=false' {out}/k32w-light-tokenizer-release
+# Generating k32w-light-release-no-ota
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 chip_pw_tokenizer_logging=true is_debug=false chip_enable_ota_requestor=false' {out}/k32w-light-release-no-ota
 
 {root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 
@@ -823,6 +845,11 @@ bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-native-posix-64-tests -b native_posix_64 {root}/src/test_driver/nrfconnect'
 
+# Generating nrf-nrf52840dk-all-clusters
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840dk-all-clusters -b nrf52840dk_nrf52840 {root}/examples/all-clusters-app/nrfconnect'
+
 # Generating nrf-nrf52840dk-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
@@ -853,10 +880,20 @@ bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf52840dk-shell -b nrf52840dk_nrf52840 {root}/examples/shell/nrfconnect'
 
+# Generating nrf-nrf52840dongle-all-clusters
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840dongle-all-clusters -b nrf52840dongle_nrf52840 {root}/examples/all-clusters-app/nrfconnect'
+
 # Generating nrf-nrf52840dongle-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf52840dongle-light -b nrf52840dongle_nrf52840 {root}/examples/lighting-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf52840dongle-light -b nrf52840dongle_nrf52840 {root}/examples/lighting-app/nrfconnect -- -DCONF_FILE=prj_no_dfu.conf'
+
+# Generating nrf-nrf5340dk-all-clusters
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340dk-all-clusters -b nrf5340dk_nrf5340_cpuapp {root}/examples/all-clusters-app/nrfconnect'
 
 # Generating nrf-nrf5340dk-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
@@ -909,6 +946,27 @@ west build --cmake-only -d {out}/telink-tlsr9518adk80d-light -b tlsr9518adk80d {
 
 # Generating tizen-arm-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light
+
+# Generating tizen-arm-light-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=is_asan=true target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-asan
+
+# Generating tizen-arm-light-no-ble
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_config_network_layer_ble=false target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-no-ble
+
+# Generating tizen-arm-light-no-ble-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_config_network_layer_ble=false is_asan=true target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-no-ble-asan
+
+# Generating tizen-arm-light-no-ble-no-wifi
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_config_network_layer_ble=false chip_enable_wifi=false target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-no-ble-no-wifi
+
+# Generating tizen-arm-light-no-ble-no-wifi-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_config_network_layer_ble=false chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-no-ble-no-wifi-asan
+
+# Generating tizen-arm-light-no-wifi
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_enable_wifi=false target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-no-wifi
+
+# Generating tizen-arm-light-no-wifi-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-no-wifi-asan
 
 # Building ameba-amebad-all-clusters
 ninja -C {out}/ameba-amebad-all-clusters
@@ -1107,6 +1165,29 @@ cp {out}/android-x64-chip-tool/lib/src/platform/android/AndroidPlatform.jar {roo
 # Building APP android-x64-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-x64-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x64-chip-tool assembleDebug
 
+# Building JNI android-x64-chip-tvserver
+ninja -C {out}/android-x64-chip-tvserver
+
+# Prepare Native libs android-x64-chip-tvserver
+mkdir -p {root}/examples/tv-app/android/App/app/libs/jniLibs/x86_64
+
+cp {out}/android-x64-chip-tvserver/lib/jni/x86_64/libSetupPayloadParser.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86_64/libSetupPayloadParser.so
+
+cp {out}/android-x64-chip-tvserver/lib/jni/x86_64/libc++_shared.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86_64/libc++_shared.so
+
+cp {out}/android-x64-chip-tvserver/lib/jni/x86_64/libTvApp.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86_64/libTvApp.so
+
+cp {out}/android-x64-chip-tvserver/lib/third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar {root}/examples/tv-app/android/App/app/libs/SetupPayloadParser.jar
+
+cp {out}/android-x64-chip-tvserver/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-app/android/App/app/libs/AndroidPlatform.jar
+
+cp {out}/android-x64-chip-tvserver/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-app/android/App/app/libs/CHIPAppServer.jar
+
+cp {out}/android-x64-chip-tvserver/lib/TvApp.jar {root}/examples/tv-app/android/App/app/libs/TvApp.jar
+
+# Building Example android-x64-chip-tvserver
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x64-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x64-chip-tvserver assembleDebug
+
 # Building JNI android-x86-chip-tool
 ninja -C {out}/android-x86-chip-tool
 
@@ -1128,8 +1209,34 @@ cp {out}/android-x86-chip-tool/lib/src/platform/android/AndroidPlatform.jar {roo
 # Building APP android-x86-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-x86-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tool assembleDebug
 
+# Building JNI android-x86-chip-tvserver
+ninja -C {out}/android-x86-chip-tvserver
+
+# Prepare Native libs android-x86-chip-tvserver
+mkdir -p {root}/examples/tv-app/android/App/app/libs/jniLibs/x86
+
+cp {out}/android-x86-chip-tvserver/lib/jni/x86/libSetupPayloadParser.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86/libSetupPayloadParser.so
+
+cp {out}/android-x86-chip-tvserver/lib/jni/x86/libc++_shared.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86/libc++_shared.so
+
+cp {out}/android-x86-chip-tvserver/lib/jni/x86/libTvApp.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86/libTvApp.so
+
+cp {out}/android-x86-chip-tvserver/lib/third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar {root}/examples/tv-app/android/App/app/libs/SetupPayloadParser.jar
+
+cp {out}/android-x86-chip-tvserver/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-app/android/App/app/libs/AndroidPlatform.jar
+
+cp {out}/android-x86-chip-tvserver/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-app/android/App/app/libs/CHIPAppServer.jar
+
+cp {out}/android-x86-chip-tvserver/lib/TvApp.jar {root}/examples/tv-app/android/App/app/libs/TvApp.jar
+
+# Building Example android-x86-chip-tvserver
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x86-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tvserver assembleDebug
+
 # Building bl602-light
 ninja -C {out}/bl602-light
+
+# Building cc13x2x7_26x2x7-all-clusters
+ninja -C {out}/cc13x2x7_26x2x7-all-clusters
 
 # Building cc13x2x7_26x2x7-lock-ftd
 ninja -C {out}/cc13x2x7_26x2x7-lock-ftd
@@ -1598,14 +1705,11 @@ ninja -C {out}/infineon-p6-light
 # Building infineon-p6-lock
 ninja -C {out}/infineon-p6-lock
 
-# Building k32w-light
-ninja -C {out}/k32w-light
+# Building k32w-light-ota-se
+ninja -C {out}/k32w-light-ota-se
 
-# Building k32w-light-release
-ninja -C {out}/k32w-light-release
-
-# Building k32w-light-tokenizer-release
-ninja -C {out}/k32w-light-tokenizer-release
+# Building k32w-light-release-no-ota
+ninja -C {out}/k32w-light-release-no-ota
 
 # Building k32w-lock-low-power-release
 ninja -C {out}/k32w-lock-low-power-release
@@ -1712,6 +1816,9 @@ ninja -C {out}/nrf-native-posix-64-tests
 # Run Tests nrf-native-posix-64-tests
 ctest --build-nocmake -V --output-on-failure --test-dir {out}/nrf-native-posix-64-tests
 
+# Building nrf-nrf52840dk-all-clusters
+ninja -C {out}/nrf-nrf52840dk-all-clusters
+
 # Building nrf-nrf52840dk-light
 ninja -C {out}/nrf-nrf52840dk-light
 
@@ -1730,8 +1837,14 @@ ninja -C {out}/nrf-nrf52840dk-pump-controller
 # Building nrf-nrf52840dk-shell
 ninja -C {out}/nrf-nrf52840dk-shell
 
+# Building nrf-nrf52840dongle-all-clusters
+ninja -C {out}/nrf-nrf52840dongle-all-clusters
+
 # Building nrf-nrf52840dongle-light
 ninja -C {out}/nrf-nrf52840dongle-light
+
+# Building nrf-nrf5340dk-all-clusters
+ninja -C {out}/nrf-nrf5340dk-all-clusters
 
 # Building nrf-nrf5340dk-light
 ninja -C {out}/nrf-nrf5340dk-light
@@ -1768,3 +1881,24 @@ ninja -C {out}/telink-tlsr9518adk80d-light
 
 # Building tizen-arm-light
 ninja -C {out}/tizen-arm-light
+
+# Building tizen-arm-light-asan
+ninja -C {out}/tizen-arm-light-asan
+
+# Building tizen-arm-light-no-ble
+ninja -C {out}/tizen-arm-light-no-ble
+
+# Building tizen-arm-light-no-ble-asan
+ninja -C {out}/tizen-arm-light-no-ble-asan
+
+# Building tizen-arm-light-no-ble-no-wifi
+ninja -C {out}/tizen-arm-light-no-ble-no-wifi
+
+# Building tizen-arm-light-no-ble-no-wifi-asan
+ninja -C {out}/tizen-arm-light-no-ble-no-wifi-asan
+
+# Building tizen-arm-light-no-wifi
+ninja -C {out}/tizen-arm-light-no-wifi
+
+# Building tizen-arm-light-no-wifi-asan
+ninja -C {out}/tizen-arm-light-no-wifi-asan

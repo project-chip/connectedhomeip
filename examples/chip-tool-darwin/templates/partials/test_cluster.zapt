@@ -101,14 +101,14 @@ class {{filename}}: public TestCommandBridge
         {{#if (isTestOnlyCluster cluster)}}
         {{command}}(
         {{#chip_tests_item_parameters}}
+        {{~#not_first}}, {{/not_first~}}
         {{#*inline "defaultValue"}}{{asTypedLiteral (chip_tests_config_get_default_value definedValue) (chip_tests_config_get_type definedValue)}}{{/inline}}
           {{~#if (chip_tests_config_has definedValue)~}}
               m{{asUpperCamelCase definedValue}}.HasValue() ? m{{asUpperCamelCase definedValue}}.Value() : {{>defaultValue}}
           {{else}}
           {{#if (isString type)}}@"{{/if}}{{definedValue}}{{#if (isString type)}}"{{/if}}
           {{~/if~}}
-        {{/chip_tests_item_parameters}}
-        {{additionalArguments}});
+        {{/chip_tests_item_parameters}});
         {{else}}
         CHIPDevice * device = GetConnectedDevice();
         CHIPTest{{asUpperCamelCase cluster}} * cluster = [[CHIPTest{{asUpperCamelCase cluster}} alloc] initWithDevice:device endpoint:{{endpoint}} queue:mCallbackQueue];

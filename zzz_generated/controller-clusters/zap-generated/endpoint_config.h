@@ -828,14 +828,22 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
         0x0103                                                                                                                     \
     }
 
-// Array of device ids
-#define FIXED_DEVICE_IDS                                                                                                           \
+// Array of device types
+#define FIXED_DEVICE_TYPES                                                                                                         \
     {                                                                                                                              \
-        22                                                                                                                         \
+        {                                                                                                                          \
+            0x0016, 1                                                                                                              \
+        }                                                                                                                          \
     }
 
-// Array of device versions
-#define FIXED_DEVICE_VERSIONS                                                                                                      \
+// Array of device type offsets
+#define FIXED_DEVICE_TYPE_OFFSETS                                                                                                  \
+    {                                                                                                                              \
+        0                                                                                                                          \
+    }
+
+// Array of device type lengths
+#define FIXED_DEVICE_TYPE_LENGTHS                                                                                                  \
     {                                                                                                                              \
         1                                                                                                                          \
     }

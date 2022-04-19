@@ -28,9 +28,9 @@
 #include "shell_extension/launch.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -39,15 +39,19 @@
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/ESP32/OTAImageProcessorImpl.h>
 
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+#include <platform/ESP32/ESP32FactoryDataProvider.h>
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+
 using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
 #if CONFIG_ENABLE_OTA_REQUESTOR
-OTARequestor gRequestorCore;
+DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
-GenericOTARequestorDriver gRequestorUser;
+DefaultOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 #endif
@@ -62,6 +66,10 @@ namespace {
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
 #endif
+
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+ESP32FactoryDataProvider sFactoryDataProvider;
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 } // namespace
 
 static void InitOTARequestor(void)
@@ -86,7 +94,12 @@ static void InitServer(intptr_t context)
     chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     sWiFiNetworkCommissioningInstance.Init();
 #endif
@@ -98,6 +111,7 @@ static void InitServer(intptr_t context)
         chip::app::DnssdServer::Instance().StartServer();
     }
 #endif
+    InitOTARequestor();
 }
 
 extern "C" void app_main()
@@ -113,6 +127,10 @@ extern "C" void app_main()
     ESP_LOGI(TAG, "==================================================");
     ESP_LOGI(TAG, "chip-esp32-light-example starting");
     ESP_LOGI(TAG, "==================================================");
+
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+    SetCommissionableDataProvider(&sFactoryDataProvider);
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();
@@ -139,8 +157,6 @@ extern "C" void app_main()
     }
 #endif
     AppLED.Init();
-
-    InitOTARequestor();
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }

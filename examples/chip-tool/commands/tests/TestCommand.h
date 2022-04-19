@@ -80,11 +80,17 @@ protected:
     chip::Controller::DeviceCommissioner & GetCurrentCommissioner() override { return CurrentCommissioner(); };
 
     void Exit(std::string message) override;
-    void ThrowFailureResponse();
+    void ThrowFailureResponse(CHIP_ERROR error);
     void ThrowSuccessResponse();
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+
+    bool IsUnsupported(const chip::app::StatusIB & status)
+    {
+        return status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute ||
+            status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedCommand;
+    }
 
     void Wait()
     {

@@ -160,6 +160,9 @@
 | Attributes:                                                         |        |
 | * Acl                                                               | 0x0000 |
 | * Extension                                                         | 0x0001 |
+| * SubjectsPerAccessControlEntry                                     | 0x0002 |
+| * TargetsPerAccessControlEntry                                      | 0x0003 |
+| * AccessControlEntriesPerFabric                                     | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -318,7 +321,7 @@ public:
         [cluster subscribeAttributeAclWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                params:params
-                              subscriptionEstablished:NULL
+                              subscriptionEstablished:nullptr
                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                             NSLog(@"AccessControl.Acl response %@", [value description]);
                                             if (error || !mWait) {
@@ -445,13 +448,255 @@ public:
         [cluster subscribeAttributeExtensionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"AccessControl.Extension response %@", [value description]);
                                                   if (error || !mWait) {
                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
                                                   }
                                               }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute SubjectsPerAccessControlEntry
+ */
+class ReadAccessControlSubjectsPerAccessControlEntry : public ModelCommand {
+public:
+    ReadAccessControlSubjectsPerAccessControlEntry()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "subjects-per-access-control-entry");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAccessControlSubjectsPerAccessControlEntry() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeSubjectsPerAccessControlEntryWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AccessControl.SubjectsPerAccessControlEntry response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "AccessControl SubjectsPerAccessControlEntry Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeAccessControlSubjectsPerAccessControlEntry : public ModelCommand {
+public:
+    SubscribeAttributeAccessControlSubjectsPerAccessControlEntry()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "subjects-per-access-control-entry");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeAccessControlSubjectsPerAccessControlEntry() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeSubjectsPerAccessControlEntryWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                    params:params
+                                                   subscriptionEstablished:nullptr
+                                                             reportHandler:^(
+                                                                 NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                                 NSLog(@"AccessControl.SubjectsPerAccessControlEntry response %@",
+                                                                     [value description]);
+                                                                 if (error || !mWait) {
+                                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                 }
+                                                             }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute TargetsPerAccessControlEntry
+ */
+class ReadAccessControlTargetsPerAccessControlEntry : public ModelCommand {
+public:
+    ReadAccessControlTargetsPerAccessControlEntry()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "targets-per-access-control-entry");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAccessControlTargetsPerAccessControlEntry() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeTargetsPerAccessControlEntryWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AccessControl.TargetsPerAccessControlEntry response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "AccessControl TargetsPerAccessControlEntry Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeAccessControlTargetsPerAccessControlEntry : public ModelCommand {
+public:
+    SubscribeAttributeAccessControlTargetsPerAccessControlEntry()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "targets-per-access-control-entry");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeAccessControlTargetsPerAccessControlEntry() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeTargetsPerAccessControlEntryWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                   params:params
+                                                  subscriptionEstablished:nullptr
+                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                                NSLog(@"AccessControl.TargetsPerAccessControlEntry response %@",
+                                                                    [value description]);
+                                                                if (error || !mWait) {
+                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                }
+                                                            }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute AccessControlEntriesPerFabric
+ */
+class ReadAccessControlAccessControlEntriesPerFabric : public ModelCommand {
+public:
+    ReadAccessControlAccessControlEntriesPerFabric()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "access-control-entries-per-fabric");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAccessControlAccessControlEntriesPerFabric() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeAccessControlEntriesPerFabricWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"AccessControl.AccessControlEntriesPerFabric response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "AccessControl AccessControlEntriesPerFabric Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeAccessControlAccessControlEntriesPerFabric : public ModelCommand {
+public:
+    SubscribeAttributeAccessControlAccessControlEntriesPerFabric()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "access-control-entries-per-fabric");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeAccessControlAccessControlEntriesPerFabric() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeAccessControlEntriesPerFabricWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                    params:params
+                                                   subscriptionEstablished:nullptr
+                                                             reportHandler:^(
+                                                                 NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                                 NSLog(@"AccessControl.AccessControlEntriesPerFabric response %@",
+                                                                     [value description]);
+                                                                 if (error || !mWait) {
+                                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                 }
+                                                             }];
 
         return CHIP_NO_ERROR;
     }
@@ -522,7 +767,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"AccessControl.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -601,7 +846,7 @@ public:
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"AccessControl.AcceptedCommandList response %@", [value description]);
                                                        if (error || !mWait) {
@@ -678,7 +923,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"AccessControl.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -755,7 +1000,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"AccessControl.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -959,7 +1204,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"AccountLogin.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -1038,7 +1283,7 @@ public:
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"AccountLogin.AcceptedCommandList response %@", [value description]);
                                                        if (error || !mWait) {
@@ -1115,7 +1360,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"AccountLogin.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -1192,7 +1437,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"AccountLogin.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -1416,7 +1661,7 @@ public:
             subscribeAttributeWindowStatusWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"AdministratorCommissioning.WindowStatus response %@", [value description]);
                                                 if (error || !mWait) {
@@ -1497,7 +1742,7 @@ public:
         [cluster subscribeAttributeAdminFabricIndexWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"AdministratorCommissioning.AdminFabricIndex response %@",
                                                              [value description]);
@@ -1579,7 +1824,7 @@ public:
         [cluster subscribeAttributeAdminVendorIdWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"AdministratorCommissioning.AdminVendorId response %@",
                                                           [value description]);
@@ -1661,7 +1906,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"AdministratorCommissioning.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -1743,7 +1988,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"AdministratorCommissioning.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -1825,7 +2070,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"AdministratorCommissioning.AttributeList response %@",
                                                           [value description]);
@@ -1907,7 +2152,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"AdministratorCommissioning.ClusterRevision response %@",
                                                             [value description]);
@@ -2012,7 +2257,7 @@ public:
         [cluster subscribeAttributeVendorNameWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ApplicationBasic.VendorName response %@", [value description]);
                                                    if (error || !mWait) {
@@ -2093,7 +2338,7 @@ public:
         [cluster subscribeAttributeVendorIDWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ApplicationBasic.VendorID response %@", [value description]);
                                                  if (error || !mWait) {
@@ -2174,7 +2419,7 @@ public:
         [cluster subscribeAttributeApplicationNameWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ApplicationBasic.ApplicationName response %@", [value description]);
                                                         if (error || !mWait) {
@@ -2255,7 +2500,7 @@ public:
         [cluster subscribeAttributeProductIDWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ApplicationBasic.ProductID response %@", [value description]);
                                                   if (error || !mWait) {
@@ -2338,7 +2583,7 @@ public:
             subscribeAttributeApplicationWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(CHIPApplicationBasicClusterApplicationBasicApplication * _Nullable value,
                                                NSError * _Nullable error) {
                                                NSLog(@"ApplicationBasic.Application response %@", [value description]);
@@ -2420,7 +2665,7 @@ public:
         [cluster subscribeAttributeStatusWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"ApplicationBasic.Status response %@", [value description]);
                                                if (error || !mWait) {
@@ -2501,7 +2746,7 @@ public:
         [cluster subscribeAttributeApplicationVersionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                               params:params
-                                             subscriptionEstablished:NULL
+                                             subscriptionEstablished:nullptr
                                                        reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"ApplicationBasic.ApplicationVersion response %@",
                                                                [value description]);
@@ -2584,7 +2829,7 @@ public:
             subscribeAttributeAllowedVendorListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ApplicationBasic.AllowedVendorList response %@", [value description]);
                                                      if (error || !mWait) {
@@ -2665,7 +2910,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ApplicationBasic.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -2747,7 +2992,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"ApplicationBasic.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -2829,7 +3074,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ApplicationBasic.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -2910,7 +3155,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ApplicationBasic.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -3150,7 +3395,7 @@ public:
         [cluster subscribeAttributeCatalogListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ApplicationLauncher.CatalogList response %@", [value description]);
                                                     if (error || !mWait) {
@@ -3286,7 +3531,7 @@ public:
         [cluster subscribeAttributeCurrentAppWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(CHIPApplicationLauncherClusterApplicationEP * _Nullable value,
                                                    NSError * _Nullable error) {
                                                    NSLog(@"ApplicationLauncher.CurrentApp response %@", [value description]);
@@ -3368,7 +3613,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ApplicationLauncher.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -3450,7 +3695,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"ApplicationLauncher.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -3532,7 +3777,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ApplicationLauncher.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -3614,7 +3859,7 @@ public:
             subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ApplicationLauncher.ClusterRevision response %@", [value description]);
                                                    if (error || !mWait) {
@@ -3784,7 +4029,7 @@ public:
         [cluster subscribeAttributeOutputListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"AudioOutput.OutputList response %@", [value description]);
                                                    if (error || !mWait) {
@@ -3861,7 +4106,7 @@ public:
         [cluster subscribeAttributeCurrentOutputWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"AudioOutput.CurrentOutput response %@", [value description]);
                                                       if (error || !mWait) {
@@ -3939,7 +4184,7 @@ public:
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"AudioOutput.GeneratedCommandList response %@", [value description]);
                                                         if (error || !mWait) {
@@ -4017,7 +4262,7 @@ public:
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"AudioOutput.AcceptedCommandList response %@", [value description]);
                                                        if (error || !mWait) {
@@ -4094,7 +4339,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"AudioOutput.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -4171,7 +4416,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"AudioOutput.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -4340,7 +4585,7 @@ public:
             subscribeAttributeBarrierMovingStateWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"BarrierControl.BarrierMovingState response %@", [value description]);
                                                       if (error || !mWait) {
@@ -4417,7 +4662,7 @@ public:
         [cluster subscribeAttributeBarrierSafetyStatusWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"BarrierControl.BarrierSafetyStatus response %@",
                                                                 [value description]);
@@ -4495,7 +4740,7 @@ public:
         [cluster subscribeAttributeBarrierCapabilitiesWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"BarrierControl.BarrierCapabilities response %@",
                                                                 [value description]);
@@ -4573,7 +4818,7 @@ public:
         [cluster subscribeAttributeBarrierPositionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"BarrierControl.BarrierPosition response %@", [value description]);
                                                         if (error || !mWait) {
@@ -4650,7 +4895,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"BarrierControl.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -4728,7 +4973,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"BarrierControl.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -4806,7 +5051,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"BarrierControl.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -4883,7 +5128,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"BarrierControl.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -4931,6 +5176,7 @@ private:
 | * LocalConfigDisabled                                               | 0x0010 |
 | * Reachable                                                         | 0x0011 |
 | * UniqueID                                                          | 0x0012 |
+| * CapabilityMinima                                                  | 0x0013 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -4999,7 +5245,7 @@ public:
         [cluster subscribeAttributeDataModelRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"Basic.DataModelRevision response %@", [value description]);
                                                           if (error || !mWait) {
@@ -5076,7 +5322,7 @@ public:
         [cluster subscribeAttributeVendorNameWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Basic.VendorName response %@", [value description]);
                                                    if (error || !mWait) {
@@ -5153,7 +5399,7 @@ public:
         [cluster subscribeAttributeVendorIDWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"Basic.VendorID response %@", [value description]);
                                                  if (error || !mWait) {
@@ -5230,7 +5476,7 @@ public:
         [cluster subscribeAttributeProductNameWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"Basic.ProductName response %@", [value description]);
                                                     if (error || !mWait) {
@@ -5307,7 +5553,7 @@ public:
         [cluster subscribeAttributeProductIDWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"Basic.ProductID response %@", [value description]);
                                                   if (error || !mWait) {
@@ -5420,7 +5666,7 @@ public:
         [cluster subscribeAttributeNodeLabelWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"Basic.NodeLabel response %@", [value description]);
                                                   if (error || !mWait) {
@@ -5533,7 +5779,7 @@ public:
         [cluster subscribeAttributeLocationWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"Basic.Location response %@", [value description]);
                                                  if (error || !mWait) {
@@ -5610,7 +5856,7 @@ public:
         [cluster subscribeAttributeHardwareVersionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Basic.HardwareVersion response %@", [value description]);
                                                         if (error || !mWait) {
@@ -5688,7 +5934,7 @@ public:
             subscribeAttributeHardwareVersionStringWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"Basic.HardwareVersionString response %@", [value description]);
                                                          if (error || !mWait) {
@@ -5765,7 +6011,7 @@ public:
         [cluster subscribeAttributeSoftwareVersionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Basic.SoftwareVersion response %@", [value description]);
                                                         if (error || !mWait) {
@@ -5843,7 +6089,7 @@ public:
             subscribeAttributeSoftwareVersionStringWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"Basic.SoftwareVersionString response %@", [value description]);
                                                          if (error || !mWait) {
@@ -5920,7 +6166,7 @@ public:
         [cluster subscribeAttributeManufacturingDateWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"Basic.ManufacturingDate response %@", [value description]);
                                                           if (error || !mWait) {
@@ -5997,7 +6243,7 @@ public:
         [cluster subscribeAttributePartNumberWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Basic.PartNumber response %@", [value description]);
                                                    if (error || !mWait) {
@@ -6074,7 +6320,7 @@ public:
         [cluster subscribeAttributeProductURLWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Basic.ProductURL response %@", [value description]);
                                                    if (error || !mWait) {
@@ -6151,7 +6397,7 @@ public:
         [cluster subscribeAttributeProductLabelWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"Basic.ProductLabel response %@", [value description]);
                                                      if (error || !mWait) {
@@ -6228,7 +6474,7 @@ public:
         [cluster subscribeAttributeSerialNumberWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"Basic.SerialNumber response %@", [value description]);
                                                      if (error || !mWait) {
@@ -6340,7 +6586,7 @@ public:
         [cluster subscribeAttributeLocalConfigDisabledWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"Basic.LocalConfigDisabled response %@", [value description]);
                                                             if (error || !mWait) {
@@ -6417,7 +6663,7 @@ public:
         [cluster subscribeAttributeReachableWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"Basic.Reachable response %@", [value description]);
                                                   if (error || !mWait) {
@@ -6494,13 +6740,92 @@ public:
         [cluster subscribeAttributeUniqueIDWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"Basic.UniqueID response %@", [value description]);
                                                  if (error || !mWait) {
                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
                                                  }
                                              }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute CapabilityMinima
+ */
+class ReadBasicCapabilityMinima : public ModelCommand {
+public:
+    ReadBasicCapabilityMinima()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "capability-minima");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBasicCapabilityMinima() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReadAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeCapabilityMinimaWithCompletionHandler:^(
+            CHIPBasicClusterCapabilityMinimaStruct * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Basic.CapabilityMinima response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "Basic CapabilityMinima Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeBasicCapabilityMinima : public ModelCommand {
+public:
+    SubscribeAttributeBasicCapabilityMinima()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "capability-minima");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeBasicCapabilityMinima() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeCapabilityMinimaWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                            params:params
+                                           subscriptionEstablished:nullptr
+                                                     reportHandler:^(CHIPBasicClusterCapabilityMinimaStruct * _Nullable value,
+                                                         NSError * _Nullable error) {
+                                                         NSLog(@"Basic.CapabilityMinima response %@", [value description]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
+                                                     }];
 
         return CHIP_NO_ERROR;
     }
@@ -6571,7 +6896,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"Basic.GeneratedCommandList response %@", [value description]);
                                                              if (error || !mWait) {
@@ -6648,7 +6973,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"Basic.AcceptedCommandList response %@", [value description]);
                                                             if (error || !mWait) {
@@ -6725,7 +7050,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Basic.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -6802,7 +7127,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Basic.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -6943,7 +7268,7 @@ public:
         [cluster subscribeAttributeOutOfServiceWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"BinaryInputBasic.OutOfService response %@", [value description]);
                                                      if (error || !mWait) {
@@ -7060,7 +7385,7 @@ public:
         [cluster subscribeAttributePresentValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"BinaryInputBasic.PresentValue response %@", [value description]);
                                                      if (error || !mWait) {
@@ -7141,7 +7466,7 @@ public:
         [cluster subscribeAttributeStatusFlagsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"BinaryInputBasic.StatusFlags response %@", [value description]);
                                                     if (error || !mWait) {
@@ -7222,7 +7547,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"BinaryInputBasic.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -7304,7 +7629,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"BinaryInputBasic.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -7386,7 +7711,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"BinaryInputBasic.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -7467,7 +7792,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"BinaryInputBasic.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -7628,7 +7953,7 @@ public:
         [cluster subscribeAttributeBindingWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"Binding.Binding response %@", [value description]);
                                                 if (error || !mWait) {
@@ -7706,7 +8031,7 @@ public:
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Binding.GeneratedCommandList response %@", [value description]);
                                                         if (error || !mWait) {
@@ -7783,7 +8108,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"Binding.AcceptedCommandList response %@", [value description]);
                                                             if (error || !mWait) {
@@ -7860,7 +8185,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Binding.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -7937,7 +8262,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Binding.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -8031,7 +8356,7 @@ public:
         [cluster subscribeAttributeStateValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BooleanState.StateValue response %@", [value description]);
                                                    if (error || !mWait) {
@@ -8108,7 +8433,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"BooleanState.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -8187,7 +8512,7 @@ public:
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"BooleanState.AcceptedCommandList response %@", [value description]);
                                                        if (error || !mWait) {
@@ -8264,7 +8589,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"BooleanState.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -8341,7 +8666,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"BooleanState.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -8938,7 +9263,7 @@ public:
         [cluster subscribeAttributeActionListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedActions.ActionList response %@", [value description]);
                                                    if (error || !mWait) {
@@ -9015,7 +9340,7 @@ public:
         [cluster subscribeAttributeEndpointListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"BridgedActions.EndpointList response %@", [value description]);
                                                      if (error || !mWait) {
@@ -9092,7 +9417,7 @@ public:
         [cluster subscribeAttributeSetupUrlWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"BridgedActions.SetupUrl response %@", [value description]);
                                                  if (error || !mWait) {
@@ -9169,7 +9494,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"BridgedActions.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -9247,7 +9572,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"BridgedActions.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -9325,7 +9650,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"BridgedActions.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -9402,7 +9727,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"BridgedActions.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -9517,7 +9842,7 @@ public:
         [cluster subscribeAttributeVendorNameWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedDeviceBasic.VendorName response %@", [value description]);
                                                    if (error || !mWait) {
@@ -9598,7 +9923,7 @@ public:
         [cluster subscribeAttributeVendorIDWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"BridgedDeviceBasic.VendorID response %@", [value description]);
                                                  if (error || !mWait) {
@@ -9679,7 +10004,7 @@ public:
         [cluster subscribeAttributeProductNameWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"BridgedDeviceBasic.ProductName response %@", [value description]);
                                                     if (error || !mWait) {
@@ -9798,7 +10123,7 @@ public:
         [cluster subscribeAttributeNodeLabelWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"BridgedDeviceBasic.NodeLabel response %@", [value description]);
                                                   if (error || !mWait) {
@@ -9880,7 +10205,7 @@ public:
             subscribeAttributeHardwareVersionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedDeviceBasic.HardwareVersion response %@", [value description]);
                                                    if (error || !mWait) {
@@ -9961,7 +10286,7 @@ public:
         [cluster subscribeAttributeHardwareVersionStringWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                  params:params
-                                                subscriptionEstablished:NULL
+                                                subscriptionEstablished:nullptr
                                                           reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"BridgedDeviceBasic.HardwareVersionString response %@",
                                                                   [value description]);
@@ -10044,7 +10369,7 @@ public:
             subscribeAttributeSoftwareVersionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedDeviceBasic.SoftwareVersion response %@", [value description]);
                                                    if (error || !mWait) {
@@ -10125,7 +10450,7 @@ public:
         [cluster subscribeAttributeSoftwareVersionStringWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                  params:params
-                                                subscriptionEstablished:NULL
+                                                subscriptionEstablished:nullptr
                                                           reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"BridgedDeviceBasic.SoftwareVersionString response %@",
                                                                   [value description]);
@@ -10207,7 +10532,7 @@ public:
         [cluster subscribeAttributeManufacturingDateWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"BridgedDeviceBasic.ManufacturingDate response %@",
                                                               [value description]);
@@ -10289,7 +10614,7 @@ public:
         [cluster subscribeAttributePartNumberWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedDeviceBasic.PartNumber response %@", [value description]);
                                                    if (error || !mWait) {
@@ -10370,7 +10695,7 @@ public:
         [cluster subscribeAttributeProductURLWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedDeviceBasic.ProductURL response %@", [value description]);
                                                    if (error || !mWait) {
@@ -10451,7 +10776,7 @@ public:
         [cluster subscribeAttributeProductLabelWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"BridgedDeviceBasic.ProductLabel response %@", [value description]);
                                                      if (error || !mWait) {
@@ -10532,7 +10857,7 @@ public:
         [cluster subscribeAttributeSerialNumberWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"BridgedDeviceBasic.SerialNumber response %@", [value description]);
                                                      if (error || !mWait) {
@@ -10613,7 +10938,7 @@ public:
         [cluster subscribeAttributeReachableWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"BridgedDeviceBasic.Reachable response %@", [value description]);
                                                   if (error || !mWait) {
@@ -10694,7 +11019,7 @@ public:
         [cluster subscribeAttributeUniqueIDWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"BridgedDeviceBasic.UniqueID response %@", [value description]);
                                                  if (error || !mWait) {
@@ -10775,7 +11100,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"BridgedDeviceBasic.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -10857,7 +11182,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"BridgedDeviceBasic.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -10939,7 +11264,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"BridgedDeviceBasic.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -11021,7 +11346,7 @@ public:
             subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedDeviceBasic.ClusterRevision response %@", [value description]);
                                                    if (error || !mWait) {
@@ -11230,7 +11555,7 @@ public:
         [cluster subscribeAttributeChannelListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"Channel.ChannelList response %@", [value description]);
                                                     if (error || !mWait) {
@@ -11309,7 +11634,7 @@ public:
             subscribeAttributeLineupWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                              params:params
-                            subscriptionEstablished:NULL
+                            subscriptionEstablished:nullptr
                                       reportHandler:^(CHIPChannelClusterLineupInfo * _Nullable value, NSError * _Nullable error) {
                                           NSLog(@"Channel.Lineup response %@", [value description]);
                                           if (error || !mWait) {
@@ -11387,7 +11712,7 @@ public:
         [cluster subscribeAttributeCurrentChannelWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(
                                                        CHIPChannelClusterChannelInfo * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"Channel.CurrentChannel response %@", [value description]);
@@ -11466,7 +11791,7 @@ public:
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Channel.GeneratedCommandList response %@", [value description]);
                                                         if (error || !mWait) {
@@ -11543,7 +11868,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"Channel.AcceptedCommandList response %@", [value description]);
                                                             if (error || !mWait) {
@@ -11620,7 +11945,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Channel.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -11697,7 +12022,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Channel.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -12813,7 +13138,7 @@ public:
         [cluster subscribeAttributeCurrentHueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ColorControl.CurrentHue response %@", [value description]);
                                                    if (error || !mWait) {
@@ -12890,7 +13215,7 @@ public:
         [cluster subscribeAttributeCurrentSaturationWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.CurrentSaturation response %@", [value description]);
                                                           if (error || !mWait) {
@@ -12967,7 +13292,7 @@ public:
         [cluster subscribeAttributeRemainingTimeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ColorControl.RemainingTime response %@", [value description]);
                                                       if (error || !mWait) {
@@ -13044,7 +13369,7 @@ public:
         [cluster subscribeAttributeCurrentXWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ColorControl.CurrentX response %@", [value description]);
                                                  if (error || !mWait) {
@@ -13121,7 +13446,7 @@ public:
         [cluster subscribeAttributeCurrentYWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ColorControl.CurrentY response %@", [value description]);
                                                  if (error || !mWait) {
@@ -13198,7 +13523,7 @@ public:
         [cluster subscribeAttributeDriftCompensationWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.DriftCompensation response %@", [value description]);
                                                           if (error || !mWait) {
@@ -13275,7 +13600,7 @@ public:
         [cluster subscribeAttributeCompensationTextWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"ColorControl.CompensationText response %@", [value description]);
                                                          if (error || !mWait) {
@@ -13352,7 +13677,7 @@ public:
         [cluster subscribeAttributeColorTemperatureWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"ColorControl.ColorTemperature response %@", [value description]);
                                                          if (error || !mWait) {
@@ -13429,7 +13754,7 @@ public:
         [cluster subscribeAttributeColorModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.ColorMode response %@", [value description]);
                                                   if (error || !mWait) {
@@ -13542,7 +13867,7 @@ public:
             subscribeAttributeColorControlOptionsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ColorControl.ColorControlOptions response %@", [value description]);
                                                        if (error || !mWait) {
@@ -13619,7 +13944,7 @@ public:
         [cluster subscribeAttributeNumberOfPrimariesWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.NumberOfPrimaries response %@", [value description]);
                                                           if (error || !mWait) {
@@ -13696,7 +14021,7 @@ public:
         [cluster subscribeAttributePrimary1XWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary1X response %@", [value description]);
                                                   if (error || !mWait) {
@@ -13773,7 +14098,7 @@ public:
         [cluster subscribeAttributePrimary1YWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary1Y response %@", [value description]);
                                                   if (error || !mWait) {
@@ -13850,7 +14175,7 @@ public:
         [cluster subscribeAttributePrimary1IntensityWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.Primary1Intensity response %@", [value description]);
                                                           if (error || !mWait) {
@@ -13927,7 +14252,7 @@ public:
         [cluster subscribeAttributePrimary2XWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary2X response %@", [value description]);
                                                   if (error || !mWait) {
@@ -14004,7 +14329,7 @@ public:
         [cluster subscribeAttributePrimary2YWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary2Y response %@", [value description]);
                                                   if (error || !mWait) {
@@ -14081,7 +14406,7 @@ public:
         [cluster subscribeAttributePrimary2IntensityWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.Primary2Intensity response %@", [value description]);
                                                           if (error || !mWait) {
@@ -14158,7 +14483,7 @@ public:
         [cluster subscribeAttributePrimary3XWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary3X response %@", [value description]);
                                                   if (error || !mWait) {
@@ -14235,7 +14560,7 @@ public:
         [cluster subscribeAttributePrimary3YWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary3Y response %@", [value description]);
                                                   if (error || !mWait) {
@@ -14312,7 +14637,7 @@ public:
         [cluster subscribeAttributePrimary3IntensityWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.Primary3Intensity response %@", [value description]);
                                                           if (error || !mWait) {
@@ -14389,7 +14714,7 @@ public:
         [cluster subscribeAttributePrimary4XWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary4X response %@", [value description]);
                                                   if (error || !mWait) {
@@ -14466,7 +14791,7 @@ public:
         [cluster subscribeAttributePrimary4YWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary4Y response %@", [value description]);
                                                   if (error || !mWait) {
@@ -14543,7 +14868,7 @@ public:
         [cluster subscribeAttributePrimary4IntensityWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.Primary4Intensity response %@", [value description]);
                                                           if (error || !mWait) {
@@ -14620,7 +14945,7 @@ public:
         [cluster subscribeAttributePrimary5XWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary5X response %@", [value description]);
                                                   if (error || !mWait) {
@@ -14697,7 +15022,7 @@ public:
         [cluster subscribeAttributePrimary5YWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary5Y response %@", [value description]);
                                                   if (error || !mWait) {
@@ -14774,7 +15099,7 @@ public:
         [cluster subscribeAttributePrimary5IntensityWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.Primary5Intensity response %@", [value description]);
                                                           if (error || !mWait) {
@@ -14851,7 +15176,7 @@ public:
         [cluster subscribeAttributePrimary6XWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary6X response %@", [value description]);
                                                   if (error || !mWait) {
@@ -14928,7 +15253,7 @@ public:
         [cluster subscribeAttributePrimary6YWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary6Y response %@", [value description]);
                                                   if (error || !mWait) {
@@ -15005,7 +15330,7 @@ public:
         [cluster subscribeAttributePrimary6IntensityWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.Primary6Intensity response %@", [value description]);
                                                           if (error || !mWait) {
@@ -15116,7 +15441,7 @@ public:
         [cluster subscribeAttributeWhitePointXWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ColorControl.WhitePointX response %@", [value description]);
                                                     if (error || !mWait) {
@@ -15227,7 +15552,7 @@ public:
         [cluster subscribeAttributeWhitePointYWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ColorControl.WhitePointY response %@", [value description]);
                                                     if (error || !mWait) {
@@ -15338,7 +15663,7 @@ public:
         [cluster subscribeAttributeColorPointRXWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ColorControl.ColorPointRX response %@", [value description]);
                                                      if (error || !mWait) {
@@ -15449,7 +15774,7 @@ public:
         [cluster subscribeAttributeColorPointRYWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ColorControl.ColorPointRY response %@", [value description]);
                                                      if (error || !mWait) {
@@ -15561,7 +15886,7 @@ public:
         [cluster subscribeAttributeColorPointRIntensityWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ColorControl.ColorPointRIntensity response %@",
                                                                  [value description]);
@@ -15673,7 +15998,7 @@ public:
         [cluster subscribeAttributeColorPointGXWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ColorControl.ColorPointGX response %@", [value description]);
                                                      if (error || !mWait) {
@@ -15784,7 +16109,7 @@ public:
         [cluster subscribeAttributeColorPointGYWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ColorControl.ColorPointGY response %@", [value description]);
                                                      if (error || !mWait) {
@@ -15896,7 +16221,7 @@ public:
         [cluster subscribeAttributeColorPointGIntensityWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ColorControl.ColorPointGIntensity response %@",
                                                                  [value description]);
@@ -16008,7 +16333,7 @@ public:
         [cluster subscribeAttributeColorPointBXWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ColorControl.ColorPointBX response %@", [value description]);
                                                      if (error || !mWait) {
@@ -16119,7 +16444,7 @@ public:
         [cluster subscribeAttributeColorPointBYWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ColorControl.ColorPointBY response %@", [value description]);
                                                      if (error || !mWait) {
@@ -16231,7 +16556,7 @@ public:
         [cluster subscribeAttributeColorPointBIntensityWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ColorControl.ColorPointBIntensity response %@",
                                                                  [value description]);
@@ -16310,7 +16635,7 @@ public:
             subscribeAttributeEnhancedCurrentHueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ColorControl.EnhancedCurrentHue response %@", [value description]);
                                                       if (error || !mWait) {
@@ -16387,7 +16712,7 @@ public:
         [cluster subscribeAttributeEnhancedColorModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.EnhancedColorMode response %@", [value description]);
                                                           if (error || !mWait) {
@@ -16464,7 +16789,7 @@ public:
         [cluster subscribeAttributeColorLoopActiveWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ColorControl.ColorLoopActive response %@", [value description]);
                                                         if (error || !mWait) {
@@ -16542,7 +16867,7 @@ public:
             subscribeAttributeColorLoopDirectionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ColorControl.ColorLoopDirection response %@", [value description]);
                                                       if (error || !mWait) {
@@ -16619,7 +16944,7 @@ public:
         [cluster subscribeAttributeColorLoopTimeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ColorControl.ColorLoopTime response %@", [value description]);
                                                       if (error || !mWait) {
@@ -16698,7 +17023,7 @@ public:
             subscribeAttributeColorLoopStartEnhancedHueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ColorControl.ColorLoopStartEnhancedHue response %@",
                                                                  [value description]);
@@ -16778,7 +17103,7 @@ public:
             subscribeAttributeColorLoopStoredEnhancedHueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                  params:params
-                                                subscriptionEstablished:NULL
+                                                subscriptionEstablished:nullptr
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ColorControl.ColorLoopStoredEnhancedHue response %@",
                                                                   [value description]);
@@ -16856,7 +17181,7 @@ public:
         [cluster subscribeAttributeColorCapabilitiesWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.ColorCapabilities response %@", [value description]);
                                                           if (error || !mWait) {
@@ -16933,7 +17258,7 @@ public:
         [cluster subscribeAttributeColorTempPhysicalMinWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ColorControl.ColorTempPhysicalMin response %@",
                                                                  [value description]);
@@ -17011,7 +17336,7 @@ public:
         [cluster subscribeAttributeColorTempPhysicalMaxWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ColorControl.ColorTempPhysicalMax response %@",
                                                                  [value description]);
@@ -17091,7 +17416,7 @@ public:
             subscribeAttributeCoupleColorTempToLevelMinMiredsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                       params:params
-                                                     subscriptionEstablished:NULL
+                                                     subscriptionEstablished:nullptr
                                                                reportHandler:^(
                                                                    NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                    NSLog(
@@ -17209,7 +17534,7 @@ public:
             subscribeAttributeStartUpColorTemperatureMiredsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                     params:params
-                                                   subscriptionEstablished:NULL
+                                                   subscriptionEstablished:nullptr
                                                              reportHandler:^(
                                                                  NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                  NSLog(@"ColorControl.StartUpColorTemperatureMireds response %@",
@@ -17288,7 +17613,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ColorControl.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -17367,7 +17692,7 @@ public:
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ColorControl.AcceptedCommandList response %@", [value description]);
                                                        if (error || !mWait) {
@@ -17444,7 +17769,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ColorControl.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -17521,7 +17846,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ColorControl.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -17921,7 +18246,7 @@ public:
         [cluster subscribeAttributeAcceptHeaderWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ContentLauncher.AcceptHeader response %@", [value description]);
                                                      if (error || !mWait) {
@@ -18036,7 +18361,7 @@ public:
             subscribeAttributeSupportedStreamingProtocolsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                   params:params
-                                                 subscriptionEstablished:NULL
+                                                 subscriptionEstablished:nullptr
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"ContentLauncher.SupportedStreamingProtocols response %@",
                                                                    [value description]);
@@ -18114,7 +18439,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ContentLauncher.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -18192,7 +18517,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"ContentLauncher.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -18270,7 +18595,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ContentLauncher.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -18347,7 +18672,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ContentLauncher.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -18443,7 +18768,7 @@ public:
         [cluster subscribeAttributeDeviceListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Descriptor.DeviceList response %@", [value description]);
                                                    if (error || !mWait) {
@@ -18520,7 +18845,7 @@ public:
         [cluster subscribeAttributeServerListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Descriptor.ServerList response %@", [value description]);
                                                    if (error || !mWait) {
@@ -18597,7 +18922,7 @@ public:
         [cluster subscribeAttributeClientListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Descriptor.ClientList response %@", [value description]);
                                                    if (error || !mWait) {
@@ -18674,7 +18999,7 @@ public:
         [cluster subscribeAttributePartsListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"Descriptor.PartsList response %@", [value description]);
                                                   if (error || !mWait) {
@@ -18752,7 +19077,7 @@ public:
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Descriptor.GeneratedCommandList response %@", [value description]);
                                                         if (error || !mWait) {
@@ -18830,7 +19155,7 @@ public:
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"Descriptor.AcceptedCommandList response %@", [value description]);
                                                        if (error || !mWait) {
@@ -18907,7 +19232,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Descriptor.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -18984,7 +19309,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Descriptor.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -19123,7 +19448,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"DiagnosticLogs.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -19201,7 +19526,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"DiagnosticLogs.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -19279,7 +19604,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"DiagnosticLogs.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -19443,6 +19768,41 @@ private:
 };
 
 /*
+ * Command ClearHolidaySchedule
+ */
+class DoorLockClearHolidaySchedule : public ModelCommand {
+public:
+    DoorLockClearHolidaySchedule()
+        : ModelCommand("clear-holiday-schedule")
+    {
+        AddArgument("HolidayIndex", 0, UINT8_MAX, &mHolidayIndex);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000013) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block chipError = CHIP_NO_ERROR;
+        __auto_type * params = [[CHIPDoorLockClusterClearHolidayScheduleParams alloc] init];
+
+        params.holidayIndex = [NSNumber numberWithUnsignedChar:mHolidayIndex];
+        [cluster clearHolidayScheduleWithParams:params
+                              completionHandler:^(NSError * _Nullable error) {
+                                  chipError = [CHIPError errorToCHIPErrorCode:error];
+                                  ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(chipError));
+                                  SetCommandExitStatus(chipError);
+                              }];
+        return chipError;
+    }
+
+private:
+    uint8_t mHolidayIndex;
+};
+
+/*
  * Command ClearUser
  */
 class DoorLockClearUser : public ModelCommand {
@@ -19595,6 +19955,43 @@ public:
 private:
     chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type mRequest;
     TypedComplexArgument<chip::app::Clusters::DoorLock::Structs::DlCredential::Type> mComplex_Credential;
+};
+
+/*
+ * Command GetHolidaySchedule
+ */
+class DoorLockGetHolidaySchedule : public ModelCommand {
+public:
+    DoorLockGetHolidaySchedule()
+        : ModelCommand("get-holiday-schedule")
+    {
+        AddArgument("HolidayIndex", 0, UINT8_MAX, &mHolidayIndex);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000012) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block chipError = CHIP_NO_ERROR;
+        __auto_type * params = [[CHIPDoorLockClusterGetHolidayScheduleParams alloc] init];
+
+        params.holidayIndex = [NSNumber numberWithUnsignedChar:mHolidayIndex];
+        [cluster getHolidayScheduleWithParams:params
+                            completionHandler:^(
+                                CHIPDoorLockClusterGetHolidayScheduleResponseParams * _Nullable values, NSError * _Nullable error) {
+                                NSLog(@"Values: %@", values);
+                                chipError = [CHIPError errorToCHIPErrorCode:error];
+                                ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(chipError));
+                                SetCommandExitStatus(chipError);
+                            }];
+        return chipError;
+    }
+
+private:
+    uint8_t mHolidayIndex;
 };
 
 /*
@@ -19810,6 +20207,53 @@ private:
     uint16_t mUserIndex;
     uint8_t mUserStatus;
     uint8_t mUserType;
+};
+
+/*
+ * Command SetHolidaySchedule
+ */
+class DoorLockSetHolidaySchedule : public ModelCommand {
+public:
+    DoorLockSetHolidaySchedule()
+        : ModelCommand("set-holiday-schedule")
+    {
+        AddArgument("HolidayIndex", 0, UINT8_MAX, &mHolidayIndex);
+        AddArgument("LocalStartTime", 0, UINT32_MAX, &mLocalStartTime);
+        AddArgument("LocalEndTime", 0, UINT32_MAX, &mLocalEndTime);
+        AddArgument("OperatingMode", 0, UINT8_MAX, &mOperatingMode);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000011) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block chipError = CHIP_NO_ERROR;
+        __auto_type * params = [[CHIPDoorLockClusterSetHolidayScheduleParams alloc] init];
+
+        params.holidayIndex = [NSNumber numberWithUnsignedChar:mHolidayIndex];
+
+        params.localStartTime = [NSNumber numberWithUnsignedInt:mLocalStartTime];
+
+        params.localEndTime = [NSNumber numberWithUnsignedInt:mLocalEndTime];
+
+        params.operatingMode = [NSNumber numberWithUnsignedChar:mOperatingMode];
+        [cluster setHolidayScheduleWithParams:params
+                            completionHandler:^(NSError * _Nullable error) {
+                                chipError = [CHIPError errorToCHIPErrorCode:error];
+                                ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(chipError));
+                                SetCommandExitStatus(chipError);
+                            }];
+        return chipError;
+    }
+
+private:
+    uint8_t mHolidayIndex;
+    uint32_t mLocalStartTime;
+    uint32_t mLocalEndTime;
+    uint8_t mOperatingMode;
 };
 
 /*
@@ -20106,7 +20550,7 @@ public:
         [cluster subscribeAttributeLockStateWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"DoorLock.LockState response %@", [value description]);
                                                   if (error || !mWait) {
@@ -20183,7 +20627,7 @@ public:
         [cluster subscribeAttributeLockTypeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"DoorLock.LockType response %@", [value description]);
                                                  if (error || !mWait) {
@@ -20260,7 +20704,7 @@ public:
         [cluster subscribeAttributeActuatorEnabledWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"DoorLock.ActuatorEnabled response %@", [value description]);
                                                         if (error || !mWait) {
@@ -20337,7 +20781,7 @@ public:
         [cluster subscribeAttributeDoorStateWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"DoorLock.DoorState response %@", [value description]);
                                                   if (error || !mWait) {
@@ -20416,7 +20860,7 @@ public:
             subscribeAttributeNumberOfTotalUsersSupportedWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                   params:params
-                                                 subscriptionEstablished:NULL
+                                                 subscriptionEstablished:nullptr
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"DoorLock.NumberOfTotalUsersSupported response %@",
                                                                    [value description]);
@@ -20496,7 +20940,7 @@ public:
             subscribeAttributeNumberOfPINUsersSupportedWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"DoorLock.NumberOfPINUsersSupported response %@",
                                                                  [value description]);
@@ -20576,7 +21020,7 @@ public:
             subscribeAttributeNumberOfRFIDUsersSupportedWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                  params:params
-                                                subscriptionEstablished:NULL
+                                                subscriptionEstablished:nullptr
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"DoorLock.NumberOfRFIDUsersSupported response %@",
                                                                   [value description]);
@@ -20656,7 +21100,7 @@ public:
             subscribeAttributeNumberOfWeekDaySchedulesSupportedPerUserWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                                params:params
-                                                              subscriptionEstablished:NULL
+                                                              subscriptionEstablished:nullptr
                                                                         reportHandler:^(
                                                                             NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                             NSLog(@"DoorLock."
@@ -20740,7 +21184,7 @@ public:
             subscribeAttributeNumberOfYearDaySchedulesSupportedPerUserWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                                params:params
-                                                              subscriptionEstablished:NULL
+                                                              subscriptionEstablished:nullptr
                                                                         reportHandler:^(
                                                                             NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                             NSLog(@"DoorLock."
@@ -20822,7 +21266,7 @@ public:
         [cluster subscribeAttributeMaxPINCodeLengthWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"DoorLock.MaxPINCodeLength response %@", [value description]);
                                                          if (error || !mWait) {
@@ -20899,7 +21343,7 @@ public:
         [cluster subscribeAttributeMinPINCodeLengthWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"DoorLock.MinPINCodeLength response %@", [value description]);
                                                          if (error || !mWait) {
@@ -20976,7 +21420,7 @@ public:
         [cluster subscribeAttributeMaxRFIDCodeLengthWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"DoorLock.MaxRFIDCodeLength response %@", [value description]);
                                                           if (error || !mWait) {
@@ -21053,7 +21497,7 @@ public:
         [cluster subscribeAttributeMinRFIDCodeLengthWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"DoorLock.MinRFIDCodeLength response %@", [value description]);
                                                           if (error || !mWait) {
@@ -21166,7 +21610,7 @@ public:
         [cluster subscribeAttributeLanguageWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"DoorLock.Language response %@", [value description]);
                                                  if (error || !mWait) {
@@ -21277,7 +21721,7 @@ public:
         [cluster subscribeAttributeAutoRelockTimeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"DoorLock.AutoRelockTime response %@", [value description]);
                                                        if (error || !mWait) {
@@ -21388,7 +21832,7 @@ public:
         [cluster subscribeAttributeSoundVolumeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"DoorLock.SoundVolume response %@", [value description]);
                                                     if (error || !mWait) {
@@ -21499,7 +21943,7 @@ public:
         [cluster subscribeAttributeOperatingModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"DoorLock.OperatingMode response %@", [value description]);
                                                       if (error || !mWait) {
@@ -21577,7 +22021,7 @@ public:
         [cluster subscribeAttributeSupportedOperatingModesWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                    params:params
-                                                  subscriptionEstablished:NULL
+                                                  subscriptionEstablished:nullptr
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"DoorLock.SupportedOperatingModes response %@",
                                                                     [value description]);
@@ -21691,7 +22135,7 @@ public:
             subscribeAttributeEnableOneTouchLockingWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"DoorLock.EnableOneTouchLocking response %@", [value description]);
                                                          if (error || !mWait) {
@@ -21804,7 +22248,7 @@ public:
         [cluster subscribeAttributeEnablePrivacyModeButtonWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                    params:params
-                                                  subscriptionEstablished:NULL
+                                                  subscriptionEstablished:nullptr
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"DoorLock.EnablePrivacyModeButton response %@",
                                                                     [value description]);
@@ -21917,7 +22361,7 @@ public:
         [cluster subscribeAttributeWrongCodeEntryLimitWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"DoorLock.WrongCodeEntryLimit response %@", [value description]);
                                                             if (error || !mWait) {
@@ -21995,7 +22439,7 @@ public:
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"DoorLock.GeneratedCommandList response %@", [value description]);
                                                         if (error || !mWait) {
@@ -22072,7 +22516,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"DoorLock.AcceptedCommandList response %@", [value description]);
                                                             if (error || !mWait) {
@@ -22149,7 +22593,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"DoorLock.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -22226,7 +22670,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"DoorLock.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -22453,7 +22897,7 @@ public:
             subscribeAttributeMeasurementTypeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ElectricalMeasurement.MeasurementType response %@", [value description]);
                                                    if (error || !mWait) {
@@ -22534,7 +22978,7 @@ public:
         [cluster subscribeAttributeTotalActivePowerWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"ElectricalMeasurement.TotalActivePower response %@",
                                                              [value description]);
@@ -22616,7 +23060,7 @@ public:
         [cluster subscribeAttributeRmsVoltageWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ElectricalMeasurement.RmsVoltage response %@", [value description]);
                                                    if (error || !mWait) {
@@ -22698,7 +23142,7 @@ public:
             subscribeAttributeRmsVoltageMinWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ElectricalMeasurement.RmsVoltageMin response %@", [value description]);
                                                  if (error || !mWait) {
@@ -22780,7 +23224,7 @@ public:
             subscribeAttributeRmsVoltageMaxWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ElectricalMeasurement.RmsVoltageMax response %@", [value description]);
                                                  if (error || !mWait) {
@@ -22861,7 +23305,7 @@ public:
         [cluster subscribeAttributeRmsCurrentWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ElectricalMeasurement.RmsCurrent response %@", [value description]);
                                                    if (error || !mWait) {
@@ -22943,7 +23387,7 @@ public:
             subscribeAttributeRmsCurrentMinWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ElectricalMeasurement.RmsCurrentMin response %@", [value description]);
                                                  if (error || !mWait) {
@@ -23025,7 +23469,7 @@ public:
             subscribeAttributeRmsCurrentMaxWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ElectricalMeasurement.RmsCurrentMax response %@", [value description]);
                                                  if (error || !mWait) {
@@ -23106,7 +23550,7 @@ public:
         [cluster subscribeAttributeActivePowerWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ElectricalMeasurement.ActivePower response %@", [value description]);
                                                     if (error || !mWait) {
@@ -23188,7 +23632,7 @@ public:
             subscribeAttributeActivePowerMinWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ElectricalMeasurement.ActivePowerMin response %@", [value description]);
                                                   if (error || !mWait) {
@@ -23270,7 +23714,7 @@ public:
             subscribeAttributeActivePowerMaxWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ElectricalMeasurement.ActivePowerMax response %@", [value description]);
                                                   if (error || !mWait) {
@@ -23351,7 +23795,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ElectricalMeasurement.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -23433,7 +23877,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"ElectricalMeasurement.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -23516,7 +23960,7 @@ public:
             subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ElectricalMeasurement.AttributeList response %@", [value description]);
                                                  if (error || !mWait) {
@@ -23598,7 +24042,7 @@ public:
             subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ElectricalMeasurement.ClusterRevision response %@", [value description]);
                                                    if (error || !mWait) {
@@ -23735,7 +24179,7 @@ public:
         [cluster subscribeAttributePHYRateWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"EthernetNetworkDiagnostics.PHYRate response %@", [value description]);
                                                 if (error || !mWait) {
@@ -23816,7 +24260,7 @@ public:
         [cluster subscribeAttributeFullDuplexWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"EthernetNetworkDiagnostics.FullDuplex response %@", [value description]);
                                                    if (error || !mWait) {
@@ -23897,7 +24341,7 @@ public:
         [cluster subscribeAttributePacketRxCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"EthernetNetworkDiagnostics.PacketRxCount response %@",
                                                           [value description]);
@@ -23979,7 +24423,7 @@ public:
         [cluster subscribeAttributePacketTxCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"EthernetNetworkDiagnostics.PacketTxCount response %@",
                                                           [value description]);
@@ -24061,7 +24505,7 @@ public:
         [cluster subscribeAttributeTxErrCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"EthernetNetworkDiagnostics.TxErrCount response %@", [value description]);
                                                    if (error || !mWait) {
@@ -24142,7 +24586,7 @@ public:
         [cluster subscribeAttributeCollisionCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"EthernetNetworkDiagnostics.CollisionCount response %@",
                                                            [value description]);
@@ -24225,7 +24669,7 @@ public:
             subscribeAttributeOverrunCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"EthernetNetworkDiagnostics.OverrunCount response %@", [value description]);
                                                 if (error || !mWait) {
@@ -24306,7 +24750,7 @@ public:
         [cluster subscribeAttributeCarrierDetectWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"EthernetNetworkDiagnostics.CarrierDetect response %@",
                                                           [value description]);
@@ -24388,7 +24832,7 @@ public:
         [cluster subscribeAttributeTimeSinceResetWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"EthernetNetworkDiagnostics.TimeSinceReset response %@",
                                                            [value description]);
@@ -24470,7 +24914,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"EthernetNetworkDiagnostics.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -24552,7 +24996,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"EthernetNetworkDiagnostics.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -24634,7 +25078,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"EthernetNetworkDiagnostics.AttributeList response %@",
                                                           [value description]);
@@ -24716,7 +25160,7 @@ public:
         [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"EthernetNetworkDiagnostics.FeatureMap response %@", [value description]);
                                                    if (error || !mWait) {
@@ -24797,7 +25241,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"EthernetNetworkDiagnostics.ClusterRevision response %@",
                                                             [value description]);
@@ -24828,6 +25272,15 @@ private:
 | Attributes:                                                         |        |
 | * FanMode                                                           | 0x0000 |
 | * FanModeSequence                                                   | 0x0001 |
+| * PercentSetting                                                    | 0x0002 |
+| * PercentCurrent                                                    | 0x0003 |
+| * SpeedMax                                                          | 0x0004 |
+| * SpeedSetting                                                      | 0x0005 |
+| * SpeedCurrent                                                      | 0x0006 |
+| * RockSupport                                                       | 0x0007 |
+| * RockSetting                                                       | 0x0008 |
+| * WindSupport                                                       | 0x0009 |
+| * WindSetting                                                       | 0x000A |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -24926,7 +25379,7 @@ public:
         [cluster subscribeAttributeFanModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"FanControl.FanMode response %@", [value description]);
                                                 if (error || !mWait) {
@@ -25037,13 +25490,842 @@ public:
         [cluster subscribeAttributeFanModeSequenceWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"FanControl.FanModeSequence response %@", [value description]);
                                                         if (error || !mWait) {
                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
                                                         }
                                                     }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute PercentSetting
+ */
+class ReadFanControlPercentSetting : public ModelCommand {
+public:
+    ReadFanControlPercentSetting()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "percent-setting");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlPercentSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributePercentSettingWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.PercentSetting response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl PercentSetting Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class WriteFanControlPercentSetting : public ModelCommand {
+public:
+    WriteFanControlPercentSetting()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "percent-setting");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteFanControlPercentSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) WriteAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block chipError = CHIP_NO_ERROR;
+
+        NSNumber * _Nonnull value = [NSNumber numberWithUnsignedChar:mValue];
+
+        [cluster writeAttributePercentSettingWithValue:value
+                                     completionHandler:^(NSError * _Nullable error) {
+                                         chipError = [CHIPError errorToCHIPErrorCode:error];
+                                         ChipLogError(chipTool, "FanControl PercentSetting Error: %s", chip::ErrorStr(chipError));
+                                         SetCommandExitStatus(chipError);
+                                     }];
+        return chipError;
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class SubscribeAttributeFanControlPercentSetting : public ModelCommand {
+public:
+    SubscribeAttributeFanControlPercentSetting()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "percent-setting");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlPercentSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributePercentSettingWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:nullptr
+                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"FanControl.PercentSetting response %@", [value description]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
+                                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute PercentCurrent
+ */
+class ReadFanControlPercentCurrent : public ModelCommand {
+public:
+    ReadFanControlPercentCurrent()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "percent-current");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlPercentCurrent() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributePercentCurrentWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.PercentCurrent response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl PercentCurrent Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeFanControlPercentCurrent : public ModelCommand {
+public:
+    SubscribeAttributeFanControlPercentCurrent()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "percent-current");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlPercentCurrent() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributePercentCurrentWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:nullptr
+                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"FanControl.PercentCurrent response %@", [value description]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
+                                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute SpeedMax
+ */
+class ReadFanControlSpeedMax : public ModelCommand {
+public:
+    ReadFanControlSpeedMax()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "speed-max");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlSpeedMax() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeSpeedMaxWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.SpeedMax response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl SpeedMax Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeFanControlSpeedMax : public ModelCommand {
+public:
+    SubscribeAttributeFanControlSpeedMax()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "speed-max");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlSpeedMax() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeSpeedMaxWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                    params:params
+                                   subscriptionEstablished:nullptr
+                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                 NSLog(@"FanControl.SpeedMax response %@", [value description]);
+                                                 if (error || !mWait) {
+                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                 }
+                                             }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute SpeedSetting
+ */
+class ReadFanControlSpeedSetting : public ModelCommand {
+public:
+    ReadFanControlSpeedSetting()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "speed-setting");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlSpeedSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeSpeedSettingWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.SpeedSetting response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl SpeedSetting Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class WriteFanControlSpeedSetting : public ModelCommand {
+public:
+    WriteFanControlSpeedSetting()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "speed-setting");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteFanControlSpeedSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) WriteAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block chipError = CHIP_NO_ERROR;
+
+        NSNumber * _Nonnull value = [NSNumber numberWithUnsignedChar:mValue];
+
+        [cluster writeAttributeSpeedSettingWithValue:value
+                                   completionHandler:^(NSError * _Nullable error) {
+                                       chipError = [CHIPError errorToCHIPErrorCode:error];
+                                       ChipLogError(chipTool, "FanControl SpeedSetting Error: %s", chip::ErrorStr(chipError));
+                                       SetCommandExitStatus(chipError);
+                                   }];
+        return chipError;
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class SubscribeAttributeFanControlSpeedSetting : public ModelCommand {
+public:
+    SubscribeAttributeFanControlSpeedSetting()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "speed-setting");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlSpeedSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeSpeedSettingWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                        params:params
+                                       subscriptionEstablished:nullptr
+                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                     NSLog(@"FanControl.SpeedSetting response %@", [value description]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
+                                                 }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute SpeedCurrent
+ */
+class ReadFanControlSpeedCurrent : public ModelCommand {
+public:
+    ReadFanControlSpeedCurrent()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "speed-current");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlSpeedCurrent() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeSpeedCurrentWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.SpeedCurrent response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl SpeedCurrent Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeFanControlSpeedCurrent : public ModelCommand {
+public:
+    SubscribeAttributeFanControlSpeedCurrent()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "speed-current");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlSpeedCurrent() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeSpeedCurrentWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                        params:params
+                                       subscriptionEstablished:nullptr
+                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                     NSLog(@"FanControl.SpeedCurrent response %@", [value description]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
+                                                 }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute RockSupport
+ */
+class ReadFanControlRockSupport : public ModelCommand {
+public:
+    ReadFanControlRockSupport()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "rock-support");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlRockSupport() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeRockSupportWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.RockSupport response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl RockSupport Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeFanControlRockSupport : public ModelCommand {
+public:
+    SubscribeAttributeFanControlRockSupport()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "rock-support");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlRockSupport() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeRockSupportWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                       params:params
+                                      subscriptionEstablished:nullptr
+                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                    NSLog(@"FanControl.RockSupport response %@", [value description]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
+                                                }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute RockSetting
+ */
+class ReadFanControlRockSetting : public ModelCommand {
+public:
+    ReadFanControlRockSetting()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "rock-setting");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlRockSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeRockSettingWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.RockSetting response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl RockSetting Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class WriteFanControlRockSetting : public ModelCommand {
+public:
+    WriteFanControlRockSetting()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "rock-setting");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteFanControlRockSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) WriteAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block chipError = CHIP_NO_ERROR;
+
+        NSNumber * _Nonnull value = [NSNumber numberWithUnsignedChar:mValue];
+
+        [cluster writeAttributeRockSettingWithValue:value
+                                  completionHandler:^(NSError * _Nullable error) {
+                                      chipError = [CHIPError errorToCHIPErrorCode:error];
+                                      ChipLogError(chipTool, "FanControl RockSetting Error: %s", chip::ErrorStr(chipError));
+                                      SetCommandExitStatus(chipError);
+                                  }];
+        return chipError;
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class SubscribeAttributeFanControlRockSetting : public ModelCommand {
+public:
+    SubscribeAttributeFanControlRockSetting()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "rock-setting");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlRockSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeRockSettingWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                       params:params
+                                      subscriptionEstablished:nullptr
+                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                    NSLog(@"FanControl.RockSetting response %@", [value description]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
+                                                }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute WindSupport
+ */
+class ReadFanControlWindSupport : public ModelCommand {
+public:
+    ReadFanControlWindSupport()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "wind-support");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlWindSupport() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeWindSupportWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.WindSupport response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl WindSupport Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeFanControlWindSupport : public ModelCommand {
+public:
+    SubscribeAttributeFanControlWindSupport()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "wind-support");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlWindSupport() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeWindSupportWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                       params:params
+                                      subscriptionEstablished:nullptr
+                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                    NSLog(@"FanControl.WindSupport response %@", [value description]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
+                                                }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute WindSetting
+ */
+class ReadFanControlWindSetting : public ModelCommand {
+public:
+    ReadFanControlWindSetting()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "wind-setting");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlWindSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeWindSettingWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.WindSetting response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl WindSetting Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class WriteFanControlWindSetting : public ModelCommand {
+public:
+    WriteFanControlWindSetting()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "wind-setting");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteFanControlWindSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) WriteAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block chipError = CHIP_NO_ERROR;
+
+        NSNumber * _Nonnull value = [NSNumber numberWithUnsignedChar:mValue];
+
+        [cluster writeAttributeWindSettingWithValue:value
+                                  completionHandler:^(NSError * _Nullable error) {
+                                      chipError = [CHIPError errorToCHIPErrorCode:error];
+                                      ChipLogError(chipTool, "FanControl WindSetting Error: %s", chip::ErrorStr(chipError));
+                                      SetCommandExitStatus(chipError);
+                                  }];
+        return chipError;
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class SubscribeAttributeFanControlWindSetting : public ModelCommand {
+public:
+    SubscribeAttributeFanControlWindSetting()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "wind-setting");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlWindSetting() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeWindSettingWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                       params:params
+                                      subscriptionEstablished:nullptr
+                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                    NSLog(@"FanControl.WindSetting response %@", [value description]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
+                                                }];
 
         return CHIP_NO_ERROR;
     }
@@ -25115,7 +26397,7 @@ public:
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"FanControl.GeneratedCommandList response %@", [value description]);
                                                         if (error || !mWait) {
@@ -25193,7 +26475,7 @@ public:
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"FanControl.AcceptedCommandList response %@", [value description]);
                                                        if (error || !mWait) {
@@ -25270,7 +26552,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"FanControl.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -25347,7 +26629,7 @@ public:
         [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"FanControl.FeatureMap response %@", [value description]);
                                                    if (error || !mWait) {
@@ -25424,7 +26706,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"FanControl.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -25517,7 +26799,7 @@ public:
         [cluster subscribeAttributeLabelListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"FixedLabel.LabelList response %@", [value description]);
                                                   if (error || !mWait) {
@@ -25595,7 +26877,7 @@ public:
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"FixedLabel.GeneratedCommandList response %@", [value description]);
                                                         if (error || !mWait) {
@@ -25673,7 +26955,7 @@ public:
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"FixedLabel.AcceptedCommandList response %@", [value description]);
                                                        if (error || !mWait) {
@@ -25750,7 +27032,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"FixedLabel.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -25827,7 +27109,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"FixedLabel.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -25923,7 +27205,7 @@ public:
         [cluster subscribeAttributeMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"FlowMeasurement.MeasuredValue response %@", [value description]);
                                                       if (error || !mWait) {
@@ -26001,7 +27283,7 @@ public:
             subscribeAttributeMinMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"FlowMeasurement.MinMeasuredValue response %@", [value description]);
                                                     if (error || !mWait) {
@@ -26079,7 +27361,7 @@ public:
             subscribeAttributeMaxMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"FlowMeasurement.MaxMeasuredValue response %@", [value description]);
                                                     if (error || !mWait) {
@@ -26156,7 +27438,7 @@ public:
         [cluster subscribeAttributeToleranceWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"FlowMeasurement.Tolerance response %@", [value description]);
                                                   if (error || !mWait) {
@@ -26233,7 +27515,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"FlowMeasurement.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -26311,7 +27593,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"FlowMeasurement.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -26389,7 +27671,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"FlowMeasurement.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -26466,7 +27748,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"FlowMeasurement.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -26732,7 +28014,7 @@ public:
         [cluster subscribeAttributeBreadcrumbWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"GeneralCommissioning.Breadcrumb response %@", [value description]);
                                                    if (error || !mWait) {
@@ -26815,7 +28097,7 @@ public:
             subscribeAttributeBasicCommissioningInfoWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(
                                                           CHIPGeneralCommissioningClusterBasicCommissioningInfo * _Nullable value,
                                                           NSError * _Nullable error) {
@@ -26899,7 +28181,7 @@ public:
         [cluster subscribeAttributeRegulatoryConfigWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"GeneralCommissioning.RegulatoryConfig response %@",
                                                              [value description]);
@@ -26981,7 +28263,7 @@ public:
         [cluster subscribeAttributeLocationCapabilityWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                               params:params
-                                             subscriptionEstablished:NULL
+                                             subscriptionEstablished:nullptr
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"GeneralCommissioning.LocationCapability response %@",
                                                                [value description]);
@@ -27065,7 +28347,7 @@ public:
             subscribeAttributeSupportsConcurrentConnectionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                    params:params
-                                                  subscriptionEstablished:NULL
+                                                  subscriptionEstablished:nullptr
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"GeneralCommissioning.SupportsConcurrentConnection response "
                                                                       @"%@",
@@ -27148,7 +28430,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"GeneralCommissioning.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -27230,7 +28512,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"GeneralCommissioning.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -27312,7 +28594,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"GeneralCommissioning.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -27394,7 +28676,7 @@ public:
             subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"GeneralCommissioning.ClusterRevision response %@", [value description]);
                                                    if (error || !mWait) {
@@ -27502,7 +28784,7 @@ public:
         [cluster subscribeAttributeNetworkInterfacesWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"GeneralDiagnostics.NetworkInterfaces response %@",
                                                               [value description]);
@@ -27584,7 +28866,7 @@ public:
         [cluster subscribeAttributeRebootCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"GeneralDiagnostics.RebootCount response %@", [value description]);
                                                     if (error || !mWait) {
@@ -27665,7 +28947,7 @@ public:
         [cluster subscribeAttributeUpTimeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"GeneralDiagnostics.UpTime response %@", [value description]);
                                                if (error || !mWait) {
@@ -27746,7 +29028,7 @@ public:
         [cluster subscribeAttributeTotalOperationalHoursWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                  params:params
-                                                subscriptionEstablished:NULL
+                                                subscriptionEstablished:nullptr
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"GeneralDiagnostics.TotalOperationalHours response %@",
                                                                   [value description]);
@@ -27828,7 +29110,7 @@ public:
         [cluster subscribeAttributeBootReasonsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"GeneralDiagnostics.BootReasons response %@", [value description]);
                                                     if (error || !mWait) {
@@ -27909,7 +29191,7 @@ public:
         [cluster subscribeAttributeActiveHardwareFaultsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"GeneralDiagnostics.ActiveHardwareFaults response %@",
                                                                  [value description]);
@@ -27991,7 +29273,7 @@ public:
         [cluster subscribeAttributeActiveRadioFaultsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"GeneralDiagnostics.ActiveRadioFaults response %@",
                                                               [value description]);
@@ -28073,7 +29355,7 @@ public:
         [cluster subscribeAttributeActiveNetworkFaultsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"GeneralDiagnostics.ActiveNetworkFaults response %@",
                                                                 [value description]);
@@ -28155,7 +29437,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"GeneralDiagnostics.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -28237,7 +29519,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"GeneralDiagnostics.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -28319,7 +29601,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"GeneralDiagnostics.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -28401,7 +29683,7 @@ public:
             subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"GeneralDiagnostics.ClusterRevision response %@", [value description]);
                                                    if (error || !mWait) {
@@ -28760,7 +30042,7 @@ public:
         [cluster subscribeAttributeGroupKeyMapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"GroupKeyManagement.GroupKeyMap response %@", [value description]);
                                                     if (error || !mWait) {
@@ -28843,7 +30125,7 @@ public:
         [cluster subscribeAttributeGroupTableWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"GroupKeyManagement.GroupTable response %@", [value description]);
                                                    if (error || !mWait) {
@@ -28924,7 +30206,7 @@ public:
         [cluster subscribeAttributeMaxGroupsPerFabricWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                               params:params
-                                             subscriptionEstablished:NULL
+                                             subscriptionEstablished:nullptr
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"GroupKeyManagement.MaxGroupsPerFabric response %@",
                                                                [value description]);
@@ -29006,7 +30288,7 @@ public:
         [cluster subscribeAttributeMaxGroupKeysPerFabricWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                  params:params
-                                                subscriptionEstablished:NULL
+                                                subscriptionEstablished:nullptr
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"GroupKeyManagement.MaxGroupKeysPerFabric response %@",
                                                                   [value description]);
@@ -29088,7 +30370,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"GroupKeyManagement.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -29170,7 +30452,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"GroupKeyManagement.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -29252,7 +30534,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"GroupKeyManagement.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -29334,7 +30616,7 @@ public:
             subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"GroupKeyManagement.ClusterRevision response %@", [value description]);
                                                    if (error || !mWait) {
@@ -29664,7 +30946,7 @@ public:
         [cluster subscribeAttributeNameSupportWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"Groups.NameSupport response %@", [value description]);
                                                     if (error || !mWait) {
@@ -29741,7 +31023,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"Groups.GeneratedCommandList response %@", [value description]);
                                                              if (error || !mWait) {
@@ -29818,7 +31100,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"Groups.AcceptedCommandList response %@", [value description]);
                                                             if (error || !mWait) {
@@ -29895,7 +31177,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Groups.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -29972,7 +31254,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Groups.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -30208,7 +31490,7 @@ public:
         [cluster subscribeAttributeIdentifyTimeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"Identify.IdentifyTime response %@", [value description]);
                                                      if (error || !mWait) {
@@ -30285,7 +31567,7 @@ public:
         [cluster subscribeAttributeIdentifyTypeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"Identify.IdentifyType response %@", [value description]);
                                                      if (error || !mWait) {
@@ -30363,7 +31645,7 @@ public:
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Identify.GeneratedCommandList response %@", [value description]);
                                                         if (error || !mWait) {
@@ -30440,7 +31722,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"Identify.AcceptedCommandList response %@", [value description]);
                                                             if (error || !mWait) {
@@ -30517,7 +31799,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Identify.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -30594,7 +31876,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Identify.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -30696,7 +31978,7 @@ public:
             subscribeAttributeMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"IlluminanceMeasurement.MeasuredValue response %@", [value description]);
                                                  if (error || !mWait) {
@@ -30777,7 +32059,7 @@ public:
         [cluster subscribeAttributeMinMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"IlluminanceMeasurement.MinMeasuredValue response %@",
                                                              [value description]);
@@ -30859,7 +32141,7 @@ public:
         [cluster subscribeAttributeMaxMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"IlluminanceMeasurement.MaxMeasuredValue response %@",
                                                              [value description]);
@@ -30941,7 +32223,7 @@ public:
         [cluster subscribeAttributeToleranceWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"IlluminanceMeasurement.Tolerance response %@", [value description]);
                                                   if (error || !mWait) {
@@ -31022,7 +32304,7 @@ public:
         [cluster subscribeAttributeLightSensorTypeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"IlluminanceMeasurement.LightSensorType response %@",
                                                             [value description]);
@@ -31104,7 +32386,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"IlluminanceMeasurement.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -31186,7 +32468,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"IlluminanceMeasurement.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -31269,7 +32551,7 @@ public:
             subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"IlluminanceMeasurement.AttributeList response %@", [value description]);
                                                  if (error || !mWait) {
@@ -31350,7 +32632,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"IlluminanceMeasurement.ClusterRevision response %@",
                                                             [value description]);
@@ -31481,7 +32763,7 @@ public:
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"KeypadInput.GeneratedCommandList response %@", [value description]);
                                                         if (error || !mWait) {
@@ -31559,7 +32841,7 @@ public:
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"KeypadInput.AcceptedCommandList response %@", [value description]);
                                                        if (error || !mWait) {
@@ -31636,7 +32918,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"KeypadInput.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -31713,7 +32995,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"KeypadInput.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -32161,7 +33443,7 @@ public:
         [cluster subscribeAttributeCurrentLevelWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"LevelControl.CurrentLevel response %@", [value description]);
                                                      if (error || !mWait) {
@@ -32238,7 +33520,7 @@ public:
         [cluster subscribeAttributeRemainingTimeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"LevelControl.RemainingTime response %@", [value description]);
                                                       if (error || !mWait) {
@@ -32315,7 +33597,7 @@ public:
         [cluster subscribeAttributeMinLevelWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"LevelControl.MinLevel response %@", [value description]);
                                                  if (error || !mWait) {
@@ -32392,7 +33674,7 @@ public:
         [cluster subscribeAttributeMaxLevelWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"LevelControl.MaxLevel response %@", [value description]);
                                                  if (error || !mWait) {
@@ -32469,7 +33751,7 @@ public:
         [cluster subscribeAttributeCurrentFrequencyWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"LevelControl.CurrentFrequency response %@", [value description]);
                                                          if (error || !mWait) {
@@ -32546,7 +33828,7 @@ public:
         [cluster subscribeAttributeMinFrequencyWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"LevelControl.MinFrequency response %@", [value description]);
                                                      if (error || !mWait) {
@@ -32623,7 +33905,7 @@ public:
         [cluster subscribeAttributeMaxFrequencyWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"LevelControl.MaxFrequency response %@", [value description]);
                                                      if (error || !mWait) {
@@ -32734,7 +34016,7 @@ public:
         [cluster subscribeAttributeOptionsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"LevelControl.Options response %@", [value description]);
                                                 if (error || !mWait) {
@@ -32847,7 +34129,7 @@ public:
             subscribeAttributeOnOffTransitionTimeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"LevelControl.OnOffTransitionTime response %@", [value description]);
                                                        if (error || !mWait) {
@@ -32958,7 +34240,7 @@ public:
         [cluster subscribeAttributeOnLevelWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"LevelControl.OnLevel response %@", [value description]);
                                                 if (error || !mWait) {
@@ -33070,7 +34352,7 @@ public:
         [cluster subscribeAttributeOnTransitionTimeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"LevelControl.OnTransitionTime response %@", [value description]);
                                                          if (error || !mWait) {
@@ -33182,7 +34464,7 @@ public:
         [cluster subscribeAttributeOffTransitionTimeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"LevelControl.OffTransitionTime response %@", [value description]);
                                                           if (error || !mWait) {
@@ -33294,7 +34576,7 @@ public:
         [cluster subscribeAttributeDefaultMoveRateWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"LevelControl.DefaultMoveRate response %@", [value description]);
                                                         if (error || !mWait) {
@@ -33407,7 +34689,7 @@ public:
             subscribeAttributeStartUpCurrentLevelWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"LevelControl.StartUpCurrentLevel response %@", [value description]);
                                                        if (error || !mWait) {
@@ -33484,7 +34766,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"LevelControl.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -33563,7 +34845,7 @@ public:
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"LevelControl.AcceptedCommandList response %@", [value description]);
                                                        if (error || !mWait) {
@@ -33640,7 +34922,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"LevelControl.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -33717,7 +34999,7 @@ public:
         [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"LevelControl.FeatureMap response %@", [value description]);
                                                    if (error || !mWait) {
@@ -33794,7 +35076,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"LevelControl.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -33932,7 +35214,7 @@ public:
             subscribeAttributeActiveLocaleWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"LocalizationConfiguration.ActiveLocale response %@", [value description]);
                                                 if (error || !mWait) {
@@ -34013,7 +35295,7 @@ public:
         [cluster subscribeAttributeSupportedLocalesWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"LocalizationConfiguration.SupportedLocales response %@",
                                                              [value description]);
@@ -34095,7 +35377,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"LocalizationConfiguration.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -34177,7 +35459,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"LocalizationConfiguration.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -34259,7 +35541,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"LocalizationConfiguration.ClusterRevision response %@",
                                                             [value description]);
@@ -34383,7 +35665,7 @@ public:
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"LowPower.GeneratedCommandList response %@", [value description]);
                                                         if (error || !mWait) {
@@ -34460,7 +35742,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"LowPower.AcceptedCommandList response %@", [value description]);
                                                             if (error || !mWait) {
@@ -34537,7 +35819,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"LowPower.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -34614,7 +35896,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"LowPower.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -34844,7 +36126,7 @@ public:
         [cluster subscribeAttributeInputListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"MediaInput.InputList response %@", [value description]);
                                                   if (error || !mWait) {
@@ -34921,7 +36203,7 @@ public:
         [cluster subscribeAttributeCurrentInputWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"MediaInput.CurrentInput response %@", [value description]);
                                                      if (error || !mWait) {
@@ -34999,7 +36281,7 @@ public:
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"MediaInput.GeneratedCommandList response %@", [value description]);
                                                         if (error || !mWait) {
@@ -35077,7 +36359,7 @@ public:
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"MediaInput.AcceptedCommandList response %@", [value description]);
                                                        if (error || !mWait) {
@@ -35154,7 +36436,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"MediaInput.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -35231,7 +36513,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"MediaInput.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -35699,7 +36981,7 @@ public:
         [cluster subscribeAttributeCurrentStateWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"MediaPlayback.CurrentState response %@", [value description]);
                                                      if (error || !mWait) {
@@ -35776,7 +37058,7 @@ public:
         [cluster subscribeAttributeStartTimeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"MediaPlayback.StartTime response %@", [value description]);
                                                   if (error || !mWait) {
@@ -35853,7 +37135,7 @@ public:
         [cluster subscribeAttributeDurationWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"MediaPlayback.Duration response %@", [value description]);
                                                  if (error || !mWait) {
@@ -35931,7 +37213,7 @@ public:
         [cluster subscribeAttributeSampledPositionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(CHIPMediaPlaybackClusterPlaybackPosition * _Nullable value,
                                                         NSError * _Nullable error) {
                                                         NSLog(@"MediaPlayback.SampledPosition response %@", [value description]);
@@ -36009,7 +37291,7 @@ public:
         [cluster subscribeAttributePlaybackSpeedWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"MediaPlayback.PlaybackSpeed response %@", [value description]);
                                                       if (error || !mWait) {
@@ -36086,7 +37368,7 @@ public:
         [cluster subscribeAttributeSeekRangeEndWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"MediaPlayback.SeekRangeEnd response %@", [value description]);
                                                      if (error || !mWait) {
@@ -36163,7 +37445,7 @@ public:
         [cluster subscribeAttributeSeekRangeStartWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"MediaPlayback.SeekRangeStart response %@", [value description]);
                                                        if (error || !mWait) {
@@ -36240,7 +37522,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"MediaPlayback.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -36319,7 +37601,7 @@ public:
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"MediaPlayback.AcceptedCommandList response %@", [value description]);
                                                        if (error || !mWait) {
@@ -36396,7 +37678,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"MediaPlayback.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -36473,7 +37755,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"MediaPlayback.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -36607,7 +37889,7 @@ public:
         [cluster subscribeAttributeDescriptionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ModeSelect.Description response %@", [value description]);
                                                     if (error || !mWait) {
@@ -36684,7 +37966,7 @@ public:
         [cluster subscribeAttributeStandardNamespaceWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ModeSelect.StandardNamespace response %@", [value description]);
                                                           if (error || !mWait) {
@@ -36761,7 +38043,7 @@ public:
         [cluster subscribeAttributeSupportedModesWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ModeSelect.SupportedModes response %@", [value description]);
                                                        if (error || !mWait) {
@@ -36838,7 +38120,7 @@ public:
         [cluster subscribeAttributeCurrentModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ModeSelect.CurrentMode response %@", [value description]);
                                                     if (error || !mWait) {
@@ -36949,7 +38231,7 @@ public:
         [cluster subscribeAttributeStartUpModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ModeSelect.StartUpMode response %@", [value description]);
                                                     if (error || !mWait) {
@@ -37060,7 +38342,7 @@ public:
         [cluster subscribeAttributeOnModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"ModeSelect.OnMode response %@", [value description]);
                                                if (error || !mWait) {
@@ -37138,7 +38420,7 @@ public:
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ModeSelect.GeneratedCommandList response %@", [value description]);
                                                         if (error || !mWait) {
@@ -37216,7 +38498,7 @@ public:
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ModeSelect.AcceptedCommandList response %@", [value description]);
                                                        if (error || !mWait) {
@@ -37293,7 +38575,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ModeSelect.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -37370,7 +38652,7 @@ public:
         [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ModeSelect.FeatureMap response %@", [value description]);
                                                    if (error || !mWait) {
@@ -37447,7 +38729,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ModeSelect.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -37823,7 +39105,7 @@ public:
         [cluster subscribeAttributeMaxNetworksWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"NetworkCommissioning.MaxNetworks response %@", [value description]);
                                                     if (error || !mWait) {
@@ -37904,7 +39186,7 @@ public:
         [cluster subscribeAttributeNetworksWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"NetworkCommissioning.Networks response %@", [value description]);
                                                  if (error || !mWait) {
@@ -37985,7 +39267,7 @@ public:
         [cluster subscribeAttributeScanMaxTimeSecondsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                               params:params
-                                             subscriptionEstablished:NULL
+                                             subscriptionEstablished:nullptr
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"NetworkCommissioning.ScanMaxTimeSeconds response %@",
                                                                [value description]);
@@ -38067,7 +39349,7 @@ public:
         [cluster subscribeAttributeConnectMaxTimeSecondsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                  params:params
-                                                subscriptionEstablished:NULL
+                                                subscriptionEstablished:nullptr
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"NetworkCommissioning.ConnectMaxTimeSeconds response %@",
                                                                   [value description]);
@@ -38186,7 +39468,7 @@ public:
         [cluster subscribeAttributeInterfaceEnabledWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"NetworkCommissioning.InterfaceEnabled response %@",
                                                              [value description]);
@@ -38268,7 +39550,7 @@ public:
         [cluster subscribeAttributeLastNetworkingStatusWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"NetworkCommissioning.LastNetworkingStatus response %@",
                                                                  [value description]);
@@ -38350,7 +39632,7 @@ public:
         [cluster subscribeAttributeLastNetworkIDWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"NetworkCommissioning.LastNetworkID response %@", [value description]);
                                                       if (error || !mWait) {
@@ -38431,7 +39713,7 @@ public:
         [cluster subscribeAttributeLastConnectErrorValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                  params:params
-                                                subscriptionEstablished:NULL
+                                                subscriptionEstablished:nullptr
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"NetworkCommissioning.LastConnectErrorValue response %@",
                                                                   [value description]);
@@ -38513,7 +39795,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"NetworkCommissioning.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -38595,7 +39877,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"NetworkCommissioning.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -38677,7 +39959,7 @@ public:
         [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"NetworkCommissioning.FeatureMap response %@", [value description]);
                                                    if (error || !mWait) {
@@ -38759,7 +40041,7 @@ public:
             subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"NetworkCommissioning.ClusterRevision response %@", [value description]);
                                                    if (error || !mWait) {
@@ -39021,7 +40303,7 @@ public:
             subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"OtaSoftwareUpdateProvider.AttributeList response %@", [value description]);
                                                  if (error || !mWait) {
@@ -39102,7 +40384,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"OtaSoftwareUpdateProvider.ClusterRevision response %@",
                                                             [value description]);
@@ -39317,7 +40599,7 @@ public:
         [cluster subscribeAttributeDefaultOtaProvidersWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"OtaSoftwareUpdateRequestor.DefaultOtaProviders response %@",
                                                                 [value description]);
@@ -39399,7 +40681,7 @@ public:
         [cluster subscribeAttributeUpdatePossibleWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"OtaSoftwareUpdateRequestor.UpdatePossible response %@",
                                                            [value description]);
@@ -39482,7 +40764,7 @@ public:
             subscribeAttributeUpdateStateWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"OtaSoftwareUpdateRequestor.UpdateState response %@", [value description]);
                                                if (error || !mWait) {
@@ -39563,7 +40845,7 @@ public:
         [cluster subscribeAttributeUpdateStateProgressWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"OtaSoftwareUpdateRequestor.UpdateStateProgress response %@",
                                                                 [value description]);
@@ -39645,7 +40927,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"OtaSoftwareUpdateRequestor.AttributeList response %@",
                                                           [value description]);
@@ -39727,7 +41009,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"OtaSoftwareUpdateRequestor.ClusterRevision response %@",
                                                             [value description]);
@@ -39836,7 +41118,7 @@ public:
         [cluster subscribeAttributeOccupancyWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"OccupancySensing.Occupancy response %@", [value description]);
                                                   if (error || !mWait) {
@@ -39917,7 +41199,7 @@ public:
         [cluster subscribeAttributeOccupancySensorTypeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"OccupancySensing.OccupancySensorType response %@",
                                                                 [value description]);
@@ -40001,7 +41283,7 @@ public:
             subscribeAttributeOccupancySensorTypeBitmapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"OccupancySensing.OccupancySensorTypeBitmap response %@",
                                                                  [value description]);
@@ -40083,7 +41365,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"OccupancySensing.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -40165,7 +41447,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"OccupancySensing.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -40247,7 +41529,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"OccupancySensing.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -40328,7 +41610,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"OccupancySensing.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -40629,7 +41911,7 @@ public:
         [cluster subscribeAttributeOnOffWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                  params:params
-                                subscriptionEstablished:NULL
+                                subscriptionEstablished:nullptr
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"OnOff.OnOff response %@", [value description]);
                                               if (error || !mWait) {
@@ -40706,7 +41988,7 @@ public:
         [cluster subscribeAttributeGlobalSceneControlWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                               params:params
-                                             subscriptionEstablished:NULL
+                                             subscriptionEstablished:nullptr
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"OnOff.GlobalSceneControl response %@", [value description]);
                                                            if (error || !mWait) {
@@ -40817,7 +42099,7 @@ public:
         [cluster subscribeAttributeOnTimeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"OnOff.OnTime response %@", [value description]);
                                                if (error || !mWait) {
@@ -40928,7 +42210,7 @@ public:
         [cluster subscribeAttributeOffWaitTimeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"OnOff.OffWaitTime response %@", [value description]);
                                                     if (error || !mWait) {
@@ -41039,7 +42321,7 @@ public:
         [cluster subscribeAttributeStartUpOnOffWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"OnOff.StartUpOnOff response %@", [value description]);
                                                      if (error || !mWait) {
@@ -41116,7 +42398,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"OnOff.GeneratedCommandList response %@", [value description]);
                                                              if (error || !mWait) {
@@ -41193,7 +42475,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"OnOff.AcceptedCommandList response %@", [value description]);
                                                             if (error || !mWait) {
@@ -41270,7 +42552,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"OnOff.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -41347,7 +42629,7 @@ public:
         [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"OnOff.FeatureMap response %@", [value description]);
                                                    if (error || !mWait) {
@@ -41424,7 +42706,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"OnOff.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -41522,7 +42804,7 @@ public:
         [cluster subscribeAttributeSwitchTypeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"OnOffSwitchConfiguration.SwitchType response %@", [value description]);
                                                    if (error || !mWait) {
@@ -41641,7 +42923,7 @@ public:
             subscribeAttributeSwitchActionsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"OnOffSwitchConfiguration.SwitchActions response %@", [value description]);
                                                  if (error || !mWait) {
@@ -41722,7 +43004,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"OnOffSwitchConfiguration.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -41804,7 +43086,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"OnOffSwitchConfiguration.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -41887,7 +43169,7 @@ public:
             subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"OnOffSwitchConfiguration.AttributeList response %@", [value description]);
                                                  if (error || !mWait) {
@@ -41968,7 +43250,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"OnOffSwitchConfiguration.ClusterRevision response %@",
                                                             [value description]);
@@ -42451,7 +43733,7 @@ public:
         [cluster subscribeAttributeNOCsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                 params:params
-                               subscriptionEstablished:NULL
+                               subscriptionEstablished:nullptr
                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                              NSLog(@"OperationalCredentials.NOCs response %@", [value description]);
                                              if (error || !mWait) {
@@ -42534,7 +43816,7 @@ public:
         [cluster subscribeAttributeFabricsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"OperationalCredentials.Fabrics response %@", [value description]);
                                                 if (error || !mWait) {
@@ -42615,7 +43897,7 @@ public:
         [cluster subscribeAttributeSupportedFabricsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"OperationalCredentials.SupportedFabrics response %@",
                                                              [value description]);
@@ -42697,7 +43979,7 @@ public:
         [cluster subscribeAttributeCommissionedFabricsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"OperationalCredentials.CommissionedFabrics response %@",
                                                                 [value description]);
@@ -42779,7 +44061,7 @@ public:
         [cluster subscribeAttributeTrustedRootCertificatesWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                    params:params
-                                                  subscriptionEstablished:NULL
+                                                  subscriptionEstablished:nullptr
                                                             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"OperationalCredentials.TrustedRootCertificates response %@",
                                                                     [value description]);
@@ -42861,7 +44143,7 @@ public:
         [cluster subscribeAttributeCurrentFabricIndexWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                               params:params
-                                             subscriptionEstablished:NULL
+                                             subscriptionEstablished:nullptr
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"OperationalCredentials.CurrentFabricIndex response %@",
                                                                [value description]);
@@ -42943,7 +44225,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"OperationalCredentials.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -43025,7 +44307,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"OperationalCredentials.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -43108,7 +44390,7 @@ public:
             subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"OperationalCredentials.AttributeList response %@", [value description]);
                                                  if (error || !mWait) {
@@ -43189,7 +44471,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"OperationalCredentials.ClusterRevision response %@",
                                                             [value description]);
@@ -43313,7 +44595,7 @@ public:
         [cluster subscribeAttributeStatusWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"PowerSource.Status response %@", [value description]);
                                                if (error || !mWait) {
@@ -43390,7 +44672,7 @@ public:
         [cluster subscribeAttributeOrderWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                  params:params
-                                subscriptionEstablished:NULL
+                                subscriptionEstablished:nullptr
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"PowerSource.Order response %@", [value description]);
                                               if (error || !mWait) {
@@ -43467,7 +44749,7 @@ public:
         [cluster subscribeAttributeDescriptionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"PowerSource.Description response %@", [value description]);
                                                     if (error || !mWait) {
@@ -43544,7 +44826,7 @@ public:
         [cluster subscribeAttributeBatteryVoltageWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"PowerSource.BatteryVoltage response %@", [value description]);
                                                        if (error || !mWait) {
@@ -43622,7 +44904,7 @@ public:
         [cluster subscribeAttributeBatteryPercentRemainingWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                    params:params
-                                                  subscriptionEstablished:NULL
+                                                  subscriptionEstablished:nullptr
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"PowerSource.BatteryPercentRemaining response %@",
                                                                     [value description]);
@@ -43701,7 +44983,7 @@ public:
             subscribeAttributeBatteryTimeRemainingWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"PowerSource.BatteryTimeRemaining response %@", [value description]);
                                                         if (error || !mWait) {
@@ -43779,7 +45061,7 @@ public:
             subscribeAttributeBatteryChargeLevelWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PowerSource.BatteryChargeLevel response %@", [value description]);
                                                       if (error || !mWait) {
@@ -43857,7 +45139,7 @@ public:
             subscribeAttributeActiveBatteryFaultsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"PowerSource.ActiveBatteryFaults response %@", [value description]);
                                                        if (error || !mWait) {
@@ -43935,7 +45217,7 @@ public:
             subscribeAttributeBatteryChargeStateWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PowerSource.BatteryChargeState response %@", [value description]);
                                                       if (error || !mWait) {
@@ -44013,7 +45295,7 @@ public:
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"PowerSource.GeneratedCommandList response %@", [value description]);
                                                         if (error || !mWait) {
@@ -44091,7 +45373,7 @@ public:
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"PowerSource.AcceptedCommandList response %@", [value description]);
                                                        if (error || !mWait) {
@@ -44168,7 +45450,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PowerSource.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -44245,7 +45527,7 @@ public:
         [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"PowerSource.FeatureMap response %@", [value description]);
                                                    if (error || !mWait) {
@@ -44322,7 +45604,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"PowerSource.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -44419,7 +45701,7 @@ public:
         [cluster subscribeAttributeSourcesWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"PowerSourceConfiguration.Sources response %@", [value description]);
                                                 if (error || !mWait) {
@@ -44500,7 +45782,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"PowerSourceConfiguration.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -44582,7 +45864,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"PowerSourceConfiguration.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -44665,7 +45947,7 @@ public:
             subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"PowerSourceConfiguration.AttributeList response %@", [value description]);
                                                  if (error || !mWait) {
@@ -44746,7 +46028,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"PowerSourceConfiguration.ClusterRevision response %@",
                                                             [value description]);
@@ -44852,7 +46134,7 @@ public:
         [cluster subscribeAttributeMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PressureMeasurement.MeasuredValue response %@", [value description]);
                                                       if (error || !mWait) {
@@ -44934,7 +46216,7 @@ public:
             subscribeAttributeMinMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"PressureMeasurement.MinMeasuredValue response %@", [value description]);
                                                     if (error || !mWait) {
@@ -45016,7 +46298,7 @@ public:
             subscribeAttributeMaxMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"PressureMeasurement.MaxMeasuredValue response %@", [value description]);
                                                     if (error || !mWait) {
@@ -45097,7 +46379,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PressureMeasurement.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -45179,7 +46461,7 @@ public:
             subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"PressureMeasurement.ClusterRevision response %@", [value description]);
                                                    if (error || !mWait) {
@@ -45317,7 +46599,7 @@ public:
             subscribeAttributeMaxPressureWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"PumpConfigurationAndControl.MaxPressure response %@", [value description]);
                                                if (error || !mWait) {
@@ -45398,7 +46680,7 @@ public:
         [cluster subscribeAttributeMaxSpeedWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"PumpConfigurationAndControl.MaxSpeed response %@", [value description]);
                                                  if (error || !mWait) {
@@ -45479,7 +46761,7 @@ public:
         [cluster subscribeAttributeMaxFlowWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"PumpConfigurationAndControl.MaxFlow response %@", [value description]);
                                                 if (error || !mWait) {
@@ -45560,7 +46842,7 @@ public:
         [cluster subscribeAttributeMinConstPressureWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"PumpConfigurationAndControl.MinConstPressure response %@",
                                                              [value description]);
@@ -45642,7 +46924,7 @@ public:
         [cluster subscribeAttributeMaxConstPressureWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"PumpConfigurationAndControl.MaxConstPressure response %@",
                                                              [value description]);
@@ -45724,7 +47006,7 @@ public:
         [cluster subscribeAttributeMinCompPressureWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"PumpConfigurationAndControl.MinCompPressure response %@",
                                                             [value description]);
@@ -45806,7 +47088,7 @@ public:
         [cluster subscribeAttributeMaxCompPressureWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"PumpConfigurationAndControl.MaxCompPressure response %@",
                                                             [value description]);
@@ -45888,7 +47170,7 @@ public:
         [cluster subscribeAttributeMinConstSpeedWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PumpConfigurationAndControl.MinConstSpeed response %@",
                                                           [value description]);
@@ -45970,7 +47252,7 @@ public:
         [cluster subscribeAttributeMaxConstSpeedWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PumpConfigurationAndControl.MaxConstSpeed response %@",
                                                           [value description]);
@@ -46053,7 +47335,7 @@ public:
             subscribeAttributeMinConstFlowWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"PumpConfigurationAndControl.MinConstFlow response %@", [value description]);
                                                 if (error || !mWait) {
@@ -46135,7 +47417,7 @@ public:
             subscribeAttributeMaxConstFlowWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"PumpConfigurationAndControl.MaxConstFlow response %@", [value description]);
                                                 if (error || !mWait) {
@@ -46217,7 +47499,7 @@ public:
             subscribeAttributeMinConstTempWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"PumpConfigurationAndControl.MinConstTemp response %@", [value description]);
                                                 if (error || !mWait) {
@@ -46299,7 +47581,7 @@ public:
             subscribeAttributeMaxConstTempWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"PumpConfigurationAndControl.MaxConstTemp response %@", [value description]);
                                                 if (error || !mWait) {
@@ -46381,7 +47663,7 @@ public:
             subscribeAttributePumpStatusWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                  params:params
-                                subscriptionEstablished:NULL
+                                subscriptionEstablished:nullptr
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"PumpConfigurationAndControl.PumpStatus response %@", [value description]);
                                               if (error || !mWait) {
@@ -46463,7 +47745,7 @@ public:
             subscribeAttributeEffectiveOperationModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"PumpConfigurationAndControl.EffectiveOperationMode response %@",
                                                               [value description]);
@@ -46545,7 +47827,7 @@ public:
         [cluster subscribeAttributeEffectiveControlModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"PumpConfigurationAndControl.EffectiveControlMode response %@",
                                                                  [value description]);
@@ -46627,7 +47909,7 @@ public:
         [cluster subscribeAttributeCapacityWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"PumpConfigurationAndControl.Capacity response %@", [value description]);
                                                  if (error || !mWait) {
@@ -46708,7 +47990,7 @@ public:
         [cluster subscribeAttributeSpeedWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                  params:params
-                                subscriptionEstablished:NULL
+                                subscriptionEstablished:nullptr
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"PumpConfigurationAndControl.Speed response %@", [value description]);
                                               if (error || !mWait) {
@@ -46826,7 +48108,7 @@ public:
         [cluster subscribeAttributeLifetimeRunningHoursWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"PumpConfigurationAndControl.LifetimeRunningHours response %@",
                                                                  [value description]);
@@ -46908,7 +48190,7 @@ public:
         [cluster subscribeAttributePowerWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                  params:params
-                                subscriptionEstablished:NULL
+                                subscriptionEstablished:nullptr
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"PumpConfigurationAndControl.Power response %@", [value description]);
                                               if (error || !mWait) {
@@ -47028,7 +48310,7 @@ public:
             subscribeAttributeLifetimeEnergyConsumedWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"PumpConfigurationAndControl.LifetimeEnergyConsumed response %@",
                                                               [value description]);
@@ -47147,7 +48429,7 @@ public:
         [cluster subscribeAttributeOperationModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PumpConfigurationAndControl.OperationMode response %@",
                                                           [value description]);
@@ -47267,7 +48549,7 @@ public:
             subscribeAttributeControlModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"PumpConfigurationAndControl.ControlMode response %@", [value description]);
                                                if (error || !mWait) {
@@ -47348,7 +48630,7 @@ public:
         [cluster subscribeAttributeAlarmMaskWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"PumpConfigurationAndControl.AlarmMask response %@", [value description]);
                                                   if (error || !mWait) {
@@ -47429,7 +48711,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"PumpConfigurationAndControl.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -47511,7 +48793,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"PumpConfigurationAndControl.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -47593,7 +48875,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PumpConfigurationAndControl.AttributeList response %@",
                                                           [value description]);
@@ -47676,7 +48958,7 @@ public:
             subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                  params:params
-                                subscriptionEstablished:NULL
+                                subscriptionEstablished:nullptr
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"PumpConfigurationAndControl.FeatureMap response %@", [value description]);
                                               if (error || !mWait) {
@@ -47757,7 +49039,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"PumpConfigurationAndControl.ClusterRevision response %@",
                                                             [value description]);
@@ -47858,7 +49140,7 @@ public:
         [cluster subscribeAttributeMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"RelativeHumidityMeasurement.MeasuredValue response %@",
                                                           [value description]);
@@ -47940,7 +49222,7 @@ public:
         [cluster subscribeAttributeMinMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"RelativeHumidityMeasurement.MinMeasuredValue response %@",
                                                              [value description]);
@@ -48022,7 +49304,7 @@ public:
         [cluster subscribeAttributeMaxMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"RelativeHumidityMeasurement.MaxMeasuredValue response %@",
                                                              [value description]);
@@ -48104,7 +49386,7 @@ public:
         [cluster subscribeAttributeToleranceWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"RelativeHumidityMeasurement.Tolerance response %@", [value description]);
                                                   if (error || !mWait) {
@@ -48185,7 +49467,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"RelativeHumidityMeasurement.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -48267,7 +49549,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"RelativeHumidityMeasurement.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -48349,7 +49631,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"RelativeHumidityMeasurement.AttributeList response %@",
                                                           [value description]);
@@ -48431,7 +49713,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"RelativeHumidityMeasurement.ClusterRevision response %@",
                                                             [value description]);
@@ -48845,7 +50127,7 @@ public:
         [cluster subscribeAttributeSceneCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Scenes.SceneCount response %@", [value description]);
                                                    if (error || !mWait) {
@@ -48922,7 +50204,7 @@ public:
         [cluster subscribeAttributeCurrentSceneWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"Scenes.CurrentScene response %@", [value description]);
                                                      if (error || !mWait) {
@@ -48999,7 +50281,7 @@ public:
         [cluster subscribeAttributeCurrentGroupWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"Scenes.CurrentGroup response %@", [value description]);
                                                      if (error || !mWait) {
@@ -49076,7 +50358,7 @@ public:
         [cluster subscribeAttributeSceneValidWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Scenes.SceneValid response %@", [value description]);
                                                    if (error || !mWait) {
@@ -49153,7 +50435,7 @@ public:
         [cluster subscribeAttributeNameSupportWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"Scenes.NameSupport response %@", [value description]);
                                                     if (error || !mWait) {
@@ -49230,7 +50512,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"Scenes.GeneratedCommandList response %@", [value description]);
                                                              if (error || !mWait) {
@@ -49307,7 +50589,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"Scenes.AcceptedCommandList response %@", [value description]);
                                                             if (error || !mWait) {
@@ -49384,7 +50666,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Scenes.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -49461,7 +50743,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Scenes.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -49594,7 +50876,7 @@ public:
         [cluster subscribeAttributeThreadMetricsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"SoftwareDiagnostics.ThreadMetrics response %@", [value description]);
                                                       if (error || !mWait) {
@@ -49676,7 +50958,7 @@ public:
             subscribeAttributeCurrentHeapFreeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"SoftwareDiagnostics.CurrentHeapFree response %@", [value description]);
                                                    if (error || !mWait) {
@@ -49758,7 +51040,7 @@ public:
             subscribeAttributeCurrentHeapUsedWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"SoftwareDiagnostics.CurrentHeapUsed response %@", [value description]);
                                                    if (error || !mWait) {
@@ -49841,7 +51123,7 @@ public:
             subscribeAttributeCurrentHeapHighWatermarkWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"SoftwareDiagnostics.CurrentHeapHighWatermark response %@",
                                                                 [value description]);
@@ -49923,7 +51205,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"SoftwareDiagnostics.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -50005,7 +51287,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"SoftwareDiagnostics.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -50087,7 +51369,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"SoftwareDiagnostics.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -50168,7 +51450,7 @@ public:
         [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"SoftwareDiagnostics.FeatureMap response %@", [value description]);
                                                    if (error || !mWait) {
@@ -50250,7 +51532,7 @@ public:
             subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"SoftwareDiagnostics.ClusterRevision response %@", [value description]);
                                                    if (error || !mWait) {
@@ -50352,7 +51634,7 @@ public:
         [cluster subscribeAttributeNumberOfPositionsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"Switch.NumberOfPositions response %@", [value description]);
                                                           if (error || !mWait) {
@@ -50429,7 +51711,7 @@ public:
         [cluster subscribeAttributeCurrentPositionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Switch.CurrentPosition response %@", [value description]);
                                                         if (error || !mWait) {
@@ -50506,7 +51788,7 @@ public:
         [cluster subscribeAttributeMultiPressMaxWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Switch.MultiPressMax response %@", [value description]);
                                                       if (error || !mWait) {
@@ -50583,7 +51865,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"Switch.GeneratedCommandList response %@", [value description]);
                                                              if (error || !mWait) {
@@ -50660,7 +51942,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"Switch.AcceptedCommandList response %@", [value description]);
                                                             if (error || !mWait) {
@@ -50737,7 +52019,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Switch.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -50814,7 +52096,7 @@ public:
         [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Switch.FeatureMap response %@", [value description]);
                                                    if (error || !mWait) {
@@ -50891,7 +52173,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Switch.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -51027,7 +52309,7 @@ public:
         [cluster subscribeAttributeTargetListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"TargetNavigator.TargetList response %@", [value description]);
                                                    if (error || !mWait) {
@@ -51104,7 +52386,7 @@ public:
         [cluster subscribeAttributeCurrentTargetWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"TargetNavigator.CurrentTarget response %@", [value description]);
                                                       if (error || !mWait) {
@@ -51181,7 +52463,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"TargetNavigator.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -51259,7 +52541,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"TargetNavigator.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -51337,7 +52619,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"TargetNavigator.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -51414,7 +52696,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TargetNavigator.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -51515,7 +52797,7 @@ public:
             subscribeAttributeMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TemperatureMeasurement.MeasuredValue response %@", [value description]);
                                                  if (error || !mWait) {
@@ -51596,7 +52878,7 @@ public:
         [cluster subscribeAttributeMinMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"TemperatureMeasurement.MinMeasuredValue response %@",
                                                              [value description]);
@@ -51678,7 +52960,7 @@ public:
         [cluster subscribeAttributeMaxMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"TemperatureMeasurement.MaxMeasuredValue response %@",
                                                              [value description]);
@@ -51760,7 +53042,7 @@ public:
         [cluster subscribeAttributeToleranceWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"TemperatureMeasurement.Tolerance response %@", [value description]);
                                                   if (error || !mWait) {
@@ -51842,7 +53124,7 @@ public:
             subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TemperatureMeasurement.AttributeList response %@", [value description]);
                                                  if (error || !mWait) {
@@ -51923,7 +53205,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TemperatureMeasurement.ClusterRevision response %@",
                                                             [value description]);
@@ -53010,7 +54292,7 @@ public:
         [cluster subscribeAttributeBooleanWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"TestCluster.Boolean response %@", [value description]);
                                                 if (error || !mWait) {
@@ -53121,7 +54403,7 @@ public:
         [cluster subscribeAttributeBitmap8WithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"TestCluster.Bitmap8 response %@", [value description]);
                                                 if (error || !mWait) {
@@ -53232,7 +54514,7 @@ public:
         [cluster subscribeAttributeBitmap16WithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TestCluster.Bitmap16 response %@", [value description]);
                                                  if (error || !mWait) {
@@ -53343,7 +54625,7 @@ public:
         [cluster subscribeAttributeBitmap32WithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TestCluster.Bitmap32 response %@", [value description]);
                                                  if (error || !mWait) {
@@ -53454,7 +54736,7 @@ public:
         [cluster subscribeAttributeBitmap64WithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TestCluster.Bitmap64 response %@", [value description]);
                                                  if (error || !mWait) {
@@ -53565,7 +54847,7 @@ public:
         [cluster subscribeAttributeInt8uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                  params:params
-                                subscriptionEstablished:NULL
+                                subscriptionEstablished:nullptr
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"TestCluster.Int8u response %@", [value description]);
                                               if (error || !mWait) {
@@ -53676,7 +54958,7 @@ public:
         [cluster subscribeAttributeInt16uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int16u response %@", [value description]);
                                                if (error || !mWait) {
@@ -53787,7 +55069,7 @@ public:
         [cluster subscribeAttributeInt24uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int24u response %@", [value description]);
                                                if (error || !mWait) {
@@ -53898,7 +55180,7 @@ public:
         [cluster subscribeAttributeInt32uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int32u response %@", [value description]);
                                                if (error || !mWait) {
@@ -54009,7 +55291,7 @@ public:
         [cluster subscribeAttributeInt40uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int40u response %@", [value description]);
                                                if (error || !mWait) {
@@ -54120,7 +55402,7 @@ public:
         [cluster subscribeAttributeInt48uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int48u response %@", [value description]);
                                                if (error || !mWait) {
@@ -54231,7 +55513,7 @@ public:
         [cluster subscribeAttributeInt56uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int56u response %@", [value description]);
                                                if (error || !mWait) {
@@ -54342,7 +55624,7 @@ public:
         [cluster subscribeAttributeInt64uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int64u response %@", [value description]);
                                                if (error || !mWait) {
@@ -54453,7 +55735,7 @@ public:
         [cluster subscribeAttributeInt8sWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                  params:params
-                                subscriptionEstablished:NULL
+                                subscriptionEstablished:nullptr
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"TestCluster.Int8s response %@", [value description]);
                                               if (error || !mWait) {
@@ -54564,7 +55846,7 @@ public:
         [cluster subscribeAttributeInt16sWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int16s response %@", [value description]);
                                                if (error || !mWait) {
@@ -54675,7 +55957,7 @@ public:
         [cluster subscribeAttributeInt24sWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int24s response %@", [value description]);
                                                if (error || !mWait) {
@@ -54786,7 +56068,7 @@ public:
         [cluster subscribeAttributeInt32sWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int32s response %@", [value description]);
                                                if (error || !mWait) {
@@ -54897,7 +56179,7 @@ public:
         [cluster subscribeAttributeInt40sWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int40s response %@", [value description]);
                                                if (error || !mWait) {
@@ -55008,7 +56290,7 @@ public:
         [cluster subscribeAttributeInt48sWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int48s response %@", [value description]);
                                                if (error || !mWait) {
@@ -55119,7 +56401,7 @@ public:
         [cluster subscribeAttributeInt56sWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int56s response %@", [value description]);
                                                if (error || !mWait) {
@@ -55230,7 +56512,7 @@ public:
         [cluster subscribeAttributeInt64sWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int64s response %@", [value description]);
                                                if (error || !mWait) {
@@ -55341,7 +56623,7 @@ public:
         [cluster subscribeAttributeEnum8WithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                  params:params
-                                subscriptionEstablished:NULL
+                                subscriptionEstablished:nullptr
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"TestCluster.Enum8 response %@", [value description]);
                                               if (error || !mWait) {
@@ -55452,7 +56734,7 @@ public:
         [cluster subscribeAttributeEnum16WithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Enum16 response %@", [value description]);
                                                if (error || !mWait) {
@@ -55563,7 +56845,7 @@ public:
         [cluster subscribeAttributeFloatSingleWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"TestCluster.FloatSingle response %@", [value description]);
                                                     if (error || !mWait) {
@@ -55674,7 +56956,7 @@ public:
         [cluster subscribeAttributeFloatDoubleWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"TestCluster.FloatDouble response %@", [value description]);
                                                     if (error || !mWait) {
@@ -55785,7 +57067,7 @@ public:
         [cluster subscribeAttributeOctetStringWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"TestCluster.OctetString response %@", [value description]);
                                                     if (error || !mWait) {
@@ -55907,7 +57189,7 @@ public:
         [cluster subscribeAttributeListInt8uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"TestCluster.ListInt8u response %@", [value description]);
                                                   if (error || !mWait) {
@@ -56030,7 +57312,7 @@ public:
         [cluster subscribeAttributeListOctetStringWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.ListOctetString response %@", [value description]);
                                                         if (error || !mWait) {
@@ -56157,7 +57439,7 @@ public:
         [cluster subscribeAttributeListStructOctetStringWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                  params:params
-                                                subscriptionEstablished:NULL
+                                                subscriptionEstablished:nullptr
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"TestCluster.ListStructOctetString response %@",
                                                                   [value description]);
@@ -56270,7 +57552,7 @@ public:
         [cluster subscribeAttributeLongOctetStringWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.LongOctetString response %@", [value description]);
                                                         if (error || !mWait) {
@@ -56383,7 +57665,7 @@ public:
         [cluster subscribeAttributeCharStringWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"TestCluster.CharString response %@", [value description]);
                                                    if (error || !mWait) {
@@ -56496,7 +57778,7 @@ public:
         [cluster subscribeAttributeLongCharStringWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.LongCharString response %@", [value description]);
                                                        if (error || !mWait) {
@@ -56607,7 +57889,7 @@ public:
         [cluster subscribeAttributeEpochUsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"TestCluster.EpochUs response %@", [value description]);
                                                 if (error || !mWait) {
@@ -56718,7 +58000,7 @@ public:
         [cluster subscribeAttributeEpochSWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                   params:params
-                                 subscriptionEstablished:NULL
+                                 subscriptionEstablished:nullptr
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.EpochS response %@", [value description]);
                                                if (error || !mWait) {
@@ -56829,7 +58111,7 @@ public:
         [cluster subscribeAttributeVendorIdWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TestCluster.VendorId response %@", [value description]);
                                                  if (error || !mWait) {
@@ -57108,7 +58390,7 @@ public:
             subscribeAttributeListNullablesAndOptionalsStructWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                       params:params
-                                                     subscriptionEstablished:NULL
+                                                     subscriptionEstablished:nullptr
                                                                reportHandler:^(
                                                                    NSArray * _Nullable value, NSError * _Nullable error) {
                                                                    NSLog(@"TestCluster.ListNullablesAndOptionalsStruct response %@",
@@ -57221,7 +58503,7 @@ public:
         [cluster subscribeAttributeEnumAttrWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TestCluster.EnumAttr response %@", [value description]);
                                                  if (error || !mWait) {
@@ -57344,7 +58626,7 @@ public:
         [cluster subscribeAttributeStructAttrWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(CHIPTestClusterClusterSimpleStruct * _Nullable value,
                                                    NSError * _Nullable error) {
                                                    NSLog(@"TestCluster.StructAttr response %@", [value description]);
@@ -57458,7 +58740,7 @@ public:
             subscribeAttributeRangeRestrictedInt8uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.RangeRestrictedInt8u response %@", [value description]);
                                                         if (error || !mWait) {
@@ -57571,7 +58853,7 @@ public:
             subscribeAttributeRangeRestrictedInt8sWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.RangeRestrictedInt8s response %@", [value description]);
                                                         if (error || !mWait) {
@@ -57683,7 +58965,7 @@ public:
         [cluster subscribeAttributeRangeRestrictedInt16uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                  params:params
-                                                subscriptionEstablished:NULL
+                                                subscriptionEstablished:nullptr
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"TestCluster.RangeRestrictedInt16u response %@",
                                                                   [value description]);
@@ -57796,7 +59078,7 @@ public:
         [cluster subscribeAttributeRangeRestrictedInt16sWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                  params:params
-                                                subscriptionEstablished:NULL
+                                                subscriptionEstablished:nullptr
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"TestCluster.RangeRestrictedInt16s response %@",
                                                                   [value description]);
@@ -57921,7 +59203,7 @@ public:
             subscribeAttributeListLongOctetStringWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.ListLongOctetString response %@", [value description]);
                                                        if (error || !mWait) {
@@ -58096,7 +59378,7 @@ public:
         [cluster subscribeAttributeListFabricScopedWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"TestCluster.ListFabricScoped response %@", [value description]);
                                                          if (error || !mWait) {
@@ -58208,7 +59490,7 @@ public:
         [cluster subscribeAttributeTimedWriteBooleanWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"TestCluster.TimedWriteBoolean response %@", [value description]);
                                                           if (error || !mWait) {
@@ -58321,7 +59603,7 @@ public:
             subscribeAttributeGeneralErrorBooleanWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.GeneralErrorBoolean response %@", [value description]);
                                                        if (error || !mWait) {
@@ -58434,7 +59716,7 @@ public:
             subscribeAttributeClusterErrorBooleanWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.ClusterErrorBoolean response %@", [value description]);
                                                        if (error || !mWait) {
@@ -58545,7 +59827,7 @@ public:
         [cluster subscribeAttributeUnsupportedWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"TestCluster.Unsupported response %@", [value description]);
                                                     if (error || !mWait) {
@@ -58657,7 +59939,7 @@ public:
         [cluster subscribeAttributeNullableBooleanWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.NullableBoolean response %@", [value description]);
                                                         if (error || !mWait) {
@@ -58769,7 +60051,7 @@ public:
         [cluster subscribeAttributeNullableBitmap8WithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.NullableBitmap8 response %@", [value description]);
                                                         if (error || !mWait) {
@@ -58881,7 +60163,7 @@ public:
         [cluster subscribeAttributeNullableBitmap16WithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"TestCluster.NullableBitmap16 response %@", [value description]);
                                                          if (error || !mWait) {
@@ -58993,7 +60275,7 @@ public:
         [cluster subscribeAttributeNullableBitmap32WithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"TestCluster.NullableBitmap32 response %@", [value description]);
                                                          if (error || !mWait) {
@@ -59105,7 +60387,7 @@ public:
         [cluster subscribeAttributeNullableBitmap64WithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"TestCluster.NullableBitmap64 response %@", [value description]);
                                                          if (error || !mWait) {
@@ -59216,7 +60498,7 @@ public:
         [cluster subscribeAttributeNullableInt8uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"TestCluster.NullableInt8u response %@", [value description]);
                                                       if (error || !mWait) {
@@ -59327,7 +60609,7 @@ public:
         [cluster subscribeAttributeNullableInt16uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt16u response %@", [value description]);
                                                        if (error || !mWait) {
@@ -59438,7 +60720,7 @@ public:
         [cluster subscribeAttributeNullableInt24uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt24u response %@", [value description]);
                                                        if (error || !mWait) {
@@ -59549,7 +60831,7 @@ public:
         [cluster subscribeAttributeNullableInt32uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt32u response %@", [value description]);
                                                        if (error || !mWait) {
@@ -59660,7 +60942,7 @@ public:
         [cluster subscribeAttributeNullableInt40uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt40u response %@", [value description]);
                                                        if (error || !mWait) {
@@ -59771,7 +61053,7 @@ public:
         [cluster subscribeAttributeNullableInt48uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt48u response %@", [value description]);
                                                        if (error || !mWait) {
@@ -59882,7 +61164,7 @@ public:
         [cluster subscribeAttributeNullableInt56uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt56u response %@", [value description]);
                                                        if (error || !mWait) {
@@ -59993,7 +61275,7 @@ public:
         [cluster subscribeAttributeNullableInt64uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt64u response %@", [value description]);
                                                        if (error || !mWait) {
@@ -60104,7 +61386,7 @@ public:
         [cluster subscribeAttributeNullableInt8sWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"TestCluster.NullableInt8s response %@", [value description]);
                                                       if (error || !mWait) {
@@ -60215,7 +61497,7 @@ public:
         [cluster subscribeAttributeNullableInt16sWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt16s response %@", [value description]);
                                                        if (error || !mWait) {
@@ -60326,7 +61608,7 @@ public:
         [cluster subscribeAttributeNullableInt24sWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt24s response %@", [value description]);
                                                        if (error || !mWait) {
@@ -60437,7 +61719,7 @@ public:
         [cluster subscribeAttributeNullableInt32sWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt32s response %@", [value description]);
                                                        if (error || !mWait) {
@@ -60548,7 +61830,7 @@ public:
         [cluster subscribeAttributeNullableInt40sWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt40s response %@", [value description]);
                                                        if (error || !mWait) {
@@ -60659,7 +61941,7 @@ public:
         [cluster subscribeAttributeNullableInt48sWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt48s response %@", [value description]);
                                                        if (error || !mWait) {
@@ -60770,7 +62052,7 @@ public:
         [cluster subscribeAttributeNullableInt56sWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt56s response %@", [value description]);
                                                        if (error || !mWait) {
@@ -60881,7 +62163,7 @@ public:
         [cluster subscribeAttributeNullableInt64sWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt64s response %@", [value description]);
                                                        if (error || !mWait) {
@@ -60992,7 +62274,7 @@ public:
         [cluster subscribeAttributeNullableEnum8WithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"TestCluster.NullableEnum8 response %@", [value description]);
                                                       if (error || !mWait) {
@@ -61103,7 +62385,7 @@ public:
         [cluster subscribeAttributeNullableEnum16WithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableEnum16 response %@", [value description]);
                                                        if (error || !mWait) {
@@ -61216,7 +62498,7 @@ public:
             subscribeAttributeNullableFloatSingleWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableFloatSingle response %@", [value description]);
                                                        if (error || !mWait) {
@@ -61329,7 +62611,7 @@ public:
             subscribeAttributeNullableFloatDoubleWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableFloatDouble response %@", [value description]);
                                                        if (error || !mWait) {
@@ -61442,7 +62724,7 @@ public:
             subscribeAttributeNullableOctetStringWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableOctetString response %@", [value description]);
                                                        if (error || !mWait) {
@@ -61557,7 +62839,7 @@ public:
             subscribeAttributeNullableCharStringWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"TestCluster.NullableCharString response %@", [value description]);
                                                       if (error || !mWait) {
@@ -61669,7 +62951,7 @@ public:
         [cluster subscribeAttributeNullableEnumAttrWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"TestCluster.NullableEnumAttr response %@", [value description]);
                                                          if (error || !mWait) {
@@ -61798,7 +63080,7 @@ public:
         [cluster subscribeAttributeNullableStructWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(CHIPTestClusterClusterSimpleStruct * _Nullable value,
                                                        NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableStruct response %@", [value description]);
@@ -61913,7 +63195,7 @@ public:
             subscribeAttributeNullableRangeRestrictedInt8uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                    params:params
-                                                  subscriptionEstablished:NULL
+                                                  subscriptionEstablished:nullptr
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"TestCluster.NullableRangeRestrictedInt8u response %@",
                                                                     [value description]);
@@ -62028,7 +63310,7 @@ public:
             subscribeAttributeNullableRangeRestrictedInt8sWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                    params:params
-                                                  subscriptionEstablished:NULL
+                                                  subscriptionEstablished:nullptr
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"TestCluster.NullableRangeRestrictedInt8s response %@",
                                                                     [value description]);
@@ -62144,7 +63426,7 @@ public:
             subscribeAttributeNullableRangeRestrictedInt16uWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                     params:params
-                                                   subscriptionEstablished:NULL
+                                                   subscriptionEstablished:nullptr
                                                              reportHandler:^(
                                                                  NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                  NSLog(@"TestCluster.NullableRangeRestrictedInt16u response %@",
@@ -62261,7 +63543,7 @@ public:
             subscribeAttributeNullableRangeRestrictedInt16sWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                     params:params
-                                                   subscriptionEstablished:NULL
+                                                   subscriptionEstablished:nullptr
                                                              reportHandler:^(
                                                                  NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                  NSLog(@"TestCluster.NullableRangeRestrictedInt16s response %@",
@@ -62341,7 +63623,7 @@ public:
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.GeneratedCommandList response %@", [value description]);
                                                         if (error || !mWait) {
@@ -62419,7 +63701,7 @@ public:
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.AcceptedCommandList response %@", [value description]);
                                                        if (error || !mWait) {
@@ -62496,7 +63778,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"TestCluster.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -62573,7 +63855,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -62644,7 +63926,7 @@ private:
 | * AcType                                                            | 0x0040 |
 | * AcCapacity                                                        | 0x0041 |
 | * AcRefrigerantType                                                 | 0x0042 |
-| * AcCompressor                                                      | 0x0043 |
+| * AcCompressorType                                                  | 0x0043 |
 | * AcErrorCode                                                       | 0x0044 |
 | * AcLouverPosition                                                  | 0x0045 |
 | * AcCoilTemperature                                                 | 0x0046 |
@@ -62910,7 +64192,7 @@ public:
         [cluster subscribeAttributeLocalTemperatureWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"Thermostat.LocalTemperature response %@", [value description]);
                                                          if (error || !mWait) {
@@ -62988,7 +64270,7 @@ public:
         [cluster subscribeAttributeAbsMinHeatSetpointLimitWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                    params:params
-                                                  subscriptionEstablished:NULL
+                                                  subscriptionEstablished:nullptr
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"Thermostat.AbsMinHeatSetpointLimit response %@",
                                                                     [value description]);
@@ -63067,7 +64349,7 @@ public:
         [cluster subscribeAttributeAbsMaxHeatSetpointLimitWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                    params:params
-                                                  subscriptionEstablished:NULL
+                                                  subscriptionEstablished:nullptr
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"Thermostat.AbsMaxHeatSetpointLimit response %@",
                                                                     [value description]);
@@ -63146,7 +64428,7 @@ public:
         [cluster subscribeAttributeAbsMinCoolSetpointLimitWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                    params:params
-                                                  subscriptionEstablished:NULL
+                                                  subscriptionEstablished:nullptr
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"Thermostat.AbsMinCoolSetpointLimit response %@",
                                                                     [value description]);
@@ -63225,7 +64507,7 @@ public:
         [cluster subscribeAttributeAbsMaxCoolSetpointLimitWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                    params:params
-                                                  subscriptionEstablished:NULL
+                                                  subscriptionEstablished:nullptr
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"Thermostat.AbsMaxCoolSetpointLimit response %@",
                                                                     [value description]);
@@ -63339,7 +64621,7 @@ public:
         [cluster subscribeAttributeOccupiedCoolingSetpointWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                    params:params
-                                                  subscriptionEstablished:NULL
+                                                  subscriptionEstablished:nullptr
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"Thermostat.OccupiedCoolingSetpoint response %@",
                                                                     [value description]);
@@ -63453,7 +64735,7 @@ public:
         [cluster subscribeAttributeOccupiedHeatingSetpointWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                    params:params
-                                                  subscriptionEstablished:NULL
+                                                  subscriptionEstablished:nullptr
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"Thermostat.OccupiedHeatingSetpoint response %@",
                                                                     [value description]);
@@ -63567,7 +64849,7 @@ public:
             subscribeAttributeMinHeatSetpointLimitWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Thermostat.MinHeatSetpointLimit response %@", [value description]);
                                                         if (error || !mWait) {
@@ -63680,7 +64962,7 @@ public:
             subscribeAttributeMaxHeatSetpointLimitWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Thermostat.MaxHeatSetpointLimit response %@", [value description]);
                                                         if (error || !mWait) {
@@ -63793,7 +65075,7 @@ public:
             subscribeAttributeMinCoolSetpointLimitWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Thermostat.MinCoolSetpointLimit response %@", [value description]);
                                                         if (error || !mWait) {
@@ -63906,7 +65188,7 @@ public:
             subscribeAttributeMaxCoolSetpointLimitWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Thermostat.MaxCoolSetpointLimit response %@", [value description]);
                                                         if (error || !mWait) {
@@ -64019,7 +65301,7 @@ public:
             subscribeAttributeMinSetpointDeadBandWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"Thermostat.MinSetpointDeadBand response %@", [value description]);
                                                        if (error || !mWait) {
@@ -64133,7 +65415,7 @@ public:
             subscribeAttributeControlSequenceOfOperationWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                  params:params
-                                                subscriptionEstablished:NULL
+                                                subscriptionEstablished:nullptr
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"Thermostat.ControlSequenceOfOperation response %@",
                                                                   [value description]);
@@ -64245,7 +65527,7 @@ public:
         [cluster subscribeAttributeSystemModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Thermostat.SystemMode response %@", [value description]);
                                                    if (error || !mWait) {
@@ -64322,7 +65604,7 @@ public:
         [cluster subscribeAttributeStartOfWeekWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"Thermostat.StartOfWeek response %@", [value description]);
                                                     if (error || !mWait) {
@@ -64401,7 +65683,7 @@ public:
             subscribeAttributeNumberOfWeeklyTransitionsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"Thermostat.NumberOfWeeklyTransitions response %@",
                                                                  [value description]);
@@ -64481,7 +65763,7 @@ public:
             subscribeAttributeNumberOfDailyTransitionsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"Thermostat.NumberOfDailyTransitions response %@",
                                                                 [value description]);
@@ -64559,7 +65841,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Thermostat.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -64636,7 +65918,7 @@ public:
         [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Thermostat.FeatureMap response %@", [value description]);
                                                    if (error || !mWait) {
@@ -64713,7 +65995,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Thermostat.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -64847,7 +66129,7 @@ public:
         [cluster subscribeAttributeTemperatureDisplayModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                   params:params
-                                                 subscriptionEstablished:NULL
+                                                 subscriptionEstablished:nullptr
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"ThermostatUserInterfaceConfiguration.TemperatureDisplayMode "
                                                                      @"response %@",
@@ -64964,7 +66246,7 @@ public:
         [cluster subscribeAttributeKeypadLockoutWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ThermostatUserInterfaceConfiguration.KeypadLockout response %@",
                                                           [value description]);
@@ -65085,7 +66367,7 @@ public:
             subscribeAttributeScheduleProgrammingVisibilityWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                     params:params
-                                                   subscriptionEstablished:NULL
+                                                   subscriptionEstablished:nullptr
                                                              reportHandler:^(
                                                                  NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                  NSLog(@"ThermostatUserInterfaceConfiguration."
@@ -65167,7 +66449,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ThermostatUserInterfaceConfiguration.GeneratedCommandList "
                                                                    @"response %@",
@@ -65249,7 +66531,7 @@ public:
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(
                                                            @"ThermostatUserInterfaceConfiguration.AcceptedCommandList response %@",
@@ -65330,7 +66612,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ThermostatUserInterfaceConfiguration.AttributeList response %@",
                                                           [value description]);
@@ -65410,7 +66692,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThermostatUserInterfaceConfiguration.ClusterRevision response %@",
                                                             [value description]);
@@ -65603,7 +66885,7 @@ public:
         [cluster subscribeAttributeChannelWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.Channel response %@", [value description]);
                                                 if (error || !mWait) {
@@ -65684,7 +66966,7 @@ public:
         [cluster subscribeAttributeRoutingRoleWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.RoutingRole response %@", [value description]);
                                                     if (error || !mWait) {
@@ -65765,7 +67047,7 @@ public:
         [cluster subscribeAttributeNetworkNameWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.NetworkName response %@", [value description]);
                                                     if (error || !mWait) {
@@ -65846,7 +67128,7 @@ public:
         [cluster subscribeAttributePanIdWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                  params:params
-                                subscriptionEstablished:NULL
+                                subscriptionEstablished:nullptr
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"ThreadNetworkDiagnostics.PanId response %@", [value description]);
                                               if (error || !mWait) {
@@ -65928,7 +67210,7 @@ public:
             subscribeAttributeExtendedPanIdWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.ExtendedPanId response %@", [value description]);
                                                  if (error || !mWait) {
@@ -66009,7 +67291,7 @@ public:
         [cluster subscribeAttributeMeshLocalPrefixWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.MeshLocalPrefix response %@",
                                                             [value description]);
@@ -66092,7 +67374,7 @@ public:
             subscribeAttributeOverrunCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.OverrunCount response %@", [value description]);
                                                 if (error || !mWait) {
@@ -66173,7 +67455,7 @@ public:
         [cluster subscribeAttributeNeighborTableListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ThreadNetworkDiagnostics.NeighborTableList response %@",
                                                               [value description]);
@@ -66255,7 +67537,7 @@ public:
         [cluster subscribeAttributeRouteTableListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ThreadNetworkDiagnostics.RouteTableList response %@",
                                                            [value description]);
@@ -66337,7 +67619,7 @@ public:
         [cluster subscribeAttributePartitionIdWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.PartitionId response %@", [value description]);
                                                     if (error || !mWait) {
@@ -66418,7 +67700,7 @@ public:
         [cluster subscribeAttributeWeightingWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ThreadNetworkDiagnostics.Weighting response %@", [value description]);
                                                   if (error || !mWait) {
@@ -66499,7 +67781,7 @@ public:
         [cluster subscribeAttributeDataVersionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.DataVersion response %@", [value description]);
                                                     if (error || !mWait) {
@@ -66580,7 +67862,7 @@ public:
         [cluster subscribeAttributeStableDataVersionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ThreadNetworkDiagnostics.StableDataVersion response %@",
                                                               [value description]);
@@ -66662,7 +67944,7 @@ public:
         [cluster subscribeAttributeLeaderRouterIdWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ThreadNetworkDiagnostics.LeaderRouterId response %@",
                                                            [value description]);
@@ -66744,7 +68026,7 @@ public:
         [cluster subscribeAttributeDetachedRoleCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ThreadNetworkDiagnostics.DetachedRoleCount response %@",
                                                               [value description]);
@@ -66826,7 +68108,7 @@ public:
         [cluster subscribeAttributeChildRoleCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ThreadNetworkDiagnostics.ChildRoleCount response %@",
                                                            [value description]);
@@ -66908,7 +68190,7 @@ public:
         [cluster subscribeAttributeRouterRoleCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.RouterRoleCount response %@",
                                                             [value description]);
@@ -66990,7 +68272,7 @@ public:
         [cluster subscribeAttributeLeaderRoleCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.LeaderRoleCount response %@",
                                                             [value description]);
@@ -67072,7 +68354,7 @@ public:
         [cluster subscribeAttributeAttachAttemptCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                               params:params
-                                             subscriptionEstablished:NULL
+                                             subscriptionEstablished:nullptr
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"ThreadNetworkDiagnostics.AttachAttemptCount response %@",
                                                                [value description]);
@@ -67154,7 +68436,7 @@ public:
         [cluster subscribeAttributePartitionIdChangeCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                   params:params
-                                                 subscriptionEstablished:NULL
+                                                 subscriptionEstablished:nullptr
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"ThreadNetworkDiagnostics.PartitionIdChangeCount response %@",
                                                                    [value description]);
@@ -67237,7 +68519,7 @@ public:
         [cluster subscribeAttributeBetterPartitionAttachAttemptCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                              params:params
-                                                            subscriptionEstablished:NULL
+                                                            subscriptionEstablished:nullptr
                                                                       reportHandler:^(
                                                                           NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                           NSLog(@"ThreadNetworkDiagnostics."
@@ -67322,7 +68604,7 @@ public:
         [cluster subscribeAttributeParentChangeCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ThreadNetworkDiagnostics.ParentChangeCount response %@",
                                                               [value description]);
@@ -67405,7 +68687,7 @@ public:
             subscribeAttributeTxTotalCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.TxTotalCount response %@", [value description]);
                                                 if (error || !mWait) {
@@ -67486,7 +68768,7 @@ public:
         [cluster subscribeAttributeTxUnicastCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ThreadNetworkDiagnostics.TxUnicastCount response %@",
                                                            [value description]);
@@ -67568,7 +68850,7 @@ public:
         [cluster subscribeAttributeTxBroadcastCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"ThreadNetworkDiagnostics.TxBroadcastCount response %@",
                                                              [value description]);
@@ -67650,7 +68932,7 @@ public:
         [cluster subscribeAttributeTxAckRequestedCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"ThreadNetworkDiagnostics.TxAckRequestedCount response %@",
                                                                 [value description]);
@@ -67733,7 +69015,7 @@ public:
             subscribeAttributeTxAckedCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.TxAckedCount response %@", [value description]);
                                                 if (error || !mWait) {
@@ -67814,7 +69096,7 @@ public:
         [cluster subscribeAttributeTxNoAckRequestedCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                  params:params
-                                                subscriptionEstablished:NULL
+                                                subscriptionEstablished:nullptr
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ThreadNetworkDiagnostics.TxNoAckRequestedCount response %@",
                                                                   [value description]);
@@ -67896,7 +69178,7 @@ public:
         [cluster subscribeAttributeTxDataCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.TxDataCount response %@", [value description]);
                                                     if (error || !mWait) {
@@ -67977,7 +69259,7 @@ public:
         [cluster subscribeAttributeTxDataPollCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.TxDataPollCount response %@",
                                                             [value description]);
@@ -68060,7 +69342,7 @@ public:
             subscribeAttributeTxBeaconCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.TxBeaconCount response %@", [value description]);
                                                  if (error || !mWait) {
@@ -68141,7 +69423,7 @@ public:
         [cluster subscribeAttributeTxBeaconRequestCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ThreadNetworkDiagnostics.TxBeaconRequestCount response %@",
                                                                  [value description]);
@@ -68224,7 +69506,7 @@ public:
             subscribeAttributeTxOtherCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.TxOtherCount response %@", [value description]);
                                                 if (error || !mWait) {
@@ -68306,7 +69588,7 @@ public:
             subscribeAttributeTxRetryCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.TxRetryCount response %@", [value description]);
                                                 if (error || !mWait) {
@@ -68389,7 +69671,7 @@ public:
             subscribeAttributeTxDirectMaxRetryExpiryCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                   params:params
-                                                 subscriptionEstablished:NULL
+                                                 subscriptionEstablished:nullptr
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"ThreadNetworkDiagnostics.TxDirectMaxRetryExpiryCount "
                                                                      @"response %@",
@@ -68474,7 +69756,7 @@ public:
             subscribeAttributeTxIndirectMaxRetryExpiryCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                     params:params
-                                                   subscriptionEstablished:NULL
+                                                   subscriptionEstablished:nullptr
                                                              reportHandler:^(
                                                                  NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                  NSLog(@"ThreadNetworkDiagnostics.TxIndirectMaxRetryExpiryCount "
@@ -68559,7 +69841,7 @@ public:
             subscribeAttributeTxErrCcaCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.TxErrCcaCount response %@", [value description]);
                                                  if (error || !mWait) {
@@ -68640,7 +69922,7 @@ public:
         [cluster subscribeAttributeTxErrAbortCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.TxErrAbortCount response %@",
                                                             [value description]);
@@ -68722,7 +70004,7 @@ public:
         [cluster subscribeAttributeTxErrBusyChannelCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                  params:params
-                                                subscriptionEstablished:NULL
+                                                subscriptionEstablished:nullptr
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ThreadNetworkDiagnostics.TxErrBusyChannelCount response %@",
                                                                   [value description]);
@@ -68805,7 +70087,7 @@ public:
             subscribeAttributeRxTotalCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.RxTotalCount response %@", [value description]);
                                                 if (error || !mWait) {
@@ -68886,7 +70168,7 @@ public:
         [cluster subscribeAttributeRxUnicastCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ThreadNetworkDiagnostics.RxUnicastCount response %@",
                                                            [value description]);
@@ -68968,7 +70250,7 @@ public:
         [cluster subscribeAttributeRxBroadcastCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"ThreadNetworkDiagnostics.RxBroadcastCount response %@",
                                                              [value description]);
@@ -69050,7 +70332,7 @@ public:
         [cluster subscribeAttributeRxDataCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.RxDataCount response %@", [value description]);
                                                     if (error || !mWait) {
@@ -69131,7 +70413,7 @@ public:
         [cluster subscribeAttributeRxDataPollCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.RxDataPollCount response %@",
                                                             [value description]);
@@ -69214,7 +70496,7 @@ public:
             subscribeAttributeRxBeaconCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.RxBeaconCount response %@", [value description]);
                                                  if (error || !mWait) {
@@ -69295,7 +70577,7 @@ public:
         [cluster subscribeAttributeRxBeaconRequestCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ThreadNetworkDiagnostics.RxBeaconRequestCount response %@",
                                                                  [value description]);
@@ -69378,7 +70660,7 @@ public:
             subscribeAttributeRxOtherCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                    params:params
-                                  subscriptionEstablished:NULL
+                                  subscriptionEstablished:nullptr
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.RxOtherCount response %@", [value description]);
                                                 if (error || !mWait) {
@@ -69459,7 +70741,7 @@ public:
         [cluster subscribeAttributeRxAddressFilteredCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                   params:params
-                                                 subscriptionEstablished:NULL
+                                                 subscriptionEstablished:nullptr
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"ThreadNetworkDiagnostics.RxAddressFilteredCount response %@",
                                                                    [value description]);
@@ -69543,7 +70825,7 @@ public:
             subscribeAttributeRxDestAddrFilteredCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                               params:params
-                                             subscriptionEstablished:NULL
+                                             subscriptionEstablished:nullptr
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"ThreadNetworkDiagnostics.RxDestAddrFilteredCount response %@",
                                                                [value description]);
@@ -69625,7 +70907,7 @@ public:
         [cluster subscribeAttributeRxDuplicatedCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ThreadNetworkDiagnostics.RxDuplicatedCount response %@",
                                                               [value description]);
@@ -69707,7 +70989,7 @@ public:
         [cluster subscribeAttributeRxErrNoFrameCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                         maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                              params:params
-                                            subscriptionEstablished:NULL
+                                            subscriptionEstablished:nullptr
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ThreadNetworkDiagnostics.RxErrNoFrameCount response %@",
                                                               [value description]);
@@ -69791,7 +71073,7 @@ public:
             subscribeAttributeRxErrUnknownNeighborCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(
                                                                  @"ThreadNetworkDiagnostics.RxErrUnknownNeighborCount response %@",
@@ -69876,7 +71158,7 @@ public:
             subscribeAttributeRxErrInvalidSrcAddrCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"ThreadNetworkDiagnostics.RxErrInvalidSrcAddrCount response %@",
                                                                 [value description]);
@@ -69959,7 +71241,7 @@ public:
             subscribeAttributeRxErrSecCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.RxErrSecCount response %@", [value description]);
                                                  if (error || !mWait) {
@@ -70041,7 +71323,7 @@ public:
             subscribeAttributeRxErrFcsCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.RxErrFcsCount response %@", [value description]);
                                                  if (error || !mWait) {
@@ -70122,7 +71404,7 @@ public:
         [cluster subscribeAttributeRxErrOtherCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.RxErrOtherCount response %@",
                                                             [value description]);
@@ -70204,7 +71486,7 @@ public:
         [cluster subscribeAttributeActiveTimestampWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.ActiveTimestamp response %@",
                                                             [value description]);
@@ -70286,7 +71568,7 @@ public:
         [cluster subscribeAttributePendingTimestampWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                             params:params
-                                           subscriptionEstablished:NULL
+                                           subscriptionEstablished:nullptr
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"ThreadNetworkDiagnostics.PendingTimestamp response %@",
                                                              [value description]);
@@ -70368,7 +71650,7 @@ public:
         [cluster subscribeAttributeDelayWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                  params:params
-                                subscriptionEstablished:NULL
+                                subscriptionEstablished:nullptr
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"ThreadNetworkDiagnostics.Delay response %@", [value description]);
                                               if (error || !mWait) {
@@ -70449,7 +71731,7 @@ public:
         [cluster subscribeAttributeSecurityPolicyWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ThreadNetworkDiagnostics.SecurityPolicy response %@",
                                                            [value description]);
@@ -70531,7 +71813,7 @@ public:
         [cluster subscribeAttributeChannelMaskWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.ChannelMask response %@", [value description]);
                                                     if (error || !mWait) {
@@ -70614,7 +71896,7 @@ public:
             subscribeAttributeOperationalDatasetComponentsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                    params:params
-                                                  subscriptionEstablished:NULL
+                                                  subscriptionEstablished:nullptr
                                                             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"ThreadNetworkDiagnostics.OperationalDatasetComponents "
                                                                       @"response %@",
@@ -70698,7 +71980,7 @@ public:
             subscribeAttributeActiveNetworkFaultsListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                               params:params
-                                             subscriptionEstablished:NULL
+                                             subscriptionEstablished:nullptr
                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"ThreadNetworkDiagnostics.ActiveNetworkFaultsList response %@",
                                                                [value description]);
@@ -70780,7 +72062,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ThreadNetworkDiagnostics.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -70862,7 +72144,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"ThreadNetworkDiagnostics.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -70945,7 +72227,7 @@ public:
             subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.AttributeList response %@", [value description]);
                                                  if (error || !mWait) {
@@ -71026,7 +72308,7 @@ public:
         [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ThreadNetworkDiagnostics.FeatureMap response %@", [value description]);
                                                    if (error || !mWait) {
@@ -71107,7 +72389,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.ClusterRevision response %@",
                                                             [value description]);
@@ -71244,7 +72526,7 @@ public:
         [cluster subscribeAttributeHourFormatWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"TimeFormatLocalization.HourFormat response %@", [value description]);
                                                    if (error || !mWait) {
@@ -71362,7 +72644,7 @@ public:
         [cluster subscribeAttributeActiveCalendarTypeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                               params:params
-                                             subscriptionEstablished:NULL
+                                             subscriptionEstablished:nullptr
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"TimeFormatLocalization.ActiveCalendarType response %@",
                                                                [value description]);
@@ -71444,7 +72726,7 @@ public:
         [cluster subscribeAttributeSupportedCalendarTypesWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                   params:params
-                                                 subscriptionEstablished:NULL
+                                                 subscriptionEstablished:nullptr
                                                            reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"TimeFormatLocalization.SupportedCalendarTypes response %@",
                                                                    [value description]);
@@ -71526,7 +72808,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"TimeFormatLocalization.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -71608,7 +72890,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"TimeFormatLocalization.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -71690,7 +72972,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TimeFormatLocalization.ClusterRevision response %@",
                                                             [value description]);
@@ -71825,7 +73107,7 @@ public:
         [cluster subscribeAttributeTemperatureUnitWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"UnitLocalization.TemperatureUnit response %@", [value description]);
                                                         if (error || !mWait) {
@@ -71906,7 +73188,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"UnitLocalization.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -71987,7 +73269,7 @@ public:
         [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"UnitLocalization.FeatureMap response %@", [value description]);
                                                    if (error || !mWait) {
@@ -72068,7 +73350,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"UnitLocalization.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -72212,7 +73494,7 @@ public:
         [cluster subscribeAttributeLabelListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"UserLabel.LabelList response %@", [value description]);
                                                   if (error || !mWait) {
@@ -72290,7 +73572,7 @@ public:
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"UserLabel.GeneratedCommandList response %@", [value description]);
                                                         if (error || !mWait) {
@@ -72368,7 +73650,7 @@ public:
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"UserLabel.AcceptedCommandList response %@", [value description]);
                                                        if (error || !mWait) {
@@ -72445,7 +73727,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"UserLabel.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -72538,7 +73820,7 @@ public:
         [cluster subscribeAttributeMACAddressWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"WakeOnLan.MACAddress response %@", [value description]);
                                                    if (error || !mWait) {
@@ -72616,7 +73898,7 @@ public:
             subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"WakeOnLan.GeneratedCommandList response %@", [value description]);
                                                         if (error || !mWait) {
@@ -72694,7 +73976,7 @@ public:
             subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"WakeOnLan.AcceptedCommandList response %@", [value description]);
                                                        if (error || !mWait) {
@@ -72771,7 +74053,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"WakeOnLan.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -72848,7 +74130,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"WakeOnLan.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -72992,7 +74274,7 @@ public:
         [cluster subscribeAttributeBssidWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                  params:params
-                                subscriptionEstablished:NULL
+                                subscriptionEstablished:nullptr
                                           reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"WiFiNetworkDiagnostics.Bssid response %@", [value description]);
                                               if (error || !mWait) {
@@ -73073,7 +74355,7 @@ public:
         [cluster subscribeAttributeSecurityTypeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"WiFiNetworkDiagnostics.SecurityType response %@", [value description]);
                                                      if (error || !mWait) {
@@ -73154,7 +74436,7 @@ public:
         [cluster subscribeAttributeWiFiVersionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                        params:params
-                                      subscriptionEstablished:NULL
+                                      subscriptionEstablished:nullptr
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"WiFiNetworkDiagnostics.WiFiVersion response %@", [value description]);
                                                     if (error || !mWait) {
@@ -73236,7 +74518,7 @@ public:
             subscribeAttributeChannelNumberWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"WiFiNetworkDiagnostics.ChannelNumber response %@", [value description]);
                                                  if (error || !mWait) {
@@ -73317,7 +74599,7 @@ public:
         [cluster subscribeAttributeRssiWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                 params:params
-                               subscriptionEstablished:NULL
+                               subscriptionEstablished:nullptr
                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                              NSLog(@"WiFiNetworkDiagnostics.Rssi response %@", [value description]);
                                              if (error || !mWait) {
@@ -73398,7 +74680,7 @@ public:
         [cluster subscribeAttributeBeaconLostCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"WiFiNetworkDiagnostics.BeaconLostCount response %@",
                                                             [value description]);
@@ -73481,7 +74763,7 @@ public:
             subscribeAttributeBeaconRxCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"WiFiNetworkDiagnostics.BeaconRxCount response %@", [value description]);
                                                  if (error || !mWait) {
@@ -73562,7 +74844,7 @@ public:
         [cluster subscribeAttributePacketMulticastRxCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                   params:params
-                                                 subscriptionEstablished:NULL
+                                                 subscriptionEstablished:nullptr
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"WiFiNetworkDiagnostics.PacketMulticastRxCount response %@",
                                                                    [value description]);
@@ -73644,7 +74926,7 @@ public:
         [cluster subscribeAttributePacketMulticastTxCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                   params:params
-                                                 subscriptionEstablished:NULL
+                                                 subscriptionEstablished:nullptr
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"WiFiNetworkDiagnostics.PacketMulticastTxCount response %@",
                                                                    [value description]);
@@ -73726,7 +75008,7 @@ public:
         [cluster subscribeAttributePacketUnicastRxCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"WiFiNetworkDiagnostics.PacketUnicastRxCount response %@",
                                                                  [value description]);
@@ -73808,7 +75090,7 @@ public:
         [cluster subscribeAttributePacketUnicastTxCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"WiFiNetworkDiagnostics.PacketUnicastTxCount response %@",
                                                                  [value description]);
@@ -73891,7 +75173,7 @@ public:
             subscribeAttributeCurrentMaxRateWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                      params:params
-                                    subscriptionEstablished:NULL
+                                    subscriptionEstablished:nullptr
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"WiFiNetworkDiagnostics.CurrentMaxRate response %@", [value description]);
                                                   if (error || !mWait) {
@@ -73972,7 +75254,7 @@ public:
         [cluster subscribeAttributeOverrunCountWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"WiFiNetworkDiagnostics.OverrunCount response %@", [value description]);
                                                      if (error || !mWait) {
@@ -74053,7 +75335,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"WiFiNetworkDiagnostics.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -74135,7 +75417,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"WiFiNetworkDiagnostics.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -74218,7 +75500,7 @@ public:
             subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                     params:params
-                                   subscriptionEstablished:NULL
+                                   subscriptionEstablished:nullptr
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"WiFiNetworkDiagnostics.AttributeList response %@", [value description]);
                                                  if (error || !mWait) {
@@ -74299,7 +75581,7 @@ public:
         [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"WiFiNetworkDiagnostics.FeatureMap response %@", [value description]);
                                                    if (error || !mWait) {
@@ -74380,7 +75662,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"WiFiNetworkDiagnostics.ClusterRevision response %@",
                                                             [value description]);
@@ -74737,7 +76019,7 @@ public:
         [cluster subscribeAttributeTypeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                 params:params
-                               subscriptionEstablished:NULL
+                               subscriptionEstablished:nullptr
                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                              NSLog(@"WindowCovering.Type response %@", [value description]);
                                              if (error || !mWait) {
@@ -74814,7 +76096,7 @@ public:
         [cluster subscribeAttributeCurrentPositionLiftWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"WindowCovering.CurrentPositionLift response %@",
                                                                 [value description]);
@@ -74892,7 +76174,7 @@ public:
         [cluster subscribeAttributeCurrentPositionTiltWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"WindowCovering.CurrentPositionTilt response %@",
                                                                 [value description]);
@@ -74970,7 +76252,7 @@ public:
         [cluster subscribeAttributeConfigStatusWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"WindowCovering.ConfigStatus response %@", [value description]);
                                                      if (error || !mWait) {
@@ -75049,7 +76331,7 @@ public:
             subscribeAttributeCurrentPositionLiftPercentageWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                     params:params
-                                                   subscriptionEstablished:NULL
+                                                   subscriptionEstablished:nullptr
                                                              reportHandler:^(
                                                                  NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                  NSLog(@"WindowCovering.CurrentPositionLiftPercentage response %@",
@@ -75130,7 +76412,7 @@ public:
             subscribeAttributeCurrentPositionTiltPercentageWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                     params:params
-                                                   subscriptionEstablished:NULL
+                                                   subscriptionEstablished:nullptr
                                                              reportHandler:^(
                                                                  NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                  NSLog(@"WindowCovering.CurrentPositionTiltPercentage response %@",
@@ -75210,7 +76492,7 @@ public:
             subscribeAttributeOperationalStatusWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"WindowCovering.OperationalStatus response %@", [value description]);
                                                      if (error || !mWait) {
@@ -75289,7 +76571,7 @@ public:
             subscribeAttributeTargetPositionLiftPercent100thsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                       params:params
-                                                     subscriptionEstablished:NULL
+                                                     subscriptionEstablished:nullptr
                                                                reportHandler:^(
                                                                    NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                    NSLog(@"WindowCovering.TargetPositionLiftPercent100ths response "
@@ -75371,7 +76653,7 @@ public:
             subscribeAttributeTargetPositionTiltPercent100thsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                       params:params
-                                                     subscriptionEstablished:NULL
+                                                     subscriptionEstablished:nullptr
                                                                reportHandler:^(
                                                                    NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                    NSLog(@"WindowCovering.TargetPositionTiltPercent100ths response "
@@ -75451,7 +76733,7 @@ public:
         [cluster subscribeAttributeEndProductTypeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                           params:params
-                                         subscriptionEstablished:NULL
+                                         subscriptionEstablished:nullptr
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"WindowCovering.EndProductType response %@", [value description]);
                                                        if (error || !mWait) {
@@ -75529,7 +76811,7 @@ public:
         [cluster subscribeAttributeCurrentPositionLiftPercent100thsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                             params:params
-                                                           subscriptionEstablished:NULL
+                                                           subscriptionEstablished:nullptr
                                                                      reportHandler:^(
                                                                          NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                          NSLog(@"WindowCovering.CurrentPositionLiftPercent100ths "
@@ -75611,7 +76893,7 @@ public:
         [cluster subscribeAttributeCurrentPositionTiltPercent100thsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                             params:params
-                                                           subscriptionEstablished:NULL
+                                                           subscriptionEstablished:nullptr
                                                                      reportHandler:^(
                                                                          NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                          NSLog(@"WindowCovering.CurrentPositionTiltPercent100ths "
@@ -75692,7 +76974,7 @@ public:
         [cluster subscribeAttributeInstalledOpenLimitLiftWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                   params:params
-                                                 subscriptionEstablished:NULL
+                                                 subscriptionEstablished:nullptr
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"WindowCovering.InstalledOpenLimitLift response %@",
                                                                    [value description]);
@@ -75772,7 +77054,7 @@ public:
             subscribeAttributeInstalledClosedLimitLiftWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"WindowCovering.InstalledClosedLimitLift response %@",
                                                                 [value description]);
@@ -75850,7 +77132,7 @@ public:
         [cluster subscribeAttributeInstalledOpenLimitTiltWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                   params:params
-                                                 subscriptionEstablished:NULL
+                                                 subscriptionEstablished:nullptr
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"WindowCovering.InstalledOpenLimitTilt response %@",
                                                                    [value description]);
@@ -75930,7 +77212,7 @@ public:
             subscribeAttributeInstalledClosedLimitTiltWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"WindowCovering.InstalledClosedLimitTilt response %@",
                                                                 [value description]);
@@ -76042,7 +77324,7 @@ public:
         [cluster subscribeAttributeModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                 params:params
-                               subscriptionEstablished:NULL
+                               subscriptionEstablished:nullptr
                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                              NSLog(@"WindowCovering.Mode response %@", [value description]);
                                              if (error || !mWait) {
@@ -76119,7 +77401,7 @@ public:
         [cluster subscribeAttributeSafetyStatusWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                         params:params
-                                       subscriptionEstablished:NULL
+                                       subscriptionEstablished:nullptr
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"WindowCovering.SafetyStatus response %@", [value description]);
                                                      if (error || !mWait) {
@@ -76196,7 +77478,7 @@ public:
         [cluster subscribeAttributeGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                 params:params
-                                               subscriptionEstablished:NULL
+                                               subscriptionEstablished:nullptr
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"WindowCovering.GeneratedCommandList response %@",
                                                                  [value description]);
@@ -76274,7 +77556,7 @@ public:
         [cluster subscribeAttributeAcceptedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                                params:params
-                                              subscriptionEstablished:NULL
+                                              subscriptionEstablished:nullptr
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"WindowCovering.AcceptedCommandList response %@",
                                                                 [value description]);
@@ -76352,7 +77634,7 @@ public:
         [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                          params:params
-                                        subscriptionEstablished:NULL
+                                        subscriptionEstablished:nullptr
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"WindowCovering.AttributeList response %@", [value description]);
                                                       if (error || !mWait) {
@@ -76429,7 +77711,7 @@ public:
         [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                       params:params
-                                     subscriptionEstablished:NULL
+                                     subscriptionEstablished:nullptr
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"WindowCovering.FeatureMap response %@", [value description]);
                                                    if (error || !mWait) {
@@ -76506,7 +77788,7 @@ public:
         [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
                                                            params:params
-                                          subscriptionEstablished:NULL
+                                          subscriptionEstablished:nullptr
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"WindowCovering.ClusterRevision response %@", [value description]);
                                                         if (error || !mWait) {
@@ -76542,6 +77824,12 @@ void registerClusterAccessControl(Commands & commands)
         make_unique<ReadAccessControlExtension>(), //
         make_unique<WriteAccessControlExtension>(), //
         make_unique<SubscribeAttributeAccessControlExtension>(), //
+        make_unique<ReadAccessControlSubjectsPerAccessControlEntry>(), //
+        make_unique<SubscribeAttributeAccessControlSubjectsPerAccessControlEntry>(), //
+        make_unique<ReadAccessControlTargetsPerAccessControlEntry>(), //
+        make_unique<SubscribeAttributeAccessControlTargetsPerAccessControlEntry>(), //
+        make_unique<ReadAccessControlAccessControlEntriesPerFabric>(), //
+        make_unique<SubscribeAttributeAccessControlAccessControlEntriesPerFabric>(), //
         make_unique<ReadAccessControlGeneratedCommandList>(), //
         make_unique<SubscribeAttributeAccessControlGeneratedCommandList>(), //
         make_unique<ReadAccessControlAcceptedCommandList>(), //
@@ -76754,6 +78042,8 @@ void registerClusterBasic(Commands & commands)
         make_unique<SubscribeAttributeBasicReachable>(), //
         make_unique<ReadBasicUniqueID>(), //
         make_unique<SubscribeAttributeBasicUniqueID>(), //
+        make_unique<ReadBasicCapabilityMinima>(), //
+        make_unique<SubscribeAttributeBasicCapabilityMinima>(), //
         make_unique<ReadBasicGeneratedCommandList>(), //
         make_unique<SubscribeAttributeBasicGeneratedCommandList>(), //
         make_unique<ReadBasicAcceptedCommandList>(), //
@@ -77163,15 +78453,18 @@ void registerClusterDoorLock(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<DoorLockClearCredential>(), //
+        make_unique<DoorLockClearHolidaySchedule>(), //
         make_unique<DoorLockClearUser>(), //
         make_unique<DoorLockClearWeekDaySchedule>(), //
         make_unique<DoorLockClearYearDaySchedule>(), //
         make_unique<DoorLockGetCredentialStatus>(), //
+        make_unique<DoorLockGetHolidaySchedule>(), //
         make_unique<DoorLockGetUser>(), //
         make_unique<DoorLockGetWeekDaySchedule>(), //
         make_unique<DoorLockGetYearDaySchedule>(), //
         make_unique<DoorLockLockDoor>(), //
         make_unique<DoorLockSetCredential>(), //
+        make_unique<DoorLockSetHolidaySchedule>(), //
         make_unique<DoorLockSetUser>(), //
         make_unique<DoorLockSetWeekDaySchedule>(), //
         make_unique<DoorLockSetYearDaySchedule>(), //
@@ -77326,6 +78619,28 @@ void registerClusterFanControl(Commands & commands)
         make_unique<ReadFanControlFanModeSequence>(), //
         make_unique<WriteFanControlFanModeSequence>(), //
         make_unique<SubscribeAttributeFanControlFanModeSequence>(), //
+        make_unique<ReadFanControlPercentSetting>(), //
+        make_unique<WriteFanControlPercentSetting>(), //
+        make_unique<SubscribeAttributeFanControlPercentSetting>(), //
+        make_unique<ReadFanControlPercentCurrent>(), //
+        make_unique<SubscribeAttributeFanControlPercentCurrent>(), //
+        make_unique<ReadFanControlSpeedMax>(), //
+        make_unique<SubscribeAttributeFanControlSpeedMax>(), //
+        make_unique<ReadFanControlSpeedSetting>(), //
+        make_unique<WriteFanControlSpeedSetting>(), //
+        make_unique<SubscribeAttributeFanControlSpeedSetting>(), //
+        make_unique<ReadFanControlSpeedCurrent>(), //
+        make_unique<SubscribeAttributeFanControlSpeedCurrent>(), //
+        make_unique<ReadFanControlRockSupport>(), //
+        make_unique<SubscribeAttributeFanControlRockSupport>(), //
+        make_unique<ReadFanControlRockSetting>(), //
+        make_unique<WriteFanControlRockSetting>(), //
+        make_unique<SubscribeAttributeFanControlRockSetting>(), //
+        make_unique<ReadFanControlWindSupport>(), //
+        make_unique<SubscribeAttributeFanControlWindSupport>(), //
+        make_unique<ReadFanControlWindSetting>(), //
+        make_unique<WriteFanControlWindSetting>(), //
+        make_unique<SubscribeAttributeFanControlWindSetting>(), //
         make_unique<ReadFanControlGeneratedCommandList>(), //
         make_unique<SubscribeAttributeFanControlGeneratedCommandList>(), //
         make_unique<ReadFanControlAcceptedCommandList>(), //

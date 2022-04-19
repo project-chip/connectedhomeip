@@ -45,7 +45,7 @@ private:
 
     // We are using the casts between ConcreteAttributePath and ConcreteDataAttributePath, then all paths passed to upper
     // applications will always have NotList as mListOp.
-    Optional<ConcreteAttributePath> mLastAttributePath;
+    Optional<ConcreteAttributePath> mProcessingAttributePath;
     StatusIB mAttributeStatus;
 
     WriteClient::Callback * callback;

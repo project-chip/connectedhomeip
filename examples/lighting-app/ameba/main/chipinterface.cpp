@@ -45,8 +45,8 @@
 #if CONFIG_ENABLE_OTA_REQUESTOR
 #include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <platform/Ameba/AmebaOTAImageProcessor.h>
 #endif
 
@@ -84,9 +84,9 @@ void NetWorkCommissioningInstInit()
 static DeviceCallbacks EchoCallbacks;
 
 #if CONFIG_ENABLE_OTA_REQUESTOR
-OTARequestor gRequestorCore;
+DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
-GenericOTARequestorDriver gRequestorUser;
+DefaultOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 AmebaOTAImageProcessor gImageProcessor;
 #endif

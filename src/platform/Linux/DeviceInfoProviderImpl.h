@@ -16,7 +16,9 @@
  */
 #pragma once
 
+#include <lib/support/EnforceFormat.h>
 #include <platform/DeviceInfoProvider.h>
+#include <platform/Linux/CHIPLinuxStorage.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -31,6 +33,7 @@ public:
     FixedLabelIterator * IterateFixedLabel(EndpointId endpoint) override;
     UserLabelIterator * IterateUserLabel(EndpointId endpoint) override;
     SupportedLocalesIterator * IterateSupportedLocales() override;
+    SupportedCalendarTypesIterator * IterateSupportedCalendarTypes() override;
 
     static DeviceInfoProviderImpl & GetDefaultInstance();
 
@@ -80,9 +83,24 @@ protected:
         char mActiveLocaleBuf[kMaxActiveLocaleLength + 1];
     };
 
+    class SupportedCalendarTypesIteratorImpl : public SupportedCalendarTypesIterator
+    {
+    public:
+        SupportedCalendarTypesIteratorImpl() = default;
+        size_t Count() override;
+        bool Next(CalendarType & output) override;
+        void Release() override { delete this; }
+
+    private:
+        size_t mIndex = 0;
+    };
+
     CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) override;
     CHIP_ERROR GetUserLabelLength(EndpointId endpoint, size_t & val) override;
     CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override;
+
+private:
+    static constexpr size_t UserLabelTLVMaxSize() { return TLV::EstimateStructOverhead(kMaxLabelNameLength, kMaxLabelValueLength); }
 };
 
 } // namespace DeviceLayer

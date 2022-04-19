@@ -29,9 +29,9 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -60,12 +60,12 @@ extern "C" {
 
 using chip::BDXDownloader;
 using chip::CharSpan;
+using chip::DefaultOTARequestor;
 using chip::FabricIndex;
 using chip::GetRequestorInstance;
 using chip::NodeId;
 using chip::OTADownloader;
 using chip::OTAImageProcessorImpl;
-using chip::OTARequestor;
 using chip::System::Layer;
 
 using namespace ::chip;
@@ -93,9 +93,9 @@ StaticQueue_t sAppEventQueueStruct;
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 
-OTARequestor gRequestorCore;
+DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
-GenericOTARequestorDriver gRequestorUser;
+DefaultOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 
@@ -470,6 +470,6 @@ void OnTriggerUpdateTimerHandler(Layer * systemLayer, void * appState)
 {
     P6_LOG("Triggering immediate OTA update query");
 
-    OTARequestor * req = static_cast<OTARequestor *>(GetRequestorInstance());
+    DefaultOTARequestor * req = static_cast<DefaultOTARequestor *>(GetRequestorInstance());
     req->TriggerImmediateQuery();
 }

@@ -43,44 +43,9 @@ using namespace chip::Callback;
 
 namespace chip {
 
-// TODO - Refactor LoadSecureSessionParametersIfNeeded() as device object is no longer persisted
-CHIP_ERROR CommissioneeDeviceProxy::LoadSecureSessionParametersIfNeeded(bool & didLoad)
-{
-    didLoad = false;
-
-    // If there is no secure connection to the device, try establishing it
-    if (mState != ConnectionState::SecureConnected)
-    {
-        ReturnErrorOnFailure(LoadSecureSessionParameters());
-        didLoad = true;
-    }
-    else
-    {
-        if (mSecureSession)
-        {
-            // Check if the connection state has the correct transport information
-            if (mSecureSession->AsSecureSession()->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
-            {
-                mState = ConnectionState::NotConnected;
-                ReturnErrorOnFailure(LoadSecureSessionParameters());
-                didLoad = true;
-            }
-        }
-        else
-        {
-            mState = ConnectionState::NotConnected;
-            ReturnErrorOnFailure(LoadSecureSessionParameters());
-            didLoad = true;
-        }
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR CommissioneeDeviceProxy::SendCommands(app::CommandSender * commandObj, Optional<System::Clock::Timeout> timeout)
 {
-    bool loadedSecureSession = false;
-    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+    VerifyOrReturnError(mSecureSession, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return commandObj->SendCommandRequest(mSecureSession.Get(), timeout);
 }
@@ -105,8 +70,6 @@ CHIP_ERROR CommissioneeDeviceProxy::CloseSession()
 CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & addr,
                                                      const ReliableMessageProtocolConfig & config)
 {
-    bool didLoad;
-
     mDeviceAddress = addr;
 
     mMRPConfig = config;
@@ -114,8 +77,6 @@ CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddres
     // Initialize PASE session state with any MRP parameters that DNS-SD has provided.
     // It can be overridden by PASE session protocol messages that include MRP parameters.
     mPairing.SetMRPConfig(mMRPConfig);
-
-    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(didLoad));
 
     if (!mSecureSession)
     {
@@ -138,11 +99,17 @@ CHIP_ERROR CommissioneeDeviceProxy::SetConnected()
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    mState = ConnectionState::SecureConnected;
-    bool _didLoad;
-    CHIP_ERROR err = LoadSecureSessionParametersIfNeeded(_didLoad);
-    if (err != CHIP_NO_ERROR)
+
+    CHIP_ERROR err = mSessionManager->NewPairing(mSecureSession, Optional<Transport::PeerAddress>::Value(mDeviceAddress),
+                                                 GetDeviceId(), &mPairing, CryptoContext::SessionRole::kInitiator, mFabricIndex);
+
+    if (err == CHIP_NO_ERROR)
     {
+        mState = ConnectionState::SecureConnected;
+    }
+    else
+    {
+        ChipLogError(Controller, "NewPairing returning error %" CHIP_ERROR_FORMAT, err.Format());
         mState = ConnectionState::NotConnected;
     }
     return err;
@@ -156,34 +123,6 @@ void CommissioneeDeviceProxy::Reset()
     mSessionManager     = nullptr;
     mUDPEndPointManager = nullptr;
     mExchangeMgr        = nullptr;
-}
-
-CHIP_ERROR CommissioneeDeviceProxy::LoadSecureSessionParameters()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    SessionHolder sessionHolder;
-
-    if (mSessionManager == nullptr || mState == ConnectionState::SecureConnected)
-    {
-        ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
-    }
-
-    if (mState == ConnectionState::Connecting)
-    {
-        ExitNow(err = CHIP_NO_ERROR);
-    }
-
-    SuccessOrExit(mSessionManager->NewPairing(mSecureSession, Optional<Transport::PeerAddress>::Value(mDeviceAddress),
-                                              GetDeviceId(), &mPairing, CryptoContext::SessionRole::kInitiator, mFabricIndex));
-    mState = ConnectionState::SecureConnected;
-
-exit:
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "LoadSecureSessionParameters returning error %" CHIP_ERROR_FORMAT, err.Format());
-    }
-    return err;
 }
 
 bool CommissioneeDeviceProxy::GetAddress(Inet::IPAddress & addr, uint16_t & port) const

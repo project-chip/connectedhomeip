@@ -18,9 +18,9 @@
  */
 #include <ChipShellCollection.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
 #include <app/server/Server.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/shell/Engine.h>
@@ -42,9 +42,9 @@ using namespace chip::Shell;
 
 static void InitApp(intptr_t args);
 
-OTARequestor gRequestorCore;
+DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
-DeviceLayer::GenericOTARequestorDriver gRequestorUser;
+DeviceLayer::DefaultOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 

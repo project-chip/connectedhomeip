@@ -48,17 +48,19 @@ namespace chip {
 
 struct DeviceProxyInitParams
 {
-    SessionManager * sessionManager                    = nullptr;
-    Messaging::ExchangeManager * exchangeMgr           = nullptr;
-    FabricTable * fabricTable                          = nullptr;
-    CASEClientPoolDelegate * clientPool                = nullptr;
-    Credentials::GroupDataProvider * groupDataProvider = nullptr;
+    SessionManager * sessionManager                     = nullptr;
+    SessionResumptionStorage * sessionResumptionStorage = nullptr;
+    Messaging::ExchangeManager * exchangeMgr            = nullptr;
+    FabricTable * fabricTable                           = nullptr;
+    CASEClientPoolDelegate * clientPool                 = nullptr;
+    Credentials::GroupDataProvider * groupDataProvider  = nullptr;
 
     Optional<ReliableMessageProtocolConfig> mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Missing();
 
     CHIP_ERROR Validate() const
     {
         ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        // sessionResumptionStorage can be nullptr when resumption is disabled
         ReturnErrorCodeIf(exchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(groupDataProvider == nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -89,6 +91,10 @@ class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy,
 {
 public:
     ~OperationalDeviceProxy() override;
+
+    //
+    // TODO: Should not be PeerId, but rather, ScopedNodeId
+    //
     OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId) : mSecureSession(*this)
     {
         mInitParams = params;
@@ -156,15 +162,6 @@ public:
      *  Mark any open session with the device as expired.
      */
     CHIP_ERROR Disconnect() override;
-
-    /**
-     * Use SetConnectedSession if 'this' object is a newly allocated device proxy.
-     * It will take an existing session, such as the one established
-     * during commissioning, and use it for this device proxy.
-     *
-     * Note: Avoid using this function generally as it is Deprecated
-     */
-    void SetConnectedSession(const SessionHandle & handle);
 
     NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
 
@@ -244,6 +241,8 @@ private:
     FabricInfo * mFabricInfo;
     System::Layer * mSystemLayer;
 
+    // mCASEClient is only non-null if we are in State::Connecting or just
+    // allocated it as part of an attempt to enter State::Connecting.
     CASEClient * mCASEClient = nullptr;
 
     PeerId mPeerId;
@@ -266,20 +265,34 @@ private:
 
     CHIP_ERROR EstablishConnection();
 
+    /*
+     * This checks to see if an existing CASE session exists to the peer within the SessionManager
+     * and if one exists, to load that into mSecureSession.
+     *
+     * Returns true if a valid session was found, false otherwise.
+     *
+     */
+    bool AttachToExistingSecureSession();
+
     bool IsSecureConnected() const override { return mState == State::SecureConnected; }
 
     static void HandleCASEConnected(void * context, CASEClient * client);
     static void HandleCASEConnectionFailure(void * context, CASEClient * client, CHIP_ERROR error);
 
-    static void CloseCASESessionTask(System::Layer * layer, void * context);
-
-    void CloseCASESession();
+    void CleanupCASEClient();
 
     void EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
                                     Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
-    void DequeueConnectionSuccessCallbacks(bool executeCallback);
-    void DequeueConnectionFailureCallbacks(CHIP_ERROR error, bool executeCallback);
+    /*
+     * This dequeues all failure and success callbacks and appropriately
+     * invokes either set depending on the value of error.
+     *
+     * If error == CHIP_NO_ERROR, only success callbacks are invoked.
+     * Otherwise, only failure callbacks are invoked.
+     *
+     */
+    void DequeueConnectionCallbacks(CHIP_ERROR error);
 };
 
 } // namespace chip

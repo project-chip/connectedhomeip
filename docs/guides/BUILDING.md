@@ -182,7 +182,7 @@ To run all tests, run:
 ninja -C out/host check
 ```
 
-To run only the tests in src/inet/tests, you can run:
+To run only the tests in `src/inet/tests`, you can run:
 
 ```
 ninja -C out/host src/inet/tests:tests_run

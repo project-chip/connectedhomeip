@@ -145,7 +145,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     sessionManager.SetMessageDelegate(&callback);
 
-    Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
     FabricIndex aliceFabricIndex;
     FabricInfo aliceFabric;
@@ -168,15 +168,15 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
 
     SessionHolder aliceToBobSession;
-    SecurePairingUsingTestSecret aliceToBobPairing(1, 2, sessionManager);
-    err = sessionManager.NewPairing(aliceToBobSession, peer, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
-                                    &aliceToBobPairing, CryptoContext::SessionRole::kInitiator, aliceFabricIndex);
+    err = sessionManager.InjectPaseSessionWithTestKey(aliceToBobSession, 2,
+                                                      fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(), 1,
+                                                      aliceFabricIndex, peer, CryptoContext::SessionRole::kInitiator);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret bobToAlicePairing(2, 1, sessionManager);
     SessionHolder bobToAliceSession;
-    err = sessionManager.NewPairing(bobToAliceSession, peer, fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
-                                    &bobToAlicePairing, CryptoContext::SessionRole::kResponder, bobFabricIndex);
+    err = sessionManager.InjectPaseSessionWithTestKey(bobToAliceSession, 1,
+                                                      fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(), 2,
+                                                      bobFabricIndex, peer, CryptoContext::SessionRole::kResponder);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Should be able to send a message to itself by just calling send.
@@ -260,7 +260,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     sessionManager.SetMessageDelegate(&callback);
 
-    Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
     FabricIndex aliceFabricIndex;
     FabricInfo aliceFabric;
@@ -283,15 +283,15 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
 
     SessionHolder aliceToBobSession;
-    SecurePairingUsingTestSecret aliceToBobPairing(1, 2, sessionManager);
-    err = sessionManager.NewPairing(aliceToBobSession, peer, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
-                                    &aliceToBobPairing, CryptoContext::SessionRole::kInitiator, aliceFabricIndex);
+    err = sessionManager.InjectPaseSessionWithTestKey(aliceToBobSession, 2,
+                                                      fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(), 1,
+                                                      aliceFabricIndex, peer, CryptoContext::SessionRole::kInitiator);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret bobToAlicePairing(2, 1, sessionManager);
     SessionHolder bobToAliceSession;
-    err = sessionManager.NewPairing(bobToAliceSession, peer, fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
-                                    &bobToAlicePairing, CryptoContext::SessionRole::kResponder, bobFabricIndex);
+    err = sessionManager.InjectPaseSessionWithTestKey(bobToAliceSession, 1,
+                                                      fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(), 2,
+                                                      bobFabricIndex, peer, CryptoContext::SessionRole::kResponder);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Should be able to send a message to itself by just calling send.
@@ -361,7 +361,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     sessionManager.SetMessageDelegate(&callback);
 
-    Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
     FabricIndex aliceFabricIndex;
     FabricInfo aliceFabric;
@@ -384,15 +384,15 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
 
     SessionHolder aliceToBobSession;
-    SecurePairingUsingTestSecret aliceToBobPairing(1, 2, sessionManager);
-    err = sessionManager.NewPairing(aliceToBobSession, peer, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
-                                    &aliceToBobPairing, CryptoContext::SessionRole::kInitiator, aliceFabricIndex);
+    err = sessionManager.InjectPaseSessionWithTestKey(aliceToBobSession, 2,
+                                                      fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(), 1,
+                                                      aliceFabricIndex, peer, CryptoContext::SessionRole::kInitiator);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret bobToAlicePairing(2, 1, sessionManager);
     SessionHolder bobToAliceSession;
-    err = sessionManager.NewPairing(bobToAliceSession, peer, fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
-                                    &bobToAlicePairing, CryptoContext::SessionRole::kResponder, bobFabricIndex);
+    err = sessionManager.InjectPaseSessionWithTestKey(bobToAliceSession, 1,
+                                                      fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(), 2,
+                                                      bobFabricIndex, peer, CryptoContext::SessionRole::kResponder);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Should be able to send a message to itself by just calling send.
@@ -464,6 +464,44 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     sessionManager.Shutdown();
 }
+
+class SecurePairingUsingTestSecret : public PairingSession
+{
+public:
+    SecurePairingUsingTestSecret() : PairingSession(Transport::SecureSession::Type::kPASE)
+    {
+        // Do not set to 0 to prevent an unwanted unsecured session
+        // since the session type is unknown.
+        SetPeerSessionId(1);
+    }
+
+    void Init(SessionManager & sessionManager)
+    {
+        // Do not set to 0 to prevent an unwanted unsecured session
+        // since the session type is unknown.
+        AllocateSecureSession(sessionManager, mLocalSessionId);
+    }
+
+    SecurePairingUsingTestSecret(uint16_t peerSessionId, uint16_t localSessionId, SessionManager & sessionManager) :
+        PairingSession(Transport::SecureSession::Type::kPASE), mLocalSessionId(localSessionId)
+    {
+        AllocateSecureSession(sessionManager, localSessionId);
+        SetPeerSessionId(peerSessionId);
+    }
+
+    CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override
+    {
+        size_t secretLen = strlen(kTestSecret);
+        return session.InitFromSecret(ByteSpan(reinterpret_cast<const uint8_t *>(kTestSecret), secretLen), ByteSpan(nullptr, 0),
+                                      CryptoContext::SessionInfoType::kSessionEstablishment, role);
+    }
+
+private:
+    // Do not set to 0 to prevent an unwanted unsecured session
+    // since the session type is unknown.
+    uint16_t mLocalSessionId = 1;
+    const char * kTestSecret = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
+};
 
 void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
 {
@@ -567,7 +605,7 @@ void SendPacketWithOldCounterTest(nlTestSuite * inSuite, void * inContext)
 
     sessionManager.SetMessageDelegate(&callback);
 
-    Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
     FabricIndex aliceFabricIndex;
     FabricInfo aliceFabric;
@@ -590,15 +628,15 @@ void SendPacketWithOldCounterTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
 
     SessionHolder aliceToBobSession;
-    SecurePairingUsingTestSecret aliceToBobPairing(1, 2, sessionManager);
-    err = sessionManager.NewPairing(aliceToBobSession, peer, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
-                                    &aliceToBobPairing, CryptoContext::SessionRole::kInitiator, aliceFabricIndex);
+    err = sessionManager.InjectPaseSessionWithTestKey(aliceToBobSession, 2,
+                                                      fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(), 1,
+                                                      aliceFabricIndex, peer, CryptoContext::SessionRole::kInitiator);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret bobToAlicePairing(2, 1, sessionManager);
     SessionHolder bobToAliceSession;
-    err = sessionManager.NewPairing(bobToAliceSession, peer, fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
-                                    &bobToAlicePairing, CryptoContext::SessionRole::kResponder, bobFabricIndex);
+    err = sessionManager.InjectPaseSessionWithTestKey(bobToAliceSession, 1,
+                                                      fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(), 2,
+                                                      bobFabricIndex, peer, CryptoContext::SessionRole::kResponder);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.ReceiveHandlerCallCount = 0;
@@ -681,7 +719,7 @@ void SendPacketWithTooOldCounterTest(nlTestSuite * inSuite, void * inContext)
 
     sessionManager.SetMessageDelegate(&callback);
 
-    Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
     FabricIndex aliceFabricIndex;
     FabricInfo aliceFabric;
@@ -704,15 +742,15 @@ void SendPacketWithTooOldCounterTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
 
     SessionHolder aliceToBobSession;
-    SecurePairingUsingTestSecret aliceToBobPairing(1, 2, sessionManager);
-    err = sessionManager.NewPairing(aliceToBobSession, peer, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
-                                    &aliceToBobPairing, CryptoContext::SessionRole::kInitiator, aliceFabricIndex);
+    err = sessionManager.InjectPaseSessionWithTestKey(aliceToBobSession, 2,
+                                                      fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(), 1,
+                                                      aliceFabricIndex, peer, CryptoContext::SessionRole::kInitiator);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret bobToAlicePairing(2, 1, sessionManager);
     SessionHolder bobToAliceSession;
-    err = sessionManager.NewPairing(bobToAliceSession, peer, fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
-                                    &bobToAlicePairing, CryptoContext::SessionRole::kResponder, bobFabricIndex);
+    err = sessionManager.InjectPaseSessionWithTestKey(bobToAliceSession, 1,
+                                                      fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(), 2,
+                                                      bobFabricIndex, peer, CryptoContext::SessionRole::kResponder);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.ReceiveHandlerCallCount = 0;

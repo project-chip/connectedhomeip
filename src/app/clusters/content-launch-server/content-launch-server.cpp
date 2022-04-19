@@ -41,6 +41,7 @@
 #include <app/clusters/content-launch-server/content-launch-delegate.h>
 #include <app/clusters/content-launch-server/content-launch-server.h>
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
@@ -117,6 +118,20 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     else
     {
     }
+}
+
+bool HasFeature(chip::EndpointId endpoint, ContentLauncherFeature feature)
+{
+    bool hasFeature     = false;
+    uint32_t featureMap = 0;
+
+    EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
+    if (EMBER_ZCL_STATUS_SUCCESS == status)
+    {
+        hasFeature = (featureMap & chip::to_underlying(feature));
+    }
+
+    return hasFeature;
 }
 
 } // namespace ContentLauncher

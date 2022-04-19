@@ -32,9 +32,4 @@ void GlobalUnencryptedMessageCounter::Init()
     mValue = Crypto::GetRandU32();
 }
 
-CHIP_ERROR GlobalEncryptedMessageCounter::Init()
-{
-    return persisted.Init(CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER, 1000);
-}
-
 } // namespace chip

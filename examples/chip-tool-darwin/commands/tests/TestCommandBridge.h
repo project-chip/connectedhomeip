@@ -78,11 +78,11 @@ public:
         });
     }
 
-    void UserPrompt(NSString * _Nonnull message) { NextTest(); }
+    void UserPrompt(NSString * _Nonnull message, NSString * _Nullable expectedValue = nil) { NextTest(); }
 
     void WaitForCommissionee(chip::NodeId nodeId)
     {
-        CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+        CHIPDeviceController * controller = CurrentCommissioner();
         VerifyOrReturn(controller != nil, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
 
         [controller getConnectedDevice:nodeId
