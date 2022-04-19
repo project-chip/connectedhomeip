@@ -20,6 +20,8 @@ function getManualTests()
   return [];
 }
 
+// clang-format off
+
 function getTests()
 {
   const AccessControl = [
@@ -174,7 +176,10 @@ function getTests()
   ];
 
   const OnOff = [
-    'Test_TC_OO_1_1', 'Test_TC_OO_2_1', 'Test_TC_OO_2_2', 'Test_TC_OO_2_3',
+    'Test_TC_OO_1_1',
+    'Test_TC_OO_2_1',
+    'Test_TC_OO_2_2',
+    'Test_TC_OO_2_3',
     // 'Test_TC_OO_2_4', Disable this Test for now as Darwin does not support reboot commands currently
   ];
 
@@ -328,6 +333,8 @@ function getTests()
   ];
   return tests.flat(1);
 }
+
+// clang-format on
 
 //
 // Module exports
