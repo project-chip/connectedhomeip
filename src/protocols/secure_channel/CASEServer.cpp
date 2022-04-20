@@ -100,7 +100,7 @@ void CASEServer::OnSessionEstablished(const SessionHandle & session)
 
 void CASEServer::OnSessionEstablishmentDone(PairingSession * pairing)
 {
-    CASESession * session = static_cast<CASESession*>(pairing);
+    CASESession * session = static_cast<CASESession *>(pairing);
     ChipLogProgress(Inet, "CASE Server releasing pairing: %p", session);
     VerifyOrDie(mPairingSession.HasValue() && session == &mPairingSession.Value());
     mPairingSession.ClearValue();

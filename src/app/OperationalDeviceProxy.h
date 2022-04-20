@@ -247,7 +247,7 @@ private:
 
     // mCASEClient is only non-null if we are in State::Connecting or just
     // allocated it as part of an attempt to enter State::Connecting.
-    CASEClient * mCASEClient = nullptr;
+    CASEClient * mCASEClient    = nullptr;
     CHIP_ERROR mCASEClientError = CHIP_NO_ERROR;
 
     PeerId mPeerId;

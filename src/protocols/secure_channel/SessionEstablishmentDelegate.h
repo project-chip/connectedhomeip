@@ -51,7 +51,8 @@ public:
      */
     virtual void OnSessionEstablished(const SessionHandle & session) {}
 
-    // Triggered when the PairingSession has done its work (either finished or encountered an error), such that the PairingSession object can be release, and so does other resources associated to it.
+    // Triggered when the PairingSession has done its work (either finished or encountered an error), such that the PairingSession
+    // object can be release, and so does other resources associated to it.
     virtual void OnSessionEstablishmentDone(PairingSession * pairing) = 0;
 };
 

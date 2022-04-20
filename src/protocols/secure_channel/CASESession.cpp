@@ -275,7 +275,8 @@ exit:
         mState = State::kError;
     }
     VerifyOrDie(SanityCheck());
-    // EstablishSession is a API from delegate side, so we don't call OnSessionEstablishmentDone here, the delegate awares the error by return value.
+    // EstablishSession is a API from delegate side, so we don't call OnSessionEstablishmentDone here, the delegate awares the error
+    // by return value.
     return err;
 }
 
