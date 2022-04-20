@@ -287,13 +287,6 @@ DlStatus LockEndpoint::SetSchedule(uint8_t yearDayIndex, uint16_t userIndex, DlS
 
 bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, DlOperationError & err)
 {
-    if (mLockState == lockState)
-    {
-        ChipLogDetail(Zcl, "Lock App: door is already locked, ignoring command to set lock state to \"%s\" [endpointId=%d]",
-                      lockStateToString(lockState), mEndpointId);
-        return true;
-    }
-
     if (!pin.HasValue())
     {
         ChipLogDetail(Zcl, "Lock App: PIN code is not specified, setting door lock state to \"%s\" [endpointId=%d]",

@@ -1049,6 +1049,7 @@
   /*   client_generated */ \
   0x00000000 /* LockDoor */, \
   0x00000001 /* UnlockDoor */, \
+  0x00000003 /* UnlockWithTimeout */, \
   0x0000000B /* SetWeekDaySchedule */, \
   0x0000000C /* GetWeekDaySchedule */, \
   0x0000000D /* ClearWeekDaySchedule */, \

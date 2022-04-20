@@ -409,6 +409,51 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
+        case Commands::UnlockWithTimeout::Id: {
+            Commands::UnlockWithTimeout::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfDoorLockClusterUnlockWithTimeoutCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::SetWeekDaySchedule::Id: {
+            Commands::SetWeekDaySchedule::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfDoorLockClusterSetWeekDayScheduleCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::GetWeekDaySchedule::Id: {
+            Commands::GetWeekDaySchedule::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfDoorLockClusterGetWeekDayScheduleCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::SetYearDaySchedule::Id: {
+            Commands::SetYearDaySchedule::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfDoorLockClusterSetYearDayScheduleCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::GetYearDaySchedule::Id: {
+            Commands::GetYearDaySchedule::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfDoorLockClusterGetYearDayScheduleCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         case Commands::SetUser::Id: {
             Commands::SetUser::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);

@@ -2066,6 +2066,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x00000016: {
+                    "attributeName": "NumberOfHolidaySchedulesSupported",
+                    "attributeId": 0x00000016,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x00000017: {
                     "attributeName": "MaxPINCodeLength",
                     "attributeId": 0x00000017,
@@ -2143,6 +2149,19 @@ class ChipClusters:
                     "attributeId": 0x00000030,
                     "type": "int",
                     "reportable": True,
+                    "writable": True,
+                },
+                0x00000031: {
+                    "attributeName": "UserCodeTemporaryDisableTime",
+                    "attributeId": 0x00000031,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000033: {
+                    "attributeName": "RequirePINforRemoteOperation",
+                    "attributeId": 0x00000033,
+                    "type": "bool",
                     "writable": True,
                 },
                 0x0000FFF8: {
