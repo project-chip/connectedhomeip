@@ -55,7 +55,7 @@ void MemMonitoring::HeapMonitoring(void * pvParameter)
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     UBaseType_t lwipTaskValue;
-    TaskHandle_t lwipHandle            = xTaskGetHandle(TCPIP_THREAD_NAME);
+    TaskHandle_t lwipHandle = xTaskGetHandle(TCPIP_THREAD_NAME);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     while (1)
@@ -66,9 +66,9 @@ void MemMonitoring::HeapMonitoring(void * pvParameter)
         linkLayerTaskValue  = uxTaskGetStackHighWaterMark(bleLinkTaskHandle);
         openThreadTaskValue = uxTaskGetStackHighWaterMark(otTaskHandle);
         eventLoopTaskValue  = uxTaskGetStackHighWaterMark(eventLoopHandleStruct);
-        #if CHIP_SYSTEM_CONFIG_USE_LWIP
-        lwipTaskValue       = uxTaskGetStackHighWaterMark(lwipHandle);
-        #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+        lwipTaskValue = uxTaskGetStackHighWaterMark(lwipHandle);
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
         EFR32_LOG("=============================");
         EFR32_LOG("     ");
@@ -82,9 +82,9 @@ void MemMonitoring::HeapMonitoring(void * pvParameter)
         EFR32_LOG("Link Layer Task most bytes ever Free  0x%x", (linkLayerTaskValue * 4));
         EFR32_LOG("OpenThread Task most bytes ever Free  0x%x", (openThreadTaskValue * 4));
         EFR32_LOG("Event Loop Task most bytes ever Free  0x%x", (eventLoopTaskValue * 4));
-        #if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
         EFR32_LOG("LWIP Task most bytes ever Free        0x%x", (lwipTaskValue * 4));
-        #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
         EFR32_LOG("     ");
         EFR32_LOG("=============================");
         vTaskDelay(pdMS_TO_TICKS(5000));
