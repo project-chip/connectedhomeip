@@ -200,7 +200,7 @@ uint16_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
 
 EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
                                         const chip::Span<chip::DataVersion> & dataVersionStorage,
-                                        chip::Span<const EmberAfDeviceType> deviceTypeList)
+                                        chip::Span<const EmberAfDeviceType> deviceTypeList, EndpointId parentEndpointId)
 {
     auto realIndex = index + FIXED_ENDPOINT_COUNT;
 
@@ -233,7 +233,8 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const Emb
     emAfEndpoints[index].endpointType   = ep;
     emAfEndpoints[index].dataVersions   = dataVersionStorage.data();
     // Start the endpoint off as disabled.
-    emAfEndpoints[index].bitmask = EMBER_AF_ENDPOINT_DISABLED;
+    emAfEndpoints[index].bitmask          = EMBER_AF_ENDPOINT_DISABLED;
+    emAfEndpoints[index].parentEndpointId = parentEndpointId;
 
     emberAfSetDynamicEndpointCount(MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT);
 
@@ -982,6 +983,11 @@ uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(EndpointId endpoint)
 EndpointId emberAfEndpointFromIndex(uint16_t index)
 {
     return emAfEndpoints[index].endpoint;
+}
+
+EndpointId emberAfParentEndpointFromIndex(uint16_t index)
+{
+    return emAfEndpoints[index].parentEndpointId;
 }
 
 // If server == true, returns the number of server clusters,
