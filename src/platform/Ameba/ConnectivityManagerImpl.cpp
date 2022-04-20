@@ -72,6 +72,10 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 
     // Set callback functions from chip_porting
     chip_connmgr_set_callback_func((chip_connmgr_callback)(conn_callback_dispatcher), this);
+    
+    // Register WiFi event handlers
+    wifi_reg_event_handler(WIFI_EVENT_CONNECT, ConnectivityManagerImpl::RtkWiFiStationConnectedHandler, NULL);
+    wifi_reg_event_handler(WIFI_EVENT_DISCONNECT, ConnectivityManagerImpl::RtkWiFiStationDisconnectedHandler, NULL);
 
     // Ensure that station mode is enabled.
     wifi_on(RTW_MODE_STA);
@@ -156,7 +160,6 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         {
             ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
         }
-        DHCPProcess();
     }
     if (event->Type == DeviceEventType::kRtkWiFiScanCompletedEvent)
     {
@@ -550,8 +553,6 @@ void ConnectivityManagerImpl::DriveStationState()
                 ChipLogProgress(DeviceLayer, "Attempting to connect WiFi station interface");
                 rtw_wifi_setting_t wifi_info;
                 CHIP_GetWiFiConfig(&wifi_info);
-                wifi_reg_event_handler(WIFI_EVENT_CONNECT, ConnectivityManagerImpl::RtkWiFiStationConnectedHandler, NULL);
-                wifi_reg_event_handler(WIFI_EVENT_CONNECT, ConnectivityManagerImpl::RtkWiFiStationDisconnectedHandler, NULL);
                 wifi_connect((char *) wifi_info.ssid, RTW_SECURITY_WPA_WPA2_MIXED, (char *) wifi_info.password,
                              strlen((const char *) wifi_info.ssid), strlen((const char *) wifi_info.password), 0, NULL);
                 ChangeWiFiStationState(kWiFiStationState_Connecting);

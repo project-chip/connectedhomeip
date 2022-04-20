@@ -40,16 +40,19 @@ CHIP_ERROR AmebaWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChan
     CHIP_ERROR err;
     size_t ssidLen        = 0;
     size_t credentialsLen = 0;
+    mpScanCallback    = nullptr;
+    mpConnectCallback = nullptr;
+    mpStatusChangeCallback = networkStatusChangeCallback;
 
     err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiCredentialsKeyName, mSavedNetwork.credentials,
                                                    sizeof(mSavedNetwork.credentials), &credentialsLen);
-    if (err == CHIP_ERROR_NOT_FOUND)
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         return CHIP_NO_ERROR;
     }
 
     err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiSSIDKeyName, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid), &ssidLen);
-    if (err == CHIP_ERROR_NOT_FOUND)
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         return CHIP_NO_ERROR;
     }
@@ -57,9 +60,6 @@ CHIP_ERROR AmebaWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChan
     mSavedNetwork.ssidLen        = ssidLen;
 
     mStagingNetwork   = mSavedNetwork;
-    mpScanCallback    = nullptr;
-    mpConnectCallback = nullptr;
-    mpStatusChangeCallback = networkStatusChangeCallback;
     return err;
 }
 
