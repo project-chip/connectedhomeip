@@ -134,8 +134,6 @@ static void InitOTARequestor(void)
 
 static void InitServer(intptr_t context)
 {
-    InitOTARequestor();
-
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
@@ -144,6 +142,8 @@ static void InitServer(intptr_t context)
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     NetWorkCommissioningInstInit();
+
+    InitOTARequestor();
 }
 
 extern "C" void ChipTest(void)
