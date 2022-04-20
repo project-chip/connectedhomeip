@@ -156,17 +156,10 @@ public:
     void UnregisterRecoveryDelegate(SessionRecoveryDelegate & cb);
     void RefreshSessionOperationalData(const SessionHandle & sessionHandle);
 
-    /**
-     * @brief
-     *   Establish a new pairing with a peer node
-     *
-     * @details
-     *   This method sets up a new pairing with the peer node. It also
-     *   establishes the security keys for secure communication with the
-     *   peer node.
-     */
-    CHIP_ERROR NewPairing(SessionHolder & sessionHolder, const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
-                          PairingSession * pairing, CryptoContext::SessionRole direction, FabricIndex fabric);
+    // Test-only: create a session on the fly.
+    CHIP_ERROR InjectPaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, NodeId peerNodeId,
+                                            uint16_t peerSessionId, FabricIndex fabric, const Transport::PeerAddress & peerAddress,
+                                            CryptoContext::SessionRole role);
 
     /**
      * @brief
@@ -178,21 +171,8 @@ public:
     CHECK_RETURN_VALUE
     Optional<SessionHandle> AllocateSession();
 
-    /**
-     * @brief
-     *   Allocate a secure session in the secure session table at the specified
-     *   session ID.  If the session ID collides with an existing session, evict
-     *   it.  This variant of the interface may be used in test scenarios where
-     *   session IDs need to be predetermined.
-     *
-     * @param localSessionId a unique identifier for the local node's secure unicast session context
-     * @return SessionHandle with a reference to a SecureSession, else NullOptional on failure
-     */
-    CHECK_RETURN_VALUE
-    Optional<SessionHandle> AllocateSession(uint16_t localSessionId);
-
     void ExpirePairing(const SessionHandle & session);
-    void ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric);
+    void ExpireAllPairings(const ScopedNodeId & node);
     void ExpireAllPairingsForFabric(FabricIndex fabric);
     void ExpireAllPASEPairings();
 

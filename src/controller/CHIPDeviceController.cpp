@@ -646,7 +646,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     exchangeCtxt = mSystemState->ExchangeMgr()->NewContext(session.Value(), &device->GetPairing());
     VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
 
-    err = device->GetPairing().Pair(*mSystemState->SessionMgr(), params.GetPeerAddress(), params.GetSetupPINCode(),
+    err = device->GetPairing().Pair(*mSystemState->SessionMgr(), params.GetSetupPINCode(),
                                     Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), exchangeCtxt, this);
     SuccessOrExit(err);
 
@@ -827,7 +827,7 @@ void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
     RendezvousCleanup(err);
 }
 
-void DeviceCommissioner::OnSessionEstablished()
+void DeviceCommissioner::OnSessionEstablished(const SessionHandle & session)
 {
     // PASE session established.
     CommissioneeDeviceProxy * device = mDeviceInPASEEstablishment;
@@ -837,12 +837,7 @@ void DeviceCommissioner::OnSessionEstablished()
 
     VerifyOrReturn(device != nullptr, OnSessionEstablishmentError(CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR));
 
-    PASESession * pairing = &device->GetPairing();
-
-    // TODO: the session should know which peer we are trying to connect to when started
-    pairing->SetPeerNodeId(device->GetDeviceId());
-
-    CHIP_ERROR err = device->SetConnected();
+    CHIP_ERROR err = device->SetConnected(session);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
@@ -1553,12 +1548,6 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
         ChipLogError(Controller, "Device connection failed without a valid error code. Making one up.");
         error = CHIP_ERROR_INTERNAL;
     }
-    // TODO: Determine if we really want the PASE session removed here. See #16089.
-    CommissioneeDeviceProxy * commissionee = commissioner->FindCommissioneeDevice(peerId.GetNodeId());
-    if (commissionee != nullptr)
-    {
-        commissioner->ReleaseCommissioneeDevice(commissionee);
-    }
 
     commissioner->mSystemState->CASESessionMgr()->ReleaseSession(peerId);
     if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational &&
@@ -1569,6 +1558,13 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
     else
     {
         commissioner->mPairingDelegate->OnPairingComplete(error);
+    }
+
+    CommissioneeDeviceProxy * commissionee = commissioner->FindCommissioneeDevice(peerId.GetNodeId());
+    // TODO: Determine if we really want the PASE session removed here. See #16089.
+    if (commissionee != nullptr)
+    {
+        commissioner->ReleaseCommissioneeDevice(commissionee);
     }
 }
 

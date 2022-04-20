@@ -47,7 +47,7 @@ public:
     /**
      *   Called when the new secure session has been established
      */
-    virtual void OnSessionEstablished() {}
+    virtual void OnSessionEstablished(const SessionHandle & session) {}
 
     virtual ~SessionEstablishmentDelegate() {}
 };

@@ -30,6 +30,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "CommissionerMain.h"
 #include "include/account-login/AccountLoginManager.h"
 #include "include/application-basic/ApplicationBasicManager.h"
 #include "include/application-launcher/ApplicationLauncherManager.h"
@@ -46,6 +47,8 @@
 #include <app/clusters/keypad-input-server/keypad-input-delegate.h>
 #include <app/clusters/media-playback-server/media-playback-delegate.h>
 #include <app/clusters/target-navigator-server/target-navigator-delegate.h>
+
+CHIP_ERROR InitVideoPlayerPlatform();
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 

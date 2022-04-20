@@ -73,6 +73,9 @@ public:
     ~Mutex();
 
     static CHIP_ERROR Init(Mutex & aMutex);
+#if CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
+    inline bool isInitialized() { return mInitialized; }
+#endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
     void Lock();   /**< Acquire the mutual exclusion lock, blocking the current thread indefinitely if necessary. */
     void Unlock(); /**< Release the mutual exclusion lock (can block on some systems until scheduler completes). */
@@ -91,7 +94,7 @@ private:
     StaticSemaphore_t mFreeRTOSSemaphoreObj;
 #endif // (configSUPPORT_STATIC_ALLOCATION == 1)
     volatile SemaphoreHandle_t mFreeRTOSSemaphore = nullptr;
-    volatile int mInitialized                     = 0;
+    volatile bool mInitialized                    = 0;
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
 #if CHIP_SYSTEM_CONFIG_MBED_LOCKING

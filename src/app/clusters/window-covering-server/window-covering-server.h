@@ -27,6 +27,7 @@
 #define WC_PERCENT100THS_MIN_OPEN 0
 #define WC_PERCENT100THS_MAX_CLOSED 10000
 #define WC_PERCENT100THS_MIDDLE 5000
+#define WC_PERCENT100THS_COEF 100
 
 namespace chip {
 namespace app {
@@ -36,27 +37,6 @@ namespace WindowCovering {
 typedef DataModel::Nullable<Percent> NPercent;
 typedef DataModel::Nullable<Percent100ths> NPercent100ths;
 typedef DataModel::Nullable<uint16_t> NAbsolute;
-
-struct Mode
-{
-    uint8_t motorDirReversed : 1; // bit 0
-    uint8_t calibrationMode : 1;  // bit 1
-    uint8_t maintenanceMode : 1;  // bit 2
-    uint8_t ledDisplay : 1;       // bit 3
-};
-static_assert(sizeof(Mode) == sizeof(uint8_t), "Mode Size is not correct");
-
-struct ConfigStatus
-{
-    uint8_t operational : 1;             // bit 0 M
-    uint8_t online : 1;                  // bit 1 M
-    uint8_t liftIsReversed : 1;          // bit 2 LF
-    uint8_t liftIsPA : 1;                // bit 3 LF & PA
-    uint8_t tiltIsPA : 1;                // bit 4 TL & PA
-    uint8_t liftIsEncoderControlled : 1; // bit 5 LF & PA
-    uint8_t tiltIsEncoderControlled : 1; // bit 6 LF & PA
-};
-static_assert(sizeof(ConfigStatus) == sizeof(uint8_t), "ConfigStatus Size is not correct");
 
 // Match directly with OperationalStatus 2 bits Fields
 enum class OperationalState : uint8_t
@@ -117,8 +97,10 @@ bool HasFeaturePaTilt(chip::EndpointId endpoint);
 void TypeSet(chip::EndpointId endpoint, Type type);
 Type TypeGet(chip::EndpointId endpoint);
 
-void ConfigStatusSet(chip::EndpointId endpoint, const ConfigStatus & status);
-const ConfigStatus ConfigStatusGet(chip::EndpointId endpoint);
+void ConfigStatusPrint(const chip::BitFlags<ConfigStatus> & configStatus);
+void ConfigStatusSet(chip::EndpointId endpoint, const chip::BitFlags<ConfigStatus> & status);
+chip::BitFlags<ConfigStatus> ConfigStatusGet(chip::EndpointId endpoint);
+void ConfigStatusUpdateFeatures(chip::EndpointId endpoint);
 
 void OperationalStatusSet(chip::EndpointId endpoint, const OperationalStatus & status);
 void OperationalStatusSetWithGlobalUpdated(chip::EndpointId endpoint, OperationalStatus & status);
@@ -131,8 +113,9 @@ Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths
 void EndProductTypeSet(chip::EndpointId endpoint, EndProductType type);
 EndProductType EndProductTypeGet(chip::EndpointId endpoint);
 
-void ModeSet(chip::EndpointId endpoint, const Mode & mode);
-const Mode ModeGet(chip::EndpointId endpoint);
+void ModePrint(const chip::BitFlags<Mode> & mode);
+void ModeSet(chip::EndpointId endpoint, chip::BitFlags<Mode> & mode);
+chip::BitFlags<Mode> ModeGet(chip::EndpointId endpoint);
 
 void SafetyStatusSet(chip::EndpointId endpoint, SafetyStatus & status);
 const SafetyStatus SafetyStatusGet(chip::EndpointId endpoint);
@@ -149,6 +132,8 @@ void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths position);
 uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt);
 uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths);
 void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths position);
+
+EmberAfStatus GetMotionLockStatus(chip::EndpointId endpoint);
 
 } // namespace WindowCovering
 } // namespace Clusters

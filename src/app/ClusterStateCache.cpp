@@ -119,7 +119,6 @@ CHIP_ERROR ClusterStateCache::UpdateEventCache(const EventHeader & aEventHeader,
         {
             return CHIP_NO_ERROR;
         }
-
         System::PacketBufferHandle handle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
 
         System::PacketBufferTLVWriter writer;
