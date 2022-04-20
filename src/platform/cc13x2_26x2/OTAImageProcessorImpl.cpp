@@ -98,8 +98,7 @@ bool OTAImageProcessorImpl::IsFirstImageRun()
     requestor = GetRequestorInstance();
 
     return (requestor->GetTargetVersion() == runningSwVer) &&
-           (requestor->GetCurrentUpdateState() ==
-                chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kApplying);
+        (requestor->GetCurrentUpdateState() == chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kApplying);
 }
 
 /* DESIGN NOTE: The Boot Image Manager will search external flash for an
