@@ -104,16 +104,18 @@ void PairingSession::Clear()
 {
     if (mSessionManager != nullptr)
     {
-        auto handle = GetSecureSessionHandle();
-        if (handle.HasValue() && !handle.Value()->AsSecureSession()->IsActiveSession())
+        if (mSecureSessionHolder && !mSecureSessionHolder->AsSecureSession()->IsActiveSession())
         {
             // Make sure to clean up our pending session, since we're the only
             // ones who have access to it do do so.
-            mSessionManager->ExpirePairing(handle.Value());
+            mSessionManager->ExpirePairing(mSecureSessionHolder.Get());
         }
     }
 
     mPeerSessionId.ClearValue();
+    // If we called ExpirePairing above, the holder has already released the
+    // session (due to it being destroyed).  If not, we need to release it.
+    // Release is idempotent, so it's OK to just call it here.
     mSecureSessionHolder.Release();
     mSessionManager = nullptr;
 }

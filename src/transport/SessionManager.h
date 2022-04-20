@@ -231,7 +231,7 @@ public:
 
     //
     // Find an existing secure session given a peer's scoped NodeId and a type of session to match against.
-    // If matching against all types of sessions is desired, kUndefined should be passed into type.
+    // If matching against all types of sessions is desired, NullOptional should be passed into type.
     //
     // If a valid session is found, an Optional<SessionHandle> with the value set to the SessionHandle of the session
     // is returned. Otherwise, an Optional<SessionHandle> with no value set is returned.
