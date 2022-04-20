@@ -53,7 +53,7 @@ limitations under the License.
     <item name="DecrementHue" value="0x00"/>
     <item name="IncrementHue" value="0x01"/>
   </enum>
-  <clusterExtension code="0x0000">
+  <clusterExtension code="0x0028">
     <attribute side="server" code="0x4000" define="SW_BUILD_ID" type="CHAR_STRING" length="16" writable="false" default="" optional="true" introducedIn="zll-1.0-11-0037-10">sw build id</attribute>
   </clusterExtension>
   <clusterExtension code="0x0005">

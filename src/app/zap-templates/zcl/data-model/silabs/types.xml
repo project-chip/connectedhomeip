@@ -67,8 +67,6 @@ limitations under the License.
     <field name="occupied" mask="0x1"/>
   </bitmap>
   <bitmap name="IasZoneStatus" type="BITMAP16">
-    <cluster code="0x0500"/>
-    <cluster code="0x0501"/>
     <field name="alarm1" mask="0x1"/>
     <field name="alarm2" mask="0x2"/>
     <field name="tamper" mask="0x4"/>
@@ -81,13 +79,11 @@ limitations under the License.
     <field name="batteryDefect" mask="0x200"/>
   </bitmap>
   <bitmap name="WarningInfo" type="BITMAP8">
-    <cluster code="0x0502"/>
     <field name="mode" mask="0xf0"/>
     <field name="strobe" mask="0x0c"/>
     <field name="sirenLevel" mask="0x03"/>
   </bitmap>
   <bitmap name="SquawkInfo" type="BITMAP8">
-    <cluster code="0x0502"/>
     <field name="mode" mask="0xf0"/>
     <field name="strobe" mask="0x08"/>
     <field name="level" mask="0x03"/>
@@ -133,12 +129,10 @@ limitations under the License.
     <item name="Toggle" value="0x2"/>
   </enum>
   <enum name="MoveMode" type="ENUM8">
-    <cluster code="0x0008"/>
     <item name="Up" value="0x0"/>
     <item name="Down" value="0x1"/>
   </enum>
   <enum name="StepMode" type="ENUM8">
-    <cluster code="0x0008"/>
     <item name="Up" value="0x0"/>
     <item name="Down" value="0x1"/>
   </enum>
