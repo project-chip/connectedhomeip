@@ -49,10 +49,13 @@ template("ti_simplelink_executable") {
       defines += [ "CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID=${invoker.device_vid}" ]
     }
     if (defined(invoker.device_pid)) {
-      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${invoker.device_pid}" ]
+      defines +=
+          [ "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${invoker.device_pid}" ]
     }
     if (defined(invoker.software_ver)) {
-      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${invoker.software_ver}" ]
+      defines += [
+        "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${invoker.software_ver}",
+      ]
     }
     if (defined(invoker.software_ver_str)) {
       defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${invoker.software_ver_str}\"" ]
@@ -99,14 +102,23 @@ template("ti_simplelink_executable") {
         "ccs",
         rebase_path(root_out_dir, root_build_dir),
         "7",
-        "-hex1", rebase_path("${root_out_dir}/${output_base_name}.hex", root_build_dir),
-        "-o", output_base_name
+        "-hex1",
+        rebase_path("${root_out_dir}/${output_base_name}.hex", root_build_dir),
+        "-o",
+        output_base_name,
       ]
 
       if (defined(invoker.pem_file)) {
-        args += [ "-k", rebase_path(invoker.pem_file, root_build_dir) ]
+        args += [
+          "-k",
+          rebase_path(invoker.pem_file, root_build_dir),
+        ]
       } else {
-        args += [ "-k", rebase_path("${ti_simplelink_sdk_root}/tools/common/oad/private.pem", root_build_dir) ]
+        args += [
+          "-k",
+          rebase_path("${ti_simplelink_sdk_root}/tools/common/oad/private.pem",
+                      root_build_dir),
+        ]
       }
     }
     pw_python_action("${simplelink_target_name}-bim.hex") {
@@ -125,7 +137,8 @@ template("ti_simplelink_executable") {
       args = [
         rebase_path("${root_out_dir}/${output_base_name}.bin", root_build_dir),
         rebase_path(bim_hex, root_build_dir),
-        rebase_path("${root_out_dir}/${output_base_name}-bim.hex", root_build_dir),
+        rebase_path("${root_out_dir}/${output_base_name}-bim.hex",
+                    root_build_dir),
       ]
 
       args += [ "${root_out_dir}/${output_base_name}-bim.hex" ]
@@ -144,29 +157,59 @@ template("ti_simplelink_executable") {
       ]
 
       if (defined(invoker.device_vid)) {
-        args += [ "-v", invoker.device_vid ]
+        args += [
+          "-v",
+          invoker.device_vid,
+        ]
       } else {
-        args += [ "-v", "0xFFF1" ]
+        args += [
+          "-v",
+          "0xFFF1",
+        ]
       }
       if (defined(invoker.device_pid)) {
-        args += [ "-p", invoker.device_pid ]
+        args += [
+          "-p",
+          invoker.device_pid,
+        ]
       } else {
-        args += [ "-p", "0x8006" ]
+        args += [
+          "-p",
+          "0x8006",
+        ]
       }
       if (defined(invoker.software_ver)) {
-        args += [ "-vn", invoker.software_ver ]
+        args += [
+          "-vn",
+          invoker.software_ver,
+        ]
       } else {
-        args += [ "-vn", "0x0001" ]
+        args += [
+          "-vn",
+          "0x0001",
+        ]
       }
       if (defined(invoker.software_ver_str)) {
-        args += [ "-vs", invoker.software_ver_str ]
+        args += [
+          "-vs",
+          invoker.software_ver_str,
+        ]
       } else {
-        args += [ "-vs", "1.0d1" ]
+        args += [
+          "-vs",
+          "1.0d1",
+        ]
       }
       if (defined(invoker.ota_digest)) {
-        args += [ "-da", invoker.ota_digest ]
+        args += [
+          "-da",
+          invoker.ota_digest,
+        ]
       } else {
-        args += [ "-da", "sha256" ]
+        args += [
+          "-da",
+          "sha256",
+        ]
       }
       if (defined(invoker.ota_args)) {
         args += invoker.ota_args
