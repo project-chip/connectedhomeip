@@ -102,6 +102,7 @@ class Struct:
     name: str
     fields: List[Field]
     tag: Optional[StructTag] = None
+    code: Optional[int] = None # for responses only
 
 
 @dataclass
