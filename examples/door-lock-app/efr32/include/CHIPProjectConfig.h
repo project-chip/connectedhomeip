@@ -37,7 +37,7 @@
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 #endif
 
-// For convenience, Chip Security Test Mode can be enabled and the
+// For convenience, Chip Security Test Mode can be enabled and theß∏
 // requirement for authentication in various protocols can be disabled.
 //
 //    WARNING: These options make it possible to circumvent basic Chip security functionality,
