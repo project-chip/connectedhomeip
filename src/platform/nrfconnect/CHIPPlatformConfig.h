@@ -31,7 +31,6 @@
 #define CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH 2
 
 #define CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY "rc"
-#define CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER "mc"
 
 // ==================== Security Adaptations ====================
 

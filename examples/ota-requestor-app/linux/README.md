@@ -251,7 +251,7 @@ out/chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 
 
 The OTA Requestor application with node ID 0x1234567890 will process this
 command and send a QueryImage command to the OTA Provider with node ID
-0xDEADBEEF, as specified in the `AnnounceOTAProvider` command.
+`0xDEADBEEF`, as specified in the `AnnounceOTAProvider` command.
 
 ### Trigger using DefaultOTAProviders attribute
 
@@ -309,7 +309,7 @@ out/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricI
 
 Every 60 seconds from when the OTA Requestor application has launched, the OTA
 Requestor application with node ID 0x1234567890 will send a QueryImage command
-to the OTA Provider with node ID 0xDEADBEEF, as specified in the
+to the OTA Provider with node ID `0xDEADBEEF`, as specified in the
 `DefaultOTAProviders` attribute.
 
 ## DefaultOTAProviders attribute

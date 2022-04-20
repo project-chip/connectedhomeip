@@ -341,8 +341,11 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
         PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
             haveRootCert = (mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen) == CHIP_NO_ERROR));
         if (haveRootCert) {
+            uint64_t rcacId;
             rcac.reduce_size(rcacBufLen);
             ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(rcac, rcac_dn));
+            ReturnErrorOnFailure(rcac_dn.GetCertChipId(rcacId));
+            VerifyOrReturnError(rcacId == mIssuerId, CHIP_ERROR_INTERNAL);
         }
     }
     if (!haveRootCert) {

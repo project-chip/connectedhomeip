@@ -119,15 +119,13 @@ bool DefaultOTARequestorDriver::ProviderLocationsEqual(const ProviderLocationTyp
     return false;
 }
 
-void DefaultOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR error) {}
-
 void DefaultOTARequestorDriver::HandleIdleStateExit()
 {
     // Start watchdog timer to monitor new Query Image session
     StartSelectedTimer(SelectedTimer::kWatchdogTimer);
 }
 
-void DefaultOTARequestorDriver::HandleIdleState(IdleStateReason reason)
+void DefaultOTARequestorDriver::HandleIdleStateEnter(IdleStateReason reason)
 {
     switch (reason)
     {
@@ -156,62 +154,30 @@ void DefaultOTARequestorDriver::UpdateAvailable(const UpdateDescription & update
         delay, [](System::Layer *, void * context) { ToDriver(context)->mRequestor->DownloadUpdate(); }, this);
 }
 
-void DefaultOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay)
+CHIP_ERROR DefaultOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay)
 {
-    VerifyOrDie(mRequestor != nullptr);
-
-    ProviderLocationType providerLocation;
-    bool willTryAnotherQuery = false;
+    CHIP_ERROR status = CHIP_NO_ERROR;
 
     switch (reason)
     {
     case UpdateNotFoundReason::kUpToDate:
-        willTryAnotherQuery = false;
         break;
-    case UpdateNotFoundReason::kBusy:
-        willTryAnotherQuery = true;
-        if (mProviderRetryCount <= kMaxBusyProviderRetryCount)
+    case UpdateNotFoundReason::kBusy: {
+        status = ScheduleQueryRetry(true);
+        if (status == CHIP_ERROR_MAX_RETRY_EXCEEDED)
         {
-            break;
+            // If max retry exceeded with current provider, try a different provider
+            status = ScheduleQueryRetry(false);
         }
-        ChipLogProgress(SoftwareUpdate, "Max Busy Provider retries reached. Attempting to get next Provider.");
-        __attribute__((fallthrough)); // fallthrough
+        break;
+    }
     case UpdateNotFoundReason::kNotAvailable: {
-        // IMPLEMENTATION CHOICE:
-        // This implementation schedules a query only if a different provider is available
-        // Note that the "listExhausted" being set to TRUE, implies that the entire list of
-        // defaultOTAProviders has been traversed. On bootup, the last provider is reset
-        // which ensures that every QueryImage call will ensure that the list is traversed from
-        // start to end, until an OTA is successfully completed.
-        bool listExhausted = false;
-        if ((GetNextProviderLocation(providerLocation, listExhausted) != true) || (listExhausted == true))
-        {
-            willTryAnotherQuery = false;
-        }
-        else
-        {
-            willTryAnotherQuery = true;
-            mRequestor->SetCurrentProviderLocation(providerLocation);
-        }
+        // Schedule a query only if a different provider is available
+        status = ScheduleQueryRetry(false);
         break;
     }
     }
-
-    if (delay < kDefaultDelayedActionTime)
-    {
-        delay = kDefaultDelayedActionTime;
-    }
-
-    if (willTryAnotherQuery == true)
-    {
-        ChipLogProgress(SoftwareUpdate, "UpdateNotFound, scheduling a retry");
-        ScheduleDelayedAction(delay, StartDelayTimerHandler, this);
-    }
-    else
-    {
-        ChipLogProgress(SoftwareUpdate, "UpdateNotFound, not scheduling further retries");
-        StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
-    }
+    return status;
 }
 
 void DefaultOTARequestorDriver::UpdateDownloaded()
@@ -247,9 +213,6 @@ void DefaultOTARequestorDriver::UpdateDiscontinued()
 
     // Cancel all update timers
     UpdateCancelled();
-
-    // Restart the periodic default provider timer
-    StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
 }
 
 // Cancel all OTA update timers
@@ -322,6 +285,7 @@ void DefaultOTARequestorDriver::ProcessAnnounceOTAProviders(
 
 void DefaultOTARequestorDriver::SendQueryImage()
 {
+    OTAUpdateStateEnum currentUpdateState;
     Optional<ProviderLocationType> lastUsedProvider;
     mRequestor->GetProviderLocation(lastUsedProvider);
     if (!lastUsedProvider.HasValue())
@@ -338,17 +302,17 @@ void DefaultOTARequestorDriver::SendQueryImage()
             return;
         }
     }
-    // IMPLEMENTATION CHOICE
-    // In this implementation explicitly triggering a query cancels any in-progress update.
-    UpdateCancelled();
 
-    // Default provider timer only runs when there is no ongoing query/update; must stop it now.
-    // TriggerImmediateQueryInternal() will cause the state to change from kIdle, which will start
-    // the Watchdog timer.  (Clean this up with Issue#16151)
-
-    mProviderRetryCount++;
-
-    DeviceLayer::SystemLayer().ScheduleLambda([this] { mRequestor->TriggerImmediateQueryInternal(); });
+    currentUpdateState = mRequestor->GetCurrentUpdateState();
+    if ((currentUpdateState == OTAUpdateStateEnum::kIdle) || (currentUpdateState == OTAUpdateStateEnum::kDelayedOnQuery))
+    {
+        mProviderRetryCount++;
+        DeviceLayer::SystemLayer().ScheduleLambda([this] { mRequestor->TriggerImmediateQueryInternal(); });
+    }
+    else
+    {
+        ChipLogProgress(SoftwareUpdate, "Query already in progress");
+    }
 }
 
 void DefaultOTARequestorDriver::PeriodicQueryTimerHandler(System::Layer * systemLayer, void * appState)
@@ -463,6 +427,46 @@ bool DefaultOTARequestorDriver::GetNextProviderLocation(ProviderLocationType & p
 
     ChipLogError(SoftwareUpdate, "No suitable OTA Provider candidate found");
     return false;
+}
+
+CHIP_ERROR DefaultOTARequestorDriver::ScheduleQueryRetry(bool trySameProvider)
+{
+    CHIP_ERROR status = CHIP_NO_ERROR;
+
+    if (trySameProvider == false)
+    {
+        VerifyOrDie(mRequestor != nullptr);
+
+        ProviderLocationType providerLocation;
+        bool listExhausted = false;
+
+        // Note that the "listExhausted" being set to TRUE, implies that the entire list of
+        // defaultOTAProviders has been traversed. On bootup, the last provider is reset
+        // which ensures that every QueryImage call will ensure that the list is traversed from
+        // start to end, until an OTA is successfully completed.
+        if ((GetNextProviderLocation(providerLocation, listExhausted) != true) || (listExhausted == true))
+        {
+            status = CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+        }
+        else
+        {
+            mRequestor->SetCurrentProviderLocation(providerLocation);
+        }
+    }
+
+    if (mProviderRetryCount > kMaxBusyProviderRetryCount)
+    {
+        ChipLogProgress(SoftwareUpdate, "Max retry of %u exceeded.  Will not retry", kMaxBusyProviderRetryCount);
+        status = CHIP_ERROR_MAX_RETRY_EXCEEDED;
+    }
+
+    if (status == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(SoftwareUpdate, "Scheduling a retry");
+        ScheduleDelayedAction(kDefaultDelayedActionTime, StartDelayTimerHandler, this);
+    }
+
+    return status;
 }
 
 } // namespace DeviceLayer

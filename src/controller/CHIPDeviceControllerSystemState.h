@@ -77,6 +77,7 @@ struct DeviceControllerSystemStateParams
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
+    Credentials::GroupDataProvider * groupDataProvider = nullptr;
 
     // Params that will be deallocated via Platform::Delete in
     // DeviceControllerSystemState::Shutdown.
@@ -90,7 +91,6 @@ struct DeviceControllerSystemStateParams
     CASESessionManager * caseSessionManager                       = nullptr;
     OperationalDevicePool * operationalDevicePool                 = nullptr;
     CASEClientPool * caseClientPool                               = nullptr;
-    Credentials::GroupDataProvider * groupDataProvider            = nullptr;
 };
 
 // A representation of the internal state maintained by the DeviceControllerFactory

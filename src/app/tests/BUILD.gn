@@ -100,7 +100,7 @@ chip_test_suite("tests") {
   #
   if (chip_device_platform != "nrfconnect") {
     test_sources += [ "TestBufferedReadCallback.cpp" ]
-    test_sources += [ "TestAttributeCache.cpp" ]
+    test_sources += [ "TestClusterStateCache.cpp" ]
   }
 
   cflags = [ "-Wconversion" ]

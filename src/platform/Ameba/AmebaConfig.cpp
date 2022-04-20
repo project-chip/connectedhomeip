@@ -86,12 +86,12 @@ const AmebaConfig::Key AmebaConfig::kCounterKey_BootReason            = { kConfi
 
 CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, bool & val)
 {
-    uint32_t intVal;
+    uint8_t intVal;
     int32_t success = 0;
 
     success = getPref_bool_new(key.Namespace, key.Name, &intVal);
     if (!success)
-        ChipLogProgress(DeviceLayer, "getPref_u32_new: %s/%s failed\n", key.Namespace, key.Name);
+        ChipLogProgress(DeviceLayer, "getPref_bool_new: %s/%s failed\n", key.Namespace, key.Name);
 
     val = (intVal != 0);
 

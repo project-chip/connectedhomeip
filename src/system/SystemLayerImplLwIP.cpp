@@ -36,7 +36,9 @@ CHIP_ERROR LayerImplLwIP::Init()
 {
     VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     RegisterLwIPErrorFormatter();
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     VerifyOrReturnError(mLayerState.SetInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;

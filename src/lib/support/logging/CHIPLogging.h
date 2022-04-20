@@ -407,5 +407,9 @@ bool IsCategoryEnabled(uint8_t category);
  */
 #define ChipLogFormatMessageType "0x%x"
 
+/** Logging helpers for scoped node ids, which is a tuple of <NodeId, FabricIndex> */
+#define ChipLogFormatScopedNodeId "<" ChipLogFormatX64 ", %d>"
+#define ChipLogValueScopedNodeId(id) ChipLogValueX64((id).GetNodeId()), (id).GetFabricIndex()
+
 } // namespace Logging
 } // namespace chip

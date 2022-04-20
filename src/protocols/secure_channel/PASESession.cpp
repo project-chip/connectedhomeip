@@ -63,12 +63,30 @@ const char * kSpake2pR2ISessionInfo = "Commissioning R2I Key";
 // The session establishment fails if the response is not received with in timeout window.
 static constexpr ExchangeContext::Timeout kSpake2p_Response_Timeout = System::Clock::Seconds16(30);
 
-PASESession::PASESession() : PairingSession(Transport::SecureSession::Type::kPASE) {}
-
 PASESession::~PASESession()
 {
     // Let's clear out any security state stored in the object, before destroying it.
     Clear();
+}
+
+void PASESession::Finish()
+{
+    mPairingComplete = true;
+
+    Transport::PeerAddress address = mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress();
+
+    // Discard the exchange so that Clear() doesn't try closing it. The exchange will handle that.
+    DiscardExchange();
+
+    CHIP_ERROR err = ActivateSecureSession(address);
+    if (err == CHIP_NO_ERROR)
+    {
+        mDelegate->OnSessionEstablished(mSecureSessionHolder.Get());
+    }
+    else
+    {
+        mDelegate->OnSessionEstablishmentError(err);
+    }
 }
 
 void PASESession::Clear()
@@ -181,6 +199,8 @@ CHIP_ERROR PASESession::WaitForPairing(SessionManager & sessionManager, const Sp
     // been initialized
     SuccessOrExit(err);
 
+    mRole = CryptoContext::SessionRole::kResponder;
+
     VerifyOrExit(CanCastTo<uint16_t>(salt.size()), err = CHIP_ERROR_INVALID_ARGUMENT);
     mSaltLength = static_cast<uint16_t>(salt.size());
 
@@ -201,8 +221,6 @@ CHIP_ERROR PASESession::WaitForPairing(SessionManager & sessionManager, const Sp
     mPairingComplete = false;
     mLocalMRPConfig  = mrpConfig;
 
-    SetPeerNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId));
-
     ChipLogDetail(SecureChannel, "Waiting for PBKDF param request");
 
 exit:
@@ -213,7 +231,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode,
+CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUpPINCode,
                              Optional<ReliableMessageProtocolConfig> mrpConfig, Messaging::ExchangeContext * exchangeCtxt,
                              SessionEstablishmentDelegate * delegate)
 {
@@ -222,13 +240,12 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, const Transport::P
     CHIP_ERROR err = Init(sessionManager, peerSetUpPINCode, delegate);
     SuccessOrExit(err);
 
+    mRole = CryptoContext::SessionRole::kInitiator;
+
     mExchangeCtxt = exchangeCtxt;
     mExchangeCtxt->SetResponseTimeout(kSpake2p_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
 
-    SetPeerAddress(peerAddress);
-
     mLocalMRPConfig = mrpConfig;
-    SetPeerNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId));
 
     err = SendPBKDFParamRequest();
     SuccessOrExit(err);
@@ -258,11 +275,11 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
     mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
 }
 
-CHIP_ERROR PASESession::DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role)
+CHIP_ERROR PASESession::DeriveSecureSession(CryptoContext & session) const
 {
     VerifyOrReturnError(mPairingComplete, CHIP_ERROR_INCORRECT_STATE);
     return session.InitFromSecret(ByteSpan(mKe, mKeLen), ByteSpan(nullptr, 0),
-                                  CryptoContext::SessionInfoType::kSessionEstablishment, role);
+                                  CryptoContext::SessionInfoType::kSessionEstablishment, mRole);
 }
 
 CHIP_ERROR PASESession::SendPBKDFParamRequest()
@@ -743,16 +760,7 @@ CHIP_ERROR PASESession::HandleMsg3(System::PacketBufferHandle && msg)
     // Send confirmation to peer that we succeeded so they can start using the session.
     SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess);
 
-    mPairingComplete = true;
-
-    // Discard the exchange so that Clear() doesn't try closing it.  The
-    // exchange will handle that.
-    DiscardExchange();
-
-    // Call delegate to indicate pairing completion
-    // Do this last in case the delegate frees us.
-    mDelegate->OnSessionEstablished();
-
+    Finish();
 exit:
 
     if (err != CHIP_NO_ERROR)
@@ -764,15 +772,7 @@ exit:
 
 void PASESession::OnSuccessStatusReport()
 {
-    mPairingComplete = true;
-
-    // Discard the exchange so that Clear() doesn't try closing it.  The
-    // exchange will handle that.
-    DiscardExchange();
-
-    // Call delegate to indicate pairing completion
-    // Do this last in case the delegate frees us.
-    mDelegate->OnSessionEstablished();
+    Finish();
 }
 
 CHIP_ERROR PASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode)
@@ -817,6 +817,13 @@ CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, cons
     VerifyOrReturnError(payloadHeader.HasMessageType(mNextExpectedMsg) || payloadHeader.HasMessageType(MsgType::StatusReport),
                         CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PASESession::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate)
+{
+    // Handle messages by myself
+    newDelegate = this;
     return CHIP_NO_ERROR;
 }
 

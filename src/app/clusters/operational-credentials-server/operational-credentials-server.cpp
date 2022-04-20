@@ -51,6 +51,9 @@
 #include <platform/DeviceControlServer.h>
 #include <string.h>
 #include <trace/trace.h>
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
@@ -260,7 +263,7 @@ CHIP_ERROR ComputeAttestationSignature(app::CommandHandler * commandObj,
 FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
 {
     FabricIndex index = aCommandHandler->GetAccessingFabricIndex();
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding fabric with fabricIndex %d", index);
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding fabric with fabricIndex 0x%x", static_cast<unsigned>(index));
     return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
 }
 
@@ -356,9 +359,10 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
 {
 
     // Gets called when a fabric is deleted from KVS store
-    void OnFabricDeletedFromStorage(CompressedFabricId compressedFabricId, FabricIndex fabricId) override
+    void OnFabricDeletedFromStorage(CompressedFabricId compressedFabricId, FabricIndex fabricIndex) override
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric 0x%u was deleted from fabric storage.", fabricId);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric index 0x%x was deleted from fabric storage.",
+                       static_cast<unsigned>(fabricIndex));
         fabricListChanged();
 
         // The Leave event SHOULD be emitted by a Node prior to permanently
@@ -376,24 +380,24 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
         }
     }
 
-    // Gets called when a fabric is loaded into the FabricTable from KVS store.
+    // Gets called when a fabric is loaded into the FabricTable from storage
     void OnFabricRetrievedFromStorage(FabricInfo * fabric) override
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "OpCreds: Fabric 0x%u was retrieved from storage. FabricId 0x" ChipLogFormatX64
+                       "OpCreds: Fabric index 0x%x was retrieved from storage. FabricId 0x" ChipLogFormatX64
                        ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
-                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
+                       static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         fabricListChanged();
     }
 
-    // Gets called when a fabric in FabricTable is persisted to KVS store.
+    // Gets called when a fabric in FabricTable is persisted to storage
     void OnFabricPersistedToStorage(FabricInfo * fabric) override
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "OpCreds: Fabric %X was persisted to storage. FabricId " ChipLogFormatX64 ", NodeId " ChipLogFormatX64
-                       ", VendorId 0x%04" PRIX16,
-                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
+                       "OpCreds: Fabric  index 0x%x was persisted to storage. FabricId " ChipLogFormatX64
+                       ", NodeId " ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
+                       static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         fabricListChanged();
     }
@@ -594,24 +598,26 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
                                                         const Commands::AddNOC::DecodableType & commandData)
 {
     MATTER_TRACE_EVENT_SCOPE("AddNOC", "OperationalCredentials");
-    auto & NOCValue      = commandData.NOCValue;
-    auto & ICACValue     = commandData.ICACValue;
-    auto & adminVendorId = commandData.adminVendorId;
-    auto & ipkValue      = commandData.IPKValue;
-    auto * groups        = Credentials::GetGroupDataProvider();
-    auto nocResponse     = OperationalCertStatus::kSuccess;
+    auto & NOCValue          = commandData.NOCValue;
+    auto & ICACValue         = commandData.ICACValue;
+    auto & adminVendorId     = commandData.adminVendorId;
+    auto & ipkValue          = commandData.IPKValue;
+    auto * groupDataProvider = Credentials::GetGroupDataProvider();
+    auto nocResponse         = OperationalCertStatus::kSuccess;
 
     CHIP_ERROR err          = CHIP_NO_ERROR;
     FabricIndex fabricIndex = 0;
     Credentials::GroupDataProvider::KeySet keyset;
     FabricInfo * newFabricInfo = nullptr;
 
+    auto * secureSession = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession();
+
     uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
     MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a NOC");
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Received AddNOC command");
 
-    if (nullptr == groups)
+    if (nullptr == groupDataProvider)
     {
         LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::Failure));
         return true;
@@ -657,9 +663,6 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     err = CreateAccessControlEntryForNewFabricAdministrator(fabricIndex, commandData.caseAdminNode);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-    // Notify the secure session of the new fabric.
-    commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->NewFabric(fabricIndex);
-
     // Set the Identity Protection Key (IPK)
     VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES,
                  nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_ARGUMENT));
@@ -674,8 +677,26 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     err = newFabricInfo->GetCompressedId(compressed_fabric_id);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-    err = groups->SetKeySet(fabricIndex, compressed_fabric_id, keyset);
+    err = groupDataProvider->SetKeySet(fabricIndex, compressed_fabric_id, keyset);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
+    /**
+     * . If the current secure session was established with PASE,
+     *   the receiver SHALL:
+     *     .. Augment the secure session context with the `FabricIndex` generated above
+     *        such that subsequent interactions have the proper accessing fabric.
+     *
+     * . If the current secure session was established with CASE, subsequent configuration
+     *   of the newly installed Fabric requires the opening of a new CASE session from the
+     *   Administrator from the Fabric just installed. This Administrator is the one listed
+     *   in the `CaseAdminNode` argument.
+     *
+     */
+    if (secureSession->GetSecureSessionType() == SecureSession::Type::kPASE)
+    {
+        err = secureSession->AdoptFabricIndex(fabricIndex);
+        VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+    }
 
     // We might have a new operational identity, so we should start advertising it right away.
     app::DnssdServer::Instance().AdvertiseOperational();
@@ -691,7 +712,8 @@ exit:
     }
     else
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: successfully added a NOC");
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: successfully created fabric index %u via AddNOC",
+                       static_cast<unsigned>(fabricIndex));
     }
 
     return true;
@@ -899,7 +921,11 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
     // Prepare NOCSRElements structure
     {
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+        Crypto::P256KeypairHSM keypair;
+#else
         Crypto::P256Keypair keypair;
+#endif
         size_t csrLength           = Crypto::kMAX_CSR_Length;
         size_t nocsrLengthEstimate = 0;
         ByteSpan kNoVendorReserved;
@@ -910,7 +936,11 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
             gFabricBeingCommissioned.GetOperationalKey()->Clear();
         }
 
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+        keypair.CreateOperationalKey(gFabricBeingCommissioned.GetFabricIndex());
+#else
         keypair.Initialize();
+#endif
         SuccessOrExit(err = gFabricBeingCommissioned.SetOperationalKeypair(&keypair));
 
         // Generate the actual CSR from the ephemeral key

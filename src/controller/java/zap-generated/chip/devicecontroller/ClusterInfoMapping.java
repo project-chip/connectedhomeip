@@ -11882,7 +11882,7 @@ public class ClusterInfoMapping {
 
     CommandParameterInfo
         windowCoveringgoToLiftPercentageliftPercent100thsValueCommandParameterInfo =
-            new CommandParameterInfo("liftPercent100thsValue", Integer.class);
+            new CommandParameterInfo("liftPercent100thsValue", Optional.class);
     windowCoveringgoToLiftPercentageCommandParams.put(
         "liftPercent100thsValue",
         windowCoveringgoToLiftPercentageliftPercent100thsValueCommandParameterInfo);
@@ -11894,7 +11894,7 @@ public class ClusterInfoMapping {
                   .goToLiftPercentage(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("liftPercentageValue"),
-                      (Integer) commandArguments.get("liftPercent100thsValue"));
+                      (Optional<Integer>) commandArguments.get("liftPercent100thsValue"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             windowCoveringgoToLiftPercentageCommandParams);
@@ -11929,7 +11929,7 @@ public class ClusterInfoMapping {
 
     CommandParameterInfo
         windowCoveringgoToTiltPercentagetiltPercent100thsValueCommandParameterInfo =
-            new CommandParameterInfo("tiltPercent100thsValue", Integer.class);
+            new CommandParameterInfo("tiltPercent100thsValue", Optional.class);
     windowCoveringgoToTiltPercentageCommandParams.put(
         "tiltPercent100thsValue",
         windowCoveringgoToTiltPercentagetiltPercent100thsValueCommandParameterInfo);
@@ -11941,7 +11941,7 @@ public class ClusterInfoMapping {
                   .goToTiltPercentage(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("tiltPercentageValue"),
-                      (Integer) commandArguments.get("tiltPercent100thsValue"));
+                      (Optional<Integer>) commandArguments.get("tiltPercent100thsValue"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             windowCoveringgoToTiltPercentageCommandParams);

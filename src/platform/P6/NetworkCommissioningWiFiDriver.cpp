@@ -242,7 +242,7 @@ CHIP_ERROR P6WiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     cy_wcm_scan_filter_t scan_filter;
     memset(&scan_filter, 0, sizeof(scan_filter));
 
-    if (ssid.data())
+    if (!ssid.empty())
     {
 
         scan_filter.mode = CY_WCM_SCAN_FILTER_TYPE_SSID;

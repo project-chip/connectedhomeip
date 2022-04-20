@@ -43,7 +43,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.5.58
+            image: connectedhomeip/chip-build:0.5.64
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -82,7 +82,7 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
                         --target linux-x64-all-clusters-test-group-${BUILD_VARIANT} \
-                        --target linux-x64-door-lock-${BUILD_VARIANT} \
+                        --target linux-x64-lock-${BUILD_VARIANT} \
                         --target linux-x64-tv-app-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
@@ -96,7 +96,7 @@ jobs:
                      run \
                      --iterations 1 \
                      --all-clusters-app ./out/linux-x64-all-clusters-test-group-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --door-lock-app ./out/linux-x64-door-lock-${BUILD_VARIANT}/chip-door-lock-app \
+                     --lock-app ./out/linux-x64-lock-${BUILD_VARIANT}/chip-lock-app \
                      --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                   "
             - name: Uploading core files
@@ -178,7 +178,7 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --target darwin-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
                         --target darwin-x64-all-clusters-${BUILD_VARIANT} \
-                        --target darwin-x64-door-lock-${BUILD_VARIANT} \
+                        --target darwin-x64-lock-${BUILD_VARIANT} \
                         --target darwin-x64-tv-app-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
@@ -193,7 +193,7 @@ jobs:
                      run \
                      --iterations 1 \
                      --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --door-lock-app ./out/darwin-x64-door-lock-${BUILD_VARIANT}/chip-door-lock-app \
+                     --lock-app ./out/darwin-x64-lock-${BUILD_VARIANT}/chip-lock-app \
                      --tv-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                   "
             - name: Uploading core files
@@ -270,6 +270,7 @@ jobs:
                     ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-all-clusters-${BUILD_VARIANT} \
+                        --target linux-x64-python-bindings \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "

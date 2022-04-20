@@ -85,12 +85,16 @@ typedef void (*OnDeviceConnectionFailure)(void * context, PeerId peerId, CHIP_ER
  *    - Expose to consumers the secure session for talking to the device.
  */
 class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy,
-                                          SessionReleaseDelegate,
+                                          public SessionReleaseDelegate,
                                           public SessionEstablishmentDelegate,
                                           public AddressResolve::NodeListener
 {
 public:
     ~OperationalDeviceProxy() override;
+
+    //
+    // TODO: Should not be PeerId, but rather, ScopedNodeId
+    //
     OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId) : mSecureSession(*this)
     {
         mInitParams = params;
@@ -136,6 +140,10 @@ public:
 
     bool IsConnecting() const { return mState == State::Connecting; }
 
+    //////////// SessionEstablishmentDelegate Implementation ///////////////
+    void OnSessionEstablished(const SessionHandle & session) override;
+    void OnSessionEstablishmentError(CHIP_ERROR error) override;
+
     /**
      *   Called when a connection is closing.
      *   The object releases all resources associated with the connection.
@@ -158,15 +166,6 @@ public:
      *  Mark any open session with the device as expired.
      */
     CHIP_ERROR Disconnect() override;
-
-    /**
-     * Use SetConnectedSession if 'this' object is a newly allocated device proxy.
-     * It will take an existing session, such as the one established
-     * during commissioning, and use it for this device proxy.
-     *
-     * Note: Avoid using this function generally as it is Deprecated
-     */
-    void SetConnectedSession(const SessionHandle & handle);
 
     NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
 
@@ -246,6 +245,8 @@ private:
     FabricInfo * mFabricInfo;
     System::Layer * mSystemLayer;
 
+    // mCASEClient is only non-null if we are in State::Connecting or just
+    // allocated it as part of an attempt to enter State::Connecting.
     CASEClient * mCASEClient = nullptr;
 
     PeerId mPeerId;
@@ -268,20 +269,31 @@ private:
 
     CHIP_ERROR EstablishConnection();
 
+    /*
+     * This checks to see if an existing CASE session exists to the peer within the SessionManager
+     * and if one exists, to load that into mSecureSession.
+     *
+     * Returns true if a valid session was found, false otherwise.
+     *
+     */
+    bool AttachToExistingSecureSession();
+
     bool IsSecureConnected() const override { return mState == State::SecureConnected; }
 
-    static void HandleCASEConnected(void * context, CASEClient * client);
-    static void HandleCASEConnectionFailure(void * context, CASEClient * client, CHIP_ERROR error);
-
-    static void CloseCASESessionTask(System::Layer * layer, void * context);
-
-    void CloseCASESession();
+    void CleanupCASEClient();
 
     void EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
                                     Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
-    void DequeueConnectionSuccessCallbacks(bool executeCallback);
-    void DequeueConnectionFailureCallbacks(CHIP_ERROR error, bool executeCallback);
+    /*
+     * This dequeues all failure and success callbacks and appropriately
+     * invokes either set depending on the value of error.
+     *
+     * If error == CHIP_NO_ERROR, only success callbacks are invoked.
+     * Otherwise, only failure callbacks are invoked.
+     *
+     */
+    void DequeueConnectionCallbacks(CHIP_ERROR error);
 };
 
 } // namespace chip

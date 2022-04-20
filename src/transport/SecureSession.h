@@ -97,15 +97,15 @@ public:
      *   PASE, setting internal state according to the parameters used and
      *   discovered during session establishment.
      */
-    void Activate(Type secureSessionType, NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric,
+    void Activate(Type secureSessionType, const ScopedNodeId & peer, CATValues peerCATs, uint16_t peerSessionId,
                   const ReliableMessageProtocolConfig & config)
     {
         mSecureSessionType = secureSessionType;
-        mPeerNodeId        = peerNodeId;
+        mPeerNodeId        = peer.GetNodeId();
         mPeerCATs          = peerCATs;
         mPeerSessionId     = peerSessionId;
         mMRPConfig         = config;
-        SetFabricIndex(fabric);
+        SetFabricIndex(peer.GetFabricIndex());
     }
     ~SecureSession() override { NotifySessionReleased(); }
 
@@ -152,20 +152,16 @@ public:
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
     uint16_t GetPeerSessionId() const { return mPeerSessionId; }
 
-    // Should only be called for PASE sessions, which start with undefined fabric,
-    // to migrate to a newly commissioned fabric after successful
-    // OperationalCredentialsCluster::AddNOC
-    CHIP_ERROR NewFabric(FabricIndex fabricIndex)
+    // Called when AddNOC has gone through sufficient success that we need to switch the
+    // session to reflect a new fabric if it was a PASE session
+    CHIP_ERROR AdoptFabricIndex(FabricIndex fabricIndex)
     {
-#if 0
-        // TODO(#13711): this check won't work until the issue is addressed
-        if (mSecureSessionType == Type::kPASE)
+        // It's not legal to augment session type for non-PASE
+        if (mSecureSessionType != Type::kPASE)
         {
-            SetFabricIndex(fabricIndex);
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
-#else
         SetFabricIndex(fabricIndex);
-#endif
         return CHIP_NO_ERROR;
     }
 

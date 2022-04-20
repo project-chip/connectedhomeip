@@ -24,12 +24,6 @@ NS_ASSUME_NONNULL_BEGIN
 @required
 
 /**
- * @brief Initialize the keypair.
- * @return Should return whether or not the keypair was successfully initialized
- **/
-- (BOOL)initialize;
-
-/**
  * @brief A function to sign a hash using ECDSA
  * @param hash Hash that needs to be signed
  *

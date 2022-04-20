@@ -17,7 +17,7 @@ name: 48.1.1. [TC-ETHDIAG-1.1] Attributes with server as DUT
 config:
     nodeId: 0x12344321
     cluster: "Ethernet Network Diagnostics"
-    endpoint: 1
+    endpoint: 0
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -28,7 +28,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Disabled due to issue #11670 and #13648
+    #Disabled due to issue #16552 and #13648
     - label: "Read PHYRate attribute"
       disabled: true
       command: "readAttribute"
@@ -37,7 +37,6 @@ tests:
           value: null
 
     - label: "Read PHYRate attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "PHYRate"
       response:
@@ -54,7 +53,6 @@ tests:
           value: null
 
     - label: "Read FullDuplex attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "FullDuplex"
       response:
@@ -69,7 +67,6 @@ tests:
           value: 0
 
     - label: "Read PacketRxCount attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "PacketRxCount"
       response:
@@ -84,7 +81,6 @@ tests:
           value: 0
 
     - label: "Read PacketTxCount attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "PacketTxCount"
       response:
@@ -99,7 +95,6 @@ tests:
           value: 0
 
     - label: "Read TxErrCount attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "TxErrCount"
       response:
@@ -114,7 +109,6 @@ tests:
           value: 0
 
     - label: "Read CollisionCount attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "CollisionCount"
       response:
@@ -129,7 +123,6 @@ tests:
           value: 0
 
     - label: "Read OverrunCount attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "OverrunCount"
       response:
@@ -144,7 +137,6 @@ tests:
           value: null
 
     - label: "Read CarrierDetect attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "CarrierDetect"
       response:
@@ -159,7 +151,6 @@ tests:
           value: 0
 
     - label: "Read TimeSinceReset attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "TimeSinceReset"
       response:

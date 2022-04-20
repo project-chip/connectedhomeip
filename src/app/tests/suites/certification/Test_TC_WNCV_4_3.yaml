@@ -70,7 +70,7 @@ tests:
 
     - label: "2b: TH sends GoToLiftPercentage command with BadParam to DUT"
       command: "GoToLiftPercentage"
-      PICS: WNCV_LF && WNCV_PA_LF || WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE
+      PICS: WNCV_LF && WNCV_PA_LF || WNCV_LF && CR_GOTOLIFTPERCENTAGE
       arguments:
           values:
               - name: "LiftPercent100thsValue"
@@ -84,7 +84,7 @@ tests:
     ### Step 3x -> Verify the GoToLiftPercentage with 10001 as param
     - label: "3a: TH sends GoToLiftPercentage command with 10001 to DUT"
       command: "GoToLiftPercentage"
-      PICS: WNCV_LF && WNCV_PA_LF || WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE
+      PICS: WNCV_LF && WNCV_PA_LF || WNCV_LF && CR_GOTOLIFTPERCENTAGE
       arguments:
           values:
               - name: "LiftPercent100thsValue"
@@ -98,7 +98,7 @@ tests:
     ### Step 4x -> Verify the GoToLiftPercentage with 0xFFFF as param
     - label: "4a: TH sends GoToLiftPercentage command with 0xFFFF to DUT"
       command: "GoToLiftPercentage"
-      PICS: WNCV_LF && WNCV_PA_LF || WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE
+      PICS: WNCV_LF && WNCV_PA_LF || WNCV_LF && CR_GOTOLIFTPERCENTAGE
       arguments:
           values:
               - name: "LiftPercent100thsValue"

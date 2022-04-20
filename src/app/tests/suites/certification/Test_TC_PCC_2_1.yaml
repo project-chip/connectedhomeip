@@ -208,7 +208,7 @@ tests:
           constraints:
               type: int16
 
-    #issue #11670 Null check is not implemented in YAML framework.
+    #issue #16650
     - label: "read the optional attribute: MinConstPressure"
       disabled: true
       command: "readAttribute"

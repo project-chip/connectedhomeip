@@ -1,6 +1,4 @@
-<p align="center">
-    <img src="https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png" alt="ARM Mbed-OS logo"/>
-</p>
+![ARM Mbed-OS logo](https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png)
 
 <h1> Matter Arm Mbed OS provisioning guide </h1>
 
@@ -67,7 +65,9 @@ After building, install the application by completing the following steps:
 1.  Install the Android Debug Bridge (adb) package by running the following
     command:
 
+        ```
         $ sudo apt install android-tools-adb
+        ```
 
 2.  Enable **USB debugging** on your smartphone. See the
     [Configure on-device developer options](https://developer.android.com/studio/debug/dev-options)
@@ -94,7 +94,9 @@ complete the following steps:
     accessory device. You can use **mbed-tools** for this purpose
     ([mbed-tools](https://github.com/ARMmbed/mbed-tools)):
 
+        ```
         mbed-tools sterm -p /dev/ttyACM0 -b 115200 -e off
+        ```
 
 To start the rendezvous, CHIPTool must get the commissioning information from
 the Matter device. The data payload is encoded within a QR code and is printed
@@ -104,8 +106,10 @@ to the UART console.
 
 -   Find a message similar to the following one in the application logs:
 
+        ```
         [INFO][CHIP]: [SVR]Copy/paste the below URL in a browser to see the QR Code:
         [INFO][CHIP]: [SVR]https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AYNJV7VSC00CMVH7SR00
+        ```
 
 -   Open URL from the console to display the QR in a web browser.
 

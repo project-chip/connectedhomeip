@@ -31,9 +31,9 @@ server cluster AdministratorCommissioning = 60 {
     INT16U commissioningTimeout = 0;
   }
 
-  timed command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
-  timed command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
-  timed command RevokeCommissioning(): DefaultSuccess = 2;
+  timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
+  timed command access(invoke: administer) OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
+  timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 
 client cluster ApplicationBasic = 1293 {
@@ -91,6 +91,11 @@ server cluster ApplicationBasic = 1293 {
 }
 
 server cluster Basic = 40 {
+  struct CapabilityMinimaStruct {
+    int16u caseSessionsPerFabric = 0;
+    int16u subscriptionsPerFabric = 1;
+  }
+
   critical event StartUp = 0 {
     INT32U softwareVersion = 0;
   }
@@ -110,8 +115,8 @@ server cluster Basic = 40 {
   readonly attribute vendor_id vendorID = 2;
   readonly attribute char_string<32> productName = 3;
   readonly attribute int16u productID = 4;
-  attribute char_string<32> nodeLabel = 5;
-  attribute char_string<2> location = 6;
+  attribute access(write: manage) char_string<32> nodeLabel = 5;
+  attribute access(write: administer) char_string<2> location = 6;
   readonly attribute int16u hardwareVersion = 7;
   readonly attribute char_string<64> hardwareVersionString = 8;
   readonly attribute int32u softwareVersion = 9;
@@ -121,9 +126,10 @@ server cluster Basic = 40 {
   readonly attribute long_char_string<256> productURL = 13;
   readonly attribute char_string<64> productLabel = 14;
   readonly attribute char_string<32> serialNumber = 15;
-  attribute boolean localConfigDisabled = 16;
+  attribute access(write: manage) boolean localConfigDisabled = 16;
   readonly attribute boolean reachable = 17;
   readonly attribute char_string<32> uniqueID = 18;
+  readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -289,7 +295,7 @@ server cluster ColorControl = 768 {
   readonly attribute int16u currentY = 4;
   attribute bitmap8 colorControlOptions = 15;
   readonly attribute int16u coupleColorTempToLevelMinMireds = 16397;
-  attribute int16u startUpColorTemperatureMireds = 16400;
+  attribute access(write: manage) int16u startUpColorTemperatureMireds = 16400;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct MoveToColorRequest {
@@ -593,7 +599,7 @@ client cluster GeneralCommissioning = 48 {
     INT16U failSafeExpiryLengthSeconds = 0;
   }
 
-  attribute int64u breadcrumb = 0;
+  attribute access(write: administer) int64u breadcrumb = 0;
   readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
   readonly attribute RegulatoryLocationType regulatoryConfig = 2;
   readonly attribute RegulatoryLocationType locationCapability = 3;
@@ -615,9 +621,9 @@ client cluster GeneralCommissioning = 48 {
     INT64U breadcrumb = 2;
   }
 
-  command ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
-  command SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
-  command CommissioningComplete(): CommissioningCompleteResponse = 4;
+  command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
+  command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
+  command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
 }
 
 server cluster GeneralCommissioning = 48 {
@@ -639,7 +645,7 @@ server cluster GeneralCommissioning = 48 {
     INT16U failSafeExpiryLengthSeconds = 0;
   }
 
-  attribute int64u breadcrumb = 0;
+  attribute access(write: administer) int64u breadcrumb = 0;
   readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
   readonly attribute RegulatoryLocationType regulatoryConfig = 2;
   readonly attribute RegulatoryLocationType locationCapability = 3;
@@ -676,9 +682,9 @@ server cluster GeneralCommissioning = 48 {
     CHAR_STRING debugText = 1;
   }
 
-  command ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
-  command SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
-  command CommissioningComplete(): CommissioningCompleteResponse = 4;
+  command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
+  command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
+  command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
 }
 
 server cluster GeneralDiagnostics = 51 {
@@ -819,12 +825,12 @@ server cluster Groups = 4 {
     group_id groupId = 1;
   }
 
-  command AddGroup(AddGroupRequest): AddGroupResponse = 0;
+  command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
   command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
   command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
-  command RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
-  command RemoveAllGroups(): DefaultSuccess = 4;
-  command AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
+  command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
+  command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
+  command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
 server cluster Identify = 3 {
@@ -862,8 +868,8 @@ server cluster Identify = 3 {
     INT16U timeout = 0;
   }
 
-  command Identify(IdentifyRequest): DefaultSuccess = 0;
-  command IdentifyQuery(): IdentifyQueryResponse = 1;
+  command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
+  command access(invoke: manage) IdentifyQuery(): IdentifyQueryResponse = 1;
 }
 
 server cluster IlluminanceMeasurement = 1024 {
@@ -1311,14 +1317,14 @@ server cluster NetworkCommissioning = 49 {
     INT8U lqi = 7;
   }
 
-  readonly attribute int8u maxNetworks = 0;
-  readonly attribute NetworkInfo networks[] = 1;
+  readonly attribute access(read: administer) int8u maxNetworks = 0;
+  readonly attribute access(read: administer) NetworkInfo networks[] = 1;
   readonly attribute int8u scanMaxTimeSeconds = 2;
   readonly attribute int8u connectMaxTimeSeconds = 3;
-  attribute boolean interfaceEnabled = 4;
-  readonly attribute nullable NetworkCommissioningStatus lastNetworkingStatus = 5;
-  readonly attribute nullable octet_string<32> lastNetworkID = 6;
-  readonly attribute nullable int32s lastConnectErrorValue = 7;
+  attribute access(write: administer) boolean interfaceEnabled = 4;
+  readonly attribute access(read: administer) nullable NetworkCommissioningStatus lastNetworkingStatus = 5;
+  readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
+  readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -1373,12 +1379,12 @@ server cluster NetworkCommissioning = 49 {
     nullable INT32S errorValue = 2;
   }
 
-  command ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
-  command AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): NetworkConfigResponse = 2;
-  command AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
-  command RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
-  command ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
-  command ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
+  command access(invoke: administer) ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
+  command access(invoke: administer) AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): NetworkConfigResponse = 2;
+  command access(invoke: administer) AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
+  command access(invoke: administer) RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
+  command access(invoke: administer) ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
+  command access(invoke: administer) ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
 }
 
 client cluster OnOff = 6 {
@@ -1415,7 +1421,7 @@ client cluster OnOff = 6 {
   readonly attribute boolean globalSceneControl = 16384;
   attribute int16u onTime = 16385;
   attribute int16u offWaitTime = 16386;
-  attribute nullable OnOffStartUpOnOff startUpOnOff = 16387;
+  attribute access(write: manage) nullable OnOffStartUpOnOff startUpOnOff = 16387;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -1472,7 +1478,7 @@ server cluster OnOff = 6 {
   readonly attribute boolean globalSceneControl = 16384;
   attribute int16u onTime = 16385;
   attribute int16u offWaitTime = 16386;
-  attribute nullable OnOffStartUpOnOff startUpOnOff = 16387;
+  attribute access(write: manage) nullable OnOffStartUpOnOff startUpOnOff = 16387;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -1566,15 +1572,15 @@ client cluster OperationalCredentials = 62 {
     OCTET_STRING trustedRootIdentifier = 0;
   }
 
-  command AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
-  command CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
-  command CSRRequest(CSRRequestRequest): CSRResponse = 4;
-  command AddNOC(AddNOCRequest): NOCResponse = 6;
-  command UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
-  command UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
-  command RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
-  command AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-  command RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
+  command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
+  command access(invoke: administer) CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
+  command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
+  command access(invoke: administer) AddNOC(AddNOCRequest): NOCResponse = 6;
+  command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
+  command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
+  command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
+  command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
+  command access(invoke: administer) RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
 }
 
 server cluster OperationalCredentials = 62 {
@@ -1668,15 +1674,15 @@ server cluster OperationalCredentials = 62 {
     optional CHAR_STRING debugText = 2;
   }
 
-  command AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
-  command CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
-  command CSRRequest(CSRRequestRequest): CSRResponse = 4;
-  command AddNOC(AddNOCRequest): NOCResponse = 6;
-  command UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
-  command UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
-  command RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
-  command AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-  command RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
+  command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
+  command access(invoke: administer) CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
+  command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
+  command access(invoke: administer) AddNOC(AddNOCRequest): NOCResponse = 6;
+  command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
+  command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
+  command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
+  command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
+  command access(invoke: administer) RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
 }
 
 server cluster PowerSource = 47 {
@@ -2027,11 +2033,11 @@ server cluster Scenes = 5 {
     INT8U sceneList[] = 4;
   }
 
-  command AddScene(AddSceneRequest): AddSceneResponse = 0;
+  command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
   command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
-  command RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
-  command RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
-  command StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
+  command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
+  command access(invoke: manage) RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
+  command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
   command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
   command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
 }
@@ -2282,13 +2288,13 @@ server cluster Thermostat = 513 {
   readonly attribute int16s absMaxCoolSetpointLimit = 6;
   attribute int16s occupiedCoolingSetpoint = 17;
   attribute int16s occupiedHeatingSetpoint = 18;
-  attribute int16s minHeatSetpointLimit = 21;
-  attribute int16s maxHeatSetpointLimit = 22;
-  attribute int16s minCoolSetpointLimit = 23;
-  attribute int16s maxCoolSetpointLimit = 24;
-  attribute int8s minSetpointDeadBand = 25;
-  attribute ThermostatControlSequence controlSequenceOfOperation = 27;
-  attribute enum8 systemMode = 28;
+  attribute access(write: manage) int16s minHeatSetpointLimit = 21;
+  attribute access(write: manage) int16s maxHeatSetpointLimit = 22;
+  attribute access(write: manage) int16s minCoolSetpointLimit = 23;
+  attribute access(write: manage) int16s maxCoolSetpointLimit = 24;
+  attribute access(write: manage) int8s minSetpointDeadBand = 25;
+  attribute access(write: manage) ThermostatControlSequence controlSequenceOfOperation = 27;
+  attribute access(write: manage) enum8 systemMode = 28;
   readonly attribute enum8 startOfWeek = 32;
   readonly attribute int8u numberOfWeeklyTransitions = 33;
   readonly attribute int8u numberOfDailyTransitions = 34;
@@ -2298,8 +2304,8 @@ server cluster Thermostat = 513 {
 
 client cluster ThermostatUserInterfaceConfiguration = 516 {
   attribute enum8 temperatureDisplayMode = 0;
-  attribute enum8 keypadLockout = 1;
-  attribute enum8 scheduleProgrammingVisibility = 2;
+  attribute access(write: manage) enum8 keypadLockout = 1;
+  attribute access(write: manage) enum8 scheduleProgrammingVisibility = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2309,8 +2315,8 @@ client cluster ThermostatUserInterfaceConfiguration = 516 {
 
 server cluster ThermostatUserInterfaceConfiguration = 516 {
   attribute enum8 temperatureDisplayMode = 0;
-  attribute enum8 keypadLockout = 1;
-  attribute enum8 scheduleProgrammingVisibility = 2;
+  attribute access(write: manage) enum8 keypadLockout = 1;
+  attribute access(write: manage) enum8 scheduleProgrammingVisibility = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2424,14 +2430,21 @@ server cluster WindowCovering = 258 {
     kUnknown = 255;
   }
 
-  bitmap WcConfigStatus : BITMAP8 {
+  bitmap ConfigStatus : BITMAP8 {
     kOperational = 0x1;
-    kOnline = 0x2;
-    kOpenAndUpCommandsReversed = 0x4;
+    kOnlineReserved = 0x2;
+    kLiftMovementReversed = 0x4;
     kLiftPositionAware = 0x8;
     kTiltPositionAware = 0x10;
     kLiftEncoderControlled = 0x20;
     kTiltEncoderControlled = 0x40;
+  }
+
+  bitmap Mode : BITMAP8 {
+    kMotorDirectionReversed = 0x1;
+    kCalibrationMode = 0x2;
+    kMaintenanceMode = 0x4;
+    kLedFeedback = 0x8;
   }
 
   bitmap WcFeature : BITMAP32 {
@@ -2440,13 +2453,6 @@ server cluster WindowCovering = 258 {
     kPositionAwareLift = 0x4;
     kAbsolutePosition = 0x8;
     kPositionAwareTilt = 0x10;
-  }
-
-  bitmap WcMode : BITMAP8 {
-    kMotorDirectionReversed = 0x1;
-    kCalibrationMode = 0x2;
-    kMaintenanceMode = 0x4;
-    kLedFeedback = 0x8;
   }
 
   bitmap WcOperationalStatus : BITMAP8 {
@@ -2473,7 +2479,7 @@ server cluster WindowCovering = 258 {
   readonly attribute Type type = 0;
   readonly attribute nullable int16u currentPositionLift = 3;
   readonly attribute nullable int16u currentPositionTilt = 4;
-  readonly attribute bitmap8 configStatus = 7;
+  readonly attribute ConfigStatus configStatus = 7;
   readonly attribute nullable Percent currentPositionLiftPercentage = 8;
   readonly attribute nullable Percent currentPositionTiltPercentage = 9;
   readonly attribute bitmap8 operationalStatus = 10;
@@ -2486,7 +2492,7 @@ server cluster WindowCovering = 258 {
   readonly attribute int16u installedClosedLimitLift = 17;
   readonly attribute int16u installedOpenLimitTilt = 18;
   readonly attribute int16u installedClosedLimitTilt = 19;
-  attribute bitmap8 mode = 23;
+  attribute access(write: manage) Mode mode = 23;
   readonly attribute bitmap16 safetyStatus = 26;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -2497,7 +2503,7 @@ server cluster WindowCovering = 258 {
 
   request struct GoToLiftPercentageRequest {
     Percent liftPercentageValue = 0;
-    Percent100ths liftPercent100thsValue = 1;
+    optional Percent100ths liftPercent100thsValue = 1;
   }
 
   request struct GoToTiltValueRequest {
@@ -2506,7 +2512,7 @@ server cluster WindowCovering = 258 {
 
   request struct GoToTiltPercentageRequest {
     Percent tiltPercentageValue = 0;
-    Percent100ths tiltPercent100thsValue = 1;
+    optional Percent100ths tiltPercent100thsValue = 1;
   }
 
   command UpOrOpen(): DefaultSuccess = 0;

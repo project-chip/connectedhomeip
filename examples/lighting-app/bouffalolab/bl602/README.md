@@ -14,12 +14,16 @@
 
 Generated files
 
+         ```
          connectedhomeip/out/lighting_app_bl602/chip-bl602-lighting-example.bin
+         ```
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/
-          $ rm -rf out/
+         ```
+         $ cd ~/connectedhomeip/
+         $ rm -rf out/
+         ```
 
 ## Flash
 
@@ -32,19 +36,24 @@ commissioning and cluster control.
 
 -   Set up python controller.
 
+           ```
            $ cd {path-to-connectedhomeip}
            $ ./scripts/build_python.sh -m platform
+           ```
 
 -   Execute the controller.
 
+           ```
            $ source ./out/python_env/bin/activate
            $ chip-device-ctrl
+           ```
 
 ### Commissioning over BLE
 
 -   Establish the secure session over BLE. BLE is the default mode in the
     application and is configurable through menuconfig.
 
+         ```
          - chip-device-ctrl > ble-scan
          - chip-device-ctrl > set-pairing-wifi-credential TESTSSID P455W4RD
          - chip-device-ctrl > connect -ble 3904 20202021 135246
@@ -58,6 +67,7 @@ commissioning and cluster control.
             We have chosen a random node ID which is 135246.
          4. TESTSSID : Wi-Fi SSID
          5. P455W4RD : Wi-Fi Password
+         ```
 
 ### Cluster control
 
