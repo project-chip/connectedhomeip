@@ -9,9 +9,9 @@
 #include <lib/support/logging/Constants.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#include <cstdio>
 #include <ctype.h>
 #include <string.h>
-#include <cstdio>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread/platform/logging.h>

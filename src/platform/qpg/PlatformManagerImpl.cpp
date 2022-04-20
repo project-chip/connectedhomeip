@@ -30,7 +30,7 @@
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
-#endif //CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 namespace chip {
 namespace DeviceLayer {
@@ -50,7 +50,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
-#endif //CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 
