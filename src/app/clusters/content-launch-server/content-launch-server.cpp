@@ -81,11 +81,11 @@ Delegate * GetDelegate(EndpointId endpoint)
     ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
     if (app != nullptr)
     {
-        ChipLogError(Zcl, "Content Launcher returning ContentApp delegate for endpoint:%u", endpoint);
+        ChipLogProgress(Zcl, "Content Launcher returning ContentApp delegate for endpoint:%u", endpoint);
         return app->GetContentLauncherDelegate();
     }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    ChipLogError(Zcl, "Content Launcher NOT returning ContentApp delegate for endpoint:%u", endpoint);
+    ChipLogProgress(Zcl, "Content Launcher NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ContentLauncher::Id);
     return ((ep == 0xFFFF || ep >= EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
@@ -95,7 +95,7 @@ bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
 {
     if (delegate == nullptr)
     {
-        ChipLogError(Zcl, "Content Launcher has no delegate set for endpoint:%u", endpoint);
+        ChipLogProgress(Zcl, "Content Launcher has no delegate set for endpoint:%u", endpoint);
         return true;
     }
     return false;
