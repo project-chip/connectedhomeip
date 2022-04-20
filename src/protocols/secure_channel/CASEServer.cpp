@@ -66,11 +66,12 @@ CHIP_ERROR CASEServer::OnUnsolicitedMessageReceived(const PayloadHeader & payloa
     }
 #endif
 
-    if (mPairingSession.HasValue() && !mPairingSession.Value().Available())
+    if (mPairingSession.HasValue())
         return CHIP_ERROR_NO_MEMORY;
 
     CASESession * session = &mPairingSession.Emplace();
 
+    ChipLogProgress(Inet, "CASE Server allocated pairing: %p", session);
     // Setup CASE state machine using the credentials for the current fabric.
     session->SetGroupDataProvider(mGroupDataProvider);
     ReturnErrorOnFailure(
@@ -95,6 +96,14 @@ void CASEServer::OnSessionEstablished(const SessionHandle & session)
 {
     ChipLogProgress(Inet, "CASE Session established to peer: " ChipLogFormatScopedNodeId,
                     ChipLogValueScopedNodeId(session->GetPeer()));
+}
+
+void CASEServer::OnSessionEstablishmentDone(PairingSession * pairing)
+{
+    CASESession * session = static_cast<CASESession *>(pairing);
+    ChipLogProgress(Inet, "CASE Server releasing pairing: %p", session);
+    VerifyOrDie(mPairingSession.HasValue() && session == &mPairingSession.Value());
+    mPairingSession.ClearValue();
 }
 
 } // namespace chip

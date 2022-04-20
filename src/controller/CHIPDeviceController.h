@@ -460,6 +460,7 @@ public:
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished(const SessionHandle & session) override;
+    void OnSessionEstablishmentDone(PairingSession * pairing) override {} // TODO: manage CASESession lifespan
 
     void RendezvousCleanup(CHIP_ERROR status);
 

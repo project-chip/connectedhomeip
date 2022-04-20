@@ -68,13 +68,8 @@ public:
     ScopedNodeId GetPeer() const override { return ScopedNodeId(mPeerNodeId, GetFabricIndex()); }
     CATValues GetPeerCATs() const override { return mPeerCATs; };
 
-    /**
-     * @brief
-     *   Return whether this session object is ready for use.
-     *   When a new session request comes, CASE server will recycle an available session to serve the new request.
-     */
-    bool Available() const { return IsFinished() || mState == State::kListening || mState == State::kError; }
-
+    // Return whether the PairingSession has done its work (either finished or encountered an error)
+    bool IsDone() const { return IsFinished() || mState == State::kError; }
     bool IsFinished() const { return mState == State::kFinished || mState == State::kFinishedResumed; }
 
     /**
@@ -213,6 +208,9 @@ private:
     CHIP_ERROR ValidateSigmaResumeMIC(const ByteSpan & resumeMIC, const ByteSpan & initiatorRandom, const ByteSpan & resumptionID,
                                       const ByteSpan & skInfo, const ByteSpan & nonce);
 
+    // For CASESession not leaked, after each action (OnMessageReceived/OnResponseTimeout), it must end with a state either the
+    // establishment is done, or waiting for a message from other side with response timer being set. This function ensure that we
+    // are indeed in such state, it is called and verifed after each action.
     bool SanityCheck() const;
 
     void OnSuccessStatusReport() override;

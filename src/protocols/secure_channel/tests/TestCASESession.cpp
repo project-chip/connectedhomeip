@@ -81,6 +81,8 @@ public:
         mNumPairingComplete++;
     }
 
+    void OnSessionEstablishmentDone(PairingSession * pairing) override {}
+
     SessionHolder & GetSessionHolder() { return mSession; }
 
     SessionHolder mSession;
