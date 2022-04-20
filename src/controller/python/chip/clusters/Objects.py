@@ -19251,29 +19251,29 @@ class PumpConfigurationAndControl(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="maxPressure", Tag=0x00000000, Type=int),
-                ClusterObjectFieldDescriptor(Label="maxSpeed", Tag=0x00000001, Type=uint),
-                ClusterObjectFieldDescriptor(Label="maxFlow", Tag=0x00000002, Type=uint),
-                ClusterObjectFieldDescriptor(Label="minConstPressure", Tag=0x00000003, Type=typing.Optional[int]),
-                ClusterObjectFieldDescriptor(Label="maxConstPressure", Tag=0x00000004, Type=typing.Optional[int]),
-                ClusterObjectFieldDescriptor(Label="minCompPressure", Tag=0x00000005, Type=typing.Optional[int]),
-                ClusterObjectFieldDescriptor(Label="maxCompPressure", Tag=0x00000006, Type=typing.Optional[int]),
-                ClusterObjectFieldDescriptor(Label="minConstSpeed", Tag=0x00000007, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="maxConstSpeed", Tag=0x00000008, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="minConstFlow", Tag=0x00000009, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="maxConstFlow", Tag=0x0000000A, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="minConstTemp", Tag=0x0000000B, Type=typing.Optional[int]),
-                ClusterObjectFieldDescriptor(Label="maxConstTemp", Tag=0x0000000C, Type=typing.Optional[int]),
+                ClusterObjectFieldDescriptor(Label="maxPressure", Tag=0x00000000, Type=typing.Union[Nullable, int]),
+                ClusterObjectFieldDescriptor(Label="maxSpeed", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="maxFlow", Tag=0x00000002, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="minConstPressure", Tag=0x00000003, Type=typing.Union[None, Nullable, int]),
+                ClusterObjectFieldDescriptor(Label="maxConstPressure", Tag=0x00000004, Type=typing.Union[None, Nullable, int]),
+                ClusterObjectFieldDescriptor(Label="minCompPressure", Tag=0x00000005, Type=typing.Union[None, Nullable, int]),
+                ClusterObjectFieldDescriptor(Label="maxCompPressure", Tag=0x00000006, Type=typing.Union[None, Nullable, int]),
+                ClusterObjectFieldDescriptor(Label="minConstSpeed", Tag=0x00000007, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="maxConstSpeed", Tag=0x00000008, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="minConstFlow", Tag=0x00000009, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="maxConstFlow", Tag=0x0000000A, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="minConstTemp", Tag=0x0000000B, Type=typing.Union[None, Nullable, int]),
+                ClusterObjectFieldDescriptor(Label="maxConstTemp", Tag=0x0000000C, Type=typing.Union[None, Nullable, int]),
                 ClusterObjectFieldDescriptor(Label="pumpStatus", Tag=0x00000010, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="effectiveOperationMode", Tag=0x00000011, Type=uint),
-                ClusterObjectFieldDescriptor(Label="effectiveControlMode", Tag=0x00000012, Type=uint),
-                ClusterObjectFieldDescriptor(Label="capacity", Tag=0x00000013, Type=int),
-                ClusterObjectFieldDescriptor(Label="speed", Tag=0x00000014, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="effectiveOperationMode", Tag=0x00000011, Type=PumpConfigurationAndControl.Enums.PumpOperationMode),
+                ClusterObjectFieldDescriptor(Label="effectiveControlMode", Tag=0x00000012, Type=PumpConfigurationAndControl.Enums.PumpControlMode),
+                ClusterObjectFieldDescriptor(Label="capacity", Tag=0x00000013, Type=typing.Union[Nullable, int]),
+                ClusterObjectFieldDescriptor(Label="speed", Tag=0x00000014, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="lifetimeRunningHours", Tag=0x00000015, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="power", Tag=0x00000016, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="power", Tag=0x00000016, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="lifetimeEnergyConsumed", Tag=0x00000017, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="operationMode", Tag=0x00000020, Type=uint),
-                ClusterObjectFieldDescriptor(Label="controlMode", Tag=0x00000021, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="operationMode", Tag=0x00000020, Type=PumpConfigurationAndControl.Enums.PumpOperationMode),
+                ClusterObjectFieldDescriptor(Label="controlMode", Tag=0x00000021, Type=typing.Optional[PumpConfigurationAndControl.Enums.PumpControlMode]),
                 ClusterObjectFieldDescriptor(Label="alarmMask", Tag=0x00000022, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -19282,29 +19282,29 @@ class PumpConfigurationAndControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    maxPressure: 'int' = None
-    maxSpeed: 'uint' = None
-    maxFlow: 'uint' = None
-    minConstPressure: 'typing.Optional[int]' = None
-    maxConstPressure: 'typing.Optional[int]' = None
-    minCompPressure: 'typing.Optional[int]' = None
-    maxCompPressure: 'typing.Optional[int]' = None
-    minConstSpeed: 'typing.Optional[uint]' = None
-    maxConstSpeed: 'typing.Optional[uint]' = None
-    minConstFlow: 'typing.Optional[uint]' = None
-    maxConstFlow: 'typing.Optional[uint]' = None
-    minConstTemp: 'typing.Optional[int]' = None
-    maxConstTemp: 'typing.Optional[int]' = None
+    maxPressure: 'typing.Union[Nullable, int]' = None
+    maxSpeed: 'typing.Union[Nullable, uint]' = None
+    maxFlow: 'typing.Union[Nullable, uint]' = None
+    minConstPressure: 'typing.Union[None, Nullable, int]' = None
+    maxConstPressure: 'typing.Union[None, Nullable, int]' = None
+    minCompPressure: 'typing.Union[None, Nullable, int]' = None
+    maxCompPressure: 'typing.Union[None, Nullable, int]' = None
+    minConstSpeed: 'typing.Union[None, Nullable, uint]' = None
+    maxConstSpeed: 'typing.Union[None, Nullable, uint]' = None
+    minConstFlow: 'typing.Union[None, Nullable, uint]' = None
+    maxConstFlow: 'typing.Union[None, Nullable, uint]' = None
+    minConstTemp: 'typing.Union[None, Nullable, int]' = None
+    maxConstTemp: 'typing.Union[None, Nullable, int]' = None
     pumpStatus: 'typing.Optional[uint]' = None
-    effectiveOperationMode: 'uint' = None
-    effectiveControlMode: 'uint' = None
-    capacity: 'int' = None
-    speed: 'typing.Optional[uint]' = None
+    effectiveOperationMode: 'PumpConfigurationAndControl.Enums.PumpOperationMode' = None
+    effectiveControlMode: 'PumpConfigurationAndControl.Enums.PumpControlMode' = None
+    capacity: 'typing.Union[Nullable, int]' = None
+    speed: 'typing.Union[None, Nullable, uint]' = None
     lifetimeRunningHours: 'typing.Union[None, Nullable, uint]' = None
-    power: 'typing.Optional[uint]' = None
+    power: 'typing.Union[None, Nullable, uint]' = None
     lifetimeEnergyConsumed: 'typing.Union[None, Nullable, uint]' = None
-    operationMode: 'uint' = None
-    controlMode: 'typing.Optional[uint]' = None
+    operationMode: 'PumpConfigurationAndControl.Enums.PumpOperationMode' = None
+    controlMode: 'typing.Optional[PumpConfigurationAndControl.Enums.PumpControlMode]' = None
     alarmMask: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
@@ -19343,9 +19343,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=int)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, int])
 
-            value: 'int' = 0
+            value: 'typing.Union[Nullable, int]' = NullValue
 
         @dataclass
         class MaxSpeed(ClusterAttributeDescriptor):
@@ -19359,9 +19359,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'uint' = 0
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class MaxFlow(ClusterAttributeDescriptor):
@@ -19375,9 +19375,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'uint' = 0
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class MinConstPressure(ClusterAttributeDescriptor):
@@ -19391,9 +19391,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[int])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, int])
 
-            value: 'typing.Optional[int]' = None
+            value: 'typing.Union[None, Nullable, int]' = None
 
         @dataclass
         class MaxConstPressure(ClusterAttributeDescriptor):
@@ -19407,9 +19407,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[int])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, int])
 
-            value: 'typing.Optional[int]' = None
+            value: 'typing.Union[None, Nullable, int]' = None
 
         @dataclass
         class MinCompPressure(ClusterAttributeDescriptor):
@@ -19423,9 +19423,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[int])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, int])
 
-            value: 'typing.Optional[int]' = None
+            value: 'typing.Union[None, Nullable, int]' = None
 
         @dataclass
         class MaxCompPressure(ClusterAttributeDescriptor):
@@ -19439,9 +19439,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[int])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, int])
 
-            value: 'typing.Optional[int]' = None
+            value: 'typing.Union[None, Nullable, int]' = None
 
         @dataclass
         class MinConstSpeed(ClusterAttributeDescriptor):
@@ -19455,9 +19455,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class MaxConstSpeed(ClusterAttributeDescriptor):
@@ -19471,9 +19471,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class MinConstFlow(ClusterAttributeDescriptor):
@@ -19487,9 +19487,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class MaxConstFlow(ClusterAttributeDescriptor):
@@ -19503,9 +19503,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class MinConstTemp(ClusterAttributeDescriptor):
@@ -19519,9 +19519,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[int])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, int])
 
-            value: 'typing.Optional[int]' = None
+            value: 'typing.Union[None, Nullable, int]' = None
 
         @dataclass
         class MaxConstTemp(ClusterAttributeDescriptor):
@@ -19535,9 +19535,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[int])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, int])
 
-            value: 'typing.Optional[int]' = None
+            value: 'typing.Union[None, Nullable, int]' = None
 
         @dataclass
         class PumpStatus(ClusterAttributeDescriptor):
@@ -19567,9 +19567,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=PumpConfigurationAndControl.Enums.PumpOperationMode)
 
-            value: 'uint' = 0
+            value: 'PumpConfigurationAndControl.Enums.PumpOperationMode' = 0
 
         @dataclass
         class EffectiveControlMode(ClusterAttributeDescriptor):
@@ -19583,9 +19583,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=PumpConfigurationAndControl.Enums.PumpControlMode)
 
-            value: 'uint' = 0
+            value: 'PumpConfigurationAndControl.Enums.PumpControlMode' = 0
 
         @dataclass
         class Capacity(ClusterAttributeDescriptor):
@@ -19599,9 +19599,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=int)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, int])
 
-            value: 'int' = 0
+            value: 'typing.Union[Nullable, int]' = NullValue
 
         @dataclass
         class Speed(ClusterAttributeDescriptor):
@@ -19615,9 +19615,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class LifetimeRunningHours(ClusterAttributeDescriptor):
@@ -19647,9 +19647,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class LifetimeEnergyConsumed(ClusterAttributeDescriptor):
@@ -19679,9 +19679,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=PumpConfigurationAndControl.Enums.PumpOperationMode)
 
-            value: 'uint' = 0
+            value: 'PumpConfigurationAndControl.Enums.PumpOperationMode' = 0
 
         @dataclass
         class ControlMode(ClusterAttributeDescriptor):
@@ -19695,9 +19695,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[PumpConfigurationAndControl.Enums.PumpControlMode])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Optional[PumpConfigurationAndControl.Enums.PumpControlMode]' = None
 
         @dataclass
         class AlarmMask(ClusterAttributeDescriptor):
