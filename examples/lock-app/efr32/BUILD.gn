@@ -15,9 +15,9 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
+import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
-
 import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
@@ -40,6 +40,7 @@ declare_args() {
 
   # PIN code for PASE session establishment.
   setupPinCode = 20202021
+  setupDiscriminator = 3840
 
   # Monitor & log memory usage at runtime.
   enable_heap_monitoring = false
@@ -50,7 +51,7 @@ declare_args() {
   # OTA timeout in seconds
   OTA_periodic_query_timeout = 86400
 
-  # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
+  # Wifi related stuff - they are overriden by gn -args="use_wf200=true"
   use_wf200 = false
   use_rs911x = false
   use_rs911x_sockets = false
@@ -91,8 +92,7 @@ if (chip_enable_wifi) {
   ]
 
   if (use_rs911x) {
-    wiseconnect_sdk_root =
-        "${chip_root}/third_party/efr32_sdk/wiseconnect-wifi-bt-sdk"
+    wiseconnect_sdk_root = "${chip_root}/third_party/wiseconnect-wifi-bt-sdk"
     import("${wifi_sdk_dir}/rs911x/rs911x.gni")
   } else {
     import("${wifi_sdk_dir}/wf200/wf200.gni")
@@ -115,6 +115,7 @@ efr32_sdk("sdk") {
   defines = [
     "BOARD_ID=${efr32_board}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
     "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
   ]
 
@@ -123,13 +124,6 @@ efr32_sdk("sdk") {
       "HAL_VCOM_ENABLE=1",
       "PW_RPC_ENABLED",
     ]
-  }
-  if (use_rs911x) {
-    defines += rs911x_defs
-    include_dirs += rs911x_plat_incs
-  } else if (use_wf200) {
-    defines += wf200_defs
-    include_dirs += wf200_plat_incs
   }
 
   # WiFi Settings
@@ -149,7 +143,6 @@ efr32_sdk("sdk") {
       # Using LWIP instead of the native TCP/IP stack
       defines += efr32_lwip_defs
     }
-
     if (sl_wfx_config_softap) {
       defines += [ "SL_WFX_CONFIG_SOFTAP" ]
     }
@@ -162,7 +155,6 @@ efr32_sdk("sdk") {
 efr32_executable("lock_app") {
   output_name = "chip-efr32-lock-example.out"
   include_dirs = [ "include" ]
-
   defines = []
 
   sources = [
@@ -170,7 +162,7 @@ efr32_executable("lock_app") {
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "src/AppTask.cpp",
-    "src/BoltLockManager.cpp",
+    "src/LockManager.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
   ]
@@ -184,9 +176,6 @@ efr32_executable("lock_app") {
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
-    "${examples_plat_dir}:efr-matter-shell",
   ]
 
   # OpenThread Settings
@@ -213,7 +202,6 @@ efr32_executable("lock_app") {
     defines += [ "EFR32_OTA_ENABLED" ]
     sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
   }
-
   # WiFi Settings
   if (chip_enable_wifi) {
     if (use_rs911x) {
@@ -248,7 +236,6 @@ efr32_executable("lock_app") {
     defines += [ "DISPLAY_ENABLED" ]
     if (show_qr_code) {
       defines += [ "QR_CODE_ENABLED" ]
-
       deps += [ "${chip_root}/examples/common/QRCode" ]
     }
   }
@@ -260,7 +247,7 @@ efr32_executable("lock_app") {
       "PW_RPC_BUTTON_SERVICE=1",
       "PW_RPC_DESCRIPTOR_SERVICE=1",
       "PW_RPC_DEVICE_SERVICE=1",
-      "PW_RPC_LOCKING_SERVICE=1",
+      "PW_RPC_LIGHTING_SERVICE=1",
       "PW_RPC_OTCLI_SERVICE=1",
       "PW_RPC_THREAD_SERVICE=1",
     ]
@@ -280,7 +267,7 @@ efr32_executable("lock_app") {
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
-      "${chip_root}/examples/common/pigweed:locking_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
       "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
@@ -295,15 +282,15 @@ efr32_executable("lock_app") {
   }
 
   if (enable_heap_monitoring) {
-    defines += [ "HEAP_MONITORING" ]
     sources += [ "${examples_plat_dir}/MemMonitoring.cpp" ]
+    defines += [ "HEAP_MONITORING" ]
   }
 
   ldscript = "${examples_plat_dir}/ldscripts/${efr32_family}.ld"
 
-  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
-
   inputs = [ ldscript ]
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
 
   if (chip_print_memory_usage) {
     ldflags += [
@@ -322,7 +309,6 @@ efr32_executable("lock_app") {
 
   output_dir = root_out_dir
 }
-
 group("efr32") {
   deps = [ ":lock_app" ]
 }

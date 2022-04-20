@@ -32,29 +32,33 @@
 #ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 #endif
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
-// For convenience, Chip Security Test Mode can be enabled and the
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
+#endif
+
+// For convenience, Chip Security Test Mode can be enabled and theß∏
 // requirement for authentication in various protocols can be disabled.
 //
 //    WARNING: These options make it possible to circumvent basic Chip security functionality,
 //    including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
 //
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
+#define CHIP_CONFIG_REQUIRE_AUTH 1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
- * 0xFFF1: Test vendor.
+ * 0xFFF1: Test vendor
  */
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0x8006: example lock-app
+ * 0x8005: example lighting app
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8006
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8005
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
