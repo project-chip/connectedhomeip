@@ -88,7 +88,7 @@ client cluster AccountLogin = 1294 {
     CHAR_STRING setupPIN = 1;
   }
 
-  response struct GetSetupPINResponse {
+  response struct GetSetupPINResponse = 1 {
     CHAR_STRING setupPIN = 0;
   }
 
@@ -203,7 +203,7 @@ client cluster ApplicationLauncher = 1292 {
     Application application = 0;
   }
 
-  response struct LauncherResponse {
+  response struct LauncherResponse = 3 {
     StatusEnum status = 0;
     OCTET_STRING data = 1;
   }
@@ -603,7 +603,7 @@ client cluster Channel = 1284 {
     INT16U count = 0;
   }
 
-  response struct ChangeChannelResponse {
+  response struct ChangeChannelResponse = 1 {
     StatusEnum status = 0;
     optional CHAR_STRING data = 1;
   }
@@ -1002,7 +1002,7 @@ client cluster ContentLauncher = 1290 {
     optional BrandingInformation brandingInformation = 2;
   }
 
-  response struct LaunchResponse {
+  response struct LaunchResponse = 2 {
     StatusEnum status = 0;
     optional CHAR_STRING data = 1;
   }
@@ -1057,7 +1057,7 @@ client cluster DiagnosticLogs = 50 {
     OCTET_STRING transferFileDesignator = 2;
   }
 
-  response struct RetrieveLogsResponse {
+  response struct RetrieveLogsResponse = 1 {
     LogsStatus status = 0;
     OCTET_STRING content = 1;
     epoch_s timeStamp = 2;
@@ -1572,7 +1572,7 @@ client cluster DoorLock = 257 {
     nullable DlCredential credential = 0;
   }
 
-  response struct GetWeekDayScheduleResponse {
+  response struct GetWeekDayScheduleResponse = 12 {
     INT8U weekDayIndex = 0;
     INT16U userIndex = 1;
     DlStatus status = 2;
@@ -1583,7 +1583,7 @@ client cluster DoorLock = 257 {
     optional INT8U endMinute = 7;
   }
 
-  response struct GetYearDayScheduleResponse {
+  response struct GetYearDayScheduleResponse = 15 {
     INT8U yearDayIndex = 0;
     INT16U userIndex = 1;
     DlStatus status = 2;
@@ -1591,7 +1591,7 @@ client cluster DoorLock = 257 {
     optional epoch_s localEndTime = 4;
   }
 
-  response struct GetHolidayScheduleResponse {
+  response struct GetHolidayScheduleResponse = 18 {
     INT8U holidayIndex = 0;
     DlStatus status = 1;
     optional epoch_s localStartTime = 2;
@@ -1599,12 +1599,12 @@ client cluster DoorLock = 257 {
     optional DlOperatingMode operatingMode = 4;
   }
 
-  response struct GetUserTypeResponse {
+  response struct GetUserTypeResponse = 21 {
     INT16U userId = 0;
     DlUserType userType = 1;
   }
 
-  response struct GetUserResponse {
+  response struct GetUserResponse = 28 {
     INT16U userIndex = 0;
     nullable CHAR_STRING userName = 1;
     nullable INT32U userUniqueId = 2;
@@ -1617,13 +1617,13 @@ client cluster DoorLock = 257 {
     nullable INT16U nextUserIndex = 9;
   }
 
-  response struct SetCredentialResponse {
+  response struct SetCredentialResponse = 35 {
     DlStatus status = 0;
     nullable INT16U userIndex = 1;
     nullable INT16U nextCredentialIndex = 2;
   }
 
-  response struct GetCredentialStatusResponse {
+  response struct GetCredentialStatusResponse = 37 {
     boolean credentialExists = 0;
     nullable INT16U userIndex = 1;
     nullable INT16U nextCredentialIndex = 2;
@@ -1819,17 +1819,17 @@ client cluster GeneralCommissioning = 48 {
     INT64U breadcrumb = 2;
   }
 
-  response struct ArmFailSafeResponse {
+  response struct ArmFailSafeResponse = 1 {
     CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
-  response struct SetRegulatoryConfigResponse {
+  response struct SetRegulatoryConfigResponse = 3 {
     CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
-  response struct CommissioningCompleteResponse {
+  response struct CommissioningCompleteResponse = 5 {
     CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
@@ -1988,11 +1988,11 @@ client cluster GroupKeyManagement = 63 {
     INT16U groupKeySetIDs[] = 0;
   }
 
-  response struct KeySetReadResponse {
+  response struct KeySetReadResponse = 2 {
     GroupKeySetStruct groupKeySet = 0;
   }
 
-  response struct KeySetReadAllIndicesResponse {
+  response struct KeySetReadAllIndicesResponse = 5 {
     INT16U groupKeySetIDs[] = 0;
   }
 
@@ -2031,23 +2031,23 @@ client cluster Groups = 4 {
     CHAR_STRING groupName = 1;
   }
 
-  response struct AddGroupResponse {
+  response struct AddGroupResponse = 0 {
     ENUM8 status = 0;
     group_id groupId = 1;
   }
 
-  response struct ViewGroupResponse {
+  response struct ViewGroupResponse = 1 {
     ENUM8 status = 0;
     group_id groupId = 1;
     CHAR_STRING groupName = 2;
   }
 
-  response struct GetGroupMembershipResponse {
+  response struct GetGroupMembershipResponse = 2 {
     nullable INT8U capacity = 0;
     group_id groupList[] = 1;
   }
 
-  response struct RemoveGroupResponse {
+  response struct RemoveGroupResponse = 3 {
     ENUM8 status = 0;
     group_id groupId = 1;
   }
@@ -2099,7 +2099,7 @@ client cluster Identify = 3 {
     IdentifyEffectVariant effectVariant = 1;
   }
 
-  response struct IdentifyQueryResponse {
+  response struct IdentifyQueryResponse = 0 {
     INT16U timeout = 0;
   }
 
@@ -2236,7 +2236,7 @@ client cluster KeypadInput = 1289 {
     CecKeyCode keyCode = 0;
   }
 
-  response struct SendKeyResponse {
+  response struct SendKeyResponse = 1 {
     StatusEnum status = 0;
   }
 
@@ -2445,7 +2445,7 @@ client cluster MediaPlayback = 1286 {
     INT64U position = 0;
   }
 
-  response struct PlaybackResponse {
+  response struct PlaybackResponse = 10 {
     StatusEnum status = 0;
     optional CHAR_STRING data = 1;
   }
@@ -2602,20 +2602,20 @@ client cluster NetworkCommissioning = 49 {
     optional INT64U breadcrumb = 2;
   }
 
-  response struct ScanNetworksResponse {
+  response struct ScanNetworksResponse = 1 {
     NetworkCommissioningStatus networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
     optional WiFiInterfaceScanResult wiFiScanResults[] = 2;
     optional ThreadInterfaceScanResult threadScanResults[] = 3;
   }
 
-  response struct NetworkConfigResponse {
+  response struct NetworkConfigResponse = 5 {
     NetworkCommissioningStatus networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
     optional INT8U networkIndex = 2;
   }
 
-  response struct ConnectNetworkResponse {
+  response struct ConnectNetworkResponse = 7 {
     NetworkCommissioningStatus networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
     nullable INT32S errorValue = 2;
@@ -2674,7 +2674,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     INT32U softwareVersion = 1;
   }
 
-  response struct QueryImageResponse {
+  response struct QueryImageResponse = 1 {
     OTAQueryStatus status = 0;
     optional INT32U delayedActionTime = 1;
     optional CHAR_STRING imageURI = 2;
@@ -2685,7 +2685,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     optional OCTET_STRING metadataForRequestor = 7;
   }
 
-  response struct ApplyUpdateResponse {
+  response struct ApplyUpdateResponse = 3 {
     OTAApplyUpdateAction action = 0;
     INT32U delayedActionTime = 1;
   }
@@ -2925,21 +2925,21 @@ client cluster OperationalCredentials = 62 {
     OCTET_STRING trustedRootIdentifier = 0;
   }
 
-  response struct AttestationResponse {
+  response struct AttestationResponse = 1 {
     OCTET_STRING attestationElements = 0;
     OCTET_STRING signature = 1;
   }
 
-  response struct CertificateChainResponse {
+  response struct CertificateChainResponse = 3 {
     OCTET_STRING certificate = 0;
   }
 
-  response struct CSRResponse {
+  response struct CSRResponse = 5 {
     OCTET_STRING NOCSRElements = 0;
     OCTET_STRING attestationSignature = 1;
   }
 
-  response struct NOCResponse {
+  response struct NOCResponse = 8 {
     OperationalCertStatus statusCode = 0;
     optional fabric_idx fabricIndex = 1;
     optional CHAR_STRING debugText = 2;
@@ -3238,13 +3238,13 @@ client cluster Scenes = 5 {
     INT16U groupId = 0;
   }
 
-  response struct AddSceneResponse {
+  response struct AddSceneResponse = 0 {
     ENUM8 status = 0;
     INT16U groupId = 1;
     INT8U sceneId = 2;
   }
 
-  response struct ViewSceneResponse {
+  response struct ViewSceneResponse = 1 {
     ENUM8 status = 0;
     INT16U groupId = 1;
     INT8U sceneId = 2;
@@ -3253,24 +3253,24 @@ client cluster Scenes = 5 {
     SceneExtensionFieldSet extensionFieldSets[] = 5;
   }
 
-  response struct RemoveSceneResponse {
+  response struct RemoveSceneResponse = 2 {
     ENUM8 status = 0;
     INT16U groupId = 1;
     INT8U sceneId = 2;
   }
 
-  response struct RemoveAllScenesResponse {
+  response struct RemoveAllScenesResponse = 3 {
     ENUM8 status = 0;
     INT16U groupId = 1;
   }
 
-  response struct StoreSceneResponse {
+  response struct StoreSceneResponse = 4 {
     ENUM8 status = 0;
     INT16U groupId = 1;
     INT8U sceneId = 2;
   }
 
-  response struct GetSceneMembershipResponse {
+  response struct GetSceneMembershipResponse = 6 {
     ENUM8 status = 0;
     INT8U capacity = 1;
     INT16U groupId = 2;
@@ -3378,7 +3378,7 @@ client cluster TargetNavigator = 1285 {
     optional CHAR_STRING data = 1;
   }
 
-  response struct NavigateTargetResponse {
+  response struct NavigateTargetResponse = 1 {
     StatusEnum status = 0;
     optional CHAR_STRING data = 1;
   }
@@ -3650,39 +3650,39 @@ client cluster TestCluster = 1295 {
     BOOLEAN arg3 = 2;
   }
 
-  response struct TestSpecificResponse {
+  response struct TestSpecificResponse = 0 {
     INT8U returnValue = 0;
   }
 
-  response struct TestAddArgumentsResponse {
+  response struct TestAddArgumentsResponse = 1 {
     INT8U returnValue = 0;
   }
 
-  response struct TestListInt8UReverseResponse {
+  response struct TestListInt8UReverseResponse = 4 {
     INT8U arg1[] = 0;
   }
 
-  response struct TestEnumsResponse {
+  response struct TestEnumsResponse = 5 {
     vendor_id arg1 = 0;
     SimpleEnum arg2 = 1;
   }
 
-  response struct TestNullableOptionalResponse {
+  response struct TestNullableOptionalResponse = 6 {
     BOOLEAN wasPresent = 0;
     optional BOOLEAN wasNull = 1;
     optional INT8U value = 2;
     optional nullable INT8U originalValue = 3;
   }
 
-  response struct BooleanResponse {
+  response struct BooleanResponse = 8 {
     BOOLEAN value = 0;
   }
 
-  response struct SimpleStructResponse {
+  response struct SimpleStructResponse = 9 {
     SimpleStruct arg1 = 0;
   }
 
-  response struct TestEmitTestEventResponse {
+  response struct TestEmitTestEventResponse = 10 {
     INT64U value = 0;
   }
 
@@ -3801,14 +3801,14 @@ client cluster Thermostat = 513 {
     ModeForSequence modeToReturn = 1;
   }
 
-  response struct GetWeeklyScheduleResponse {
+  response struct GetWeeklyScheduleResponse = 0 {
     ENUM8 numberOfTransitionsForSequence = 0;
     DayOfWeek dayOfWeekForSequence = 1;
     ModeForSequence modeForSequence = 2;
     INT8U payload[] = 3;
   }
 
-  response struct GetRelayStatusLogResponse {
+  response struct GetRelayStatusLogResponse = 1 {
     INT16U timeOfDay = 0;
     BITMAP16 relayStatus = 1;
     INT16S localTemperature = 2;

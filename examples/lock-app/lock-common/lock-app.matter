@@ -678,7 +678,7 @@ server cluster DoorLock = 257 {
     nullable DlCredential credential = 0;
   }
 
-  response struct GetWeekDayScheduleResponse {
+  response struct GetWeekDayScheduleResponse = 12 {
     INT8U weekDayIndex = 0;
     INT16U userIndex = 1;
     DlStatus status = 2;
@@ -689,7 +689,7 @@ server cluster DoorLock = 257 {
     optional INT8U endMinute = 7;
   }
 
-  response struct GetYearDayScheduleResponse {
+  response struct GetYearDayScheduleResponse = 15 {
     INT8U yearDayIndex = 0;
     INT16U userIndex = 1;
     DlStatus status = 2;
@@ -697,7 +697,7 @@ server cluster DoorLock = 257 {
     optional epoch_s localEndTime = 4;
   }
 
-  response struct GetUserResponse {
+  response struct GetUserResponse = 28 {
     INT16U userIndex = 0;
     nullable CHAR_STRING userName = 1;
     nullable INT32U userUniqueId = 2;
@@ -710,13 +710,13 @@ server cluster DoorLock = 257 {
     nullable INT16U nextUserIndex = 9;
   }
 
-  response struct SetCredentialResponse {
+  response struct SetCredentialResponse = 35 {
     DlStatus status = 0;
     nullable INT16U userIndex = 1;
     nullable INT16U nextCredentialIndex = 2;
   }
 
-  response struct GetCredentialStatusResponse {
+  response struct GetCredentialStatusResponse = 37 {
     boolean credentialExists = 0;
     nullable INT16U userIndex = 1;
     nullable INT16U nextCredentialIndex = 2;
@@ -810,17 +810,17 @@ server cluster GeneralCommissioning = 48 {
     INT64U breadcrumb = 2;
   }
 
-  response struct ArmFailSafeResponse {
+  response struct ArmFailSafeResponse = 1 {
     CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
-  response struct SetRegulatoryConfigResponse {
+  response struct SetRegulatoryConfigResponse = 3 {
     CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
-  response struct CommissioningCompleteResponse {
+  response struct CommissioningCompleteResponse = 5 {
     CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
@@ -1034,20 +1034,20 @@ server cluster NetworkCommissioning = 49 {
     optional INT64U breadcrumb = 2;
   }
 
-  response struct ScanNetworksResponse {
+  response struct ScanNetworksResponse = 1 {
     NetworkCommissioningStatus networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
     optional WiFiInterfaceScanResult wiFiScanResults[] = 2;
     optional ThreadInterfaceScanResult threadScanResults[] = 3;
   }
 
-  response struct NetworkConfigResponse {
+  response struct NetworkConfigResponse = 5 {
     NetworkCommissioningStatus networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
     optional INT8U networkIndex = 2;
   }
 
-  response struct ConnectNetworkResponse {
+  response struct ConnectNetworkResponse = 7 {
     NetworkCommissioningStatus networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
     nullable INT32S errorValue = 2;
@@ -1105,7 +1105,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     INT32U softwareVersion = 1;
   }
 
-  response struct QueryImageResponse {
+  response struct QueryImageResponse = 1 {
     OTAQueryStatus status = 0;
     optional INT32U delayedActionTime = 1;
     optional CHAR_STRING imageURI = 2;
@@ -1116,7 +1116,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     optional OCTET_STRING metadataForRequestor = 7;
   }
 
-  response struct ApplyUpdateResponse {
+  response struct ApplyUpdateResponse = 3 {
     OTAApplyUpdateAction action = 0;
     INT32U delayedActionTime = 1;
   }
@@ -1316,21 +1316,21 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING trustedRootIdentifier = 0;
   }
 
-  response struct AttestationResponse {
+  response struct AttestationResponse = 1 {
     OCTET_STRING attestationElements = 0;
     OCTET_STRING signature = 1;
   }
 
-  response struct CertificateChainResponse {
+  response struct CertificateChainResponse = 3 {
     OCTET_STRING certificate = 0;
   }
 
-  response struct CSRResponse {
+  response struct CSRResponse = 5 {
     OCTET_STRING NOCSRElements = 0;
     OCTET_STRING attestationSignature = 1;
   }
 
-  response struct NOCResponse {
+  response struct NOCResponse = 8 {
     OperationalCertStatus statusCode = 0;
     optional fabric_idx fabricIndex = 1;
     optional CHAR_STRING debugText = 2;
