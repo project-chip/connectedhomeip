@@ -56,9 +56,7 @@ qpg_executable("shell_app") {
 
   #fixme Added lock-app dependency as linker errors get generated if no
   #chip datamodel is given [import("${chip_root}/src/app/chip_data_model.gni")]
-  deps += [
-    "${chip_root}/examples/lock-app/lock-common",
-  ]
+  deps += [ "${chip_root}/examples/lock-app/lock-common" ]
 
   include_dirs = [ "include" ]
 

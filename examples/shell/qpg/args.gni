@@ -27,4 +27,3 @@ chip_build_libshell = true
 chip_stack_lock_tracking = "none"
 
 chip_openthread_ftd = false
-
