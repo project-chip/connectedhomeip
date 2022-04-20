@@ -87,23 +87,22 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 
 bool OTAImageProcessorImpl::IsFirstImageRun()
 {
-     CHIP_ERROR err;
-     OTARequestorInterface *requestor;
-     uint32_t runningSwVer;
+    CHIP_ERROR err;
+    OTARequestorInterface * requestor;
+    uint32_t runningSwVer;
 
-     err = ConfigurationMgr().GetSoftwareVersion(runningSwVer);
-     SuccessOrExit(err);
+    err = ConfigurationMgr().GetSoftwareVersion(runningSwVer);
+    SuccessOrExit(err);
 
-     requestor = GetRequestorInstance();
-     if (chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kApplying == requestor->GetCurrentUpdateState()
-         && runningSwVer == requestor->GetTargetVersion())
-     {
-         return true;
-     }
+    requestor = GetRequestorInstance();
+    if (chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kApplying == requestor->GetCurrentUpdateState() &&
+        runningSwVer == requestor->GetTargetVersion())
+    {
+        return true;
+    }
 
 exit:
     return false;
-
 }
 
 /* DESIGN NOTE: The Boot Image Manager will search external flash for an
@@ -321,7 +320,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 {
     ExtImageInfo_t header;
-    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    auto * imageProcessor    = reinterpret_cast<OTAImageProcessorImpl *>(context);
     const uint8_t extImgId[] = OAD_EFL_MAGIC;
 
     if (imageProcessor == nullptr)
@@ -329,7 +328,8 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         return;
     }
 
-    if (!readExtFlashImgHeader(imageProcessor->mNvsHandle, &(header.fixedHdr), imageProcessor->mFixedOtaHeader.headerSize + sizeof(imageProcessor->mFixedOtaHeader)))
+    if (!readExtFlashImgHeader(imageProcessor->mNvsHandle, &(header.fixedHdr),
+                               imageProcessor->mFixedOtaHeader.headerSize + sizeof(imageProcessor->mFixedOtaHeader)))
     {
         return;
     }
@@ -338,7 +338,8 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     header.extFlAddr = IMG_START + imageProcessor->mFixedOtaHeader.headerSize + sizeof(imageProcessor->mFixedOtaHeader);
     header.counter   = 0x0;
 
-    if (validateExtFlashImage(imageProcessor->mNvsHandle, imageProcessor->mFixedOtaHeader.headerSize + sizeof(imageProcessor->mFixedOtaHeader)))
+    if (validateExtFlashImage(imageProcessor->mNvsHandle,
+                              imageProcessor->mFixedOtaHeader.headerSize + sizeof(imageProcessor->mFixedOtaHeader)))
     {
         // only write the meta header if the crc check passes
         writeExtFlashMetaHeader(imageProcessor->mNvsHandle, &header);
@@ -409,20 +410,22 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     /* Save the fixed size header */
     if (imageProcessor->mParams.downloadedBytes < sizeof(imageProcessor->mFixedOtaHeader))
     {
-        uint8_t *header = reinterpret_cast<uint8_t *>(&(imageProcessor->mFixedOtaHeader));
+        uint8_t * header = reinterpret_cast<uint8_t *>(&(imageProcessor->mFixedOtaHeader));
         if (imageProcessor->mBlock.size() + imageProcessor->mParams.downloadedBytes < sizeof(imageProcessor->mFixedOtaHeader))
         {
             memcpy(header + imageProcessor->mParams.downloadedBytes, imageProcessor->mBlock.data(), imageProcessor->mBlock.size());
         }
         else
         {
-            memcpy(header + imageProcessor->mParams.downloadedBytes, imageProcessor->mBlock.data(), sizeof(imageProcessor->mFixedOtaHeader) - imageProcessor->mParams.downloadedBytes);
+            memcpy(header + imageProcessor->mParams.downloadedBytes, imageProcessor->mBlock.data(),
+                   sizeof(imageProcessor->mFixedOtaHeader) - imageProcessor->mParams.downloadedBytes);
         }
     }
 
     /* chip::OTAImageHeaderParser can be used for processing the variable size header */
 
-    ChipLogDetail(SoftwareUpdate, "Write block %d, %d", (size_t)imageProcessor->mParams.downloadedBytes, imageProcessor->mBlock.size());
+    ChipLogDetail(SoftwareUpdate, "Write block %d, %d", (size_t) imageProcessor->mParams.downloadedBytes,
+                  imageProcessor->mBlock.size());
     if (!writeExtFlashImgPages(imageProcessor->mNvsHandle, imageProcessor->mParams.downloadedBytes, imageProcessor->mBlock))
     {
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
