@@ -513,6 +513,7 @@ function getTests()
     'Test_TC_WNCV_4_2',
     'Test_TC_WNCV_4_3',
     'Test_TC_WNCV_4_4',
+    'Test_TC_WNCV_4_5',
   ];
 
   const TV = [

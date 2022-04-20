@@ -127,23 +127,10 @@ void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
     Cleanup();
 }
 
-void CASEServer::OnSessionEstablished()
+void CASEServer::OnSessionEstablished(const SessionHandle & session)
 {
-    ChipLogProgress(Inet, "CASE Session established. Setting up the secure channel.");
-    mSessionManager->ExpireAllPairings(GetSession().GetPeerNodeId(), GetSession().GetFabricIndex());
-
-    SessionHolder sessionHolder;
-    CHIP_ERROR err = mSessionManager->NewPairing(
-        sessionHolder, Optional<Transport::PeerAddress>::Value(GetSession().GetPeerAddress()), GetSession().GetPeerNodeId(),
-        &GetSession(), CryptoContext::SessionRole::kResponder, GetSession().GetFabricIndex());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Inet, "Failed in setting up secure channel: err %s", ErrorStr(err));
-        OnSessionEstablishmentError(err);
-        return;
-    }
-
-    ChipLogProgress(Inet, "CASE secure channel is available now.");
+    ChipLogProgress(Inet, "CASE Session established to peer: " ChipLogFormatScopedNodeId,
+                    ChipLogValueScopedNodeId(session->GetPeer()));
     Cleanup();
 }
 } // namespace chip

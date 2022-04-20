@@ -214,8 +214,8 @@ CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
         CASEClientInitParams{ mInitParams.sessionManager, mInitParams.sessionResumptionStorage, mInitParams.exchangeMgr,
                               mFabricInfo, mInitParams.groupDataProvider, mInitParams.mrpLocalConfig });
     ReturnErrorCodeIf(mCASEClient == nullptr, CHIP_ERROR_NO_MEMORY);
-    CHIP_ERROR err =
-        mCASEClient->EstablishSession(mPeerId, mDeviceAddress, mMRPConfig, HandleCASEConnected, HandleCASEConnectionFailure, this);
+
+    CHIP_ERROR err = mCASEClient->EstablishSession(mPeerId, mDeviceAddress, mMRPConfig, this);
     if (err != CHIP_NO_ERROR)
     {
         CleanupCASEClient();
@@ -282,50 +282,33 @@ void OperationalDeviceProxy::DequeueConnectionCallbacks(CHIP_ERROR error)
     }
 }
 
-void OperationalDeviceProxy::HandleCASEConnectionFailure(void * context, CASEClient * client, CHIP_ERROR error)
+void OperationalDeviceProxy::OnSessionEstablishmentError(CHIP_ERROR error)
 {
-    OperationalDeviceProxy * device = static_cast<OperationalDeviceProxy *>(context);
-    VerifyOrReturn(device->mState != State::Uninitialized && device->mState != State::NeedsAddress,
+    VerifyOrReturn(mState != State::Uninitialized && mState != State::NeedsAddress,
                    ChipLogError(Controller, "HandleCASEConnectionFailure was called while the device was not initialized"));
-    VerifyOrReturn(client == device->mCASEClient, ChipLogError(Controller, "HandleCASEConnectionFailure for unknown CASEClient"));
 
     //
     // We don't need to reset the state all the way back to NeedsAddress since all that transpired
     // was just CASE connection failure. So let's re-use the cached address to re-do CASE again
     // if need-be.
     //
-    device->MoveToState(State::Initialized);
+    MoveToState(State::Initialized);
 
-    device->DequeueConnectionCallbacks(error);
+    DequeueConnectionCallbacks(error);
 
-    //
-    // Do not touch device instance anymore; it might have been destroyed by a failure
-    // callback.
-    //
+    // Do not touch device instance anymore; it might have been destroyed by a failure callback.
 }
 
-void OperationalDeviceProxy::HandleCASEConnected(void * context, CASEClient * client)
+void OperationalDeviceProxy::OnSessionEstablished(const SessionHandle & session)
 {
-    OperationalDeviceProxy * device = static_cast<OperationalDeviceProxy *>(context);
-    VerifyOrReturn(device->mState != State::Uninitialized,
+    VerifyOrReturn(mState != State::Uninitialized,
                    ChipLogError(Controller, "HandleCASEConnected was called while the device was not initialized"));
-    VerifyOrReturn(client == device->mCASEClient, ChipLogError(Controller, "HandleCASEConnected for unknown CASEClient"));
 
-    CHIP_ERROR err = client->DeriveSecureSessionHandle(device->mSecureSession);
-    if (err != CHIP_NO_ERROR)
-    {
-        device->HandleCASEConnectionFailure(context, client, err);
-    }
-    else
-    {
-        device->MoveToState(State::SecureConnected);
-        device->DequeueConnectionCallbacks(CHIP_NO_ERROR);
-    }
+    mSecureSession.Grab(session);
+    MoveToState(State::SecureConnected);
+    DequeueConnectionCallbacks(CHIP_NO_ERROR);
 
-    //
-    // Do not touch this instance anymore; it might have been destroyed by a
-    // callback.
-    //
+    // Do not touch this instance anymore; it might have been destroyed by a callback.
 }
 
 CHIP_ERROR OperationalDeviceProxy::Disconnect()

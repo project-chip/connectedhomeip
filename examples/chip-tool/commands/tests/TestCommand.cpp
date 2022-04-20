@@ -41,7 +41,7 @@ CHIP_ERROR TestCommand::WaitForCommissionee(chip::NodeId nodeId)
     // or is just starting out fresh outright. Let's make sure we're not re-using any cached CASE sessions
     // that will now be stale and mismatched with the peer, causing subsequent interactions to fail.
     //
-    CurrentCommissioner().SessionMgr()->ExpireAllPairings(nodeId, fabricIndex);
+    CurrentCommissioner().SessionMgr()->ExpireAllPairings(chip::ScopedNodeId(nodeId, fabricIndex));
 
     return CurrentCommissioner().GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }

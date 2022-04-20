@@ -85,7 +85,7 @@ typedef void (*OnDeviceConnectionFailure)(void * context, PeerId peerId, CHIP_ER
  *    - Expose to consumers the secure session for talking to the device.
  */
 class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy,
-                                          SessionReleaseDelegate,
+                                          public SessionReleaseDelegate,
                                           public SessionEstablishmentDelegate,
                                           public AddressResolve::NodeListener
 {
@@ -139,6 +139,10 @@ public:
     bool IsConnected() const { return mState == State::SecureConnected; }
 
     bool IsConnecting() const { return mState == State::Connecting; }
+
+    //////////// SessionEstablishmentDelegate Implementation ///////////////
+    void OnSessionEstablished(const SessionHandle & session) override;
+    void OnSessionEstablishmentError(CHIP_ERROR error) override;
 
     /**
      *   Called when a connection is closing.
@@ -275,9 +279,6 @@ private:
     bool AttachToExistingSecureSession();
 
     bool IsSecureConnected() const override { return mState == State::SecureConnected; }
-
-    static void HandleCASEConnected(void * context, CASEClient * client);
-    static void HandleCASEConnectionFailure(void * context, CASEClient * client, CHIP_ERROR error);
 
     void CleanupCASEClient();
 
