@@ -34,6 +34,8 @@ namespace chip {
 class DLL_EXPORT SessionEstablishmentDelegate
 {
 public:
+    virtual ~SessionEstablishmentDelegate() {}
+
     /**
      *   Called when session establishment fails with an error
      */
@@ -49,7 +51,8 @@ public:
      */
     virtual void OnSessionEstablished(const SessionHandle & session) {}
 
-    virtual ~SessionEstablishmentDelegate() {}
+    // Triggered when the PairingSession has done its work (either finished or encountered an error), such that the PairingSession object can be release, and so does other resources associated to it.
+    virtual void OnSessionEstablishmentDone(PairingSession * pairing) = 0;
 };
 
 } // namespace chip

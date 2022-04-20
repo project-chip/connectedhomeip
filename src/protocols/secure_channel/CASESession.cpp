@@ -133,9 +133,9 @@ CASESession::~CASESession()
 
 bool CASESession::SanityCheck() const
 {
-    // This is called after handling a message, the session must be in a state of available or waiting for another message,
+    // This is called after handling a message, the session must be in a state of done or waiting for another message,
     // otherwise the object may be leaked.
-    if (Available())
+    if (IsDone())
         return true;
 
     if (mRole == CryptoContext::SessionRole::kInitiator)
@@ -159,7 +159,6 @@ void CASESession::Finish()
     DiscardExchange();
 
     CHIP_ERROR err = ActivateSecureSession(address);
-    // Do this last in case the delegate frees us.
     if (err == CHIP_NO_ERROR)
     {
         mDelegate->OnSessionEstablished(mSecureSessionHolder.Get());
@@ -272,8 +271,11 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
 
 exit:
     if (err != CHIP_NO_ERROR)
+    {
         mState = State::kError;
+    }
     VerifyOrDie(SanityCheck());
+    // EstablishSession is a API from delegate side, so we don't call OnSessionEstablishmentDone here, the delegate awares the error by return value.
     return err;
 }
 
@@ -283,9 +285,10 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
                  static_cast<uint8_t>(mState));
     AbortExchange();
     mState = State::kError;
-    VerifyOrDie(SanityCheck());
-    // Do this last in case the delegate frees us.
     mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
+    VerifyOrDie(SanityCheck());
+    // Do this last because `this` is probably deleted after OnSessionEstablishmentDone
+    mDelegate->OnSessionEstablishmentDone(this);
 }
 
 CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session) const
@@ -1774,9 +1777,16 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         // Call delegate to indicate session establishment failure.
-        // Do this last in case the delegate frees us.
         mDelegate->OnSessionEstablishmentError(err);
     }
+
+    VerifyOrDie(SanityCheck());
+    if (IsDone())
+    {
+        // Do this last because `this` is probably deleted after OnSessionEstablishmentDone
+        mDelegate->OnSessionEstablishmentDone(this);
+    }
+
     return err;
 }
 

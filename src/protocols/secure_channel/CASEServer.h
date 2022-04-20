@@ -50,6 +50,7 @@ public:
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished(const SessionHandle & session) override;
+    void OnSessionEstablishmentDone(PairingSession * pairing) override;
 
     //// UnsolicitedMessageHandler Implementation ////
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader,
@@ -68,8 +69,6 @@ private:
 
     FabricTable * mFabrics                              = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider = nullptr;
-
-    CHIP_ERROR InitCASEHandshake(Messaging::ExchangeContext * ec);
 };
 
 } // namespace chip

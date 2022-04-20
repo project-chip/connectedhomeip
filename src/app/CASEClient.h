@@ -26,9 +26,6 @@ namespace chip {
 
 class CASEClient;
 
-typedef void (*OnCASEConnected)(void * context, CASEClient * client);
-typedef void (*OnCASEConnectionFailure)(void * context, CASEClient * client, CHIP_ERROR error);
-
 struct CASEClientInitParams
 {
     SessionManager * sessionManager                     = nullptr;
