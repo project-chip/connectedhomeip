@@ -81,8 +81,8 @@ private:
                     }
                 }
                 ChipLogDetail(DataManagement,
-                              "Dirty path Endpoint %" PRIx8 " Cluster %" PRIx32 ", Attribute %" PRIx32 " is not expected",
-                              path->mEndpointId, path->mClusterId, path->mAttributeId);
+                              "Dirty path Endpoint %" PRIx16 " Cluster %" PRIx32 ", Attribute %" PRIx32 " is not expected",
+                              uint16_t(path->mEndpointId), path->mClusterId, path->mAttributeId);
                 return Loop::Break;
             }) == Loop::Break)
         {
@@ -94,9 +94,9 @@ private:
             if (!content[i].verified)
             {
                 ChipLogDetail(DataManagement,
-                              "Dirty path Endpoint %" PRIx8 " Cluster %" PRIx32 ", Attribute %" PRIx32
+                              "Dirty path Endpoint %" PRIx16 " Cluster %" PRIx32 ", Attribute %" PRIx32
                               " is not found in the dirty set",
-                              content[i].mEndpointId, content[i].mClusterId, content[i].mAttributeId);
+                              uint16_t(content[i].mEndpointId), content[i].mClusterId, content[i].mAttributeId);
                 return false;
             }
         }
