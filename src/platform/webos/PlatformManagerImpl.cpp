@@ -113,8 +113,6 @@ void SignalHandler(int signum)
 //     g_main_loop_run(loop);
 //     g_main_loop_unref(loop);
 
-
-
 //     // LSMethod serviceMethods[] = {
 //     //             { "hello", handle_hello },
 //     //             { },

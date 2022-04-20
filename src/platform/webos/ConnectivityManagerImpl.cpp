@@ -23,9 +23,9 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Linux/ConnectivityUtils.h>
 #include <platform/Linux/DiagnosticDataProviderImpl.h>
-#include <platform/webos/NetworkCommissioningDriver.h>
 #include <platform/Linux/WirelessDefs.h>
 #include <platform/internal/BLEManager.h>
+#include <platform/webos/NetworkCommissioningDriver.h>
 
 #include <cstdlib>
 #include <new>

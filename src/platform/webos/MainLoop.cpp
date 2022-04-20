@@ -231,7 +231,8 @@ bool MainLoop::StartLSMainLoop(void)
 
     if (result != false)
     {
-        loopData->mThread = g_thread_new("ThreadStartLSMainLoopHandler", ThreadStartLSMainLoopHandler, reinterpret_cast<gpointer>(loopData));
+        loopData->mThread =
+            g_thread_new("ThreadStartLSMainLoopHandler", ThreadStartLSMainLoopHandler, reinterpret_cast<gpointer>(loopData));
     }
 
     return result;
