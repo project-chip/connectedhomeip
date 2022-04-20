@@ -239,6 +239,15 @@ public:
     CHIP_ERROR GetVersion(EndpointId mEndpointId, ClusterId mClusterId, Optional<DataVersion> & aVersion);
 
     /*
+     * Get highest received event number.
+     */
+    virtual CHIP_ERROR GetHighestReceivedEventNumber(Optional<EventNumber> & aEventNumber) final
+    {
+        aEventNumber = mHighestReceivedEventNumber;
+        return CHIP_NO_ERROR;
+    }
+
+    /*
      * Retrieve the value of an event from the cache given an EventNumber by decoding
      * it using DataModel::Decode into the in-out argument 'value'.
      *

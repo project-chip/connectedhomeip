@@ -293,7 +293,7 @@ protected:
         chip::app::ReadPrepareParams params(device->GetSecureSession().Value());
         params.mpEventPathParamsList        = eventPathParams;
         params.mEventPathParamsListSize     = pathsCount;
-        params.mEventNumber                 = mEventNumber.ValueOr(0);
+        params.mEventNumber                 = mEventNumber;
         params.mpAttributePathParamsList    = nullptr;
         params.mAttributePathParamsListSize = 0;
 

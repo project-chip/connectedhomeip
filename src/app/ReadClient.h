@@ -183,6 +183,17 @@ public:
             aEncodedDataVersionList = false;
             return CHIP_NO_ERROR;
         }
+
+        /*
+         * Get highest received event number.
+         * If application don't have this one, it clear outparam and return CHIP_NO_ERROR.
+         * if any returning error, it will fail the entire read client.
+         */
+        virtual CHIP_ERROR GetHighestReceivedEventNumber(Optional<EventNumber> & aEventNumber)
+        {
+            aEventNumber.ClearValue();
+            return CHIP_NO_ERROR;
+        }
     };
 
     enum class InteractionType : uint8_t
@@ -361,6 +372,7 @@ private:
 
     void StopResubscription();
     void ClearActiveSubscriptionState();
+    CHIP_ERROR GetMinEventNumber(const ReadPrepareParams & aReadPrepareParams, Optional<EventNumber> & aEventMin);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
@@ -376,7 +388,6 @@ private:
     FabricIndex mFabricIndex            = kUndefinedFabricIndex;
     InteractionType mInteractionType    = InteractionType::Read;
     Timestamp mEventTimestamp;
-    EventNumber mEventMin                    = 0;
     bool mSawAttributeReportsInCurrentReport = false;
 
     ReadClient * mpNext                 = nullptr;

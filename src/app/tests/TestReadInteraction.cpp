@@ -753,7 +753,7 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
     readPrepareParams.mEventPathParamsListSize     = 1;
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 2;
-    readPrepareParams.mEventNumber                 = 1;
+    readPrepareParams.mEventNumber.SetValue(1);
 
     {
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
@@ -1062,7 +1062,7 @@ void TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport(nlTest
         ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
         readPrepareParams.mpEventPathParamsList    = eventPathParams;
         readPrepareParams.mEventPathParamsListSize = 1;
-        readPrepareParams.mEventNumber             = 1;
+        readPrepareParams.mEventNumber.SetValue(1);
 
         MockInteractionModelApp delegate;
         NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
@@ -1093,7 +1093,7 @@ void TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport(nlTest
         ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
         readPrepareParams.mpEventPathParamsList    = eventPathParams;
         readPrepareParams.mEventPathParamsListSize = 1;
-        readPrepareParams.mEventNumber             = 1;
+        readPrepareParams.mEventNumber.SetValue(1);
 
         MockInteractionModelApp delegate;
         NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
