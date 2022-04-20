@@ -55,11 +55,6 @@ void OperationalDeviceProxy::MoveToState(State aTargetState)
                       ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()), to_underlying(mState),
                       to_underlying(aTargetState));
         mState = aTargetState;
-
-        if (aTargetState != State::Connecting)
-        {
-            CleanupCASEClient();
-        }
     }
 }
 
@@ -285,31 +280,42 @@ void OperationalDeviceProxy::DequeueConnectionCallbacks(CHIP_ERROR error)
 
 void OperationalDeviceProxy::OnSessionEstablishmentError(CHIP_ERROR error)
 {
-    VerifyOrReturn(mState != State::Uninitialized && mState != State::NeedsAddress,
-                   ChipLogError(Controller, "HandleCASEConnectionFailure was called while the device was not initialized"));
-
-    //
-    // We don't need to reset the state all the way back to NeedsAddress since all that transpired
-    // was just CASE connection failure. So let's re-use the cached address to re-do CASE again
-    // if need-be.
-    //
-    MoveToState(State::Initialized);
-
-    DequeueConnectionCallbacks(error);
-
-    // Do not touch device instance anymore; it might have been destroyed by a failure callback.
+    VerifyOrReturn(mState == State::Connecting,
+                   ChipLogError(Controller, "OnSessionEstablishmentError was called while the device was not connecting"));
+    mCASEClientError = error;
 }
 
 void OperationalDeviceProxy::OnSessionEstablished(const SessionHandle & session)
 {
-    VerifyOrReturn(mState != State::Uninitialized,
-                   ChipLogError(Controller, "HandleCASEConnected was called while the device was not initialized"));
-
+    VerifyOrReturn(mState == State::Connecting,
+                   ChipLogError(Controller, "OnSessionEstablished was called while the device was not connecting"));
     mSecureSession.Grab(session);
-    MoveToState(State::SecureConnected);
-    DequeueConnectionCallbacks(CHIP_NO_ERROR);
+}
 
-    // Do not touch this instance anymore; it might have been destroyed by a callback.
+void OperationalDeviceProxy::OnSessionEstablishmentDone(PairingSession * pairing)
+{
+    VerifyOrReturn(mState == State::Connecting,
+                   ChipLogError(Controller, "OnSessionEstablishmentDone was called while the device was not connecting"));
+
+    CleanupCASEClient();
+
+    if (mCASEClientError == CHIP_NO_ERROR && mSecureSession)
+    {
+        MoveToState(State::SecureConnected);
+        DequeueConnectionCallbacks(CHIP_NO_ERROR);
+    }
+    else
+    {
+        //
+        // We don't need to reset the state all the way back to NeedsAddress since all that transpired
+        // was just CASE connection failure. So let's re-use the cached address to re-do CASE again
+        // if need-be.
+        //
+        MoveToState(State::Initialized);
+        DequeueConnectionCallbacks(mCASEClientError);
+        mCASEClientError = CHIP_NO_ERROR;
+    }
+    // Do not touch device instance anymore; it might have been destroyed by a failure callback.
 }
 
 CHIP_ERROR OperationalDeviceProxy::Disconnect()

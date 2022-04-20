@@ -81,6 +81,8 @@ public:
         mNumPairingComplete++;
     }
 
+    void OnSessionEstablishmentDone(PairingSession * pairing) override {}
+
     SessionHolder & GetSessionHolder() { return mSession; }
 
     SessionHolder mSession;
@@ -88,15 +90,6 @@ public:
     // TODO: Rename mNumPairing* to mNumEstablishment*
     uint32_t mNumPairingErrors   = 0;
     uint32_t mNumPairingComplete = 0;
-};
-
-class CASEServerForTest : public CASEServer
-{
-public:
-    CASESession & GetSession() override { return mCaseSession; }
-
-private:
-    CASESession mCaseSession;
 };
 
 CHIP_ERROR InitTestIpk(GroupDataProvider & groupDataProvider, const FabricInfo & fabricInfo, size_t numIpks)
@@ -256,32 +249,25 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     // Test all combinations of invalid parameters
-    TestCASESecurePairingDelegate delegateAccessory;
-    CASESession pairingAccessory;
-    SessionManager sessionManager;
+    CASEServer pairingAccessory;
 
     gLoopback.mSentMessageCount = 0;
-
-    NL_TEST_ASSERT(inSuite,
-                   ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
-                                                                                     &pairingAccessory) == CHIP_NO_ERROR);
 
     ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(&pairingCommissioner);
 
     FabricInfo * fabric = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
     NL_TEST_ASSERT(inSuite, fabric != nullptr);
 
-    pairingAccessory.SetGroupDataProvider(&gDeviceGroupDataProvider);
     NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.ListenForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, &delegateAccessory) ==
-                       CHIP_NO_ERROR);
+                   pairingAccessory.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &ctx.GetTransportMgr(),
+                                                                  &ctx.GetSecureSessionManager(), &gDeviceFabrics, nullptr,
+                                                                  &gDeviceGroupDataProvider) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.EstablishSession(sessionManager, fabric, Node01_01, contextCommissioner, nullptr,
-                                                        &delegateCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner.EstablishSession(ctx.GetSecureSessionManager(), fabric, Node01_01, contextCommissioner,
+                                                        nullptr, &delegateCommissioner) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 5);
-    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 }
 
@@ -293,13 +279,12 @@ void CASE_SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
     CASE_SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, delegateCommissioner);
 }
 
-CASEServerForTest gPairingServer;
-
 void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inContext)
 {
     // TODO: Add cases for mismatching IPK config between initiator/responder
 
     TestCASESecurePairingDelegate delegateCommissioner;
+    CASEServer gPairingServer;
 
     auto * pairingCommissioner = chip::Platform::New<CASESession>();
     pairingCommissioner->SetGroupDataProvider(&gCommissionerGroupDataProvider);

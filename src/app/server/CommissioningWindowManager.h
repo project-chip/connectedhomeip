@@ -86,6 +86,7 @@ public:
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablishmentStarted() override;
     void OnSessionEstablished(const SessionHandle & session) override;
+    void OnSessionEstablishmentDone(PairingSession * pairing) override {} // TODO: manage PASESession lifespan
 
     void Shutdown();
     void Cleanup();

@@ -37,7 +37,6 @@
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
-#include <protocols/secure_channel/CASESession.h>
 #include <system/SystemLayer.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
@@ -143,6 +142,7 @@ public:
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablished(const SessionHandle & session) override;
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
+    void OnSessionEstablishmentDone(PairingSession * pairing) override;
 
     /**
      *   Called when a connection is closing.
@@ -247,7 +247,8 @@ private:
 
     // mCASEClient is only non-null if we are in State::Connecting or just
     // allocated it as part of an attempt to enter State::Connecting.
-    CASEClient * mCASEClient = nullptr;
+    CASEClient * mCASEClient    = nullptr;
+    CHIP_ERROR mCASEClientError = CHIP_NO_ERROR;
 
     PeerId mPeerId;
 

@@ -92,8 +92,8 @@ class TestSecurePairingDelegate : public SessionEstablishmentDelegate
 {
 public:
     void OnSessionEstablishmentError(CHIP_ERROR error) override { mNumPairingErrors++; }
-
     void OnSessionEstablished(const SessionHandle & session) override { mNumPairingComplete++; }
+    void OnSessionEstablishmentDone(PairingSession * pairing) override {}
 
     uint32_t mNumPairingErrors   = 0;
     uint32_t mNumPairingComplete = 0;

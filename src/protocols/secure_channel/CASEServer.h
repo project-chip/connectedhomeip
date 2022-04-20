@@ -24,9 +24,7 @@
 
 namespace chip {
 
-class CASEServer : public SessionEstablishmentDelegate,
-                   public Messaging::UnsolicitedMessageHandler,
-                   public Messaging::ExchangeDelegate
+class CASEServer : public SessionEstablishmentDelegate, public Messaging::UnsolicitedMessageHandler
 {
 public:
     CASEServer() {}
@@ -46,31 +44,22 @@ public:
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished(const SessionHandle & session) override;
+    void OnSessionEstablishmentDone(PairingSession * pairing) override;
 
     //// UnsolicitedMessageHandler Implementation ////
-    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
-
-    //// ExchangeDelegate Implementation ////
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                 System::PacketBufferHandle && payload) override;
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
-    Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return GetSession().GetMessageDispatch(); }
-
-    virtual CASESession & GetSession() { return mPairingSession; }
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader,
+                                            Messaging::ExchangeDelegate *& newDelegate) override;
+    void OnExchangeCreationFailed(Messaging::ExchangeDelegate * delegate) override;
 
 private:
     Messaging::ExchangeManager * mExchangeManager        = nullptr;
     SessionResumptionStorage * mSessionResumptionStorage = nullptr;
 
-    CASESession mPairingSession;
+    Optional<CASESession> mPairingSession; // TOOD: use a pool to enable concurrent CASE session.
     SessionManager * mSessionManager = nullptr;
 
     FabricTable * mFabrics                              = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider = nullptr;
-
-    CHIP_ERROR InitCASEHandshake(Messaging::ExchangeContext * ec);
-
-    void Cleanup();
 };
 
 } // namespace chip

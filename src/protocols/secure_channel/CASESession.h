@@ -55,9 +55,7 @@ namespace chip {
 
 // TODO: temporary derive from Messaging::UnsolicitedMessageHandler, actually the CASEServer should be the umh, it will be fixed
 // when implementing concurrent CASE session.
-class DLL_EXPORT CASESession : public Messaging::UnsolicitedMessageHandler,
-                               public Messaging::ExchangeDelegate,
-                               public PairingSession
+class DLL_EXPORT CASESession : public Messaging::ExchangeDelegate, public PairingSession
 {
 public:
     ~CASESession() override;
@@ -65,6 +63,10 @@ public:
     Transport::SecureSession::Type GetSecureSessionType() const override { return Transport::SecureSession::Type::kCASE; }
     ScopedNodeId GetPeer() const override { return ScopedNodeId(mPeerNodeId, GetFabricIndex()); }
     CATValues GetPeerCATs() const override { return mPeerCATs; };
+
+    // Return whether the PairingSession has done its work (either finished or encountered an error)
+    bool IsDone() const { return IsFinished() || mState == State::kError; }
+    bool IsFinished() const { return mState == State::kFinished || mState == State::kFinishedResumed; }
 
     /**
      * @brief
@@ -141,13 +143,6 @@ public:
      */
     CHIP_ERROR DeriveSecureSession(CryptoContext & session) const override;
 
-    //// UnsolicitedMessageHandler Implementation ////
-    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
-    {
-        newDelegate = this;
-        return CHIP_NO_ERROR;
-    }
-
     //// ExchangeDelegate Implementation ////
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override;
@@ -156,20 +151,19 @@ public:
 
     FabricIndex GetFabricIndex() const { return mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : kUndefinedFabricIndex; }
 
-    // TODO: remove Clear, we should create a new instance instead reset the old instance.
-    /** @brief This function zeroes out and resets the memory used by the object.
-     **/
-    void Clear();
-
 private:
-    enum State : uint8_t
+    enum class State : uint8_t
     {
-        kInitialized      = 0,
+        kInitial          = 0,
+        kListening        = 0,
         kSentSigma1       = 1,
         kSentSigma2       = 2,
         kSentSigma3       = 3,
         kSentSigma1Resume = 4,
         kSentSigma2Resume = 5,
+        kFinished         = 6,
+        kFinishedResumed  = 7,
+        kError            = 8,
     };
 
     CHIP_ERROR Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate);
@@ -209,6 +203,11 @@ private:
                                       const ByteSpan & nonce, MutableByteSpan & resumeMIC);
     CHIP_ERROR ValidateSigmaResumeMIC(const ByteSpan & resumeMIC, const ByteSpan & initiatorRandom, const ByteSpan & resumptionID,
                                       const ByteSpan & skInfo, const ByteSpan & nonce);
+
+    // For CASESession not leaked, after each action (OnMessageReceived/OnResponseTimeout), it must end with a state either the
+    // establishment is done, or waiting for a message from other side with response timer being set. This function ensure that we
+    // are indeed in such state, it is called and verifed after each action.
+    bool SanityCheck() const;
 
     void OnSuccessStatusReport() override;
     CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
@@ -260,10 +259,7 @@ private:
     // Sigma1 initiator random, maintained to be reused post-Sigma1, such as when generating Sigma2 S2RK key
     uint8_t mInitiatorRandom[kSigmaParamRandomNumberSize];
 
-    State mState;
-
-protected:
-    bool mCASESessionEstablished = false;
+    State mState = State::kInitial;
 };
 
 } // namespace chip
