@@ -684,7 +684,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     uint8_t outCertBuf[chip::Credentials::kMaxCHIPCertLength];
     chip::MutableByteSpan outCert(outCertBuf);
 
-    errorCode = chip::Credentials::ConvertX509CertToChipCert(chip::ByteSpan((const uint8_t *) x509Cert.bytes, x509Cert.length), outCert);
+    errorCode
+        = chip::Credentials::ConvertX509CertToChipCert(chip::ByteSpan((const uint8_t *) x509Cert.bytes, x509Cert.length), outCert);
     if (errorCode != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error(%s): Convert X509Cert to MatterCert failed", chip::ErrorStr(errorCode));
         return nil;
