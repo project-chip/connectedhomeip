@@ -87,22 +87,18 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 
 bool OTAImageProcessorImpl::IsFirstImageRun()
 {
-    CHIP_ERROR err;
     OTARequestorInterface * requestor;
     uint32_t runningSwVer;
 
-    err = ConfigurationMgr().GetSoftwareVersion(runningSwVer);
-    SuccessOrExit(err);
-
-    requestor = GetRequestorInstance();
-    if (chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kApplying == requestor->GetCurrentUpdateState() &&
-        runningSwVer == requestor->GetTargetVersion())
+    if (CHIP_NO_ERROR != ConfigurationMgr().GetSoftwareVersion(runningSwVer))
     {
-        return true;
+        return false;
     }
 
-exit:
-    return false;
+    requestor = GetRequestorInstance();
+
+    return (requestor->GetTargetVersion() == runningSwVer) &&
+        (requestor->GetCurrentUpdateState() == chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kApplying);
 }
 
 /* DESIGN NOTE: The Boot Image Manager will search external flash for an
@@ -152,10 +148,7 @@ static bool writeExtFlashImgPages(NVS_Handle handle, size_t bytesWritten, Mutabl
         ChipLogError(SoftwareUpdate, "NVS_write failed status: %d", status);
         return false;
     }
-    else
-    {
-        return true;
-    }
+    return true;
 }
 
 static bool readExtFlashMetaHeader(NVS_Handle handle, ExtImageInfo_t * header)
