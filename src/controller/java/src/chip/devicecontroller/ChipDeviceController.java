@@ -370,7 +370,7 @@ public class ChipDeviceController {
   }
 
   public void shutdownCommissioning() {
-      shutdownCommissioning(deviceControllerPtr);
+    shutdownCommissioning(deviceControllerPtr);
   }
 
   private native PaseVerifierParams computePaseVerifier(
