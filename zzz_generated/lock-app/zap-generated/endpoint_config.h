@@ -1070,7 +1070,6 @@ const EmberAfGenericClusterFunction chipFuncArrayDoorLockServer[] = {\
 #define GENERATED_CLUSTER_COUNT 27
 
 
-
 // clang-format off
 #define GENERATED_CLUSTERS { \
   { \
