@@ -56,6 +56,9 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         mCommissioningTimeoutTimerArmed = false;
         Cleanup();
         mServer->GetSecureSessionManager().ExpireAllPASEPairings();
+#if CONFIG_NETWORK_LAYER_BLE
+        mServer->GetBleLayerObject()->CloseAllBleConnections();
+#endif
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {

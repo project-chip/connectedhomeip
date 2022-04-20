@@ -73,9 +73,7 @@ private:
     void StopWaiting();
     CHIPDeviceController * mController;
 
-#if CONFIG_USE_SEPARATE_EVENTLOOP
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;
     bool mWaitingForResponse{ true };
-#endif // CONFIG_USE_SEPARATE_EVENTLOOP
 };

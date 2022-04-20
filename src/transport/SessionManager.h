@@ -231,15 +231,14 @@ public:
 
     //
     // Find an existing secure session given a peer's scoped NodeId and a type of session to match against.
-    // If matching against all types of sessions is desired, kUndefined should be passed into type.
+    // If matching against all types of sessions is desired, NullOptional should be passed into type.
     //
     // If a valid session is found, an Optional<SessionHandle> with the value set to the SessionHandle of the session
     // is returned. Otherwise, an Optional<SessionHandle> with no value set is returned.
     //
     //
-    Optional<SessionHandle>
-    FindSecureSessionForNode(ScopedNodeId peerNodeId,
-                             Transport::SecureSession::Type type = Transport::SecureSession::Type::kUndefined);
+    Optional<SessionHandle> FindSecureSessionForNode(ScopedNodeId peerNodeId,
+                                                     const Optional<Transport::SecureSession::Type> & type = NullOptional);
 
     using SessionHandleCallback = bool (*)(void * context, SessionHandle & sessionHandle);
     CHIP_ERROR ForEachSessionHandle(void * context, SessionHandleCallback callback);

@@ -45,11 +45,6 @@
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
 
-#if CONFIG_NETWORK_LAYER_BLE
-#include <ble/BleLayer.h>
-#include <transport/raw/BLE.h>
-#endif
-
 namespace chip {
 
 constexpr size_t kAttestationNonceLength = 32;
@@ -67,10 +62,7 @@ struct ControllerDeviceInitParams
     SessionManager * sessionManager                               = nullptr;
     Messaging::ExchangeManager * exchangeMgr                      = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
-#if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * bleLayer = nullptr;
-#endif
-    FabricTable * fabricsTable = nullptr;
+    FabricTable * fabricsTable                                    = nullptr;
 };
 
 class CommissioneeDeviceProxy : public DeviceProxy, public SessionReleaseDelegate
@@ -117,9 +109,6 @@ public:
         mExchangeMgr        = params.exchangeMgr;
         mUDPEndPointManager = params.udpEndPointManager;
         mFabricIndex        = fabric;
-#if CONFIG_NETWORK_LAYER_BLE
-        mBleLayer = params.bleLayer;
-#endif
     }
 
     /**
@@ -242,10 +231,6 @@ private:
 
     bool mActive           = false;
     ConnectionState mState = ConnectionState::NotConnected;
-
-#if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * mBleLayer = nullptr;
-#endif
 
     PASESession mPairing;
 

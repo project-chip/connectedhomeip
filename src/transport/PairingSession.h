@@ -35,10 +35,12 @@
 
 namespace chip {
 
+class SessionManager;
+
 class DLL_EXPORT PairingSession
 {
 public:
-    virtual ~PairingSession() {}
+    virtual ~PairingSession() { Clear(); }
 
     virtual Transport::SecureSession::Type GetSecureSessionType() const = 0;
     virtual ScopedNodeId GetPeer() const                                = 0;
@@ -158,15 +160,14 @@ protected:
     CHIP_ERROR DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TLV::ContiguousBufferTLVReader & tlvReader);
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
-    void Clear()
-    {
-        mPeerSessionId.ClearValue();
-        mSecureSessionHolder.Release();
-    }
+    void Clear();
 
 protected:
     CryptoContext::SessionRole mRole;
     SessionHolder mSecureSessionHolder;
+    // mSessionManager is set if we actually allocate a secure session, so we
+    // can clean it up later as needed.
+    SessionManager * mSessionManager = nullptr;
 
     // mLocalMRPConfig is our config which is sent to the other end and used by the peer session.
     // mRemoteMRPConfig is received from other end and set to our session.

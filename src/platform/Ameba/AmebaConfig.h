@@ -40,6 +40,18 @@ public:
     static const char kConfigNamespace_ChipFactory[];
     static const char kConfigNamespace_ChipConfig[];
     static const char kConfigNamespace_ChipCounters[];
+    static const char kConfigNamespace_ChipFabric1[];
+    static const char kConfigNamespace_ChipFabric2[];
+    static const char kConfigNamespace_ChipFabric3[];
+    static const char kConfigNamespace_ChipFabric4[];
+    static const char kConfigNamespace_ChipFabric5[];
+    static const char kConfigNamespace_ChipACL[];
+    static const char kConfigNamespace_ChipGroupMsgCounters[];
+    static const char kConfigNamespace_ChipAttributes[];
+    static const char kConfigNamespace_ChipBindingTable[];
+    static const char kConfigNamespace_ChipOTA[];
+    static const char kConfigNamespace_ChipDNS[];
+    static const char kConfigNamespace_ChipOthers[];
 
     // Key definitions for well-known keys.
     static const Key kConfigKey_SerialNum;
@@ -96,6 +108,7 @@ public:
     static bool ConfigValueExists(Key key);
 
     static CHIP_ERROR EnsureNamespace(const char * ns);
+    static CHIP_ERROR EnsureNamespace2(const char * ns);
     static CHIP_ERROR ClearNamespace(const char * ns);
 
     static void RunConfigUnitTest(void);

@@ -6513,6 +6513,16 @@ public class ChipClusters {
           chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readNumberOfHolidaySchedulesSupportedAttribute(IntegerAttributeCallback callback) {
+      readNumberOfHolidaySchedulesSupportedAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeNumberOfHolidaySchedulesSupportedAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeNumberOfHolidaySchedulesSupportedAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readMaxPINCodeLengthAttribute(IntegerAttributeCallback callback) {
       readMaxPINCodeLengthAttribute(chipClusterPtr, callback);
     }
@@ -6686,6 +6696,42 @@ public class ChipClusters {
       subscribeWrongCodeEntryLimitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readUserCodeTemporaryDisableTimeAttribute(IntegerAttributeCallback callback) {
+      readUserCodeTemporaryDisableTimeAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeUserCodeTemporaryDisableTimeAttribute(
+        DefaultClusterCallback callback, Integer value) {
+      writeUserCodeTemporaryDisableTimeAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeUserCodeTemporaryDisableTimeAttribute(
+        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeUserCodeTemporaryDisableTimeAttribute(
+          chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeUserCodeTemporaryDisableTimeAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUserCodeTemporaryDisableTimeAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readRequirePINforRemoteOperationAttribute(BooleanAttributeCallback callback) {
+      readRequirePINforRemoteOperationAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeRequirePINforRemoteOperationAttribute(
+        DefaultClusterCallback callback, Boolean value) {
+      writeRequirePINforRemoteOperationAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeRequirePINforRemoteOperationAttribute(
+        DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      writeRequirePINforRemoteOperationAttribute(
+          chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
     public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
       readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
@@ -6774,6 +6820,12 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void subscribeNumberOfYearDaySchedulesSupportedPerUserAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readNumberOfHolidaySchedulesSupportedAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeNumberOfHolidaySchedulesSupportedAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readMaxPINCodeLengthAttribute(
@@ -6892,6 +6944,27 @@ public class ChipClusters {
 
     private native void subscribeWrongCodeEntryLimitAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUserCodeTemporaryDisableTimeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeUserCodeTemporaryDisableTimeAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeUserCodeTemporaryDisableTimeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readRequirePINforRemoteOperationAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void writeRequirePINforRemoteOperationAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Boolean value,
+        @Nullable Integer timedWriteTimeoutMs);
 
     private native void readGeneratedCommandListAttribute(
         long chipClusterPtr, GeneratedCommandListAttributeCallback callback);

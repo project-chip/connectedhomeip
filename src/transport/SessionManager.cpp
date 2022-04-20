@@ -780,12 +780,12 @@ void SessionManager::ExpiryTimerCallback(System::Layer * layer, void * param)
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
 }
 
-Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId peerNodeId, Transport::SecureSession::Type type)
+Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId peerNodeId,
+                                                                 const Optional<Transport::SecureSession::Type> & type)
 {
     SecureSession * found = nullptr;
-    mSecureSessions.ForEachSession([&peerNodeId, type, &found](auto session) {
-        if (session->GetPeer() == peerNodeId &&
-            (type == SecureSession::Type::kUndefined || type == session->GetSecureSessionType()))
+    mSecureSessions.ForEachSession([&peerNodeId, &type, &found](auto session) {
+        if (session->GetPeer() == peerNodeId && (!type.HasValue() || type.Value() == session->GetSecureSessionType()))
         {
             found = session;
             return Loop::Break;

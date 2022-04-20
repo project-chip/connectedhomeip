@@ -262,11 +262,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mCASESessionManager.Init(&DeviceLayer::SystemLayer(), caseSessionManagerConfig);
     SuccessOrExit(err);
 
-    err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mTransports,
-#if CONFIG_NETWORK_LAYER_BLE
-                                                    chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
-#endif
-                                                    &mSessions, &mFabrics, mSessionResumptionStorage, mGroupsProvider);
+    err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mTransports, &mSessions, &mFabrics, mSessionResumptionStorage,
+                                                    mGroupsProvider);
     SuccessOrExit(err);
 
     // This code is necessary to restart listening to existing groups after a reboot
