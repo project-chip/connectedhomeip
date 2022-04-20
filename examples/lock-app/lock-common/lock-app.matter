@@ -953,23 +953,39 @@ server cluster Groups = 4 {
     CHAR_STRING groupName = 1;
   }
 
+<<<<<<< HEAD
   response struct AddGroupResponse = 0 {
+=======
+  response struct AddGroupResponse {
+>>>>>>> c425b9ab1 (work in progress)
     ENUM8 status = 0;
     group_id groupId = 1;
   }
 
+<<<<<<< HEAD
   response struct ViewGroupResponse = 1 {
+=======
+  response struct ViewGroupResponse {
+>>>>>>> c425b9ab1 (work in progress)
     ENUM8 status = 0;
     group_id groupId = 1;
     CHAR_STRING groupName = 2;
   }
 
+<<<<<<< HEAD
   response struct GetGroupMembershipResponse = 2 {
+=======
+  response struct GetGroupMembershipResponse {
+>>>>>>> c425b9ab1 (work in progress)
     nullable INT8U capacity = 0;
     group_id groupList[] = 1;
   }
 
+<<<<<<< HEAD
   response struct RemoveGroupResponse = 3 {
+=======
+  response struct RemoveGroupResponse {
+>>>>>>> c425b9ab1 (work in progress)
     ENUM8 status = 0;
     group_id groupId = 1;
   }
@@ -1012,7 +1028,11 @@ server cluster Identify = 3 {
     INT16U identifyTime = 0;
   }
 
+<<<<<<< HEAD
   response struct IdentifyQueryResponse = 0 {
+=======
+  response struct IdentifyQueryResponse {
+>>>>>>> c425b9ab1 (work in progress)
     INT16U timeout = 0;
   }
 

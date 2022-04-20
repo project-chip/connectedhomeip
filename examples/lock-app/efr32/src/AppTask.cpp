@@ -16,20 +16,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "LEDWidget.h"
-#ifdef DISPLAY_ENABLED
 #include "lcd.h"
 #include "qrcodegen.h"
-#endif // DISPLAY_ENABLED
 #include "sl_simple_led_instances.h"
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/af-structs.h>
@@ -109,6 +104,11 @@ bool sIsThreadEnabled     = false;
 #endif /* CHIP_ENABLE_OPENTHREAD */
 bool sHaveBLEConnections = false;
 bool configValueSet = false;
+
+EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
+
+uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
+StaticQueue_t sAppEventQueueStruct;
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 

@@ -119,11 +119,7 @@ public:
     static constexpr Key kConfigKey_GroupKeyBase       = EFR32ConfigKey(kMatterConfig_KeyBase, 0x0F);
     static constexpr Key kConfigKey_LockUser           = EFR32ConfigKey(kMatterConfig_KeyBase, 0x10);
     static constexpr Key kConfigKey_Credential         = EFR32ConfigKey(kMatterConfig_KeyBase, 0x11);
-<<<<<<< HEAD
     static constexpr Key kConfigKey_LockState          = EFR32ConfigKey(kMatterConfig_KeyBase, 0x12);
-=======
-    static constexpr Key kConfigKey_LockState          = EFR32ConfigKey(kMatterConfig_KeyBase, 0x10);
->>>>>>> 07717b002 (Add user/credential functionality back to app. Save lockState in NVRam)
 
     static constexpr Key kConfigKey_GroupKeyMax =
         EFR32ConfigKey(kMatterConfig_KeyBase, 0x1E); // Allows 16 Group Keys to be created.
