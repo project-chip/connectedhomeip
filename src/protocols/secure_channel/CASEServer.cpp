@@ -30,9 +30,6 @@ using namespace ::chip::Credentials;
 namespace chip {
 
 CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-#if CONFIG_NETWORK_LAYER_BLE
-                                                     Ble::BleLayer * bleLayer,
-#endif
                                                      SessionManager * sessionManager, FabricTable * fabrics,
                                                      SessionResumptionStorage * sessionResumptionStorage,
                                                      Credentials::GroupDataProvider * responderGroupDataProvider)
@@ -43,9 +40,6 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
     VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(responderGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-#if CONFIG_NETWORK_LAYER_BLE
-    mBleLayer = bleLayer;
-#endif
     mSessionManager           = sessionManager;
     mSessionResumptionStorage = sessionResumptionStorage;
     mFabrics                  = fabrics;
@@ -59,15 +53,6 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
 CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
 {
     ReturnErrorCodeIf(ec == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-#if CONFIG_NETWORK_LAYER_BLE
-    // Close all BLE connections now since a CASE handshake has been initiated.
-    if (mBleLayer != nullptr)
-    {
-        ChipLogProgress(Discovery, "CASE handshake initiated, closing all BLE Connections");
-        mBleLayer->CloseAllBleConnections();
-    }
-#endif
 
     // Setup CASE state machine using the credentials for the current fabric.
     GetSession().SetGroupDataProvider(mGroupDataProvider);

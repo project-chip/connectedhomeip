@@ -108,10 +108,7 @@ void CommissioneeDeviceProxy::Reset()
     mState              = ConnectionState::NotConnected;
     mSessionManager     = nullptr;
     mUDPEndPointManager = nullptr;
-#if CONFIG_NETWORK_LAYER_BLE
-    mBleLayer = nullptr;
-#endif
-    mExchangeMgr = nullptr;
+    mExchangeMgr        = nullptr;
 }
 
 bool CommissioneeDeviceProxy::GetAddress(Inet::IPAddress & addr, uint16_t & port) const
