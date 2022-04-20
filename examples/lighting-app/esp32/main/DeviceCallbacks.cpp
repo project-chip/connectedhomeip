@@ -37,9 +37,11 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/server/Dnssd.h>
 #include <app/util/util.h>
+#include <examples/platform/esp32/ota/InitOTAR.h>
 #include <lib/support/CodeUtils.h>
 
-static const char * TAG = "light-app-callbacks";
+static const char * TAG                      = "light-app-callbacks";
+constexpr uint32_t mInitOTARequestorDelaySec = 3;
 
 extern LEDWidget AppLED;
 
@@ -149,12 +151,25 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
     ESP_LOGI(TAG, "Current free heap: %zu\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }
 
+void InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
+{
+    InitOTA::Instance().InitOTARequestor();
+}
+
 void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event)
 {
+    static bool IsOTAInitialized = false;
     if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
     {
         ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
         chip::app::DnssdServer::Instance().StartServer();
+
+        if (!IsOTAInitialized)
+        {
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(mInitOTARequestorDelaySec),
+                                                        InitOTARequestorHandler, nullptr);
+            IsOTAInitialized = true;
+        }
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {

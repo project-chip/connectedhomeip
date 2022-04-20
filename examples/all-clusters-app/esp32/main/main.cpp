@@ -37,17 +37,12 @@
 #include "shell_extension/launch.h"
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/util/af.h>
 #include <binding-handler.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
-#include <platform/ESP32/OTAImageProcessorImpl.h>
 
 #if CONFIG_HAVE_DISPLAY
 #include "DeviceWithDisplay.h"
@@ -70,20 +65,11 @@ using namespace ::chip::DeviceLayer;
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
 
-const char * TAG                    = "all-clusters-app";
-const uint32_t delayConfirmImageSec = 10;
+const char * TAG = "all-clusters-app";
 
 static DeviceCallbacks EchoCallbacks;
 
 namespace {
-
-#if CONFIG_ENABLE_OTA_REQUESTOR
-DefaultOTARequestor gRequestorCore;
-DefaultOTARequestorStorage gRequestorStorage;
-DefaultOTARequestorDriver gRequestorUser;
-BDXDownloader gDownloader;
-OTAImageProcessorImpl gImageProcessor;
-#endif
 
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
@@ -107,19 +93,6 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 } // namespace
 
-static void InitOTARequestor(void)
-{
-#if CONFIG_ENABLE_OTA_REQUESTOR
-    SetRequestorInstance(&gRequestorCore);
-    gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-    gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
-    gImageProcessor.SetOTADownloader(&gDownloader);
-    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-    gRequestorUser.SetDelayConfirmCurrentImageSec(delayConfirmImageSec);
-    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-#endif
-}
-
 static void InitServer(intptr_t context)
 {
     // Init ZCL Data Model and CHIP App Server
@@ -138,8 +111,6 @@ static void InitServer(intptr_t context)
 #if CONFIG_DEVICE_TYPE_M5STACK
     SetupPretendDevices();
 #endif
-
-    InitOTARequestor();
 }
 
 extern "C" void app_main()
