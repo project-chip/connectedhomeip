@@ -419,7 +419,7 @@ struct EmberAfDefinedEndpoint
     /**
      * Root endpoint id for composed device type.
      */
-    chip::EndpointId composedEpId = chip::kInvalidEndpointId;
+    chip::EndpointId parentEndpointId = chip::kInvalidEndpointId;
 };
 
 // Cluster specific types

@@ -290,7 +290,7 @@ chip::EndpointId emberAfEndpointFromIndex(uint16_t index);
 /**
  * @brief Returns root endpoint of a composed bridged device
  */
-chip::EndpointId emberAfComposedEndpointFromIndex(uint16_t index);
+chip::EndpointId emberAfParentEndpointFromIndex(uint16_t index);
 
 /**
  * Returns the index of a given endpoint.  Will return 0xFFFF if this is not a

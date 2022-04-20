@@ -84,7 +84,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
             {
                 if (emberAfEndpointIndexIsEnabled(index))
                 {
-                    EndpointId composedEndpointId = emberAfComposedEndpointFromIndex(index);
+                    EndpointId composedEndpointId = emberAfParentEndpointFromIndex(index);
                     if (composedEndpointId == chip::kInvalidEndpointId || composedEndpointId != endpoint)
                         continue;
 
