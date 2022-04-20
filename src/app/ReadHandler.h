@@ -281,7 +281,7 @@ private:
     {
         Idle,                   ///< The handler has been initialized and is ready
         GeneratingReports,      ///< The handler has is now capable of generating reports and may generate one immediately
-                                ///< or later when other criteria is satifified (e.g hold-off for min reporting interval).
+                                ///< or later when other criteria are satisfied (e.g hold-off for min reporting interval).
         AwaitingReportResponse, ///< The handler has sent the report to the client and is awaiting a status response.
         AwaitingDestruction,    ///< The object has completed its work and is awaiting destruction by the application.
     };

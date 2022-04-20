@@ -608,7 +608,7 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
 
     //
     // If we just unblocked sending reports, let's go ahead and schedule the reporting
-    // engine to run to run to kick that off.
+    // engine to run to kick that off.
     //
     if (aTargetState == HandlerState::GeneratingReports)
     {
