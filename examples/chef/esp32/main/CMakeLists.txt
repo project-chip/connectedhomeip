@@ -18,7 +18,7 @@
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../../.. REALPATH)
 get_filename_component(CHEF ${CMAKE_CURRENT_SOURCE_DIR}/../../ REALPATH)
-get_filename_component(GEN_DIR ${CHEF}/zap-generated/ REALPATH)
+get_filename_component(GEN_DIR ${CHEF}/out/${SAMPLE_NAME}/zap-generated REALPATH)
 
 # include(${CMAKE_CURRENT_LIST_DIR}/../../project_include.cmake)
 
@@ -33,6 +33,7 @@ set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/nlio/repo/include"
                       "${CMAKE_SOURCE_DIR}/../"
+                      "${GEN_DIR}/../"
                       "${CMAKE_SOURCE_DIR}/main/include/"
 )
 
