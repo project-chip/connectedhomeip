@@ -1522,7 +1522,7 @@ void CheckGetBackoff(nlTestSuite * inSuite, void * inContext)
         {
             struct BackoffComplianceTestVector * test = &theBackoffComplianceTestVector[i];
             System::Clock::Timestamp backoff          = ReliableMessageMgr::GetBackoff(test->backoffBase, test->sendCount);
-            ChipLogProgress(Test, "Backoff # %d: %d", test->sendCount, (uint32_t) backoff.count());
+            ChipLogProgress(Test, "Backoff # %d: %" PRIu32, test->sendCount, (uint32_t) backoff.count());
 
             NL_TEST_ASSERT(inSuite, backoff >= test->backoffMin);
             NL_TEST_ASSERT(inSuite, backoff <= test->backoffMax);
