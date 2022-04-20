@@ -39,7 +39,7 @@ class App:
         self.lastLogIndex = 0
         self.kvs = '/tmp/chip_kvs'
 
-    def start(self, options):
+    def start(self, options = None):
         if not self.process:
             # Make sure to assign self.process before we do any operations that
             # might fail, so attempts to kill us on failure actually work.
@@ -102,12 +102,15 @@ class App:
     def __startServer(self, runner, command, options):
         app_cmd = command + ['--interface-id', str(-1)]
 
-        logging.debug('Executing application under test with the following args:')
-        for key, value in options.items():
-            logging.debug('   %s: %s' % (key, value))
-            app_cmd = app_cmd + [key, value]
-            if key == '--KVS':
-                self.kvs = value
+        if options is None:
+            logging.debug('Executing application under test with default args')
+        else:
+            logging.debug('Executing application under test with the following args:')
+            for key, value in options.items():
+                logging.debug('   %s: %s' % (key, value))
+                app_cmd = app_cmd + [key, value]
+                if key == '--KVS':
+                    self.kvs = value
         return runner.RunSubprocess(app_cmd, name='APP ', wait=False)
 
     def __waitFor(self, waitForString, server_process, outpipe):
@@ -233,7 +236,7 @@ class TestDefinition:
             # Remove server application storage (factory reset),
             # so it will be commissionable again.
             app.factoryReset()
-            app.start({})
+            app.start()
 
             runner.RunSubprocess(
                 tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode] +

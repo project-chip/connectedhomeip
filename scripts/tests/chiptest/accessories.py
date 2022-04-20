@@ -125,8 +125,9 @@ class AppsRegister:
 
     def __createCommandLineOptions(self, args):
         # args should contain a list of strings in key-value pair, e.g. [option1, value1, option2, value2, ...]
-        options = {}
-        if (len(args) % 2) == 0:
-            # Create a dictionary from the key-value pair list
-            options = {args[i]: args[i+1] for i in range(0, len(args), 2)}
+        if len(args) == 0 or (len(args) % 2) != 0:
+            return None
+
+        # Create a dictionary from the key-value pair list
+        options = {args[i]: args[i+1] for i in range(0, len(args), 2)}
         return options
