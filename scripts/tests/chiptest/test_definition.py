@@ -39,7 +39,7 @@ class App:
         self.lastLogIndex = 0
         self.kvs = '/tmp/chip_kvs'
 
-    def start(self, options = None):
+    def start(self, options=None):
         if not self.process:
             # Make sure to assign self.process before we do any operations that
             # might fail, so attempts to kill us on failure actually work.
