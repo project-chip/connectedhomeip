@@ -46,7 +46,7 @@ declare_args() {
   # Event loop type.
   if (chip_system_config_use_lwip ||
       chip_system_config_use_open_thread_inet_endpoints) {
-    chip_system_config_event_loop = "LwIP"
+    chip_system_config_event_loop = "FreeRTOS"
   } else {
     chip_system_config_event_loop = "Select"
   }

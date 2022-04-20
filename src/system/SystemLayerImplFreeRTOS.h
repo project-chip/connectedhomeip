@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This file declares an implementation of LayerImplLwIP using LwIP.
+ *      This file declares an implementation of LayerImplFreeRTOS using LwIP.
  */
 
 #pragma once
@@ -29,11 +29,11 @@
 namespace chip {
 namespace System {
 
-class LayerImplLwIP : public LayerLwIP
+class LayerImplFreeRTOS : public LayerFreeRTOS
 {
 public:
-    LayerImplLwIP();
-    ~LayerImplLwIP() { VerifyOrDie(mLayerState.Destroy()); }
+    LayerImplFreeRTOS();
+    ~LayerImplFreeRTOS() { VerifyOrDie(mLayerState.Destroy()); }
 
     // Layer overrides.
     CHIP_ERROR Init() override;
@@ -58,7 +58,7 @@ private:
     ObjectLifeCycle mLayerState;
 };
 
-using LayerImpl = LayerImplLwIP;
+using LayerImpl = LayerImplFreeRTOS;
 
 } // namespace System
 } // namespace chip
