@@ -38,9 +38,8 @@ public:
         }
     }
 
-    CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-                                             SessionManager * sessionManager, FabricTable * fabrics,
-                                             SessionResumptionStorage * sessionResumptionStorage,
+    CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, SessionManager * sessionManager,
+                                             FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage,
                                              Credentials::GroupDataProvider * responderGroupDataProvider);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
