@@ -430,10 +430,8 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
     }
     else
     {
-        ChipLogProgress(
-            DeviceLayer,
-            "Thread Network: %s Panid 0x%" PRIx16 " Channel %" PRIu16 " RSSI %" PRId16 " LQI %" PRIu16 " Version %" PRIu16,
-            aResult->mNetworkName.m8, aResult->mPanId, aResult->mChannel, aResult->mRssi, aResult->mLqi, aResult->mVersion);
+        ChipLogProgress(DeviceLayer, "Thread Network: %s Panid 0x%x Channel %u RSSI %d LQI %u Version %u", aResult->mNetworkName.m8,
+                        aResult->mPanId, aResult->mChannel, aResult->mRssi, aResult->mLqi, aResult->mVersion);
 
         NetworkCommissioning::ThreadScanResponse scanResponse = { 0 };
 

@@ -355,7 +355,7 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
         System::PacketBufferHandle copy = System::PacketBufferHandle::New(messageSize, 0);
         if (copy.IsNull() || buf->Read(copy->Start(), messageSize) != CHIP_NO_ERROR)
         {
-            ChipLogError(Inet, "No memory to flatten incoming packet buffer chain of size %" PRIu16, buf->TotalLength());
+            ChipLogError(Inet, "No memory to flatten incoming packet buffer chain of size %u", buf->TotalLength());
             return;
         }
         buf = std::move(copy);

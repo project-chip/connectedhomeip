@@ -129,7 +129,7 @@ void DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
         break;
     }
 
-    ChipLogProgress(Shell, "Current free heap: %zu\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+    ChipLogProgress(Shell, "Current free heap: %u\n", static_cast<unsigned int>(heap_caps_get_free_size(MALLOC_CAP_8BIT)));
 }
 
 const char * TAG = "chef-app";
