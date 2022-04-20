@@ -247,7 +247,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
         constexpr size_t kMaxCatsToLog = 6;
         char catLogBuf[kMaxCatsToLog * kCharsPerCatForLogging];
         ChipLogProgress(DataManagement,
-                        "AccessControl: checking f=%u a=%c s=0x" ChipLogFormatX64 " t=%s c=" ChipLogFormatMEI " e=%" PRIu16 " p=%c",
+                        "AccessControl: checking f=%u a=%c s=0x" ChipLogFormatX64 " t=%s c=" ChipLogFormatMEI " e=%u p=%c",
                         subjectDescriptor.fabricIndex, GetAuthModeStringForLogging(subjectDescriptor.authMode),
                         ChipLogValueX64(subjectDescriptor.subject),
                         GetCatStringForLogging(catLogBuf, sizeof(catLogBuf), subjectDescriptor.cats),
@@ -412,13 +412,13 @@ CHIP_ERROR AccessControl::Dump(const Entry & entry)
     {
         Privilege privilege;
         SuccessOrExit(err = entry.GetPrivilege(privilege));
-        ChipLogProgress(DataManagement, "privilege: %d", (int) privilege);
+        ChipLogProgress(DataManagement, "privilege: %d", static_cast<int>(privilege));
     }
 
     {
         AuthMode authMode;
         SuccessOrExit(err = entry.GetAuthMode(authMode));
-        ChipLogProgress(DataManagement, "authMode: %d", (int) authMode);
+        ChipLogProgress(DataManagement, "authMode: %d", static_cast<int>(authMode));
     }
 
     {
@@ -426,12 +426,12 @@ CHIP_ERROR AccessControl::Dump(const Entry & entry)
         SuccessOrExit(err = entry.GetSubjectCount(count));
         if (count)
         {
-            ChipLogProgress(DataManagement, "subjects: %u", (unsigned) count);
+            ChipLogProgress(DataManagement, "subjects: %u", static_cast<unsigned>(count));
             for (size_t i = 0; i < count; ++i)
             {
                 NodeId subject;
                 SuccessOrExit(err = entry.GetSubject(i, subject));
-                ChipLogProgress(DataManagement, "  %u: 0x" ChipLogFormatX64, (unsigned) i, ChipLogValueX64(subject));
+                ChipLogProgress(DataManagement, "  %u: 0x" ChipLogFormatX64, static_cast<unsigned>(i), ChipLogValueX64(subject));
             }
         }
     }
@@ -441,23 +441,23 @@ CHIP_ERROR AccessControl::Dump(const Entry & entry)
         SuccessOrExit(err = entry.GetTargetCount(count));
         if (count)
         {
-            ChipLogProgress(DataManagement, "targets: %u", (unsigned) count);
+            ChipLogProgress(DataManagement, "targets: %u", static_cast<unsigned>(count));
             for (size_t i = 0; i < count; ++i)
             {
                 Entry::Target target;
                 SuccessOrExit(err = entry.GetTarget(i, target));
                 if (target.flags & Entry::Target::kCluster)
                 {
-                    ChipLogProgress(DataManagement, "  %u: cluster: 0x" ChipLogFormatMEI, (unsigned) i,
+                    ChipLogProgress(DataManagement, "  %u: cluster: 0x" ChipLogFormatMEI, static_cast<unsigned>(i),
                                     ChipLogValueMEI(target.cluster));
                 }
                 if (target.flags & Entry::Target::kEndpoint)
                 {
-                    ChipLogProgress(DataManagement, "  %u: endpoint: %" PRIu16, (unsigned) i, target.endpoint);
+                    ChipLogProgress(DataManagement, "  %u: endpoint: %u", static_cast<unsigned>(i), target.endpoint);
                 }
                 if (target.flags & Entry::Target::kDeviceType)
                 {
-                    ChipLogProgress(DataManagement, "  %u: deviceType: 0x" ChipLogFormatMEI, (unsigned) i,
+                    ChipLogProgress(DataManagement, "  %u: deviceType: 0x" ChipLogFormatMEI, static_cast<unsigned>(i),
                                     ChipLogValueMEI(target.deviceType));
                 }
             }

@@ -96,9 +96,13 @@ public:
          * Constructor-provided entry is staged into a staging entry,
          * which is then encoded into a writer.
          */
-        CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
         CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex fabric) const;
+
+        /**
+         * Constructor-provided entry is staged into a staging entry,
+         * which is then encoded into a writer.
+         */
+        CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
         /**
          * Constructor-provided entry is staged into a staging entry.

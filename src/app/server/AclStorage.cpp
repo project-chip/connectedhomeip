@@ -33,8 +33,39 @@ using Target           = AccessControl::Entry::Target;
 
 namespace {
 
-// TODO: how to choose this size?
-constexpr int kStorageBufferSize = 256;
+/*
+Size calculation for TLV encoded entry.
+
+Because EncodeForWrite is used without an accessing fabric, the fabric index is
+not encoded. However, let's assume it is. This yields 17 bytes total overhead,
+but it's wise to add a few more for safety.
+
+Each subject may require up to 9 bytes. Each target may require up to 14 bytes
+(only one of endpoint or device type will be encoded).
+
+DATA                                    C   T   L   V   NOTES
+structure (anonymous)                   1               0x15
+  field 1 privilege                     1   1       1
+  field 2 authmode                      1   1       1
+  field 3 subjects                      1   1
+    uint64                              1           8   per subject
+  end list                              1               0x18
+  field 4 targets                       1   1
+    structure (anonymous)               1               per target
+      field 0 cluster                   1   1       4
+      field 1 endpoint                  1   1       2   only field 1 or 2
+      field 2 devicetype                1   1       4   only field 1 or 2
+    end structure                       1
+  end list                              1               0x18
+  field 254 fabric index                1   1       1   not written
+end structure                           1               0x18
+*/
+
+// TODO(#14455): get actual values for max subjects/targets
+constexpr int kEncodedEntryOverheadBytes = 17 + 8;
+constexpr int kEncodedEntrySubjectBytes  = 9 * CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY;
+constexpr int kEncodedEntryTargetBytes   = 14 * CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY;
+constexpr int kEncodedEntryTotalBytes    = kEncodedEntryOverheadBytes + kEncodedEntrySubjectBytes + kEncodedEntryTargetBytes;
 
 struct StagingSubject
 {
@@ -233,9 +264,7 @@ public:
         auto & storage = Server::GetInstance().GetPersistentStorage();
         DefaultStorageKeyAllocator key;
 
-        uint8_t buffer[kStorageBufferSize] = { 0 };
-
-        // TODO: may wish to check existence of entry is correct, handle buffer size too small, etc.
+        uint8_t buffer[kEncodedEntryTotalBytes] = { 0 };
 
         if (changeType == ChangeType::kRemoved)
         {
@@ -261,7 +290,7 @@ public:
             TLV::TLVWriter writer;
             writer.Init(buffer);
             EncodableEntry encodableEntry(*entry);
-            SuccessOrExit(err = encodableEntry.Encode(writer, TLV::AnonymousTag()));
+            SuccessOrExit(err = encodableEntry.EncodeForWrite(writer, TLV::AnonymousTag()));
             SuccessOrExit(err = storage.SyncSetKeyValue(key.AccessControlAclEntry(fabric, index), buffer,
                                                         static_cast<uint16_t>(writer.GetLengthWritten())));
         }
@@ -331,17 +360,17 @@ CHIP_ERROR AclStorage::DecodableEntry::Unstage()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AclStorage::EncodableEntry::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    ReturnErrorOnFailure(Stage());
-    ReturnErrorOnFailure(mStagingEntry.EncodeForWrite(writer, tag));
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR AclStorage::EncodableEntry::EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex fabric) const
 {
     ReturnErrorOnFailure(Stage());
     ReturnErrorOnFailure(mStagingEntry.EncodeForRead(writer, tag, fabric));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AclStorage::EncodableEntry::EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    ReturnErrorOnFailure(Stage());
+    ReturnErrorOnFailure(mStagingEntry.EncodeForWrite(writer, tag));
     return CHIP_NO_ERROR;
 }
 
@@ -420,9 +449,9 @@ CHIP_ERROR AclStorage::Init()
         auto fabric = info.GetFabricIndex();
         for (size_t index = 0; /**/; ++index)
         {
-            uint8_t buffer[kStorageBufferSize] = { 0 };
-            uint16_t size                      = static_cast<uint16_t>(sizeof(buffer));
-            err                                = storage.SyncGetKeyValue(key.AccessControlAclEntry(fabric, index), buffer, size);
+            uint8_t buffer[kEncodedEntryTotalBytes] = { 0 };
+            uint16_t size                           = static_cast<uint16_t>(sizeof(buffer));
+            err = storage.SyncGetKeyValue(key.AccessControlAclEntry(fabric, index), buffer, size);
             if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
             {
                 break;

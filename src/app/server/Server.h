@@ -309,10 +309,8 @@ private:
                 size_t count = 0;
                 if (Access::GetAccessControl().GetEntryCount(fabricIndex, count) == CHIP_NO_ERROR)
                 {
-                    ChipLogProgress(DataManagement, "################### remove fabric ACL count %d", (int) count);
                     while (count)
                     {
-                        ChipLogProgress(DataManagement, "################### remove fabric ACL index %d", (int) count - 1);
                         Access::GetAccessControl().DeleteEntry(nullptr, fabricIndex, --count);
                     }
                 }
