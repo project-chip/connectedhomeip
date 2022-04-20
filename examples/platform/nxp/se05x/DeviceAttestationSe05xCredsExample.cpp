@@ -28,7 +28,10 @@
 
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
 
+#include <crypto/hsm/nxp/CHIPCryptoPALHsm_SE05X_utils.h>
+
 #define DEV_ATTESTATION_KEY 0xDADADADA
+#define DEV_ATTESTATION_CERT 0xDADADADB
 
 namespace chip {
 namespace Credentials {
@@ -48,7 +51,31 @@ public:
 
 CHIP_ERROR ExampleSe05xDACProvider::GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer)
 {
+    #if 0
     return CopySpanToMutableSpan(DevelopmentCerts::kDacCert, out_dac_buffer);
+    #else
+    sss_object_t keyObject = { 0 };
+    sss_status_t status = kStatus_SSS_Fail;
+    size_t certLen   = out_dac_buffer.size();
+    size_t certBitLen = out_dac_buffer.size() * 8;
+
+    ChipLogDetail(Crypto, "Get certificate from se05x");
+
+    se05x_sessionOpen();
+
+    status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
+    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+
+    status = sss_key_object_get_handle(&keyObject, DEV_ATTESTATION_CERT);
+    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+
+    status = sss_key_store_get_key(&gex_sss_chip_ctx.ks, &keyObject, out_dac_buffer.data(), &certLen, &certBitLen);
+    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+
+    out_dac_buffer.reduce_size(certLen);
+
+    return CHIP_NO_ERROR;
+    #endif
 }
 
 CHIP_ERROR ExampleSe05xDACProvider::GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer)
@@ -122,6 +149,8 @@ CHIP_ERROR ExampleSe05xDACProvider::SignWithDeviceAttestationKey(const ByteSpan 
 {
     Crypto::P256ECDSASignature signature;
     Crypto::P256KeypairHSM keypair;
+
+    ChipLogDetail(Crypto, "Sign using DA key from se05x");
 
     VerifyOrReturnError(IsSpanUsable(out_signature_buffer), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSpanUsable(digest_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
