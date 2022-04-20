@@ -19,6 +19,8 @@
 
 #pragma once
 
+#if CONFIG_ENABLE_YAML_TESTS
+
 #include <commands/common/CommandInvoker.h>
 #include <commands/tests/TestCommandBridge.h>
 #include <lib/core/Optional.h>
@@ -64469,11 +64471,14 @@ private:
     }
 };
 
+#endif // CONFIG_ENABLE_YAML_TESTS
+
 void registerCommandsTests(Commands & commands)
 {
     const char * clusterName = "Tests";
 
     commands_list clusterCommands = {
+#if CONFIG_ENABLE_YAML_TESTS
         make_unique<TestList>(),
         make_unique<ManualTestList>(),
         make_unique<TestAccessControlCluster>(),
@@ -64633,6 +64638,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_SWDIAG_2_1>(),
         make_unique<Test_TC_SWDIAG_3_1>(),
         make_unique<TestSubscribe_OnOff>(),
+#endif // CONFIG_ENABLE_YAML_TESTS
     };
 
     commands.Register(clusterName, clusterCommands);
