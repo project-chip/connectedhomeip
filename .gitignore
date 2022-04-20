@@ -47,8 +47,11 @@ __pycache__
 *.pyc
 *.egg-info
 
-# Doxygen outputs
-docs/html
+# Python venv
+.venv
+
+# Documentation
+docs/_build
 
 # VSCode java extensions
 .project

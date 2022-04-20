@@ -1,0 +1,4 @@
+Sphinx
+sphinx-book-theme
+myst-parser
+breathe
