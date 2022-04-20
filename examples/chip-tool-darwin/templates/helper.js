@@ -23,4 +23,4 @@ function hasArguments()
 //
 // Module exports
 //
-exports.hasArguments      = hasArguments;
+exports.hasArguments = hasArguments;
