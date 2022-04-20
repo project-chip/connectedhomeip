@@ -34,7 +34,6 @@ public:
     TestCommandBridge(const char * _Nonnull commandName)
         : CHIPCommandBridge(commandName)
     {
-        AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
         AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
         AddArgument("PICS", &mPICSFilePath);
     }
@@ -101,7 +100,6 @@ public:
 protected:
     dispatch_queue_t _Nullable mCallbackQueue;
     CHIPDevice * _Nullable mConnectedDevice;
-    chip::NodeId mNodeId;
 
     void Wait()
     {
