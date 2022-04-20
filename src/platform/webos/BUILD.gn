@@ -84,19 +84,19 @@ static_library("webos") {
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "CHIPPlatformConfig.h",
+    "ChipDeviceScanner.cpp",
+    "ChipDeviceScanner.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
     "Logging.cpp",
+    "MainLoop.cpp",
+    "MainLoop.h",
     "NetworkCommissioningDriver.h",
     "NetworkCommissioningThreadDriver.cpp",
     "NetworkCommissioningWiFiDriver.cpp",
     "SystemPlatformConfig.h",
-    "MainLoop.cpp",
-    "MainLoop.h",
-    "ChipDeviceScanner.cpp",
-    "ChipDeviceScanner.h",
   ]
 
   deps = [ "${chip_root}/src/setup_payload" ]
@@ -147,6 +147,6 @@ static_library("webos") {
   libs = [
     "luna-service2",
     "pbnjson_c",
-    "pbnjson_cpp"
+    "pbnjson_cpp",
   ]
 }
