@@ -68,7 +68,8 @@ bool OperationalDeviceProxy::AttachToExistingSecureSession()
     VerifyOrReturnError(mState == State::NeedsAddress || mState == State::Initialized, false);
 
     ScopedNodeId peerNodeId(mPeerId.GetNodeId(), mFabricInfo->GetFabricIndex());
-    auto sessionHandle = mInitParams.sessionManager->FindSecureSessionForNode(peerNodeId, Transport::SecureSession::Type::kCASE);
+    auto sessionHandle =
+        mInitParams.sessionManager->FindSecureSessionForNode(peerNodeId, MakeOptional(Transport::SecureSession::Type::kCASE));
     if (sessionHandle.HasValue())
     {
         ChipLogProgress(Controller, "Found an existing secure session to [" ChipLogFormatX64 "-" ChipLogFormatX64 "]!",
