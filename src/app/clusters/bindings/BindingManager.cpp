@@ -161,8 +161,15 @@ void BindingManager::HandleDeviceConnected(OperationalDeviceProxy * device)
         {
             fabricToRemove = entry.fabricIndex;
             nodeToRemove   = entry.nodeId;
-            mBoundDeviceChangedHandler(entry, device, pendingNotification.mContext);
-            mBoundDeviceContextReleaseHandler(pendingNotification.mContext);
+
+            BindingManagerContext * context = static_cast<BindingManagerContext *>(pendingNotification.mContext);
+            mBoundDeviceChangedHandler(entry, device, context->GetContext());
+
+            context->DecrementConsumersNumber();
+            if (context->GetConsumersNumber() == 0)
+            {
+                mBoundDeviceContextReleaseHandler(context);
+            }
         }
     }
     mPendingNotificationMap.RemoveAllEntriesForNode(fabricToRemove, nodeToRemove);
@@ -187,7 +194,13 @@ void BindingManager::HandleDeviceConnectionFailure(PeerId peerId, CHIP_ERROR err
 
         if (peerId == peer)
         {
-            mBoundDeviceContextReleaseHandler(pendingNotification.mContext);
+            BindingManagerContext * context = static_cast<BindingManagerContext *>(pendingNotification.mContext);
+
+            context->DecrementConsumersNumber();
+            if (context->GetConsumersNumber() == 0)
+            {
+                mBoundDeviceContextReleaseHandler(context);
+            }
         }
     }
 
@@ -200,14 +213,15 @@ void BindingManager::FabricRemoved(CompressedFabricId compressedFabricId, Fabric
     mInitParams.mCASESessionManager->ReleaseSessionsForFabric(compressedFabricId);
 }
 
-CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context)
+CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, BindingManagerContext * context)
 {
     VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mBoundDeviceChangedHandler, CHIP_NO_ERROR);
     VerifyOrReturnError(mBoundDeviceContextReleaseHandler, CHIP_NO_ERROR);
 
-    CHIP_ERROR error              = CHIP_NO_ERROR;
-    bool pendingNotificationAdded = false;
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    context->IncrementConsumersNumber();
 
     for (auto iter = BindingTable::GetInstance().begin(); iter != BindingTable::GetInstance().end(); ++iter)
     {
@@ -222,27 +236,31 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
                 if (peerDevice != nullptr && peerDevice->IsConnected())
                 {
                     // We already have an active connection
-                    mBoundDeviceChangedHandler(*iter, peerDevice, context);
+                    mBoundDeviceChangedHandler(*iter, peerDevice, context->GetContext());
                 }
                 else
                 {
-                    mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), context);
-                    pendingNotificationAdded = true;
-                    error                    = EstablishConnection(iter->fabricIndex, iter->nodeId);
+                    mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), static_cast<void *>(context));
+                    context->IncrementConsumersNumber();
+                    error = EstablishConnection(iter->fabricIndex, iter->nodeId);
                     SuccessOrExit(error == CHIP_NO_ERROR);
                 }
             }
             else if (iter->type == EMBER_MULTICAST_BINDING)
             {
-                mBoundDeviceChangedHandler(*iter, nullptr, context);
+                mBoundDeviceChangedHandler(*iter, nullptr, context->GetContext());
             }
         }
     }
 
 exit:
+    context->DecrementConsumersNumber();
+
     // Call release context handler only if any pending notification is not going to use it.
-    if (!pendingNotificationAdded)
+    if (context->GetConsumersNumber() == 0)
+    {
         mBoundDeviceContextReleaseHandler(context);
+    }
 
     return error;
 }

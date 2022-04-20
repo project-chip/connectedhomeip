@@ -132,11 +132,13 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, DevicePro
     }
 }
 
-void LightSwitchContextReleaseHandler(void * context)
+void LightSwitchContextReleaseHandler(BindingManagerContext * context)
 {
     VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "LightSwitchContextReleaseHandler: context is null"));
-    BindingCommandData * data = static_cast<BindingCommandData *>(context);
-    Platform::Delete(data);
+
+    // Release the internal context stored in BindingManagerContext and then the BindingManagerContext itself.
+    Platform::Delete(static_cast<BindingCommandData *>(context->GetContext()));
+    Platform::Delete(context);
 }
 
 #ifdef ENABLE_CHIP_SHELL
@@ -404,8 +406,9 @@ void SwitchWorkerFunction(intptr_t context)
 {
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "SwitchWorkerFunction - Invalid work data"));
 
-    BindingCommandData * data = reinterpret_cast<BindingCommandData *>(context);
-    BindingManager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId, static_cast<void *>(data));
+    BindingCommandData * data              = reinterpret_cast<BindingCommandData *>(context);
+    BindingManagerContext * bindingContext = Platform::New<BindingManagerContext>(static_cast<void *>(data));
+    BindingManager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId, bindingContext);
 }
 
 void BindingWorkerFunction(intptr_t context)

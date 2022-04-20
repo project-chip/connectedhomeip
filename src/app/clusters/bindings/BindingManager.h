@@ -26,6 +26,26 @@
 
 namespace chip {
 
+class BindingManagerContext
+{
+public:
+    BindingManagerContext(void * context) : mContext(context) {}
+    void * GetContext() { return mContext; };
+    uint8_t GetConsumersNumber() { return mConsumersNumber; }
+    void IncrementConsumersNumber() { mConsumersNumber++; }
+    void DecrementConsumersNumber()
+    {
+        if (mConsumersNumber > 0)
+        {
+            mConsumersNumber--;
+        }
+    }
+
+private:
+    void * mContext;
+    uint8_t mConsumersNumber = 0;
+};
+
 /**
  * Application callback function when a cluster associated with a binding changes.
  *
@@ -40,7 +60,11 @@ namespace chip {
  */
 using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry & binding, DeviceProxy * peer_device, void * context);
 
-using BoundDeviceContextReleaseHandler = void (*)(void * context);
+/**
+ * Application callback function when a context used in NotifyBoundClusterChanged will not be needed and should be
+ * released.
+ */
+using BoundDeviceContextReleaseHandler = void (*)(BindingManagerContext * context);
 
 struct BindingManagerInitParams
 {
@@ -112,7 +136,7 @@ public:
      * be initiated. The BoundDeviceChangedHandler will be called once the session is established.
      *
      */
-    CHIP_ERROR NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context);
+    CHIP_ERROR NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, BindingManagerContext * context);
 
     static BindingManager & GetInstance() { return sBindingManager; }
 
