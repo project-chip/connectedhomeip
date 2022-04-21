@@ -205,7 +205,7 @@ gpointer MainLoop::ThreadStartLSMainLoopHandler(gpointer data)
 
 bool MainLoop::StartLSMainLoop(void)
 {
-    bool result;
+    bool result = true;
     LSError lserror;
     LSErrorInit(&lserror);
 

@@ -26,7 +26,7 @@ declare_args() {
   # payloads) and clients need to allocate more resources for this (need one
   # more UDP socket and corresponding code for the unicast query sending)
   chip_use_ephemeral_port_for_mdns_unicast_query =
-      current_os == "mac" || current_os == "linux" || current_os == "android"
+      current_os == "mac" || current_os == "linux" || current_os == "android" || current_os == "webos"
 }
 
 config("config") {
