@@ -283,7 +283,8 @@ void SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
     gLoopback.Reset();
-    SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner, Optional<ReliableMessageProtocolConfig>::Missing(),
+    SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
+                                     Optional<ReliableMessageProtocolConfig>::Missing(),
                                      Optional<ReliableMessageProtocolConfig>::Missing(), delegateCommissioner);
 }
 
@@ -306,7 +307,8 @@ void SecurePairingHandshakeWithDeviceMRPTest(nlTestSuite * inSuite, void * inCon
     PASESession pairingCommissioner;
     gLoopback.Reset();
     ReliableMessageProtocolConfig config(1000_ms32, 10000_ms32);
-    SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner, Optional<ReliableMessageProtocolConfig>::Missing(),
+    SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
+                                     Optional<ReliableMessageProtocolConfig>::Missing(),
                                      Optional<ReliableMessageProtocolConfig>::Value(config), delegateCommissioner);
 }
 
@@ -330,7 +332,8 @@ void SecurePairingHandshakeWithPacketLossTest(nlTestSuite * inSuite, void * inCo
     PASESession pairingCommissioner;
     gLoopback.Reset();
     gLoopback.mNumMessagesToDrop = 2;
-    SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner, Optional<ReliableMessageProtocolConfig>::Missing(),
+    SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
+                                     Optional<ReliableMessageProtocolConfig>::Missing(),
                                      Optional<ReliableMessageProtocolConfig>::Missing(), delegateCommissioner);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 2);
     NL_TEST_ASSERT(inSuite, gLoopback.mNumMessagesToDrop == 0);

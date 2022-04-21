@@ -66,10 +66,11 @@ public:
     };
 
     // Test-only: inject a session in Active state.
-    SecureSession(SecureSessionTable & table, Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId,
-                  FabricIndex fabric, const ReliableMessageProtocolConfig & config) :
-        mTable(table), mState(State::kActive), mSecureSessionType(secureSessionType),
-        mPeerNodeId(peerNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId),
+    SecureSession(SecureSessionTable & table, Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId,
+                  CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric, const ReliableMessageProtocolConfig & config) :
+        mTable(table),
+        mState(State::kActive), mSecureSessionType(secureSessionType), mPeerNodeId(peerNodeId), mPeerCATs(peerCATs),
+        mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId),
         mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()),
         mLastPeerActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
     {
@@ -93,14 +94,15 @@ public:
      *   PASE, setting internal state according to the parameters used and
      *   discovered during session establishment.
      */
-    void Activate(const ScopedNodeId & peer, CATValues peerCATs, uint16_t peerSessionId, const ReliableMessageProtocolConfig & config)
+    void Activate(const ScopedNodeId & peer, CATValues peerCATs, uint16_t peerSessionId,
+                  const ReliableMessageProtocolConfig & config)
     {
         VerifyOrDie(mState == State::kPairing);
         Retain();
-        mPeerNodeId        = peer.GetNodeId();
-        mPeerCATs          = peerCATs;
-        mPeerSessionId     = peerSessionId;
-        mMRPConfig         = config;
+        mPeerNodeId    = peer.GetNodeId();
+        mPeerCATs      = peerCATs;
+        mPeerSessionId = peerSessionId;
+        mMRPConfig     = config;
         SetFabricIndex(peer.GetFabricIndex());
     }
     ~SecureSession() override {}
@@ -119,19 +121,19 @@ public:
     {
         switch (mState)
         {
-            case State::kPairing:
-                mState = State::kPendingRemoval;
-                // Interrupt the pairing
-                NotifySessionReleased();
-                return;
-            case State::kActive:
-                Release(); // Decrease the ref which is retained at Activate
-                mState = State::kPendingRemoval;
-                NotifySessionReleased();
-                return;
-            case State::kPendingRemoval:
-                // Do nothing
-                return;
+        case State::kPairing:
+            mState = State::kPendingRemoval;
+            // Interrupt the pairing
+            NotifySessionReleased();
+            return;
+        case State::kActive:
+            Release(); // Decrease the ref which is retained at Activate
+            mState = State::kPendingRemoval;
+            NotifySessionReleased();
+            return;
+        case State::kPendingRemoval:
+            // Do nothing
+            return;
         }
     }
 
@@ -239,15 +241,15 @@ private:
     SecureSessionTable & mTable;
     State mState;
     const Type mSecureSessionType;
-    NodeId mPeerNodeId = kUndefinedNodeId;
+    NodeId mPeerNodeId  = kUndefinedNodeId;
     CATValues mPeerCATs = CATValues{};
     const uint16_t mLocalSessionId;
     uint16_t mPeerSessionId = 0;
 
     PeerAddress mPeerAddress;
-    System::Clock::Timestamp mLastActivityTime = System::SystemClock().GetMonotonicTimestamp();     ///< Timestamp of last tx or rx
+    System::Clock::Timestamp mLastActivityTime     = System::SystemClock().GetMonotonicTimestamp(); ///< Timestamp of last tx or rx
     System::Clock::Timestamp mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp(); ///< Timestamp of last rx
-    ReliableMessageProtocolConfig mMRPConfig = GetLocalMRPConfig();
+    ReliableMessageProtocolConfig mMRPConfig       = GetLocalMRPConfig();
     CryptoContext mCryptoContext;
     SessionMessageCounter mSessionMessageCounter;
 };

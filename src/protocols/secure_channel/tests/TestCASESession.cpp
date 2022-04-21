@@ -251,7 +251,6 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     gLoopback.mMessageSendError = CHIP_NO_ERROR;
 }
 
-
 void CASE_SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);

@@ -65,7 +65,7 @@ public:
         mHolders.Remove(&holder);
     }
 
-    virtual void Retain() = 0;
+    virtual void Retain()  = 0;
     virtual void Release() = 0;
 
     virtual bool IsPendingRemoval() const { return false; }

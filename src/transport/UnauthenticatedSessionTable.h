@@ -33,7 +33,8 @@ namespace Transport {
  * @brief
  *   An UnauthenticatedSession stores the binding of TransportAddress, and message counters.
  */
-class UnauthenticatedSession : public Session, public ReferenceCounted<UnauthenticatedSession, NoopDeletor<UnauthenticatedSession>, 0>
+class UnauthenticatedSession : public Session,
+                               public ReferenceCounted<UnauthenticatedSession, NoopDeletor<UnauthenticatedSession>, 0>
 {
 public:
     enum class SessionRole
