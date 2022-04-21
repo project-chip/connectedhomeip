@@ -24,6 +24,8 @@ shared_library("jni") {
 
   sources = [
     "${chip_root}/examples/tv-casting-app/tv-casting-common/include/CHIPProjectAppConfig.h",
+    "App/app/src/main/jni/cpp/JNIDACProvider.cpp",
+    "App/app/src/main/jni/cpp/JNIDACProvider.h",
     "App/app/src/main/jni/cpp/TvCastingApp-JNI.cpp",
   ]
 
@@ -57,6 +59,8 @@ android_library("java") {
   sources = [
     "App/app/src/main/jni/com/chip/casting/TvCastingApp.java",
     "App/app/src/main/jni/com/chip/casting/TvCastingAppCallback.java",
+    "App/app/src/main/jni/com/chip/casting/DACProvider.java",
+    "App/app/src/main/jni/com/chip/casting/DACProviderStub.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
