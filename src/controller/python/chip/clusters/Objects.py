@@ -21132,8 +21132,8 @@ class FanControl(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="fanMode", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="fanModeSequence", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="fanMode", Tag=0x00000000, Type=FanControl.Enums.FanModeType),
+                ClusterObjectFieldDescriptor(Label="fanModeSequence", Tag=0x00000001, Type=FanControl.Enums.FanModeSequenceType),
                 ClusterObjectFieldDescriptor(Label="percentSetting", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="percentCurrent", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="speedMax", Tag=0x00000004, Type=typing.Optional[uint]),
@@ -21150,8 +21150,8 @@ class FanControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    fanMode: 'uint' = None
-    fanModeSequence: 'uint' = None
+    fanMode: 'FanControl.Enums.FanModeType' = None
+    fanModeSequence: 'FanControl.Enums.FanModeSequenceType' = None
     percentSetting: 'uint' = None
     percentCurrent: 'uint' = None
     speedMax: 'typing.Optional[uint]' = None
@@ -21168,7 +21168,15 @@ class FanControl(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class FanMode(IntEnum):
+        class FanModeSequenceType(IntEnum):
+            kOffLowMedHigh = 0x00
+            kOffLowHigh = 0x01
+            kOffLowMedHighAuto = 0x02
+            kOffLowHighAuto = 0x03
+            kOffOnAuto = 0x04
+            kOffOn = 0x05
+
+        class FanModeType(IntEnum):
             kOff = 0x00
             kLow = 0x01
             kMedium = 0x02
@@ -21176,14 +21184,6 @@ class FanControl(Cluster):
             kOn = 0x04
             kAuto = 0x05
             kSmart = 0x06
-
-        class FanModeSequence(IntEnum):
-            kOffLowMedHigh = 0x00
-            kOffLowHigh = 0x01
-            kOffLowMedHighAuto = 0x02
-            kOffLowHighAuto = 0x03
-            kOffOnAuto = 0x04
-            kOffOn = 0x05
 
 
 
@@ -21201,9 +21201,9 @@ class FanControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=FanControl.Enums.FanModeType)
 
-            value: 'uint' = 0
+            value: 'FanControl.Enums.FanModeType' = 0
 
         @dataclass
         class FanModeSequence(ClusterAttributeDescriptor):
@@ -21217,9 +21217,9 @@ class FanControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=FanControl.Enums.FanModeSequenceType)
 
-            value: 'uint' = 0
+            value: 'FanControl.Enums.FanModeSequenceType' = 0
 
         @dataclass
         class PercentSetting(ClusterAttributeDescriptor):

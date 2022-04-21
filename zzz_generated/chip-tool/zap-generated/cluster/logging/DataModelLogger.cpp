@@ -6540,12 +6540,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case FanControl::Attributes::FanMode::Id: {
-            uint8_t value;
+            chip::app::Clusters::FanControl::FanModeType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("fan mode", 1, value);
         }
         case FanControl::Attributes::FanModeSequence::Id: {
-            uint8_t value;
+            chip::app::Clusters::FanControl::FanModeSequenceType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("fan mode sequence", 1, value);
         }

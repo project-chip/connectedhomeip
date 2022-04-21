@@ -22922,9 +22922,9 @@ namespace Attributes {
 namespace FanMode {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::FanControl::FanModeType;
+    using DecodableType    = chip::app::Clusters::FanControl::FanModeType;
+    using DecodableArgType = chip::app::Clusters::FanControl::FanModeType;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FanMode::Id; }
@@ -22934,9 +22934,9 @@ struct TypeInfo
 namespace FanModeSequence {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::FanControl::FanModeSequenceType;
+    using DecodableType    = chip::app::Clusters::FanControl::FanModeSequenceType;
+    using DecodableArgType = chip::app::Clusters::FanControl::FanModeSequenceType;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FanModeSequence::Id; }
@@ -23120,17 +23120,18 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::FanMode::TypeInfo::DecodableType fanMode                 = static_cast<uint8_t>(0);
-        Attributes::FanModeSequence::TypeInfo::DecodableType fanModeSequence = static_cast<uint8_t>(0);
-        Attributes::PercentSetting::TypeInfo::DecodableType percentSetting   = static_cast<uint8_t>(0);
-        Attributes::PercentCurrent::TypeInfo::DecodableType percentCurrent   = static_cast<uint8_t>(0);
-        Attributes::SpeedMax::TypeInfo::DecodableType speedMax               = static_cast<uint8_t>(0);
-        Attributes::SpeedSetting::TypeInfo::DecodableType speedSetting       = static_cast<uint8_t>(0);
-        Attributes::SpeedCurrent::TypeInfo::DecodableType speedCurrent       = static_cast<uint8_t>(0);
-        Attributes::RockSupport::TypeInfo::DecodableType rockSupport         = static_cast<uint8_t>(0);
-        Attributes::RockSetting::TypeInfo::DecodableType rockSetting         = static_cast<uint8_t>(0);
-        Attributes::WindSupport::TypeInfo::DecodableType windSupport         = static_cast<uint8_t>(0);
-        Attributes::WindSetting::TypeInfo::DecodableType windSetting         = static_cast<uint8_t>(0);
+        Attributes::FanMode::TypeInfo::DecodableType fanMode = static_cast<chip::app::Clusters::FanControl::FanModeType>(0);
+        Attributes::FanModeSequence::TypeInfo::DecodableType fanModeSequence =
+            static_cast<chip::app::Clusters::FanControl::FanModeSequenceType>(0);
+        Attributes::PercentSetting::TypeInfo::DecodableType percentSetting = static_cast<uint8_t>(0);
+        Attributes::PercentCurrent::TypeInfo::DecodableType percentCurrent = static_cast<uint8_t>(0);
+        Attributes::SpeedMax::TypeInfo::DecodableType speedMax             = static_cast<uint8_t>(0);
+        Attributes::SpeedSetting::TypeInfo::DecodableType speedSetting     = static_cast<uint8_t>(0);
+        Attributes::SpeedCurrent::TypeInfo::DecodableType speedCurrent     = static_cast<uint8_t>(0);
+        Attributes::RockSupport::TypeInfo::DecodableType rockSupport       = static_cast<uint8_t>(0);
+        Attributes::RockSetting::TypeInfo::DecodableType rockSetting       = static_cast<uint8_t>(0);
+        Attributes::WindSupport::TypeInfo::DecodableType windSupport       = static_cast<uint8_t>(0);
+        Attributes::WindSetting::TypeInfo::DecodableType windSetting       = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

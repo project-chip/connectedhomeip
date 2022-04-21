@@ -1021,7 +1021,7 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Fan Control (server) */                                                                       \
             { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x6 },  /* fan mode */                                                    \
-            { (uint16_t) 0x2, (uint16_t) 0x0, (uint16_t) 0x4 },  /* fan mode sequence */                                           \
+            { (uint16_t) 0x2, (uint16_t) 0x0, (uint16_t) 0x5 },  /* fan mode sequence */                                           \
             { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x64 }, /* percent setting */                                             \
             { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x64 }, /* speed setting */                                               \
                                                                                                                                    \

@@ -1354,7 +1354,16 @@ server cluster EthernetNetworkDiagnostics = 55 {
 }
 
 server cluster FanControl = 514 {
-  enum FanMode : ENUM8 {
+  enum FanModeSequenceType : ENUM8 {
+    kOffLowMedHigh = 0;
+    kOffLowHigh = 1;
+    kOffLowMedHighAuto = 2;
+    kOffLowHighAuto = 3;
+    kOffOnAuto = 4;
+    kOffOn = 5;
+  }
+
+  enum FanModeType : ENUM8 {
     kOff = 0;
     kLow = 1;
     kMedium = 2;
@@ -1362,15 +1371,6 @@ server cluster FanControl = 514 {
     kOn = 4;
     kAuto = 5;
     kSmart = 6;
-  }
-
-  enum FanModeSequence : ENUM8 {
-    kOffLowMedHigh = 0;
-    kOffLowHigh = 1;
-    kOffLowMedHighAuto = 2;
-    kOffLowHighAuto = 3;
-    kOffOnAuto = 4;
-    kOffOn = 5;
   }
 
   bitmap FanControlFeature : BITMAP32 {
@@ -1396,8 +1396,8 @@ server cluster FanControl = 514 {
     kNaturalWind = 0x2;
   }
 
-  attribute enum8 fanMode = 0;
-  attribute enum8 fanModeSequence = 1;
+  attribute FanModeType fanMode = 0;
+  attribute FanModeSequenceType fanModeSequence = 1;
   attribute int8u percentSetting = 2;
   readonly attribute int8u percentCurrent = 3;
   readonly attribute int8u speedMax = 4;

@@ -1603,8 +1603,19 @@ enum class ThermostatFeature : uint32_t
 
 namespace FanControl {
 
-// Enum for FanMode
-enum class FanMode : uint8_t
+// Enum for FanModeSequenceType
+enum class FanModeSequenceType : uint8_t
+{
+    kOffLowMedHigh     = 0x00,
+    kOffLowHigh        = 0x01,
+    kOffLowMedHighAuto = 0x02,
+    kOffLowHighAuto    = 0x03,
+    kOffOnAuto         = 0x04,
+    kOffOn             = 0x05,
+};
+
+// Enum for FanModeType
+enum class FanModeType : uint8_t
 {
     kOff    = 0x00,
     kLow    = 0x01,
@@ -1613,17 +1624,6 @@ enum class FanMode : uint8_t
     kOn     = 0x04,
     kAuto   = 0x05,
     kSmart  = 0x06,
-};
-
-// Enum for FanModeSequence
-enum class FanModeSequence : uint8_t
-{
-    kOffLowMedHigh     = 0x00,
-    kOffLowHigh        = 0x01,
-    kOffLowMedHighAuto = 0x02,
-    kOffLowHighAuto    = 0x03,
-    kOffOnAuto         = 0x04,
-    kOffOn             = 0x05,
 };
 
 // Bitmap for FanControlFeature
