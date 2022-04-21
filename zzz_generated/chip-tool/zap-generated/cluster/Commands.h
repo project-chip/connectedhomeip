@@ -10763,11 +10763,7 @@ public:
     }
 
 private:
-<<<<<<< HEAD
     chip::app::Clusters::FanControl::FanModeType mValue;
-=======
-    chip::app::Clusters::FanControl::enum8 mValue;
->>>>>>> Changes for cleaner regen
 };
 
 class WriteFanControlFanModeSequence : public WriteAttribute
@@ -10794,11 +10790,7 @@ public:
     }
 
 private:
-<<<<<<< HEAD
     chip::app::Clusters::FanControl::FanModeSequenceType mValue;
-=======
-    chip::app::Clusters::FanControl::enum8 mValue;
->>>>>>> Changes for cleaner regen
 };
 
 class WriteFanControlPercentSetting : public WriteAttribute

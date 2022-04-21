@@ -455,22 +455,12 @@ typedef void (*ThermostatClusterThermostatSystemModeAttributeCallback)(void *,
                                                                        chip::app::Clusters::Thermostat::ThermostatSystemMode);
 typedef void (*NullableThermostatClusterThermostatSystemModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatSystemMode> &);
-<<<<<<< HEAD
 typedef void (*FanControlClusterFanModeSequenceTypeAttributeCallback)(void *, chip::app::Clusters::FanControl::FanModeSequenceType);
 typedef void (*NullableFanControlClusterFanModeSequenceTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeSequenceType> &);
 typedef void (*FanControlClusterFanModeTypeAttributeCallback)(void *, chip::app::Clusters::FanControl::FanModeType);
 typedef void (*NullableFanControlClusterFanModeTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeType> &);
-=======
-typedef void (*FanControlClusterFanControlFanModeAttributeCallback)(void *, chip::app::Clusters::FanControl::FanControlFanMode);
-typedef void (*NullableFanControlClusterFanControlFanModeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanControlFanMode> &);
-typedef void (*FanControlClusterFanControlFanModeSequenceAttributeCallback)(
-    void *, chip::app::Clusters::FanControl::FanControlFanModeSequence);
-typedef void (*NullableFanControlClusterFanControlFanModeSequenceAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanControlFanModeSequence> &);
->>>>>>> Changes for cleaner regen
 typedef void (*ColorControlClusterColorLoopActionAttributeCallback)(void *, chip::app::Clusters::ColorControl::ColorLoopAction);
 typedef void (*NullableColorControlClusterColorLoopActionAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorLoopAction> &);
@@ -16567,7 +16557,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-<<<<<<< HEAD
 class CHIPFanControlClusterFanModeSequenceTypeAttributeCallbackBridge
     : public CHIPCallbackBridge<FanControlClusterFanModeSequenceTypeAttributeCallback>
 {
@@ -16587,27 +16576,6 @@ public:
                                                                                 CHIPActionBlock action,
                                                                                 SubscriptionEstablishedHandler establishedHandler) :
         CHIPFanControlClusterFanModeSequenceTypeAttributeCallbackBridge(queue, handler, action, true),
-=======
-class CHIPFanControlClusterFanControlFanModeAttributeCallbackBridge
-    : public CHIPCallbackBridge<FanControlClusterFanControlFanModeAttributeCallback>
-{
-public:
-    CHIPFanControlClusterFanControlFanModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<FanControlClusterFanControlFanModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::FanControl::FanControlFanMode value);
-};
-
-class CHIPFanControlClusterFanControlFanModeAttributeCallbackSubscriptionBridge
-    : public CHIPFanControlClusterFanControlFanModeAttributeCallbackBridge
-{
-public:
-    CHIPFanControlClusterFanControlFanModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPFanControlClusterFanControlFanModeAttributeCallbackBridge(queue, handler, action, true),
->>>>>>> Changes for cleaner regen
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -16617,7 +16585,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-<<<<<<< HEAD
 class CHIPNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge
     : public CHIPCallbackBridge<NullableFanControlClusterFanModeSequenceTypeAttributeCallback>
 {
@@ -16639,29 +16606,6 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge(queue, handler, action, true),
-=======
-class CHIPNullableFanControlClusterFanControlFanModeAttributeCallbackBridge
-    : public CHIPCallbackBridge<NullableFanControlClusterFanControlFanModeAttributeCallback>
-{
-public:
-    CHIPNullableFanControlClusterFanControlFanModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NullableFanControlClusterFanControlFanModeAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanControlFanMode> & value);
-};
-
-class CHIPNullableFanControlClusterFanControlFanModeAttributeCallbackSubscriptionBridge
-    : public CHIPNullableFanControlClusterFanControlFanModeAttributeCallbackBridge
-{
-public:
-    CHIPNullableFanControlClusterFanControlFanModeAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPNullableFanControlClusterFanControlFanModeAttributeCallbackBridge(queue, handler, action, true),
->>>>>>> Changes for cleaner regen
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -16671,7 +16615,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-<<<<<<< HEAD
 class CHIPFanControlClusterFanModeTypeAttributeCallbackBridge
     : public CHIPCallbackBridge<FanControlClusterFanModeTypeAttributeCallback>
 {
@@ -16691,28 +16634,6 @@ public:
                                                                         CHIPActionBlock action,
                                                                         SubscriptionEstablishedHandler establishedHandler) :
         CHIPFanControlClusterFanModeTypeAttributeCallbackBridge(queue, handler, action, true),
-=======
-class CHIPFanControlClusterFanControlFanModeSequenceAttributeCallbackBridge
-    : public CHIPCallbackBridge<FanControlClusterFanControlFanModeSequenceAttributeCallback>
-{
-public:
-    CHIPFanControlClusterFanControlFanModeSequenceAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<FanControlClusterFanControlFanModeSequenceAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::FanControl::FanControlFanModeSequence value);
-};
-
-class CHIPFanControlClusterFanControlFanModeSequenceAttributeCallbackSubscriptionBridge
-    : public CHIPFanControlClusterFanControlFanModeSequenceAttributeCallbackBridge
-{
-public:
-    CHIPFanControlClusterFanControlFanModeSequenceAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPFanControlClusterFanControlFanModeSequenceAttributeCallbackBridge(queue, handler, action, true),
->>>>>>> Changes for cleaner regen
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -16722,7 +16643,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-<<<<<<< HEAD
 class CHIPNullableFanControlClusterFanModeTypeAttributeCallbackBridge
     : public CHIPCallbackBridge<NullableFanControlClusterFanModeTypeAttributeCallback>
 {
@@ -16743,30 +16663,6 @@ public:
                                                                                 CHIPActionBlock action,
                                                                                 SubscriptionEstablishedHandler establishedHandler) :
         CHIPNullableFanControlClusterFanModeTypeAttributeCallbackBridge(queue, handler, action, true),
-=======
-class CHIPNullableFanControlClusterFanControlFanModeSequenceAttributeCallbackBridge
-    : public CHIPCallbackBridge<NullableFanControlClusterFanControlFanModeSequenceAttributeCallback>
-{
-public:
-    CHIPNullableFanControlClusterFanControlFanModeSequenceAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NullableFanControlClusterFanControlFanModeSequenceAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                                keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanControlFanModeSequence> & value);
-};
-
-class CHIPNullableFanControlClusterFanControlFanModeSequenceAttributeCallbackSubscriptionBridge
-    : public CHIPNullableFanControlClusterFanControlFanModeSequenceAttributeCallbackBridge
-{
-public:
-    CHIPNullableFanControlClusterFanControlFanModeSequenceAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPNullableFanControlClusterFanControlFanModeSequenceAttributeCallbackBridge(queue, handler, action, true),
->>>>>>> Changes for cleaner regen
         mEstablishedHandler(establishedHandler)
     {}
 

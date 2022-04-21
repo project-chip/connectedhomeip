@@ -5,7 +5,6 @@
         "../../../../examples/chip-tool/templates/helper.js",
         "../../../../examples/chip-tool/templates/tests/helper.js",
         "../../../../src/app/zap-templates/partials/helper.js",
-        "../../../../src/app/zap-templates/common/StringHelper.js",
         "../../../../src/app/zap-templates/templates/app/helper.js",
         "../../../../src/app/zap-templates/templates/chip/helper.js",
         "../../../../src/app/zap-templates/common/ClusterTestGeneration.js",

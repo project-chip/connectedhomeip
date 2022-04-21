@@ -428,8 +428,8 @@ client cluster ContentLauncher = 1290 {
     optional BrandingInformation brandingInformation = 2;
   }
 
-<<<<<<< HEAD
   response struct LaunchResponse = 2 {
+<<<<<<< HEAD
 <<<<<<< HEAD
     ContentLaunchStatusEnum status = 0;
 =======
@@ -439,6 +439,9 @@ client cluster ContentLauncher = 1290 {
     StatusEnumContentLauncher status = 0;
 >>>>>>> Changes for cleaner regen
 >>>>>>> Changes for cleaner regen
+=======
+    StatusEnumContentLauncher status = 0;
+>>>>>>> Regening after rebase
     optional CHAR_STRING data = 1;
   }
 
@@ -548,8 +551,8 @@ server cluster ContentLauncher = 1290 {
     optional BrandingInformation brandingInformation = 2;
   }
 
-<<<<<<< HEAD
   response struct LaunchResponse = 2 {
+<<<<<<< HEAD
 <<<<<<< HEAD
     ContentLaunchStatusEnum status = 0;
 =======
@@ -559,6 +562,9 @@ server cluster ContentLauncher = 1290 {
     StatusEnumContentLauncher status = 0;
 >>>>>>> Changes for cleaner regen
 >>>>>>> Changes for cleaner regen
+=======
+    StatusEnumContentLauncher status = 0;
+>>>>>>> Regening after rebase
     optional CHAR_STRING data = 1;
   }
 
@@ -1037,8 +1043,8 @@ client cluster KeypadInput = 1289 {
     CecKeyCode keyCode = 0;
   }
 
-<<<<<<< HEAD
   response struct SendKeyResponse = 1 {
+<<<<<<< HEAD
 <<<<<<< HEAD
     KeypadInputStatusEnum status = 0;
 =======
@@ -1048,6 +1054,9 @@ client cluster KeypadInput = 1289 {
     StatusEnumKeypadInput status = 0;
 >>>>>>> Changes for cleaner regen
 >>>>>>> Changes for cleaner regen
+=======
+    StatusEnumKeypadInput status = 0;
+>>>>>>> Regening after rebase
   }
 
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
@@ -1168,8 +1177,8 @@ server cluster KeypadInput = 1289 {
     CecKeyCode keyCode = 0;
   }
 
-<<<<<<< HEAD
   response struct SendKeyResponse = 1 {
+<<<<<<< HEAD
 <<<<<<< HEAD
     KeypadInputStatusEnum status = 0;
 =======
@@ -1179,6 +1188,9 @@ server cluster KeypadInput = 1289 {
     StatusEnumKeypadInput status = 0;
 >>>>>>> Changes for cleaner regen
 >>>>>>> Changes for cleaner regen
+=======
+    StatusEnumKeypadInput status = 0;
+>>>>>>> Regening after rebase
   }
 
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
@@ -2239,8 +2251,8 @@ client cluster TargetNavigator = 1285 {
     optional CHAR_STRING data = 1;
   }
 
-<<<<<<< HEAD
   response struct NavigateTargetResponse = 1 {
+<<<<<<< HEAD
 <<<<<<< HEAD
     TargetNavigatorStatusEnum status = 0;
 =======
@@ -2250,6 +2262,9 @@ client cluster TargetNavigator = 1285 {
     StatusEnumTargetNavigator status = 0;
 >>>>>>> Changes for cleaner regen
 >>>>>>> Changes for cleaner regen
+=======
+    StatusEnumTargetNavigator status = 0;
+>>>>>>> Regening after rebase
     optional CHAR_STRING data = 1;
   }
 
@@ -2284,8 +2299,8 @@ server cluster TargetNavigator = 1285 {
     optional CHAR_STRING data = 1;
   }
 
-<<<<<<< HEAD
   response struct NavigateTargetResponse = 1 {
+<<<<<<< HEAD
 <<<<<<< HEAD
     TargetNavigatorStatusEnum status = 0;
 =======
@@ -2295,6 +2310,9 @@ server cluster TargetNavigator = 1285 {
     StatusEnumTargetNavigator status = 0;
 >>>>>>> Changes for cleaner regen
 >>>>>>> Changes for cleaner regen
+=======
+    StatusEnumTargetNavigator status = 0;
+>>>>>>> Regening after rebase
     optional CHAR_STRING data = 1;
   }
 

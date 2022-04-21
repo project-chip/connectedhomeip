@@ -194,8 +194,8 @@ server cluster ApplicationLauncher = 1292 {
     Application application = 0;
   }
 
-<<<<<<< HEAD
   response struct LauncherResponse = 3 {
+<<<<<<< HEAD
 <<<<<<< HEAD
     ApplicationLauncherStatusEnum status = 0;
 =======
@@ -205,6 +205,9 @@ server cluster ApplicationLauncher = 1292 {
     StatusEnumApplicationLauncher status = 0;
 >>>>>>> Changes for cleaner regen
 >>>>>>> Changes for cleaner regen
+=======
+    StatusEnumApplicationLauncher status = 0;
+>>>>>>> Regening after rebase
     OCTET_STRING data = 1;
   }
 
@@ -370,8 +373,8 @@ server cluster Channel = 1284 {
     INT16U count = 0;
   }
 
-<<<<<<< HEAD
   response struct ChangeChannelResponse = 1 {
+<<<<<<< HEAD
 <<<<<<< HEAD
     ChannelStatusEnum status = 0;
 =======
@@ -381,6 +384,9 @@ server cluster Channel = 1284 {
     ChannelStatusEnum status = 0;
 >>>>>>> Changes for cleaner regen
 >>>>>>> Changes for cleaner regen
+=======
+    ChannelStatusEnum status = 0;
+>>>>>>> Regening after rebase
     optional CHAR_STRING data = 1;
   }
 
@@ -489,8 +495,8 @@ server cluster ContentLauncher = 1290 {
     optional BrandingInformation brandingInformation = 2;
   }
 
-<<<<<<< HEAD
   response struct LaunchResponse = 2 {
+<<<<<<< HEAD
 <<<<<<< HEAD
     ContentLaunchStatusEnum status = 0;
 =======
@@ -500,6 +506,9 @@ server cluster ContentLauncher = 1290 {
     StatusEnumContentLauncher status = 0;
 >>>>>>> Changes for cleaner regen
 >>>>>>> Changes for cleaner regen
+=======
+    StatusEnumContentLauncher status = 0;
+>>>>>>> Regening after rebase
     optional CHAR_STRING data = 1;
   }
 
@@ -1119,8 +1128,8 @@ server cluster MediaPlayback = 1286 {
     INT64U position = 0;
   }
 
-<<<<<<< HEAD
   response struct PlaybackResponse = 10 {
+<<<<<<< HEAD
 <<<<<<< HEAD
     MediaPlaybackStatusEnum status = 0;
 =======
@@ -1130,6 +1139,9 @@ server cluster MediaPlayback = 1286 {
     StatusEnumMediaPlayback status = 0;
 >>>>>>> Changes for cleaner regen
 >>>>>>> Changes for cleaner regen
+=======
+    StatusEnumMediaPlayback status = 0;
+>>>>>>> Regening after rebase
     optional CHAR_STRING data = 1;
   }
 
@@ -1790,8 +1802,8 @@ server cluster TargetNavigator = 1285 {
     optional CHAR_STRING data = 1;
   }
 
-<<<<<<< HEAD
   response struct NavigateTargetResponse = 1 {
+<<<<<<< HEAD
 <<<<<<< HEAD
     TargetNavigatorStatusEnum status = 0;
 =======
@@ -1801,6 +1813,9 @@ server cluster TargetNavigator = 1285 {
     StatusEnumTargetNavigator status = 0;
 >>>>>>> Changes for cleaner regen
 >>>>>>> Changes for cleaner regen
+=======
+    StatusEnumTargetNavigator status = 0;
+>>>>>>> Regening after rebase
     optional CHAR_STRING data = 1;
   }
 
