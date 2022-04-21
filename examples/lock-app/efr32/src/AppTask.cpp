@@ -395,7 +395,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        if (LockMgr().IsUnlocked() == true)
+        if (LockMgr().NextState() == true)
         {
             action = LockManager::LOCK_ACTION;
         }
@@ -670,8 +670,8 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 
 void AppTask::UpdateClusterState(intptr_t context)
 {
-    bool unlocked = LockMgr().IsUnlocked();
-    DlLockState newState = unlocked ? DlLockState::kLocked : DlLockState::kUnlocked;
+    bool unlocked = LockMgr().NextState();
+    DlLockState newState = unlocked ? DlLockState::kUnlocked : DlLockState::kLocked;
 
     DlOperationSource source = DlOperationSource::kUnspecified;
 

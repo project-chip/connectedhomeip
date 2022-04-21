@@ -78,7 +78,7 @@ bool LockManager::IsActionInProgress()
     return (mState == kState_LockInitiated || mState == kState_UnlockInitiated);
 }
 
-bool LockManager::IsUnlocked()
+bool LockManager::NextState()
 {
     return (mState == kState_UnlockCompleted);
 }
@@ -94,14 +94,12 @@ bool LockManager::InitiateAction(int32_t aActor, Action_t aAction)
         action_initiated = true;
 
         new_state = kState_UnlockInitiated;
-        EFR32Config::WriteConfigValue(EFR32Config::kConfigKey_LockState, true);
     }
     else if (mState == kState_UnlockCompleted && aAction == LOCK_ACTION)
     {
         action_initiated = true;
 
         new_state = kState_LockInitiated;
-        EFR32Config::WriteConfigValue(EFR32Config::kConfigKey_LockState, false);
     }
 
     if (action_initiated)
