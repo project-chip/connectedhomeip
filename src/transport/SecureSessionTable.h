@@ -35,7 +35,6 @@ constexpr uint16_t kUnsecuredSessionId = 0;
  *   - handle session active time and expiration
  *   - allocate and free space for sessions.
  */
-template <size_t kMaxSessionCount>
 class SecureSessionTable
 {
 public:
@@ -89,36 +88,9 @@ public:
             }
         }
 
-        SecureSession * result = mEntries.CreateObject(secureSessionType, localSessionId, localNodeId, peerNodeId, peerCATs,
+        SecureSession * result = mEntries.CreateObject(*this, secureSessionType, localSessionId, localNodeId, peerNodeId, peerCATs,
                                                        peerSessionId, fabricIndex, config);
         return result != nullptr ? MakeOptional<SessionHandle>(*result) : Optional<SessionHandle>::Missing();
-    }
-
-    /**
-     * Allocate a new secure session out of the internal resource pool with the
-     * specified session ID.  The returned secure session will not become active
-     * until the call to SecureSession::Activate.  If there is a resident
-     * session at the passed ID, an empty Optional will be returned to signal
-     * the error.
-     *
-     * This variant of the interface is primarily useful in testing, where
-     * session IDs may need to be predetermined.
-     *
-     * @param localSessionId unique identifier for the local node's secure unicast session context
-     * @returns allocated session, or NullOptional on failure
-     */
-    CHECK_RETURN_VALUE
-    Optional<SessionHandle> CreateNewSecureSession(uint16_t localSessionId)
-    {
-        Optional<SessionHandle> rv = Optional<SessionHandle>::Missing();
-        SecureSession * allocated  = nullptr;
-        VerifyOrExit(localSessionId != kUnsecuredSessionId, rv = NullOptional);
-        VerifyOrExit(!FindSecureSessionByLocalKey(localSessionId).HasValue(), rv = NullOptional);
-        allocated = mEntries.CreateObject(localSessionId);
-        VerifyOrExit(allocated != nullptr, rv = Optional<SessionHandle>::Missing());
-        rv = MakeOptional<SessionHandle>(*allocated);
-    exit:
-        return rv;
     }
 
     /**
@@ -130,13 +102,13 @@ public:
      * @returns allocated session, or NullOptional on failure
      */
     CHECK_RETURN_VALUE
-    Optional<SessionHandle> CreateNewSecureSession()
+    Optional<SessionHandle> CreateNewSecureSession(SecureSession::Type secureSessionType)
     {
         Optional<SessionHandle> rv = Optional<SessionHandle>::Missing();
         auto sessionId             = FindUnusedSessionId();
         SecureSession * allocated  = nullptr;
         VerifyOrExit(sessionId.HasValue(), rv = Optional<SessionHandle>::Missing());
-        allocated = mEntries.CreateObject(sessionId.Value());
+        allocated = mEntries.CreateObject(*this, secureSessionType, sessionId.Value());
         VerifyOrExit(allocated != nullptr, rv = Optional<SessionHandle>::Missing());
         rv             = MakeOptional<SessionHandle>(*allocated);
         mNextSessionId = sessionId.Value() == kMaxSessionID ? static_cast<uint16_t>(kUnsecuredSessionId + 1)
@@ -175,26 +147,6 @@ public:
         return result != nullptr ? MakeOptional<SessionHandle>(*result) : Optional<SessionHandle>::Missing();
     }
 
-    /**
-     * Iterates through all active sessions and expires any sessions with an idle time
-     * larger than the given amount.
-     *
-     * Expiring a session involves callback execution and then clearing the internal state.
-     */
-    template <typename Callback>
-    void ExpireInactiveSessions(System::Clock::Timestamp maxIdleTime, Callback callback)
-    {
-        mEntries.ForEachActiveObject([&](auto session) {
-            if (session->GetSecureSessionType() != SecureSession::Type::kPending &&
-                session->GetLastActivityTime() + maxIdleTime < System::SystemClock().GetMonotonicTimestamp())
-            {
-                callback(*session);
-                ReleaseSession(session);
-            }
-            return Loop::Continue;
-        });
-    }
-
 private:
     /**
      * Find an available session ID that is unused in the secure session table.
@@ -204,7 +156,7 @@ private:
      * from the starting mNextSessionId clue.
      *
      * The outer-loop considers 64 session IDs in each iteration to give a
-     * runtime complexity of O(kMaxSessionCount^2/64).  Speed up could be
+     * runtime complexity of O(CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE^2/64).  Speed up could be
      * achieved with a sorted session table or additional storage.
      *
      * @return an unused session ID if any is found, else NullOptional
@@ -262,7 +214,7 @@ private:
         return NullOptional;
     }
 
-    BitMapObjectPool<SecureSession, kMaxSessionCount> mEntries;
+    BitMapObjectPool<SecureSession, CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mEntries;
     uint16_t mNextSessionId = 0;
 };
 

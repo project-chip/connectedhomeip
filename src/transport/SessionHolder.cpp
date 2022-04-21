@@ -14,8 +14,10 @@
  *    limitations under the License.
  */
 
-#include <transport/Session.h>
 #include <transport/SessionHolder.h>
+
+#include <transport/SecureSession.h>
+#include <transport/Session.h>
 
 namespace chip {
 
@@ -72,11 +74,24 @@ SessionHolder & SessionHolder::operator=(SessionHolder && that)
     return *this;
 }
 
+void SessionHolder::GrabPairing(const SessionHandle & session)
+{
+    Release();
+    if (session->IsSecureSession() && session->AsSecureSession()->IsPairing())
+    {
+        mSession.Emplace(session.mSession);
+        session->AddHolder(*this);
+    }
+}
+
 void SessionHolder::Grab(const SessionHandle & session)
 {
     Release();
-    mSession.Emplace(session.mSession);
-    session->AddHolder(*this);
+    if (session->IsActiveSession())
+    {
+        mSession.Emplace(session.mSession);
+        session->AddHolder(*this);
+    }
 }
 
 void SessionHolder::Release()

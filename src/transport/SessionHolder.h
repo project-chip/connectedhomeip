@@ -47,6 +47,7 @@ public:
         return mSession.HasValue() && &mSession.Value().Get() == &session.mSession.Get();
     }
 
+    void GrabPairing(const SessionHandle & session); // Should be only used inside CASE/PASE pairing.
     void Grab(const SessionHandle & session);
     void Release();
 
