@@ -28,9 +28,9 @@
 
 #pragma once
 
-#include <app/AttributeCache.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
+#include <app/ClusterStateCache.h>
 #include <app/OperationalDeviceProxy.h>
 #include <app/OperationalDeviceProxyPool.h>
 #include <controller/AbstractDnssdDiscoveryController.h>
@@ -143,6 +143,16 @@ public:
      *  ensure this happened before calling this method.
      */
     virtual CHIP_ERROR Shutdown();
+
+    SessionManager * SessionMgr()
+    {
+        if (mSystemState)
+        {
+            return mSystemState->SessionMgr();
+        }
+
+        return nullptr;
+    }
 
     CHIP_ERROR GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port);
 
@@ -280,7 +290,7 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController,
                                       public Protocols::UserDirectedCommissioning::InstanceNameResolver,
 #endif
                                       public SessionEstablishmentDelegate,
-                                      public app::AttributeCache::Callback
+                                      public app::ClusterStateCache::Callback
 {
 public:
     DeviceCommissioner();
@@ -449,7 +459,7 @@ public:
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
-    void OnSessionEstablished() override;
+    void OnSessionEstablished(const SessionHandle & session) override;
 
     void RendezvousCleanup(CHIP_ERROR status);
 
@@ -549,7 +559,7 @@ public:
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
     DevicePairingDelegate * GetPairingDelegate() const { return mPairingDelegate; }
 
-    // AttributeCache::Callback impl
+    // ClusterStateCache::Callback impl
     void OnDone() override;
 
     // Commissioner will establish new device connections after PASE.
@@ -764,7 +774,7 @@ private:
         nullptr; // Commissioning delegate that issued the PerformCommissioningStep command
     CompletionStatus commissioningCompletionStatus;
 
-    Platform::UniquePtr<app::AttributeCache> mAttributeCache;
+    Platform::UniquePtr<app::ClusterStateCache> mAttributeCache;
     Platform::UniquePtr<app::ReadClient> mReadClient;
     Credentials::AttestationVerificationResult mAttestationResult;
 };

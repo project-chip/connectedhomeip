@@ -22,7 +22,9 @@
 #pragma once
 
 #include <crypto/RandUtils.h>
-#include <lib/support/PersistedCounter.h>
+#include <lib/core/CHIPError.h>
+
+#include <stdint.h>
 
 namespace chip {
 
@@ -48,9 +50,9 @@ public:
 
     virtual ~MessageCounter() = default;
 
-    virtual Type GetType()       = 0;
-    virtual uint32_t Value()     = 0; /** Get current value */
-    virtual CHIP_ERROR Advance() = 0; /** Advance the counter */
+    virtual Type GetType() const   = 0;
+    virtual uint32_t Value() const = 0; /** Get current value */
+    virtual CHIP_ERROR Advance()   = 0; /** Advance the counter */
 };
 
 class GlobalUnencryptedMessageCounter : public MessageCounter
@@ -60,8 +62,8 @@ public:
 
     void Init();
 
-    Type GetType() override { return GlobalUnencrypted; }
-    uint32_t Value() override { return mValue; }
+    Type GetType() const override { return GlobalUnencrypted; }
+    uint32_t Value() const override { return mValue; }
     CHIP_ERROR Advance() override
     {
         ++mValue;
@@ -70,38 +72,6 @@ public:
 
 private:
     uint32_t mValue;
-};
-
-class GlobalEncryptedMessageCounter : public MessageCounter
-{
-public:
-    GlobalEncryptedMessageCounter() {}
-
-    CHIP_ERROR Init();
-    Type GetType() override { return GlobalEncrypted; }
-    uint32_t Value() override { return persisted.GetValue(); }
-    CHIP_ERROR Advance() override { return persisted.Advance(); }
-
-private:
-#if CONFIG_DEVICE_LAYER
-    PersistedCounter persisted;
-#else
-    struct FakePersistedCounter
-    {
-        FakePersistedCounter() : mValue(0) {}
-        CHIP_ERROR Init(chip::Platform::PersistedStorage::Key aId, uint32_t aEpoch) { return CHIP_NO_ERROR; }
-
-        uint32_t GetValue() { return mValue; }
-        CHIP_ERROR Advance()
-        {
-            ++mValue;
-            return CHIP_NO_ERROR;
-        }
-
-    private:
-        uint32_t mValue;
-    } persisted;
-#endif
 };
 
 class LocalSessionMessageCounter : public MessageCounter
@@ -117,8 +87,8 @@ public:
      */
     LocalSessionMessageCounter() { mValue = (Crypto::GetRandU32() & kMessageCounterRandomInitMask) + 1; }
 
-    Type GetType() override { return Session; }
-    uint32_t Value() override { return mValue; }
+    Type GetType() const override { return Session; }
+    uint32_t Value() const override { return mValue; }
     CHIP_ERROR Advance() override
     {
         ++mValue;

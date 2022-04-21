@@ -20,13 +20,13 @@
 #import "CHIPAttributeCacheContainer.h"
 #import "CHIPDeviceControllerOverXPC.h"
 
-#include <app/AttributeCache.h>
+#include <app/ClusterStateCache.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPAttributeCacheContainer ()
 
-@property (atomic, readwrite, nullable) chip::app::AttributeCache * cppAttributeCache;
+@property (atomic, readwrite, nullable) chip::app::ClusterStateCache * cppAttributeCache;
 @property (nonatomic, readwrite) uint64_t deviceId;
 @property (nonatomic, readwrite, weak, nullable) CHIPDeviceControllerXPCConnection * xpcConnection;
 @property (nonatomic, readwrite, strong, nullable) id<NSCopying> xpcControllerId;

@@ -1659,14 +1659,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000003, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000003, 0x00000000, mRequest);
     }
@@ -1688,14 +1688,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000003, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000003, 0x00000001, mRequest);
     }
@@ -1719,14 +1719,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000040) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000040) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000003, 0x00000040, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000040) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000040) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000003, 0x00000040, mRequest);
     }
@@ -1798,14 +1798,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000004, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000004, 0x00000000, mRequest);
     }
@@ -1828,14 +1828,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000004, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000004, 0x00000001, mRequest);
     }
@@ -1859,14 +1859,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000004, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000004, 0x00000002, mRequest);
     }
@@ -1890,14 +1890,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000003) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000004, 0x00000003, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000003) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000003) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000004, 0x00000003, mRequest);
     }
@@ -1919,14 +1919,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000004) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000004, 0x00000004, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000004) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000004) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000004, 0x00000004, mRequest);
     }
@@ -1951,14 +1951,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000005) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000004, 0x00000005, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000005) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000005) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000004, 0x00000005, mRequest);
     }
@@ -2017,14 +2017,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000005, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000005, 0x00000000, mRequest);
     }
@@ -2050,14 +2050,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000005, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000005, 0x00000001, mRequest);
     }
@@ -2081,14 +2081,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000005, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000005, 0x00000002, mRequest);
     }
@@ -2111,14 +2111,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000003) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000005, 0x00000003, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000003) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000003) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000005, 0x00000003, mRequest);
     }
@@ -2142,14 +2142,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000004) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000005, 0x00000004, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000004) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000004) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000005, 0x00000004, mRequest);
     }
@@ -2174,14 +2174,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000005) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000005, 0x00000005, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000005) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000005) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000005, 0x00000005, mRequest);
     }
@@ -2205,14 +2205,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000006) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000005, 0x00000006, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000006) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000006) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000005, 0x00000006, mRequest);
     }
@@ -2240,14 +2240,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000040) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000040) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000005, 0x00000040, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000040) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000040) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000005, 0x00000040, mRequest);
     }
@@ -2273,14 +2273,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000041) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000041) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000005, 0x00000041, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000041) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000041) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000005, 0x00000041, mRequest);
     }
@@ -2307,14 +2307,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000042) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000042) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000005, 0x00000042, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000042) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000042) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000005, 0x00000042, mRequest);
     }
@@ -2362,14 +2362,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000006, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000006, 0x00000000, mRequest);
     }
@@ -2391,14 +2391,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000006, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000006, 0x00000001, mRequest);
     }
@@ -2420,14 +2420,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000006, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000006, 0x00000002, mRequest);
     }
@@ -2451,14 +2451,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000040) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000040) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000006, 0x00000040, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000040) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000040) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000006, 0x00000040, mRequest);
     }
@@ -2481,14 +2481,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000041) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000041) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000006, 0x00000041, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000041) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000041) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000006, 0x00000041, mRequest);
     }
@@ -2513,14 +2513,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000042) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000042) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000006, 0x00000042, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000042) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000042) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000006, 0x00000042, mRequest);
     }
@@ -2705,14 +2705,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000000, mRequest);
     }
@@ -2738,14 +2738,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000001, mRequest);
     }
@@ -2772,14 +2772,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000002, mRequest);
     }
@@ -2803,14 +2803,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000003) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000003, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000003) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000003) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000003, mRequest);
     }
@@ -2835,14 +2835,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000004) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000004, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000004) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000004) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000004, mRequest);
     }
@@ -2866,14 +2866,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000005) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000005, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000005) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000005) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000005, mRequest);
     }
@@ -2898,14 +2898,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000006) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000006, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000006) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000006) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000006, mRequest);
     }
@@ -2927,14 +2927,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000007) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000007) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000007, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000007) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000007) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000007, mRequest);
     }
@@ -3165,14 +3165,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000009, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000009, 0x00000000, mRequest);
     }
@@ -3194,14 +3194,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000009, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000009, 0x00000001, mRequest);
     }
@@ -3223,14 +3223,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000009, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000009, 0x00000002, mRequest);
     }
@@ -3252,14 +3252,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000003) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000009, 0x00000003, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000003) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000003) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000009, 0x00000003, mRequest);
     }
@@ -3704,14 +3704,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001A, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001A, 0x00000000, mRequest);
     }
@@ -3734,14 +3734,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001A, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001A, 0x00000001, mRequest);
     }
@@ -3768,14 +3768,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001A, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001A, 0x00000002, mRequest);
     }
@@ -3801,14 +3801,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000003) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001A, 0x00000003, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000003) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000003) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001A, 0x00000003, mRequest);
     }
@@ -3835,14 +3835,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000004) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001A, 0x00000004, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000004) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000004) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001A, 0x00000004, mRequest);
     }
@@ -3870,14 +3870,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000005) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001A, 0x00000005, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000005) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000005) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001A, 0x00000005, mRequest);
     }
@@ -3903,14 +3903,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000006) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001A, 0x00000006, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000006) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000006) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001A, 0x00000006, mRequest);
     }
@@ -3934,14 +3934,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000007) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000007) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001A, 0x00000007, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000007) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000007) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001A, 0x00000007, mRequest);
     }
@@ -3968,14 +3968,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000008) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000008) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001A, 0x00000008, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000008) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000008) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001A, 0x00000008, mRequest);
     }
@@ -4049,14 +4049,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001B, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001B, 0x00000000, mRequest);
     }
@@ -4078,14 +4078,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001B, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001B, 0x00000001, mRequest);
     }
@@ -4111,14 +4111,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001B, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001B, 0x00000002, mRequest);
     }
@@ -4142,14 +4142,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000003) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001B, 0x00000003, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000003) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000003) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001B, 0x00000003, mRequest);
     }
@@ -4172,14 +4172,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000004) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001B, 0x00000004, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000004) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000004) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001B, 0x00000004, mRequest);
     }
@@ -4203,14 +4203,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000005) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000001B, 0x00000005, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000005) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000005) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000001B, 0x00000005, mRequest);
     }
@@ -4305,6 +4305,9 @@ private:
 | Attributes:                                                         |        |
 | * Acl                                                               | 0x0000 |
 | * Extension                                                         | 0x0001 |
+| * SubjectsPerAccessControlEntry                                     | 0x0002 |
+| * TargetsPerAccessControlEntry                                      | 0x0003 |
+| * AccessControlEntriesPerFabric                                     | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -4416,14 +4419,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000020, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000020, 0x00000000, mRequest);
     }
@@ -4445,14 +4448,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000020, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000020, 0x00000001, mRequest);
     }
@@ -4476,14 +4479,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000020, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000020, 0x00000002, mRequest);
     }
@@ -4507,14 +4510,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000003) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000020, 0x00000003, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000003) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000003) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000020, 0x00000003, mRequest);
     }
@@ -4624,14 +4627,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x00000000, mRequest);
     }
@@ -4657,14 +4660,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x00000001, mRequest);
     }
@@ -4688,14 +4691,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x00000002, mRequest);
     }
@@ -4721,14 +4724,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000003) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x00000003, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000003) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000003) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x00000003, mRequest);
     }
@@ -4752,14 +4755,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000004) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x00000004, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000004) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000004) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x00000004, mRequest);
     }
@@ -4783,14 +4786,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000005) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x00000005, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000005) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000005) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x00000005, mRequest);
     }
@@ -4816,14 +4819,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000006) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x00000006, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000006) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000006) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x00000006, mRequest);
     }
@@ -4847,14 +4850,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000007) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000007) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x00000007, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000007) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000007) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x00000007, mRequest);
     }
@@ -4878,14 +4881,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000008) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000008) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x00000008, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000008) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000008) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x00000008, mRequest);
     }
@@ -4911,14 +4914,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000009) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000009) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x00000009, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000009) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000009) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x00000009, mRequest);
     }
@@ -4942,14 +4945,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000A) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000A) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x0000000A, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000A) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000A) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x0000000A, mRequest);
     }
@@ -4975,14 +4978,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000B) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000B) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000025, 0x0000000B, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000B) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000B) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000025, 0x0000000B, mRequest);
     }
@@ -5017,6 +5020,7 @@ private:
 | * LocalConfigDisabled                                               | 0x0010 |
 | * Reachable                                                         | 0x0011 |
 | * UniqueID                                                          | 0x0012 |
+| * CapabilityMinima                                                  | 0x0013 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -5043,14 +5047,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000028) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000028, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000028) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000028) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000028, 0x00000000, mRequest);
     }
@@ -5178,14 +5182,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000029, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000029, 0x00000000, mRequest);
     }
@@ -5212,14 +5216,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000029, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000029, 0x00000002, mRequest);
     }
@@ -5244,14 +5248,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000004) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000029, 0x00000004, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000004) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000004) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000029, 0x00000004, mRequest);
     }
@@ -5302,14 +5306,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000002A, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002A) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000002A, 0x00000000, mRequest);
     }
@@ -5608,14 +5612,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000030, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000030, 0x00000000, mRequest);
     }
@@ -5641,14 +5645,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000030, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000030, 0x00000002, mRequest);
     }
@@ -5671,14 +5675,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000004) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000030, 0x00000004, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000004) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000004) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000030, 0x00000004, mRequest);
     }
@@ -5759,14 +5763,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000031, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000031, 0x00000000, mRequest);
     }
@@ -5792,14 +5796,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000031, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000031, 0x00000002, mRequest);
     }
@@ -5824,14 +5828,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000003) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000031, 0x00000003, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000003) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000003) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000031, 0x00000003, mRequest);
     }
@@ -5856,14 +5860,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000004) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000031, 0x00000004, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000004) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000004) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000031, 0x00000004, mRequest);
     }
@@ -5888,14 +5892,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000006) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000031, 0x00000006, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000006) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000006) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000031, 0x00000006, mRequest);
     }
@@ -5921,14 +5925,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000008) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000008) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000031, 0x00000008, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000008) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000008) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000031, 0x00000008, mRequest);
     }
@@ -5997,14 +6001,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000032) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000032) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000032, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000032) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000032) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000032, 0x00000000, mRequest);
     }
@@ -6075,14 +6079,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000034) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000034) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000034, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000034) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000034) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000034, 0x00000000, mRequest);
     }
@@ -6185,14 +6189,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000035) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000035, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000035) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000035) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000035, 0x00000000, mRequest);
     }
@@ -6247,14 +6251,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000036) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000036, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000036) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000036) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000036, 0x00000000, mRequest);
     }
@@ -6302,14 +6306,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000037) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000037, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000037) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000037) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000037, 0x00000000, mRequest);
     }
@@ -6458,14 +6462,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003C, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003C, 0x00000000, mRequest);
     }
@@ -6489,14 +6493,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003C, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003C, 0x00000001, mRequest);
     }
@@ -6519,14 +6523,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003C, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003C, 0x00000002, mRequest);
     }
@@ -6580,14 +6584,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003E, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003E, 0x00000000, mRequest);
     }
@@ -6611,14 +6615,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003E, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003E, 0x00000002, mRequest);
     }
@@ -6641,14 +6645,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000004) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003E, 0x00000004, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000004) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000004) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003E, 0x00000004, mRequest);
     }
@@ -6675,14 +6679,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000006) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003E, 0x00000006, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000006) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000006) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003E, 0x00000006, mRequest);
     }
@@ -6706,14 +6710,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000007) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000007) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003E, 0x00000007, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000007) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000007) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003E, 0x00000007, mRequest);
     }
@@ -6737,14 +6741,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000009) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000009) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003E, 0x00000009, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000009) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000009) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003E, 0x00000009, mRequest);
     }
@@ -6768,14 +6772,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000A) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000A) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003E, 0x0000000A, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000A) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000A) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003E, 0x0000000A, mRequest);
     }
@@ -6799,14 +6803,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000B) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000B) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003E, 0x0000000B, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000B) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000B) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003E, 0x0000000B, mRequest);
     }
@@ -6830,14 +6834,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000C) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000C) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003E, 0x0000000C, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000C) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000C) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003E, 0x0000000C, mRequest);
     }
@@ -6884,14 +6888,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003F, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003F, 0x00000000, mRequest);
     }
@@ -6915,14 +6919,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003F, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003F, 0x00000001, mRequest);
     }
@@ -6946,14 +6950,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000003) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003F, 0x00000003, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000003) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000003) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003F, 0x00000003, mRequest);
     }
@@ -6977,14 +6981,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000004) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003F, 0x00000004, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000004) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000004) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003F, 0x00000004, mRequest);
     }
@@ -7182,14 +7186,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000050, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000050) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000050, 0x00000000, mRequest);
     }
@@ -7459,14 +7463,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000000, mRequest);
     }
@@ -7489,14 +7493,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000001, mRequest);
     }
@@ -7521,14 +7525,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000003) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000003, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000003) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000003) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000003, mRequest);
     }
@@ -7551,14 +7555,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000004) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000004, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000004) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000004) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000004, mRequest);
     }
@@ -7584,14 +7588,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000005) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000005, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000005) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000005) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000005, mRequest);
     }
@@ -7614,14 +7618,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000006) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000006, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000006) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000006) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000006, mRequest);
     }
@@ -7644,14 +7648,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000007) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000007) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000007, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000007) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000007) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000007, mRequest);
     }
@@ -7673,14 +7677,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000008) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000008) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000008, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000008) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000008) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000008, mRequest);
     }
@@ -7704,14 +7708,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000009) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000009) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000009, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000009) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000009) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000009, mRequest);
     }
@@ -7734,14 +7738,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000A) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000A) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000000A, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000A) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000A) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000000A, mRequest);
     }
@@ -7771,14 +7775,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000B) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000B) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000000B, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000B) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000B) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000000B, mRequest);
     }
@@ -7803,14 +7807,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000C) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000C) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000000C, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000C) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000C) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000000C, mRequest);
     }
@@ -7835,14 +7839,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000D) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000D) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000000D, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000D) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000D) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000000D, mRequest);
     }
@@ -7869,14 +7873,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000E) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000E) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000000E, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000E) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000E) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000000E, mRequest);
     }
@@ -7901,14 +7905,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000F) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000F) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000000F, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000F) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000F) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000000F, mRequest);
     }
@@ -7933,14 +7937,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000010) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000010) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000010, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000010) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000010) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000010, mRequest);
     }
@@ -7967,14 +7971,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000011) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000011) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000011, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000011) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000011) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000011, mRequest);
     }
@@ -7998,14 +8002,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000012) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000012) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000012, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000012) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000012) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000012, mRequest);
     }
@@ -8029,14 +8033,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000013) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000013) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000013, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000013) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000013) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000013, mRequest);
     }
@@ -8060,14 +8064,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000014) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000014) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000014, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000014) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000014) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000014, mRequest);
     }
@@ -8090,14 +8094,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000015) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000015) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000015, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000015) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000015) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000015, mRequest);
     }
@@ -8123,14 +8127,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000016) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000016) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000016, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000016) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000016) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000016, mRequest);
     }
@@ -8153,14 +8157,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000017) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000017) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000017, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000017) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000017) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000017, mRequest);
     }
@@ -8183,14 +8187,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000018) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000018) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000018, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000018) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000018) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000018, mRequest);
     }
@@ -8213,14 +8217,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000019) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000019) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000019, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000019) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000019) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000019, mRequest);
     }
@@ -8249,14 +8253,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001A) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001A) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000001A, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001A) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001A) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000001A, mRequest);
     }
@@ -8279,14 +8283,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001B) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001B) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000001B, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001B) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001B) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000001B, mRequest);
     }
@@ -8309,14 +8313,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001D) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001D) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000001D, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001D) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001D) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000001D, mRequest);
     }
@@ -8345,14 +8349,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000022) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000022) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000022, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000022) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000022) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000022, mRequest);
     }
@@ -8377,14 +8381,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000024) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000024) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000024, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000024) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000024) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000024, mRequest);
     }
@@ -8409,14 +8413,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000026) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000026) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000026, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000026) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000026) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000026, mRequest);
     }
@@ -9204,14 +9208,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000102, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000102, 0x00000000, mRequest);
     }
@@ -9233,14 +9237,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000102, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000102, 0x00000001, mRequest);
     }
@@ -9262,14 +9266,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000102, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000102, 0x00000002, mRequest);
     }
@@ -9293,14 +9297,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000004) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000102, 0x00000004, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000004) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000004) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000102, 0x00000004, mRequest);
     }
@@ -9325,14 +9329,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000005) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000102, 0x00000005, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000005) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000005) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000102, 0x00000005, mRequest);
     }
@@ -9356,14 +9360,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000007) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000007) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000102, 0x00000007, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000007) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000007) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000102, 0x00000007, mRequest);
     }
@@ -9388,14 +9392,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000008) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000008) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000102, 0x00000008, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000008) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000008) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000102, 0x00000008, mRequest);
     }
@@ -9427,7 +9431,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -9472,14 +9476,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000103) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000103) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000103, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000103) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000103) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000103, 0x00000000, mRequest);
     }
@@ -9502,14 +9506,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000103) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000103) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000103, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000103) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000103) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000103, 0x00000001, mRequest);
     }
@@ -9814,7 +9818,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode mValue;
 };
 
 class WritePumpConfigurationAndControlControlMode : public WriteAttribute
@@ -9841,7 +9845,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -9923,14 +9927,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000000, mRequest);
     }
@@ -9957,14 +9961,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000001, mRequest);
     }
@@ -9990,14 +9994,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000002, mRequest);
     }
@@ -10020,14 +10024,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000003) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000003, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000003) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000003) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000003, mRequest);
     }
@@ -10050,14 +10054,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000004) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000004, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000004) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000004) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000004, mRequest);
     }
@@ -10717,6 +10721,15 @@ private:
 | Attributes:                                                         |        |
 | * FanMode                                                           | 0x0000 |
 | * FanModeSequence                                                   | 0x0001 |
+| * PercentSetting                                                    | 0x0002 |
+| * PercentCurrent                                                    | 0x0003 |
+| * SpeedMax                                                          | 0x0004 |
+| * SpeedSetting                                                      | 0x0005 |
+| * SpeedCurrent                                                      | 0x0006 |
+| * RockSupport                                                       | 0x0007 |
+| * RockSetting                                                       | 0x0008 |
+| * WindSupport                                                       | 0x0009 |
+| * WindSetting                                                       | 0x000A |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -10773,6 +10786,111 @@ public:
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000202, 0x00000001, mValue);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class WriteFanControlPercentSetting : public WriteAttribute
+{
+public:
+    WriteFanControlPercentSetting(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("PercentSetting", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "percent-setting");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteFanControlPercentSetting() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000202, 0x00000002, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000202, 0x00000002, mValue);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class WriteFanControlSpeedSetting : public WriteAttribute
+{
+public:
+    WriteFanControlSpeedSetting(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("SpeedSetting", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "speed-setting");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteFanControlSpeedSetting() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000202, 0x00000005, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000202, 0x00000005, mValue);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class WriteFanControlRockSetting : public WriteAttribute
+{
+public:
+    WriteFanControlRockSetting(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("RockSetting", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "rock-setting");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteFanControlRockSetting() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000202, 0x00000008, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000202, 0x00000008, mValue);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class WriteFanControlWindSetting : public WriteAttribute
+{
+public:
+    WriteFanControlWindSetting(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("WindSetting", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "wind-setting");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteFanControlWindSetting() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000202, 0x0000000A, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000202, 0x0000000A, mValue);
     }
 
 private:
@@ -11167,14 +11285,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000000, mRequest);
     }
@@ -11200,14 +11318,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000001, mRequest);
     }
@@ -11234,14 +11352,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000002, mRequest);
     }
@@ -11268,14 +11386,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000003) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000003, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000003) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000003) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000003, mRequest);
     }
@@ -11301,14 +11419,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000004) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000004, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000004) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000004) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000004, mRequest);
     }
@@ -11335,14 +11453,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000005) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000005, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000005) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000005) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000005, mRequest);
     }
@@ -11370,14 +11488,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000006) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000006, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000006) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000006) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000006, mRequest);
     }
@@ -11404,14 +11522,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000007) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000007) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000007, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000007) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000007) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000007, mRequest);
     }
@@ -11437,14 +11555,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000008) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000008) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000008, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000008) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000008) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000008, mRequest);
     }
@@ -11471,14 +11589,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000009) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000009) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000009, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000009) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000009) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000009, mRequest);
     }
@@ -11505,14 +11623,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000000A) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000000A) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x0000000A, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000000A) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000000A) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x0000000A, mRequest);
     }
@@ -11540,14 +11658,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000040) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000040) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000040, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000040) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000040) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000040, mRequest);
     }
@@ -11574,14 +11692,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000041) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000041) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000041, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000041) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000041) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000041, mRequest);
     }
@@ -11609,14 +11727,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000042) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000042) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000042, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000042) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000042) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000042, mRequest);
     }
@@ -11644,14 +11762,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000043) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000043) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000043, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000043) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000043) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000043, mRequest);
     }
@@ -11680,14 +11798,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000044) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000044) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000044, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000044) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000044) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000044, mRequest);
     }
@@ -11711,14 +11829,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000047) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000047) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000047, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000047) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000047) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x00000047, mRequest);
     }
@@ -11747,14 +11865,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000004B) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000004B) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x0000004B, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000004B) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000004B) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x0000004B, mRequest);
     }
@@ -11784,14 +11902,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000004C) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000004C) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000300, 0x0000004C, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000004C) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000004C) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000300, 0x0000004C, mRequest);
     }
@@ -13477,14 +13595,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000500) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000500) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000500, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000500) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000500) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000500, 0x00000000, mRequest);
     }
@@ -13507,14 +13625,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000500) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000500) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000500, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000500) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000500) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000500, 0x00000001, mRequest);
     }
@@ -13538,14 +13656,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000500) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000500) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000500, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000500) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000500) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000500, 0x00000002, mRequest);
     }
@@ -13648,14 +13766,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000501, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000501, 0x00000000, mRequest);
     }
@@ -13681,14 +13799,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000501, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000501, 0x00000001, mRequest);
     }
@@ -13711,14 +13829,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000501, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000501, 0x00000002, mRequest);
     }
@@ -13740,14 +13858,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000003) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000501, 0x00000003, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000003) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000003) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000501, 0x00000003, mRequest);
     }
@@ -13769,14 +13887,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000004) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000501, 0x00000004, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000004) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000004) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000501, 0x00000004, mRequest);
     }
@@ -13798,14 +13916,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000005) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000501, 0x00000005, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000005) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000005) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000501, 0x00000005, mRequest);
     }
@@ -13829,14 +13947,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000006) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000501, 0x00000006, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000006) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000006) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000501, 0x00000006, mRequest);
     }
@@ -13858,14 +13976,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000007) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000007) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000501, 0x00000007, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000007) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000007) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000501, 0x00000007, mRequest);
     }
@@ -13888,14 +14006,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000008) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000008) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000501, 0x00000008, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000008) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000008) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000501, 0x00000008, mRequest);
     }
@@ -13921,14 +14039,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000009) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000009) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000501, 0x00000009, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000009) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000009) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000501, 0x00000009, mRequest);
     }
@@ -13972,14 +14090,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000502) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000502) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000502, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000502) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000502) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000502, 0x00000000, mRequest);
     }
@@ -14002,14 +14120,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000502) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000502) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000502, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000502) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000502) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000502, 0x00000001, mRequest);
     }
@@ -14095,14 +14213,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000504, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000504, 0x00000000, mRequest);
     }
@@ -14127,14 +14245,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000504, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000504, 0x00000002, mRequest);
     }
@@ -14157,14 +14275,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000003) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000504, 0x00000003, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000003) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000003) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000504, 0x00000003, mRequest);
     }
@@ -14207,14 +14325,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000505) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000505) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000505, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000505) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000505) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000505, 0x00000000, mRequest);
     }
@@ -14269,14 +14387,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x00000000, mRequest);
     }
@@ -14298,14 +14416,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x00000001, mRequest);
     }
@@ -14327,14 +14445,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x00000002, mRequest);
     }
@@ -14356,14 +14474,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000003) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x00000003, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000003) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000003) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x00000003, mRequest);
     }
@@ -14385,14 +14503,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000004) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x00000004, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000004) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000004) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x00000004, mRequest);
     }
@@ -14414,14 +14532,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000005) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x00000005, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000005) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000005) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x00000005, mRequest);
     }
@@ -14443,14 +14561,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000006) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x00000006, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000006) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000006) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x00000006, mRequest);
     }
@@ -14472,14 +14590,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000007) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000007) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x00000007, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000007) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000007) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x00000007, mRequest);
     }
@@ -14502,14 +14620,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000008) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000008) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x00000008, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000008) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000008) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x00000008, mRequest);
     }
@@ -14532,14 +14650,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000009) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000009) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x00000009, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000009) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000009) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x00000009, mRequest);
     }
@@ -14562,14 +14680,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x0000000B) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x0000000B) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000506, 0x0000000B, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x0000000B) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x0000000B) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000506, 0x0000000B, mRequest);
     }
@@ -14613,14 +14731,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000507, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000507, 0x00000000, mRequest);
     }
@@ -14642,14 +14760,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000507, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000507, 0x00000001, mRequest);
     }
@@ -14671,14 +14789,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000507, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000507, 0x00000002, mRequest);
     }
@@ -14702,14 +14820,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000003) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000507, 0x00000003, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000003) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000003) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000507, 0x00000003, mRequest);
     }
@@ -14747,14 +14865,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000508) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000508) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000508, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000508) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000508) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000508, 0x00000000, mRequest);
     }
@@ -14793,14 +14911,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000509) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000509) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000509, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000509) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000509) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000509, 0x00000000, mRequest);
     }
@@ -14845,14 +14963,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050A, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050A, 0x00000000, mRequest);
     }
@@ -14879,14 +14997,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050A, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050A) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050A, 0x00000001, mRequest);
     }
@@ -14957,14 +15075,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050B) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050B) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050B, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050B) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050B) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050B, 0x00000000, mRequest);
     }
@@ -14988,14 +15106,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050B) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050B) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050B, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050B) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050B) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050B, 0x00000001, mRequest);
     }
@@ -15040,14 +15158,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050C, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050C, 0x00000000, mRequest);
     }
@@ -15072,14 +15190,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050C, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050C, 0x00000001, mRequest);
     }
@@ -15104,14 +15222,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050C, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050C, 0x00000002, mRequest);
     }
@@ -15205,14 +15323,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050E, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050E, 0x00000000, mRequest);
     }
@@ -15236,14 +15354,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050E, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050E, 0x00000002, mRequest);
     }
@@ -15265,14 +15383,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000003) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050E, 0x00000003, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000003) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000003) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050E, 0x00000003, mRequest);
     }
@@ -15414,14 +15532,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000000, mRequest);
     }
@@ -15443,14 +15561,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000001, mRequest);
     }
@@ -15472,14 +15590,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000002, mRequest);
     }
@@ -15502,14 +15620,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000003) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000003, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000003) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000003) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000003, mRequest);
     }
@@ -15534,14 +15652,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000004) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000004, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000004) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000004) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000004, mRequest);
     }
@@ -15565,14 +15683,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000005) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000005, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000005) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000005) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000005, mRequest);
     }
@@ -15602,14 +15720,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000006) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000006, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000006) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000006) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000006, mRequest);
     }
@@ -15639,14 +15757,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000007) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000007) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000007, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000007) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000007) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000007, mRequest);
     }
@@ -15671,14 +15789,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000008) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000008) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000008, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000008) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000008) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000008, mRequest);
     }
@@ -15703,14 +15821,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000009) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000009) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000009, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000009) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000009) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000009, mRequest);
     }
@@ -15736,14 +15854,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000A) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000A) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000A, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000A) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000A) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000A, mRequest);
     }
@@ -15768,14 +15886,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000B) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000B) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000B, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000B) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000B) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000B, mRequest);
     }
@@ -15800,14 +15918,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000C) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000C) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000C, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000C) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000C) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000C, mRequest);
     }
@@ -15833,14 +15951,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000D) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000D) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000D, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000D) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000D) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000D, mRequest);
     }
@@ -15866,14 +15984,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000E) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000E) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000E, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000E) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000E) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000E, mRequest);
     }
@@ -15897,14 +16015,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000F) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000F) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000F, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000F) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000F) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000F, mRequest);
     }
@@ -15942,14 +16060,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000010) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000010) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000010, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000010) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000010) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000010, mRequest);
     }
@@ -15987,14 +16105,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000011) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000011) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000011, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000011) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000011) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000011, mRequest);
     }
@@ -16018,14 +16136,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000012) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000012) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000012, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000012) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000012) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000012, mRequest);
     }
@@ -16049,14 +16167,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000013) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000013) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000013, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000013) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000013) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000013, mRequest);
     }
@@ -16082,14 +16200,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000014) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000014) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000014, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000014) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000014) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000014, mRequest);
     }
@@ -16113,14 +16231,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000015) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000015) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000015, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000015) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000015) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000015, mRequest);
     }
@@ -18324,14 +18442,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000703, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000703, 0x00000000, mRequest);
     }
@@ -18358,14 +18476,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000703, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000703, 0x00000001, mRequest);
     }
@@ -18389,14 +18507,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000002) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000703, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000002) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000002) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000703, 0x00000002, mRequest);
     }
@@ -18515,14 +18633,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000B02) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B02) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000B02, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000B02) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B02) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000B02, 0x00000000, mRequest);
     }
@@ -18564,14 +18682,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000B03) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B03) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000B03, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000B03) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B03) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000B03, 0x00000000, mRequest);
     }
@@ -18594,14 +18712,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000B03) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B03) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000B03, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000B03) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B03) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000B03, 0x00000001, mRequest);
     }
@@ -18769,14 +18887,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) command (0x00000000) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000B04, 0x00000000, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) command (0x00000000) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) command (0x00000000) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000B04, 0x00000000, mRequest);
     }
@@ -18802,14 +18920,14 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) command (0x00000001) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000B04, 0x00000001, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) command (0x00000001) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000B04) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000B04, 0x00000001, mRequest);
     }
@@ -20076,20 +20194,32 @@ void registerClusterAccessControl(Commands & commands, CredentialIssuerCommands 
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                      //
-        make_unique<ReadAttribute>(Id, "acl", Attributes::Acl::Id, credsIssuerConfig),                                          //
-        make_unique<ReadAttribute>(Id, "extension", Attributes::Extension::Id, credsIssuerConfig),                              //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),        //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                     //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                           //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                 //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                     //
-        make_unique<WriteAccessControlAcl>(credsIssuerConfig),                                                                  //
-        make_unique<WriteAccessControlExtension>(credsIssuerConfig),                                                            //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "acl", Attributes::Acl::Id, credsIssuerConfig),                                     //
-        make_unique<SubscribeAttribute>(Id, "extension", Attributes::Extension::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                         //
+        make_unique<ReadAttribute>(Id, "acl", Attributes::Acl::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "extension", Attributes::Extension::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "subjects-per-access-control-entry", Attributes::SubjectsPerAccessControlEntry::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "targets-per-access-control-entry", Attributes::TargetsPerAccessControlEntry::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "access-control-entries-per-fabric", Attributes::AccessControlEntriesPerFabric::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<WriteAccessControlAcl>(credsIssuerConfig),                                                             //
+        make_unique<WriteAccessControlExtension>(credsIssuerConfig),                                                       //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                            //
+        make_unique<SubscribeAttribute>(Id, "acl", Attributes::Acl::Id, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, "extension", Attributes::Extension::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "subjects-per-access-control-entry", Attributes::SubjectsPerAccessControlEntry::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "targets-per-access-control-entry", Attributes::TargetsPerAccessControlEntry::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "access-control-entries-per-fabric", Attributes::AccessControlEntriesPerFabric::Id,
+                                        credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -20260,6 +20390,7 @@ void registerClusterBasic(Commands & commands, CredentialIssuerCommands * credsI
         make_unique<ReadAttribute>(Id, "local-config-disabled", Attributes::LocalConfigDisabled::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                                //
         make_unique<ReadAttribute>(Id, "unique-id", Attributes::UniqueID::Id, credsIssuerConfig),                                 //
+        make_unique<ReadAttribute>(Id, "capability-minima", Attributes::CapabilityMinima::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                       //
@@ -20289,6 +20420,7 @@ void registerClusterBasic(Commands & commands, CredentialIssuerCommands * credsI
         make_unique<SubscribeAttribute>(Id, "local-config-disabled", Attributes::LocalConfigDisabled::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                           //
         make_unique<SubscribeAttribute>(Id, "unique-id", Attributes::UniqueID::Id, credsIssuerConfig),                            //
+        make_unique<SubscribeAttribute>(Id, "capability-minima", Attributes::CapabilityMinima::Id, credsIssuerConfig),            //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
@@ -22637,6 +22769,15 @@ void registerClusterFanControl(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                      //
         make_unique<ReadAttribute>(Id, "fan-mode", Attributes::FanMode::Id, credsIssuerConfig),                                 //
         make_unique<ReadAttribute>(Id, "fan-mode-sequence", Attributes::FanModeSequence::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "percent-setting", Attributes::PercentSetting::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "percent-current", Attributes::PercentCurrent::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "speed-max", Attributes::SpeedMax::Id, credsIssuerConfig),                               //
+        make_unique<ReadAttribute>(Id, "speed-setting", Attributes::SpeedSetting::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "speed-current", Attributes::SpeedCurrent::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "rock-support", Attributes::RockSupport::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, "rock-setting", Attributes::RockSetting::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, "wind-support", Attributes::WindSupport::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, "wind-setting", Attributes::WindSetting::Id, credsIssuerConfig),                         //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),      //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                     //
@@ -22645,9 +22786,22 @@ void registerClusterFanControl(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                     //
         make_unique<WriteFanControlFanMode>(credsIssuerConfig),                                                                 //
         make_unique<WriteFanControlFanModeSequence>(credsIssuerConfig),                                                         //
+        make_unique<WriteFanControlPercentSetting>(credsIssuerConfig),                                                          //
+        make_unique<WriteFanControlSpeedSetting>(credsIssuerConfig),                                                            //
+        make_unique<WriteFanControlRockSetting>(credsIssuerConfig),                                                             //
+        make_unique<WriteFanControlWindSetting>(credsIssuerConfig),                                                             //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "fan-mode", Attributes::FanMode::Id, credsIssuerConfig),                            //
         make_unique<SubscribeAttribute>(Id, "fan-mode-sequence", Attributes::FanModeSequence::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "percent-setting", Attributes::PercentSetting::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "percent-current", Attributes::PercentCurrent::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "speed-max", Attributes::SpeedMax::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "speed-setting", Attributes::SpeedSetting::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "speed-current", Attributes::SpeedCurrent::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "rock-support", Attributes::RockSupport::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "rock-setting", Attributes::RockSetting::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "wind-support", Attributes::WindSupport::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "wind-setting", Attributes::WindSetting::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //

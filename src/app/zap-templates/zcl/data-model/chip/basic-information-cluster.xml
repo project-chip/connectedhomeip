@@ -16,6 +16,13 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
+
+  <struct name="CapabilityMinimaStruct">
+    <cluster code="0x0028"/>
+    <item fieldId="0" name="CaseSessionsPerFabric" type="int16u" isNullable="false" writable="false"/>
+    <item fieldId="1" name="SubscriptionsPerFabric" type="int16u" isNullable="false" writable="false"/>
+  </struct>
+
   <cluster singleton="true">
     <name>Basic</name>
     <domain>CHIP</domain>
@@ -57,6 +64,7 @@ limitations under the License.
     </attribute>
     <attribute side="server" code="17" define="REACHABLE"                 type="boolean"                                default="1"                  optional="true">Reachable</attribute>
     <attribute side="server" code="18" define="UNIQUE_ID"                 type="char_string"               length="32"                               optional="true">UniqueID</attribute>
+    <attribute side="server" code="19" define="CAPABILITY_MINIMA"         type="CapabilityMinimaStruct"                              writable="false"               >CapabilityMinima</attribute>
 
     <event side="server" code="0x00" name="StartUp" priority="critical" optional="false">
       <description>The StartUp event SHALL be emitted by a Node as soon as reasonable after completing a boot or reboot process.</description>
@@ -70,8 +78,8 @@ limitations under the License.
     </event>
     <event side="server" code="0x03" name="ReachableChanged" priority="info" optional="true">
       <description>This event (when supported) SHALL be generated when there is a change in the Reachable attribute.</description>
-      <field id="0" name="ReachableNewValue" type="boolean"/>      
-    </event>    
+      <field id="0" name="ReachableNewValue" type="boolean"/>
+    </event>
 
   </cluster>
 </configurator>

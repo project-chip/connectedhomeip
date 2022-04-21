@@ -23,12 +23,11 @@ CASEClient::CASEClient(const CASEClientInitParams & params) : mInitParams(params
 
 void CASEClient::SetMRPIntervals(const ReliableMessageProtocolConfig & mrpConfig)
 {
-    mCASESession.SetMRPConfig(mrpConfig);
+    mCASESession.SetRemoteMRPConfig(mrpConfig);
 }
 
 CHIP_ERROR CASEClient::EstablishSession(PeerId peer, const Transport::PeerAddress & peerAddress,
-                                        const ReliableMessageProtocolConfig & mrpConfig, OnCASEConnected onConnection,
-                                        OnCASEConnectionFailure onFailure, void * context)
+                                        const ReliableMessageProtocolConfig & mrpConfig, SessionEstablishmentDelegate * delegate)
 {
     // Create a UnauthenticatedSession for CASE pairing.
     // Don't use mSecureSession here, because mSecureSession is for encrypted communication.
@@ -45,45 +44,9 @@ CHIP_ERROR CASEClient::EstablishSession(PeerId peer, const Transport::PeerAddres
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
 
     mCASESession.SetGroupDataProvider(mInitParams.groupDataProvider);
-    ReturnErrorOnFailure(mCASESession.EstablishSession(*mInitParams.sessionManager, peerAddress, mInitParams.fabricInfo,
-                                                       peer.GetNodeId(), exchange, mInitParams.sessionResumptionStorage, this,
+    ReturnErrorOnFailure(mCASESession.EstablishSession(*mInitParams.sessionManager, mInitParams.fabricInfo, peer.GetNodeId(),
+                                                       exchange, mInitParams.sessionResumptionStorage, delegate,
                                                        mInitParams.mrpLocalConfig));
-    mConnectionSuccessCallback = onConnection;
-    mConnectionFailureCallback = onFailure;
-    mConectionContext          = context;
-    mPeerId                    = peer;
-    mPeerAddress               = peerAddress;
-
-    return CHIP_NO_ERROR;
-}
-
-void CASEClient::OnSessionEstablishmentError(CHIP_ERROR error)
-{
-    if (mConnectionFailureCallback)
-    {
-        mConnectionFailureCallback(mConectionContext, this, error);
-    }
-}
-
-void CASEClient::OnSessionEstablished()
-{
-    // On successful CASE connection, the local session ID will be used for the derived secure session.
-    if (mConnectionSuccessCallback)
-    {
-        mConnectionSuccessCallback(mConectionContext, this);
-    }
-}
-
-CHIP_ERROR CASEClient::DeriveSecureSessionHandle(SessionHolder & handle)
-{
-    CHIP_ERROR err = mInitParams.sessionManager->NewPairing(
-        handle, Optional<Transport::PeerAddress>::Value(mPeerAddress), mPeerId.GetNodeId(), &mCASESession,
-        CryptoContext::SessionRole::kInitiator, mInitParams.fabricInfo->GetFabricIndex());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Failed in setting up CASE secure channel: err %s", ErrorStr(err));
-        return err;
-    }
 
     return CHIP_NO_ERROR;
 }

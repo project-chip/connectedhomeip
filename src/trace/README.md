@@ -7,7 +7,7 @@ execution of the application. It depends on
 ## How to add trace events
 
 1. Include "trace/trace.h" in the source file.
-2. Add "\${chip_root}/src/trace" as deps in BUILD.gn.
+2. Add `${chip_root}/src/trace` as deps in BUILD.gn.
 3. Add MATTER*TRACE_EVENT*\* in functions to be traced.
 
 ## Example

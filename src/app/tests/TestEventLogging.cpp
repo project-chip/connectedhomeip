@@ -33,6 +33,7 @@
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/CHIPCounter.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -67,6 +68,11 @@ public:
 
         auto * ctx = static_cast<TestContext *>(context);
 
+        if (ctx->mEventCounter.Init(0) != CHIP_NO_ERROR)
+        {
+            return FAILURE;
+        }
+
         chip::app::LogStorageResources logStorageResources[] = {
             { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
             { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
@@ -75,7 +81,7 @@ public:
 
         chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(),
                                                           sizeof(logStorageResources) / sizeof(logStorageResources[0]),
-                                                          gCircularEventBuffer, logStorageResources, nullptr, 0, nullptr);
+                                                          gCircularEventBuffer, logStorageResources, &ctx->mEventCounter);
 
         return SUCCESS;
     }
@@ -89,6 +95,9 @@ public:
 
         return SUCCESS;
     }
+
+private:
+    chip::MonotonicallyIncreasingCounter mEventCounter;
 };
 
 void ENFORCE_FORMAT(1, 2) SimpleDumpWriter(const char * aFormat, ...)
@@ -110,7 +119,7 @@ void PrintEventLog()
     chip::app::EventManagement::GetInstance().GetEventReader(reader, chip::app::PriorityLevel::Debug, &bufWrapper);
 
     chip::TLV::Utilities::Count(reader, elementCount, false);
-    printf("Found %zu elements\n", elementCount);
+    printf("Found %u elements\n", static_cast<unsigned int>(elementCount));
     chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
 }
 
@@ -128,7 +137,8 @@ static void CheckLogState(nlTestSuite * apSuite, chip::app::EventManagement & aL
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, elementCount == expectedNumEvents);
-    printf("elementCount vs expectedNumEvents : %zu vs %zu \n", elementCount, expectedNumEvents);
+    printf("elementCount vs expectedNumEvents : %u vs %u \n", static_cast<unsigned int>(elementCount),
+           static_cast<unsigned int>(expectedNumEvents));
 }
 
 static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & alogMgmt, chip::EventNumber startingEventNumber,
@@ -149,8 +159,8 @@ static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & 
     err = chip::TLV::Utilities::Count(reader, totalNumElements, false);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    printf("totalNumElements vs expectedNumEvents vs eventCount : %zu vs %zu vs %zu \n", totalNumElements, expectedNumEvents,
-           eventCount);
+    printf("totalNumElements vs expectedNumEvents vs eventCount : %u vs %u vs %u \n", static_cast<unsigned int>(totalNumElements),
+           static_cast<unsigned int>(expectedNumEvents), static_cast<unsigned int>(eventCount));
     NL_TEST_ASSERT(apSuite, totalNumElements == expectedNumEvents && totalNumElements == eventCount);
     reader.Init(backingStore, writer.GetLengthWritten());
     chip::TLV::Debug::Dump(reader, SimpleDumpWriter);

@@ -1,8 +1,10 @@
 {{> header}}
 
+#pragma once
+
 #include <stdint.h>
 
-#pragma once
+#include <app-common/zap-generated/enums.h>
 
 namespace chip {
 namespace app {

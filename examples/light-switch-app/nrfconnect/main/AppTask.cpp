@@ -18,7 +18,6 @@
 
 #include "AppTask.h"
 #include "AppConfig.h"
-#include "BindingHandler.h"
 #include "LEDWidget.h"
 #include "LightSwitch.h"
 #include "ThreadUtil.h"

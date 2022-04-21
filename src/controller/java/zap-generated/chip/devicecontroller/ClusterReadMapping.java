@@ -56,6 +56,48 @@ public class ClusterReadMapping {
             readAccessControlExtensionCommandParams);
     readAccessControlInteractionInfo.put(
         "readExtensionAttribute", readAccessControlExtensionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readAccessControlSubjectsPerAccessControlEntryCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readAccessControlSubjectsPerAccessControlEntryAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.AccessControlCluster) cluster)
+                  .readSubjectsPerAccessControlEntryAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readAccessControlSubjectsPerAccessControlEntryCommandParams);
+    readAccessControlInteractionInfo.put(
+        "readSubjectsPerAccessControlEntryAttribute",
+        readAccessControlSubjectsPerAccessControlEntryAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readAccessControlTargetsPerAccessControlEntryCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readAccessControlTargetsPerAccessControlEntryAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.AccessControlCluster) cluster)
+                  .readTargetsPerAccessControlEntryAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readAccessControlTargetsPerAccessControlEntryCommandParams);
+    readAccessControlInteractionInfo.put(
+        "readTargetsPerAccessControlEntryAttribute",
+        readAccessControlTargetsPerAccessControlEntryAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readAccessControlAccessControlEntriesPerFabricCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readAccessControlAccessControlEntriesPerFabricAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.AccessControlCluster) cluster)
+                  .readAccessControlEntriesPerFabricAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readAccessControlAccessControlEntriesPerFabricCommandParams);
+    readAccessControlInteractionInfo.put(
+        "readAccessControlEntriesPerFabricAttribute",
+        readAccessControlAccessControlEntriesPerFabricAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readAccessControlGeneratedCommandListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readAccessControlGeneratedCommandListAttributeInteractionInfo =
@@ -2806,6 +2848,20 @@ public class ClusterReadMapping {
     readDoorLockInteractionInfo.put(
         "readNumberOfYearDaySchedulesSupportedPerUserAttribute",
         readDoorLockNumberOfYearDaySchedulesSupportedPerUserAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readDoorLockNumberOfHolidaySchedulesSupportedCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readDoorLockNumberOfHolidaySchedulesSupportedAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .readNumberOfHolidaySchedulesSupportedAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readDoorLockNumberOfHolidaySchedulesSupportedCommandParams);
+    readDoorLockInteractionInfo.put(
+        "readNumberOfHolidaySchedulesSupportedAttribute",
+        readDoorLockNumberOfHolidaySchedulesSupportedAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readDoorLockMaxPINCodeLengthCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readDoorLockMaxPINCodeLengthAttributeInteractionInfo =
@@ -2958,6 +3014,34 @@ public class ClusterReadMapping {
     readDoorLockInteractionInfo.put(
         "readWrongCodeEntryLimitAttribute",
         readDoorLockWrongCodeEntryLimitAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readDoorLockUserCodeTemporaryDisableTimeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readDoorLockUserCodeTemporaryDisableTimeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .readUserCodeTemporaryDisableTimeAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readDoorLockUserCodeTemporaryDisableTimeCommandParams);
+    readDoorLockInteractionInfo.put(
+        "readUserCodeTemporaryDisableTimeAttribute",
+        readDoorLockUserCodeTemporaryDisableTimeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readDoorLockRequirePINforRemoteOperationCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readDoorLockRequirePINforRemoteOperationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .readRequirePINforRemoteOperationAttribute(
+                      (ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readDoorLockRequirePINforRemoteOperationCommandParams);
+    readDoorLockInteractionInfo.put(
+        "readRequirePINforRemoteOperationAttribute",
+        readDoorLockRequirePINforRemoteOperationAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readDoorLockGeneratedCommandListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readDoorLockGeneratedCommandListAttributeInteractionInfo =
@@ -3459,6 +3543,114 @@ public class ClusterReadMapping {
             readFanControlFanModeSequenceCommandParams);
     readFanControlInteractionInfo.put(
         "readFanModeSequenceAttribute", readFanControlFanModeSequenceAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlPercentSettingCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlPercentSettingAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readPercentSettingAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlPercentSettingCommandParams);
+    readFanControlInteractionInfo.put(
+        "readPercentSettingAttribute", readFanControlPercentSettingAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlPercentCurrentCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlPercentCurrentAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readPercentCurrentAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlPercentCurrentCommandParams);
+    readFanControlInteractionInfo.put(
+        "readPercentCurrentAttribute", readFanControlPercentCurrentAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlSpeedMaxCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlSpeedMaxAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readSpeedMaxAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlSpeedMaxCommandParams);
+    readFanControlInteractionInfo.put(
+        "readSpeedMaxAttribute", readFanControlSpeedMaxAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlSpeedSettingCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlSpeedSettingAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readSpeedSettingAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlSpeedSettingCommandParams);
+    readFanControlInteractionInfo.put(
+        "readSpeedSettingAttribute", readFanControlSpeedSettingAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlSpeedCurrentCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlSpeedCurrentAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readSpeedCurrentAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlSpeedCurrentCommandParams);
+    readFanControlInteractionInfo.put(
+        "readSpeedCurrentAttribute", readFanControlSpeedCurrentAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlRockSupportCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlRockSupportAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readRockSupportAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlRockSupportCommandParams);
+    readFanControlInteractionInfo.put(
+        "readRockSupportAttribute", readFanControlRockSupportAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlRockSettingCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlRockSettingAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readRockSettingAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlRockSettingCommandParams);
+    readFanControlInteractionInfo.put(
+        "readRockSettingAttribute", readFanControlRockSettingAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlWindSupportCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlWindSupportAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readWindSupportAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlWindSupportCommandParams);
+    readFanControlInteractionInfo.put(
+        "readWindSupportAttribute", readFanControlWindSupportAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlWindSettingCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlWindSettingAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readWindSettingAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlWindSettingCommandParams);
+    readFanControlInteractionInfo.put(
+        "readWindSettingAttribute", readFanControlWindSettingAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readFanControlGeneratedCommandListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readFanControlGeneratedCommandListAttributeInteractionInfo =
@@ -6444,7 +6636,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMaxPressureAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMaxPressureAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster.MaxPressureAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMaxPressureCommandParams);
@@ -6457,7 +6651,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMaxSpeedAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMaxSpeedAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster.MaxSpeedAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMaxSpeedCommandParams);
@@ -6469,7 +6665,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMaxFlowAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMaxFlowAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster.MaxFlowAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMaxFlowCommandParams);
@@ -6481,7 +6679,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMinConstPressureAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMinConstPressureAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .MinConstPressureAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMinConstPressureCommandParams);
@@ -6494,7 +6695,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMaxConstPressureAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMaxConstPressureAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .MaxConstPressureAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMaxConstPressureCommandParams);
@@ -6507,7 +6711,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMinCompPressureAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMinCompPressureAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .MinCompPressureAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMinCompPressureCommandParams);
@@ -6520,7 +6727,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMaxCompPressureAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMaxCompPressureAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .MaxCompPressureAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMaxCompPressureCommandParams);
@@ -6533,7 +6743,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMinConstSpeedAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMinConstSpeedAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .MinConstSpeedAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMinConstSpeedCommandParams);
@@ -6546,7 +6759,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMaxConstSpeedAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMaxConstSpeedAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .MaxConstSpeedAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMaxConstSpeedCommandParams);
@@ -6559,7 +6775,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMinConstFlowAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMinConstFlowAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .MinConstFlowAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMinConstFlowCommandParams);
@@ -6572,7 +6791,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMaxConstFlowAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMaxConstFlowAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .MaxConstFlowAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMaxConstFlowCommandParams);
@@ -6585,7 +6807,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMinConstTempAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMinConstTempAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .MinConstTempAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMinConstTempCommandParams);
@@ -6598,7 +6823,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readMaxConstTempAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMaxConstTempAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .MaxConstTempAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlMaxConstTempCommandParams);
@@ -6654,7 +6882,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readCapacityAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readCapacityAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster.CapacityAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlCapacityCommandParams);
@@ -6666,7 +6896,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readSpeedAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readSpeedAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster.SpeedAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlSpeedCommandParams);
@@ -6695,7 +6927,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readPowerAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readPowerAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster.PowerAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readPumpConfigurationAndControlPowerCommandParams);

@@ -1472,15 +1472,15 @@ using CHIP_ERROR = ::chip::ChipError;
  * @brief
  *   The operation cancelled because a shut down was initiated
  */
-#define CHIP_ERROR_SHUT_DOWN                     CHIP_CORE_ERROR(0x73)
+#define CHIP_ERROR_SHUT_DOWN                                   CHIP_CORE_ERROR(0x73)
 
 /**
- * @def CHIP_ERROR_SHUT_DOWN
+ * @def CHIP_ERROR_CANCELLED
  *
  * @brief
  *   The operation has been cancelled, generally by calling a cancel/abort request.
  */
-#define CHIP_ERROR_CANCELLED                     CHIP_CORE_ERROR(0x74)
+#define CHIP_ERROR_CANCELLED                                   CHIP_CORE_ERROR(0x74)
 
 /**
  *  @def CHIP_ERROR_DRBG_ENTROPY_SOURCE_FAILED
@@ -2206,7 +2206,7 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_IB         CHIP_CORE_ERROR(0xcc)
 
 /**
- * @def CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_MESSAGE
+ * @def CHIP_ERROR_IM_MALFORMED_INVOKE_REQUEST_MESSAGE
  *
  * @brief
  *   The InvokeResponseMessage is malformed: it either does not contain
@@ -2286,15 +2286,6 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_IM_MALFORMED_EVENT_REPORT_IB             CHIP_CORE_ERROR(0xd5)
 
-/*
- * @def CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS
- *
- * @brief
- *   Indicates that the commissioning window on the device is already open, and another
- *   commissioning is in progress
- */
-#define CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS           CHIP_CORE_ERROR(0xd6)
-
 /**
  * @def CHIP_ERROR_IM_MALFORMED_CLUSTER_PATH_IB
  *
@@ -2302,7 +2293,7 @@ using CHIP_ERROR = ::chip::ChipError;
  *   The ClusterPathIB is malformed: it either does not contain
  *   the required elements
  */
-#define CHIP_ERROR_IM_MALFORMED_CLUSTER_PATH_IB             CHIP_CORE_ERROR(0xd6)
+#define CHIP_ERROR_IM_MALFORMED_CLUSTER_PATH_IB                CHIP_CORE_ERROR(0xd6)
 
 /**
  * @def CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB
@@ -2320,31 +2311,6 @@ using CHIP_ERROR = ::chip::ChipError;
  *   The item referenced in the function call was not found
  */
 #define CHIP_ERROR_NOT_FOUND                                       CHIP_CORE_ERROR(0xd8)
-
-/**
- * @def CHIP_ERROR_INVALID_SCHEME_PREFIX
- *
- * @brief
- *   The scheme field contains an invalid prefix
- */
-#define CHIP_ERROR_INVALID_SCHEME_PREFIX             CHIP_CORE_ERROR(0xd6)
-
-/**
- * @def CHIP_ERROR_MISSING_URI_SEPARATOR
- *
- * @brief
- *   The URI separator is missing
- */
-#define CHIP_ERROR_MISSING_URI_SEPARATOR             CHIP_CORE_ERROR(0xd7)
-
-/**
- * @def CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE
- *
- * @brief
- *   The Attribute DataElement is malformed: it either does not contain
- *   the required elements
- */
-#define CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE                    CHIP_CORE_ERROR(0xd8)
 
 /**
  * @def CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE
@@ -2370,7 +2336,57 @@ using CHIP_ERROR = ::chip::ChipError;
  * @brief
  *   The Resource is busy and cannot process the request. Trying again might work.
  */
-#define CHIP_ERROR_BUSY                     CHIP_CORE_ERROR(0xdb)
+#define CHIP_ERROR_BUSY                                        CHIP_CORE_ERROR(0xdb)
+
+/**
+  * @def CHIP_ERROR_MAX_RETRY_EXCEEDED
+  *
+  * @brief
+  *   The maximum retry limit has been exceeded.
+  */
+ #define CHIP_ERROR_MAX_RETRY_EXCEEDED                         CHIP_CORE_ERROR(0xdc)
+
+ /**
+  * @def CHIP_ERROR_PROVIDER_LIST_EXHAUSTED
+  *
+  * @brief
+  *   The provider list has been exhausted.
+  */
+ #define CHIP_ERROR_PROVIDER_LIST_EXHAUSTED                    CHIP_CORE_ERROR(0xdd)
+
+/*
+ * @def CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS
+ *
+ * @brief
+ *   Indicates that the commissioning window on the device is already open, and another
+ *   commissioning is in progress
+ */
+#define CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS           CHIP_CORE_ERROR(0xde)
+
+/**
+ * @def CHIP_ERROR_INVALID_SCHEME_PREFIX
+ *
+ * @brief
+ *   The scheme field contains an invalid prefix
+ */
+#define CHIP_ERROR_INVALID_SCHEME_PREFIX                      CHIP_CORE_ERROR(0xdf)
+
+/**
+ * @def CHIP_ERROR_MISSING_URI_SEPARATOR
+ *
+ * @brief
+ *   The URI separator is missing
+ */
+#define CHIP_ERROR_MISSING_URI_SEPARATOR                      CHIP_CORE_ERROR(0xe0)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE
+ *
+ * @brief
+ *   The Attribute DataElement is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE      CHIP_CORE_ERROR(0xe1)
 
 /**
  *  @}
@@ -2379,8 +2395,8 @@ using CHIP_ERROR = ::chip::ChipError;
 // clang-format on
 
 // !!!!! IMPORTANT !!!!!  If you add new CHIP errors, please update the translation
-// of error codes to strings in CHIPError.cpp, and add them to unittest
-// in test-apps/TestErrorStr.cpp
+// of error codes to strings in CHIPError.cpp, and add them to kTestElements[]
+// in core/tests/TestCHIPErrorStr.cpp
 
 namespace chip {
 

@@ -62,6 +62,11 @@ const ESP32Config::Key ESP32Config::kConfigKey_SetupDiscriminator    = { kConfig
 const ESP32Config::Key ESP32Config::kConfigKey_Spake2pIterationCount = { kConfigNamespace_ChipFactory, "iteration-count" };
 const ESP32Config::Key ESP32Config::kConfigKey_Spake2pSalt           = { kConfigNamespace_ChipFactory, "salt" };
 const ESP32Config::Key ESP32Config::kConfigKey_Spake2pVerifier       = { kConfigNamespace_ChipFactory, "verifier" };
+const ESP32Config::Key ESP32Config::kConfigKey_DACCert               = { kConfigNamespace_ChipFactory, "dac-cert" };
+const ESP32Config::Key ESP32Config::kConfigKey_DACPrivateKey         = { kConfigNamespace_ChipFactory, "dac-key" };
+const ESP32Config::Key ESP32Config::kConfigKey_DACPublicKey          = { kConfigNamespace_ChipFactory, "dac-pub-key" };
+const ESP32Config::Key ESP32Config::kConfigKey_PAICert               = { kConfigNamespace_ChipFactory, "pai-cert" };
+const ESP32Config::Key ESP32Config::kConfigKey_CertDeclaration       = { kConfigNamespace_ChipFactory, "cert-dclrn" };
 
 // Keys stored in the chip-config namespace
 const ESP32Config::Key ESP32Config::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };

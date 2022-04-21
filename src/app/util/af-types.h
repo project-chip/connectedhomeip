@@ -415,6 +415,11 @@ struct EmberAfDefinedEndpoint
      * endpoint
      */
     chip::DataVersion * dataVersions = nullptr;
+
+    /**
+     * Root endpoint id for composed device type.
+     */
+    chip::EndpointId parentEndpointId = chip::kInvalidEndpointId;
 };
 
 // Cluster specific types

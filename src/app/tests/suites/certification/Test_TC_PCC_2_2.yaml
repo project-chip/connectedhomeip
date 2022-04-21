@@ -36,7 +36,6 @@ tests:
           value: 1
 
     - label: "Reads the attribute: EffectiveOperationMode"
-      disabled: true
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
       PICS: A_EFFECTIVEOPERATIONMODE
@@ -51,7 +50,6 @@ tests:
           value: 2
 
     - label: "Reads the attribute: EffectiveOperationMode"
-      disabled: true
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
       PICS: A_EFFECTIVEOPERATIONMODE
@@ -66,7 +64,6 @@ tests:
           value: 3
 
     - label: "Reads the attribute: EffectiveOperationMode"
-      disabled: true
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
       PICS: A_EFFECTIVEOPERATIONMODE

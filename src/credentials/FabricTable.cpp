@@ -153,7 +153,7 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
 {
     DefaultStorageKeyAllocator keyAlloc;
 
-    ChipLogProgress(Inet, "Loading from storage for fabric index %u", mFabricIndex);
+    ChipLogProgress(Inet, "Loading from storage for fabric index 0x%x", static_cast<unsigned>(mFabricIndex));
 
     // Scopes for "size" so we don't forget to re-initialize it between gets,
     // since each get modifies it.
@@ -195,11 +195,14 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
     }
 
     {
-        uint8_t buf[OpKeyTLVMaxSize()];
-        uint16_t size = sizeof(buf);
-        ReturnErrorOnFailure(storage->SyncGetKeyValue(keyAlloc.FabricOpKey(mFabricIndex), buf, size));
+        // Use a CapacityBoundBuffer to get RAII secret data clearing on scope exit.
+        Crypto::CapacityBoundBuffer<OpKeyTLVMaxSize()> buf;
+        uint16_t size = static_cast<uint16_t>(buf.Capacity());
+        ReturnErrorOnFailure(storage->SyncGetKeyValue(keyAlloc.FabricOpKey(mFabricIndex), buf.Bytes(), size));
+        buf.SetLength(static_cast<size_t>(size));
+
         TLV::ContiguousBufferTLVReader reader;
-        reader.Init(buf, size);
+        reader.Init(buf.Bytes(), buf.Length());
 
         ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
         TLV::TLVType containerType;
@@ -225,17 +228,12 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
         {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
             mOperationalKey = chip::Platform::New<P256KeypairHSM>();
-            mOperationalKey->SetKeyId(CASE_OPS_KEY);
 #else
             mOperationalKey = chip::Platform::New<P256Keypair>();
 #endif
         }
         VerifyOrReturnError(mOperationalKey != nullptr, CHIP_ERROR_NO_MEMORY);
         ReturnErrorOnFailure(mOperationalKey->Deserialize(serializedOpKey));
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-        // Set provisioned_key = true , so that key is not deleted from HSM.
-        mOperationalKey->provisioned_key = true;
-#endif
 
         ReturnErrorOnFailure(reader.ExitContainer(containerType));
         ReturnErrorOnFailure(reader.VerifyEndOfContainer());
@@ -329,7 +327,6 @@ CHIP_ERROR FabricInfo::SetOperationalKeypair(const P256Keypair * keyPair)
     {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
         mOperationalKey = chip::Platform::New<P256KeypairHSM>();
-        mOperationalKey->SetKeyId(CASE_OPS_KEY);
 #else
         mOperationalKey = chip::Platform::New<P256Keypair>();
 #endif
@@ -565,7 +562,8 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
     SetNOCCert(newFabric.mNOCCert);
     SetVendorId(newFabric.GetVendorId());
     SetFabricLabel(newFabric.GetFabricLabel());
-    ChipLogProgress(Discovery, "Added new fabric at index: %d, Initialized: %d", GetFabricIndex(), IsInitialized());
+    ChipLogProgress(Discovery, "Added new fabric at index: 0x%x, Initialized: %d", static_cast<unsigned>(GetFabricIndex()),
+                    IsInitialized());
     ChipLogProgress(Discovery, "Assigned compressed fabric ID: 0x" ChipLogFormatX64 ", node ID: 0x" ChipLogFormatX64,
                     ChipLogValueX64(mOperationalId.GetCompressedFabricId()), ChipLogValueX64(mOperationalId.GetNodeId()));
     return CHIP_NO_ERROR;
@@ -689,13 +687,13 @@ CHIP_ERROR FabricTable::Delete(FabricIndex index)
     {
         if (mFabricCount == 0)
         {
-            ChipLogError(Discovery, "!!Trying to delete a fabric, but the current fabric count is already 0");
+            ChipLogError(Discovery, "Trying to delete a fabric, but the current fabric count is already 0");
         }
         else
         {
             mFabricCount--;
+            ChipLogProgress(Discovery, "Fabric (0x%x) deleted. Calling OnFabricDeletedFromStorage", static_cast<unsigned>(index));
         }
-        ChipLogProgress(Discovery, "Fabric (%d) deleted. Calling OnFabricDeletedFromStorage", index);
 
         FabricTableDelegate * delegate = mDelegate;
         while (delegate)

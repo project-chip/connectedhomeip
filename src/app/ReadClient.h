@@ -165,6 +165,35 @@ public:
          * SendAutoResubscribeRequest is not called, this function will not be called.
          */
         virtual void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) {}
+
+        /**
+         * This function is invoked when constructing a read/subscribeRequest that does not have data
+         * version filters specified, to give the callback a chance to provide some.
+         *
+         * This function is expected to encode as many complete data version filters as will fit into
+         * the buffer, rolling back any partially-encoded filters if it runs out of space, and set the
+         * aEncodedDataVersionList boolean to true if it has successfully encoded at least one data version filter.
+         *
+         * Otherwise aEncodedDataVersionList will be set to false.
+         */
+        virtual CHIP_ERROR OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                                         const Span<AttributePathParams> & aAttributePaths,
+                                                         bool & aEncodedDataVersionList)
+        {
+            aEncodedDataVersionList = false;
+            return CHIP_NO_ERROR;
+        }
+
+        /*
+         * Get highest received event number.
+         * If application don't have this one, it clear outparam and return CHIP_NO_ERROR.
+         * if any returning error, it will fail the entire read client.
+         */
+        virtual CHIP_ERROR GetHighestReceivedEventNumber(Optional<EventNumber> & aEventNumber)
+        {
+            aEventNumber.ClearValue();
+            return CHIP_NO_ERROR;
+        }
     };
 
     enum class InteractionType : uint8_t
@@ -301,12 +330,16 @@ private:
     bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
     bool IsAwaitingSubscribeResponse() const { return mState == ClientState::AwaitingSubscribeResponse; }
 
-    CHIP_ERROR GenerateEventPaths(EventPathIBs::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
-                                  size_t aEventPathParamsListSize);
-    CHIP_ERROR GenerateAttributePathList(AttributePathIBs::Builder & aAttributePathIBsBuilder,
-                                         AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);
+    CHIP_ERROR GenerateEventPaths(EventPathIBs::Builder & aEventPathsBuilder, const Span<EventPathParams> & aEventPaths);
+    CHIP_ERROR GenerateAttributePaths(AttributePathIBs::Builder & aAttributePathIBsBuilder,
+                                      const Span<AttributePathParams> & aAttributePaths);
+
     CHIP_ERROR GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                             DataVersionFilter * apDataVersionFilterList, size_t aDataVersionFilterListSize);
+                                             const Span<AttributePathParams> & aAttributePaths,
+                                             const Span<DataVersionFilter> & aDataVersionFilters, bool & aEncodedDataVersionList);
+    CHIP_ERROR BuildDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                          const Span<AttributePathParams> & aAttributePaths,
+                                          const Span<DataVersionFilter> & aDataVersionFilters, bool & aEncodedDataVersionList);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 
@@ -339,6 +372,7 @@ private:
 
     void StopResubscription();
     void ClearActiveSubscriptionState();
+    CHIP_ERROR GetMinEventNumber(const ReadPrepareParams & aReadPrepareParams, Optional<EventNumber> & aEventMin);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
@@ -354,13 +388,22 @@ private:
     FabricIndex mFabricIndex            = kUndefinedFabricIndex;
     InteractionType mInteractionType    = InteractionType::Read;
     Timestamp mEventTimestamp;
-    EventNumber mEventMin                    = 0;
     bool mSawAttributeReportsInCurrentReport = false;
 
     ReadClient * mpNext                 = nullptr;
     InteractionModelEngine * mpImEngine = nullptr;
     ReadPrepareParams mReadPrepareParams;
     uint32_t mNumRetries = 0;
+
+    // End Of Container (0x18) uses one byte.
+    static constexpr uint16_t kReservedSizeForEndOfContainer = 1;
+    // Reserved size for the uint8_t InteractionModelRevision flag, which takes up 1 byte for the control tag and 1 byte for the
+    // context tag, 1 byte for value
+    static constexpr uint16_t kReservedSizeForIMRevision = 1 + 1 + 1;
+    // Reserved buffer for TLV level overhead (the overhead for data version filter IBs EndOfContainer, IM reversion end
+    // of RequestMessage (another end of container)).
+    static constexpr uint16_t kReservedSizeForTLVEncodingOverhead =
+        kReservedSizeForEndOfContainer + kReservedSizeForIMRevision + kReservedSizeForEndOfContainer;
 };
 
 }; // namespace app
