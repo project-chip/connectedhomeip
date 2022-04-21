@@ -56,7 +56,6 @@ namespace Platform {
 //     return true;
 // }
 
-
 // int initialize_service_ls2_calls()
 // {
 //     LSMethod serviceMethods[] = {

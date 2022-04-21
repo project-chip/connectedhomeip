@@ -32,7 +32,6 @@ namespace DeviceLayer {
 namespace Internal {
 namespace {
 
-
 static unsigned int kScanTimeout = 10000;
 
 // Default CHIP Scan Timeout in Millisecond
@@ -52,16 +51,11 @@ using GDBusObjectManagerUniquePtr = std::unique_ptr<GDBusObjectManager, GObjectU
 
 } // namespace
 
-ChipDeviceScanner::ChipDeviceScanner(LSHandle *handle, ChipDeviceScannerDelegate * delegate) :
-    mLSHandle(handle),
-    mDelegate(delegate)
-{
-}
+ChipDeviceScanner::ChipDeviceScanner(LSHandle * handle, ChipDeviceScannerDelegate * delegate) :
+    mLSHandle(handle), mDelegate(delegate)
+{}
 
-ChipDeviceScanner::ChipDeviceScanner(ChipDeviceScannerDelegate * delegate) :
-    mDelegate(delegate)
-{
-}
+ChipDeviceScanner::ChipDeviceScanner(ChipDeviceScannerDelegate * delegate) : mDelegate(delegate) {}
 
 ChipDeviceScanner::~ChipDeviceScanner()
 {
@@ -69,10 +63,10 @@ ChipDeviceScanner::~ChipDeviceScanner()
 
     // In case the timeout timer is still active
     chip::DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, this);
-    mDelegate    = nullptr;
+    mDelegate = nullptr;
 }
 
-std::unique_ptr<ChipDeviceScanner> ChipDeviceScanner::Create(LSHandle *handle, ChipDeviceScannerDelegate * delegate)
+std::unique_ptr<ChipDeviceScanner> ChipDeviceScanner::Create(LSHandle * handle, ChipDeviceScannerDelegate * delegate)
 {
     if (!LSCall(handle, "palm://com.webos.service.bluetooth2/adapter/getStatus", "{}", NULL, NULL, NULL, NULL))
     {
@@ -95,22 +89,23 @@ gboolean ChipDeviceScanner::TimerExpiredCb(gpointer userData)
     return G_SOURCE_REMOVE;
 }
 
-void ChipDeviceScanner::printFoundChipDevice(const jvalue_ref& scanRecord, const std::string& address) {
+void ChipDeviceScanner::printFoundChipDevice(const jvalue_ref & scanRecord, const std::string & address)
+{
 
     int j = 0;
 
-     int scanRecordLength = jarray_size(scanRecord);
+    int scanRecordLength = jarray_size(scanRecord);
 
-
-	printf("printFoundChipDevice start : scanRecoredLength : %d \n", scanRecordLength);
-    while (j < scanRecordLength) {
-        int32_t l = -1;
-        int32_t t = -1;
+    printf("printFoundChipDevice start : scanRecoredLength : %d \n", scanRecordLength);
+    while (j < scanRecordLength)
+    {
+        int32_t l  = -1;
+        int32_t t  = -1;
         int32_t v0 = -1;
         int32_t v1 = -1;
 
-        jvalue_ref lObj = jarray_get(scanRecord, j);
-        jvalue_ref tObj = jarray_get(scanRecord, j + 1);
+        jvalue_ref lObj  = jarray_get(scanRecord, j);
+        jvalue_ref tObj  = jarray_get(scanRecord, j + 1);
         jvalue_ref v0Obj = jarray_get(scanRecord, j + 2);
         jvalue_ref v1Obj = jarray_get(scanRecord, j + 3);
 
@@ -119,7 +114,8 @@ void ChipDeviceScanner::printFoundChipDevice(const jvalue_ref& scanRecord, const
         jnumber_get_i32(v0Obj, &v0);
         jnumber_get_i32(v1Obj, &v1);
 
-        if (t == 22 && v0 == 175 && v1 == 254) { // 22 = 0x16  175 = 0xAF,  254 = 0xFE
+        if (t == 22 && v0 == 175 && v1 == 254)
+        { // 22 = 0x16  175 = 0xAF,  254 = 0xFE
 
             int32_t disc1 = -1;
             int32_t disc2 = -1;
@@ -130,7 +126,7 @@ void ChipDeviceScanner::printFoundChipDevice(const jvalue_ref& scanRecord, const
             jnumber_get_i32(disc1Obj, &disc1);
             jnumber_get_i32(disc2Obj, &disc2);
 
-	        // uint16_t discriminator = (disc2 << 8) | disc1;
+            // uint16_t discriminator = (disc2 << 8) | disc1;
 
             int32_t vid1 = -1;
             int32_t vid2 = -1;
@@ -156,15 +152,15 @@ void ChipDeviceScanner::printFoundChipDevice(const jvalue_ref& scanRecord, const
     }
 }
 
-bool ChipDeviceScanner::deviceGetstatusCb(LSHandle *sh, LSMessage *message, void *userData)
+bool ChipDeviceScanner::deviceGetstatusCb(LSHandle * sh, LSMessage * message, void * userData)
 {
     ChipDeviceScanner * self = (ChipDeviceScanner *) userData;
 
-    jvalue_ref parsedObj = {0};
+    jvalue_ref parsedObj     = { 0 };
     jschema_ref input_schema = jschema_parse(j_cstr_to_buffer("{}"), DOMOPT_NOOPT, NULL);
 
     if (!input_schema)
-            return false;
+        return false;
 
     JSchemaInfo schemaInfo;
     jschema_info_init(&schemaInfo, input_schema, NULL, NULL);
@@ -172,23 +168,23 @@ bool ChipDeviceScanner::deviceGetstatusCb(LSHandle *sh, LSMessage *message, void
     jschema_release(&input_schema);
 
     if (jis_null(parsedObj))
-            return true;
+        return true;
 
-    jvalue_ref devicesObj = {0};
+    jvalue_ref devicesObj = { 0 };
 
     if (jobject_get_exists(parsedObj, J_CSTR_TO_BUF("devices"), &devicesObj))
     {
         int devicesLength = jarray_size(devicesObj);
-        int i = 0;
-        while(i < devicesLength)
+        int i             = 0;
+        while (i < devicesLength)
         {
             jvalue_ref devicesElementObj = jarray_get(devicesObj, i);
 
-            jvalue_ref manufacturerDataObj = {0};
+            jvalue_ref manufacturerDataObj = { 0 };
 
             if (jobject_get_exists(devicesElementObj, J_CSTR_TO_BUF("manufacturerData"), &manufacturerDataObj))
             {
-                jvalue_ref scanRecordObj = {0};
+                jvalue_ref scanRecordObj = { 0 };
 
                 if (jobject_get_exists(manufacturerDataObj, J_CSTR_TO_BUF("scanRecord"), &scanRecordObj))
                 {
@@ -205,13 +201,13 @@ bool ChipDeviceScanner::deviceGetstatusCb(LSHandle *sh, LSMessage *message, void
 
                         if (scanRecordElement == 3)
                         {
-                            int32_t firstByte = -1;
+                            int32_t firstByte  = -1;
                             int32_t secondByte = -1;
-                            int32_t thirdByte = -1;
+                            int32_t thirdByte  = -1;
 
-                            jvalue_ref firstByteObj = jarray_get(scanRecordObj, j + 1);
+                            jvalue_ref firstByteObj  = jarray_get(scanRecordObj, j + 1);
                             jvalue_ref secondByteObj = jarray_get(scanRecordObj, j + 2);
-                            jvalue_ref thirdByteObj = jarray_get(scanRecordObj, j + 3);
+                            jvalue_ref thirdByteObj  = jarray_get(scanRecordObj, j + 3);
 
                             jnumber_get_i32(firstByteObj, &firstByte);
                             jnumber_get_i32(secondByteObj, &secondByte);
@@ -219,28 +215,26 @@ bool ChipDeviceScanner::deviceGetstatusCb(LSHandle *sh, LSMessage *message, void
 
                             if (firstByte == 3 && secondByte == 246 && thirdByte == 255)
                             {
-                                jvalue_ref addressObj = {0};
+                                jvalue_ref addressObj = { 0 };
                                 if (jobject_get_exists(devicesElementObj, J_CSTR_TO_BUF("address"), &addressObj))
                                 {
                                     raw_buffer address_buf = jstring_get(addressObj);
-                                    char *address = g_strdup(address_buf.m_str);
+                                    char * address         = g_strdup(address_buf.m_str);
                                     jstring_free_buffer(address_buf);
 
-				                    printFoundChipDevice(scanRecordObj,address);
+                                    printFoundChipDevice(scanRecordObj, address);
 
                                     self->mDelegate->OnChipDeviceScanned(address);
-
                                 }
 
-                                jvalue_ref nameObj = {0};
+                                jvalue_ref nameObj = { 0 };
                                 if (jobject_get_exists(devicesElementObj, J_CSTR_TO_BUF("name"), &nameObj))
                                 {
                                     raw_buffer name_buf = jstring_get(nameObj);
-                                    char *name = g_strdup(name_buf.m_str);
+                                    char * name         = g_strdup(name_buf.m_str);
                                     jstring_free_buffer(name_buf);
 
-                                    printf ("name : %s \n", name);
-
+                                    printf("name : %s \n", name);
                                 }
                                 break;
                             }
@@ -259,10 +253,9 @@ bool ChipDeviceScanner::deviceGetstatusCb(LSHandle *sh, LSMessage *message, void
     }
 
     return true;
-
 }
 
-bool ChipDeviceScanner::startDiscoveryCb(LSHandle *sh, LSMessage *message, void *userData)
+bool ChipDeviceScanner::startDiscoveryCb(LSHandle * sh, LSMessage * message, void * userData)
 {
     return true;
 }
@@ -275,9 +268,11 @@ gboolean ChipDeviceScanner::TriggerScan(GMainLoop * mainLoop, gpointer userData)
 
     self->mAsyncLoop = mainLoop;
 
-    ret = LSCall(self->mLSHandle, "luna://com.webos.service.bluetooth2/adapter/internal/startDiscovery", "{\"typeOfDevice\":\"ble\"}", startDiscoveryCb, userData, NULL, NULL);
+    ret = LSCall(self->mLSHandle, "luna://com.webos.service.bluetooth2/adapter/internal/startDiscovery",
+                 "{\"typeOfDevice\":\"ble\"}", startDiscoveryCb, userData, NULL, NULL);
 
-    ret = LSCall(self->mLSHandle, "luna://com.webos.service.bluetooth2/device/getStatus", "{\"subscribe\":true}", deviceGetstatusCb, userData, NULL, NULL);
+    ret = LSCall(self->mLSHandle, "luna://com.webos.service.bluetooth2/device/getStatus", "{\"subscribe\":true}", deviceGetstatusCb,
+                 userData, NULL, NULL);
 
     VerifyOrExit(ret == 1, ChipLogError(DeviceLayer, "bt_adapter_le_start_scan() ret: %d", ret));
     ChipLogProgress(DeviceLayer, "Scan started");
@@ -322,7 +317,7 @@ exit:
     return err;
 }
 
-bool ChipDeviceScanner::cancelDiscoveryCb(LSHandle *sh, LSMessage *message, void *userData)
+bool ChipDeviceScanner::cancelDiscoveryCb(LSHandle * sh, LSMessage * message, void * userData)
 {
     return true;
 }
@@ -332,7 +327,8 @@ CHIP_ERROR ChipDeviceScanner::StopChipScan(void)
     int ret = 0;
     ReturnErrorCodeIf(!mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
-    ret = LSCall(mLSHandle, "luna://com.webos.service.bluetooth2/dadapter/cancelDiscovery", "{}", cancelDiscoveryCb, this, NULL, NULL);
+    ret = LSCall(mLSHandle, "luna://com.webos.service.bluetooth2/dadapter/cancelDiscovery", "{}", cancelDiscoveryCb, this, NULL,
+                 NULL);
 
     ChipLogError(DeviceLayer, "Stop CHIP scan ret: %d", ret);
 
@@ -340,13 +336,12 @@ CHIP_ERROR ChipDeviceScanner::StopChipScan(void)
     ChipLogProgress(DeviceLayer, "CHIP Scanner Async Thread Quit Done..Wait for Thread Windup...!");
 
     // Report to Impl class
-     mDelegate->OnChipScanComplete();
+    mDelegate->OnChipScanComplete();
 
     mIsScanning = false;
 
     return CHIP_NO_ERROR;
 }
-
 
 CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
 {
