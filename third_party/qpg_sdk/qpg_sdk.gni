@@ -99,7 +99,10 @@ template("qpg_sdk") {
     cflags = []
 
     # Allow warning due to mbedtls
-    cflags += [ "-Wno-maybe-uninitialized" ]
+    cflags += [
+      "-Wno-maybe-uninitialized",
+      "-Wno-shadow",
+    ]
 
     if (defined(invoker.defines)) {
       defines += invoker.defines

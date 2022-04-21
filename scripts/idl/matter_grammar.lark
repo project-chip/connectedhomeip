@@ -31,7 +31,9 @@ attribute_tag: "readonly"i -> attr_readonly
              | "nosubscribe"i -> attr_nosubscribe
 
 request_struct: "request"i struct
-response_struct: "response"i struct
+
+// Response structures must have a response id
+response_struct: "response"i "struct"i id "=" number "{" struct_field * "}"
 
 command_attribute: "timed"i -> timed_command
 command_attributes: command_attribute*

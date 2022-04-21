@@ -96,7 +96,7 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
                            chip::AttributeId attributeId, const T & value)
     {
-        ChipLogProgress(chipTool, "Sending WriteAttribute to cluster " ChipLogFormatMEI " on endpoint %" PRIu16,
+        ChipLogProgress(chipTool, "Sending WriteAttribute to cluster " ChipLogFormatMEI " on endpoint %u",
                         ChipLogValueMEI(clusterId), endpointId);
         chip::app::AttributePathParams attributePathParams;
         if (!device->GetSecureSession().Value()->IsGroupSession())

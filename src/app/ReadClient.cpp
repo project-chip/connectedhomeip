@@ -801,8 +801,8 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
     ReturnErrorOnFailure(subscribeResponse.GetMaxIntervalCeilingSeconds(&mMaxIntervalCeilingSeconds));
 
     ChipLogProgress(DataManagement,
-                    "Subscription established with SubscriptionID = 0x" ChipLogFormatX64 " MinInterval = %" PRIu16
-                    "s MaxInterval = %" PRIu16 "s Peer = %02x:" ChipLogFormatX64,
+                    "Subscription established with SubscriptionID = 0x" ChipLogFormatX64 " MinInterval = %u"
+                    "s MaxInterval = %us Peer = %02x:" ChipLogFormatX64,
                     ChipLogValueX64(mSubscriptionId), mMinIntervalFloorSeconds, mMaxIntervalCeilingSeconds, mFabricIndex,
                     ChipLogValueX64(mPeerNodeId));
 

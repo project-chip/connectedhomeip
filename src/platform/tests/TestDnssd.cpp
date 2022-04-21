@@ -40,7 +40,7 @@ static void HandleBrowse(void * context, DnssdService * services, size_t service
     NL_TEST_ASSERT(suite, error == CHIP_NO_ERROR);
     if (services)
     {
-        printf("Mdns service size %zu\n", servicesSize);
+        printf("Mdns service size %u\n", static_cast<unsigned int>(servicesSize));
         printf("Service name %s\n", services->mName);
         printf("Service type %s\n", services->mType);
         NL_TEST_ASSERT(suite, ChipDnssdResolve(services, chip::Inet::InterfaceId::Null(), HandleResolve, suite) == CHIP_NO_ERROR);

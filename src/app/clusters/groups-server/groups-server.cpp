@@ -227,7 +227,7 @@ struct GroupMembershipResponse
                         {
                             ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag(), mapping.group_id));
                             matchCount++;
-                            ChipLogDetail(Zcl, " 0x%02" PRIx16, mapping.group_id);
+                            ChipLogDetail(Zcl, " 0x%02x", mapping.group_id);
                         }
                     }
                 }
@@ -242,7 +242,7 @@ struct GroupMembershipResponse
                             {
                                 ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag(), mapping.group_id));
                                 matchCount++;
-                                ChipLogDetail(Zcl, " 0x%02" PRIx16, mapping.group_id);
+                                ChipLogDetail(Zcl, " 0x%02x", mapping.group_id);
                                 break;
                             }
                         }

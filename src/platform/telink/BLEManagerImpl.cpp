@@ -888,8 +888,8 @@ CHIP_ERROR BLEManagerImpl::HandleGAPConnect(const ChipDeviceEvent * event)
     /* Increase number of connections */
     mNumConnections++;
 
-    ChipLogProgress(DeviceLayer, "BLE connection established (ConnId: 0x%02" PRIx16 ")", connEvent->connHandle);
-    ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%" PRIu16, NumConnections(), kMaxConnections);
+    ChipLogProgress(DeviceLayer, "BLE connection established (ConnId: 0x%02x)", connEvent->connHandle);
+    ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", NumConnections(), kMaxConnections);
 
     return CHIP_NO_ERROR;
 }
@@ -902,8 +902,8 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
     /* Decrease number of connections */
     mNumConnections--;
 
-    ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (reason 0x%02" PRIx16 ")", connEvent->HciResult);
-    ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%" PRIu16, NumConnections(), kMaxConnections);
+    ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (reason 0x%02x)", connEvent->HciResult);
+    ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", NumConnections(), kMaxConnections);
 
     /* Unsubscribe */
     if (UnsetSubscribed(connEvent->connHandle))
@@ -988,7 +988,7 @@ CHIP_ERROR BLEManagerImpl::HandleRXCharWrite(const ChipDeviceEvent * event)
 {
     const BleRXWriteEventType * writeEvent = &event->Platform.BleRXWriteEvent;
 
-    ChipLogDetail(DeviceLayer, "Write request received for CHIPoBLE RX (ConnId 0x%02" PRIx16 ")", writeEvent->connHandle);
+    ChipLogDetail(DeviceLayer, "Write request received for CHIPoBLE RX (ConnId 0x%02x)", writeEvent->connHandle);
 
     HandleWriteReceived(writeEvent->connHandle, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX,
                         PacketBufferHandle::Adopt(writeEvent->Data));
@@ -1000,7 +1000,7 @@ CHIP_ERROR BLEManagerImpl::HandleTXCharComplete(const ChipDeviceEvent * event)
 {
     const BleTXCompleteEventType * completeEvent = &event->Platform.BleTXCompleteEvent;
 
-    ChipLogDetail(DeviceLayer, "Notification for CHIPoBLE TX done (ConnId 0x%02" PRIx16 ")", completeEvent->connHandle);
+    ChipLogDetail(DeviceLayer, "Notification for CHIPoBLE TX done (ConnId 0x%02x)", completeEvent->connHandle);
 
     // Signal the BLE Layer that the outstanding notification is complete.
     HandleIndicationConfirmation(completeEvent->connHandle, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);

@@ -497,7 +497,7 @@ exit:
         mLastEventTimestamp = timestamp;
 #if CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
         ChipLogDetail(EventLogging,
-                      "LogEvent event number: 0x" ChipLogFormatX64 " priority: %u, endpoint id:  0x%" PRIx16
+                      "LogEvent event number: 0x" ChipLogFormatX64 " priority: %u, endpoint id:  0x%x"
                       " cluster id: " ChipLogFormatMEI " event id: 0x%" PRIx32 " %s timestamp: 0x" ChipLogFormatX64,
                       ChipLogValueX64(aEventNumber), static_cast<unsigned>(opts.mPriority), opts.mPath.mEndpointId,
                       ChipLogValueMEI(opts.mPath.mClusterId), opts.mPath.mEventId,

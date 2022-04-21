@@ -58,7 +58,7 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
             {
                 uint16_t minIntervalFloorSeconds;
                 ReturnErrorOnFailure(reader.Get(minIntervalFloorSeconds));
-                PRETTY_PRINT("\tMinIntervalFloorSeconds = 0x%" PRIx16 ",", minIntervalFloorSeconds);
+                PRETTY_PRINT("\tMinIntervalFloorSeconds = 0x%x,", minIntervalFloorSeconds);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -71,7 +71,7 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
             {
                 uint16_t maxIntervalCeilingSeconds;
                 ReturnErrorOnFailure(reader.Get(maxIntervalCeilingSeconds));
-                PRETTY_PRINT("\tMaxIntervalCeilingSeconds = 0x%" PRIx16 ",", maxIntervalCeilingSeconds);
+                PRETTY_PRINT("\tMaxIntervalCeilingSeconds = 0x%x,", maxIntervalCeilingSeconds);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;

@@ -33,8 +33,8 @@
 #include <ble/CHIPBleServiceData.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/internal/BLEManager.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/internal/BLEManager.h>
 
 // Show BLE status with LEDs
 #define _BLEMGRIMPL_USE_LEDS 0
@@ -245,7 +245,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
         {
             ChipLogError(DeviceLayer, "BLE connection failed, mbed-os error: %d", mbed_err);
         }
-        ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%d", ble_manager.NumConnections(),
+        ChipLogProgress(DeviceLayer, "Current number of connections: %u/%d", ble_manager.NumConnections(),
                         ble_manager.kMaxConnections);
 
         // The connection established event is propagated when the client has subscribed to
@@ -309,7 +309,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
         PlatformMgrImpl().PostEventOrDie(&chip_event);
 
         ChipLogProgress(DeviceLayer, "BLE connection terminated, mbed-os reason: %d", reason.value());
-        ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%d", ble_manager.NumConnections(),
+        ChipLogProgress(DeviceLayer, "Current number of connections: %u/%d", ble_manager.NumConnections(),
                         ble_manager.kMaxConnections);
 
         // Force a reconfiguration of advertising in case we switched to non-connectable mode when
@@ -1031,7 +1031,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 
     ChipLogDetail(DeviceLayer,
                   "Sending indication for CHIPoBLE characteristic "
-                  "(connHandle=%d, attHandle=%d, data_len=%" PRIu16 ")",
+                  "(connHandle=%d, attHandle=%d, data_len=%u)",
                   conId, att_handle, pBuf->DataLength());
 
     mbed_err = gatt_server.write(att_handle, pBuf->Start(), pBuf->DataLength(), false);
