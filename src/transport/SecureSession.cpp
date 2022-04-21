@@ -16,9 +16,37 @@
 
 #include <access/AuthMode.h>
 #include <transport/SecureSession.h>
+#include <transport/SecureSessionTable.h>
 
 namespace chip {
 namespace Transport {
+
+void SecureSessionDeleter::Release(SecureSession * entry)
+{
+    entry->mTable.ReleaseSession(entry);
+}
+
+void SecureSession::MarkForRemoval()
+{
+    ChipLogDetail(Inet, "SecureSession MarkForRemoval %p Type:%d LSID:%d", this, static_cast<int>(mSecureSessionType), mLocalSessionId);
+    ReferenceCountedHandle<Transport::Session> ref(*this);
+    switch (mState)
+    {
+        case State::kPairing:
+            mState = State::kPendingRemoval;
+            // Interrupt the pairing
+            NotifySessionReleased();
+            return;
+        case State::kActive:
+            Release(); // Decrease the ref which is retained at Activate
+            mState = State::kPendingRemoval;
+            NotifySessionReleased();
+            return;
+        case State::kPendingRemoval:
+            // Do nothing
+            return;
+    }
+}
 
 ScopedNodeId SecureSession::GetPeer() const
 {

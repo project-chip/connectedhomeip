@@ -25,10 +25,9 @@ namespace chip {
 
 CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager)
 {
-    auto handle = sessionManager.AllocateSession();
+    auto handle = sessionManager.AllocateSession(GetSecureSessionType());
     VerifyOrReturnError(handle.HasValue(), CHIP_ERROR_NO_MEMORY);
     mSecureSessionHolder.Grab(handle.Value());
-    mSessionManager = &sessionManager;
     return CHIP_NO_ERROR;
 }
 
@@ -39,7 +38,7 @@ CHIP_ERROR PairingSession::ActivateSecureSession(const Transport::PeerAddress & 
     uint16_t peerSessionId = GetPeerSessionId();
     ChipLogDetail(Inet, "New secure session created for device " ChipLogFormatScopedNodeId ", LSID:%d PSID:%d!",
                   ChipLogValueScopedNodeId(GetPeer()), secureSession->GetLocalSessionId(), peerSessionId);
-    secureSession->Activate(GetSecureSessionType(), GetPeer(), GetPeerCATs(), peerSessionId, mRemoteMRPConfig);
+    secureSession->Activate(GetPeer(), GetPeerCATs(), peerSessionId, mRemoteMRPConfig);
     secureSession->SetPeerAddress(peerAddress);
     ReturnErrorOnFailure(DeriveSecureSession(secureSession->GetCryptoContext()));
     secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
@@ -102,22 +101,8 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
 
 void PairingSession::Clear()
 {
-    if (mSessionManager != nullptr)
-    {
-        if (mSecureSessionHolder && !mSecureSessionHolder->AsSecureSession()->IsActiveSession())
-        {
-            // Make sure to clean up our pending session, since we're the only
-            // ones who have access to it do do so.
-            mSessionManager->ExpirePairing(mSecureSessionHolder.Get());
-        }
-    }
-
     mPeerSessionId.ClearValue();
-    // If we called ExpirePairing above, the holder has already released the
-    // session (due to it being destroyed).  If not, we need to release it.
-    // Release is idempotent, so it's OK to just call it here.
     mSecureSessionHolder.Release();
-    mSessionManager = nullptr;
 }
 
 } // namespace chip

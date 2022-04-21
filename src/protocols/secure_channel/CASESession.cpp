@@ -129,6 +129,11 @@ CASESession::~CASESession()
     Clear();
 }
 
+void CASESession::OnSessionReleased()
+{
+    // TODO: interrupt pairing procedure, call OnSessionEstablishmentError, if the pairing is not finished
+}
+
 void CASESession::Finish()
 {
     mCASESessionEstablished = true;

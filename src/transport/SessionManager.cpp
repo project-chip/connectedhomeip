@@ -346,7 +346,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
 void SessionManager::ExpirePairing(const SessionHandle & sessionHandle)
 {
-    mSecureSessions.ReleaseSession(sessionHandle->AsSecureSession());
+    sessionHandle->AsSecureSession()->MarkForRemoval();
 }
 
 void SessionManager::ExpireAllPairings(const ScopedNodeId & node)
@@ -354,7 +354,7 @@ void SessionManager::ExpireAllPairings(const ScopedNodeId & node)
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetPeer() == node)
         {
-            mSecureSessions.ReleaseSession(session);
+            session->MarkForRemoval();
         }
         return Loop::Continue;
     });
@@ -366,7 +366,7 @@ void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetFabricIndex() == fabric)
         {
-            mSecureSessions.ReleaseSession(session);
+            session->MarkForRemoval();
         }
         return Loop::Continue;
     });
@@ -378,15 +378,15 @@ void SessionManager::ExpireAllPASEPairings()
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetSecureSessionType() == Transport::SecureSession::Type::kPASE)
         {
-            mSecureSessions.ReleaseSession(session);
+            session->MarkForRemoval();
         }
         return Loop::Continue;
     });
 }
 
-Optional<SessionHandle> SessionManager::AllocateSession()
+Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType)
 {
-    return mSecureSessions.CreateNewSecureSession();
+    return mSecureSessions.CreateNewSecureSession(secureSessionType);
 }
 
 CHIP_ERROR SessionManager::InjectPaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, NodeId peerNodeId,
@@ -771,12 +771,6 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
 void SessionManager::ExpiryTimerCallback(System::Layer * layer, void * param)
 {
     SessionManager * mgr = reinterpret_cast<SessionManager *>(param);
-#if CHIP_CONFIG_SESSION_REKEYING
-    // TODO(#14217): session expiration is currently disabled until rekeying is supported
-    // the #ifdef should be removed after that.
-    mgr->mSecureSessions.ExpireInactiveSessions(System::SystemClock().GetMonotonicTimestamp(),
-                                                System::Clock::Milliseconds32(CHIP_PEER_CONNECTION_TIMEOUT_MS));
-#endif
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
 }
 
@@ -785,7 +779,7 @@ Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId pe
 {
     SecureSession * found = nullptr;
     mSecureSessions.ForEachSession([&peerNodeId, &type, &found](auto session) {
-        if (session->GetPeer() == peerNodeId && (!type.HasValue() || type.Value() == session->GetSecureSessionType()))
+        if (session->IsActiveSession() && session->GetPeer() == peerNodeId && (!type.HasValue() || type.Value() == session->GetSecureSessionType()))
         {
             found = session;
             return Loop::Break;
