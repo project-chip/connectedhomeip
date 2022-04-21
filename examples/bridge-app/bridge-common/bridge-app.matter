@@ -173,8 +173,8 @@ server cluster AdministratorCommissioning = 60 {
 
 server cluster Basic = 40 {
   struct CapabilityMinimaStruct {
-    int16u caseSessionsPerFabric = 0;
-    int16u subscriptionsPerFabric = 1;
+    INT16U caseSessionsPerFabric = 0;
+    INT16U subscriptionsPerFabric = 1;
   }
 
   critical event StartUp = 0 {
@@ -216,7 +216,7 @@ server cluster Basic = 40 {
 
 server cluster Descriptor = 29 {
   struct DeviceType {
-    DEVTYPE_ID type = 0;
+    devtype_id type = 0;
     INT16U revision = 1;
   }
 
@@ -439,16 +439,6 @@ server cluster GeneralDiagnostics = 51 {
 }
 
 server cluster LevelControl = 8 {
-  enum MoveMode : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  enum StepMode : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
   bitmap LevelControlFeature : BITMAP32 {
     kOnOff = 0x1;
     kLighting = 0x2;
@@ -666,17 +656,17 @@ server cluster NetworkCommissioning = 49 {
 }
 
 server cluster OnOff = 6 {
-  enum OnOffDelayedAllOffEffectVariant : enum8 {
+  enum OnOffDelayedAllOffEffectVariant : ENUM8 {
     kFadeToOffIn0p8Seconds = 0;
     kNoFade = 1;
     k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
   }
 
-  enum OnOffDyingLightEffectVariant : enum8 {
+  enum OnOffDyingLightEffectVariant : ENUM8 {
     k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
   }
 
-  enum OnOffEffectIdentifier : enum8 {
+  enum OnOffEffectIdentifier : ENUM8 {
     kDelayedAllOff = 0;
     kDyingLight = 1;
   }
@@ -725,9 +715,15 @@ server cluster OperationalCredentials = 62 {
 
   struct FabricDescriptor {
     OCTET_STRING<65> rootPublicKey = 1;
+<<<<<<< HEAD
     VENDOR_ID vendorId = 2;
     FABRIC_ID fabricId = 3;
     NODE_ID nodeId = 4;
+=======
+    INT16U vendorId = 2;
+    fabric_id fabricId = 3;
+    node_id nodeId = 4;
+>>>>>>> Changes for cleaner regen
     CHAR_STRING<32> label = 5;
     fabric_idx fabricIndex = 254;
   }
@@ -933,7 +929,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
 
   struct SecurityPolicy {
     INT16U rotationTime = 0;
-    BITMAP16 flags = 1;
+    bitmap16 flags = 1;
   }
 
   struct OperationalDatasetComponents {

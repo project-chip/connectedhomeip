@@ -21,7 +21,7 @@ const templateUtil = require(zapPath + 'generator/template-util.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
 
 const ChipTypesHelper = require('../../../../src/app/zap-templates/common/ChipTypesHelper.js');
-const StringHelper    = require('../../../../src/app/zap-templates/common/StringHelper.js');
+const StringHelper    = require(zapPath + 'generator/helper-string-matter.js')
 const appHelper       = require('../../../../src/app/zap-templates/templates/app/helper.js');
 
 function convertBasicCTypeToJavaType(cType)

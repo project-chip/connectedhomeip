@@ -163,7 +163,11 @@ client cluster ApplicationBasic = 1293 {
 }
 
 client cluster ApplicationLauncher = 1292 {
+<<<<<<< HEAD
   enum ApplicationLauncherStatusEnum : ENUM8 {
+=======
+  enum StatusEnumApplicationLauncher : ENUM8 {
+>>>>>>> Changes for cleaner regen
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
@@ -175,7 +179,7 @@ client cluster ApplicationLauncher = 1292 {
 
   struct ApplicationEP {
     Application application = 0;
-    optional ENDPOINT_NO endpoint = 1;
+    optional endpoint_no endpoint = 1;
   }
 
   struct Application {
@@ -203,8 +207,17 @@ client cluster ApplicationLauncher = 1292 {
     Application application = 0;
   }
 
+<<<<<<< HEAD
   response struct LauncherResponse = 3 {
+<<<<<<< HEAD
     ApplicationLauncherStatusEnum status = 0;
+=======
+    StatusEnum status = 0;
+=======
+  response struct LauncherResponse {
+    StatusEnumApplicationLauncher status = 0;
+>>>>>>> Changes for cleaner regen
+>>>>>>> Changes for cleaner regen
     OCTET_STRING data = 1;
   }
 
@@ -273,8 +286,8 @@ client cluster BarrierControl = 259 {
 
 client cluster Basic = 40 {
   struct CapabilityMinimaStruct {
-    int16u caseSessionsPerFabric = 0;
-    int16u subscriptionsPerFabric = 1;
+    INT16U caseSessionsPerFabric = 0;
+    INT16U subscriptionsPerFabric = 1;
   }
 
   critical event StartUp = 0 {
@@ -329,11 +342,11 @@ client cluster BinaryInputBasic = 15 {
 
 client cluster Binding = 30 {
   struct TargetStruct {
-    optional NODE_ID node = 1;
-    optional GROUP_ID group = 2;
-    optional ENDPOINT_NO endpoint = 3;
-    optional CLUSTER_ID cluster = 4;
-    FABRIC_IDX fabricIndex = 254;
+    optional node_id node = 1;
+    optional group_id group = 2;
+    optional endpoint_no endpoint = 3;
+    optional cluster_id cluster = 4;
+    fabric_idx fabricIndex = 254;
   }
 
   attribute TargetStruct binding[] = 0;
@@ -412,7 +425,7 @@ client cluster BridgedActions = 37 {
     INT16U endpointListID = 0;
     CHAR_STRING<32> name = 1;
     EndpointListTypeEnum type = 2;
-    ENDPOINT_NO endpoints[] = 3;
+    endpoint_no endpoints[] = 3;
   }
 
   info event StateChanged = 0 {
@@ -603,8 +616,17 @@ client cluster Channel = 1284 {
     INT16U count = 0;
   }
 
+<<<<<<< HEAD
   response struct ChangeChannelResponse = 1 {
+<<<<<<< HEAD
     ChannelStatusEnum status = 0;
+=======
+    StatusEnum status = 0;
+=======
+  response struct ChangeChannelResponse {
+    ChannelStatusEnum status = 0;
+>>>>>>> Changes for cleaner regen
+>>>>>>> Changes for cleaner regen
     optional CHAR_STRING data = 1;
   }
 
@@ -937,6 +959,15 @@ client cluster ContentLauncher = 1290 {
     kType = 12;
   }
 
+<<<<<<< HEAD
+=======
+  enum StatusEnumContentLauncher : ENUM8 {
+    kSuccess = 0;
+    kUrlNotAvailable = 1;
+    kAuthFailed = 2;
+  }
+
+>>>>>>> Changes for cleaner regen
   bitmap ContentLauncherFeature : BITMAP32 {
     kContentSearch = 0x1;
     kURLPlayback = 0x2;
@@ -978,8 +1009,8 @@ client cluster ContentLauncher = 1290 {
   }
 
   struct Dimension {
-    double width = 0;
-    double height = 1;
+    DOUBLE width = 0;
+    DOUBLE height = 1;
     MetricTypeEnum metric = 2;
   }
 
@@ -1002,8 +1033,17 @@ client cluster ContentLauncher = 1290 {
     optional BrandingInformation brandingInformation = 2;
   }
 
+<<<<<<< HEAD
   response struct LaunchResponse = 2 {
+<<<<<<< HEAD
     ContentLaunchStatusEnum status = 0;
+=======
+    StatusEnum status = 0;
+=======
+  response struct LaunchResponse {
+    StatusEnumContentLauncher status = 0;
+>>>>>>> Changes for cleaner regen
+>>>>>>> Changes for cleaner regen
     optional CHAR_STRING data = 1;
   }
 
@@ -1013,7 +1053,7 @@ client cluster ContentLauncher = 1290 {
 
 client cluster Descriptor = 29 {
   struct DeviceType {
-    DEVTYPE_ID type = 0;
+    devtype_id type = 0;
     INT16U revision = 1;
   }
 
@@ -1703,6 +1743,7 @@ client cluster EthernetNetworkDiagnostics = 55 {
 }
 
 client cluster FanControl = 514 {
+<<<<<<< HEAD
   enum FanModeSequenceType : ENUM8 {
     kOffLowMedHigh = 0;
     kOffLowHigh = 1;
@@ -1713,6 +1754,9 @@ client cluster FanControl = 514 {
   }
 
   enum FanModeType : ENUM8 {
+=======
+  enum FanControlFanMode : ENUM8 {
+>>>>>>> Changes for cleaner regen
     kOff = 0;
     kLow = 1;
     kMedium = 2;
@@ -1722,6 +1766,18 @@ client cluster FanControl = 514 {
     kSmart = 6;
   }
 
+<<<<<<< HEAD
+=======
+  enum FanControlFanModeSequence : ENUM8 {
+    kOffLowMedHigh = 0;
+    kOffLowHigh = 1;
+    kOffLowMedHighAuto = 2;
+    kOffLowHighAuto = 3;
+    kOffOnAuto = 4;
+    kOffOn = 5;
+  }
+
+>>>>>>> Changes for cleaner regen
   bitmap FanControlFeature : BITMAP32 {
     kMultiSpeed = 0x1;
     kAuto = 0x2;
@@ -2218,7 +2274,11 @@ client cluster KeypadInput = 1289 {
     kData = 118;
   }
 
+<<<<<<< HEAD
   enum KeypadInputStatusEnum : ENUM8 {
+=======
+  enum StatusEnumKeypadInput : ENUM8 {
+>>>>>>> Changes for cleaner regen
     kSuccess = 0;
     kUnsupportedKey = 1;
     kInvalidKeyInCurrentState = 2;
@@ -2239,24 +2299,23 @@ client cluster KeypadInput = 1289 {
     CecKeyCode keyCode = 0;
   }
 
+<<<<<<< HEAD
   response struct SendKeyResponse = 1 {
+<<<<<<< HEAD
     KeypadInputStatusEnum status = 0;
+=======
+    StatusEnum status = 0;
+=======
+  response struct SendKeyResponse {
+    StatusEnumKeypadInput status = 0;
+>>>>>>> Changes for cleaner regen
+>>>>>>> Changes for cleaner regen
   }
 
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
 }
 
 client cluster LevelControl = 8 {
-  enum MoveMode : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  enum StepMode : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
   bitmap LevelControlFeature : BITMAP32 {
     kOnOff = 0x1;
     kLighting = 0x2;
@@ -2403,7 +2462,18 @@ client cluster MediaInput = 1287 {
 }
 
 client cluster MediaPlayback = 1286 {
+<<<<<<< HEAD
   enum MediaPlaybackStatusEnum : ENUM8 {
+=======
+  enum PlaybackStateEnum : ENUM8 {
+    kPlaying = 0;
+    kPaused = 1;
+    kNotPlaying = 2;
+    kBuffering = 3;
+  }
+
+  enum StatusEnumMediaPlayback : ENUM8 {
+>>>>>>> Changes for cleaner regen
     kSuccess = 0;
     kInvalidStateForCommand = 1;
     kNotAllowed = 2;
@@ -2448,8 +2518,17 @@ client cluster MediaPlayback = 1286 {
     INT64U position = 0;
   }
 
+<<<<<<< HEAD
   response struct PlaybackResponse = 10 {
+<<<<<<< HEAD
     MediaPlaybackStatusEnum status = 0;
+=======
+    StatusEnum status = 0;
+=======
+  response struct PlaybackResponse {
+    StatusEnumMediaPlayback status = 0;
+>>>>>>> Changes for cleaner regen
+>>>>>>> Changes for cleaner regen
     optional CHAR_STRING data = 1;
   }
 
@@ -2779,17 +2858,17 @@ client cluster OccupancySensing = 1030 {
 }
 
 client cluster OnOff = 6 {
-  enum OnOffDelayedAllOffEffectVariant : enum8 {
+  enum OnOffDelayedAllOffEffectVariant : ENUM8 {
     kFadeToOffIn0p8Seconds = 0;
     kNoFade = 1;
     k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
   }
 
-  enum OnOffDyingLightEffectVariant : enum8 {
+  enum OnOffDyingLightEffectVariant : ENUM8 {
     k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
   }
 
-  enum OnOffEffectIdentifier : enum8 {
+  enum OnOffEffectIdentifier : ENUM8 {
     kDelayedAllOff = 0;
     kDyingLight = 1;
   }
@@ -2869,9 +2948,15 @@ client cluster OperationalCredentials = 62 {
 
   struct FabricDescriptor {
     OCTET_STRING<65> rootPublicKey = 1;
+<<<<<<< HEAD
     VENDOR_ID vendorId = 2;
     FABRIC_ID fabricId = 3;
     NODE_ID nodeId = 4;
+=======
+    INT16U vendorId = 2;
+    fabric_id fabricId = 3;
+    node_id nodeId = 4;
+>>>>>>> Changes for cleaner regen
     CHAR_STRING<32> label = 5;
     fabric_idx fabricIndex = 254;
   }
@@ -3217,7 +3302,7 @@ client cluster Scenes = 5 {
   }
 
   struct SceneExtensionFieldSet {
-    CLUSTER_ID clusterId = 0;
+    cluster_id clusterId = 0;
     INT8U length = 1;
     INT8U value = 2;
   }
@@ -3386,7 +3471,11 @@ client cluster Switch = 59 {
 }
 
 client cluster TargetNavigator = 1285 {
+<<<<<<< HEAD
   enum TargetNavigatorStatusEnum : ENUM8 {
+=======
+  enum StatusEnumTargetNavigator : ENUM8 {
+>>>>>>> Changes for cleaner regen
     kSuccess = 0;
     kTargetNotFound = 1;
     kNotAllowed = 2;
@@ -3409,8 +3498,17 @@ client cluster TargetNavigator = 1285 {
     optional CHAR_STRING data = 1;
   }
 
+<<<<<<< HEAD
   response struct NavigateTargetResponse = 1 {
+<<<<<<< HEAD
     TargetNavigatorStatusEnum status = 0;
+=======
+    StatusEnum status = 0;
+=======
+  response struct NavigateTargetResponse {
+    StatusEnumTargetNavigator status = 0;
+>>>>>>> Changes for cleaner regen
+>>>>>>> Changes for cleaner regen
     optional CHAR_STRING data = 1;
   }
 
@@ -3495,8 +3593,8 @@ client cluster TestCluster = 1295 {
     OCTET_STRING d = 3;
     CHAR_STRING e = 4;
     SimpleBitmap f = 5;
-    single g = 6;
-    double h = 7;
+    SINGLE g = 6;
+    DOUBLE h = 7;
   }
 
   struct TestFabricScoped {
@@ -3927,7 +4025,7 @@ client cluster ThreadNetworkDiagnostics = 53 {
 
   struct SecurityPolicy {
     INT16U rotationTime = 0;
-    BITMAP16 flags = 1;
+    bitmap16 flags = 1;
   }
 
   struct OperationalDatasetComponents {

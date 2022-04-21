@@ -248,7 +248,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8> mValue;
 };
 
 class WritePowerConfigurationMainsVoltageMinThreshold : public WriteAttribute
@@ -383,7 +383,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::PowerConfiguration::enum8 mValue;
 };
 
 class WritePowerConfigurationBatteryAhrRating : public WriteAttribute
@@ -491,7 +491,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8> mValue;
 };
 
 class WritePowerConfigurationBatteryVoltageMinThreshold : public WriteAttribute
@@ -761,7 +761,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::PowerConfiguration::enum8 mValue;
 };
 
 class WritePowerConfigurationBattery2AhrRating : public WriteAttribute
@@ -869,7 +869,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8> mValue;
 };
 
 class WritePowerConfigurationBattery2VoltageMinThreshold : public WriteAttribute
@@ -1139,7 +1139,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::PowerConfiguration::enum8 mValue;
 };
 
 class WritePowerConfigurationBattery3AhrRating : public WriteAttribute
@@ -1247,7 +1247,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8> mValue;
 };
 
 class WritePowerConfigurationBattery3VoltageMinThreshold : public WriteAttribute
@@ -1514,7 +1514,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::BitFlags<chip::app::Clusters::DeviceTemperatureConfiguration::bitmap8> mValue;
 };
 
 class WriteDeviceTemperatureConfigurationLowTempThreshold : public WriteAttribute
@@ -2648,7 +2648,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::OnOffSwitchConfiguration::enum8 mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -2966,7 +2966,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::BitFlags<chip::app::Clusters::LevelControl::bitmap8> mValue;
 };
 
 class WriteLevelControlOnOffTransitionTime : public WriteAttribute
@@ -3342,7 +3342,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::BitFlags<chip::app::Clusters::Time::bitmap8> mValue;
 };
 
 class WriteTimeTimeZone : public WriteAttribute
@@ -3657,7 +3657,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::BinaryInputBasic::enum8 mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -4007,7 +4007,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::BitFlags<chip::app::Clusters::PowerProfile::bitmap8> mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -5021,6 +5021,7 @@ private:
 | * Reachable                                                         | 0x0011 |
 | * UniqueID                                                          | 0x0012 |
 | * CapabilityMinima                                                  | 0x0013 |
+| * SwBuildId                                                         | 0x4000 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -7297,7 +7298,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::BitFlags<chip::app::Clusters::ShadeConfiguration::bitmap8> mValue;
 };
 
 class WriteShadeConfigurationClosedLimit : public WriteAttribute
@@ -7350,7 +7351,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::ShadeConfiguration::enum8 mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -10094,7 +10095,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8> mValue;
 };
 
 class WriteThermostatLocalTemperatureCalibration : public WriteAttribute
@@ -10390,7 +10391,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8> mValue;
 };
 
 class WriteThermostatControlSequenceOfOperation : public WriteAttribute
@@ -10443,7 +10444,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::Thermostat::enum8 mValue;
 };
 
 class WriteThermostatTemperatureSetpointHold : public WriteAttribute
@@ -10470,7 +10471,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::Thermostat::enum8 mValue;
 };
 
 class WriteThermostatTemperatureSetpointHoldDuration : public WriteAttribute
@@ -10524,7 +10525,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8> mValue;
 };
 
 class WriteThermostatAcType : public WriteAttribute
@@ -10550,7 +10551,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::Thermostat::enum8 mValue;
 };
 
 class WriteThermostatAcCapacity : public WriteAttribute
@@ -10603,7 +10604,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::Thermostat::enum8 mValue;
 };
 
 class WriteThermostatAcCompressorType : public WriteAttribute
@@ -10630,7 +10631,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::Thermostat::enum8 mValue;
 };
 
 class WriteThermostatAcErrorCode : public WriteAttribute
@@ -10656,7 +10657,7 @@ public:
     }
 
 private:
-    uint32_t mValue;
+    chip::BitFlags<chip::app::Clusters::Thermostat::bitmap32> mValue;
 };
 
 class WriteThermostatAcLouverPosition : public WriteAttribute
@@ -10683,7 +10684,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::Thermostat::enum8 mValue;
 };
 
 class WriteThermostatAcCapacityFormat : public WriteAttribute
@@ -10710,7 +10711,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::Thermostat::enum8 mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -10762,7 +10763,11 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     chip::app::Clusters::FanControl::FanModeType mValue;
+=======
+    chip::app::Clusters::FanControl::enum8 mValue;
+>>>>>>> Changes for cleaner regen
 };
 
 class WriteFanControlFanModeSequence : public WriteAttribute
@@ -10789,7 +10794,11 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     chip::app::Clusters::FanControl::FanModeSequenceType mValue;
+=======
+    chip::app::Clusters::FanControl::enum8 mValue;
+>>>>>>> Changes for cleaner regen
 };
 
 class WriteFanControlPercentSetting : public WriteAttribute
@@ -10868,7 +10877,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::BitFlags<chip::app::Clusters::FanControl::bitmap8> mValue;
 };
 
 class WriteFanControlWindSetting : public WriteAttribute
@@ -10894,7 +10903,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::BitFlags<chip::app::Clusters::FanControl::bitmap8> mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -10971,7 +10980,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::DehumidificationControl::enum8 mValue;
 };
 
 class WriteDehumidificationControlDehumidificationLockout : public WriteAttribute
@@ -10998,7 +11007,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::DehumidificationControl::enum8 mValue;
 };
 
 class WriteDehumidificationControlDehumidificationHysteresis : public WriteAttribute
@@ -11079,7 +11088,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::DehumidificationControl::enum8 mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -11124,7 +11133,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8 mValue;
 };
 
 class WriteThermostatUserInterfaceConfigurationKeypadLockout : public WriteAttribute
@@ -11151,7 +11160,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8 mValue;
 };
 
 class WriteThermostatUserInterfaceConfigurationScheduleProgrammingVisibility : public WriteAttribute
@@ -11178,7 +11187,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8 mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -11942,7 +11951,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::BitFlags<chip::app::Clusters::ColorControl::bitmap8> mValue;
 };
 
 class WriteColorControlWhitePointX : public WriteAttribute
@@ -12583,7 +12592,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::BitFlags<chip::app::Clusters::BallastConfiguration::bitmap8> mValue;
 };
 
 class WriteBallastConfigurationLampBurnHoursTripPoint : public WriteAttribute
@@ -15039,7 +15048,7 @@ public:
     }
 
 private:
-    uint32_t mValue;
+    chip::BitFlags<chip::app::Clusters::ContentLauncher::bitmap32> mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -16816,7 +16825,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::TestCluster::enum8 mValue;
 };
 
 class WriteTestClusterEnum16 : public WriteAttribute
@@ -16842,7 +16851,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::app::Clusters::TestCluster::enum16 mValue;
 };
 
 class WriteTestClusterFloatSingle : public WriteAttribute
@@ -18110,7 +18119,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<uint8_t> mValue;
+    chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::enum8> mValue;
 };
 
 class WriteTestClusterNullableEnum16 : public WriteAttribute
@@ -18137,7 +18146,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<uint16_t> mValue;
+    chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::enum16> mValue;
 };
 
 class WriteTestClusterNullableFloatSingle : public WriteAttribute
@@ -19122,7 +19131,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap8> mValue;
 };
 
 class WriteElectricalMeasurementAcOverloadAlarmsMask : public WriteAttribute
@@ -19149,7 +19158,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap16> mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -20391,6 +20400,7 @@ void registerClusterBasic(Commands & commands, CredentialIssuerCommands * credsI
         make_unique<ReadAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                                //
         make_unique<ReadAttribute>(Id, "unique-id", Attributes::UniqueID::Id, credsIssuerConfig),                                 //
         make_unique<ReadAttribute>(Id, "capability-minima", Attributes::CapabilityMinima::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "sw-build-id", Attributes::SwBuildId::Id, credsIssuerConfig),                              //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                       //
@@ -20421,6 +20431,7 @@ void registerClusterBasic(Commands & commands, CredentialIssuerCommands * credsI
         make_unique<SubscribeAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                           //
         make_unique<SubscribeAttribute>(Id, "unique-id", Attributes::UniqueID::Id, credsIssuerConfig),                            //
         make_unique<SubscribeAttribute>(Id, "capability-minima", Attributes::CapabilityMinima::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "sw-build-id", Attributes::SwBuildId::Id, credsIssuerConfig),                         //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //

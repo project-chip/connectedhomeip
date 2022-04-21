@@ -316,9 +316,15 @@ server cluster OperationalCredentials = 62 {
 
   struct FabricDescriptor {
     OCTET_STRING<65> rootPublicKey = 1;
+<<<<<<< HEAD
     VENDOR_ID vendorId = 2;
     FABRIC_ID fabricId = 3;
     NODE_ID nodeId = 4;
+=======
+    INT16U vendorId = 2;
+    fabric_id fabricId = 3;
+    node_id nodeId = 4;
+>>>>>>> Changes for cleaner regen
     CHAR_STRING<32> label = 5;
     fabric_idx fabricIndex = 254;
   }

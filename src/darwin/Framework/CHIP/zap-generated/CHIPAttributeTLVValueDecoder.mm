@@ -1077,7 +1077,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::BarrierSafetyStatus::Id: {
@@ -1088,7 +1088,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
             return value;
         }
         case Attributes::BarrierCapabilities::Id: {
@@ -1099,7 +1099,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
             return value;
         }
         case Attributes::BarrierOpenEvents::Id: {
@@ -1704,7 +1704,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
             return value;
         }
         case Attributes::ApplicationType::Id: {
@@ -2870,7 +2870,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::CompensationText::Id: {
@@ -2903,7 +2903,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::ColorControlOptions::Id: {
@@ -2914,7 +2914,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
             return value;
         }
         case Attributes::NumberOfPrimaries::Id: {
@@ -3266,7 +3266,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::ColorLoopActive::Id: {
@@ -3332,7 +3332,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
             return value;
         }
         case Attributes::ColorTempPhysicalMin::Id: {
@@ -3524,7 +3524,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
+            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -4361,7 +4361,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithBool:cppValue];
+=======
+            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+>>>>>>> Changes for cleaner regen
             return value;
         }
         case Attributes::ExpiringUserTimeout::Id: {
@@ -4712,7 +4716,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithUnsignedShort:cppValue];
+=======
+            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+>>>>>>> Changes for cleaner regen
             return value;
         }
         case Attributes::DcCurrentDivisor::Id: {
@@ -4811,7 +4819,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithInt:cppValue];
+=======
+            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
+>>>>>>> Changes for cleaner regen
             return value;
         }
         case Attributes::TotalApparentPower::Id: {
@@ -4822,7 +4834,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithUnsignedInt:cppValue];
+=======
+            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
+>>>>>>> Changes for cleaner regen
             return value;
         }
         case Attributes::Measured1stHarmonicCurrent::Id: {
@@ -4833,7 +4849,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithShort:cppValue];
+=======
+            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
+>>>>>>> Changes for cleaner regen
             return value;
         }
         case Attributes::Measured3rdHarmonicCurrent::Id: {
@@ -4844,7 +4864,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithShort:cppValue];
+=======
+            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
+>>>>>>> Changes for cleaner regen
             return value;
         }
         case Attributes::Measured5thHarmonicCurrent::Id: {
@@ -4899,7 +4923,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithShort:cppValue];
+=======
+            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+>>>>>>> Changes for cleaner regen
             return value;
         }
         case Attributes::MeasuredPhase3rdHarmonicCurrent::Id: {
@@ -5273,7 +5301,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithUnsignedShort:cppValue];
+=======
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+>>>>>>> Changes for cleaner regen
             return value;
         }
         case Attributes::AcVoltageMultiplier::Id: {
@@ -5449,7 +5481,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithShort:cppValue];
+=======
+            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
+>>>>>>> Changes for cleaner regen
             return value;
         }
         case Attributes::RmsExtremeOverVoltage::Id: {
@@ -5515,7 +5551,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithShort:cppValue];
+=======
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+>>>>>>> Changes for cleaner regen
             return value;
         }
         case Attributes::ReactiveCurrentPhaseB::Id: {
@@ -5613,8 +5653,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
+<<<<<<< HEAD
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithShort:cppValue];
+=======
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value())];
+            }
+>>>>>>> Changes for cleaner regen
             return value;
         }
         case Attributes::ActivePowerMaxPhaseB::Id: {
@@ -5801,7 +5850,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithUnsignedShort:cppValue];
+=======
+            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
+>>>>>>> Changes for cleaner regen
             return value;
         }
         case Attributes::RmsCurrentPhaseC::Id: {
@@ -5911,7 +5964,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithUnsignedShort:cppValue];
+=======
+            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+>>>>>>> Changes for cleaner regen
             return value;
         }
         case Attributes::AverageRmsOverVoltageCounterPhaseC::Id: {
@@ -6539,8 +6596,39 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::FixedLabel::Id: {
         using namespace Clusters::FixedLabel;
         switch (aPath.mAttributeId) {
+<<<<<<< HEAD
         case Attributes::LabelList::Id: {
             using TypeInfo = Attributes::LabelList::TypeInfo;
+=======
+        case Attributes::Description::Id: {
+            using TypeInfo = Attributes::Description::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSString * _Nonnull value;
+            value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
+            return value;
+        }
+        case Attributes::StandardNamespace::Id: {
+            using TypeInfo = Attributes::StandardNamespace::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedShort:chip::to_underlying(cppValue.Value())];
+            }
+            return value;
+        }
+        case Attributes::SupportedModes::Id: {
+            using TypeInfo = Attributes::SupportedModes::TypeInfo;
+>>>>>>> Changes for cleaner regen
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -6657,7 +6745,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
+            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -6788,6 +6876,40 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+<<<<<<< HEAD
+=======
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+            return value;
+        }
+        case Attributes::ClusterRevision::Id: {
+            using TypeInfo = Attributes::ClusterRevision::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            break;
+        }
+        break;
+    }
+    case Clusters::OtaSoftwareUpdateProvider::Id: {
+        using namespace Clusters::OtaSoftwareUpdateProvider;
+        switch (aPath.mAttributeId) {
+>>>>>>> Changes for cleaner regen
         case Attributes::AttributeList::Id: {
             using TypeInfo = Attributes::AttributeList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -6876,7 +6998,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+=======
+            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
+>>>>>>> Changes for cleaner regen
             return value;
         }
         case Attributes::LocationCapability::Id: {
@@ -6898,7 +7024,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithBool:cppValue];
+=======
+            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
+>>>>>>> Changes for cleaner regen
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -7209,6 +7339,62 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+<<<<<<< HEAD
+=======
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+            return value;
+        }
+        case Attributes::ClusterRevision::Id: {
+            using TypeInfo = Attributes::ClusterRevision::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            break;
+        }
+        break;
+    }
+    case Clusters::OnOffSwitchConfiguration::Id: {
+        using namespace Clusters::OnOffSwitchConfiguration;
+        switch (aPath.mAttributeId) {
+        case Attributes::SwitchType::Id: {
+            using TypeInfo = Attributes::SwitchType::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+            return value;
+        }
+        case Attributes::SwitchActions::Id: {
+            using TypeInfo = Attributes::SwitchActions::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+            return value;
+        }
+>>>>>>> Changes for cleaner regen
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -7498,8 +7684,88 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+<<<<<<< HEAD
         case Attributes::FeatureMap::Id: {
             using TypeInfo = Attributes::FeatureMap::TypeInfo;
+=======
+        case Attributes::ClusterRevision::Id: {
+            using TypeInfo = Attributes::ClusterRevision::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            break;
+        }
+        break;
+    }
+    case Clusters::PowerSource::Id: {
+        using namespace Clusters::PowerSource;
+        switch (aPath.mAttributeId) {
+        case Attributes::Status::Id: {
+            using TypeInfo = Attributes::Status::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+            return value;
+        }
+        case Attributes::Order::Id: {
+            using TypeInfo = Attributes::Order::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::Description::Id: {
+            using TypeInfo = Attributes::Description::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSString * _Nonnull value;
+            value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
+            return value;
+        }
+        case Attributes::BatteryVoltage::Id: {
+            using TypeInfo = Attributes::BatteryVoltage::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
+        case Attributes::BatteryPercentRemaining::Id: {
+            using TypeInfo = Attributes::BatteryPercentRemaining::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::BatteryTimeRemaining::Id: {
+            using TypeInfo = Attributes::BatteryTimeRemaining::TypeInfo;
+>>>>>>> Changes for cleaner regen
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -7517,7 +7783,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithUnsignedShort:cppValue];
+=======
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+>>>>>>> Changes for cleaner regen
             return value;
         }
         default:
@@ -7537,7 +7807,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -7626,7 +7896,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
+            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -8132,7 +8402,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
             return value;
         }
         case Attributes::MaxFrequency::Id: {
@@ -8241,6 +8511,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             } else {
                 value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
             }
+<<<<<<< HEAD
+=======
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
+>>>>>>> Changes for cleaner regen
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -8329,7 +8604,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
+            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -8491,9 +8766,33 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
+<<<<<<< HEAD
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
             break;
+=======
+        case Attributes::SceneValid::Id: {
+            using TypeInfo = Attributes::SceneValid::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithBool:cppValue];
+            return value;
+        }
+        case Attributes::NameSupport::Id: {
+            using TypeInfo = Attributes::NameSupport::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
+            return value;
+>>>>>>> Changes for cleaner regen
         }
         break;
     }
@@ -8740,7 +9039,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
+            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -8952,7 +9251,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
+            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -9777,7 +10076,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithUnsignedShort:cppValue];
+=======
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+>>>>>>> Changes for cleaner regen
             return value;
         }
         case Attributes::UltrasonicUnoccupiedToOccupiedThreshold::Id: {
@@ -9788,7 +10091,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithUnsignedChar:cppValue];
+=======
+            value = [NSNumber numberWithUnsignedShort:chip::to_underlying(cppValue)];
+>>>>>>> Changes for cleaner regen
             return value;
         }
         case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id: {
@@ -14349,6 +14656,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
+<<<<<<< HEAD
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithShort:cppValue];
             return value;
@@ -14359,6 +14667,13 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
+=======
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value())];
+>>>>>>> Changes for cleaner regen
             }
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithShort:cppValue];
@@ -14371,8 +14686,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
+<<<<<<< HEAD
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithShort:cppValue];
+=======
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedShort:chip::to_underlying(cppValue.Value())];
+            }
+>>>>>>> Changes for cleaner regen
             return value;
         }
         case Attributes::UnoccupiedHeatingSetpoint::Id: {
@@ -14680,7 +15004,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithShort:cppValue];
+=======
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+>>>>>>> Changes for cleaner regen
             return value;
         }
         case Attributes::AcCapacityFormat::Id: {
@@ -14691,7 +15019,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -14780,7 +15108,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
+            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -14811,7 +15139,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::KeypadLockout::Id: {
@@ -14822,7 +15150,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::ScheduleProgrammingVisibility::Id: {
@@ -14833,7 +15161,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -14964,7 +15292,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::NetworkName::Id: {
@@ -15664,7 +15992,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * newElement_0;
                     newElement_0 = [CHIPThreadNetworkDiagnosticsClusterSecurityPolicy new];
                     newElement_0.rotationTime = [NSNumber numberWithUnsignedShort:entry_0.rotationTime];
-                    newElement_0.flags = [NSNumber numberWithUnsignedShort:entry_0.flags];
+                    newElement_0.flags = [NSNumber numberWithUnsignedShort:entry_0.flags.Raw()];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -15837,7 +16165,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
+            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -16114,7 +16442,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
+            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -16647,7 +16975,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
+            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -16804,7 +17132,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
             return value;
         }
         case Attributes::TargetPositionLiftPercent100ths::Id: {
@@ -16941,7 +17269,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -17030,7 +17358,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
+            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
             return value;
         }
         case Attributes::ClusterRevision::Id: {

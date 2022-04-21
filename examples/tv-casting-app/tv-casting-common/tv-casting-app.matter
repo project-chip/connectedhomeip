@@ -141,7 +141,11 @@ client cluster ApplicationBasic = 1293 {
 }
 
 client cluster ApplicationLauncher = 1292 {
+<<<<<<< HEAD
   enum ApplicationLauncherStatusEnum : ENUM8 {
+=======
+  enum StatusEnumApplicationLauncher : ENUM8 {
+>>>>>>> Changes for cleaner regen
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
@@ -230,8 +234,8 @@ server cluster BarrierControl = 259 {
 
 server cluster Basic = 40 {
   struct CapabilityMinimaStruct {
-    int16u caseSessionsPerFabric = 0;
-    int16u subscriptionsPerFabric = 1;
+    INT16U caseSessionsPerFabric = 0;
+    INT16U subscriptionsPerFabric = 1;
   }
 
   critical event StartUp = 0 {
@@ -280,11 +284,11 @@ server cluster BinaryInputBasic = 15 {
 
 server cluster Binding = 30 {
   struct TargetStruct {
-    optional NODE_ID node = 1;
-    optional GROUP_ID group = 2;
-    optional ENDPOINT_NO endpoint = 3;
-    optional CLUSTER_ID cluster = 4;
-    FABRIC_IDX fabricIndex = 254;
+    optional node_id node = 1;
+    optional group_id group = 2;
+    optional endpoint_no endpoint = 3;
+    optional cluster_id cluster = 4;
+    fabric_idx fabricIndex = 254;
   }
 
   attribute TargetStruct binding[] = 0;
@@ -373,6 +377,15 @@ client cluster ContentLauncher = 1290 {
     kType = 12;
   }
 
+<<<<<<< HEAD
+=======
+  enum StatusEnumContentLauncher : ENUM8 {
+    kSuccess = 0;
+    kUrlNotAvailable = 1;
+    kAuthFailed = 2;
+  }
+
+>>>>>>> Changes for cleaner regen
   bitmap ContentLauncherFeature : BITMAP32 {
     kContentSearch = 0x1;
     kURLPlayback = 0x2;
@@ -414,8 +427,8 @@ client cluster ContentLauncher = 1290 {
   }
 
   struct Dimension {
-    double width = 0;
-    double height = 1;
+    DOUBLE width = 0;
+    DOUBLE height = 1;
     MetricTypeEnum metric = 2;
   }
 
@@ -441,7 +454,7 @@ client cluster ContentLauncher = 1290 {
 
 client cluster Descriptor = 29 {
   struct DeviceType {
-    DEVTYPE_ID type = 0;
+    devtype_id type = 0;
     INT16U revision = 1;
   }
 
@@ -454,7 +467,7 @@ client cluster Descriptor = 29 {
 
 server cluster Descriptor = 29 {
   struct DeviceType {
-    DEVTYPE_ID type = 0;
+    devtype_id type = 0;
     INT16U revision = 1;
   }
 
@@ -782,19 +795,6 @@ server cluster IasZone = 1280 {
     kInvalidZoneType = 65535;
   }
 
-  bitmap IasZoneStatus : BITMAP16 {
-    kAlarm1 = 0x1;
-    kAlarm2 = 0x2;
-    kTamper = 0x4;
-    kBattery = 0x8;
-    kSupervisionReports = 0x10;
-    kRestoreReports = 0x20;
-    kTrouble = 0x40;
-    kAc = 0x80;
-    kTest = 0x100;
-    kBatteryDefect = 0x200;
-  }
-
   readonly attribute enum8 zoneState = 0;
   readonly attribute enum16 zoneType = 1;
   readonly attribute bitmap16 zoneStatus = 2;
@@ -950,7 +950,11 @@ client cluster KeypadInput = 1289 {
     kData = 118;
   }
 
+<<<<<<< HEAD
   enum KeypadInputStatusEnum : ENUM8 {
+=======
+  enum StatusEnumKeypadInput : ENUM8 {
+>>>>>>> Changes for cleaner regen
     kSuccess = 0;
     kUnsupportedKey = 1;
     kInvalidKeyInCurrentState = 2;
@@ -972,16 +976,6 @@ client cluster KeypadInput = 1289 {
 }
 
 client cluster LevelControl = 8 {
-  enum MoveMode : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  enum StepMode : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
   bitmap LevelControlFeature : BITMAP32 {
     kOnOff = 0x1;
     kLighting = 0x2;
@@ -1058,16 +1052,6 @@ client cluster LevelControl = 8 {
 }
 
 server cluster LevelControl = 8 {
-  enum MoveMode : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  enum StepMode : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
   bitmap LevelControlFeature : BITMAP32 {
     kOnOff = 0x1;
     kLighting = 0x2;
@@ -1195,7 +1179,18 @@ client cluster MediaInput = 1287 {
 }
 
 client cluster MediaPlayback = 1286 {
+<<<<<<< HEAD
   enum MediaPlaybackStatusEnum : ENUM8 {
+=======
+  enum PlaybackStateEnum : ENUM8 {
+    kPlaying = 0;
+    kPaused = 1;
+    kNotPlaying = 2;
+    kBuffering = 3;
+  }
+
+  enum StatusEnumMediaPlayback : ENUM8 {
+>>>>>>> Changes for cleaner regen
     kSuccess = 0;
     kInvalidStateForCommand = 1;
     kNotAllowed = 2;
@@ -1438,17 +1433,17 @@ server cluster OtaSoftwareUpdateProvider = 41 {
 }
 
 client cluster OnOff = 6 {
-  enum OnOffDelayedAllOffEffectVariant : enum8 {
+  enum OnOffDelayedAllOffEffectVariant : ENUM8 {
     kFadeToOffIn0p8Seconds = 0;
     kNoFade = 1;
     k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
   }
 
-  enum OnOffDyingLightEffectVariant : enum8 {
+  enum OnOffDyingLightEffectVariant : ENUM8 {
     k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
   }
 
-  enum OnOffEffectIdentifier : enum8 {
+  enum OnOffEffectIdentifier : ENUM8 {
     kDelayedAllOff = 0;
     kDyingLight = 1;
   }
@@ -1481,17 +1476,17 @@ client cluster OnOff = 6 {
 }
 
 server cluster OnOff = 6 {
-  enum OnOffDelayedAllOffEffectVariant : enum8 {
+  enum OnOffDelayedAllOffEffectVariant : ENUM8 {
     kFadeToOffIn0p8Seconds = 0;
     kNoFade = 1;
     k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
   }
 
-  enum OnOffDyingLightEffectVariant : enum8 {
+  enum OnOffDyingLightEffectVariant : ENUM8 {
     k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
   }
 
-  enum OnOffEffectIdentifier : enum8 {
+  enum OnOffEffectIdentifier : ENUM8 {
     kDelayedAllOff = 0;
     kDyingLight = 1;
   }
@@ -1545,9 +1540,15 @@ server cluster OperationalCredentials = 62 {
 
   struct FabricDescriptor {
     OCTET_STRING<65> rootPublicKey = 1;
+<<<<<<< HEAD
     VENDOR_ID vendorId = 2;
     FABRIC_ID fabricId = 3;
     NODE_ID nodeId = 4;
+=======
+    INT16U vendorId = 2;
+    fabric_id fabricId = 3;
+    node_id nodeId = 4;
+>>>>>>> Changes for cleaner regen
     CHAR_STRING<32> label = 5;
     fabric_idx fabricIndex = 254;
   }
@@ -1638,7 +1639,7 @@ server cluster Scenes = 5 {
   }
 
   struct SceneExtensionFieldSet {
-    CLUSTER_ID clusterId = 0;
+    cluster_id clusterId = 0;
     INT8U length = 1;
     INT8U value = 2;
   }
@@ -1794,7 +1795,11 @@ server cluster Switch = 59 {
 }
 
 client cluster TargetNavigator = 1285 {
+<<<<<<< HEAD
   enum TargetNavigatorStatusEnum : ENUM8 {
+=======
+  enum StatusEnumTargetNavigator : ENUM8 {
+>>>>>>> Changes for cleaner regen
     kSuccess = 0;
     kTargetNotFound = 1;
     kNotAllowed = 2;
@@ -1968,7 +1973,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
 
   struct SecurityPolicy {
     INT16U rotationTime = 0;
-    BITMAP16 flags = 1;
+    bitmap16 flags = 1;
   }
 
   struct OperationalDatasetComponents {

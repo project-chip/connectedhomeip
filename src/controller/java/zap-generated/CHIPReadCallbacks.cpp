@@ -9901,8 +9901,8 @@ CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback::~CHIPIlluminanceMeas
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback::CallbackFn(void * context,
-                                                                            const chip::app::DataModel::Nullable<uint8_t> & value)
+void CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::enum8> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9932,7 +9932,7 @@ void CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback::CallbackFn(void
         std::string javaValueClassName     = "java/lang/Integer";
         std::string javaValueCtorSignature = "(I)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                      value.Value(), javaValue);
+                                                                      static_cast<uint8_t>(value.Value()), javaValue);
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
@@ -12146,8 +12146,8 @@ CHIPModeSelectStandardNamespaceAttributeCallback::~CHIPModeSelectStandardNamespa
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPModeSelectStandardNamespaceAttributeCallback::CallbackFn(void * context,
-                                                                  const chip::app::DataModel::Nullable<uint16_t> & value)
+void CHIPModeSelectStandardNamespaceAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ModeSelect::enum16> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12177,7 +12177,7 @@ void CHIPModeSelectStandardNamespaceAttributeCallback::CallbackFn(void * context
         std::string javaValueClassName     = "java/lang/Integer";
         std::string javaValueCtorSignature = "(I)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                       value.Value(), javaValue);
+                                                                       static_cast<uint16_t>(value.Value()), javaValue);
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
@@ -21587,8 +21587,8 @@ CHIPTestClusterNullableEnum8AttributeCallback::~CHIPTestClusterNullableEnum8Attr
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestClusterNullableEnum8AttributeCallback::CallbackFn(void * context,
-                                                               const chip::app::DataModel::Nullable<uint8_t> & value)
+void CHIPTestClusterNullableEnum8AttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::enum8> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -21618,7 +21618,7 @@ void CHIPTestClusterNullableEnum8AttributeCallback::CallbackFn(void * context,
         std::string javaValueClassName     = "java/lang/Integer";
         std::string javaValueCtorSignature = "(I)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                      value.Value(), javaValue);
+                                                                      static_cast<uint8_t>(value.Value()), javaValue);
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
@@ -21654,8 +21654,8 @@ CHIPTestClusterNullableEnum16AttributeCallback::~CHIPTestClusterNullableEnum16At
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestClusterNullableEnum16AttributeCallback::CallbackFn(void * context,
-                                                                const chip::app::DataModel::Nullable<uint16_t> & value)
+void CHIPTestClusterNullableEnum16AttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::enum16> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -21685,7 +21685,7 @@ void CHIPTestClusterNullableEnum16AttributeCallback::CallbackFn(void * context,
         std::string javaValueClassName     = "java/lang/Integer";
         std::string javaValueCtorSignature = "(I)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                       value.Value(), javaValue);
+                                                                       static_cast<uint16_t>(value.Value()), javaValue);
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
@@ -23185,7 +23185,7 @@ void CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback::CallbackFn(
         std::string newElement_0_flagsClassName     = "java/lang/Integer";
         std::string newElement_0_flagsCtorSignature = "(I)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
-            newElement_0_flagsClassName.c_str(), newElement_0_flagsCtorSignature.c_str(), entry_0.flags, newElement_0_flags);
+            newElement_0_flagsClassName.c_str(), newElement_0_flagsCtorSignature.c_str(), entry_0.flags.Raw(), newElement_0_flags);
 
         jclass securityPolicyStructClass;
         err = chip::JniReferences::GetInstance().GetClassRef(
