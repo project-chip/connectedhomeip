@@ -74,11 +74,7 @@ public:
     } State;
 
     CHIP_ERROR Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state);
-<<<<<<< HEAD
     bool NextState();
-=======
-    bool IsUnlocked();
->>>>>>> 80a3f7c72 (code review changes: read lock state from server, save user/credential in nvm flash)
     bool IsActionInProgress();
     bool InitiateAction(int32_t aActor, Action_t aAction);
 
