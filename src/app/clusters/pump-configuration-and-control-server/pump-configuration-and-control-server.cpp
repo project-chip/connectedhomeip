@@ -54,7 +54,7 @@ static PumpControlMode determineEffectiveControlMode(PumpControlMode controlMode
     // If a remote sensor is detected and the OperationMode is kNormal, then the pump is operating in the
     // control mode indicated by the repective remote senor type
     RemoteSensorType sensorType = detectRemoteSensorConnected();
-    switch(sensorType)
+    switch (sensorType)
     {
     case RemoteSensorType::kNoSensor:
         // Set to current ControlMode;
