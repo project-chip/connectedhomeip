@@ -565,17 +565,17 @@ server cluster GeneralCommissioning = 48 {
     INT64U breadcrumb = 2;
   }
 
-  response struct ArmFailSafeResponse {
+  response struct ArmFailSafeResponse = 1 {
     CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
-  response struct SetRegulatoryConfigResponse {
+  response struct SetRegulatoryConfigResponse = 3 {
     CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
-  response struct CommissioningCompleteResponse {
+  response struct CommissioningCompleteResponse = 5 {
     CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
@@ -726,23 +726,23 @@ server cluster Groups = 4 {
     CHAR_STRING groupName = 1;
   }
 
-  response struct AddGroupResponse {
+  response struct AddGroupResponse = 0 {
     ENUM8 status = 0;
     group_id groupId = 1;
   }
 
-  response struct ViewGroupResponse {
+  response struct ViewGroupResponse = 1 {
     ENUM8 status = 0;
     group_id groupId = 1;
     CHAR_STRING groupName = 2;
   }
 
-  response struct GetGroupMembershipResponse {
+  response struct GetGroupMembershipResponse = 2 {
     nullable INT8U capacity = 0;
     group_id groupList[] = 1;
   }
 
-  response struct RemoveGroupResponse {
+  response struct RemoveGroupResponse = 3 {
     ENUM8 status = 0;
     group_id groupId = 1;
   }
@@ -807,14 +807,14 @@ server cluster IasZone = 1280 {
     INT8U zoneId = 1;
   }
 
-  response struct ZoneStatusChangeNotification {
+  response struct ZoneStatusChangeNotification = 0 {
     IasZoneStatus zoneStatus = 0;
     BITMAP8 extendedStatus = 1;
     INT8U zoneId = 2;
     INT16U delay = 3;
   }
 
-  response struct ZoneEnrollRequest {
+  response struct ZoneEnrollRequest = 1 {
     IasZoneType zoneType = 0;
     INT16U manufacturerCode = 1;
   }
@@ -852,7 +852,7 @@ server cluster Identify = 3 {
     INT16U identifyTime = 0;
   }
 
-  response struct IdentifyQueryResponse {
+  response struct IdentifyQueryResponse = 0 {
     INT16U timeout = 0;
   }
 
@@ -1345,20 +1345,20 @@ server cluster NetworkCommissioning = 49 {
     optional INT64U breadcrumb = 2;
   }
 
-  response struct ScanNetworksResponse {
+  response struct ScanNetworksResponse = 1 {
     NetworkCommissioningStatus networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
     optional WiFiInterfaceScanResult wiFiScanResults[] = 2;
     optional ThreadInterfaceScanResult threadScanResults[] = 3;
   }
 
-  response struct NetworkConfigResponse {
+  response struct NetworkConfigResponse = 5 {
     NetworkCommissioningStatus networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
     optional INT8U networkIndex = 2;
   }
 
-  response struct ConnectNetworkResponse {
+  response struct ConnectNetworkResponse = 7 {
     NetworkCommissioningStatus networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
     nullable INT32S errorValue = 2;
@@ -1416,7 +1416,7 @@ server cluster OtaSoftwareUpdateProvider = 41 {
     INT32U softwareVersion = 1;
   }
 
-  response struct QueryImageResponse {
+  response struct QueryImageResponse = 1 {
     OTAQueryStatus status = 0;
     optional INT32U delayedActionTime = 1;
     optional CHAR_STRING imageURI = 2;
@@ -1427,7 +1427,7 @@ server cluster OtaSoftwareUpdateProvider = 41 {
     optional OCTET_STRING metadataForRequestor = 7;
   }
 
-  response struct ApplyUpdateResponse {
+  response struct ApplyUpdateResponse = 3 {
     OTAApplyUpdateAction action = 0;
     INT32U delayedActionTime = 1;
   }
@@ -1601,21 +1601,21 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING trustedRootIdentifier = 0;
   }
 
-  response struct AttestationResponse {
+  response struct AttestationResponse = 1 {
     OCTET_STRING attestationElements = 0;
     OCTET_STRING signature = 1;
   }
 
-  response struct CertificateChainResponse {
+  response struct CertificateChainResponse = 3 {
     OCTET_STRING certificate = 0;
   }
 
-  response struct CSRResponse {
+  response struct CSRResponse = 5 {
     OCTET_STRING NOCSRElements = 0;
     OCTET_STRING attestationSignature = 1;
   }
 
-  response struct NOCResponse {
+  response struct NOCResponse = 8 {
     OperationalCertStatus statusCode = 0;
     optional fabric_idx fabricIndex = 1;
     optional CHAR_STRING debugText = 2;
@@ -1687,13 +1687,13 @@ server cluster Scenes = 5 {
     INT16U groupId = 0;
   }
 
-  response struct AddSceneResponse {
+  response struct AddSceneResponse = 0 {
     ENUM8 status = 0;
     INT16U groupId = 1;
     INT8U sceneId = 2;
   }
 
-  response struct ViewSceneResponse {
+  response struct ViewSceneResponse = 1 {
     ENUM8 status = 0;
     INT16U groupId = 1;
     INT8U sceneId = 2;
@@ -1702,24 +1702,24 @@ server cluster Scenes = 5 {
     SceneExtensionFieldSet extensionFieldSets[] = 5;
   }
 
-  response struct RemoveSceneResponse {
+  response struct RemoveSceneResponse = 2 {
     ENUM8 status = 0;
     INT16U groupId = 1;
     INT8U sceneId = 2;
   }
 
-  response struct RemoveAllScenesResponse {
+  response struct RemoveAllScenesResponse = 3 {
     ENUM8 status = 0;
     INT16U groupId = 1;
   }
 
-  response struct StoreSceneResponse {
+  response struct StoreSceneResponse = 4 {
     ENUM8 status = 0;
     INT16U groupId = 1;
     INT8U sceneId = 2;
   }
 
-  response struct GetSceneMembershipResponse {
+  response struct GetSceneMembershipResponse = 6 {
     ENUM8 status = 0;
     INT8U capacity = 1;
     INT16U groupId = 2;
@@ -1898,7 +1898,7 @@ server cluster TestCluster = 1295 {
   attribute long_octet_string<1000> longOctetString = 29;
   readonly attribute int16u clusterRevision = 65533;
 
-  response struct TestSpecificResponse {
+  response struct TestSpecificResponse = 0 {
     INT8U returnValue = 0;
   }
 

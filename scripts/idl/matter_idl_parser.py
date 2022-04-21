@@ -253,9 +253,8 @@ class MatterIdlTransformer(Transformer):
         return value
 
     @v_args(inline=True)
-    def response_struct(self, value):
-        value.tag = StructTag.RESPONSE
-        return value
+    def response_struct(self, id, code, *fields):
+        return Struct(name=id, tag=StructTag.RESPONSE, code=code, fields=list(fields))
 
     @v_args(inline=True)
     def endpoint(self, number, *clusters):
