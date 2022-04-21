@@ -45,4 +45,4 @@ Checks: >
   -clang-analyzer-cplusplus.NewDeleteLeaks,
   -clang-diagnostic-implicit-int-conversion
 WarningsAsErrors: '*'
-HeaderFilterRegex: '(src|examples|zzz_generated|credentials)'
+HeaderFilterRegex: '(src|examples|zzz_generated|credentials).*(?<!third_party.*repo)'
