@@ -58,7 +58,7 @@ bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
 {
     if (delegate == nullptr)
     {
-        ChipLogError(Zcl, "Media Input has no delegate set for endpoint:%u", endpoint);
+        ChipLogProgress(Zcl, "Media Input has no delegate set for endpoint:%u", endpoint);
         return true;
     }
     return false;
