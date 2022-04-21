@@ -134,18 +134,27 @@ class ClangTidyEntry:
                 #
                 # 59 warnings generated.
                 # Suppressed 59 warnings (59 in non-user code).
-                # Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+                # Use -header-filter=.* to display errors from all non-system headers. 
+                # Use -system-headers to display errors from system headers as well.
                 #
                 # We ignore output from that file
+
+                skip_strings = [
+                    "warnings generated",
+                    "in non-user code",
+                    "Use -header-filter=.* to display errors from all non-system headers.",
+                    "Use -system-headers to display errors from system headers as well.",
+                ]
+
+
                 for l in err.decode('utf-8').split('\n'):
-                    if 'warnings generated.' in l:
+                    l = l.strip()
+
+                    if any(map(lambda s: s in l, skip_strings)):
                         continue
 
-                    if 'in non-user code' in l:
-                        continue
-
-                    if 'use -system-headers to display errors' in l:
-                        continue
+                    if not l:
+                        continue # no empty lines
 
                     logging.warning('TIDY %s: %s', self.file, l)
 
