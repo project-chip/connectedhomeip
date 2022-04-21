@@ -53,6 +53,7 @@ struct LockCredentialInfo
     uint8_t credentialData[DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE];
     size_t credentialDataSize;
 };
+
 class LockManager
 {
 public:
@@ -72,7 +73,7 @@ public:
         kState_UnlockCompleted,
     } State;
 
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state);
     bool IsUnlocked();
     bool IsActionInProgress();
     bool InitiateAction(int32_t aActor, Action_t aAction);
@@ -98,6 +99,8 @@ public:
     bool setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
     const char * lockStateToString(DlLockState lockState) const;
 
+    bool ReadConfigValues();
+
 private:
     friend LockManager & LockMgr();
     chip::EndpointId mEndpointId;
@@ -106,15 +109,15 @@ private:
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;
 
-    bool mAutoTurnOff;
-    uint32_t mAutoTurnOffDuration;
-    bool mAutoTurnOffTimerArmed;
+    bool mAutoLock;
+    uint32_t mAutoLockDuration;
+    bool mAutoLockTimerArmed;
 
     void CancelTimer(void);
     void StartTimer(uint32_t aTimeoutMs);
 
     static void TimerEventHandler(TimerHandle_t xTimer);
-    static void AutoTurnOffTimerEventHandler(AppEvent * aEvent);
+    static void AutoLockTimerEventHandler(AppEvent * aEvent);
     static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
 
     LockUserInfo mLockUser;

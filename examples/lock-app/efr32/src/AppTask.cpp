@@ -16,12 +16,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "LEDWidget.h"
+#ifdef DISPLAY_ENABLED
 #include "lcd.h"
 #include "qrcodegen.h"
+#endif // DISPLAY_ENABLED
 #include "sl_simple_led_instances.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -78,6 +81,7 @@ using chip::app::Clusters::DoorLock::DlOperationSource;
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceLayer::Internal;
 
 namespace {
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
@@ -102,6 +106,7 @@ bool sIsThreadProvisioned = false;
 bool sIsThreadEnabled     = false;
 #endif /* CHIP_ENABLE_OPENTHREAD */
 bool sHaveBLEConnections = false;
+bool configValueSet = false;
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 
@@ -221,9 +226,17 @@ CHIP_ERROR AppTask::Init()
         EFR32_LOG("funct timer create failed");
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
-
+    
     EFR32_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
-    err = LockMgr().Init();
+
+    //Initial lock state
+    chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state;
+    chip::EndpointId endpointId{ 1 };
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    chip::app::Clusters::DoorLock::Attributes::LockState::Get(endpointId, state);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    err = LockMgr().Init(state);
     if (err != CHIP_NO_ERROR)
     {
         EFR32_LOG("LockMgr().Init() failed");
@@ -237,9 +250,14 @@ CHIP_ERROR AppTask::Init()
     sStatusLED.Init(SYSTEM_STATE_LED);
     sLockLED.Init(LOCK_STATE_LED);
 
-    bool state;
-    chip::DeviceLayer::Internal::EFR32Config::ReadConfigValue(chip::DeviceLayer::Internal::EFR32Config::kConfigKey_LockState, state);
-    sLockLED.Set(state);
+    if(state.Value() == DlLockState::kUnlocked)
+    {
+        sLockLED.Set(true);
+    }
+    else
+    {
+        sLockLED.Set(false);
+    }
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 
@@ -279,6 +297,13 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     while (true)
     {
+        // Users and credentials should be checked once from nvm flash on boot
+        if(!configValueSet)
+        {
+            LockMgr().ReadConfigValues();
+            configValueSet = true;
+        }
+
         BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
         while (eventReceived == pdTRUE)
         {
@@ -570,9 +595,9 @@ void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
 
 void AppTask::ActionCompleted(LockManager::Action_t aAction)
 {
-    // if the action has been completed by the lock, update the bolt lock trait.
-    // Turn on the lock LED if in a LOCKED state OR
-    // Turn off the lock LED if in an UNLOCKED state.
+    // if the action has been completed by the lock, update the lock trait.
+    // Turn off the lock LED if in a LOCKED state OR
+    // Turn on the lock LED if in an UNLOCKED state.
     if (aAction == LockManager::LOCK_ACTION)
     {
         EFR32_LOG("Lock Action has been completed")

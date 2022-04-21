@@ -31,7 +31,7 @@ TimerHandle_t sLockTimer;
 
 using namespace ::chip::DeviceLayer::Internal;
 
-CHIP_ERROR LockManager::Init()
+CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state)
 {
     // Create FreeRTOS sw timer for lock timer.
     sLockTimer = xTimerCreate("lockTmr",        // Just a text name, not used by the RTOS kernel
@@ -46,27 +46,25 @@ CHIP_ERROR LockManager::Init()
         EFR32_LOG("sLockTimer timer create failed");
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
-    bool state;
-    EFR32Config::ReadConfigValue(EFR32Config::kConfigKey_LockState, state);
-    if (state == true)
+
+    if(state.Value() == DlLockState::kUnlocked)
         mState = kState_UnlockCompleted;
     else
         mState = kState_LockCompleted;
 
-    mAutoTurnOffTimerArmed = false;
-    mAutoTurnOff           = false;
-    mAutoTurnOffDuration   = 0;
-
-    mLockUser.credentials[0]   = { 1, 1 };
-    mLockUser.totalCredentials = 1;
-    mLockUser.userUniqueId     = 5;
-    mLockUser.userStatus       = DlUserStatus::kAvailable;
-    mLockUser.credentialRule   = DlCredentialRule::kSingle;
-
-    mLockCredentials.credentialType = DlCredentialType::kPin;
-    mLockCredentials.status         = DlCredentialStatus::kAvailable;
+    mAutoLockTimerArmed = false;
+    mAutoLock           = false;
+    mAutoLockDuration   = 0;
 
     return CHIP_NO_ERROR;
+}
+
+bool LockManager::ReadConfigValues()
+{
+    size_t outLen;
+    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_LockUser, reinterpret_cast<uint8_t *> (&mLockUser), sizeof(LockUserInfo), outLen);    
+    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_Credential, reinterpret_cast<uint8_t *> (&mLockCredentials), sizeof(LockCredentialInfo), outLen);
+    return true;
 }
 
 void LockManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB)
@@ -90,7 +88,7 @@ bool LockManager::InitiateAction(int32_t aActor, Action_t aAction)
     bool action_initiated = false;
     State_t new_state;
 
-    // Initiate Turn On/Off Action only when the previous one is complete.
+    // Initiate Turn Lock/Unlock Action only when the previous one is complete.
     if (mState == kState_LockCompleted && aAction == UNLOCK_ACTION)
     {
         action_initiated = true;
@@ -108,11 +106,11 @@ bool LockManager::InitiateAction(int32_t aActor, Action_t aAction)
 
     if (action_initiated)
     {
-        if (mAutoTurnOffTimerArmed && new_state == kState_LockInitiated)
+        if (mAutoLockTimerArmed && new_state == kState_LockInitiated)
         {
-            // If auto turn off timer has been armed and someone initiates turning off,
+            // If auto lock timer has been armed and someone initiates lock,
             // cancel the timer and continue as normal.
-            mAutoTurnOffTimerArmed = false;
+            mAutoLockTimerArmed = false;
 
             CancelTimer();
         }
@@ -169,9 +167,9 @@ void LockManager::TimerEventHandler(TimerHandle_t xTimer)
     AppEvent event;
     event.Type               = AppEvent::kEventType_Timer;
     event.TimerEvent.Context = lock;
-    if (lock->mAutoTurnOffTimerArmed)
+    if (lock->mAutoLockTimerArmed)
     {
-        event.Handler = AutoTurnOffTimerEventHandler;
+        event.Handler = AutoLockTimerEventHandler;
     }
     else
     {
@@ -180,20 +178,20 @@ void LockManager::TimerEventHandler(TimerHandle_t xTimer)
     GetAppTask().PostEvent(&event);
 }
 
-void LockManager::AutoTurnOffTimerEventHandler(AppEvent * aEvent)
+void LockManager::AutoLockTimerEventHandler(AppEvent * aEvent)
 {
     LockManager * lock = static_cast<LockManager *>(aEvent->TimerEvent.Context);
     int32_t actor      = 0;
 
-    // Make sure auto turn off timer is still armed.
-    if (!lock->mAutoTurnOffTimerArmed)
+    // Make sure auto lock timer is still armed.
+    if (!lock->mAutoLockTimerArmed)
     {
         return;
     }
 
-    lock->mAutoTurnOffTimerArmed = false;
+    lock->mAutoLockTimerArmed = false;
 
-    EFR32_LOG("Auto Turn Off has been triggered!");
+    EFR32_LOG("Auto Lock has been triggered!");
 
     lock->InitiateAction(actor, LOCK_ACTION);
 }
@@ -222,14 +220,14 @@ void LockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
             lock->mActionCompleted_CB(actionCompleted);
         }
 
-        if (lock->mAutoTurnOff && actionCompleted == UNLOCK_ACTION)
+        if (lock->mAutoLock && actionCompleted == UNLOCK_ACTION)
         {
-            // Start the timer for auto turn off
-            lock->StartTimer(lock->mAutoTurnOffDuration * 1000);
+            // Start the timer for auto lock
+            lock->StartTimer(lock->mAutoLockDuration * 1000);
 
-            lock->mAutoTurnOffTimerArmed = true;
+            lock->mAutoLockTimerArmed = true;
 
-            EFR32_LOG("Auto Turn off enabled. Will be triggered in %u seconds", lock->mAutoTurnOffDuration);
+            EFR32_LOG("Auto lock enabled. Will be triggered in %u seconds", lock->mAutoLockDuration);
         }
     }
 }
@@ -246,7 +244,8 @@ bool LockManager::Unlock(chip::EndpointId endpointId, const Optional<chip::ByteS
 
 bool LockManager::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const
 {
-    ChipLogProgress(Zcl, "Door Lock App: LockManager::GetUser [endpoint=%d,userIndex=%hu]", mEndpointId, userIndex);
+    chip::ByteSpan credentialData(mLockCredentials.credentialData, mLockCredentials.credentialDataSize);
+    ChipLogProgress(Zcl, "Door Lock App: LockManager::GetUser [endpoint=%d,userIndex=%hu] pin =%s", mEndpointId, userIndex, (char *) &(mLockCredentials.credentialData));
 
     const auto & userInDb = mLockUser;
     user.userStatus       = userInDb.userStatus;
@@ -319,7 +318,7 @@ bool LockManager::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::F
         userInStorage.credentials[i] = credentials[i];
     }
 
-    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_LockUser, (const uint8_t *) &mLockUser, sizeof(LockUserInfo));
+    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&userInStorage), sizeof(LockUserInfo));
 
     ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", mEndpointId, userIndex);
 
@@ -370,7 +369,9 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, DlCredentialStatus 
 
     memcpy((void *) credentialInStorage.credentialData, credentialData.data(), credentialData.size());
 
-    credentialInStorage.credentialDataSize = credentialData.size();
+    mLockCredentials.credentialDataSize = credentialData.size();
+
+    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&credentialInStorage), sizeof(LockCredentialInfo));
 
     ChipLogProgress(Zcl, "Successfully set the credential [credentialType=%u]", to_underlying(credentialType));
 
@@ -394,10 +395,10 @@ const char * LockManager::lockStateToString(DlLockState lockState) const
 
 bool LockManager::setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, DlOperationError & err)
 {
-    bool state;
-    chip::DeviceLayer::Internal::EFR32Config::ReadConfigValue(chip::DeviceLayer::Internal::EFR32Config::kConfigKey_LockState,
-                                                              state);
-    DlLockState curState = state ? DlLockState::kUnlocked : DlLockState::kLocked;
+    DlLockState curState = DlLockState::kLocked;
+    if(mState == kState_UnlockCompleted)
+        curState = DlLockState::kUnlocked;
+
     if (curState == lockState)
     {
         ChipLogDetail(Zcl, "Door Lock App: door is already locked, ignoring command to set lock state to \"%s\" [endpointId=%d]",
