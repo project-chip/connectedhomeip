@@ -419,13 +419,8 @@ client cluster ContentLauncher = 1290 {
     optional BrandingInformation brandingInformation = 2;
   }
 
-<<<<<<< HEAD
   response struct LaunchResponse = 2 {
-    StatusEnum status = 0;
-=======
-  response struct LaunchResponse {
     StatusEnumContentLauncher status = 0;
->>>>>>> Changes for cleaner regen
     optional CHAR_STRING data = 1;
   }
 
@@ -526,13 +521,8 @@ server cluster ContentLauncher = 1290 {
     optional BrandingInformation brandingInformation = 2;
   }
 
-<<<<<<< HEAD
   response struct LaunchResponse = 2 {
-    StatusEnum status = 0;
-=======
-  response struct LaunchResponse {
     StatusEnumContentLauncher status = 0;
->>>>>>> Changes for cleaner regen
     optional CHAR_STRING data = 1;
   }
 
@@ -1007,13 +997,8 @@ client cluster KeypadInput = 1289 {
     CecKeyCode keyCode = 0;
   }
 
-<<<<<<< HEAD
   response struct SendKeyResponse = 1 {
-    StatusEnum status = 0;
-=======
-  response struct SendKeyResponse {
     StatusEnumKeypadInput status = 0;
->>>>>>> Changes for cleaner regen
   }
 
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
@@ -1130,13 +1115,8 @@ server cluster KeypadInput = 1289 {
     CecKeyCode keyCode = 0;
   }
 
-<<<<<<< HEAD
   response struct SendKeyResponse = 1 {
-    StatusEnum status = 0;
-=======
-  response struct SendKeyResponse {
     StatusEnumKeypadInput status = 0;
->>>>>>> Changes for cleaner regen
   }
 
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
@@ -2181,13 +2161,8 @@ client cluster TargetNavigator = 1285 {
     optional CHAR_STRING data = 1;
   }
 
-<<<<<<< HEAD
   response struct NavigateTargetResponse = 1 {
-    StatusEnum status = 0;
-=======
-  response struct NavigateTargetResponse {
     StatusEnumTargetNavigator status = 0;
->>>>>>> Changes for cleaner regen
     optional CHAR_STRING data = 1;
   }
 
@@ -2218,13 +2193,8 @@ server cluster TargetNavigator = 1285 {
     optional CHAR_STRING data = 1;
   }
 
-<<<<<<< HEAD
   response struct NavigateTargetResponse = 1 {
-    StatusEnum status = 0;
-=======
-  response struct NavigateTargetResponse {
     StatusEnumTargetNavigator status = 0;
->>>>>>> Changes for cleaner regen
     optional CHAR_STRING data = 1;
   }
 

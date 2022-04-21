@@ -21141,13 +21141,8 @@ class FanControl(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-<<<<<<< HEAD
                 ClusterObjectFieldDescriptor(Label="fanMode", Tag=0x00000000, Type=FanControl.Enums.FanModeType),
                 ClusterObjectFieldDescriptor(Label="fanModeSequence", Tag=0x00000001, Type=FanControl.Enums.FanModeSequenceType),
-=======
-                ClusterObjectFieldDescriptor(Label="fanMode", Tag=0x00000000, Type=FanControl.Enums.enum8),
-                ClusterObjectFieldDescriptor(Label="fanModeSequence", Tag=0x00000001, Type=FanControl.Enums.enum8),
->>>>>>> Changes for cleaner regen
                 ClusterObjectFieldDescriptor(Label="percentSetting", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="percentCurrent", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="speedMax", Tag=0x00000004, Type=typing.Optional[uint]),
@@ -21164,13 +21159,8 @@ class FanControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-<<<<<<< HEAD
     fanMode: 'FanControl.Enums.FanModeType' = None
     fanModeSequence: 'FanControl.Enums.FanModeSequenceType' = None
-=======
-    fanMode: 'FanControl.Enums.enum8' = None
-    fanModeSequence: 'FanControl.Enums.enum8' = None
->>>>>>> Changes for cleaner regen
     percentSetting: 'uint' = None
     percentCurrent: 'uint' = None
     speedMax: 'typing.Optional[uint]' = None
@@ -21187,7 +21177,6 @@ class FanControl(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-<<<<<<< HEAD
         class FanModeSequenceType(IntEnum):
             kOffLowMedHigh = 0x00
             kOffLowHigh = 0x01
@@ -21197,9 +21186,6 @@ class FanControl(Cluster):
             kOffOn = 0x05
 
         class FanModeType(IntEnum):
-=======
-        class FanControlFanMode(IntEnum):
->>>>>>> Changes for cleaner regen
             kOff = 0x00
             kLow = 0x01
             kMedium = 0x02
@@ -21208,17 +21194,6 @@ class FanControl(Cluster):
             kAuto = 0x05
             kSmart = 0x06
 
-<<<<<<< HEAD
-=======
-        class FanControlFanModeSequence(IntEnum):
-            kOffLowMedHigh = 0x00
-            kOffLowHigh = 0x01
-            kOffLowMedHighAuto = 0x02
-            kOffLowHighAuto = 0x03
-            kOffOnAuto = 0x04
-            kOffOn = 0x05
-
->>>>>>> Changes for cleaner regen
 
 
 
@@ -21235,15 +21210,9 @@ class FanControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-<<<<<<< HEAD
                 return ClusterObjectFieldDescriptor(Type=FanControl.Enums.FanModeType)
 
             value: 'FanControl.Enums.FanModeType' = 0
-=======
-                return ClusterObjectFieldDescriptor(Type=FanControl.Enums.enum8)
-
-            value: 'FanControl.Enums.enum8' = 0
->>>>>>> Changes for cleaner regen
 
         @dataclass
         class FanModeSequence(ClusterAttributeDescriptor):
@@ -21257,15 +21226,9 @@ class FanControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-<<<<<<< HEAD
                 return ClusterObjectFieldDescriptor(Type=FanControl.Enums.FanModeSequenceType)
 
             value: 'FanControl.Enums.FanModeSequenceType' = 0
-=======
-                return ClusterObjectFieldDescriptor(Type=FanControl.Enums.enum8)
-
-            value: 'FanControl.Enums.enum8' = 0
->>>>>>> Changes for cleaner regen
 
         @dataclass
         class PercentSetting(ClusterAttributeDescriptor):

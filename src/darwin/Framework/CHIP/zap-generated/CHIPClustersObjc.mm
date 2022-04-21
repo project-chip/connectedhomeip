@@ -18589,17 +18589,10 @@ using namespace chip::app::Clusters;
 
 - (void)readAttributeFanModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-<<<<<<< HEAD
     new CHIPFanControlClusterFanModeTypeAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = FanControl::Attributes::FanMode::TypeInfo;
             auto successFn = Callback<FanControlClusterFanModeTypeAttributeCallback>::FromCancelable(success);
-=======
-    new CHIPFanControlClusterEnum8AttributeCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = FanControl::Attributes::FanMode::TypeInfo;
-            auto successFn = Callback<FanControlClusterEnum8AttributeCallback>::FromCancelable(success);
->>>>>>> Changes for cleaner regen
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
@@ -18629,11 +18622,7 @@ using namespace chip::app::Clusters;
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-<<<<<<< HEAD
     new CHIPFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge(
-=======
-    new CHIPFanControlClusterEnum8AttributeCallbackSubscriptionBridge(
->>>>>>> Changes for cleaner regen
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
@@ -18641,19 +18630,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = FanControl::Attributes::FanMode::TypeInfo;
-<<<<<<< HEAD
             auto successFn = Callback<FanControlClusterFanModeTypeAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
                 CHIPFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
-=======
-            auto successFn = Callback<FanControlClusterEnum8AttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPFanControlClusterEnum8AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
->>>>>>> Changes for cleaner regen
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -18665,7 +18646,6 @@ using namespace chip::app::Clusters;
                                          queue:(dispatch_queue_t)queue
                              completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-<<<<<<< HEAD
     new CHIPFanControlClusterFanModeTypeAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             if (attributeCacheContainer.cppAttributeCache) {
@@ -18681,20 +18661,6 @@ using namespace chip::app::Clusters;
                     successFn->mCall(successFn->mContext, value);
                 }
                 return err;
-=======
-    new CHIPFanControlClusterEnum8AttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        if (attributeCacheContainer.cppAttributeCache) {
-            chip::app::ConcreteAttributePath path;
-            using TypeInfo = FanControl::Attributes::FanMode::TypeInfo;
-            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
-            path.mClusterId = TypeInfo::GetClusterId();
-            path.mAttributeId = TypeInfo::GetAttributeId();
-            TypeInfo::DecodableType value;
-            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-            auto successFn = Callback<FanControlClusterEnum8AttributeCallback>::FromCancelable(success);
-            if (err == CHIP_NO_ERROR) {
-                successFn->mCall(successFn->mContext, value);
->>>>>>> Changes for cleaner regen
             }
             return CHIP_ERROR_NOT_FOUND;
         });
@@ -18703,17 +18669,10 @@ using namespace chip::app::Clusters;
 - (void)readAttributeFanModeSequenceWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler
 {
-<<<<<<< HEAD
     new CHIPFanControlClusterFanModeSequenceTypeAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = FanControl::Attributes::FanModeSequence::TypeInfo;
             auto successFn = Callback<FanControlClusterFanModeSequenceTypeAttributeCallback>::FromCancelable(success);
-=======
-    new CHIPFanControlClusterEnum8AttributeCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = FanControl::Attributes::FanModeSequence::TypeInfo;
-            auto successFn = Callback<FanControlClusterEnum8AttributeCallback>::FromCancelable(success);
->>>>>>> Changes for cleaner regen
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
@@ -18744,11 +18703,7 @@ using namespace chip::app::Clusters;
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-<<<<<<< HEAD
     new CHIPFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge(
-=======
-    new CHIPFanControlClusterEnum8AttributeCallbackSubscriptionBridge(
->>>>>>> Changes for cleaner regen
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
@@ -18756,19 +18711,11 @@ using namespace chip::app::Clusters;
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             using TypeInfo = FanControl::Attributes::FanModeSequence::TypeInfo;
-<<<<<<< HEAD
             auto successFn = Callback<FanControlClusterFanModeSequenceTypeAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
                 CHIPFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
-=======
-            auto successFn = Callback<FanControlClusterEnum8AttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPFanControlClusterEnum8AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
->>>>>>> Changes for cleaner regen
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
@@ -18781,7 +18728,6 @@ using namespace chip::app::Clusters;
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-<<<<<<< HEAD
     new CHIPFanControlClusterFanModeSequenceTypeAttributeCallbackBridge(
         queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             if (attributeCacheContainer.cppAttributeCache) {
@@ -18797,20 +18743,6 @@ using namespace chip::app::Clusters;
                     successFn->mCall(successFn->mContext, value);
                 }
                 return err;
-=======
-    new CHIPFanControlClusterEnum8AttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        if (attributeCacheContainer.cppAttributeCache) {
-            chip::app::ConcreteAttributePath path;
-            using TypeInfo = FanControl::Attributes::FanModeSequence::TypeInfo;
-            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
-            path.mClusterId = TypeInfo::GetClusterId();
-            path.mAttributeId = TypeInfo::GetAttributeId();
-            TypeInfo::DecodableType value;
-            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-            auto successFn = Callback<FanControlClusterEnum8AttributeCallback>::FromCancelable(success);
-            if (err == CHIP_NO_ERROR) {
-                successFn->mCall(successFn->mContext, value);
->>>>>>> Changes for cleaner regen
             }
             return CHIP_ERROR_NOT_FOUND;
         });

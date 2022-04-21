@@ -190,13 +190,8 @@ server cluster ApplicationLauncher = 1292 {
     Application application = 0;
   }
 
-<<<<<<< HEAD
   response struct LauncherResponse = 3 {
-    StatusEnum status = 0;
-=======
-  response struct LauncherResponse {
     StatusEnumApplicationLauncher status = 0;
->>>>>>> Changes for cleaner regen
     OCTET_STRING data = 1;
   }
 
@@ -362,13 +357,8 @@ server cluster Channel = 1284 {
     INT16U count = 0;
   }
 
-<<<<<<< HEAD
   response struct ChangeChannelResponse = 1 {
-    StatusEnum status = 0;
-=======
-  response struct ChangeChannelResponse {
     ChannelStatusEnum status = 0;
->>>>>>> Changes for cleaner regen
     optional CHAR_STRING data = 1;
   }
 
@@ -468,13 +458,8 @@ server cluster ContentLauncher = 1290 {
     optional BrandingInformation brandingInformation = 2;
   }
 
-<<<<<<< HEAD
   response struct LaunchResponse = 2 {
-    StatusEnum status = 0;
-=======
-  response struct LaunchResponse {
     StatusEnumContentLauncher status = 0;
->>>>>>> Changes for cleaner regen
     optional CHAR_STRING data = 1;
   }
 
@@ -1079,13 +1064,8 @@ server cluster MediaPlayback = 1286 {
     INT64U position = 0;
   }
 
-<<<<<<< HEAD
   response struct PlaybackResponse = 10 {
-    StatusEnum status = 0;
-=======
-  response struct PlaybackResponse {
     StatusEnumMediaPlayback status = 0;
->>>>>>> Changes for cleaner regen
     optional CHAR_STRING data = 1;
   }
 
@@ -1730,13 +1710,8 @@ server cluster TargetNavigator = 1285 {
     optional CHAR_STRING data = 1;
   }
 
-<<<<<<< HEAD
   response struct NavigateTargetResponse = 1 {
-    StatusEnum status = 0;
-=======
-  response struct NavigateTargetResponse {
     StatusEnumTargetNavigator status = 0;
->>>>>>> Changes for cleaner regen
     optional CHAR_STRING data = 1;
   }
 

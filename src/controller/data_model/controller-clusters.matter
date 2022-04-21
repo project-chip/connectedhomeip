@@ -203,13 +203,8 @@ client cluster ApplicationLauncher = 1292 {
     Application application = 0;
   }
 
-<<<<<<< HEAD
   response struct LauncherResponse = 3 {
-    StatusEnum status = 0;
-=======
-  response struct LauncherResponse {
     StatusEnumApplicationLauncher status = 0;
->>>>>>> Changes for cleaner regen
     OCTET_STRING data = 1;
   }
 
@@ -608,13 +603,8 @@ client cluster Channel = 1284 {
     INT16U count = 0;
   }
 
-<<<<<<< HEAD
   response struct ChangeChannelResponse = 1 {
-    StatusEnum status = 0;
-=======
-  response struct ChangeChannelResponse {
     ChannelStatusEnum status = 0;
->>>>>>> Changes for cleaner regen
     optional CHAR_STRING data = 1;
   }
 
@@ -1012,13 +1002,8 @@ client cluster ContentLauncher = 1290 {
     optional BrandingInformation brandingInformation = 2;
   }
 
-<<<<<<< HEAD
   response struct LaunchResponse = 2 {
-    StatusEnum status = 0;
-=======
-  response struct LaunchResponse {
     StatusEnumContentLauncher status = 0;
->>>>>>> Changes for cleaner regen
     optional CHAR_STRING data = 1;
   }
 
@@ -1718,7 +1703,6 @@ client cluster EthernetNetworkDiagnostics = 55 {
 }
 
 client cluster FanControl = 514 {
-<<<<<<< HEAD
   enum FanModeSequenceType : ENUM8 {
     kOffLowMedHigh = 0;
     kOffLowHigh = 1;
@@ -1729,9 +1713,6 @@ client cluster FanControl = 514 {
   }
 
   enum FanModeType : ENUM8 {
-=======
-  enum FanControlFanMode : ENUM8 {
->>>>>>> Changes for cleaner regen
     kOff = 0;
     kLow = 1;
     kMedium = 2;
@@ -1741,18 +1722,6 @@ client cluster FanControl = 514 {
     kSmart = 6;
   }
 
-<<<<<<< HEAD
-=======
-  enum FanControlFanModeSequence : ENUM8 {
-    kOffLowMedHigh = 0;
-    kOffLowHigh = 1;
-    kOffLowMedHighAuto = 2;
-    kOffLowHighAuto = 3;
-    kOffOnAuto = 4;
-    kOffOn = 5;
-  }
-
->>>>>>> Changes for cleaner regen
   bitmap FanControlFeature : BITMAP32 {
     kMultiSpeed = 0x1;
     kAuto = 0x2;
@@ -2270,13 +2239,8 @@ client cluster KeypadInput = 1289 {
     CecKeyCode keyCode = 0;
   }
 
-<<<<<<< HEAD
   response struct SendKeyResponse = 1 {
-    StatusEnum status = 0;
-=======
-  response struct SendKeyResponse {
     StatusEnumKeypadInput status = 0;
->>>>>>> Changes for cleaner regen
   }
 
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
@@ -2474,13 +2438,8 @@ client cluster MediaPlayback = 1286 {
     INT64U position = 0;
   }
 
-<<<<<<< HEAD
   response struct PlaybackResponse = 10 {
-    StatusEnum status = 0;
-=======
-  response struct PlaybackResponse {
     StatusEnumMediaPlayback status = 0;
->>>>>>> Changes for cleaner regen
     optional CHAR_STRING data = 1;
   }
 
@@ -3412,13 +3371,8 @@ client cluster TargetNavigator = 1285 {
     optional CHAR_STRING data = 1;
   }
 
-<<<<<<< HEAD
   response struct NavigateTargetResponse = 1 {
-    StatusEnum status = 0;
-=======
-  response struct NavigateTargetResponse {
     StatusEnumTargetNavigator status = 0;
->>>>>>> Changes for cleaner regen
     optional CHAR_STRING data = 1;
   }
 
