@@ -16,16 +16,10 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/examples/chip-tool/chip-tool.gni")
 import("${chip_root}/src/lib/core/core.gni")
 
 assert(chip_build_tools)
-
-declare_args() {
-  # Use a separate eventloop for CHIP tasks
-  config_use_separate_eventloop = true
-  config_use_interactive_mode = true
-  config_enable_yaml_tests = true
-}
 
 config("config") {
   include_dirs = [
