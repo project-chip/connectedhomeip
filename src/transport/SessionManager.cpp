@@ -548,7 +548,7 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & packetH
     if (mCB != nullptr)
     {
         CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, unsecuredSession, peerAddress, msg->Start(), msg->TotalLength());
-        mCB->OnMessageReceived(packetHeader, payloadHeader, session, peerAddress, isDuplicate, std::move(msg));
+        mCB->OnMessageReceived(packetHeader, payloadHeader, session, isDuplicate, std::move(msg));
     }
 }
 
@@ -631,7 +631,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
     if (mCB != nullptr)
     {
         CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, secureSession, peerAddress, msg->Start(), msg->TotalLength());
-        mCB->OnMessageReceived(packetHeader, payloadHeader, session.Value(), peerAddress, isDuplicate, std::move(msg));
+        mCB->OnMessageReceived(packetHeader, payloadHeader, session.Value(), isDuplicate, std::move(msg));
     }
 }
 
@@ -763,7 +763,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
         Transport::IncomingGroupSession groupSession(groupContext.group_id, groupContext.fabric_index,
                                                      packetHeader.GetSourceNodeId().Value());
         CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, &groupSession, peerAddress, msg->Start(), msg->TotalLength());
-        mCB->OnMessageReceived(packetHeader, payloadHeader, SessionHandle(groupSession), peerAddress,
+        mCB->OnMessageReceived(packetHeader, payloadHeader, SessionHandle(groupSession),
                                SessionMessageDelegate::DuplicateMessage::No, std::move(msg));
     }
 }
