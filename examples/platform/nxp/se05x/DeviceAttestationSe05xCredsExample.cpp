@@ -51,13 +51,13 @@ public:
 
 CHIP_ERROR ExampleSe05xDACProvider::GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer)
 {
-    #if 0
+#if 0
     return CopySpanToMutableSpan(DevelopmentCerts::kDacCert, out_dac_buffer);
-    #else
+#else
     sss_object_t keyObject = { 0 };
-    sss_status_t status = kStatus_SSS_Fail;
-    size_t certLen   = out_dac_buffer.size();
-    size_t certBitLen = out_dac_buffer.size() * 8;
+    sss_status_t status    = kStatus_SSS_Fail;
+    size_t certLen         = out_dac_buffer.size();
+    size_t certBitLen      = out_dac_buffer.size() * 8;
 
     ChipLogDetail(Crypto, "Get certificate from se05x");
 
@@ -75,7 +75,7 @@ CHIP_ERROR ExampleSe05xDACProvider::GetDeviceAttestationCert(MutableByteSpan & o
     out_dac_buffer.reduce_size(certLen);
 
     return CHIP_NO_ERROR;
-    #endif
+#endif
 }
 
 CHIP_ERROR ExampleSe05xDACProvider::GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer)
