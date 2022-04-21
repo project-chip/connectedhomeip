@@ -653,12 +653,44 @@ JNI_METHOD(jbyteArray, getAttestationChallenge)
     }
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    err                                      = wrapper->Controller()->GetAttestationChallenge(chipDevice, attestationChallenge);
+    err = wrapper->Controller()->GetAttestationChallenge(attestationChallenge);
     SuccessOrExit(err);
     VerifyOrExit(attestationChallenge.size() == 16, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     err = JniReferences::GetInstance().N2J_ByteArray(env, attestationChallenge.data(), attestationChallenge.size(),
-                                                     attestationChallengeJbytes);
+        attestationChallengeJbytes);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+    return attestationChallengeJbytes;
+}
+
+JNI_METHOD(jbyteArray, getAttestationChallengeWithDevice)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ByteSpan attestationChallenge;
+    jbyteArray attestationChallengeJbytes = nullptr;
+
+    DeviceProxy * chipDevice = reinterpret_cast<DeviceProxy *>(devicePtr);
+    if (chipDevice == nullptr)
+    {
+        ChipLogProgress(Controller, "Could not cast device pointer to Device object");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    err = wrapper->Controller()->GetAttestationChallenge(chipDevice, attestationChallenge);
+    SuccessOrExit(err);
+    VerifyOrExit(attestationChallenge.size() == 16, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    err = JniReferences::GetInstance().N2J_ByteArray(env, attestationChallenge.data(), attestationChallenge.size(),
+        attestationChallengeJbytes);
     SuccessOrExit(err);
 
 exit:

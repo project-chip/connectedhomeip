@@ -322,6 +322,17 @@ public class ChipDeviceController {
     return getAttestationChallenge(deviceControllerPtr, devicePtr);
   }
 
+  /**
+   * Returns an attestation challenge for the given device, for which there must be an existing
+   * secure session.
+   *
+   * @param devicePtr a pointer to the device from which to retrieve the challenge
+   * @throws ChipDeviceControllerException if there is no secure session for the given device
+   */
+  public byte[] getAttestationChallengeWithDevice(long devicePtr) {
+    return getAttestationChallengeWithDevice(deviceControllerPtr, devicePtr);
+  }
+
   /** Subscribe to the given attribute path. */
   public void subscribeToPath(
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
@@ -449,6 +460,8 @@ public class ChipDeviceController {
   private native boolean isActive(long deviceControllerPtr, long deviceId);
 
   private native byte[] getAttestationChallenge(long deviceControllerPtr, long devicePtr);
+
+  private native byte[] getAttestationChallengeWithDevice(long deviceControllerPtr, long devicePtr);
 
   private native void shutdownSubscriptions(long deviceControllerPtr, long devicePtr);
 
