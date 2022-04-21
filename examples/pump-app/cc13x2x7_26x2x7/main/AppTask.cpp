@@ -17,6 +17,8 @@
  *    limitations under the License.
  */
 
+#include "CHIPDeviceManager.h"
+#include "DeviceCallbacks.h"
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
@@ -63,6 +65,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
+using namespace chip::DeviceManager;
 using namespace chip::app::Clusters;
 
 static TaskHandle_t sAppTaskHandle;
@@ -74,6 +77,8 @@ static Button_Handle sAppLeftHandle;
 static Button_Handle sAppRightHandle;
 
 AppTask AppTask::sAppTask;
+
+static DeviceCallbacks sDeviceCallbacks;
 
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
 static DefaultOTARequestor sRequestorCore;
@@ -152,10 +157,11 @@ int AppTask::Init()
             ;
     }
 
-    ret = PlatformMgr().StartEventLoopTask();
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+    ret = deviceMgr.Init(&sDeviceCallbacks);
     if (ret != CHIP_NO_ERROR)
     {
-        PLAT_LOG("PlatformMgr().StartEventLoopTask() failed");
+        PLAT_LOG("CHIPDeviceManager::Init() failed: %s", ErrorStr(ret));
         while (1)
             ;
     }

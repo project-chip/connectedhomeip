@@ -29,25 +29,6 @@
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
-                                       uint16_t size, uint8_t * value)
-{
-    if (attributePath.mClusterId == OnOff::Id && attributePath.mAttributeId == OnOff::Attributes::OnOff::Id)
-    {
-        PumpMgr().InitiateAction(0, *value ? PumpManager::START_ACTION : PumpManager::STOP_ACTION);
-    }
-    else if (attributePath.mClusterId == LevelControl::Id &&
-             attributePath.mAttributeId == LevelControl::Attributes::CurrentLevel::Id)
-    {
-        ChipLogProgress(Zcl, "[pump-app] Cluster LevelControl: attribute CurrentLevel set to %u", *value);
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mAttributeId));
-        return;
-    }
-}
-
 /** @brief OnOff Cluster Init
  *
  * This function is called when a specific cluster is initialized. It gives the
