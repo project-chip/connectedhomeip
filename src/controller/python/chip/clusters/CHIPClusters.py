@@ -5503,233 +5503,233 @@ class ChipClusters:
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008000: {
+                0x00004000: {
                     "attributeName": "NullableBoolean",
-                    "attributeId": 0x00008000,
+                    "attributeId": 0x00004000,
                     "type": "bool",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008001: {
+                0x00004001: {
                     "attributeName": "NullableBitmap8",
-                    "attributeId": 0x00008001,
+                    "attributeId": 0x00004001,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008002: {
+                0x00004002: {
                     "attributeName": "NullableBitmap16",
-                    "attributeId": 0x00008002,
+                    "attributeId": 0x00004002,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008003: {
+                0x00004003: {
                     "attributeName": "NullableBitmap32",
-                    "attributeId": 0x00008003,
+                    "attributeId": 0x00004003,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008004: {
+                0x00004004: {
                     "attributeName": "NullableBitmap64",
-                    "attributeId": 0x00008004,
+                    "attributeId": 0x00004004,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008005: {
+                0x00004005: {
                     "attributeName": "NullableInt8u",
-                    "attributeId": 0x00008005,
+                    "attributeId": 0x00004005,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008006: {
+                0x00004006: {
                     "attributeName": "NullableInt16u",
-                    "attributeId": 0x00008006,
+                    "attributeId": 0x00004006,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008007: {
+                0x00004007: {
                     "attributeName": "NullableInt24u",
-                    "attributeId": 0x00008007,
+                    "attributeId": 0x00004007,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008008: {
+                0x00004008: {
                     "attributeName": "NullableInt32u",
-                    "attributeId": 0x00008008,
+                    "attributeId": 0x00004008,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008009: {
+                0x00004009: {
                     "attributeName": "NullableInt40u",
-                    "attributeId": 0x00008009,
+                    "attributeId": 0x00004009,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x0000800A: {
+                0x0000400A: {
                     "attributeName": "NullableInt48u",
-                    "attributeId": 0x0000800A,
+                    "attributeId": 0x0000400A,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x0000800B: {
+                0x0000400B: {
                     "attributeName": "NullableInt56u",
-                    "attributeId": 0x0000800B,
+                    "attributeId": 0x0000400B,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x0000800C: {
+                0x0000400C: {
                     "attributeName": "NullableInt64u",
-                    "attributeId": 0x0000800C,
+                    "attributeId": 0x0000400C,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x0000800D: {
+                0x0000400D: {
                     "attributeName": "NullableInt8s",
-                    "attributeId": 0x0000800D,
+                    "attributeId": 0x0000400D,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x0000800E: {
+                0x0000400E: {
                     "attributeName": "NullableInt16s",
-                    "attributeId": 0x0000800E,
+                    "attributeId": 0x0000400E,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x0000800F: {
+                0x0000400F: {
                     "attributeName": "NullableInt24s",
-                    "attributeId": 0x0000800F,
+                    "attributeId": 0x0000400F,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008010: {
+                0x00004010: {
                     "attributeName": "NullableInt32s",
-                    "attributeId": 0x00008010,
+                    "attributeId": 0x00004010,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008011: {
+                0x00004011: {
                     "attributeName": "NullableInt40s",
-                    "attributeId": 0x00008011,
+                    "attributeId": 0x00004011,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008012: {
+                0x00004012: {
                     "attributeName": "NullableInt48s",
-                    "attributeId": 0x00008012,
+                    "attributeId": 0x00004012,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008013: {
+                0x00004013: {
                     "attributeName": "NullableInt56s",
-                    "attributeId": 0x00008013,
+                    "attributeId": 0x00004013,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008014: {
+                0x00004014: {
                     "attributeName": "NullableInt64s",
-                    "attributeId": 0x00008014,
+                    "attributeId": 0x00004014,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008015: {
+                0x00004015: {
                     "attributeName": "NullableEnum8",
-                    "attributeId": 0x00008015,
+                    "attributeId": 0x00004015,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008016: {
+                0x00004016: {
                     "attributeName": "NullableEnum16",
-                    "attributeId": 0x00008016,
+                    "attributeId": 0x00004016,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008017: {
+                0x00004017: {
                     "attributeName": "NullableFloatSingle",
-                    "attributeId": 0x00008017,
+                    "attributeId": 0x00004017,
                     "type": "",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008018: {
+                0x00004018: {
                     "attributeName": "NullableFloatDouble",
-                    "attributeId": 0x00008018,
+                    "attributeId": 0x00004018,
                     "type": "",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008019: {
+                0x00004019: {
                     "attributeName": "NullableOctetString",
-                    "attributeId": 0x00008019,
+                    "attributeId": 0x00004019,
                     "type": "bytes",
                     "reportable": True,
                     "writable": True,
                 },
-                0x0000801E: {
+                0x0000401E: {
                     "attributeName": "NullableCharString",
-                    "attributeId": 0x0000801E,
+                    "attributeId": 0x0000401E,
                     "type": "str",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008024: {
+                0x00004024: {
                     "attributeName": "NullableEnumAttr",
-                    "attributeId": 0x00008024,
+                    "attributeId": 0x00004024,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008025: {
+                0x00004025: {
                     "attributeName": "NullableStruct",
-                    "attributeId": 0x00008025,
+                    "attributeId": 0x00004025,
                     "type": "",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008026: {
+                0x00004026: {
                     "attributeName": "NullableRangeRestrictedInt8u",
-                    "attributeId": 0x00008026,
+                    "attributeId": 0x00004026,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008027: {
+                0x00004027: {
                     "attributeName": "NullableRangeRestrictedInt8s",
-                    "attributeId": 0x00008027,
+                    "attributeId": 0x00004027,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008028: {
+                0x00004028: {
                     "attributeName": "NullableRangeRestrictedInt16u",
-                    "attributeId": 0x00008028,
+                    "attributeId": 0x00004028,
                     "type": "int",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00008029: {
+                0x00004029: {
                     "attributeName": "NullableRangeRestrictedInt16s",
-                    "attributeId": 0x00008029,
+                    "attributeId": 0x00004029,
                     "type": "int",
                     "reportable": True,
                     "writable": True,

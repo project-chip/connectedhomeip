@@ -389,14 +389,11 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
         {
             aStatus = Protocols::InteractionModel::Status::ResourceExhausted;
         }
-        else if (err.IsIMStatus())
+        else
         {
             aStatus = StatusIB(err).mStatus;
         }
-        ReturnErrorOnFailure(err);
-
-        aStatus = Protocols::InteractionModel::Status::Success;
-        return CHIP_NO_ERROR;
+        return err;
     }
 
     ChipLogProgress(InteractionModel, "no resource for %s interaction",
