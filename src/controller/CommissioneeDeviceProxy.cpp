@@ -72,11 +72,11 @@ CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddres
 {
     mDeviceAddress = addr;
 
-    mMRPConfig = config;
+    mRemoteMRPConfig = config;
 
     // Initialize PASE session state with any MRP parameters that DNS-SD has provided.
     // It can be overridden by PASE session protocol messages that include MRP parameters.
-    mPairing.SetRemoteMRPConfig(mMRPConfig);
+    mPairing.SetRemoteMRPConfig(mRemoteMRPConfig);
 
     if (!mSecureSession)
     {
@@ -99,26 +99,6 @@ CHIP_ERROR CommissioneeDeviceProxy::SetConnected(const SessionHandle & session)
     mState = ConnectionState::SecureConnected;
     mSecureSession.Grab(session);
     return CHIP_NO_ERROR;
-}
-
-void CommissioneeDeviceProxy::Reset()
-{
-    SetActive(false);
-
-    mState              = ConnectionState::NotConnected;
-    mSessionManager     = nullptr;
-    mUDPEndPointManager = nullptr;
-    mExchangeMgr        = nullptr;
-}
-
-bool CommissioneeDeviceProxy::GetAddress(Inet::IPAddress & addr, uint16_t & port) const
-{
-    if (mState == ConnectionState::NotConnected)
-        return false;
-
-    addr = mDeviceAddress.GetIPAddress();
-    port = mDeviceAddress.GetPort();
-    return true;
 }
 
 CommissioneeDeviceProxy::~CommissioneeDeviceProxy() {}
