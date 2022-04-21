@@ -129,7 +129,7 @@ class ClangTidyEntry:
                 logging.info("TIDY %s: %s", self.file, output.decode("utf-8"))
 
             if err:
-                # Most (all?) of our files do contain errors in system-heades so lines like these
+                # Most (all?) of our files do contain errors in system-headers so lines like these
                 # are expected:
                 #
                 # ```
