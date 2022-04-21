@@ -8171,7 +8171,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("MaxConstTemp", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::PumpStatus::Id: {
-            uint16_t value;
+            chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PumpStatus", 1, value);
         }

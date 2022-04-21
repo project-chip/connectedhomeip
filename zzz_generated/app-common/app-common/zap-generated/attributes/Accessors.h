@@ -3060,8 +3060,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace MaxConstTemp
 
 namespace PumpStatus {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // bitmap16
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> * value); // PumpStatus
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value);
 } // namespace PumpStatus
 
 namespace EffectiveOperationMode {

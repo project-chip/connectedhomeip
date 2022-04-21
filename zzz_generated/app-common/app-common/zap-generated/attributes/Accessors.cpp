@@ -17451,9 +17451,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 
 namespace PumpStatus {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> * value)
 {
-    using Traits = NumericAttributeTraits<uint16_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus>>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -17466,9 +17466,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value)
 {
-    using Traits = NumericAttributeTraits<uint16_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;

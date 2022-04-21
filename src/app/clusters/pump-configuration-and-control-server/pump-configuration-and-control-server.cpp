@@ -25,8 +25,8 @@
 #include <app/util/attribute-storage.h>
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::PumpConfigurationAndControl;
-using namespace chip::app::Clusters::PumpConfigurationAndControl::Attributes;
 
 namespace {
 
@@ -47,66 +47,77 @@ static RemoteSensorType detectRemoteSensorConnected(void)
     return RemoteSensorType::kNoSensor;
 }
 
-static PumpControlMode determineEffectiveControlMode(PumpControlMode controlMode)
+static void updateAttributeLinks(EndpointId endpoint)
 {
-    PumpControlMode effectiveControlMode = controlMode;
+    PumpControlMode controlMode;
+    PumpOperationMode operationMode;
+    
+    // Get the current control- and operation modes
+    Attributes::ControlMode::Get(endpoint, &controlMode);
+    Attributes::OperationMode::Get(endpoint, &operationMode);
 
-    // If a remote sensor is detected and the OperationMode is kNormal, then the pump is operating in the
-    // control mode indicated by the repective remote senor type
-    RemoteSensorType sensorType = detectRemoteSensorConnected();
-    switch (sensorType)
+    switch (operationMode)
     {
-    case RemoteSensorType::kNoSensor:
-        // Set to current ControlMode;
-        effectiveControlMode = controlMode;
-        break;
-    case RemoteSensorType::kFlowSensor:
-        effectiveControlMode = PumpControlMode::kConstantFlow;
-        break;
-    case RemoteSensorType::kPressureSensor:
-        effectiveControlMode = PumpControlMode::kConstantPressure;
-        break;
-    case RemoteSensorType::kTemperatureSensor:
-        effectiveControlMode = PumpControlMode::kConstantTemperature;
-        break;
-    }
-
-    return effectiveControlMode;
-}
-
-static PumpOperationMode determineEffectiveOperationMode(PumpOperationMode operationMode)
-{
-    PumpOperationMode effectiveOperationMode = operationMode;
-
-    if (operationMode == PumpOperationMode::kNormal)
-    {
-        RemoteSensorType sensorType;
-        sensorType = detectRemoteSensorConnected();
-        if (sensorType != RemoteSensorType::kNoSensor)
+        case PumpOperationMode::kNormal:
         {
             // The pump runs in the control mode as per the type of the remote sensor
             // If the remote sensor is a Flow sensor the mode would be ConstantFlow
             // If the remote sensor is a Pressure sensor the mode would be ConstantPressure (not ProportionalPressure)
             // If the remote sensor is a Temperature sensor the mode would be ConstantTemperature
-            // ARE NOT IMPLEMENTED!
+
+            // If a remote sensor is detected and the OperationMode is kNormal, then the pump is operating in the
+            // control mode indicated by the repective remote senor type
+            RemoteSensorType sensorType = detectRemoteSensorConnected();
+            switch (sensorType)
+            {
+            case RemoteSensorType::kFlowSensor:
+                Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantFlow);
+                Attributes::PumpStatus::Set(endpoint, PumpStatus::kRemoteFlow);
+                break;
+            case RemoteSensorType::kPressureSensor:
+                Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantPressure);
+                Attributes::PumpStatus::Set(endpoint, PumpStatus::kRemotePressure);
+                break;
+            case RemoteSensorType::kTemperatureSensor:
+                Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantTemperature);
+                Attributes::PumpStatus::Set(endpoint, PumpStatus::kRemoteTemperature);
+                break;
+            case RemoteSensorType::kNoSensor:
+                // The pump is controlled by a setpoint, as defined by
+                // the ControlMode attribute. (N.B. The setpoint is an internal variable which MAY be
+                // controlled between 0% and 100%, e.g., by means of the Level Control cluster)
+                // The ControlMode can be any of the following:
+                // ConstantSpeed, ConstantPressure, ProportionalPressure,
+                // ConstantFlow, ConstantTemperature or Automatic
+                Attributes::EffectiveControlMode::Set(endpoint, controlMode);
+                break;
+            }
+            // Set the overall effective operation mode to Normal
+            Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kNormal);
         }
-        else
-        {
-            // The pump is controlled by a setpoint, as defined by
-            // the ControlMode attribute. (N.B. The setpoint is an internal variable which MAY be
-            // controlled between 0% and 100%, e.g., by means of the Level Control cluster)
-            // The ControlMode can be any of the following:
-            // ConstantSpeed, ConstantPressure, ProportionalPressure,
-            // ConstantFlow, ConstantTemperature or Automatic
-        }
-    }
-    else
-    {
+        break;
+
         // The pump is controlled by the OperationMode attribute.
         // Maximum, Minimum or Local
-    }
 
-    return effectiveOperationMode;
+        case PumpOperationMode::kMaximum:
+            Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kMaximum);
+            Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantSpeed);
+            LevelControl::Attributes::CurrentLevel::Set(endpoint, 200);
+            break;
+
+        case PumpOperationMode::kMinimum:
+            Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kMinimum);
+            Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantSpeed);
+            LevelControl::Attributes::CurrentLevel::Set(endpoint, 1);
+            break;
+
+        case PumpOperationMode::kLocal:
+            Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kLocal);
+            Attributes::EffectiveControlMode::Set(endpoint, controlMode);
+            Attributes::PumpStatus::Set(endpoint, PumpStatus::kLocalOverride);
+            break;
+    }
 }
 } // namespace
 
@@ -122,16 +133,12 @@ void MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback(cons
 
     switch (attributePath.mAttributeId)
     {
-    case ControlMode::Id: {
-        PumpControlMode controlMode;
-        ControlMode::Get(attributePath.mEndpointId, &controlMode);
-        EffectiveControlMode::Set(attributePath.mEndpointId, determineEffectiveControlMode(controlMode));
+    case Attributes::ControlMode::Id: {
+        updateAttributeLinks(attributePath.mEndpointId);
     }
     break;
-    case OperationMode::Id: {
-        PumpOperationMode operationMode;
-        OperationMode::Get(attributePath.mEndpointId, &operationMode);
-        EffectiveOperationMode::Set(attributePath.mEndpointId, determineEffectiveOperationMode(operationMode));
+    case Attributes::OperationMode::Id: {
+        updateAttributeLinks(attributePath.mEndpointId);
     }
     break;
     default:
