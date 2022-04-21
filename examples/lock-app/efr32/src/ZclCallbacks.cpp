@@ -70,7 +70,6 @@ bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const O
     if(status == true)
     {
         LockMgr().InitiateAction(AppEvent::kEventType_Lock, LockManager::LOCK_ACTION);
-        EFR32Config::WriteConfigValue(EFR32Config::kConfigKey_LockState, false);
     }
     return status;
 }
@@ -83,7 +82,6 @@ bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const
     if(status == true)    
     {
         LockMgr().InitiateAction(AppEvent::kEventType_Lock, LockManager::UNLOCK_ACTION);    
-        EFR32Config::WriteConfigValue(EFR32Config::kConfigKey_LockState, true);
     }
 
     return status;
