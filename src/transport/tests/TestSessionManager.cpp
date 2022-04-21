@@ -70,8 +70,7 @@ class TestSessMgrCallback : public SessionMessageDelegate
 {
 public:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, const SessionHandle & session,
-                           const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
-                           System::PacketBufferHandle && msgBuf) override
+                           DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf) override
     {
         size_t data_len = msgBuf->DataLength();
 
