@@ -2,6 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.matter.tv.server">
 
+    <!-- Permission for Matter Agent to send Matter commands -->
+    <permission
+        android:name="com.matter.app_agent_api.permission.SEND_DATA"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.matter.app_agent_api.permission.SEND_DATA" />
+
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -21,6 +28,7 @@
         android:supportsRtl="true"
         android:name="com.matter.tv.server.MatterTvServerApplication"
         android:theme="@style/Theme.MatterTVSlave">
+
         <activity android:name="com.matter.tv.server.MainActivity"
             android:launchMode="singleTask">
             <intent-filter>
@@ -29,7 +37,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <service android:name="com.matter.tv.server.service.MatterServantService" />
+
+        <receiver
+            android:name="com.matter.tv.server.receivers.ContentAppDiscoveryService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <data android:scheme="package" />
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+            </intent-filter>
+        </receiver>
+
     </application>
+
+
 
 </manifest>
