@@ -302,10 +302,6 @@ public class ChipDeviceController {
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode);
   }
 
-  public boolean isActive(long deviceId) {
-    return isActive(deviceControllerPtr, deviceId);
-  }
-
   /* Shutdown all cluster attribute subscriptions for a given device */
   public void shutdownSubscriptions(long devicePtr) {
     shutdownSubscriptions(deviceControllerPtr, devicePtr);
@@ -445,8 +441,6 @@ public class ChipDeviceController {
       long iteration,
       int discriminator,
       long setupPinCode);
-
-  private native boolean isActive(long deviceControllerPtr, long deviceId);
 
   private native byte[] getAttestationChallenge(long deviceControllerPtr, long devicePtr);
 

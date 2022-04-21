@@ -162,13 +162,13 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
     CHIP_ERROR err = CHIP_NO_ERROR;
     mDeviceAddress = addr;
 
-    mMRPConfig = config;
+    mRemoteMRPConfig = config;
 
     // Initialize CASE session state with any MRP parameters that DNS-SD has provided.
     // It can be overridden by CASE session protocol messages that include MRP parameters.
     if (mCASEClient)
     {
-        mCASEClient->SetMRPIntervals(mMRPConfig);
+        mCASEClient->SetRemoteMRPIntervals(mRemoteMRPConfig);
     }
 
     if (mState == State::NeedsAddress)
@@ -197,18 +197,6 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
     return err;
 }
 
-bool OperationalDeviceProxy::GetAddress(Inet::IPAddress & addr, uint16_t & port) const
-{
-    if (mState == State::Uninitialized || mState == State::NeedsAddress)
-    {
-        return false;
-    }
-
-    addr = mDeviceAddress.GetIPAddress();
-    port = mDeviceAddress.GetPort();
-    return true;
-}
-
 CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
 {
     mCASEClient = mInitParams.clientPool->Allocate(
@@ -216,7 +204,7 @@ CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
                               mFabricInfo, mInitParams.groupDataProvider, mInitParams.mrpLocalConfig });
     ReturnErrorCodeIf(mCASEClient == nullptr, CHIP_ERROR_NO_MEMORY);
 
-    CHIP_ERROR err = mCASEClient->EstablishSession(mPeerId, mDeviceAddress, mMRPConfig, this);
+    CHIP_ERROR err = mCASEClient->EstablishSession(mPeerId, mDeviceAddress, mRemoteMRPConfig, this);
     if (err != CHIP_NO_ERROR)
     {
         CleanupCASEClient();
