@@ -91,6 +91,13 @@
         }
     },
     "listsUseAttributeAccessInterface": true,
-    "attributeAccessInterfaceAttributes": {},
+    "attributeAccessInterfaceAttributes": {
+      "Access Control": ["ClusterRevision", "SubjectsPerAccessControlEntry",
+                         "TargetsPerAccessControlEntry", "AccessControlEntriesPerFabric"],
+      "AdministratorCommissioning": [ "WindowStatus", "AdminFabricIndex", "AdminVendorId" ],
+      "Basic": [ "DataModelRevision", "VendorName", "VendorID", "ProductName", "ProductID", "Location", "HardwareVersion", "HardwareVersionString", "SoftwareVersion", "SoftwareVersionString", "ManufacturingDate", "PartNumber", "ProductURL", "ProductLabel", "SerialNumber", "UniqueID", "CapabilityMinima" ],
+      "Descriptor": [ "ClusterRevision" ],
+      "Ethernet Network Diagnostics": [ "PHYRate", "FullDuplex", "CarrierDetect", "TimeSinceReset", "PacketRxCount", "PacketTxCount", "TxErrCount", "CollisionCount", "OverrunCount" ]
+    },
     "defaultReportingPolicy": "mandatory"
 }
