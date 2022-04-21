@@ -16,10 +16,10 @@
 #
 
 import pprint
-import chip.clusters as Clusters
 import chip.exceptions
 import logging
 from chip.clusters.Attribute import AttributePath, AttributeReadResult, AttributeStatus, ValueDecodeFailure, TypedAttributePath, SubscriptionTransaction, DataVersion
+from chip.clusters import Objects as Clusters
 import chip.interaction_model
 import asyncio
 import time
@@ -35,10 +35,10 @@ LIGHTING_ENDPOINT_ID = 1
 
 # Ignore failures decoding these attributes (e.g. not yet implemented)
 ignoreAttributeDecodeFailureList = [
-    (1, Clusters.Objects.TestCluster,
-     Clusters.Objects.TestCluster.Attributes.GeneralErrorBoolean),
-    (1, Clusters.Objects.TestCluster,
-     Clusters.Objects.TestCluster.Attributes.ClusterErrorBoolean),
+    (1, Clusters.TestCluster,
+     Clusters.TestCluster.Attributes.GeneralErrorBoolean),
+    (1, Clusters.TestCluster,
+     Clusters.TestCluster.Attributes.ClusterErrorBoolean),
 ]
 
 

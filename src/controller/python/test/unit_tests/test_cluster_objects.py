@@ -3,7 +3,7 @@ import unittest
 
 from dataclasses import dataclass
 
-from chip.clusters import ClusterObjects
+import chip.clusters.ClusterObjects as ClusterObjects
 from chip.tlv import TLVReader, TLVWriter, uint
 import chip.ChipUtility
 

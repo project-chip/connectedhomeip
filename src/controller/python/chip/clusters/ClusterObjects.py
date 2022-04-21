@@ -217,6 +217,10 @@ class ClusterCommand(ClusterObject):
     def must_use_timed_invoke(cls) -> bool:
         return False
 
+    @ChipUtility.classproperty
+    def response_type(cls) -> type:
+        return None
+
 
 class Cluster(ClusterObject):
     '''

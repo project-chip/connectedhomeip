@@ -35,6 +35,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--storagepath", help="Path to persistent storage configuration file (default: /tmp/repl-storage.json)",
                         action="store", default="/tmp/repl-storage.json")
+    parser.add_argument(
+        "-i", "--idl", help="Path to matter interface definition language (Matter IDL) files for cluster objects (default: internal IDL will be used)", action="store", default="")
 
     args = parser.parse_args()
 
@@ -42,7 +44,7 @@ def main():
     c.InteractiveShellApp.exec_lines = [
         "import pkgutil",
         "module = pkgutil.get_loader('chip.ChipReplStartup')",
-        "%run {module.path} --storagepath " + f"{args.storagepath}"
+        "%run {module.path} --storagepath " + f"{args.storagepath}" + (" --idl " + f"{args.idl}" if args.idl else "")
     ]
 
     sys.argv = [sys.argv[0]]

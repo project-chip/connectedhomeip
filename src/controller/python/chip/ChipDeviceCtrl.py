@@ -36,8 +36,8 @@ from .exceptions import *
 from .clusters import Command as ClusterCommand
 from .clusters import Attribute as ClusterAttribute
 from .clusters import ClusterObjects as ClusterObjects
-from .clusters import Objects as GeneratedObjects
 from .clusters.CHIPClusters import *
+from . import clusters
 import enum
 import threading
 import typing
@@ -58,6 +58,9 @@ _DevicePairingDelegate_OnCommissioningStatusUpdateFunct = CFUNCTYPE(
 # CHIP_ERROR is actually signed, so using c_uint32 is weird, but everything
 # else seems to do it.
 _DeviceAvailableFunct = CFUNCTYPE(None, c_void_p, c_uint32)
+
+# Generated cluster objects from IDL
+GeneratedObjects = clusters.Objects
 
 
 # This is a fix for WEAV-429. Jay Logue recommends revisiting this at a later

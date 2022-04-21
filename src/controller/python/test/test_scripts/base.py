@@ -30,12 +30,14 @@ import sys
 import logging
 import time
 import ctypes
-import chip.clusters as Clusters
+import chip.clusters
 import chip.clusters.Attribute as Attribute
 from chip.ChipStack import *
 import chip.FabricAdmin
 import copy
 import secrets
+
+Clusters = chip.clusters.Objects
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)

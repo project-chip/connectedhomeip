@@ -140,6 +140,29 @@ launch the REPL environment itself through the IPython shell.
 To launch the IPython REPL, launch "matter-env" from the "Console" tab in the
 Launcher.
 
+### IDL
+
+REPL supports loading IDL files for cluster objects used for sending commands,
+parsing received attribute data etc. There is an IDL file included in the REPL
+package. However, you can always load custom IDL files to use the clusters in
+it.
+
+```shell
+# To load a custom IDL when starting REPL
+$ chip-repl -idl /path/to/idl.matter
+...
+IDL file: /path/to/idl.matter loaded
+...
+```
+
+```python
+# To load a custom IDL on the fly
+In [1]: Clusters = LoadIDL('/path/to/idl.matter')
+# You can use the clusters in ``Clusters'' now.
+```
+
+> Note: The endpoint configurations in the IDL files will be discarded.
+
 ### Guide Notebooks
 
 A number of Jupyter Notebooks have been written that serve as both guides for

@@ -1,0 +1,131 @@
+// This IDL was generated automatically by ZAP.
+// This file don't uses the infomations from zap files, thus it will contain all clusters, commands, attributes etc and it won't contain any endpoint configs.
+
+{{#chip_shared_structs}}
+{{>idl_structure_definition extraIndent=0}}
+
+{{/chip_shared_structs}}
+{{!TODO: consider #chip_clusters as iteration point as well.
+{{!      Unsure about the differences}}
+{{#zcl_clusters}}
+server cluster {{asUpperCamelCase name}} = {{code}} {
+  {{#zcl_enums}}
+  enum {{asUpperCamelCase name}} : {{type}} {
+    {{#zcl_enum_items}}
+    k{{asUpperCamelCase label}} = {{value}};
+    {{/zcl_enum_items}}
+  }
+
+  {{/zcl_enums}}
+  {{#zcl_bitmaps}}
+  bitmap {{name}} : {{type}} {
+    {{#zcl_bitmap_items}}
+    k{{asUpperCamelCase label}} = {{asHex mask}};
+    {{/zcl_bitmap_items}}
+  }
+
+  {{/zcl_bitmaps}}
+  {{#zcl_structs}}
+  struct {{name}} {
+  {{#zcl_struct_items}}
+  {{indent 1~}}{{> idl_structure_member}}
+  {{/zcl_struct_items}}
+  }
+
+  {{/zcl_structs}}
+  {{#zcl_events}}
+  {{priority}} event {{!ensure space}}
+  {{~#chip_access_elements entity="event"~}}
+      {{~#first~}}access({{~/first~}}
+      {{~#not_first~}}, {{/not_first~}}
+        {{operation}}: {{role}} 
+      {{~#last}}) {{/last~}}
+  {{~/chip_access_elements~}}
+  {{asUpperCamelCase name}} = {{code}} {
+    {{#zcl_event_fields}}
+    {{>idl_structure_member label=name}}
+
+    {{/zcl_event_fields}}
+  }
+
+  {{/zcl_events}}
+  {{#zcl_attributes_server}}
+  {{! ensure indent }}{{#unless isWritableAttribute~}}
+    readonly {{!marker to place a space even with whitespace removal~}}
+  {{~/unless~}}
+  {{~!TODO: write only attributes should also be supported~}}
+  {{~#unless isReportableAttribute~}}
+    nosubscribe {{!marker to place a space even with whitespace removal~}}
+  {{~/unless~}}
+  {{~!Removes spaces~}} attribute {{!ensure space}}
+    {{~#chip_access_elements entity="attribute"~}}
+      {{~#first~}}access({{~/first~}}
+      {{~#not_first~}}, {{/not_first~}}
+        {{operation}}: {{role}} 
+      {{~#last}}) {{/last~}}
+    {{~/chip_access_elements~}}
+    {{~#if isNullable~}}
+      nullable {{!marker to place a space even with whitespace removal~}}
+    {{~/if~}} {{type}}
+    {{~#unless isArray~}}
+      {{~#if (isString type)~}}
+        {{~#if maxLength~}} 
+          <{{maxLength}}> 
+        {{~/if~}}
+      {{~/if~}}
+    {{/unless}} {{asLowerCamelCase name~}}
+    {{~#if isArray~}} [] {{~/if}} = {{code}};
+  {{/zcl_attributes_server}}
+  {{#zcl_commands}}
+    {{~!--For requests, we only generate structs for commands that with at least one arguments--~}}
+    {{#if (isClient source)}}
+      {{#zcl_command_arguments}}
+          {{#first}}
+              {{~new_line 1~}}{{~indent 1~}}request struct {{asUpperCamelCase parent.name}}Request {
+          {{/first}}    
+          {{~indent 2~}}{{> idl_structure_member}}
+          {{#last}}
+
+              {{~indent 1~}}}
+          {{/last}}
+      {{/zcl_command_arguments}}
+    {{else}}
+    {{~!--However, we generate all structs for responses even if it has no arguments--~}}
+            {{~new_line 1~}}{{~indent 1~}}response struct {{asUpperCamelCase name}} = {{code}} {
+    {{#zcl_command_arguments}}
+        {{~indent 2~}}{{> idl_structure_member}}
+    {{/zcl_command_arguments}}
+
+            {{~indent 1~}}}
+    {{/if}}
+  {{/zcl_commands}}
+
+  {{#zcl_commands}}
+    {{#if (isClient source)}}
+      {{#first}}
+
+      {{/first}}
+        {{~indent 1~}}
+        {{#if mustUseTimedInvoke~}} timed {{/if~}}
+        command {{!ensure space}} {{~#chip_access_elements entity="command"~}}
+            {{~#first~}}access({{~/first~}}
+            {{~#not_first~}}, {{/not_first~}}
+              {{operation}}: {{role}} 
+            {{~#last}}) {{/last~}}
+          {{~/chip_access_elements~}} {{asUpperCamelCase name}}(
+          {{~#zcl_command_arguments~}}
+          {{~#first~}}
+            {{asUpperCamelCase parent.name}}Request
+          {{~/first~}}
+          {{~/zcl_command_arguments~}}
+        ): {{#if responseName~}}
+          {{responseName}}
+      {{~else~}}
+          DefaultSuccess
+      {{~/if~}}
+      {{~indent 0}} = {{code}};
+    {{/if}}
+  {{/zcl_commands}}
+}
+
+{{/zcl_clusters}}

@@ -23,5 +23,7 @@
 """Provides Python APIs for CHIP."""
 from . import Command
 from . import Attribute
-from .Objects import *
 from . import CHIPClusters
+from . import idl
+
+Objects = idl.DefaultClusters()

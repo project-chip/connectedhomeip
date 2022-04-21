@@ -106,7 +106,9 @@ try:
         srcDir = os.path.join(manifestBase, entry['src_dir'])
         for path in entry['sources']:
             srcFile = os.path.join(srcDir, path)
-            dstFile = os.path.join(tmpDir, path)
+            dstFile = os.path.join(tmpDir, entry['dst_dir'], os.path.relpath(srcFile, srcDir))
+            print(f"{srcFile} => {dstFile}")
+            print(f"mkdir {os.path.dirname(dstFile)}")
             os.makedirs(os.path.dirname(dstFile), exist_ok=True)
             shutil.copyfile(srcFile, dstFile)
 
@@ -139,7 +141,8 @@ try:
         'pyyaml',
         'ipdb',
         'ipykernel',
-        'deprecation'
+        'deprecation',
+        'lark',
     ]
 
     if platform.system() == "Darwin":
@@ -168,6 +171,7 @@ try:
         'chip.tlv',
         'chip.setup_payload',
         'chip.storage',
+        'chip.idl',
     ]
     #print ("Server: {}".format(args.server))
     if args.server:
@@ -202,7 +206,12 @@ try:
         package_data={
             packageName: [
                 # Include the wrapper DLL as package data in the "chip" package.
-                chipDLLName
+                chipDLLName,
+                # Include the Matter IDL grammar as package data.
+                "idl/matter_grammar.lark",
+            ],
+            "": [
+                "**.matter"
             ]
         },
         scripts=[name for name in map(

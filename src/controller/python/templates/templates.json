@@ -21,6 +21,26 @@
         {
             "name": "cluster_header",
             "path": "../../../../src/app/zap-templates/partials/cluster_header.zapt"
+        },
+        {
+            "name": "idl_structure_definition",
+            "path": "../../../../src/app/zap-templates/partials/idl/structure_definition.zapt"
+        },
+        {
+            "name": "idl_structure_member",
+            "path": "../../../../src/app/zap-templates/partials/idl/structure_member.zapt"
+        },
+        {
+            "name": "idl_command_request_response",
+            "path": "../../../../src/app/zap-templates/partials/idl/command_request_response.zapt"
+        },
+        {
+            "name": "idl_command_request_struct",
+            "path": "../../../../src/app/zap-templates/partials/idl/command_request_struct.zapt"
+        },
+        {
+            "name": "idl_command_response_struct",
+            "path": "../../../../src/app/zap-templates/partials/idl/command_response_struct.zapt"
         }
     ],
     "templates": [
@@ -30,9 +50,9 @@
             "output": "src/controller/python/chip/clusters/CHIPClusters.py"
         },
         {
-            "path": "python-cluster-Objects-py.zapt",
+            "path": "MatterIDL.zapt",
             "name": "CHIP ClusterObjects for Python",
-            "output": "src/controller/python/chip/clusters/Objects.py"
+            "output": "src/controller/python/chip/clusters/default.matter"
         }
     ]
 }

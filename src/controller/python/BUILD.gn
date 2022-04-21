@@ -116,6 +116,7 @@ pw_python_action("python") {
   _py_manifest_files = [
     {
       src_dir = "."
+      dst_dir = ""
       sources = [
         "chip-device-ctrl.py",
         "chip-repl.py",
@@ -139,10 +140,11 @@ pw_python_action("python") {
         "chip/clusters/CHIPClusters.py",
         "chip/clusters/ClusterObjects.py",
         "chip/clusters/Command.py",
-        "chip/clusters/Objects.py",
         "chip/clusters/TestObjects.py",
         "chip/clusters/Types.py",
         "chip/clusters/__init__.py",
+        "chip/clusters/default.matter",
+        "chip/clusters/idl.py",
         "chip/configuration/__init__.py",
         "chip/discovery/__init__.py",
         "chip/discovery/library_handle.py",
@@ -175,6 +177,7 @@ pw_python_action("python") {
     },
     {
       src_dir = target_out_dir
+      dst_dir = ""
       if (chip_controller) {
         sources = [ "${target_out_dir}/chip/_ChipDeviceCtrl.so" ]
       } else {
@@ -182,7 +185,18 @@ pw_python_action("python") {
       }
     },
     {
+      src_dir = "${chip_root}/scripts/idl"
+      dst_dir = "chip/idl"
+      sources = [
+        "${chip_root}/scripts/idl/__init__.py",
+        "${chip_root}/scripts/idl/matter_grammar.lark",
+        "${chip_root}/scripts/idl/matter_idl_parser.py",
+        "${chip_root}/scripts/idl/matter_idl_types.py",
+      ]
+    },
+    {
       src_dir = "//"
+      dst_dir = ""
       sources = [ "//LICENSE" ]
     },
   ]
@@ -197,6 +211,7 @@ pw_python_action("python") {
       {
         src_dir = rebase_path(_manifest_entry.src_dir,
                               get_path_info(_py_manifest_file, "dir"))
+        dst_dir = _manifest_entry.dst_dir
         sources = rebase_path(_manifest_entry.sources, _manifest_entry.src_dir)
       },
     ]

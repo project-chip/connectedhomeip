@@ -288,13 +288,15 @@ _EventIndex = {}
 _ClusterIndex = {}
 
 
-def _BuildAttributeIndex():
+def _BuildAttributeIndex(namespace=None):
     ''' Build internal attribute index for locating the corresponding cluster object by path in the future.
     We do this because this operation will take a long time when there are lots of attributes, it takes about 300ms for a single query.
     This is acceptable during init, but unacceptable when the server returns lots of attributes at the same time.
     '''
-    for clusterName, obj in inspect.getmembers(sys.modules['chip.clusters.Objects']):
-        if ('chip.clusters.Objects' in str(obj)) and inspect.isclass(obj):
+    if namespace is None:
+        namespace = sys.modules['chip.clusters'].Objects
+    for clusterName, obj in inspect.getmembers(namespace):
+        if inspect.isclass(obj) and obj != Cluster and issubclass(obj, Cluster):
             for objName, subclass in inspect.getmembers(obj):
                 if inspect.isclass(subclass) and (('Attributes') in str(subclass)):
                     for attributeName, attribute in inspect.getmembers(subclass):
@@ -307,16 +309,23 @@ def _BuildAttributeIndex():
                             if (matched == []):
                                 continue
 
-                            _AttributeIndex[(attribute.cluster_id, attribute.attribute_id)] = (eval(
-                                'chip.clusters.Objects.' + clusterName + '.Attributes.' + attributeName), obj)
+                            _AttributeIndex[(attribute.cluster_id, attribute.attribute_id)] = (attribute, obj)
 
 
-def _BuildClusterIndex():
+def _BuildClusterIndex(namespace=None):
     ''' Build internal cluster index for locating the corresponding cluster object by path in the future.
     '''
-    for clusterName, obj in inspect.getmembers(sys.modules['chip.clusters.Objects']):
-        if ('chip.clusters.Objects' in str(obj)) and inspect.isclass(obj):
+    if namespace is None:
+        namespace = sys.modules['chip.clusters'].Objects
+    for clusterName, obj in inspect.getmembers(namespace):
+        if inspect.isclass(obj) and obj != Cluster and issubclass(obj, Cluster):
             _ClusterIndex[obj.id] = obj
+
+
+def UpdateIndex(namespace):
+    _BuildAttributeIndex(namespace)
+    _BuildClusterIndex(namespace)
+    _BuildEventIndex(namespace)
 
 
 @dataclass
@@ -544,13 +553,15 @@ def DefaultEventChangeCallback(data: EventReadResult, transaction: SubscriptionT
     pprint(data, expand_all=True)
 
 
-def _BuildEventIndex():
+def _BuildEventIndex(namespace=None):
     ''' Build internal event index for locating the corresponding cluster object by path in the future.
     We do this because this operation will take a long time when there are lots of events, it takes about 300ms for a single query.
     This is acceptable during init, but unacceptable when the server returns lots of events at the same time.
     '''
-    for clusterName, obj in inspect.getmembers(sys.modules['chip.clusters.Objects']):
-        if ('chip.clusters.Objects' in str(obj)) and inspect.isclass(obj):
+    if namespace is None:
+        namespace = sys.modules['chip.clusters'].Objects
+    for clusterName, obj in inspect.getmembers(namespace):
+        if inspect.isclass(obj):
             for objName, subclass in inspect.getmembers(obj):
                 if inspect.isclass(subclass) and (('Events' == objName)):
                     for eventName, event in inspect.getmembers(subclass):
@@ -563,8 +574,7 @@ def _BuildEventIndex():
                             if (matched == []):
                                 continue
 
-                            _EventIndex[str(EventPath(ClusterId=event.cluster_id, EventId=event.event_id))] = eval(
-                                'chip.clusters.Objects.' + clusterName + '.Events.' + eventName)
+                            _EventIndex[str(EventPath(ClusterId=event.cluster_id, EventId=event.event_id))] = event
 
 
 class AsyncReadTransaction:
@@ -993,7 +1003,3 @@ def Init():
     handle.pychip_ReadClient_InitCallbacks(
         _OnReadAttributeDataCallback, _OnReadEventDataCallback, _OnSubscriptionEstablishedCallback, _OnReadErrorCallback, _OnReadDoneCallback,
         _OnReportBeginCallback, _OnReportEndCallback)
-
-    _BuildAttributeIndex()
-    _BuildClusterIndex()
-    _BuildEventIndex()
