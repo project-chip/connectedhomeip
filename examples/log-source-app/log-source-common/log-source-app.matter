@@ -317,8 +317,8 @@ server cluster OperationalCredentials = 62 {
   struct FabricDescriptor {
     OCTET_STRING<65> rootPublicKey = 1;
     INT16U vendorId = 2;
-    FABRIC_ID fabricId = 3;
-    NODE_ID nodeId = 4;
+    fabric_id fabricId = 3;
+    node_id nodeId = 4;
     CHAR_STRING<32> label = 5;
     fabric_idx fabricIndex = 254;
   }

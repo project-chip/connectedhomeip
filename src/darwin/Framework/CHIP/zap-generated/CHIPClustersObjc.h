@@ -15246,16 +15246,6 @@ typedef NS_OPTIONS(uint32_t, CHIPOnOffFeature) {
     CHIPOnOffFeatureLighting = 0x1,
 };
 
-typedef NS_ENUM(uint8_t, CHIPLevelControlMoveMode) {
-    CHIPLevelControlMoveModeUp = 0x00,
-    CHIPLevelControlMoveModeDown = 0x01,
-};
-
-typedef NS_ENUM(uint8_t, CHIPLevelControlStepMode) {
-    CHIPLevelControlStepModeUp = 0x00,
-    CHIPLevelControlStepModeDown = 0x01,
-};
-
 typedef NS_OPTIONS(uint32_t, CHIPLevelControlFeature) {
     CHIPLevelControlFeatureOnOff = 0x1,
     CHIPLevelControlFeatureLighting = 0x2,
@@ -16391,19 +16381,6 @@ typedef NS_ENUM(uint16_t, CHIPIasZoneType) {
     CHIPIasZoneTypeInvalidZoneType = 0xFFFF,
 };
 
-typedef NS_OPTIONS(uint16_t, CHIPIasZoneStatus) {
-    CHIPIasZoneStatusAlarm1 = 0x1,
-    CHIPIasZoneStatusAlarm2 = 0x2,
-    CHIPIasZoneStatusTamper = 0x4,
-    CHIPIasZoneStatusBattery = 0x8,
-    CHIPIasZoneStatusSupervisionReports = 0x10,
-    CHIPIasZoneStatusRestoreReports = 0x20,
-    CHIPIasZoneStatusTrouble = 0x40,
-    CHIPIasZoneStatusAC = 0x80,
-    CHIPIasZoneStatusTest = 0x100,
-    CHIPIasZoneStatusBatteryDefect = 0x200,
-};
-
 typedef NS_ENUM(uint8_t, CHIPIasAceAlarmStatus) {
     CHIPIasAceAlarmStatusNoAlarm = 0x00,
     CHIPIasAceAlarmStatusBurglar = 0x01,
@@ -16478,39 +16455,14 @@ typedef NS_ENUM(uint16_t, CHIPIasAceIasZoneType) {
     CHIPIasAceIasZoneTypeInvalidZoneType = 0xFFFF,
 };
 
-typedef NS_OPTIONS(uint16_t, CHIPIasAceIasZoneStatus) {
-    CHIPIasAceIasZoneStatusAlarm1 = 0x1,
-    CHIPIasAceIasZoneStatusAlarm2 = 0x2,
-    CHIPIasAceIasZoneStatusTamper = 0x4,
-    CHIPIasAceIasZoneStatusBattery = 0x8,
-    CHIPIasAceIasZoneStatusSupervisionReports = 0x10,
-    CHIPIasAceIasZoneStatusRestoreReports = 0x20,
-    CHIPIasAceIasZoneStatusTrouble = 0x40,
-    CHIPIasAceIasZoneStatusAC = 0x80,
-    CHIPIasAceIasZoneStatusTest = 0x100,
-    CHIPIasAceIasZoneStatusBatteryDefect = 0x200,
-};
-
-typedef NS_OPTIONS(uint8_t, CHIPIasWdSquawkInfo) {
-    CHIPIasWdSquawkInfoMode = 0xF0,
-    CHIPIasWdSquawkInfoStrobe = 0x8,
-    CHIPIasWdSquawkInfoLevel = 0x3,
-};
-
-typedef NS_OPTIONS(uint8_t, CHIPIasWdWarningInfo) {
-    CHIPIasWdWarningInfoMode = 0xF0,
-    CHIPIasWdWarningInfoStrobe = 0xC,
-    CHIPIasWdWarningInfoSirenLevel = 0x3,
-};
-
-typedef NS_ENUM(uint8_t, CHIPChannelLineupInfoType) {
-    CHIPChannelLineupInfoTypeMso = 0x00,
-};
-
 typedef NS_ENUM(uint8_t, CHIPChannelStatus) {
     CHIPChannelStatusSuccess = 0x00,
     CHIPChannelStatusMultipleMatches = 0x01,
     CHIPChannelStatusNoMatches = 0x02,
+};
+
+typedef NS_ENUM(uint8_t, CHIPChannelLineupInfoType) {
+    CHIPChannelLineupInfoTypeMso = 0x00,
 };
 
 typedef NS_OPTIONS(uint32_t, CHIPChannelFeature) {
@@ -16518,10 +16470,10 @@ typedef NS_OPTIONS(uint32_t, CHIPChannelFeature) {
     CHIPChannelFeatureLineupInfo = 0x2,
 };
 
-typedef NS_ENUM(uint8_t, CHIPTargetNavigatorStatus) {
-    CHIPTargetNavigatorStatusSuccess = 0x00,
-    CHIPTargetNavigatorStatusTargetNotFound = 0x01,
-    CHIPTargetNavigatorStatusNotAllowed = 0x02,
+typedef NS_ENUM(uint8_t, CHIPTargetNavigatorStatusEnumTargetNavigator) {
+    CHIPTargetNavigatorStatusEnumTargetNavigatorSuccess = 0x00,
+    CHIPTargetNavigatorStatusEnumTargetNavigatorTargetNotFound = 0x01,
+    CHIPTargetNavigatorStatusEnumTargetNavigatorNotAllowed = 0x02,
 };
 
 typedef NS_ENUM(uint8_t, CHIPMediaPlaybackPlaybackState) {
@@ -16531,13 +16483,13 @@ typedef NS_ENUM(uint8_t, CHIPMediaPlaybackPlaybackState) {
     CHIPMediaPlaybackPlaybackStateBuffering = 0x03,
 };
 
-typedef NS_ENUM(uint8_t, CHIPMediaPlaybackStatus) {
-    CHIPMediaPlaybackStatusSuccess = 0x00,
-    CHIPMediaPlaybackStatusInvalidStateForCommand = 0x01,
-    CHIPMediaPlaybackStatusNotAllowed = 0x02,
-    CHIPMediaPlaybackStatusNotActive = 0x03,
-    CHIPMediaPlaybackStatusSpeedOutOfRange = 0x04,
-    CHIPMediaPlaybackStatusSeekOutOfRange = 0x05,
+typedef NS_ENUM(uint8_t, CHIPMediaPlaybackStatusEnumMediaPlayback) {
+    CHIPMediaPlaybackStatusEnumMediaPlaybackSuccess = 0x00,
+    CHIPMediaPlaybackStatusEnumMediaPlaybackInvalidStateForCommand = 0x01,
+    CHIPMediaPlaybackStatusEnumMediaPlaybackNotAllowed = 0x02,
+    CHIPMediaPlaybackStatusEnumMediaPlaybackNotActive = 0x03,
+    CHIPMediaPlaybackStatusEnumMediaPlaybackSpeedOutOfRange = 0x04,
+    CHIPMediaPlaybackStatusEnumMediaPlaybackSeekOutOfRange = 0x05,
 };
 
 typedef NS_ENUM(uint8_t, CHIPMediaInputInputType) {
@@ -16648,10 +16600,10 @@ typedef NS_ENUM(uint8_t, CHIPKeypadInputCecKeyCode) {
     CHIPKeypadInputCecKeyCodeData = 0x76,
 };
 
-typedef NS_ENUM(uint8_t, CHIPKeypadInputStatus) {
-    CHIPKeypadInputStatusSuccess = 0x00,
-    CHIPKeypadInputStatusUnsupportedKey = 0x01,
-    CHIPKeypadInputStatusInvalidKeyInCurrentState = 0x02,
+typedef NS_ENUM(uint8_t, CHIPKeypadInputStatusEnumKeypadInput) {
+    CHIPKeypadInputStatusEnumKeypadInputSuccess = 0x00,
+    CHIPKeypadInputStatusEnumKeypadInputUnsupportedKey = 0x01,
+    CHIPKeypadInputStatusEnumKeypadInputInvalidKeyInCurrentState = 0x02,
 };
 
 typedef NS_OPTIONS(uint32_t, CHIPKeypadInputFeature) {
@@ -16681,10 +16633,10 @@ typedef NS_ENUM(uint8_t, CHIPContentLauncherParameter) {
     CHIPContentLauncherParameterType = 0x0C,
 };
 
-typedef NS_ENUM(uint8_t, CHIPContentLauncherStatus) {
-    CHIPContentLauncherStatusSuccess = 0x00,
-    CHIPContentLauncherStatusUrlNotAvailable = 0x01,
-    CHIPContentLauncherStatusAuthFailed = 0x02,
+typedef NS_ENUM(uint8_t, CHIPContentLauncherStatusEnumContentLauncher) {
+    CHIPContentLauncherStatusEnumContentLauncherSuccess = 0x00,
+    CHIPContentLauncherStatusEnumContentLauncherUrlNotAvailable = 0x01,
+    CHIPContentLauncherStatusEnumContentLauncherAuthFailed = 0x02,
 };
 
 typedef NS_OPTIONS(uint32_t, CHIPContentLauncherFeature) {
@@ -16710,10 +16662,10 @@ typedef NS_OPTIONS(uint32_t, CHIPAudioOutputFeature) {
     CHIPAudioOutputFeatureNameUpdates = 0x1,
 };
 
-typedef NS_ENUM(uint8_t, CHIPApplicationLauncherStatus) {
-    CHIPApplicationLauncherStatusSuccess = 0x00,
-    CHIPApplicationLauncherStatusAppNotAvailable = 0x01,
-    CHIPApplicationLauncherStatusSystemBusy = 0x02,
+typedef NS_ENUM(uint8_t, CHIPApplicationLauncherStatusEnumApplicationLauncher) {
+    CHIPApplicationLauncherStatusEnumApplicationLauncherSuccess = 0x00,
+    CHIPApplicationLauncherStatusEnumApplicationLauncherAppNotAvailable = 0x01,
+    CHIPApplicationLauncherStatusEnumApplicationLauncherSystemBusy = 0x02,
 };
 
 typedef NS_OPTIONS(uint32_t, CHIPApplicationLauncherFeature) {

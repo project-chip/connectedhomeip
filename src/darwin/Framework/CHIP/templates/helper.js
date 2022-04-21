@@ -20,9 +20,10 @@ const zapPath      = '../../../../../third_party/zap/repo/dist/src-electron/';
 const string       = require(zapPath + 'util/string.js')
 const templateUtil = require(zapPath + 'generator/template-util.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
+const querZcl      = require(zapPath + 'db/query-zcl.js')
 
 const ChipTypesHelper = require('../../../../../src/app/zap-templates/common/ChipTypesHelper.js');
-const StringHelper    = require('../../../../../src/app/zap-templates/common/StringHelper.js');
+const StringHelper    = require(zapPath + 'generator/helper-string-matter.js')
 const appHelper       = require('../../../../../src/app/zap-templates/templates/app/helper.js');
 
 function asObjectiveCBasicType(type, options)

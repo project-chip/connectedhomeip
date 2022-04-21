@@ -108,8 +108,8 @@ server cluster AdministratorCommissioning = 60 {
 
 server cluster Basic = 40 {
   struct CapabilityMinimaStruct {
-    int16u caseSessionsPerFabric = 0;
-    int16u subscriptionsPerFabric = 1;
+    INT16U caseSessionsPerFabric = 0;
+    INT16U subscriptionsPerFabric = 1;
   }
 
   critical event StartUp = 0 {
@@ -151,11 +151,11 @@ server cluster Basic = 40 {
 
 server cluster Binding = 30 {
   struct TargetStruct {
-    optional NODE_ID node = 1;
-    optional GROUP_ID group = 2;
-    optional ENDPOINT_NO endpoint = 3;
-    optional CLUSTER_ID cluster = 4;
-    FABRIC_IDX fabricIndex = 254;
+    optional node_id node = 1;
+    optional group_id group = 2;
+    optional endpoint_no endpoint = 3;
+    optional cluster_id cluster = 4;
+    fabric_idx fabricIndex = 254;
   }
 
   attribute TargetStruct binding[] = 0;
@@ -164,7 +164,7 @@ server cluster Binding = 30 {
 
 server cluster Descriptor = 29 {
   struct DeviceType {
-    DEVTYPE_ID type = 0;
+    devtype_id type = 0;
     INT16U revision = 1;
   }
 
@@ -771,8 +771,8 @@ server cluster OperationalCredentials = 62 {
   struct FabricDescriptor {
     OCTET_STRING<65> rootPublicKey = 1;
     INT16U vendorId = 2;
-    FABRIC_ID fabricId = 3;
-    NODE_ID nodeId = 4;
+    fabric_id fabricId = 3;
+    node_id nodeId = 4;
     CHAR_STRING<32> label = 5;
     fabric_idx fabricIndex = 254;
   }
@@ -863,7 +863,7 @@ server cluster Scenes = 5 {
   }
 
   struct SceneExtensionFieldSet {
-    CLUSTER_ID clusterId = 0;
+    cluster_id clusterId = 0;
     INT8U length = 1;
     INT8U value = 2;
   }
@@ -1161,7 +1161,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
 
   struct SecurityPolicy {
     INT16U rotationTime = 0;
-    BITMAP16 flags = 1;
+    bitmap16 flags = 1;
   }
 
   struct OperationalDatasetComponents {

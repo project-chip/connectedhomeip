@@ -4318,7 +4318,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case AccessControl::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::AccessControl::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -4349,7 +4349,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case AccountLogin::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::AccountLogin::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -4395,7 +4395,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case AdministratorCommissioning::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::AdministratorCommissioning::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -4466,7 +4466,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case ApplicationBasic::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::ApplicationBasic::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -4507,7 +4507,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case ApplicationLauncher::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::ApplicationLauncher::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -4548,7 +4548,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case AudioOutput::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::AudioOutput::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -4564,17 +4564,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case BarrierControl::Attributes::BarrierMovingState::Id: {
-            uint8_t value;
+            chip::app::Clusters::BarrierControl::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("barrier moving state", 1, value);
         }
         case BarrierControl::Attributes::BarrierSafetyStatus::Id: {
-            uint16_t value;
+            chip::BitFlags<chip::app::Clusters::BarrierControl::bitmap16> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("barrier safety status", 1, value);
         }
         case BarrierControl::Attributes::BarrierCapabilities::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::BarrierControl::bitmap8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("barrier capabilities", 1, value);
         }
@@ -4629,7 +4629,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case BarrierControl::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::BarrierControl::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -4744,6 +4744,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CapabilityMinima", 1, value);
         }
+        case Basic::Attributes::SwBuildId::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("sw build id", 1, value);
+        }
         case Basic::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -4760,7 +4765,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case Basic::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::Basic::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -4796,7 +4801,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("out of service", 1, value);
         }
         case BinaryInputBasic::Attributes::Polarity::Id: {
-            uint8_t value;
+            chip::app::Clusters::BinaryInputBasic::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("polarity", 1, value);
         }
@@ -4806,12 +4811,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("present value", 1, value);
         }
         case BinaryInputBasic::Attributes::Reliability::Id: {
-            uint8_t value;
+            chip::app::Clusters::BinaryInputBasic::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("reliability", 1, value);
         }
         case BinaryInputBasic::Attributes::StatusFlags::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::BinaryInputBasic::bitmap8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("status flags", 1, value);
         }
@@ -4836,7 +4841,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case BinaryInputBasic::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::BinaryInputBasic::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -4872,7 +4877,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case Binding::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::Binding::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -4908,7 +4913,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case BooleanState::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::BooleanState::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -4955,7 +4960,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case BridgedActions::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::BridgedActions::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -5061,7 +5066,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case BridgedDeviceBasic::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::BridgedDeviceBasic::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -5107,7 +5112,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case Channel::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::Channel::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -5148,7 +5153,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("current y", 1, value);
         }
         case ColorControl::Attributes::DriftCompensation::Id: {
-            uint8_t value;
+            chip::app::Clusters::ColorControl::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("drift compensation", 1, value);
         }
@@ -5163,12 +5168,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("color temperature", 1, value);
         }
         case ColorControl::Attributes::ColorMode::Id: {
-            uint8_t value;
+            chip::app::Clusters::ColorControl::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("color mode", 1, value);
         }
         case ColorControl::Attributes::ColorControlOptions::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::ColorControl::bitmap8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("color control options", 1, value);
         }
@@ -5328,7 +5333,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("enhanced current hue", 1, value);
         }
         case ColorControl::Attributes::EnhancedColorMode::Id: {
-            uint8_t value;
+            chip::app::Clusters::ColorControl::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("enhanced color mode", 1, value);
         }
@@ -5358,7 +5363,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("color loop stored enhanced hue", 1, value);
         }
         case ColorControl::Attributes::ColorCapabilities::Id: {
-            uint16_t value;
+            chip::BitFlags<chip::app::Clusters::ColorControl::bitmap16> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("color capabilities", 1, value);
         }
@@ -5398,7 +5403,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case ColorControl::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::ColorControl::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -5419,7 +5424,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AcceptHeader", 1, value);
         }
         case ContentLauncher::Attributes::SupportedStreamingProtocols::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::ContentLauncher::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedStreamingProtocols", 1, value);
         }
@@ -5439,7 +5444,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case ContentLauncher::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::ContentLauncher::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -5490,7 +5495,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case Descriptor::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::Descriptor::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -5521,7 +5526,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case DiagnosticLogs::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::DiagnosticLogs::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -5777,7 +5782,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case DoorLock::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::DoorLock::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -5793,7 +5798,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case ElectricalMeasurement::Attributes::MeasurementType::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("measurement type", 1, value);
         }
@@ -6143,7 +6148,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ac power divisor", 1, value);
         }
         case ElectricalMeasurement::Attributes::OverloadAlarmsMask::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("overload alarms mask", 1, value);
         }
@@ -6158,7 +6163,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("current overload", 1, value);
         }
         case ElectricalMeasurement::Attributes::AcOverloadAlarmsMask::Id: {
-            uint16_t value;
+            chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap16> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ac overload alarms mask", 1, value);
         }
@@ -6448,7 +6453,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case ElectricalMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -6524,7 +6529,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case EthernetNetworkDiagnostics::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::EthernetNetworkDiagnostics::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -6540,12 +6545,20 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case FanControl::Attributes::FanMode::Id: {
+<<<<<<< HEAD
             chip::app::Clusters::FanControl::FanModeType value;
+=======
+            chip::app::Clusters::FanControl::enum8 value;
+>>>>>>> Changes for cleaner regen
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("fan mode", 1, value);
         }
         case FanControl::Attributes::FanModeSequence::Id: {
+<<<<<<< HEAD
             chip::app::Clusters::FanControl::FanModeSequenceType value;
+=======
+            chip::app::Clusters::FanControl::enum8 value;
+>>>>>>> Changes for cleaner regen
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("fan mode sequence", 1, value);
         }
@@ -6575,22 +6588,22 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("speed current", 1, value);
         }
         case FanControl::Attributes::RockSupport::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::FanControl::bitmap8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("rock support", 1, value);
         }
         case FanControl::Attributes::RockSetting::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::FanControl::bitmap8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("rock setting", 1, value);
         }
         case FanControl::Attributes::WindSupport::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::FanControl::bitmap8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("wind support", 1, value);
         }
         case FanControl::Attributes::WindSetting::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::FanControl::bitmap8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("wind setting", 1, value);
         }
@@ -6610,7 +6623,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case FanControl::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::FanControl::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -6646,7 +6659,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case FixedLabel::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::FixedLabel::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -6697,7 +6710,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case FlowMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::FlowMeasurement::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -6753,7 +6766,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case GeneralCommissioning::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::GeneralCommissioning::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -6791,7 +6804,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("TotalOperationalHours", 1, value);
         }
         case GeneralDiagnostics::Attributes::BootReasons::Id: {
-            uint8_t value;
+            chip::app::Clusters::GeneralDiagnostics::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BootReasons", 1, value);
         }
@@ -6826,7 +6839,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case GeneralDiagnostics::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::GeneralDiagnostics::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -6879,7 +6892,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case GroupKeyManagement::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::GroupKeyManagement::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -6895,7 +6908,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case Groups::Attributes::NameSupport::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::Groups::bitmap8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("name support", 1, value);
         }
@@ -6915,7 +6928,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case Groups::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::Groups::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -6936,7 +6949,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("identify time", 1, value);
         }
         case Identify::Attributes::IdentifyType::Id: {
-            uint8_t value;
+            chip::app::Clusters::Identify::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("identify type", 1, value);
         }
@@ -6956,7 +6969,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case Identify::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::Identify::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -6992,7 +7005,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Tolerance", 1, value);
         }
         case IlluminanceMeasurement::Attributes::LightSensorType::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::enum8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LightSensorType", 1, value);
         }
@@ -7012,7 +7025,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case IlluminanceMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::IlluminanceMeasurement::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -7043,7 +7056,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case KeypadInput::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::KeypadInput::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -7094,7 +7107,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("max frequency", 1, value);
         }
         case LevelControl::Attributes::Options::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::LevelControl::bitmap8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("options", 1, value);
         }
@@ -7144,7 +7157,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case LevelControl::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::LevelControl::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -7185,7 +7198,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case LocalizationConfiguration::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::LocalizationConfiguration::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -7216,7 +7229,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case LowPower::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::LowPower::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -7257,7 +7270,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case MediaInput::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::MediaInput::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -7323,7 +7336,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case MediaPlayback::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::MediaPlayback::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -7344,7 +7357,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Description", 1, value);
         }
         case ModeSelect::Attributes::StandardNamespace::Id: {
-            chip::app::DataModel::Nullable<uint16_t> value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::ModeSelect::enum16> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StandardNamespace", 1, value);
         }
@@ -7384,7 +7397,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case ModeSelect::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::ModeSelect::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -7456,7 +7469,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case NetworkCommissioning::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::NetworkCommissioning::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -7487,7 +7500,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case OtaSoftwareUpdateProvider::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::OtaSoftwareUpdateProvider::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -7540,7 +7553,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case OtaSoftwareUpdateRequestor::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::OtaSoftwareUpdateRequestor::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -7556,17 +7569,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case OccupancySensing::Attributes::Occupancy::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::OccupancySensing::bitmap8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("occupancy", 1, value);
         }
         case OccupancySensing::Attributes::OccupancySensorType::Id: {
-            uint8_t value;
+            chip::app::Clusters::OccupancySensing::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("occupancy sensor type", 1, value);
         }
         case OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::OccupancySensing::bitmap8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("occupancy sensor type bitmap", 1, value);
         }
@@ -7631,7 +7644,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case OccupancySensing::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::OccupancySensing::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -7687,7 +7700,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case OnOff::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::OnOff::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -7703,12 +7716,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case OnOffSwitchConfiguration::Attributes::SwitchType::Id: {
-            uint8_t value;
+            chip::app::Clusters::OnOffSwitchConfiguration::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("switch type", 1, value);
         }
         case OnOffSwitchConfiguration::Attributes::SwitchActions::Id: {
-            uint8_t value;
+            chip::app::Clusters::OnOffSwitchConfiguration::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("switch actions", 1, value);
         }
@@ -7728,7 +7741,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case OnOffSwitchConfiguration::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::OnOffSwitchConfiguration::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -7792,7 +7805,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case OperationalCredentials::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::OperationalCredentials::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -7808,7 +7821,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case PowerSource::Attributes::Status::Id: {
-            uint8_t value;
+            chip::app::Clusters::PowerSource::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Status", 1, value);
         }
@@ -7833,7 +7846,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("WiredAssessedInputFrequency", 1, value);
         }
         case PowerSource::Attributes::WiredCurrentType::Id: {
-            uint8_t value;
+            chip::app::Clusters::PowerSource::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("WiredCurrentType", 1, value);
         }
@@ -7878,7 +7891,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("BatteryTimeRemaining", 1, value);
         }
         case PowerSource::Attributes::BatteryChargeLevel::Id: {
-            uint8_t value;
+            chip::app::Clusters::PowerSource::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BatteryChargeLevel", 1, value);
         }
@@ -7888,7 +7901,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("BatteryReplacementNeeded", 1, value);
         }
         case PowerSource::Attributes::BatteryReplaceability::Id: {
-            uint8_t value;
+            chip::app::Clusters::PowerSource::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BatteryReplaceability", 1, value);
         }
@@ -7938,7 +7951,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("BatteryQuantity", 1, value);
         }
         case PowerSource::Attributes::BatteryChargeState::Id: {
-            uint8_t value;
+            chip::app::Clusters::PowerSource::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BatteryChargeState", 1, value);
         }
@@ -7978,7 +7991,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case PowerSource::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::PowerSource::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -8014,7 +8027,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case PowerSourceConfiguration::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::PowerSourceConfiguration::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -8090,7 +8103,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case PressureMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::PressureMeasurement::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -8171,7 +8184,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("MaxConstTemp", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::PumpStatus::Id: {
-            uint16_t value;
+            chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::bitmap16> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PumpStatus", 1, value);
         }
@@ -8221,7 +8234,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ControlMode", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::AlarmMask::Id: {
-            uint16_t value;
+            chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::bitmap16> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AlarmMask", 1, value);
         }
@@ -8241,7 +8254,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -8292,7 +8305,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case RelativeHumidityMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::RelativeHumidityMeasurement::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -8328,7 +8341,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("scene valid", 1, value);
         }
         case Scenes::Attributes::NameSupport::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::Scenes::bitmap8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("name support", 1, value);
         }
@@ -8353,7 +8366,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case Scenes::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::Scenes::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -8405,7 +8418,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case SoftwareDiagnostics::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::SoftwareDiagnostics::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -8451,7 +8464,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case Switch::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::Switch::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -8492,7 +8505,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case TargetNavigator::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::TargetNavigator::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -8543,7 +8556,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case TemperatureMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::TemperatureMeasurement::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -8664,12 +8677,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("int64s", 1, value);
         }
         case TestCluster::Attributes::Enum8::Id: {
-            uint8_t value;
+            chip::app::Clusters::TestCluster::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("enum8", 1, value);
         }
         case TestCluster::Attributes::Enum16::Id: {
-            uint16_t value;
+            chip::app::Clusters::TestCluster::enum16 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("enum16", 1, value);
         }
@@ -8907,12 +8920,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("nullable_int64s", 1, value);
         }
         case TestCluster::Attributes::NullableEnum8::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::enum8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_enum8", 1, value);
         }
         case TestCluster::Attributes::NullableEnum16::Id: {
-            chip::app::DataModel::Nullable<uint16_t> value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::enum16> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_enum16", 1, value);
         }
@@ -8982,7 +8995,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case TestCluster::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::TestCluster::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -9008,7 +9021,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("outdoor temperature", 1, value);
         }
         case Thermostat::Attributes::Occupancy::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("occupancy", 1, value);
         }
@@ -9043,7 +9056,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("pi heating demand", 1, value);
         }
         case Thermostat::Attributes::HvacSystemTypeConfiguration::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("HVAC system type configuration", 1, value);
         }
@@ -9098,7 +9111,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("min setpoint dead band", 1, value);
         }
         case Thermostat::Attributes::RemoteSensing::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("remote sensing", 1, value);
         }
@@ -9108,22 +9121,22 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("control sequence of operation", 1, value);
         }
         case Thermostat::Attributes::SystemMode::Id: {
-            uint8_t value;
+            chip::app::Clusters::Thermostat::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("system mode", 1, value);
         }
         case Thermostat::Attributes::AlarmMask::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("alarm mask", 1, value);
         }
         case Thermostat::Attributes::ThermostatRunningMode::Id: {
-            uint8_t value;
+            chip::app::Clusters::Thermostat::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("thermostat running mode", 1, value);
         }
         case Thermostat::Attributes::StartOfWeek::Id: {
-            uint8_t value;
+            chip::app::Clusters::Thermostat::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("start of week", 1, value);
         }
@@ -9138,7 +9151,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("number of daily transitions", 1, value);
         }
         case Thermostat::Attributes::TemperatureSetpointHold::Id: {
-            uint8_t value;
+            chip::app::Clusters::Thermostat::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("temperature setpoint hold", 1, value);
         }
@@ -9148,17 +9161,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("temperature setpoint hold duration", 1, value);
         }
         case Thermostat::Attributes::ThermostatProgrammingOperationMode::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("thermostat programming operation mode", 1, value);
         }
         case Thermostat::Attributes::ThermostatRunningState::Id: {
-            uint16_t value;
+            chip::BitFlags<chip::app::Clusters::Thermostat::bitmap16> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("thermostat running state", 1, value);
         }
         case Thermostat::Attributes::SetpointChangeSource::Id: {
-            uint8_t value;
+            chip::app::Clusters::Thermostat::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("setpoint change source", 1, value);
         }
@@ -9173,7 +9186,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("setpoint change source timestamp", 1, value);
         }
         case Thermostat::Attributes::AcType::Id: {
-            uint8_t value;
+            chip::app::Clusters::Thermostat::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ac type", 1, value);
         }
@@ -9183,22 +9196,22 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ac capacity", 1, value);
         }
         case Thermostat::Attributes::AcRefrigerantType::Id: {
-            uint8_t value;
+            chip::app::Clusters::Thermostat::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ac refrigerant type", 1, value);
         }
         case Thermostat::Attributes::AcCompressorType::Id: {
-            uint8_t value;
+            chip::app::Clusters::Thermostat::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ac compressor type", 1, value);
         }
         case Thermostat::Attributes::AcErrorCode::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::Thermostat::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ac error code", 1, value);
         }
         case Thermostat::Attributes::AcLouverPosition::Id: {
-            uint8_t value;
+            chip::app::Clusters::Thermostat::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ac louver position", 1, value);
         }
@@ -9208,7 +9221,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ac coil temperature", 1, value);
         }
         case Thermostat::Attributes::AcCapacityFormat::Id: {
-            uint8_t value;
+            chip::app::Clusters::Thermostat::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ac capacity format", 1, value);
         }
@@ -9228,7 +9241,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case Thermostat::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::Thermostat::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -9244,17 +9257,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Id: {
-            uint8_t value;
+            chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("temperature display mode", 1, value);
         }
         case ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id: {
-            uint8_t value;
+            chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("keypad lockout", 1, value);
         }
         case ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id: {
-            uint8_t value;
+            chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("schedule programming visibility", 1, value);
         }
@@ -9274,7 +9287,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case ThermostatUserInterfaceConfiguration::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::ThermostatUserInterfaceConfiguration::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -9295,7 +9308,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("channel", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::RoutingRole::Id: {
-            uint8_t value;
+            chip::app::Clusters::ThreadNetworkDiagnostics::enum8 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RoutingRole", 1, value);
         }
@@ -9627,7 +9640,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::ThreadNetworkDiagnostics::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -9673,7 +9686,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case TimeFormatLocalization::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::TimeFormatLocalization::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -9709,7 +9722,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case UnitLocalization::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::UnitLocalization::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -9745,7 +9758,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case UserLabel::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::UserLabel::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -9781,7 +9794,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case WakeOnLan::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::WakeOnLan::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -9877,7 +9890,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::WiFiNetworkDiagnostics::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
@@ -9943,7 +9956,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("CurrentPositionTiltPercentage", 1, value);
         }
         case WindowCovering::Attributes::OperationalStatus::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap8> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalStatus", 1, value);
         }
@@ -9998,7 +10011,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Mode", 1, value);
         }
         case WindowCovering::Attributes::SafetyStatus::Id: {
-            uint16_t value;
+            chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap16> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SafetyStatus", 1, value);
         }
@@ -10018,7 +10031,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case WindowCovering::Attributes::FeatureMap::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap32> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }

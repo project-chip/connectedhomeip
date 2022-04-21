@@ -184,40 +184,39 @@ class {{filename}}: public TestCommandBridge
             {{#*inline "actualValue"}}value{{#unless parent.isAttribute}}s.{{asStructPropertyName name}}{{/unless}}{{/inline}}
             {{#if hasExpectedValue}}
             {
-              id actualValue = {{> actualValue}};
+              id actualValue = value{{#unless parent.isAttribute}}s.{{asStructPropertyName name}}{{/unless}};
               {{>check_test_value actual="actualValue" expected=expectedValue cluster=../cluster}}
             }
             {{/if}}
             {{#if hasExpectedConstraints}}
-            {{~#*inline "item"}}{{asLowerCamelCase name}}{{/inline}}
-            {{#if (hasProperty expectedConstraints "type")}}VerifyOrReturn(CheckConstraintType("{{>item}}", "", "{{expectedConstraints.type}}"));{{/if}}
-            {{~#if (hasProperty expectedConstraints "format")}}VerifyOrReturn(CheckConstraintFormat("{{>item}}", "", "{{expectedConstraints.format}}"));{{/if}}
-            {{~#if (hasProperty expectedConstraints "startsWith")}}VerifyOrReturn(CheckConstraintStartsWith("{{>item}}", {{>actualValue}}, "{{expectedConstraints.startsWith}}"));{{/if}}
-            {{~#if (hasProperty expectedConstraints "endsWith")}}VerifyOrReturn(CheckConstraintEndsWith("{{>item}}", {{>actualValue}}, "{{expectedConstraints.endsWith}}"));{{/if}}
-            {{~#if (hasProperty expectedConstraints "isUpperCase")}}VerifyOrReturn(CheckConstraintIsUpperCase("{{>item}}", {{>actualValue}}, {{expectedConstraints.isUpperCase}}));{{/if}}
-            {{~#if (hasProperty expectedConstraints "isLowerCase")}}VerifyOrReturn(CheckConstraintIsLowerCase("{{>item}}", {{>actualValue}}, {{expectedConstraints.isLowerCase}}));{{/if}}
-            {{~#if (hasProperty expectedConstraints "isHexString")}}VerifyOrReturn(CheckConstraintIsHexString("{{>item}}", {{>actualValue}}, {{expectedConstraints.isHexString}}));{{/if}}
-            {{~#if (hasProperty expectedConstraints "minLength")}}VerifyOrReturn(CheckConstraintMinLength("{{>item}}", [{{>actualValue}} length], {{expectedConstraints.minLength}}));{{/if}}
-            {{~#if (hasProperty expectedConstraints "maxLength")}}VerifyOrReturn(CheckConstraintMaxLength("{{>item}}", [{{>actualValue}} length], {{expectedConstraints.maxLength}}));{{/if}}
+            {{#if (hasProperty expectedConstraints "type")}}VerifyOrReturn(CheckConstraintType("{{asLowerCamelCase name}}", "", "{{expectedConstraints.type}}"));{{/if}}
+            {{~#if (hasProperty expectedConstraints "format")}}VerifyOrReturn(CheckConstraintFormat("{{asLowerCamelCase name}}", "", "{{expectedConstraints.format}}"));{{/if}}
+            {{~#if (hasProperty expectedConstraints "startsWith")}}VerifyOrReturn(CheckConstraintStartsWith("{{asLowerCamelCase name}}", value{{#unless parent.isAttribute}}s.{{asStructPropertyName name}}{{/unless}}, "{{expectedConstraints.startsWith}}"));{{/if}}
+            {{~#if (hasProperty expectedConstraints "endsWith")}}VerifyOrReturn(CheckConstraintEndsWith("{{asLowerCamelCase name}}", value{{#unless parent.isAttribute}}s.{{asStructPropertyName name}}{{/unless}}, "{{expectedConstraints.endsWith}}"));{{/if}}
+            {{~#if (hasProperty expectedConstraints "isUpperCase")}}VerifyOrReturn(CheckConstraintIsUpperCase("{{asLowerCamelCase name}}", value{{#unless parent.isAttribute}}s.{{asStructPropertyName name}}{{/unless}}, {{expectedConstraints.isUpperCase}}));{{/if}}
+            {{~#if (hasProperty expectedConstraints "isLowerCase")}}VerifyOrReturn(CheckConstraintIsLowerCase("{{asLowerCamelCase name}}", value{{#unless parent.isAttribute}}s.{{asStructPropertyName name}}{{/unless}}, {{expectedConstraints.isLowerCase}}));{{/if}}
+            {{~#if (hasProperty expectedConstraints "isHexString")}}VerifyOrReturn(CheckConstraintIsHexString("{{asLowerCamelCase name}}", value{{#unless parent.isAttribute}}s.{{asStructPropertyName name}}{{/unless}}, {{expectedConstraints.isHexString}}));{{/if}}
+            {{~#if (hasProperty expectedConstraints "minLength")}}VerifyOrReturn(CheckConstraintMinLength("{{asLowerCamelCase name}}", [value{{#unless parent.isAttribute}}s.{{asStructPropertyName name}}{{/unless}} length], {{expectedConstraints.minLength}}));{{/if}}
+            {{~#if (hasProperty expectedConstraints "maxLength")}}VerifyOrReturn(CheckConstraintMaxLength("{{asLowerCamelCase name}}", [value{{#unless parent.isAttribute}}s.{{asStructPropertyName name}}{{/unless}} length], {{expectedConstraints.maxLength}}));{{/if}}
             {{~#if (hasProperty expectedConstraints "minValue")}}
-              if ({{>actualValue}} != nil) {
-                VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{>item}}", [{{>actualValue}} {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.minValue type}}));
+              if (value{{#unless parent.isAttribute}}s.{{asStructPropertyName name}}{{/unless}} != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{asLowerCamelCase name}}", [value{{#unless parent.isAttribute}}s.{{asStructPropertyName name}}{{/unless}} {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.minValue type}}));
               }
             {{/if}}
             {{~#if (hasProperty expectedConstraints "maxValue")}}
-              if ({{>actualValue}} != nil) {
-                VerifyOrReturn(CheckConstraintMaxValue<{{chipType}}>("{{>item}}", [{{>actualValue}} {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.maxValue type}}));
+              if (value{{#unless parent.isAttribute}}s.{{asStructPropertyName name}}{{/unless}} != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<{{chipType}}>("{{asLowerCamelCase name}}", [value{{#unless parent.isAttribute}}s.{{asStructPropertyName name}}{{/unless}} {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.maxValue type}}));
               }
             {{/if}}
             {{~#if (hasProperty expectedConstraints "notValue")}}
               {{#if (isLiteralNull expectedConstraints.notValue)}}
-              VerifyOrReturn(CheckValueNonNull("{{>item}}", {{>actualValue}}));
+              VerifyOrReturn(CheckValueNonNull("{{asLowerCamelCase name}}", value{{#unless parent.isAttribute}}s.{{asStructPropertyName name}}{{/unless}}));
               {{else}}
-              if ({{>actualValue}} != nil) {
+              if (value{{#unless parent.isAttribute}}s.{{asStructPropertyName name}}{{/unless}} != nil) {
                 {{#if (isString type)}}
-                VerifyOrReturn(CheckConstraintNotValue("{{>item}}", {{>actualValue}}, {{asTypedLiteral expectedConstraints.notValue type}}));
+                VerifyOrReturn(CheckConstraintNotValue("{{asLowerCamelCase name}}", value{{#unless parent.isAttribute}}s.{{asStructPropertyName name}}{{/unless}}, {{asTypedLiteral expectedConstraints.notValue type}}));
                 {{else}}
-                VerifyOrReturn(CheckConstraintNotValue("{{>item}}", {{>actualValue}}, {{asTypedLiteral expectedConstraints.notValue type}}));
+                VerifyOrReturn(CheckConstraintNotValue("{{asLowerCamelCase name}}", value{{#unless parent.isAttribute}}s.{{asStructPropertyName name}}{{/unless}}, {{asTypedLiteral expectedConstraints.notValue type}}));
                 {{/if}}
               }
               {{/if}}
@@ -225,7 +224,7 @@ class {{filename}}: public TestCommandBridge
         {{/if}}
         {{#if saveAs}}
         {
-          {{saveAs}} = {{>actualValue}};
+          {{saveAs}} = value{{#unless parent.isAttribute}}s.{{asStructPropertyName name}}{{/unless}};
         }
         {{/if}}
         {{/chip_tests_item_response_parameters}}

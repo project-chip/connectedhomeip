@@ -92,8 +92,8 @@ server cluster ApplicationBasic = 1293 {
 
 server cluster Basic = 40 {
   struct CapabilityMinimaStruct {
-    int16u caseSessionsPerFabric = 0;
-    int16u subscriptionsPerFabric = 1;
+    INT16U caseSessionsPerFabric = 0;
+    INT16U subscriptionsPerFabric = 1;
   }
 
   critical event StartUp = 0 {
@@ -199,7 +199,7 @@ server cluster BridgedActions = 37 {
     INT16U endpointListID = 0;
     CHAR_STRING<32> name = 1;
     EndpointListTypeEnum type = 2;
-    ENDPOINT_NO endpoints[] = 3;
+    endpoint_no endpoints[] = 3;
   }
 
   info event StateChanged = 0 {
@@ -348,7 +348,7 @@ client cluster ContentLauncher = 1290 {
     kType = 12;
   }
 
-  enum StatusEnum : ENUM8 {
+  enum StatusEnumContentLauncher : ENUM8 {
     kSuccess = 0;
     kUrlNotAvailable = 1;
     kAuthFailed = 2;
@@ -395,8 +395,8 @@ client cluster ContentLauncher = 1290 {
   }
 
   struct Dimension {
-    double width = 0;
-    double height = 1;
+    DOUBLE width = 0;
+    DOUBLE height = 1;
     MetricTypeEnum metric = 2;
   }
 
@@ -419,8 +419,13 @@ client cluster ContentLauncher = 1290 {
     optional BrandingInformation brandingInformation = 2;
   }
 
+<<<<<<< HEAD
   response struct LaunchResponse = 2 {
     StatusEnum status = 0;
+=======
+  response struct LaunchResponse {
+    StatusEnumContentLauncher status = 0;
+>>>>>>> Changes for cleaner regen
     optional CHAR_STRING data = 1;
   }
 
@@ -450,7 +455,7 @@ server cluster ContentLauncher = 1290 {
     kType = 12;
   }
 
-  enum StatusEnum : ENUM8 {
+  enum StatusEnumContentLauncher : ENUM8 {
     kSuccess = 0;
     kUrlNotAvailable = 1;
     kAuthFailed = 2;
@@ -497,8 +502,8 @@ server cluster ContentLauncher = 1290 {
   }
 
   struct Dimension {
-    double width = 0;
-    double height = 1;
+    DOUBLE width = 0;
+    DOUBLE height = 1;
     MetricTypeEnum metric = 2;
   }
 
@@ -521,8 +526,13 @@ server cluster ContentLauncher = 1290 {
     optional BrandingInformation brandingInformation = 2;
   }
 
+<<<<<<< HEAD
   response struct LaunchResponse = 2 {
     StatusEnum status = 0;
+=======
+  response struct LaunchResponse {
+    StatusEnumContentLauncher status = 0;
+>>>>>>> Changes for cleaner regen
     optional CHAR_STRING data = 1;
   }
 
@@ -532,7 +542,7 @@ server cluster ContentLauncher = 1290 {
 
 server cluster Descriptor = 29 {
   struct DeviceType {
-    DEVTYPE_ID type = 0;
+    devtype_id type = 0;
     INT16U revision = 1;
   }
 
@@ -976,7 +986,7 @@ client cluster KeypadInput = 1289 {
     kData = 118;
   }
 
-  enum StatusEnum : ENUM8 {
+  enum StatusEnumKeypadInput : ENUM8 {
     kSuccess = 0;
     kUnsupportedKey = 1;
     kInvalidKeyInCurrentState = 2;
@@ -997,8 +1007,13 @@ client cluster KeypadInput = 1289 {
     CecKeyCode keyCode = 0;
   }
 
+<<<<<<< HEAD
   response struct SendKeyResponse = 1 {
     StatusEnum status = 0;
+=======
+  response struct SendKeyResponse {
+    StatusEnumKeypadInput status = 0;
+>>>>>>> Changes for cleaner regen
   }
 
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
@@ -1094,7 +1109,7 @@ server cluster KeypadInput = 1289 {
     kData = 118;
   }
 
-  enum StatusEnum : ENUM8 {
+  enum StatusEnumKeypadInput : ENUM8 {
     kSuccess = 0;
     kUnsupportedKey = 1;
     kInvalidKeyInCurrentState = 2;
@@ -1115,24 +1130,19 @@ server cluster KeypadInput = 1289 {
     CecKeyCode keyCode = 0;
   }
 
+<<<<<<< HEAD
   response struct SendKeyResponse = 1 {
     StatusEnum status = 0;
+=======
+  response struct SendKeyResponse {
+    StatusEnumKeypadInput status = 0;
+>>>>>>> Changes for cleaner regen
   }
 
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
 }
 
 server cluster LevelControl = 8 {
-  enum MoveMode : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  enum StepMode : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
   bitmap LevelControlFeature : BITMAP32 {
     kOnOff = 0x1;
     kLighting = 0x2;
@@ -1388,17 +1398,17 @@ server cluster NetworkCommissioning = 49 {
 }
 
 client cluster OnOff = 6 {
-  enum OnOffDelayedAllOffEffectVariant : enum8 {
+  enum OnOffDelayedAllOffEffectVariant : ENUM8 {
     kFadeToOffIn0p8Seconds = 0;
     kNoFade = 1;
     k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
   }
 
-  enum OnOffDyingLightEffectVariant : enum8 {
+  enum OnOffDyingLightEffectVariant : ENUM8 {
     k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
   }
 
-  enum OnOffEffectIdentifier : enum8 {
+  enum OnOffEffectIdentifier : ENUM8 {
     kDelayedAllOff = 0;
     kDyingLight = 1;
   }
@@ -1445,17 +1455,17 @@ client cluster OnOff = 6 {
 }
 
 server cluster OnOff = 6 {
-  enum OnOffDelayedAllOffEffectVariant : enum8 {
+  enum OnOffDelayedAllOffEffectVariant : ENUM8 {
     kFadeToOffIn0p8Seconds = 0;
     kNoFade = 1;
     k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
   }
 
-  enum OnOffDyingLightEffectVariant : enum8 {
+  enum OnOffDyingLightEffectVariant : ENUM8 {
     k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
   }
 
-  enum OnOffEffectIdentifier : enum8 {
+  enum OnOffEffectIdentifier : ENUM8 {
     kDelayedAllOff = 0;
     kDyingLight = 1;
   }
@@ -1518,8 +1528,8 @@ client cluster OperationalCredentials = 62 {
   struct FabricDescriptor {
     OCTET_STRING<65> rootPublicKey = 1;
     INT16U vendorId = 2;
-    FABRIC_ID fabricId = 3;
-    NODE_ID nodeId = 4;
+    fabric_id fabricId = 3;
+    node_id nodeId = 4;
     CHAR_STRING<32> label = 5;
     fabric_idx fabricIndex = 254;
   }
@@ -1600,8 +1610,8 @@ server cluster OperationalCredentials = 62 {
   struct FabricDescriptor {
     OCTET_STRING<65> rootPublicKey = 1;
     INT16U vendorId = 2;
-    FABRIC_ID fabricId = 3;
-    NODE_ID nodeId = 4;
+    fabric_id fabricId = 3;
+    node_id nodeId = 4;
     CHAR_STRING<32> label = 5;
     fabric_idx fabricIndex = 254;
   }
@@ -1944,7 +1954,7 @@ server cluster Scenes = 5 {
   }
 
   struct SceneExtensionFieldSet {
-    CLUSTER_ID clusterId = 0;
+    cluster_id clusterId = 0;
     INT8U length = 1;
     INT8U value = 2;
   }
@@ -2148,7 +2158,7 @@ server cluster Switch = 59 {
 }
 
 client cluster TargetNavigator = 1285 {
-  enum StatusEnum : ENUM8 {
+  enum StatusEnumTargetNavigator : ENUM8 {
     kSuccess = 0;
     kTargetNotFound = 1;
     kNotAllowed = 2;
@@ -2171,8 +2181,13 @@ client cluster TargetNavigator = 1285 {
     optional CHAR_STRING data = 1;
   }
 
+<<<<<<< HEAD
   response struct NavigateTargetResponse = 1 {
     StatusEnum status = 0;
+=======
+  response struct NavigateTargetResponse {
+    StatusEnumTargetNavigator status = 0;
+>>>>>>> Changes for cleaner regen
     optional CHAR_STRING data = 1;
   }
 
@@ -2180,7 +2195,7 @@ client cluster TargetNavigator = 1285 {
 }
 
 server cluster TargetNavigator = 1285 {
-  enum StatusEnum : ENUM8 {
+  enum StatusEnumTargetNavigator : ENUM8 {
     kSuccess = 0;
     kTargetNotFound = 1;
     kNotAllowed = 2;
@@ -2203,8 +2218,13 @@ server cluster TargetNavigator = 1285 {
     optional CHAR_STRING data = 1;
   }
 
+<<<<<<< HEAD
   response struct NavigateTargetResponse = 1 {
     StatusEnum status = 0;
+=======
+  response struct NavigateTargetResponse {
+    StatusEnumTargetNavigator status = 0;
+>>>>>>> Changes for cleaner regen
     optional CHAR_STRING data = 1;
   }
 

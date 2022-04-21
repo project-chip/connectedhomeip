@@ -10,7 +10,7 @@
 {{#all_user_clusters}}
   {{~side}} cluster {{asUpperCamelCase name}} = {{code}} {
   {{#zcl_enums}}
-  enum {{asUpperCamelCase name}} : {{type}} {
+  enum {{asUpperCamelCase name}} : ENUM{{multiply size 8}} {
     {{#zcl_enum_items}}
     k{{asUpperCamelCase label}} = {{value}};
     {{/zcl_enum_items}}
@@ -18,7 +18,7 @@
 
   {{/zcl_enums}}
   {{#zcl_bitmaps}}
-  bitmap {{name}} : {{type}} {
+  bitmap {{name}} : BITMAP{{multiply size 8}} {
     {{#zcl_bitmap_items}}
     k{{asUpperCamelCase label}} = {{asHex mask}};
     {{/zcl_bitmap_items}}

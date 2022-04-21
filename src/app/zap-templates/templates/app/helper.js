@@ -26,14 +26,14 @@ const cHelper      = require(zapPath + 'generator/helper-c.js')
 const string       = require(zapPath + 'util/string.js')
 const dbEnum       = require(zapPath + '../src-shared/db-enum.js')
 
-const StringHelper    = require('../../common/StringHelper.js');
+const StringHelper    = require(zapPath + 'generator/helper-string-matter.js')
 const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
 
-zclHelper['isEvent'] = function(db, event_name, packageId) {
-    return queryEvents
-      .selectAllEvents(db, packageId)
-      .then(events => events.find(event => event.name == event_name))
-      .then(events => events ? 'event' : dbEnum.zclType.unknown);
+zclHelper['isEvent'] = function (db, event_name, packageId) {
+  return queryEvents
+    .selectAllEvents(db, packageId)
+    .then(events => events.find(event => event.name == event_name))
+    .then(events => events ? 'event' : dbEnum.zclType.unknown);
 }
 
 // This list of attributes is taken from section '11.2. Global Attributes' of the

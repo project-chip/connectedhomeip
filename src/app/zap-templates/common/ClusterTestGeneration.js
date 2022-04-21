@@ -755,7 +755,7 @@ function if_include_struct_item_value(structValue, name, options)
   }
 
   if (!this.isOptional) {
-    throw new Error(`Value not provided for ${name} where one is expected`);
+    throw new Error(`Value not provided for ${name} where one is expected in ${structValue}`);
   }
 
   return options.inverse(this);
