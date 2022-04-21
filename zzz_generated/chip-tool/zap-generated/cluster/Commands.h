@@ -10762,7 +10762,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::FanControl::FanModeType mValue;
 };
 
 class WriteFanControlFanModeSequence : public WriteAttribute
@@ -10789,7 +10789,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::FanControl::FanModeSequenceType mValue;
 };
 
 class WriteFanControlPercentSetting : public WriteAttribute
