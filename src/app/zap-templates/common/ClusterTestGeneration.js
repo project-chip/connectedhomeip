@@ -292,7 +292,7 @@ function setDefaultResponse(test)
     return;
   }
 
-  if (test.isWriteAttribute || test.isSubscribe) {
+  if (test.isWriteAttribute) {
     if (hasResponseValueOrConstraints) {
       const errorStr = 'Test has a "value" or a "constraints" defined.';
       throwError(test, errorStr);
@@ -349,36 +349,6 @@ function parse(filename)
 
   const data = fs.readFileSync(filepath, { encoding : 'utf8', flag : 'r' });
   const yaml = YAML.parse(data);
-
-  // "subscribeAttribute" command expects a report to be acked before
-  // it got a success response.
-  // In order to validate that the report has been received with the proper value
-  // a "subscribeAttribute" command can have a response configured into the test step
-  // definition. In this case, a new async "waitForReport" test step will be synthesized
-  // and added to the list of tests.
-  yaml.tests.forEach((test, index) => {
-    if (test.command == "subscribeAttribute" && test.response) {
-      // Create a new report test where the expected response is the response argument
-      // for the "subscribeAttributeTest"
-      const reportTest = {
-        label : "Report: " + test.label,
-        command : "waitForReport",
-        attribute : test.attribute,
-        response : test.response,
-        async : true,
-        allocateSubscribeDataCallback : true,
-      };
-      delete test.response;
-
-      // insert the new report test into the tests list
-      yaml.tests.splice(index, 0, reportTest);
-
-      // Associate the "subscribeAttribute" test with the synthesized report test
-      test.hasWaitForReport              = true;
-      test.waitForReport                 = reportTest;
-      test.allocateSubscribeDataCallback = !test.hasWaitForReport;
-    }
-  });
 
   const defaultConfig = yaml.config || [];
   yaml.tests.forEach(test => {
@@ -652,6 +622,10 @@ function checkNumberSanity(value, errorContext)
 
 function chip_tests_item_parameters(options)
 {
+  if (this.isWait) {
+      return asBlocks.call(this, Promise.resolve([]), options);
+  }
+
   const commandValues = this.arguments.values;
 
   const promise = assertCommandOrAttributeOrEvent(this).then(item => {
