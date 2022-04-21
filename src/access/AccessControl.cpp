@@ -208,7 +208,8 @@ void AccessControl::AddEntryListener(EntryListener & listener)
         {
             return;
         }
-        else if (l->mNext == nullptr)
+
+        if (l->mNext == nullptr)
         {
             l->mNext       = &listener;
             listener.mNext = nullptr;
