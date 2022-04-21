@@ -653,12 +653,12 @@ JNI_METHOD(jbyteArray, getAttestationChallenge)
     }
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    err = wrapper->Controller()->GetAttestationChallenge(attestationChallenge);
+    err                                      wrapper->Controller()->GetAttestationChallenge(attestationChallenge);
     SuccessOrExit(err);
     VerifyOrExit(attestationChallenge.size() == 16, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     err = JniReferences::GetInstance().N2J_ByteArray(env, attestationChallenge.data(), attestationChallenge.size(),
-        attestationChallengeJbytes);
+                                                     attestationChallengeJbytes);
     SuccessOrExit(err);
 
 exit:
@@ -685,12 +685,12 @@ JNI_METHOD(jbyteArray, getAttestationChallengeWithDevice)
     }
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    err = wrapper->Controller()->GetAttestationChallenge(chipDevice, attestationChallenge);
+    err                                      wrapper->Controller()->GetAttestationChallenge(chipDevice, attestationChallenge);
     SuccessOrExit(err);
     VerifyOrExit(attestationChallenge.size() == 16, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     err = JniReferences::GetInstance().N2J_ByteArray(env, attestationChallenge.data(), attestationChallenge.size(),
-        attestationChallengeJbytes);
+                                                     attestationChallengeJbytes);
     SuccessOrExit(err);
 
 exit:
