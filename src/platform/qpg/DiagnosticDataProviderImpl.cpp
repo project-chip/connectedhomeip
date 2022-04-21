@@ -27,8 +27,6 @@
 #include <platform/PlatformManager.h>
 #include <platform/qpg/DiagnosticDataProviderImpl.h>
 
-#include <lwip/tcpip.h>
-
 namespace chip {
 namespace DeviceLayer {
 
