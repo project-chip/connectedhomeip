@@ -125,10 +125,30 @@ class ClangTidyEntry:
             )
             output, err = proc.communicate()
             if output:
+                # Output generally contains validation data. Print it out as-is
                 logging.info("TIDY %s: %s", self.file, output.decode("utf-8"))
 
             if err:
-                logging.warning("TIDY %s: %s", self.file, err.decode("utf-8"))
+                # Most (all?) of our files do contain errors in system-heades so lines like these
+                # are expected:
+                #
+                # 59 warnings generated.
+                # Suppressed 59 warnings (59 in non-user code).
+                # Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+                #
+                # We ignore output from that file
+                for l in err.decode('utf-8').split('\n'):
+                    if 'warnings generated.' in l:
+                        continue
+
+                    if 'in non-user code' in l:
+                        continue
+
+                    if 'use -system-headers to display errors' in l:
+                        continue
+
+                    logging.warning('TIDY %s: %s', self.file, l)
+
 
             if proc.returncode != 0:
                 if proc.returncode < 0:
