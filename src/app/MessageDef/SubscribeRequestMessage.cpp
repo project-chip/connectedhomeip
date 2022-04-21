@@ -59,7 +59,7 @@ CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
             {
                 uint16_t MinIntervalFloorSeconds;
                 ReturnErrorOnFailure(reader.Get(MinIntervalFloorSeconds));
-                PRETTY_PRINT("\tMinIntervalFloorSeconds = 0x%" PRIx16 ",", MinIntervalFloorSeconds);
+                PRETTY_PRINT("\tMinIntervalFloorSeconds = 0x%x,", MinIntervalFloorSeconds);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -72,7 +72,7 @@ CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
             {
                 uint16_t MaxIntervalCeilingSeconds;
                 ReturnErrorOnFailure(reader.Get(MaxIntervalCeilingSeconds));
-                PRETTY_PRINT("\tMaxIntervalCeilingSeconds = 0x%" PRIx16 ",", MaxIntervalCeilingSeconds);
+                PRETTY_PRINT("\tMaxIntervalCeilingSeconds = 0x%x,", MaxIntervalCeilingSeconds);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -91,7 +91,7 @@ CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kDataVersionFilters):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kEventFilters))), CHIP_ERROR_INVALID_TLV_TAG);
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kDataVersionFilters))), CHIP_ERROR_INVALID_TLV_TAG);
             tagPresenceMask |= (1 << to_underlying(Tag::kDataVersionFilters));
             {
                 DataVersionFilterIBs::Parser dataVersionFilters;

@@ -44,7 +44,7 @@ CHIP_ERROR StatusResponseMessage::Parser::CheckSchemaValidity() const
             {
                 uint16_t status;
                 ReturnErrorOnFailure(reader.Get(status));
-                PRETTY_PRINT("\tStatus = 0x%" PRIx16 ",", status);
+                PRETTY_PRINT("\tStatus = 0x%x,", status);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;

@@ -341,7 +341,7 @@ class {{filename}}Suite: public TestCommand
           {{#unless async}}NextTest();{{/unless}}
           {{/if}}
         {{else}}
-          {{#if optional}}(status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : {{/if}}ThrowFailureResponse();
+          {{#if optional}}(status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : {{/if}}ThrowFailureResponse(error);
         {{/if}}
     }
 

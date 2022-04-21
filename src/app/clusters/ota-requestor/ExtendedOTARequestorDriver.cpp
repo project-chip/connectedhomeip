@@ -32,9 +32,9 @@ bool ExtendedOTARequestorDriver::CanConsent()
 {
     bool localConfigDisabled = false;
     VerifyOrdo(DeviceLayer::ConfigurationMgr().GetLocalConfigDisabled(localConfigDisabled) == CHIP_NO_ERROR,
-               ChipLogProgress(SoftwareUpdate, "Failed to get local config disabled, using as false"));
+               ChipLogProgress(SoftwareUpdate, "Failed to get local config disabled, assuming not disabled"));
 
-    // If local config is disabled, we can't consent.
+    // User consent delegation SHALL NOT be used if a Node is configured with the LocalConfigDisabled attribute set to True
     return localConfigDisabled == false;
 }
 
@@ -49,7 +49,6 @@ void ExtendedOTARequestorDriver::UpdateAvailable(const UpdateDescription & updat
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(SoftwareUpdate, "Failed to get user consent subject");
-            HandleError(UpdateFailureState::kDelayedOnUserConsent, err);
             return;
         }
 

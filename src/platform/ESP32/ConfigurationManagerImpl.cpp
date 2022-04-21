@@ -61,6 +61,15 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     CHIP_ERROR err;
     uint32_t rebootCount;
 
+    // Initialize the nvs partitions,
+    // nvs_flash_init_partition() will initialize the partition only if it is not already initialized.
+    esp_err_t esp_err = nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_FACTORY_NAMESPACE_PARTITION);
+    SuccessOrExit(MapConfigError(esp_err));
+    esp_err = nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_CONFIG_NAMESPACE_PARTITION);
+    SuccessOrExit(MapConfigError(esp_err));
+    esp_err = nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_COUNTERS_NAMESPACE_PARTITION);
+    SuccessOrExit(MapConfigError(esp_err));
+
     // Force initialization of NVS namespaces if they doesn't already exist.
     err = ESP32Config::EnsureNamespace(ESP32Config::kConfigNamespace_ChipFactory);
     SuccessOrExit(err);

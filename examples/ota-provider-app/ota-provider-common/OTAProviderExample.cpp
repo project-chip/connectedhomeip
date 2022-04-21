@@ -52,7 +52,6 @@ using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
 constexpr uint8_t kUpdateTokenLen    = 32;                      // must be between 8 and 32
 constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
-constexpr size_t kUriMaxLen          = 256;
 constexpr size_t kOtaHeaderMaxSize   = 1024;
 
 // Arbitrary BDX Transfer Params
@@ -80,7 +79,8 @@ void GenerateUpdateToken(uint8_t * buf, size_t bufSize)
 
 OTAProviderExample::OTAProviderExample()
 {
-    memset(mOTAFilePath, 0, kFilepathBufLen);
+    memset(mOTAFilePath, 0, sizeof(mOTAFilePath));
+    memset(mImageUri, 0, sizeof(mImageUri));
     mIgnoreQueryImageCount     = 0;
     mIgnoreApplyUpdateCount    = 0;
     mQueryImageStatus          = OTAQueryStatus::kNotAvailable;
@@ -100,7 +100,19 @@ void OTAProviderExample::SetOTAFilePath(const char * path)
     }
     else
     {
-        memset(mOTAFilePath, 0, kFilepathBufLen);
+        memset(mOTAFilePath, 0, sizeof(mOTAFilePath));
+    }
+}
+
+void OTAProviderExample::SetImageUri(const char * imageUri)
+{
+    if (imageUri != nullptr)
+    {
+        chip::Platform::CopyString(mImageUri, imageUri);
+    }
+    else
+    {
+        memset(mImageUri, 0, sizeof(mImageUri));
     }
 }
 
@@ -225,7 +237,6 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
     bool requestorCanConsent             = commandData.requestorCanConsent.ValueOr(false);
     uint8_t updateToken[kUpdateTokenLen] = { 0 };
     char strBuf[kUpdateTokenStrLen]      = { 0 };
-    char uriBuf[kUriMaxLen]              = { 0 };
 
     // Set fields specific for an available status response
     if (mQueryImageStatus == OTAQueryStatus::kUpdateAvailable)
@@ -240,10 +251,22 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
         FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
         NodeId nodeId           = fabricInfo->GetPeerId().GetNodeId();
 
-        // Only supporting BDX protocol for now
-        MutableCharSpan uri(uriBuf, kUriMaxLen);
-        chip::bdx::MakeURI(nodeId, CharSpan::fromCharString(mOTAFilePath), uri);
-        ChipLogDetail(SoftwareUpdate, "Generated URI: %.*s", static_cast<int>(uri.size()), uri.data());
+        // Generate the ImageURI if one is not already preset
+        if (strlen(mImageUri) == 0)
+        {
+            // Only supporting BDX protocol for now
+            MutableCharSpan uri(mImageUri);
+            CHIP_ERROR error = chip::bdx::MakeURI(nodeId, CharSpan::fromCharString(mOTAFilePath), uri);
+            if (error != CHIP_NO_ERROR)
+            {
+                ChipLogError(SoftwareUpdate, "Cannot generate URI");
+                memset(mImageUri, 0, sizeof(mImageUri));
+            }
+            else
+            {
+                ChipLogDetail(SoftwareUpdate, "Generated URI: %s", mImageUri);
+            }
+        }
 
         // Initialize the transfer session in prepartion for a BDX transfer
         BitFlags<TransferControlFlags> bdxFlags;
@@ -260,7 +283,7 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
                 return;
             }
 
-            response.imageURI.Emplace(chip::CharSpan::fromCharString(uriBuf));
+            response.imageURI.Emplace(chip::CharSpan::fromCharString(mImageUri));
             response.softwareVersion.Emplace(mSoftwareVersion);
             response.softwareVersionString.Emplace(chip::CharSpan::fromCharString(mSoftwareVersionString));
             response.updateToken.Emplace(chip::ByteSpan(updateToken));
@@ -307,7 +330,7 @@ void OTAProviderExample::HandleQueryImage(app::CommandHandler * commandObj, cons
 
     if (mQueryImageStatus == OTAQueryStatus::kUpdateAvailable)
     {
-        memset(mSoftwareVersionString, 0, SW_VER_STR_MAX_LEN);
+        memset(mSoftwareVersionString, 0, sizeof(mSoftwareVersionString));
 
         if (!mCandidates.empty()) // If list of OTA candidates is supplied
         {

@@ -85,7 +85,7 @@ menu "CHIP Core"
 
         config USE_MINIMAL_MDNS
             bool "Use the minimal mDNS implementation shipped in the CHIP library"
-            default n
+            default y
             help
                 The CHIP library is shipped with a minimal mDNS implementation,
                 enable this config to use it rather than the mDNS library in IDF.
@@ -620,6 +620,16 @@ menu "CHIP Device Layer"
             bool "Enable Rotating Device Identifier Support"
             default n
 
+        config ENABLE_ESP32_FACTORY_DATA_PROVIDER
+            bool "Use ESP32 Factory Data Provider"
+            default n
+            help
+                If this option is enabled, then ESP32 implementation of CommissionableDataProvider and
+                DeviceAttestationCredentialsProvider is used. Otherwise, the test-mode CommissionableDataProvider
+                and Example DeviceAttestationCredentialsProvider is used. ESP32 implementation reads factory data from
+                nvs partition. Factory partition can be configured using CONFIG_CHIP_FACTORY_NAMESPACE_PARTITION_LABEL
+                option, default is "nvs".
+
     endmenu
 
 
@@ -778,6 +788,27 @@ menu "CHIP Device Layer"
             depends on CHIP_ENABLE_EXTERNAL_PLATFORM
             help
                 The gn target of the external platform.
+    endmenu
+
+    menu "Matter Manufacturing Options"
+        config CHIP_FACTORY_NAMESPACE_PARTITION_LABEL
+            string "chip-factory namespace partition label"
+            default "nvs"
+            help
+                Label of the partition to store key-values in the "chip-factory" namespace.
+
+        config CHIP_CONFIG_NAMESPACE_PARTITION_LABEL
+            string "chip-config namespace partition label"
+            default "nvs"
+            help
+                Label of the partition to store key-values in the "chip-config" namespace.
+
+        config CHIP_COUNTERS_NAMESPACE_PARTITION_LABEL
+            string "chip-counters namespace partition label"
+            default "nvs"
+            help
+                Label of the partition to store key-values in the "chip-counters" namespace.
+
     endmenu
 
 endmenu

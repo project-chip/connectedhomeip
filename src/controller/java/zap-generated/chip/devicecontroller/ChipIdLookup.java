@@ -232,6 +232,15 @@ public final class ChipIdLookup {
       if (attributeId == 1L) {
         return "Extension";
       }
+      if (attributeId == 2L) {
+        return "SubjectsPerAccessControlEntry";
+      }
+      if (attributeId == 3L) {
+        return "TargetsPerAccessControlEntry";
+      }
+      if (attributeId == 4L) {
+        return "AccessControlEntriesPerFabric";
+      }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
       }
@@ -450,6 +459,9 @@ public final class ChipIdLookup {
       }
       if (attributeId == 18L) {
         return "UniqueID";
+      }
+      if (attributeId == 19L) {
+        return "CapabilityMinima";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -892,6 +904,9 @@ public final class ChipIdLookup {
       if (attributeId == 21L) {
         return "NumberOfYearDaySchedulesSupportedPerUser";
       }
+      if (attributeId == 22L) {
+        return "NumberOfHolidaySchedulesSupported";
+      }
       if (attributeId == 23L) {
         return "MaxPINCodeLength";
       }
@@ -927,6 +942,12 @@ public final class ChipIdLookup {
       }
       if (attributeId == 48L) {
         return "WrongCodeEntryLimit";
+      }
+      if (attributeId == 49L) {
+        return "UserCodeTemporaryDisableTime";
+      }
+      if (attributeId == 51L) {
+        return "RequirePINforRemoteOperation";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -1041,6 +1062,33 @@ public final class ChipIdLookup {
       }
       if (attributeId == 1L) {
         return "FanModeSequence";
+      }
+      if (attributeId == 2L) {
+        return "PercentSetting";
+      }
+      if (attributeId == 3L) {
+        return "PercentCurrent";
+      }
+      if (attributeId == 4L) {
+        return "SpeedMax";
+      }
+      if (attributeId == 5L) {
+        return "SpeedSetting";
+      }
+      if (attributeId == 6L) {
+        return "SpeedCurrent";
+      }
+      if (attributeId == 7L) {
+        return "RockSupport";
+      }
+      if (attributeId == 8L) {
+        return "RockSetting";
+      }
+      if (attributeId == 9L) {
+        return "WindSupport";
+      }
+      if (attributeId == 10L) {
+        return "WindSetting";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";

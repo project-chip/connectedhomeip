@@ -76,6 +76,7 @@ tests:
                   16,
                   17,
                   18,
+                  19,
                   0xFFF8, # GeneratedCommandList
                   0xFFF9, # AcceptedCommandList
                   0xFFFB, # AttributeList

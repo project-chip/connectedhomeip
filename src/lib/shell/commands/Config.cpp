@@ -49,7 +49,7 @@ static CHIP_ERROR ConfigGetVendorId(bool printHeader)
     {
         streamer_printf(sout, "VendorId:        ");
     }
-    streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")\r\n", value16, value16);
+    streamer_printf(sout, "%u (0x%X)\r\n", value16, value16);
     return CHIP_NO_ERROR;
 }
 
@@ -68,7 +68,7 @@ static CHIP_ERROR ConfigGetProductId(bool printHeader)
     {
         streamer_printf(sout, "ProductId:       ");
     }
-    streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")\r\n", value16, value16);
+    streamer_printf(sout, "%u (0x%X)\r\n", value16, value16);
     return CHIP_NO_ERROR;
 }
 
@@ -87,7 +87,7 @@ static CHIP_ERROR ConfigGetHardwareVersion(bool printHeader)
     {
         streamer_printf(sout, "HardwareVersion: ");
     }
-    streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")\r\n", value16, value16);
+    streamer_printf(sout, "%u (0x%X)\r\n", value16, value16);
     return CHIP_NO_ERROR;
 }
 
@@ -157,10 +157,8 @@ static CHIP_ERROR ConfigDiscriminator(int argc, char ** argv)
     {
         return ConfigGetSetupDiscriminator(false);
     }
-    else
-    {
-        return ConfigSetSetupDiscriminator(argv[0]);
-    }
+
+    return ConfigSetSetupDiscriminator(argv[0]);
 }
 
 static CHIP_ERROR PrintAllConfigs()

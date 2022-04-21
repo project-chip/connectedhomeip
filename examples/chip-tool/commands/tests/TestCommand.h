@@ -80,7 +80,7 @@ protected:
     chip::Controller::DeviceCommissioner & GetCurrentCommissioner() override { return CurrentCommissioner(); };
 
     void Exit(std::string message) override;
-    void ThrowFailureResponse();
+    void ThrowFailureResponse(CHIP_ERROR error);
     void ThrowSuccessResponse();
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;

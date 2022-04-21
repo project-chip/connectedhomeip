@@ -50,15 +50,16 @@ public:
     const char * FabricOpKey(FabricIndex fabric) { return Format("f/%x/o", fabric); }
 
     // FailSafeContext
-    const char * FailSafeContextKey() { return Format("g/fsc"); }
+    const char * FailSafeContextKey() { return Format("g/fs/c"); }
+    static const char * FailSafeNetworkConfig() { return "g/fs/n"; }
 
     // Session resumption
     const char * FabricSession(FabricIndex fabric, NodeId nodeId)
     {
         return Format("f/%x/s/%08" PRIX32 "%08" PRIX32, fabric, static_cast<uint32_t>(nodeId >> 32), static_cast<uint32_t>(nodeId));
     }
-    const char * SessionResumptionIndex() { return Format("f/sri"); }
-    const char * SessionResumption(const char * resumptionIdBase64) { return Format("s/%s", resumptionIdBase64); }
+    const char * SessionResumptionIndex() { return Format("g/sri"); }
+    const char * SessionResumption(const char * resumptionIdBase64) { return Format("g/s/%s", resumptionIdBase64); }
 
     // Access Control
     const char * AccessControlExtensionEntry(FabricIndex fabric) { return Format("f/%x/ac/1", fabric); }
@@ -97,7 +98,7 @@ public:
     {
         // Needs at most 26 chars: 6 for "g/a///", 4 for the endpoint id, 8 each
         // for the cluster and attribute ids.
-        return Format("g/a/%" PRIx16 "/%" PRIx32 "/%" PRIx32, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+        return Format("g/a/%x/%" PRIx32 "/%" PRIx32, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
     }
 
     // TODO: Should store fabric-specific parts of the binding list under keys
@@ -111,8 +112,8 @@ public:
     static const char * OTACurrentUpdateState() { return "g/o/us"; }
     static const char * OTATargetVersion() { return "g/o/tv"; }
 
-    // [G]lobal [D]NS-related keys
-    static const char * DNSExtendedDiscoveryTimeout() { return "g/d/edt"; }
+    // Event number counter.
+    const char * IMEventNumber() { return Format("g/im/e"); }
 
 private:
     // The ENFORCE_FORMAT args are "off by one" because this is a class method,

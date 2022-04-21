@@ -39,6 +39,10 @@
 #include <logging/log.h>
 #include <zephyr.h>
 
+using namespace ::chip;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
+
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define APP_EVENT_QUEUE_SIZE 10
@@ -51,6 +55,8 @@ K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(Ap
 static LEDWidget sStatusLED;
 static UnusedLedsWrapper<3> sUnusedLeds{ { DK_LED2, DK_LED3, DK_LED4 } };
 static k_timer sFunctionTimer;
+
+constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 namespace LedConsts {
 constexpr uint32_t kBlinkRate_ms{ 500 };
@@ -66,10 +72,6 @@ constexpr uint32_t kOff_ms{ 950 };
 
 } // namespace StatusLed
 } // namespace LedConsts
-
-using namespace ::chip;
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceLayer;
 
 CHIP_ERROR AppTask::Init()
 {
@@ -137,6 +139,8 @@ CHIP_ERROR AppTask::Init()
 #if CONFIG_CHIP_OTA_REQUESTOR
     InitBasicOTARequestor();
 #endif
+    // We only have network commissioning on endpoint 0.
+    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
 

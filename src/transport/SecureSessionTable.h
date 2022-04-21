@@ -60,9 +60,9 @@ public:
      *          has been reached (with CHIP_ERROR_NO_MEMORY).
      */
     CHECK_RETURN_VALUE
-    Optional<SessionHandle> CreateNewSecureSession(SecureSession::Type secureSessionType, uint16_t localSessionId,
-                                                   NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId,
-                                                   FabricIndex fabric, const ReliableMessageProtocolConfig & config)
+    Optional<SessionHandle> CreateNewSecureSessionForTest(SecureSession::Type secureSessionType, uint16_t localSessionId,
+                                                          NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId,
+                                                          FabricIndex fabric, const ReliableMessageProtocolConfig & config)
     {
         SecureSession * result =
             mEntries.CreateObject(secureSessionType, localSessionId, peerNodeId, peerCATs, peerSessionId, fabric, config);
@@ -233,10 +233,8 @@ private:
             uint16_t available = static_cast<uint16_t>(candidate_base + offset);
             return MakeOptional<uint16_t>(available);
         }
-        else
-        {
-            return NullOptional;
-        }
+
+        return NullOptional;
     }
 
     BitMapObjectPool<SecureSession, kMaxSessionCount> mEntries;

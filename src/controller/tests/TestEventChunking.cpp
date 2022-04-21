@@ -32,6 +32,7 @@
 #include <app/util/DataModelHandler.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
+#include <lib/support/CHIPCounter.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -60,6 +61,11 @@ public:
 
         auto * ctx = static_cast<TestContext *>(context);
 
+        if (ctx->mEventCounter.Init(0) != CHIP_NO_ERROR)
+        {
+            return FAILURE;
+        }
+
         chip::app::LogStorageResources logStorageResources[] = {
             { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
             { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
@@ -68,7 +74,7 @@ public:
 
         chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(),
                                                           sizeof(logStorageResources) / sizeof(logStorageResources[0]),
-                                                          gCircularEventBuffer, logStorageResources, nullptr, 0, nullptr);
+                                                          gCircularEventBuffer, logStorageResources, &ctx->mEventCounter);
 
         return SUCCESS;
     }
@@ -82,6 +88,9 @@ public:
 
         return SUCCESS;
     }
+
+private:
+    MonotonicallyIncreasingCounter mEventCounter;
 };
 
 uint32_t gIterationCount = 0;
@@ -317,7 +326,7 @@ void TestReadEvents::TestEventChunking(nlTestSuite * apSuite, void * apContext)
 
     readParams.mpEventPathParamsList    = &eventPath;
     readParams.mEventPathParamsListSize = 1;
-    readParams.mEventNumber             = firstEventNumber;
+    readParams.mEventNumber.SetValue(firstEventNumber);
 
     // Since we will always read from the first event, we only generate event once.
 
@@ -388,7 +397,7 @@ void TestReadEvents::TestMixedEventsAndAttributesChunking(nlTestSuite * apSuite,
     readParams.mAttributePathParamsListSize = 1;
     readParams.mpEventPathParamsList        = &eventPath;
     readParams.mEventPathParamsListSize     = 1;
-    readParams.mEventNumber                 = firstEventNumber;
+    readParams.mEventNumber.SetValue(firstEventNumber);
 
     //
     // We've empirically determined that by reserving 950 bytes in the packet buffer, we can fit 2
@@ -467,7 +476,7 @@ void TestReadEvents::TestMixedEventsAndLargeAttributesChunking(nlTestSuite * apS
     readParams.mAttributePathParamsListSize = 1;
     readParams.mpEventPathParamsList        = &eventPath;
     readParams.mEventPathParamsListSize     = 1;
-    readParams.mEventNumber                 = firstEventNumber;
+    readParams.mEventNumber.SetValue(firstEventNumber);
 
     //
     // We've empirically determined that by reserving 950 bytes in the packet buffer, we can fit 2

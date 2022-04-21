@@ -630,7 +630,7 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
                                    &joiner_udp_port, &channel, &rssi, &lqi, &version, &is_native, &is_joinable))
         {
             ChipLogProgress(DeviceLayer,
-                            "Thread Network: %s (%016" PRIx64 ") ExtPanId(%016" PRIx64 ") RSSI %" PRIu16 " LQI %u"
+                            "Thread Network: %s (%016" PRIx64 ") ExtPanId(%016" PRIx64 ") RSSI %u LQI %u"
                             " Version %u",
                             network_name, ext_address, ext_panid, rssi, lqi, version);
             NetworkCommissioning::ThreadScanResponse networkScanned;
@@ -696,15 +696,20 @@ CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(A
 }
 
 CHIP_ERROR
-ThreadStackManagerImpl::_AttachToThreadNetwork(ByteSpan netInfo,
+ThreadStackManagerImpl::_AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
                                                NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
 {
-    // There is another ongoing connect request, reject the new one.
-    VerifyOrReturnError(mpConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    // Reset the previously set callback since it will never be called in case incorrect dataset was supplied.
+    mpConnectCallback = nullptr;
     ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(false));
-    ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadProvision(netInfo));
-    ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(true));
-    mpConnectCallback = callback;
+    ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadProvision(dataset.AsByteSpan()));
+
+    if (dataset.IsCommissioned())
+    {
+        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(true));
+        mpConnectCallback = callback;
+    }
+
     return CHIP_NO_ERROR;
 }
 

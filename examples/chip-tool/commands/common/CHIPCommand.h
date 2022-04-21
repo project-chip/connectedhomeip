@@ -61,6 +61,8 @@ public:
     {
         AddArgument("paa-trust-store-path", &mPaaTrustStorePath);
         AddArgument("commissioner-name", &mCommissionerName);
+        AddArgument("commissioner-nodeid", 0, UINT64_MAX, &mCommissionerNodeId);
+        AddArgument("commissioner-fabricid", 0, UINT64_MAX, &mCommissionerNodeId);
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace_file", &mTraceFile);
         AddArgument("trace_log", 0, 1, &mTraceLog);
@@ -116,6 +118,8 @@ private:
     chip::FabricId CurrentCommissionerId();
     static std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
     chip::Optional<char *> mCommissionerName;
+    chip::Optional<chip::NodeId> mCommissionerNodeId;
+    chip::Optional<chip::FabricId> mCommissionerFabricId;
     chip::Optional<uint16_t> mBleAdapterId;
     chip::Optional<char *> mPaaTrustStorePath;
 

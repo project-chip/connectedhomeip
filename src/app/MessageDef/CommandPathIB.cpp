@@ -58,7 +58,7 @@ CHIP_ERROR CommandPathIB::Parser::CheckSchemaValidity() const
             {
                 uint16_t endpointId;
                 reader.Get(endpointId);
-                PRETTY_PRINT("\tEndpointId = 0x%" PRIx16 ",", endpointId);
+                PRETTY_PRINT("\tEndpointId = 0x%x,", endpointId);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -84,7 +84,7 @@ CHIP_ERROR CommandPathIB::Parser::CheckSchemaValidity() const
             {
                 chip::CommandId commandId;
                 reader.Get(commandId);
-                PRETTY_PRINT("\tCommandId = 0x%" PRIx16 ",", commandId);
+                PRETTY_PRINT("\tCommandId = 0x%x,", commandId);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;

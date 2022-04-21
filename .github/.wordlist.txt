@@ -8,7 +8,6 @@
 21
 22
 AAAA
-aabbccddeeff
 aarch
 abcdef
 abfb
@@ -253,6 +252,7 @@ ColorControl
 Comcast
 Commandline
 Commissionable
+CommissionableDataProvider
 commissionables
 commissionee
 CommissioningFlow
@@ -307,6 +307,7 @@ ctypes
 CurrentHue
 CurrentLevel
 CurrentSaturation
+customAcl
 customizations
 cvfJ
 cxx
@@ -352,6 +353,7 @@ demangle
 deployable
 depottools
 deps
+der
 desc
 descheduled
 detokenization
@@ -360,6 +362,7 @@ dev
 devcontainer
 devCtrl
 DevelopmentCerts
+DeviceAttestationCredentialsProvider
 DeviceAttestationCredsExample
 DeviceCaCerts
 DeviceCert
@@ -417,8 +420,8 @@ DoorLock
 doru
 DOTBR
 DOVERLAY
-DownloadProtocolEnum
 downcasting
+DownloadProtocolEnum
 Doxygen
 dpkg
 dropdown
@@ -509,7 +512,6 @@ ffeebaefa
 FFF
 fffe
 fffff
-fHtcwcAAAAAAAAAwQAAAAAAXPMlAAAAAAA
 Fi
 filepath
 fini
@@ -588,6 +590,7 @@ hciattach
 hciconfig
 hdlc
 HKDF
+HMAC
 hoc
 homebrew
 hostapd
@@ -619,6 +622,8 @@ IlluminanceMeasurement
 IM
 imager
 imagetool
+ImageURI
+imageUri
 img
 Impl
 ImplClass
@@ -843,6 +848,7 @@ mydir
 MyPASSWORD
 MySSID
 NAMESERVER
+NAMESPACE
 namespacing
 nano
 natively
@@ -880,6 +886,7 @@ nullable
 nullptr
 NUM
 NVM
+NVS
 nwk
 NXP
 objcopy
@@ -923,8 +930,8 @@ OTAProviderIpAddress
 OTAProviderNodeId
 OTAProviderSerialPort
 OTARequesterImpl
-OTARequestorInterface
 OTARequestorDriver
+OTARequestorInterface
 OTARequestorSerialPort
 OTARequestorStorage
 OtaSoftwareUpdateProvider
@@ -1073,6 +1080,7 @@ RequestorCanConsent
 Requestor's
 Requestors
 responder
+RestrictedEvent
 retargeting
 reusability
 reviwed
@@ -1390,7 +1398,6 @@ xAAAA
 xab
 xaver
 xb
-xBEEF
 xbef
 xc
 xcd
@@ -1398,9 +1405,6 @@ Xcode
 xcodeproj
 xcworkspace
 xd
-xDEAD
-xDEADBEEF
-xdeadbeefcafe
 xds
 xdsdfu
 xEA
@@ -1418,15 +1422,8 @@ xFF
 xFFF
 xFFFF
 xfffff
-xFFFFFFFD
-xffffffffe
-xfffffffff
-xffffffffffff
-xffffffffffffXXXX
 xtensa
 xwayland
-XXXX
-XXXXXXXX
 xyz
 xz
 xzvf
@@ -1437,7 +1434,6 @@ YNJV
 Yocto
 yoctoproject
 YourFolder
-yWsC
 zapt
 zaptool
 ZCL

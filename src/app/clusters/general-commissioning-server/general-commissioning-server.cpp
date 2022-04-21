@@ -68,6 +68,7 @@ public:
     GeneralCommissioningAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralCommissioning::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 private:
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &), AttributeValueEncoder & aEncoder);
@@ -99,11 +100,35 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
     case SupportsConcurrentConnection::Id: {
         return ReadSupportsConcurrentConnection(aEncoder);
     }
+    case Breadcrumb::Id: {
+        return aEncoder.Encode(DeviceLayer::DeviceControlServer::DeviceControlSvr().GetBreadcrumb());
+    }
     default: {
         break;
     }
     }
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GeneralCommissioningAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    // TODO: There was discussion about moving the breadcrumb to the attribute store, which would make this function obsolete
+
+    if (aPath.mClusterId != GeneralCommissioning::Id)
+    {
+        // We shouldn't have been called at all.
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    switch (aPath.mAttributeId)
+    {
+    case Attributes::Breadcrumb::Id:
+        Attributes::Breadcrumb::TypeInfo::DecodableType value;
+        ReturnErrorOnFailure(aDecoder.Decode(value));
+        return DeviceLayer::DeviceControlServer::DeviceControlSvr().SetBreadcrumb(value);
+    default:
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
 }
 
 CHIP_ERROR GeneralCommissioningAttrAccess::ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &),
@@ -194,6 +219,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
             response.errorCode = CommissioningError::kOk;
             commandObj->AddResponse(commandPath, response);
         }
+        DeviceLayer::DeviceControlServer::DeviceControlSvr().SetBreadcrumb(commandData.breadcrumb);
     }
     else
     {
@@ -243,6 +269,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
         }
     }
 
+    DeviceLayer::DeviceControlServer::DeviceControlSvr().SetBreadcrumb(0);
     commandObj->AddResponse(commandPath, response);
 
     return true;
@@ -268,5 +295,6 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
 
 void MatterGeneralCommissioningPluginServerInitCallback()
 {
+    DeviceLayer::DeviceControlServer::DeviceControlSvr().SetBreadcrumb(0);
     registerAttributeAccessOverride(&gAttrAccess);
 }

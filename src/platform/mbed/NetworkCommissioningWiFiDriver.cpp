@@ -261,7 +261,7 @@ void WiFiDriverImpl::ConnectNetwork(ByteSpan networkId, ConnectCallback * callba
 exit:
     if (status != Status::kSuccess)
     {
-        ChipLogError(DeviceLayer, "Connect WiFi network failed: 0x%" PRIx16, int(status));
+        ChipLogError(DeviceLayer, "Connect WiFi network failed: 0x%x", int(status));
         if (callback)
         {
             callback->OnResult(status, CharSpan(), 0);
@@ -386,7 +386,7 @@ void WiFiDriverImpl::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * call
 exit:
     if (status != Status::kSuccess)
     {
-        ChipLogError(DeviceLayer, "Scan WiFi networks failed: 0x%" PRIx16, int(status));
+        ChipLogError(DeviceLayer, "Scan WiFi networks failed: 0x%x", int(status));
         if (callback)
         {
             callback->OnFinished(status, CharSpan(), nullptr);

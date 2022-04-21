@@ -56,7 +56,8 @@ bool Command::InitArguments(int argc, char ** argv)
     }
 
     VerifyOrExit((size_t)(argc) >= mandatoryArgsCount && (argvExtraArgsCount == 0 || (argvExtraArgsCount && optionalArgsCount)),
-                 ChipLogError(chipTool, "InitArgs: Wrong arguments number: %d instead of %zu", argc, mandatoryArgsCount));
+                 ChipLogError(chipTool, "InitArgs: Wrong arguments number: %d instead of %u", argc,
+                              static_cast<unsigned int>(mandatoryArgsCount)));
 
     // Initialize mandatory arguments
     for (size_t i = 0; i < mandatoryArgsCount; i++)
@@ -313,20 +314,18 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
                 *value = chip::ByteSpan(chip::Uint8::from_char(argValue), octetCount);
                 return true;
             }
-            else
+
+            // Just ASCII.  Check for the "str:" prefix.
+            static constexpr char strPrefix[] = "str:";
+            constexpr size_t strPrefixLen     = ArraySize(strPrefix) - 1; // Don't         count the null
+            if (strncmp(argValue, strPrefix, strPrefixLen) == 0)
             {
-                // Just ASCII.  Check for the "str:" prefix.
-                static constexpr char strPrefix[] = "str:";
-                constexpr size_t strPrefixLen     = ArraySize(strPrefix) - 1; // Don't count the null
-                if (strncmp(argValue, strPrefix, strPrefixLen) == 0)
-                {
-                    // Skip the prefix
-                    argValue += strPrefixLen;
-                    argLen -= strPrefixLen;
-                }
-                *value = chip::ByteSpan(chip::Uint8::from_char(argValue), argLen);
-                return true;
+                // Skip the prefix
+                argValue += strPrefixLen;
+                argLen -= strPrefixLen;
             }
+            *value = chip::ByteSpan(chip::Uint8::from_char(argValue), argLen);
+            return true;
         });
         break;
     }
@@ -347,10 +346,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
                 uint64_t max = arg.max;
                 return (!ss.fail() && ss.eof() && *value >= min && *value <= max);
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         });
         break;
     }
@@ -409,10 +406,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
                 int64_t max = chip::CanCastTo<int64_t>(arg.max) ? static_cast<int64_t>(arg.max) : INT64_MAX;
                 return (!ss.fail() && ss.eof() && *value >= min && *value <= max);
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         });
         break;
     }

@@ -2569,9 +2569,9 @@ void CheckCHIPTLVPutStringF(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     writer.Init(backingStore, bufsize);
-    snprintf(strBuffer, sizeof(strBuffer), "Sample string %zu", num);
+    snprintf(strBuffer, sizeof(strBuffer), "Sample string %u", static_cast<unsigned int>(num));
 
-    err = writer.PutStringF(ProfileTag(TestProfile_1, 1), "Sample string %zu", num);
+    err = writer.PutStringF(ProfileTag(TestProfile_1, 1), "Sample string %u", static_cast<unsigned int>(num));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = writer.Finalize();
@@ -2651,7 +2651,7 @@ void CheckCHIPTLVPutStringFCircular(nlTestSuite * inSuite, void * inContext)
     // Initial test: Verify that a straight printf works as expected into continuous buffer.
 
     writer.Init(buffer);
-    snprintf(strBuffer, sizeof(strBuffer), "Sample string %zu", num);
+    snprintf(strBuffer, sizeof(strBuffer), "Sample string %u", static_cast<unsigned int>(num));
 
     err = writer.PutBoolean(ProfileTag(TestProfile_1, 2), true);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -2659,7 +2659,7 @@ void CheckCHIPTLVPutStringFCircular(nlTestSuite * inSuite, void * inContext)
     err = writer.Finalize();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = writer.PutStringF(ProfileTag(TestProfile_1, 1), "Sample string %zu", num);
+    err = writer.PutStringF(ProfileTag(TestProfile_1, 1), "Sample string %u", static_cast<unsigned int>(num));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = writer.Finalize();
@@ -2683,9 +2683,9 @@ void CheckCHIPTLVPutStringFCircular(nlTestSuite * inSuite, void * inContext)
     // This print will both stradle the boundary of the buffer and displace the previous two elements.
     num = 2;
 
-    snprintf(strBuffer, sizeof(strBuffer), "Sample string %zu", num);
+    snprintf(strBuffer, sizeof(strBuffer), "Sample string %u", static_cast<unsigned int>(num));
 
-    err = writer.PutStringF(ProfileTag(TestProfile_1, 1), "Sample string %zu", num);
+    err = writer.PutStringF(ProfileTag(TestProfile_1, 1), "Sample string %u", static_cast<unsigned int>(num));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = writer.Finalize();

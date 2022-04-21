@@ -124,14 +124,17 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
                       err = mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen));
     if (err == CHIP_NO_ERROR)
     {
+        uint64_t rcacId;
         // Found root certificate in the storage.
         rcac.reduce_size(rcacBufLen);
         ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(rcac, rcac_dn));
+        ReturnErrorOnFailure(rcac_dn.GetCertChipId(rcacId));
+        VerifyOrReturnError(rcacId == mIssuerId, CHIP_ERROR_INTERNAL);
     }
     // If root certificate not found in the storage, generate new root certificate.
     else
     {
-        ReturnErrorOnFailure(rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipRootId, mIssuerId));
+        ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterRCACId(mIssuerId));
 
         ChipLogProgress(Controller, "Generating RCAC");
         X509CertRequestParams rcac_request = { 0, mNow, mNow + mValidity, rcac_dn, rcac_dn };
@@ -148,14 +151,17 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
                       err = mStorage->SyncGetKeyValue(key, icac.data(), icacBufLen));
     if (err == CHIP_NO_ERROR)
     {
+        uint64_t icacId;
         // Found intermediate certificate in the storage.
         icac.reduce_size(icacBufLen);
         ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(icac, icac_dn));
+        ReturnErrorOnFailure(icac_dn.GetCertChipId(icacId));
+        VerifyOrReturnError(icacId == mIntermediateIssuerId, CHIP_ERROR_INTERNAL);
     }
     // If intermediate certificate not found in the storage, generate new intermediate certificate.
     else
     {
-        ReturnErrorOnFailure(icac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipICAId, mIntermediateIssuerId));
+        ReturnErrorOnFailure(icac_dn.AddAttribute_MatterICACId(mIntermediateIssuerId));
 
         ChipLogProgress(Controller, "Generating ICAC");
         X509CertRequestParams icac_request = { 0, mNow, mNow + mValidity, icac_dn, rcac_dn };
@@ -167,8 +173,8 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     }
 
     ChipDN noc_dn;
-    ReturnErrorOnFailure(noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId));
-    ReturnErrorOnFailure(noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipNodeId, nodeId));
+    ReturnErrorOnFailure(noc_dn.AddAttribute_MatterFabricId(fabricId));
+    ReturnErrorOnFailure(noc_dn.AddAttribute_MatterNodeId(nodeId));
     ReturnErrorOnFailure(noc_dn.AddCATs(cats));
 
     ChipLogProgress(Controller, "Generating NOC");

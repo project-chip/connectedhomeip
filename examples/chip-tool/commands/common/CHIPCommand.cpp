@@ -49,10 +49,8 @@ const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStor
     {
         return &attestationTrustStore;
     }
-    else
-    {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 } // namespace
 
@@ -327,16 +325,17 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
         chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
 
         ReturnLogErrorOnFailure(ephemeralKey.Initialize());
-        ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(mCommissionerStorage.GetLocalNodeId(), fabricId,
-                                                                            mCommissionerStorage.GetCommissionerCATs(),
-                                                                            ephemeralKey, rcacSpan, icacSpan, nocSpan));
+        chip::NodeId nodeId = mCommissionerNodeId.ValueOr(mCommissionerStorage.GetLocalNodeId());
+        fabricId            = mCommissionerFabricId.ValueOr(fabricId);
+
+        ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(
+            nodeId, fabricId, mCommissionerStorage.GetCommissionerCATs(), ephemeralKey, rcacSpan, icacSpan, nocSpan));
         commissionerParams.operationalKeypair = &ephemeralKey;
         commissionerParams.controllerRCAC     = rcacSpan;
         commissionerParams.controllerICAC     = icacSpan;
         commissionerParams.controllerNOC      = nocSpan;
     }
 
-    commissionerParams.storageDelegate = &mCommissionerStorage;
     // TODO: Initialize IPK epoch key in ExampleOperationalCredentials issuer rather than relying on DefaultIpkValue
     commissionerParams.operationalCredentialsDelegate = mCredIssuerCmds->GetCredentialIssuer();
     commissionerParams.controllerVendorId             = chip::VendorId::TestVendor1;

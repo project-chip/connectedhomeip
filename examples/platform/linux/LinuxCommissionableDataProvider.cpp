@@ -94,7 +94,7 @@ CHIP_ERROR LinuxCommissionableDataProvider::Init(chip::Optional<std::vector<uint
         ChipLogError(Support, "PASE salt length invalid: %u", static_cast<unsigned>(spake2pSaltLength));
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    else if (!havePaseSalt)
+    if (!havePaseSalt)
     {
         ChipLogProgress(Support, "LinuxCommissionableDataProvider didn't get a PASE salt, generating one.");
         std::vector<uint8_t> spake2pSaltVector;

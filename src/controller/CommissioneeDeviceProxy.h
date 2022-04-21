@@ -45,11 +45,6 @@
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
 
-#if CONFIG_NETWORK_LAYER_BLE
-#include <ble/BleLayer.h>
-#include <transport/raw/BLE.h>
-#endif
-
 namespace chip {
 
 constexpr size_t kAttestationNonceLength = 32;
@@ -67,11 +62,7 @@ struct ControllerDeviceInitParams
     SessionManager * sessionManager                               = nullptr;
     Messaging::ExchangeManager * exchangeMgr                      = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
-    PersistentStorageDelegate * storageDelegate                   = nullptr;
-#if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * bleLayer = nullptr;
-#endif
-    FabricTable * fabricsTable = nullptr;
+    FabricTable * fabricsTable                                    = nullptr;
 };
 
 class CommissioneeDeviceProxy : public DeviceProxy, public SessionReleaseDelegate
@@ -118,9 +109,6 @@ public:
         mExchangeMgr        = params.exchangeMgr;
         mUDPEndPointManager = params.udpEndPointManager;
         mFabricIndex        = fabric;
-#if CONFIG_NETWORK_LAYER_BLE
-        mBleLayer = params.bleLayer;
-#endif
     }
 
     /**
@@ -168,8 +156,6 @@ public:
      *   Update data of the device.
      *
      *   This function will set new IP address, port and MRP retransmission intervals of the device.
-     *   Since the device settings might have been moved from RAM to the persistent storage, the function
-     *   will load the device settings first, before making the changes.
      *
      * @param[in] addr   Address of the device to be set.
      * @param[in] config MRP parameters
@@ -190,9 +176,9 @@ public:
      * @brief
      * Called to indicate this proxy has been paired successfully.
      *
-     * This causes the secure session parameters to be loaded and stores the session details in the session manager.
+     * This stores the session details in the session manager.
      */
-    CHIP_ERROR SetConnected();
+    CHIP_ERROR SetConnected(const SessionHandle & session);
 
     bool IsSecureConnected() const override { return IsActive() && mState == ConnectionState::SecureConnected; }
 
@@ -245,10 +231,6 @@ private:
 
     bool mActive           = false;
     ConnectionState mState = ConnectionState::NotConnected;
-
-#if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * mBleLayer = nullptr;
-#endif
 
     PASESession mPairing;
 

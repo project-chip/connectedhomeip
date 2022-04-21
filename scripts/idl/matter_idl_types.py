@@ -40,6 +40,18 @@ class EndpointContentType(enum.Enum):
     CLIENT_BINDING = enum.auto()
 
 
+class AccessPrivilege(enum.Enum):
+    VIEW = enum.auto()
+    OPERATE = enum.auto()
+    MANAGE = enum.auto()
+    ADMINISTER = enum.auto()
+
+
+class AttributeOperation(enum.Enum):
+    READ = enum.auto()
+    WRITE = enum.auto()
+
+
 @dataclass
 class DataType:
     name: str
@@ -69,6 +81,8 @@ class Field:
 class Attribute:
     definition: Field
     tags: Set[AttributeTag] = field(default_factory=set)
+    readacl: AccessPrivilege = AccessPrivilege.VIEW
+    writeacl: AccessPrivilege = AccessPrivilege.OPERATE
 
     @property
     def is_readable(self):
@@ -96,6 +110,7 @@ class Event:
     name: str
     code: int
     fields: List[Field]
+    readacl: AccessPrivilege = AccessPrivilege.VIEW
 
 
 @dataclass
@@ -125,6 +140,7 @@ class Command:
     input_param: Optional[str]
     output_param: str
     attributes: Set[CommandAttribute] = field(default_factory=set)
+    invokeacl: AccessPrivilege = AccessPrivilege.OPERATE
 
     @property
     def is_timed_invoke(self):

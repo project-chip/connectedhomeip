@@ -233,17 +233,17 @@ void LogOpenThreadPacket(const char * titleStr, otMessage * pkt)
 
         if (IPv6_NextHeader == kIPProto_UDP || IPv6_NextHeader == kIPProto_TCP)
         {
-            snprintf(srcStr + strlen(srcStr), 13, ", port %" PRIu16, Encoding::BigEndian::Get16(IPv6_SrcPort));
-            snprintf(destStr + strlen(destStr), 13, ", port %" PRIu16, Encoding::BigEndian::Get16(IPv6_DestPort));
+            snprintf(srcStr + strlen(srcStr), 13, ", port %u", Encoding::BigEndian::Get16(IPv6_SrcPort));
+            snprintf(destStr + strlen(destStr), 13, ", port %u", Encoding::BigEndian::Get16(IPv6_DestPort));
         }
 
-        ChipLogDetail(DeviceLayer, "%s: %s, len %" PRIu16, titleStr, type, pktLen);
+        ChipLogDetail(DeviceLayer, "%s: %s, len %u", titleStr, type, pktLen);
         ChipLogDetail(DeviceLayer, "    src  %s", srcStr);
         ChipLogDetail(DeviceLayer, "    dest %s", destStr);
     }
     else
     {
-        ChipLogDetail(DeviceLayer, "%s: %s, len %" PRIu16, titleStr, "(decode error)", pktLen);
+        ChipLogDetail(DeviceLayer, "%s: %s, len %u", titleStr, "(decode error)", pktLen);
     }
 
 #endif // CHIP_DETAIL_LOGGING

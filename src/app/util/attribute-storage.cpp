@@ -200,7 +200,7 @@ uint16_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
 
 EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
                                         const chip::Span<chip::DataVersion> & dataVersionStorage,
-                                        chip::Span<const EmberAfDeviceType> deviceTypeList)
+                                        chip::Span<const EmberAfDeviceType> deviceTypeList, EndpointId parentEndpointId)
 {
     auto realIndex = index + FIXED_ENDPOINT_COUNT;
 
@@ -233,7 +233,8 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const Emb
     emAfEndpoints[index].endpointType   = ep;
     emAfEndpoints[index].dataVersions   = dataVersionStorage.data();
     // Start the endpoint off as disabled.
-    emAfEndpoints[index].bitmask = EMBER_AF_ENDPOINT_DISABLED;
+    emAfEndpoints[index].bitmask          = EMBER_AF_ENDPOINT_DISABLED;
+    emAfEndpoints[index].parentEndpointId = parentEndpointId;
 
     emberAfSetDynamicEndpointCount(MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT);
 
@@ -627,10 +628,8 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                 {
                                     return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength);
                                 }
-                                else
-                                {
-                                    return EMBER_ZCL_STATUS_FAILURE;
-                                }
+
+                                return EMBER_ZCL_STATUS_FAILURE;
                             }
                         }
                         else
@@ -986,6 +985,11 @@ EndpointId emberAfEndpointFromIndex(uint16_t index)
     return emAfEndpoints[index].endpoint;
 }
 
+EndpointId emberAfParentEndpointFromIndex(uint16_t index)
+{
+    return emAfEndpoints[index].parentEndpointId;
+}
+
 // If server == true, returns the number of server clusters,
 // otherwise number of client clusters on this endpoint
 uint8_t emberAfClusterCount(EndpointId endpoint, bool server)
@@ -1227,11 +1231,10 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                     }
                     else
                     {
-                        ChipLogDetail(DataManagement,
-                                      "Failed to read stored attribute (%" PRIu16 ", " ChipLogFormatMEI ", " ChipLogFormatMEI
-                                      ": %" CHIP_ERROR_FORMAT,
-                                      de->endpoint, ChipLogValueMEI(cluster->clusterId), ChipLogValueMEI(am->attributeId),
-                                      err.Format());
+                        ChipLogDetail(
+                            DataManagement,
+                            "Failed to read stored attribute (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
+                            de->endpoint, ChipLogValueMEI(cluster->clusterId), ChipLogValueMEI(am->attributeId), err.Format());
                         // Just fall back to default value.
                     }
                 }
@@ -1387,7 +1390,9 @@ bool registerAttributeAccessOverride(app::AttributeAccessInterface * attrOverrid
     return true;
 }
 
-app::AttributeAccessInterface * findAttributeAccessOverride(EndpointId endpointId, ClusterId clusterId)
+namespace chip {
+namespace app {
+app::AttributeAccessInterface * GetAttributeAccessOverride(EndpointId endpointId, ClusterId clusterId)
 {
     for (app::AttributeAccessInterface * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
     {
@@ -1399,6 +1404,8 @@ app::AttributeAccessInterface * findAttributeAccessOverride(EndpointId endpointI
 
     return nullptr;
 }
+} // namespace app
+} // namespace chip
 
 uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::ClusterId cluster)
 {

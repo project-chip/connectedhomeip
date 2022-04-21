@@ -44,7 +44,7 @@ image yet), the following symlinks are required:
 -   `usr/lib/arm-linux-gnueabihf` to `usr/lib/armv7-linux-gnueabihf`
 -   `usr/include/arm-linux-gnueabihf` to `usr/lib/armv7-linux-gnueabihf`
 
-Once the sysroot is on the host machine, create the corresponding tar.xz file:
+Once the sysroot is on the host machine, create the corresponding `tar.xz` file:
 
 ```
 tar cvfJ ubuntu-21.04-aarch64-sysroot.tar.xz ubuntu-21.04-aarch64-sysroot

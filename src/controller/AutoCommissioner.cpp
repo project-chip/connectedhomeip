@@ -71,6 +71,21 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         mParams.SetWiFiCredentials(
             WiFiCredentials(ByteSpan(mSsid, creds.ssid.size()), ByteSpan(mCredentials, creds.credentials.size())));
     }
+
+    if (params.GetCountryCode().HasValue())
+    {
+        auto & code = params.GetCountryCode().Value();
+        MutableCharSpan copiedCode(mCountryCode);
+        if (CopyCharSpanToMutableCharSpan(code, copiedCode) == CHIP_NO_ERROR)
+        {
+            mParams.SetCountryCode(copiedCode);
+        }
+        else
+        {
+            ChipLogError(Controller, "Country code is too large: %u", static_cast<unsigned>(code.size()));
+        }
+    }
+
     // If the AttestationNonce is passed in, using that else using a random one..
     if (params.GetAttestationNonce().HasValue())
     {
@@ -109,8 +124,16 @@ const CommissioningParameters & AutoCommissioner::GetCommissioningParameters() c
 CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr)
 {
     auto nextStage = GetNextCommissioningStageInternal(currentStage, lastErr);
-    ChipLogProgress(Controller, "Going from commissioning step '%s' with lastErr = '%s' --> '%s'", StageToString(currentStage),
-                    lastErr.AsString(), StageToString(nextStage));
+    if (lastErr == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Controller, "Commissioning stage next step: '%s' -> '%s'", StageToString(currentStage),
+                        StageToString(nextStage));
+    }
+    else
+    {
+        ChipLogProgress(Controller, "Going from commissioning step '%s' with lastErr = '%s' -> '%s'", StageToString(currentStage),
+                        lastErr.AsString(), StageToString(nextStage));
+    }
     return nextStage;
 }
 
@@ -169,18 +192,16 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             {
                 return CommissioningStage::kThreadNetworkSetup;
             }
-            else
-            {
-                ChipLogError(Controller, "Required network information not provided in commissioning parameters");
-                ChipLogError(Controller, "Parameters supplied: wifi (%s) thread (%s)",
-                             mParams.GetWiFiCredentials().HasValue() ? "yes" : "no",
-                             mParams.GetThreadOperationalDataset().HasValue() ? "yes" : "no");
-                ChipLogError(Controller, "Device supports: wifi (%s) thread(%s)",
-                             mDeviceCommissioningInfo.network.wifi.endpoint == kInvalidEndpointId ? "no" : "yes",
-                             mDeviceCommissioningInfo.network.thread.endpoint == kInvalidEndpointId ? "no" : "yes");
-                lastErr = CHIP_ERROR_INVALID_ARGUMENT;
-                return CommissioningStage::kCleanup;
-            }
+
+            ChipLogError(Controller, "Required network information not provided in commissioning parameters");
+            ChipLogError(Controller, "Parameters supplied: wifi (%s) thread (%s)",
+                         mParams.GetWiFiCredentials().HasValue() ? "yes" : "no",
+                         mParams.GetThreadOperationalDataset().HasValue() ? "yes" : "no");
+            ChipLogError(Controller, "Device supports: wifi (%s) thread(%s)",
+                         mDeviceCommissioningInfo.network.wifi.endpoint == kInvalidEndpointId ? "no" : "yes",
+                         mDeviceCommissioningInfo.network.thread.endpoint == kInvalidEndpointId ? "no" : "yes");
+            lastErr = CHIP_ERROR_INVALID_ARGUMENT;
+            return CommissioningStage::kCleanup;
         }
         else
         {
@@ -328,8 +349,16 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 {
     CompletionStatus completionStatus;
     completionStatus.err = err;
-    ChipLogProgress(Controller, "Finished commissioning step '%s' with error '%s'", StageToString(report.stageCompleted),
-                    err.AsString());
+
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Controller, "Successfully finished commissioning step '%s'", StageToString(report.stageCompleted));
+    }
+    else
+    {
+        ChipLogProgress(Controller, "Error on commissioning step '%s': '%s'", StageToString(report.stageCompleted), err.AsString());
+    }
+
     if (err != CHIP_NO_ERROR)
     {
         completionStatus.failedStage = MakeOptional(report.stageCompleted);
