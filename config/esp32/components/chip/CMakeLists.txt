@@ -95,6 +95,10 @@ if (CONFIG_BUILD_CHIP_TESTS)
     chip_gn_arg_bool("chip_build_tests"     "true")
 endif()
 
+if (CONFIG_CHIP_ENABLE_SCHEMA_CHECK)
+    chip_gn_arg_bool("chip_enable_schema_check"	"true")
+endif()
+
 if (NOT CONFIG_USE_MINIMAL_MDNS)
     chip_gn_arg_append("chip_mdns"                          "\"platform\"")
 endif()
