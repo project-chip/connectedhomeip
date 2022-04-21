@@ -16,9 +16,15 @@
 
 #include <access/AuthMode.h>
 #include <transport/SecureSession.h>
+#include <transport/SecureSessionTable.h>
 
 namespace chip {
 namespace Transport {
+
+void SecureSessionDeleter::Release(SecureSession * entry)
+{
+    entry->mTable.ReleaseSession(entry);
+}
 
 ScopedNodeId SecureSession::GetPeer() const
 {

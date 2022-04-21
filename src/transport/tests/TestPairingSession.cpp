@@ -45,6 +45,8 @@ public:
     ScopedNodeId GetPeer() const override { return ScopedNodeId(); }
     CATValues GetPeerCATs() const override { return CATValues(); };
 
+    void OnSessionReleased() override {}
+
     const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteMRPConfig; }
 
     CHIP_ERROR DeriveSecureSession(CryptoContext & session) const override { return CHIP_NO_ERROR; }

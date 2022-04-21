@@ -69,6 +69,11 @@ PASESession::~PASESession()
     Clear();
 }
 
+void PASESession::OnSessionReleased()
+{
+    // TODO: interrupt pairing procedure, call OnSessionEstablishmentError, if the pairing is not finished
+}
+
 void PASESession::Finish()
 {
     mPairingComplete = true;

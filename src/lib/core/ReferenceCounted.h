@@ -39,6 +39,13 @@ public:
     static void Release(T * obj) { chip::Platform::Delete(obj); }
 };
 
+template <class T>
+class NoopDeletor
+{
+public:
+    static void Release(T * obj) {}
+};
+
 /**
  * A reference counted object maintains a count of usages and when the usage
  * count drops to 0, it deletes itself.
