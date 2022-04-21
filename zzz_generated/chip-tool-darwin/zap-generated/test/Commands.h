@@ -31962,62 +31962,67 @@ public:
         // incorrect mTestIndex value observed when we get the response.
         switch (mTestIndex++) {
         case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Reboot target device\n");
-            err = TestRebootTargetDevice_0();
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Stop target device\n");
+            err = TestStopTargetDevice_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : TH_CR1 starts a commissioning process with DUT_CE\n");
-            err = TestThCr1StartsACommissioningProcessWithDutCe_1();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 1 : Start target device with the provided discriminator for basic commissioning advertisement\n");
+            err = TestStartTargetDeviceWithTheProvidedDiscriminatorForBasicCommissioningAdvertisement_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : TH_CR1 opens a commissioning window on DUT_CE\n");
-            err = TestThCr1OpensACommissioningWindowOnDutCe_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : TH_CR1 starts a commissioning process with DUT_CE\n");
+            err = TestThCr1StartsACommissioningProcessWithDutCe_2();
             break;
         case 3:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 3 : TH_CR1 writes the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
-            err = TestThCr1WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : TH_CR1 opens a commissioning window on DUT_CE\n");
+            err = TestThCr1OpensACommissioningWindowOnDutCe_3();
             break;
         case 4:
             ChipLogProgress(chipTool,
-                " ***** Test Step 4 : TH_CR1 reads the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
-            err = TestThCr1ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_4();
+                " ***** Test Step 4 : TH_CR1 writes the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
+            err = TestThCr1WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Commission from beta\n");
-            err = TestCommissionFromBeta_5();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 5 : TH_CR1 reads the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
+            err = TestThCr1ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : TH_CR2 starts a commissioning process with DUT_CE\n");
-            err = TestThCr2StartsACommissioningProcessWithDutCe_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Commission from beta\n");
+            err = TestCommissionFromBeta_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Query fabrics list\n");
-            err = TestQueryFabricsList_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : TH_CR2 starts a commissioning process with DUT_CE\n");
+            err = TestThCr2StartsACommissioningProcessWithDutCe_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : Query fabrics list\n");
             err = TestQueryFabricsList_8();
             break;
         case 9:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 9 : TH_CR1 writes the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
-            err = TestThCr1WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Query fabrics list\n");
+            err = TestQueryFabricsList_9();
             break;
         case 10:
             ChipLogProgress(chipTool,
-                " ***** Test Step 10 : TH_CR1 reads the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
-            err = TestThCr1ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_10();
+                " ***** Test Step 10 : TH_CR1 writes the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
+            err = TestThCr1WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_10();
             break;
         case 11:
             ChipLogProgress(chipTool,
-                " ***** Test Step 11 : TH_CR2 writes the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
-            err = TestThCr2WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_11();
+                " ***** Test Step 11 : TH_CR1 reads the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
+            err = TestThCr1ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_11();
             break;
         case 12:
             ChipLogProgress(chipTool,
-                " ***** Test Step 12 : TH_CR2 reads the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
-            err = TestThCr2ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_12();
+                " ***** Test Step 12 : TH_CR2 writes the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
+            err = TestThCr2WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 13 : TH_CR2 reads the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
+            err = TestThCr2ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_13();
             break;
         }
 
@@ -32069,6 +32074,9 @@ public:
         case 12:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
         }
 
         // Go on to the next test.
@@ -32082,7 +32090,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 13;
+    const uint16_t mTestCount = 14;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::NodeId> mNodeId2;
@@ -32091,21 +32099,28 @@ private:
     chip::Optional<chip::CharSpan> mPayload;
     chip::Optional<uint16_t> mTimeout;
 
-    CHIP_ERROR TestRebootTargetDevice_0()
+    CHIP_ERROR TestStopTargetDevice_0()
     {
         SetIdentity("alpha");
-        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        Stop();
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1StartsACommissioningProcessWithDutCe_1()
+    CHIP_ERROR TestStartTargetDeviceWithTheProvidedDiscriminatorForBasicCommissioningAdvertisement_1()
+    {
+        SetIdentity("alpha");
+        Start(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThCr1StartsACommissioningProcessWithDutCe_2()
     {
         SetIdentity("alpha");
         WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1OpensACommissioningWindowOnDutCe_2()
+    CHIP_ERROR TestThCr1OpensACommissioningWindowOnDutCe_3()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -32137,7 +32152,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_3()
+    CHIP_ERROR TestThCr1WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_4()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -32160,7 +32175,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_4()
+    CHIP_ERROR TestThCr1ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_5()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -32185,7 +32200,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCommissionFromBeta_5()
+    CHIP_ERROR TestCommissionFromBeta_6()
     {
         SetIdentity("beta");
         PairWithQRCode(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL,
@@ -32193,14 +32208,14 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr2StartsACommissioningProcessWithDutCe_6()
+    CHIP_ERROR TestThCr2StartsACommissioningProcessWithDutCe_7()
     {
         SetIdentity("beta");
         WaitForCommissionee(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestQueryFabricsList_7()
+    CHIP_ERROR TestQueryFabricsList_8()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -32231,7 +32246,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestQueryFabricsList_8()
+    CHIP_ERROR TestQueryFabricsList_9()
     {
         SetIdentity("beta");
         CHIPDevice * device = GetConnectedDevice();
@@ -32264,7 +32279,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_9()
+    CHIP_ERROR TestThCr1WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_10()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -32287,7 +32302,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_10()
+    CHIP_ERROR TestThCr1ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_11()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -32312,7 +32327,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr2WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_11()
+    CHIP_ERROR TestThCr2WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_12()
     {
         SetIdentity("beta");
         CHIPDevice * device = GetConnectedDevice();
@@ -32335,7 +32350,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr2ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_12()
+    CHIP_ERROR TestThCr2ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_13()
     {
         SetIdentity("beta");
         CHIPDevice * device = GetConnectedDevice();
@@ -32402,62 +32417,67 @@ public:
         // incorrect mTestIndex value observed when we get the response.
         switch (mTestIndex++) {
         case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Reboot target device\n");
-            err = TestRebootTargetDevice_0();
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Stop target device\n");
+            err = TestStopTargetDevice_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : TH_CR1 starts a commissioning process with DUT_CE\n");
-            err = TestThCr1StartsACommissioningProcessWithDutCe_1();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 1 : Start target device with the provided discriminator for basic commissioning advertisement\n");
+            err = TestStartTargetDeviceWithTheProvidedDiscriminatorForBasicCommissioningAdvertisement_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : TH_CR1 opens a commissioning window on DUT_CE\n");
-            err = TestThCr1OpensACommissioningWindowOnDutCe_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : TH_CR1 starts a commissioning process with DUT_CE\n");
+            err = TestThCr1StartsACommissioningProcessWithDutCe_2();
             break;
         case 3:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 3 : TH_CR1 writes the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
-            err = TestThCr1WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : TH_CR1 opens a commissioning window on DUT_CE\n");
+            err = TestThCr1OpensACommissioningWindowOnDutCe_3();
             break;
         case 4:
             ChipLogProgress(chipTool,
-                " ***** Test Step 4 : TH_CR1 reads the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
-            err = TestThCr1ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_4();
+                " ***** Test Step 4 : TH_CR1 writes the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
+            err = TestThCr1WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Commission from beta\n");
-            err = TestCommissionFromBeta_5();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 5 : TH_CR1 reads the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
+            err = TestThCr1ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : TH_CR2 starts a commissioning process with DUT_CE\n");
-            err = TestThCr2StartsACommissioningProcessWithDutCe_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Commission from beta\n");
+            err = TestCommissionFromBeta_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Query fabrics list\n");
-            err = TestQueryFabricsList_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : TH_CR2 starts a commissioning process with DUT_CE\n");
+            err = TestThCr2StartsACommissioningProcessWithDutCe_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : Query fabrics list\n");
             err = TestQueryFabricsList_8();
             break;
         case 9:
-            ChipLogProgress(chipTool,
-                " ***** Test Step 9 : TH_CR1 writes the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
-            err = TestThCr1WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Query fabrics list\n");
+            err = TestQueryFabricsList_9();
             break;
         case 10:
             ChipLogProgress(chipTool,
-                " ***** Test Step 10 : TH_CR1 reads the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
-            err = TestThCr1ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_10();
+                " ***** Test Step 10 : TH_CR1 writes the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
+            err = TestThCr1WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_10();
             break;
         case 11:
             ChipLogProgress(chipTool,
-                " ***** Test Step 11 : TH_CR1 writes the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
-            err = TestThCr1WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_11();
+                " ***** Test Step 11 : TH_CR1 reads the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
+            err = TestThCr1ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_11();
             break;
         case 12:
             ChipLogProgress(chipTool,
-                " ***** Test Step 12 : TH_CR1 reads the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
-            err = TestThCr1ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_12();
+                " ***** Test Step 12 : TH_CR1 writes the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
+            err = TestThCr1WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 13 : TH_CR1 reads the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE\n");
+            err = TestThCr1ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_13();
             break;
         }
 
@@ -32509,6 +32529,9 @@ public:
         case 12:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
         }
 
         // Go on to the next test.
@@ -32522,7 +32545,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 13;
+    const uint16_t mTestCount = 14;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::NodeId> mNodeId2;
@@ -32531,21 +32554,28 @@ private:
     chip::Optional<chip::CharSpan> mPayload;
     chip::Optional<uint16_t> mTimeout;
 
-    CHIP_ERROR TestRebootTargetDevice_0()
+    CHIP_ERROR TestStopTargetDevice_0()
     {
         SetIdentity("alpha");
-        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        Stop();
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1StartsACommissioningProcessWithDutCe_1()
+    CHIP_ERROR TestStartTargetDeviceWithTheProvidedDiscriminatorForBasicCommissioningAdvertisement_1()
+    {
+        SetIdentity("alpha");
+        Start(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThCr1StartsACommissioningProcessWithDutCe_2()
     {
         SetIdentity("alpha");
         WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1OpensACommissioningWindowOnDutCe_2()
+    CHIP_ERROR TestThCr1OpensACommissioningWindowOnDutCe_3()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -32568,7 +32598,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_3()
+    CHIP_ERROR TestThCr1WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_4()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -32591,7 +32621,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_4()
+    CHIP_ERROR TestThCr1ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_5()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -32611,7 +32641,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCommissionFromBeta_5()
+    CHIP_ERROR TestCommissionFromBeta_6()
     {
         SetIdentity("beta");
         PairWithQRCode(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL,
@@ -32619,14 +32649,14 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr2StartsACommissioningProcessWithDutCe_6()
+    CHIP_ERROR TestThCr2StartsACommissioningProcessWithDutCe_7()
     {
         SetIdentity("beta");
         WaitForCommissionee(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestQueryFabricsList_7()
+    CHIP_ERROR TestQueryFabricsList_8()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -32657,7 +32687,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestQueryFabricsList_8()
+    CHIP_ERROR TestQueryFabricsList_9()
     {
         SetIdentity("beta");
         CHIPDevice * device = GetConnectedDevice();
@@ -32688,7 +32718,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_9()
+    CHIP_ERROR TestThCr1WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_10()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -32711,7 +32741,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_10()
+    CHIP_ERROR TestThCr1ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_11()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -32731,7 +32761,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_11()
+    CHIP_ERROR TestThCr1WritesTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_12()
     {
         SetIdentity("beta");
         CHIPDevice * device = GetConnectedDevice();
@@ -32754,7 +32784,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_12()
+    CHIP_ERROR TestThCr1ReadsTheBasicInformationClustersNodeLabelMandatoryAttributeOfDutCe_13()
     {
         SetIdentity("beta");
         CHIPDevice * device = GetConnectedDevice();
@@ -32964,7 +32994,7 @@ private:
     CHIP_ERROR TestRebootTargetDevice_0()
     {
         SetIdentity("alpha");
-        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        Reboot();
         return CHIP_NO_ERROR;
     }
 
@@ -33250,20 +33280,21 @@ public:
         // incorrect mTestIndex value observed when we get the response.
         switch (mTestIndex++) {
         case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Reboot target device\n");
-            err = TestRebootTargetDevice_0();
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Stop target device\n");
+            err = TestStopTargetDevice_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : TH_CR1 starts a commissioning process with DUT_CE\n");
-            err = TestThCr1StartsACommissioningProcessWithDutCe_1();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 1 : Start target device with the provided discriminator for basic commissioning advertisement\n");
+            err = TestStartTargetDeviceWithTheProvidedDiscriminatorForBasicCommissioningAdvertisement_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : TH_CR1 opens a commissioning window on DUT_CE\n");
-            err = TestThCr1OpensACommissioningWindowOnDutCe_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : TH_CR1 starts a commissioning process with DUT_CE\n");
+            err = TestThCr1StartsACommissioningProcessWithDutCe_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait for PIXIT_COMM_WIN(180) + 10\n");
-            err = TestWaitForPixitCommWin18010_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : TH_CR1 opens a commissioning window on DUT_CE\n");
+            err = TestThCr1OpensACommissioningWindowOnDutCe_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Wait for PIXIT_COMM_WIN(180) + 10\n");
@@ -33278,48 +33309,52 @@ public:
             err = TestWaitForPixitCommWin18010_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Commission from beta\n");
-            err = TestCommissionFromBeta_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait for PIXIT_COMM_WIN(180) + 10\n");
+            err = TestWaitForPixitCommWin18010_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : TH_CR1 opens a commissioning window on DUT_CE\n");
-            err = TestThCr1OpensACommissioningWindowOnDutCe_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Commission from beta\n");
+            err = TestCommissionFromBeta_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : TH_CR1 revokes the commissioning window on DUT_CE\n");
-            err = TestThCr1RevokesTheCommissioningWindowOnDutCe_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : TH_CR1 opens a commissioning window on DUT_CE\n");
+            err = TestThCr1OpensACommissioningWindowOnDutCe_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Commission from beta\n");
-            err = TestCommissionFromBeta_10();
+            ChipLogProgress(chipTool, " ***** Test Step 10 : TH_CR1 revokes the commissioning window on DUT_CE\n");
+            err = TestThCr1RevokesTheCommissioningWindowOnDutCe_10();
             break;
         case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : TH_CR1 revokes the commissioning window on DUT_CE\n");
-            err = TestThCr1RevokesTheCommissioningWindowOnDutCe_11();
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Commission from beta\n");
+            err = TestCommissionFromBeta_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : TH_CR1 writes the mandatory attribute NodeLabel of DUT_CE\n");
-            err = TestThCr1WritesTheMandatoryAttributeNodeLabelOfDutCe_12();
+            ChipLogProgress(chipTool, " ***** Test Step 12 : TH_CR1 revokes the commissioning window on DUT_CE\n");
+            err = TestThCr1RevokesTheCommissioningWindowOnDutCe_12();
             break;
         case 13:
-            ChipLogProgress(chipTool, " ***** Test Step 13 : TH_CR1 read the mandatory attribute NodeLabel of DUT_CE\n");
-            err = TestThCr1ReadTheMandatoryAttributeNodeLabelOfDutCe_13();
+            ChipLogProgress(chipTool, " ***** Test Step 13 : TH_CR1 writes the mandatory attribute NodeLabel of DUT_CE\n");
+            err = TestThCr1WritesTheMandatoryAttributeNodeLabelOfDutCe_13();
             break;
         case 14:
-            ChipLogProgress(chipTool, " ***** Test Step 14 : TH_CR1 opens a commissioning window on DUT_CE\n");
-            err = TestThCr1OpensACommissioningWindowOnDutCe_14();
+            ChipLogProgress(chipTool, " ***** Test Step 14 : TH_CR1 read the mandatory attribute NodeLabel of DUT_CE\n");
+            err = TestThCr1ReadTheMandatoryAttributeNodeLabelOfDutCe_14();
             break;
         case 15:
-            ChipLogProgress(chipTool, " ***** Test Step 15 : Commission from beta\n");
-            err = TestCommissionFromBeta_15();
+            ChipLogProgress(chipTool, " ***** Test Step 15 : TH_CR1 opens a commissioning window on DUT_CE\n");
+            err = TestThCr1OpensACommissioningWindowOnDutCe_15();
             break;
         case 16:
-            ChipLogProgress(chipTool, " ***** Test Step 16 : TH_CR2 starts a commissioning process on DUT_CE\n");
-            err = TestThCr2StartsACommissioningProcessOnDutCe_16();
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Commission from beta\n");
+            err = TestCommissionFromBeta_16();
             break;
         case 17:
-            ChipLogProgress(chipTool, " ***** Test Step 17 : TH_CR3 starts a commissioning process with DUT_CE\n");
-            err = TestThCr3StartsACommissioningProcessWithDutCe_17();
+            ChipLogProgress(chipTool, " ***** Test Step 17 : TH_CR2 starts a commissioning process on DUT_CE\n");
+            err = TestThCr2StartsACommissioningProcessOnDutCe_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : TH_CR3 starts a commissioning process with DUT_CE\n");
+            err = TestThCr3StartsACommissioningProcessWithDutCe_18();
             break;
         }
 
@@ -33354,22 +33389,22 @@ public:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         case 7:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         case 8:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
             break;
         case 9:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         case 10:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         case 11:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
             break;
         case 12:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
             break;
         case 13:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
@@ -33384,6 +33419,9 @@ public:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         case 17:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 18:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
             break;
         }
@@ -33396,7 +33434,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 18;
+    const uint16_t mTestCount = 19;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<uint16_t> mTimeout;
@@ -33407,21 +33445,28 @@ private:
     chip::Optional<uint16_t> mDiscriminator;
     chip::Optional<chip::CharSpan> mPayload;
 
-    CHIP_ERROR TestRebootTargetDevice_0()
+    CHIP_ERROR TestStopTargetDevice_0()
     {
         SetIdentity("alpha");
-        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        Stop();
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1StartsACommissioningProcessWithDutCe_1()
+    CHIP_ERROR TestStartTargetDeviceWithTheProvidedDiscriminatorForBasicCommissioningAdvertisement_1()
+    {
+        SetIdentity("alpha");
+        Start(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestThCr1StartsACommissioningProcessWithDutCe_2()
     {
         SetIdentity("alpha");
         WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1OpensACommissioningWindowOnDutCe_2()
+    CHIP_ERROR TestThCr1OpensACommissioningWindowOnDutCe_3()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -33441,13 +33486,6 @@ private:
                                           NextTest();
                                       }];
 
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestWaitForPixitCommWin18010_3()
-    {
-        SetIdentity("alpha");
-        WaitForMs(54000);
         return CHIP_NO_ERROR;
     }
 
@@ -33468,11 +33506,18 @@ private:
     CHIP_ERROR TestWaitForPixitCommWin18010_6()
     {
         SetIdentity("alpha");
+        WaitForMs(54000);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWaitForPixitCommWin18010_7()
+    {
+        SetIdentity("alpha");
         WaitForMs(28000);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCommissionFromBeta_7()
+    CHIP_ERROR TestCommissionFromBeta_8()
     {
         SetIdentity("beta");
         PairWithQRCode(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL,
@@ -33480,7 +33525,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1OpensACommissioningWindowOnDutCe_8()
+    CHIP_ERROR TestThCr1OpensACommissioningWindowOnDutCe_9()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -33503,7 +33548,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1RevokesTheCommissioningWindowOnDutCe_9()
+    CHIP_ERROR TestThCr1RevokesTheCommissioningWindowOnDutCe_10()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -33523,7 +33568,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCommissionFromBeta_10()
+    CHIP_ERROR TestCommissionFromBeta_11()
     {
         SetIdentity("beta");
         PairWithQRCode(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL,
@@ -33531,7 +33576,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1RevokesTheCommissioningWindowOnDutCe_11()
+    CHIP_ERROR TestThCr1RevokesTheCommissioningWindowOnDutCe_12()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -33550,7 +33595,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1WritesTheMandatoryAttributeNodeLabelOfDutCe_12()
+    CHIP_ERROR TestThCr1WritesTheMandatoryAttributeNodeLabelOfDutCe_13()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -33571,7 +33616,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1ReadTheMandatoryAttributeNodeLabelOfDutCe_13()
+    CHIP_ERROR TestThCr1ReadTheMandatoryAttributeNodeLabelOfDutCe_14()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -33594,7 +33639,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr1OpensACommissioningWindowOnDutCe_14()
+    CHIP_ERROR TestThCr1OpensACommissioningWindowOnDutCe_15()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -33617,7 +33662,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCommissionFromBeta_15()
+    CHIP_ERROR TestCommissionFromBeta_16()
     {
         SetIdentity("beta");
         PairWithQRCode(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL,
@@ -33625,14 +33670,14 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr2StartsACommissioningProcessOnDutCe_16()
+    CHIP_ERROR TestThCr2StartsACommissioningProcessOnDutCe_17()
     {
         SetIdentity("beta");
         WaitForCommissionee(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestThCr3StartsACommissioningProcessWithDutCe_17()
+    CHIP_ERROR TestThCr3StartsACommissioningProcessWithDutCe_18()
     {
         SetIdentity("gamma");
         PairWithQRCode(mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL,
@@ -33886,7 +33931,7 @@ private:
     CHIP_ERROR TestRebootTargetDevice_0()
     {
         SetIdentity("alpha");
-        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        Reboot();
         return CHIP_NO_ERROR;
     }
 
@@ -37791,7 +37836,6 @@ public:
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("discriminator", 0, UINT16_MAX, &mDiscriminator);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
     // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
@@ -38031,7 +38075,6 @@ private:
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mDiscriminator;
     chip::Optional<uint16_t> mTimeout;
 
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
@@ -38107,7 +38150,7 @@ private:
     CHIP_ERROR TestPowerOffDut_4()
     {
         SetIdentity("alpha");
-        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        Reboot();
         return CHIP_NO_ERROR;
     }
 
@@ -38165,7 +38208,7 @@ private:
     CHIP_ERROR TestPowerOffDut_8()
     {
         SetIdentity("alpha");
-        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        Reboot();
         return CHIP_NO_ERROR;
     }
 
@@ -38223,7 +38266,7 @@ private:
     CHIP_ERROR TestPowerOffDut_12()
     {
         SetIdentity("alpha");
-        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        Reboot();
         return CHIP_NO_ERROR;
     }
 
@@ -38260,7 +38303,7 @@ private:
     CHIP_ERROR TestPowerOffDut_15()
     {
         SetIdentity("alpha");
-        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        Reboot();
         return CHIP_NO_ERROR;
     }
 
@@ -38318,7 +38361,7 @@ private:
     CHIP_ERROR TestPowerOffDut_19()
     {
         SetIdentity("alpha");
-        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        Reboot();
         return CHIP_NO_ERROR;
     }
 
@@ -38373,7 +38416,7 @@ private:
     CHIP_ERROR TestPowerOffDut_23()
     {
         SetIdentity("alpha");
-        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        Reboot();
         return CHIP_NO_ERROR;
     }
 
@@ -60364,7 +60407,6 @@ public:
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("discriminator", 0, UINT16_MAX, &mDiscriminator);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
     // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
@@ -60560,7 +60602,6 @@ private:
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mDiscriminator;
     chip::Optional<uint16_t> mTimeout;
 
     CHIP_ERROR Test0aWaitForTheCommissionedDeviceToBeRetrieved_0()
@@ -60753,7 +60794,7 @@ private:
     CHIP_ERROR Test3cRebootRestartTheDut_12()
     {
         SetIdentity("alpha");
-        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        Reboot();
         return CHIP_NO_ERROR;
     }
 
@@ -86004,7 +86045,6 @@ public:
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("discriminator", 0, UINT16_MAX, &mDiscriminator);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
     // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
@@ -86287,7 +86327,6 @@ private:
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mDiscriminator;
     chip::Optional<uint16_t> mTimeout;
 
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
@@ -86838,7 +86877,7 @@ private:
     CHIP_ERROR TestRebootTargetDevice_25()
     {
         SetIdentity("alpha");
-        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        Reboot();
         return CHIP_NO_ERROR;
     }
 
@@ -86896,7 +86935,7 @@ private:
     CHIP_ERROR TestRebootTargetDevice_29()
     {
         SetIdentity("alpha");
-        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        Reboot();
         return CHIP_NO_ERROR;
     }
 
@@ -87532,7 +87571,6 @@ public:
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("discriminator", 0, UINT16_MAX, &mDiscriminator);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
     // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
@@ -87639,7 +87677,6 @@ private:
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mDiscriminator;
     chip::Optional<uint16_t> mTimeout;
 
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
@@ -87739,7 +87776,7 @@ private:
     CHIP_ERROR TestRebootTargetDevice_4()
     {
         SetIdentity("alpha");
-        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        Reboot();
         return CHIP_NO_ERROR;
     }
 
@@ -87794,8 +87831,6 @@ public:
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("discriminator", 0, UINT16_MAX, &mDiscriminator);
-        AddArgument("payload", &mPayload);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
     // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
@@ -87887,14 +87922,12 @@ private:
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mDiscriminator;
-    chip::Optional<chip::CharSpan> mPayload;
     chip::Optional<uint16_t> mTimeout;
 
     CHIP_ERROR TestRebootTargetDevice_0()
     {
         SetIdentity("alpha");
-        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        Reboot();
         return CHIP_NO_ERROR;
     }
 
@@ -88033,72 +88066,77 @@ public:
         // incorrect mTestIndex value observed when we get the response.
         switch (mTestIndex++) {
         case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Reboot target device\n");
-            err = TestRebootTargetDevice_0();
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Stop target device\n");
+            err = TestStopTargetDevice_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Wait for the commissioned device to be retrieved for alpha\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrievedForAlpha_1();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 1 : Start target device with the provided discriminator for basic commissioning advertisement\n");
+            err = TestStartTargetDeviceWithTheProvidedDiscriminatorForBasicCommissioningAdvertisement_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Commission from alpha when the commissioning window is not opened\n");
-            err = TestCommissionFromAlphaWhenTheCommissioningWindowIsNotOpened_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Wait for the commissioned device to be retrieved for alpha\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrievedForAlpha_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Open Commissioning Window from alpha\n");
-            err = TestOpenCommissioningWindowFromAlpha_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Commission from alpha when the commissioning window is not opened\n");
+            err = TestCommissionFromAlphaWhenTheCommissioningWindowIsNotOpened_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Commission from alpha again\n");
-            err = TestCommissionFromAlphaAgain_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Open Commissioning Window from alpha\n");
+            err = TestOpenCommissioningWindowFromAlpha_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Check that we just have the one fabric and did not add a new one\n");
-            err = TestCheckThatWeJustHaveTheOneFabricAndDidNotAddANewOne_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Commission from alpha again\n");
+            err = TestCommissionFromAlphaAgain_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Close Commissioning Window after failed commissioning\n");
-            err = TestCloseCommissioningWindowAfterFailedCommissioning_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Check that we just have the one fabric and did not add a new one\n");
+            err = TestCheckThatWeJustHaveTheOneFabricAndDidNotAddANewOne_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Open Commissioning Window from alpha again\n");
-            err = TestOpenCommissioningWindowFromAlphaAgain_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Close Commissioning Window after failed commissioning\n");
+            err = TestCloseCommissioningWindowAfterFailedCommissioning_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Commission from beta\n");
-            err = TestCommissionFromBeta_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Open Commissioning Window from alpha again\n");
+            err = TestOpenCommissioningWindowFromAlphaAgain_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait for the commissioned device to be retrieved for beta\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrievedForBeta_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Commission from beta\n");
+            err = TestCommissionFromBeta_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Open Commissioning Window from beta\n");
-            err = TestOpenCommissioningWindowFromBeta_10();
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Wait for the commissioned device to be retrieved for beta\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrievedForBeta_10();
             break;
         case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : Commission from gamma\n");
-            err = TestCommissionFromGamma_11();
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Open Commissioning Window from beta\n");
+            err = TestOpenCommissioningWindowFromBeta_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait for the commissioned device to be retrieved for gamma\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrievedForGamma_12();
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Commission from gamma\n");
+            err = TestCommissionFromGamma_12();
             break;
         case 13:
-            ChipLogProgress(chipTool, " ***** Test Step 13 : read the mandatory attribute: NodeLabel from alpha\n");
-            err = TestReadTheMandatoryAttributeNodeLabelFromAlpha_13();
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Wait for the commissioned device to be retrieved for gamma\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrievedForGamma_13();
             break;
         case 14:
-            ChipLogProgress(chipTool, " ***** Test Step 14 : write the mandatory attribute NodeLabel from beta\n");
-            err = TestWriteTheMandatoryAttributeNodeLabelFromBeta_14();
+            ChipLogProgress(chipTool, " ***** Test Step 14 : read the mandatory attribute: NodeLabel from alpha\n");
+            err = TestReadTheMandatoryAttributeNodeLabelFromAlpha_14();
             break;
         case 15:
-            ChipLogProgress(chipTool, " ***** Test Step 15 : read the mandatory attribute: NodeLabel from gamma\n");
-            err = TestReadTheMandatoryAttributeNodeLabelFromGamma_15();
+            ChipLogProgress(chipTool, " ***** Test Step 15 : write the mandatory attribute NodeLabel from beta\n");
+            err = TestWriteTheMandatoryAttributeNodeLabelFromBeta_15();
             break;
         case 16:
-            ChipLogProgress(chipTool, " ***** Test Step 16 : write the mandatory attribute NodeLabel back to default\n");
-            err = TestWriteTheMandatoryAttributeNodeLabelBackToDefault_16();
+            ChipLogProgress(chipTool, " ***** Test Step 16 : read the mandatory attribute: NodeLabel from gamma\n");
+            err = TestReadTheMandatoryAttributeNodeLabelFromGamma_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : write the mandatory attribute NodeLabel back to default\n");
+            err = TestWriteTheMandatoryAttributeNodeLabelBackToDefault_17();
             break;
         }
 
@@ -88118,18 +88156,18 @@ public:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         case 2:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
-            break;
-        case 3:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
+            break;
         case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
             VerifyOrReturn(CheckValue("clusterStatus present", status.mClusterStatus.HasValue(), true));
             VerifyOrReturn(CheckValue("clusterStatus value", status.mClusterStatus.Value(), 9));
-            break;
-        case 5:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         case 6:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
@@ -88164,6 +88202,9 @@ public:
         case 16:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
+        case 17:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
         }
 
         // Go on to the next test.
@@ -88177,7 +88218,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 17;
+    const uint16_t mTestCount = 18;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::NodeId> mNodeIdForDuplicateCommissioning;
@@ -88188,21 +88229,28 @@ private:
     chip::Optional<chip::CharSpan> mPayload;
     chip::Optional<uint16_t> mTimeout;
 
-    CHIP_ERROR TestRebootTargetDevice_0()
+    CHIP_ERROR TestStopTargetDevice_0()
     {
         SetIdentity("alpha");
-        Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        Stop();
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrievedForAlpha_1()
+    CHIP_ERROR TestStartTargetDeviceWithTheProvidedDiscriminatorForBasicCommissioningAdvertisement_1()
+    {
+        SetIdentity("alpha");
+        Start(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrievedForAlpha_2()
     {
         SetIdentity("alpha");
         WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCommissionFromAlphaWhenTheCommissioningWindowIsNotOpened_2()
+    CHIP_ERROR TestCommissionFromAlphaWhenTheCommissioningWindowIsNotOpened_3()
     {
         SetIdentity("alpha");
         PairWithQRCode(mNodeIdForDuplicateCommissioning.HasValue() ? mNodeIdForDuplicateCommissioning.Value() : 17ULL,
@@ -88210,7 +88258,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestOpenCommissioningWindowFromAlpha_3()
+    CHIP_ERROR TestOpenCommissioningWindowFromAlpha_4()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -88233,7 +88281,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCommissionFromAlphaAgain_4()
+    CHIP_ERROR TestCommissionFromAlphaAgain_5()
     {
         SetIdentity("alpha");
         PairWithQRCode(mNodeIdForDuplicateCommissioning.HasValue() ? mNodeIdForDuplicateCommissioning.Value() : 17ULL,
@@ -88241,7 +88289,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCheckThatWeJustHaveTheOneFabricAndDidNotAddANewOne_5()
+    CHIP_ERROR TestCheckThatWeJustHaveTheOneFabricAndDidNotAddANewOne_6()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -88269,7 +88317,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCloseCommissioningWindowAfterFailedCommissioning_6()
+    CHIP_ERROR TestCloseCommissioningWindowAfterFailedCommissioning_7()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -88289,7 +88337,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestOpenCommissioningWindowFromAlphaAgain_7()
+    CHIP_ERROR TestOpenCommissioningWindowFromAlphaAgain_8()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -88312,7 +88360,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCommissionFromBeta_8()
+    CHIP_ERROR TestCommissionFromBeta_9()
     {
         SetIdentity("beta");
         PairWithQRCode(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL,
@@ -88320,14 +88368,14 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrievedForBeta_9()
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrievedForBeta_10()
     {
         SetIdentity("beta");
         WaitForCommissionee(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestOpenCommissioningWindowFromBeta_10()
+    CHIP_ERROR TestOpenCommissioningWindowFromBeta_11()
     {
         SetIdentity("beta");
         CHIPDevice * device = GetConnectedDevice();
@@ -88350,7 +88398,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCommissionFromGamma_11()
+    CHIP_ERROR TestCommissionFromGamma_12()
     {
         SetIdentity("gamma");
         PairWithQRCode(mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL,
@@ -88358,7 +88406,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrievedForGamma_12()
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrievedForGamma_13()
     {
         SetIdentity("gamma");
         WaitForCommissionee(mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL);
@@ -88366,7 +88414,7 @@ private:
     }
     NSString * _Nonnull readFromAlpha;
 
-    CHIP_ERROR TestReadTheMandatoryAttributeNodeLabelFromAlpha_13()
+    CHIP_ERROR TestReadTheMandatoryAttributeNodeLabelFromAlpha_14()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -88392,7 +88440,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWriteTheMandatoryAttributeNodeLabelFromBeta_14()
+    CHIP_ERROR TestWriteTheMandatoryAttributeNodeLabelFromBeta_15()
     {
         SetIdentity("beta");
         CHIPDevice * device = GetConnectedDevice();
@@ -88413,7 +88461,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeNodeLabelFromGamma_15()
+    CHIP_ERROR TestReadTheMandatoryAttributeNodeLabelFromGamma_16()
     {
         SetIdentity("gamma");
         CHIPDevice * device = GetConnectedDevice();
@@ -88435,7 +88483,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWriteTheMandatoryAttributeNodeLabelBackToDefault_16()
+    CHIP_ERROR TestWriteTheMandatoryAttributeNodeLabelBackToDefault_17()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
