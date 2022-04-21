@@ -23,7 +23,6 @@ public class ChannelManagerStub implements ChannelManager {
   private static final String TAG = ChannelManagerStub.class.getSimpleName();
 
   private int endpoint;
-  private int mCurrentChannel = 0;
 
   public ChannelManagerStub(int endpoint) {
     this.endpoint = endpoint;
@@ -39,12 +38,6 @@ public class ChannelManagerStub implements ChannelManager {
 
   @Override
   public ChannelLineupInfo getLineup() {
-    // for null lineup test
-    if (mCurrentChannel == 100) {
-      Log.d(TAG, "getChannelLineup: null at " + endpoint);
-      return null;
-    }
-
     ChannelLineupInfo lineupInfo = new ChannelLineupInfo("operator", "lineup", "postalCode");
     Log.d(TAG, "getChannelLineup: " + lineupInfo + " at " + endpoint);
     return lineupInfo;
@@ -53,11 +46,6 @@ public class ChannelManagerStub implements ChannelManager {
   @Override
   public ChannelInfo getCurrentChannel() {
     Log.d(TAG, "getCurrentChannel: at " + endpoint);
-    // for null channel test
-    if (mCurrentChannel == 100) {
-      return null;
-    }
-
     return new ChannelInfo(1, 1, "HDMI", "callSign", "affiliateCallSign");
   }
 
@@ -83,8 +71,6 @@ public class ChannelManagerStub implements ChannelManager {
             + minorNumber
             + " at "
             + endpoint);
-
-    mCurrentChannel = majorNumber;
 
     // for failed test
     if (majorNumber == 1 && minorNumber == 1) {
