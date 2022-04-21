@@ -52,8 +52,14 @@ tests:
       command: "Reboot"
       arguments:
           values:
+              - name: "registerKey"
+                value: "default"
               - name: "discriminator"
                 value: discriminator
+              - name: "port"
+                value: 5540
+              - name: "kvs"
+                value: "/tmp/chip_kvs_default"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -84,8 +90,14 @@ tests:
       command: "Reboot"
       arguments:
           values:
+              - name: "registerKey"
+                value: "default"
               - name: "discriminator"
                 value: discriminator
+              - name: "port"
+                value: 5540
+              - name: "kvs"
+                value: "/tmp/chip_kvs_default"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -116,8 +128,14 @@ tests:
       command: "Reboot"
       arguments:
           values:
+              - name: "registerKey"
+                value: "default"
               - name: "discriminator"
                 value: discriminator
+              - name: "port"
+                value: 5540
+              - name: "kvs"
+                value: "/tmp/chip_kvs_default"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -142,8 +160,14 @@ tests:
       command: "Reboot"
       arguments:
           values:
+              - name: "registerKey"
+                value: "default"
               - name: "discriminator"
                 value: discriminator
+              - name: "port"
+                value: 5540
+              - name: "kvs"
+                value: "/tmp/chip_kvs_default"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -174,8 +198,14 @@ tests:
       command: "Reboot"
       arguments:
           values:
+              - name: "registerKey"
+                value: "default"
               - name: "discriminator"
                 value: discriminator
+              - name: "port"
+                value: 5540
+              - name: "kvs"
+                value: "/tmp/chip_kvs_default"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -203,8 +233,14 @@ tests:
       command: "Reboot"
       arguments:
           values:
+              - name: "registerKey"
+                value: "default"
               - name: "discriminator"
                 value: discriminator
+              - name: "port"
+                value: 5540
+              - name: "kvs"
+                value: "/tmp/chip_kvs_default"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"

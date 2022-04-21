@@ -27,30 +27,30 @@
 const Start = {
   name : 'Start',
   arguments : [
-    { 'name' : 'discriminator', type : 'INT16U', isOptional : true }, { 'name' : 'port', type : 'INT16U', isOptional : true },
-    { 'name' : 'kvs', type : 'CHAR_STRING', isOptional : true }
+    { 'name' : 'registerKey', type : 'CHAR_STRING' }, { 'name' : 'discriminator', type : 'INT16U', isOptional : true },
+    { 'name' : 'port', type : 'INT16U', isOptional : true }, { 'name' : 'kvs', type : 'CHAR_STRING', isOptional : true }
   ],
   response : { arguments : [] }
 };
 
 const Stop = {
   name : 'Stop',
-  arguments : [],
+  arguments : [ { 'name' : 'registerKey', type : 'CHAR_STRING' } ],
   response : { arguments : [] }
 };
 
 const Reboot = {
   name : 'Reboot',
   arguments : [
-    { 'name' : 'discriminator', type : 'INT16U', isOptional : true }, { 'name' : 'port', type : 'INT16U', isOptional : true },
-    { 'name' : 'kvs', type : 'CHAR_STRING', isOptional : true }
+    { 'name' : 'registerKey', type : 'CHAR_STRING' }, { 'name' : 'discriminator', type : 'INT16U', isOptional : true },
+    { 'name' : 'port', type : 'INT16U', isOptional : true }, { 'name' : 'kvs', type : 'CHAR_STRING', isOptional : true }
   ],
   response : { arguments : [] }
 };
 
 const FactoryReset = {
   name : 'FactoryReset',
-  arguments : [],
+  arguments : [ { 'name' : 'registerKey', type : 'CHAR_STRING' } ],
   response : { arguments : [] }
 };
 

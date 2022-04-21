@@ -133,8 +133,14 @@ tests:
       command: "Reboot"
       arguments:
           values:
+              - name: "registerKey"
+                value: "default"
               - name: "discriminator"
                 value: discriminator
+              - name: "port"
+                value: 5540
+              - name: "kvs"
+                value: "/tmp/chip_kvs_default"
 
     ### DUT GoesOff
     - label: "3d: Wait for the commissioned device to be retrieved"

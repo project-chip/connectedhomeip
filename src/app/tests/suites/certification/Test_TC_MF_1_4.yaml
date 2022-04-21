@@ -33,8 +33,14 @@ tests:
       command: "Reboot"
       arguments:
           values:
+              - name: "registerKey"
+                value: "default"
               - name: "discriminator"
                 value: discriminator
+              - name: "port"
+                value: 5540
+              - name: "kvs"
+                value: "/tmp/chip_kvs_default"
 
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
       cluster: "DelayCommands"

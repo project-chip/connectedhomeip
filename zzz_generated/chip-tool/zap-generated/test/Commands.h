@@ -15668,7 +15668,7 @@ private:
         case 0: {
             LogStep(0, "Reboot target device");
             SetIdentity(kIdentityAlpha);
-            return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            return Reboot("default", mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U, 5540, "/tmp/chip_kvs_default");
         }
         case 1: {
             LogStep(1, "TH_CR1 starts a commissioning process with DUT_CE");
@@ -15857,7 +15857,7 @@ private:
         case 0: {
             LogStep(0, "Reboot target device");
             SetIdentity(kIdentityAlpha);
-            return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            return Reboot("default", mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U, 5540, "/tmp/chip_kvs_default");
         }
         case 1: {
             LogStep(1, "TH_CR1 starts a commissioning process with DUT_CE");
@@ -17700,7 +17700,7 @@ private:
         case 4: {
             LogStep(4, "Power off DUT");
             SetIdentity(kIdentityAlpha);
-            return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            return Reboot("default", mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U, 5540, "/tmp/chip_kvs_default");
         }
         case 5: {
             LogStep(5, "Wait for the commissioned device to be retrieved");
@@ -17721,7 +17721,7 @@ private:
         case 8: {
             LogStep(8, "Power off DUT");
             SetIdentity(kIdentityAlpha);
-            return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            return Reboot("default", mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U, 5540, "/tmp/chip_kvs_default");
         }
         case 9: {
             LogStep(9, "Wait for the commissioned device to be retrieved");
@@ -17742,7 +17742,7 @@ private:
         case 12: {
             LogStep(12, "Power off DUT");
             SetIdentity(kIdentityAlpha);
-            return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            return Reboot("default", mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U, 5540, "/tmp/chip_kvs_default");
         }
         case 13: {
             LogStep(13, "Wait for the commissioned device to be retrieved");
@@ -17756,7 +17756,7 @@ private:
         case 15: {
             LogStep(15, "Power off DUT");
             SetIdentity(kIdentityAlpha);
-            return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            return Reboot("default", mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U, 5540, "/tmp/chip_kvs_default");
         }
         case 16: {
             LogStep(16, "Wait for the commissioned device to be retrieved");
@@ -17776,7 +17776,7 @@ private:
         case 19: {
             LogStep(19, "Power off DUT");
             SetIdentity(kIdentityAlpha);
-            return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            return Reboot("default", mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U, 5540, "/tmp/chip_kvs_default");
         }
         case 20: {
             LogStep(20, "Wait for the commissioned device to be retrieved");
@@ -17795,7 +17795,7 @@ private:
         case 23: {
             LogStep(23, "Power off DUT");
             SetIdentity(kIdentityAlpha);
-            return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            return Reboot("default", mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U, 5540, "/tmp/chip_kvs_default");
         }
         case 24: {
             LogStep(24, "Wait for the commissioned device to be retrieved");
@@ -20728,7 +20728,7 @@ private:
         case 0: {
             LogStep(0, "Reboot target device");
             SetIdentity(kIdentityAlpha);
-            return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            return Reboot("default", mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U, 5540, "/tmp/chip_kvs_default");
         }
         case 1: {
             LogStep(1, "Wait for the commissioned device to be retrieved");
@@ -20832,7 +20832,7 @@ private:
         case 18: {
             LogStep(18, "Reboot target device");
             SetIdentity(kIdentityAlpha);
-            return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            return Reboot("default", mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U, 5540, "/tmp/chip_kvs_default");
         }
         case 19: {
             LogStep(19, "Log commands");
@@ -28848,7 +28848,7 @@ private:
         case 12: {
             LogStep(12, "3c: reboot/restart the DUT");
             SetIdentity(kIdentityAlpha);
-            return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            return Reboot("default", mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U, 5540, "/tmp/chip_kvs_default");
         }
         case 13: {
             LogStep(13, "3d: Wait for the commissioned device to be retrieved");
@@ -38308,7 +38308,7 @@ private:
         case 0: {
             LogStep(0, "Reboot target device");
             SetIdentity(kIdentityAlpha);
-            return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            return Reboot("default", mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U, 5540, "/tmp/chip_kvs_default");
         }
         case 1: {
             LogStep(1, "Wait for the commissioned device to be retrieved");
@@ -38431,7 +38431,7 @@ private:
         case 21: {
             LogStep(21, "Reboot target device");
             SetIdentity(kIdentityAlpha);
-            return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            return Reboot("default", mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U, 5540, "/tmp/chip_kvs_default");
         }
         case 22: {
             LogStep(22, "Wait for the commissioned device to be retrieved");
@@ -41277,7 +41277,7 @@ private:
         case 25: {
             LogStep(25, "Reboot target device");
             SetIdentity(kIdentityAlpha);
-            return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            return Reboot("default", mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U, 5540, "/tmp/chip_kvs_default");
         }
         case 26: {
             LogStep(26, "Wait for the commissioned device to be retrieved");
@@ -41297,7 +41297,7 @@ private:
         case 29: {
             LogStep(29, "Reboot target device");
             SetIdentity(kIdentityAlpha);
-            return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            return Reboot("default", mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U, 5540, "/tmp/chip_kvs_default");
         }
         case 30: {
             LogStep(30, "Wait for the commissioned device to be retrieved");
@@ -41316,11 +41316,12 @@ private:
 class TestSystemCommandsSuite : public TestCommand
 {
 public:
-    TestSystemCommandsSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestSystemCommands", 14, credsIssuerConfig)
+    TestSystemCommandsSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestSystemCommands", 20, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("payload", &mPayload);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
@@ -41335,6 +41336,7 @@ private:
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<chip::CharSpan> mPayload;
     chip::Optional<uint16_t> mTimeout;
 
     chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
@@ -41405,6 +41407,30 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
+        case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 15:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 16:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 17:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 18:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 19:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -41426,69 +41452,100 @@ private:
             return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         }
         case 1: {
-            LogStep(1, "Stop the accessory");
+            LogStep(1, "Stop the default accessory");
             SetIdentity(kIdentityAlpha);
-            return Stop();
+            return Stop("default");
         }
         case 2: {
-            LogStep(2, "Start the accessory with no command line options");
+            LogStep(2, "Start the default accessory with no command line options");
             SetIdentity(kIdentityAlpha);
-            return Start();
+            return Start("default");
         }
         case 3: {
-            LogStep(3, "Stop the accessory");
+            LogStep(3, "Stop the default accessory");
             SetIdentity(kIdentityAlpha);
-            return Stop();
+            return Stop("default");
         }
         case 4: {
-            LogStep(4, "Start the accessory with only discriminator command line option");
+            LogStep(4, "Start the default accessory with discriminator command line option");
             SetIdentity(kIdentityAlpha);
-            return Start(1111);
+            return Start("default", 1111);
         }
         case 5: {
-            LogStep(5, "Stop the accessory");
+            LogStep(5, "Stop the default accessory");
             SetIdentity(kIdentityAlpha);
-            return Stop();
+            return Stop("default");
         }
         case 6: {
-            LogStep(6, "Start the accessory with discriminator and port command line option");
+            LogStep(6, "Start the default accessory with discriminator and port command line options");
             SetIdentity(kIdentityAlpha);
-            return Start(1111, 5560);
+            return Start("default", 1111, 5560);
         }
         case 7: {
-            LogStep(7, "Stop the accessory");
+            LogStep(7, "Stop the default accessory");
             SetIdentity(kIdentityAlpha);
-            return Stop();
+            return Stop("default");
         }
         case 8: {
-            LogStep(8, "Start the accessory with all command line options");
+            LogStep(8, "Start the default accessory with all command line options");
             SetIdentity(kIdentityAlpha);
-            return Start(1111, 5560, "/tmp/chip_kvs_test");
+            return Start("default", 1111, 5560, "/tmp/chip_kvs_default");
         }
         case 9: {
-            LogStep(9, "Reboot the accessory with no command line options");
+            LogStep(9, "Start a second accessory with all command line options");
             SetIdentity(kIdentityAlpha);
-            return Reboot();
+            return Start("chip-lock-app", 50, 5561, "/tmp/chip_kvs_lock");
         }
         case 10: {
-            LogStep(10, "Reboot the accessory with only discriminator command line option");
+            LogStep(10, "Commission second accessory from alpha");
             SetIdentity(kIdentityAlpha);
-            return Reboot(2222);
+            return PairWithQRCode(
+                3735928559, mPayload.HasValue() ? mPayload.Value() : chip::CharSpan::fromCharString("MT:-24J0IX4122-.548G00"));
         }
         case 11: {
-            LogStep(11, "Reboot the accessory with discriminator and port command line option");
+            LogStep(11, "Wait for the second commissioned device to be retrieved for alpha");
             SetIdentity(kIdentityAlpha);
-            return Reboot(2222, 5565);
+            return WaitForCommissionee(3735928559);
         }
         case 12: {
-            LogStep(12, "Reboot the accessory with all command line options");
+            LogStep(12, "Reboot the second accessory with all command line options");
             SetIdentity(kIdentityAlpha);
-            return Reboot(2222, 5565, "/tmp/chip_kvs_test");
+            return Reboot("chip-lock-app", 50, 5561, "/tmp/chip_kvs_lock");
         }
         case 13: {
-            LogStep(13, "Factory Reset the accessory");
+            LogStep(13, "Stop the second accessory");
             SetIdentity(kIdentityAlpha);
-            return FactoryReset();
+            return Stop("chip-lock-app");
+        }
+        case 14: {
+            LogStep(14, "Reboot the default accessory with no command line options");
+            SetIdentity(kIdentityAlpha);
+            return Reboot("default");
+        }
+        case 15: {
+            LogStep(15, "Reboot the default accessory with discriminator command line option");
+            SetIdentity(kIdentityAlpha);
+            return Reboot("default", 2222);
+        }
+        case 16: {
+            LogStep(16, "Reboot the default accessory with discriminator and port command line options");
+            SetIdentity(kIdentityAlpha);
+            return Reboot("default", 2222, 5565);
+        }
+        case 17: {
+            LogStep(17, "Reboot the default accessory with all command line options");
+            SetIdentity(kIdentityAlpha);
+            return Reboot("default", 2222, 5565, "/tmp/chip_kvs_default");
+        }
+        case 18: {
+            LogStep(18, "Factory Reset the default accessory");
+            SetIdentity(kIdentityAlpha);
+            return FactoryReset("default");
+        }
+        case 19: {
+            LogStep(19, "Factory Reset the second accessory");
+            SetIdentity(kIdentityAlpha);
+            return FactoryReset("chip-lock-app");
         }
         }
         return CHIP_NO_ERROR;
@@ -41915,7 +41972,7 @@ private:
         case 4: {
             LogStep(4, "Reboot target device");
             SetIdentity(kIdentityAlpha);
-            return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            return Reboot("default", mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U, 5540, "/tmp/chip_kvs_default");
         }
         case 5: {
             LogStep(5, "Wait for the commissioned device to be retrieved");
@@ -42027,7 +42084,7 @@ private:
         case 0: {
             LogStep(0, "Reboot target device");
             SetIdentity(kIdentityAlpha);
-            return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            return Reboot("default", mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U, 5540, "/tmp/chip_kvs_default");
         }
         case 1: {
             LogStep(1, "Wait for the alpha device to be retrieved ");
@@ -42218,7 +42275,7 @@ private:
         case 0: {
             LogStep(0, "Reboot target device");
             SetIdentity(kIdentityAlpha);
-            return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            return Reboot("default", mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U, 5540, "/tmp/chip_kvs_default");
         }
         case 1: {
             LogStep(1, "Wait for the commissioned device to be retrieved for alpha");
@@ -53346,7 +53403,7 @@ private:
         case 0: {
             LogStep(0, "Reboot target device");
             SetIdentity(kIdentityAlpha);
-            return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            return Reboot("default", mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U, 5540, "/tmp/chip_kvs_default");
         }
         case 1: {
             LogStep(1, "TH_CR1 starts a commissioning process with DUT_CE");

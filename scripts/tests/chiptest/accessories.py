@@ -49,6 +49,9 @@ class AppsRegister:
     def removeAll(self):
         self.__accessories = {}
 
+    def get(self, name):
+        return self.__accessories[name]
+
     def kill(self, name):
         accessory = self.__accessories[name]
         if accessory:

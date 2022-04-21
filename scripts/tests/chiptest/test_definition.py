@@ -36,7 +36,7 @@ class App:
         self.runner = runner
         self.command = command
         self.cv_stopped = threading.Condition()
-        self.stopped = False
+        self.stopped = True
         self.lastLogIndex = 0
         self.kvs = '/tmp/chip_kvs'
 
@@ -208,14 +208,32 @@ class TestDefinition:
 
         try:
             if self.target == TestTarget.ALL_CLUSTERS:
-                app_cmd = paths.all_clusters_app
+                target_app = paths.all_clusters_app
             elif self.target == TestTarget.TV:
-                app_cmd = paths.tv_app
+                target_app = paths.tv_app
             elif self.target == TestTarget.LOCK:
-                app_cmd = paths.lock_app
+                target_app = paths.lock_app
             else:
                 raise Exception("Unknown test target - "
                                 "don't know which application to run")
+
+            # The paths argument is a dataclass where each field contains a list of one application path
+            for field in paths.__dataclass_fields__:
+                path = getattr(paths, field)
+
+                # For the app indicated by self.target, give it the 'default' key to add to the register
+                if path == target_app:
+                    key = 'default'
+                else:
+                    key = os.path.basename(path[0])
+
+                app = App(runner, path)
+                # Add the App to the register immediately, so if it fails during
+                # start() we will be able to clean things up properly.
+                apps_register.add(key, app)
+                # Remove server application storage (factory reset),
+                # so it will be commissionable again.
+                app.factoryReset()
 
             tool_cmd = paths.chip_tool
 
@@ -230,19 +248,13 @@ class TestDefinition:
                 if os.path.exists(f):
                     os.unlink(f)
 
-            app = App(runner, app_cmd)
-            # Add the App to the register immediately, so if it fails during
-            # start() we will be able to clean things up properly.
-            apps_register.add("default", app)
-            # Remove server application storage (factory reset),
-            # so it will be commissionable again.
-            app.factoryReset()
-            app.start()
+            # Only start and pair the default app
+            app = apps_register.get('default')
+            app.start({'--KVS': '/tmp/chip_kvs_default'})
             pairing_cmd = tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode]
             if sys.platform != 'darwin':
                 pairing_cmd.append('--paa-trust-store-path')
                 pairing_cmd.append(DEVELOPMENT_PAA_LIST)
-
             runner.RunSubprocess(pairing_cmd,
                                  name='PAIR', dependencies=[apps_register])
 
