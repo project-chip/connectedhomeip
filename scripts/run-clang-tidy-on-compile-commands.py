@@ -132,13 +132,14 @@ class ClangTidyEntry:
                 # Most (all?) of our files do contain errors in system-heades so lines like these
                 # are expected:
                 #
+                # ```
                 # 59 warnings generated.
                 # Suppressed 59 warnings (59 in non-user code).
                 # Use -header-filter=.* to display errors from all non-system headers.
                 # Use -system-headers to display errors from system headers as well.
+                # ```
                 #
-                # We ignore output from that file
-
+                # The list below ignores those expected output lines.
                 skip_strings = [
                     "warnings generated",
                     "in non-user code",
