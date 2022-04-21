@@ -179,12 +179,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     {
         stateParams.caseServer = chip::Platform::New<CASEServer>();
 
-        //
         // Enable listening for session establishment messages.
-        //
-        // We pass in a nullptr for the BLELayer since we're not permitting usage of BLE in this server modality for the controller,
-        // especially since it will interrupt other potential usages of BLE by the controller acting in a commissioning capacity.
-        //
         ReturnErrorOnFailure(stateParams.caseServer->ListenForSessionEstablishment(
             stateParams.exchangeMgr, stateParams.transportMgr, stateParams.sessionMgr, stateParams.fabricTable,
             stateParams.sessionResumptionStorage, stateParams.groupDataProvider));
