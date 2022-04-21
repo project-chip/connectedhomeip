@@ -307,11 +307,12 @@ class ClangTidyRunner:
             task_queue.put(e)
         task_queue.join()
 
-        logging.info("Successfully processed %d paths", self.state.successes)
-        logging.info("Failed to process %d paths", self.state.failures)
+        logging.info("Successfully processed %d path(s)", self.state.successes)
+        logging.warning("Failed to process %d path(s)", self.state.failures)
         if self.state.failures:
+            logging.warning("The following paths failed clang-tidy checks:")
             for name in self.state.failed_files:
-                logging.warning("Failure reported for %s", name)
+                logging.warning("  - %s", name)
 
         return self.state.failures == 0
 
