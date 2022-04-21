@@ -51,72 +51,77 @@ static void updateAttributeLinks(EndpointId endpoint)
 {
     PumpControlMode controlMode;
     PumpOperationMode operationMode;
-    
+
     // Get the current control- and operation modes
     Attributes::ControlMode::Get(endpoint, &controlMode);
     Attributes::OperationMode::Get(endpoint, &operationMode);
 
     switch (operationMode)
     {
-        case PumpOperationMode::kNormal:
+    case PumpOperationMode::kNormal: {
+        // The pump runs in the control mode as per the type of the remote sensor
+        // If the remote sensor is a Flow sensor the mode would be ConstantFlow
+        // If the remote sensor is a Pressure sensor the mode would be ConstantPressure (not ProportionalPressure)
+        // If the remote sensor is a Temperature sensor the mode would be ConstantTemperature
+
+        // If a remote sensor is detected and the OperationMode is kNormal, then the pump is operating in the
+        // control mode indicated by the repective remote senor type
+        RemoteSensorType sensorType = detectRemoteSensorConnected();
+        switch (sensorType)
         {
-            // The pump runs in the control mode as per the type of the remote sensor
-            // If the remote sensor is a Flow sensor the mode would be ConstantFlow
-            // If the remote sensor is a Pressure sensor the mode would be ConstantPressure (not ProportionalPressure)
-            // If the remote sensor is a Temperature sensor the mode would be ConstantTemperature
-
-            // If a remote sensor is detected and the OperationMode is kNormal, then the pump is operating in the
-            // control mode indicated by the repective remote senor type
-            RemoteSensorType sensorType = detectRemoteSensorConnected();
-            switch (sensorType)
-            {
-            case RemoteSensorType::kFlowSensor:
-                Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantFlow);
-                Attributes::PumpStatus::Set(endpoint, PumpStatus::kRemoteFlow);
-                break;
-            case RemoteSensorType::kPressureSensor:
-                Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantPressure);
-                Attributes::PumpStatus::Set(endpoint, PumpStatus::kRemotePressure);
-                break;
-            case RemoteSensorType::kTemperatureSensor:
-                Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantTemperature);
-                Attributes::PumpStatus::Set(endpoint, PumpStatus::kRemoteTemperature);
-                break;
-            case RemoteSensorType::kNoSensor:
-                // The pump is controlled by a setpoint, as defined by
-                // the ControlMode attribute. (N.B. The setpoint is an internal variable which MAY be
-                // controlled between 0% and 100%, e.g., by means of the Level Control cluster)
-                // The ControlMode can be any of the following:
-                // ConstantSpeed, ConstantPressure, ProportionalPressure,
-                // ConstantFlow, ConstantTemperature or Automatic
-                Attributes::EffectiveControlMode::Set(endpoint, controlMode);
-                break;
-            }
-            // Set the overall effective operation mode to Normal
-            Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kNormal);
-        }
-        break;
-
-        // The pump is controlled by the OperationMode attribute.
-        // Maximum, Minimum or Local
-
-        case PumpOperationMode::kMaximum:
-            Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kMaximum);
-            Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantSpeed);
-            LevelControl::Attributes::CurrentLevel::Set(endpoint, 200);
+        case RemoteSensorType::kFlowSensor:
+            Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantFlow);
+            Attributes::PumpStatus::Set(endpoint, PumpStatus::kRemoteFlow);
             break;
-
-        case PumpOperationMode::kMinimum:
-            Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kMinimum);
-            Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantSpeed);
-            LevelControl::Attributes::CurrentLevel::Set(endpoint, 1);
+        case RemoteSensorType::kPressureSensor:
+            Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantPressure);
+            Attributes::PumpStatus::Set(endpoint, PumpStatus::kRemotePressure);
             break;
-
-        case PumpOperationMode::kLocal:
-            Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kLocal);
+        case RemoteSensorType::kTemperatureSensor:
+            Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantTemperature);
+            Attributes::PumpStatus::Set(endpoint, PumpStatus::kRemoteTemperature);
+            break;
+        case RemoteSensorType::kNoSensor:
+            // The pump is controlled by a setpoint, as defined by
+            // the ControlMode attribute. (N.B. The setpoint is an internal variable which MAY be
+            // controlled between 0% and 100%, e.g., by means of the Level Control cluster)
+            // The ControlMode can be any of the following:
+            // ConstantSpeed, ConstantPressure, ProportionalPressure,
+            // ConstantFlow, ConstantTemperature or Automatic
             Attributes::EffectiveControlMode::Set(endpoint, controlMode);
-            Attributes::PumpStatus::Set(endpoint, PumpStatus::kLocalOverride);
             break;
+        }
+        // Set the overall effective operation mode to Normal
+        Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kNormal);
+    }
+    break;
+
+    // The pump is controlled by the OperationMode attribute.
+    // Maximum, Minimum or Local
+
+    case PumpOperationMode::kMaximum: {
+        uint8_t maxLevel;
+        Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kMaximum);
+        Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantSpeed);
+        LevelControl::Attributes::MaxLevel::Get(endpoint, &maxLevel);
+        LevelControl::Attributes::CurrentLevel::Set(endpoint, maxLevel);
+    }
+    break;
+
+    case PumpOperationMode::kMinimum: {
+        uint8_t minLevel;
+        Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kMinimum);
+        Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantSpeed);
+        LevelControl::Attributes::MinLevel::Get(endpoint, &minLevel);
+        LevelControl::Attributes::CurrentLevel::Set(endpoint, minLevel);
+    }
+    break;
+
+    case PumpOperationMode::kLocal:
+        Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kLocal);
+        Attributes::EffectiveControlMode::Set(endpoint, controlMode);
+        Attributes::PumpStatus::Set(endpoint, PumpStatus::kLocalOverride);
+        break;
     }
 }
 } // namespace
