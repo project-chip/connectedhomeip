@@ -52,9 +52,8 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         break;
 
     case DeviceEventType::kServiceProvisioningChange:
-        PLAT_LOG("## Service provisioning state change (%d,%d)",
-            event->ServiceProvisioningChange.IsServiceProvisioned,
-            event->ServiceProvisioningChange.ServiceConfigUpdated);
+        PLAT_LOG("## Service provisioning state change (%d,%d)", event->ServiceProvisioningChange.IsServiceProvisioned,
+                 event->ServiceProvisioningChange.ServiceConfigUpdated);
         break;
 
     case DeviceEventType::kSessionEstablished:
@@ -68,16 +67,14 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
     case DeviceEventType::kCHIPoBLEConnectionClosed:
         PLAT_LOG("CHIPoBLE disconnected");
         break;
-    
+
     case DeviceEventType::kThreadStateChange:
-        PLAT_LOG("## Thread stack state change (%x)",
-            event->ThreadStateChange.OpenThread.Flags);
+        PLAT_LOG("## Thread stack state change (%x)", event->ThreadStateChange.OpenThread.Flags);
         break;
 
     case DeviceEventType::kCommissioningComplete:
-        PLAT_LOG("Commissioning complete (%x,%d)",
-            event->CommissioningComplete.PeerNodeId,
-            event->CommissioningComplete.PeerFabricIndex);
+        PLAT_LOG("Commissioning complete (%x,%d)", event->CommissioningComplete.PeerNodeId,
+                 event->CommissioningComplete.PeerFabricIndex);
         break;
 
     case DeviceEventType::kOperationalNetworkEnabled:

@@ -17,11 +17,11 @@
  *    limitations under the License.
  */
 
-#include "CHIPDeviceManager.h"
-#include "DeviceCallbacks.h"
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
+#include "CHIPDeviceManager.h"
+#include "DeviceCallbacks.h"
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 
@@ -158,7 +158,7 @@ int AppTask::Init()
     }
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
-    ret = deviceMgr.Init(&sDeviceCallbacks);
+    ret                           = deviceMgr.Init(&sDeviceCallbacks);
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("CHIPDeviceManager::Init() failed: %s", ErrorStr(ret));

@@ -24,8 +24,8 @@
 
 #include <stdlib.h>
 
-#include "CHIPDeviceManager.h"
 #include "AppConfig.h"
+#include "CHIPDeviceManager.h"
 
 #include <app/ConcreteAttributePath.h>
 #include <app/util/basic-types.h>
