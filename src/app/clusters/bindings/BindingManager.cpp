@@ -186,6 +186,9 @@ void BindingManager::HandleDeviceConnectionFailure(PeerId peerId, CHIP_ERROR err
     // Simply release the entry, the connection will be re-established as needed.
     ChipLogError(AppServer, "Failed to establish connection to node 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
 
+    FabricIndex fabricToRemove = kUndefinedFabricIndex;
+    NodeId nodeToRemove        = kUndefinedNodeId;
+
     for (PendingNotificationEntry pendingNotification : mPendingNotificationMap)
     {
         EmberBindingTableEntry entry = BindingTable::GetInstance().GetAt(pendingNotification.mBindingEntryId);
@@ -194,6 +197,9 @@ void BindingManager::HandleDeviceConnectionFailure(PeerId peerId, CHIP_ERROR err
 
         if (peerId == peer)
         {
+            fabricToRemove = entry.fabricIndex;
+            nodeToRemove   = entry.nodeId;
+
             BindingManagerContext * context = static_cast<BindingManagerContext *>(pendingNotification.mContext);
 
             context->DecrementConsumersNumber();
@@ -203,6 +209,7 @@ void BindingManager::HandleDeviceConnectionFailure(PeerId peerId, CHIP_ERROR err
             }
         }
     }
+    mPendingNotificationMap.RemoveAllEntriesForNode(fabricToRemove, nodeToRemove);
 
     mInitParams.mCASESessionManager->ReleaseSession(peerId);
 }
