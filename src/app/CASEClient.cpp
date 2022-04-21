@@ -27,7 +27,8 @@ void CASEClient::SetRemoteMRPIntervals(const ReliableMessageProtocolConfig & rem
 }
 
 CHIP_ERROR CASEClient::EstablishSession(PeerId peer, const Transport::PeerAddress & peerAddress,
-                                        const ReliableMessageProtocolConfig & remoteMRPConfig, SessionEstablishmentDelegate * delegate)
+                                        const ReliableMessageProtocolConfig & remoteMRPConfig,
+                                        SessionEstablishmentDelegate * delegate)
 {
     // Create a UnauthenticatedSession for CASE pairing.
     // Don't use mSecureSession here, because mSecureSession is for encrypted communication.

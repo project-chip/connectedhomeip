@@ -51,8 +51,8 @@ constexpr size_t kAttestationNonceLength = 32;
 
 struct ControllerDeviceInitParams
 {
-    SessionManager * sessionManager                               = nullptr;
-    Messaging::ExchangeManager * exchangeMgr                      = nullptr;
+    SessionManager * sessionManager          = nullptr;
+    Messaging::ExchangeManager * exchangeMgr = nullptr;
 };
 
 class CommissioneeDeviceProxy : public DeviceProxy, public SessionReleaseDelegate
@@ -85,10 +85,10 @@ public:
      */
     void Init(ControllerDeviceInitParams params, NodeId deviceId, const Transport::PeerAddress & peerAddress)
     {
-        mSessionManager     = params.sessionManager;
-        mExchangeMgr        = params.exchangeMgr;
-        mPeerId = PeerId().SetNodeId(deviceId);
-        mState  = ConnectionState::Connecting;
+        mSessionManager = params.sessionManager;
+        mExchangeMgr    = params.exchangeMgr;
+        mPeerId         = PeerId().SetNodeId(deviceId);
+        mState          = ConnectionState::Connecting;
 
         mDeviceAddress = peerAddress;
     }

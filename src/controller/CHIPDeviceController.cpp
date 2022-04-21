@@ -330,8 +330,8 @@ CHIP_ERROR DeviceController::ComputePASEVerifier(uint32_t iterations, uint32_t s
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 {
     return ControllerDeviceInitParams{
-        .sessionManager     = mSystemState->SessionMgr(),
-        .exchangeMgr        = mSystemState->ExchangeMgr(),
+        .sessionManager = mSystemState->SessionMgr(),
+        .exchangeMgr    = mSystemState->ExchangeMgr(),
     };
 }
 
