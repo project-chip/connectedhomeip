@@ -154,6 +154,9 @@ public:
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
     Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return SessionEstablishmentExchangeDispatch::Instance(); }
 
+    //// SessionReleaseDelegate ////
+    void OnSessionReleased() override;
+
     FabricIndex GetFabricIndex() const { return mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : kUndefinedFabricIndex; }
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.

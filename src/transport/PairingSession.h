@@ -37,9 +37,10 @@ namespace chip {
 
 class SessionManager;
 
-class DLL_EXPORT PairingSession
+class DLL_EXPORT PairingSession : public SessionReleaseDelegate
 {
 public:
+    PairingSession() : mSecureSessionHolder(*this) {}
     virtual ~PairingSession() { Clear(); }
 
     virtual Transport::SecureSession::Type GetSecureSessionType() const = 0;
@@ -164,9 +165,8 @@ protected:
 
 protected:
     CryptoContext::SessionRole mRole;
-    SessionHolder mSecureSessionHolder;
-    // mSessionManager is set if we actually allocate a secure session, so we
-    // can clean it up later as needed.
+    SessionHolderWithDelegate mSecureSessionHolder;
+    // TODO(17568): Remove mSessionManager we dont't need it
     SessionManager * mSessionManager = nullptr;
 
     // mLocalMRPConfig is our config which is sent to the other end and used by the peer session.
