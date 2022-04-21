@@ -182,11 +182,12 @@ CHIP_ERROR InitCredentialSets()
 
 void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 {
+    SessionManager sessionManager;
+
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegate;
     CASESession pairing;
     FabricTable fabrics;
-    SessionManager sessionManager;
 
     NL_TEST_ASSERT(inSuite, pairing.GetSecureSessionType() == SecureSession::Type::kCASE);
 
@@ -201,6 +202,7 @@ void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    SessionManager sessionManager;
 
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegate;
@@ -209,7 +211,6 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 
     FabricInfo * fabric = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
     NL_TEST_ASSERT(inSuite, fabric != nullptr);
-    SessionManager sessionManager;
 
     ExchangeContext * context = ctx.NewUnauthenticatedExchangeToBob(&pairing);
 
@@ -249,15 +250,18 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     gLoopback.mMessageSendError = CHIP_NO_ERROR;
 }
 
-void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, CASESession & pairingCommissioner,
-                                           TestCASESecurePairingDelegate & delegateCommissioner)
+void CASE_SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    SessionManager sessionManager;
+
+    TestCASESecurePairingDelegate delegateCommissioner;
+    CASESession pairingCommissioner;
+    pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
 
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegateAccessory;
     CASESession pairingAccessory;
-    SessionManager sessionManager;
 
     gLoopback.mSentMessageCount = 0;
 
@@ -282,14 +286,6 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 5);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
-}
-
-void CASE_SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
-{
-    TestCASESecurePairingDelegate delegateCommissioner;
-    CASESession pairingCommissioner;
-    pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
-    CASE_SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, delegateCommissioner);
 }
 
 CASEServerForTest gPairingServer;

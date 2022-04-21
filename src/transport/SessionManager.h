@@ -53,8 +53,6 @@
 
 namespace chip {
 
-class PairingSession;
-
 /**
  * @brief
  *  Tracks ownership of a encrypted packet buffer.
@@ -169,7 +167,7 @@ public:
      * @return SessionHandle with a reference to a SecureSession, else NullOptional on failure
      */
     CHECK_RETURN_VALUE
-    Optional<SessionHandle> AllocateSession();
+    Optional<SessionHandle> AllocateSession(Transport::SecureSession::Type secureSessionType);
 
     void ExpirePairing(const SessionHandle & session);
     void ExpireAllPairings(const ScopedNodeId & node);
@@ -262,7 +260,7 @@ private:
     System::Layer * mSystemLayer = nullptr;
     FabricTable * mFabricTable   = nullptr;
     Transport::UnauthenticatedSessionTable<CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE> mUnauthenticatedSessions;
-    Transport::SecureSessionTable<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mSecureSessions;
+    Transport::SecureSessionTable mSecureSessions;
     State mState; // < Initialization state of the object
     chip::Transport::GroupOutgoingCounters mGroupClientCounter;
 
@@ -275,8 +273,6 @@ private:
     Transport::MessageCounterManagerInterface * mMessageCounterManager = nullptr;
 
     GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;
-
-    friend class SessionHandle;
 
     /** Schedules a new oneshot timer for checking connection expiry. */
     void ScheduleExpiryTimer();
