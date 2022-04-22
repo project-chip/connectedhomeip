@@ -199,10 +199,10 @@ protected:
         kFlagWillSendMessage = (1u << 8),
 
         /// When set, we have had Close() or Abort() called on us already.
-        kFlagClosed = (1u << 10),
+        kFlagClosed = (1u << 9),
 
         /// When set, signifies that the exchange is requesting Sleepy End Device fast-polling mode.
-        kFlagFastPollingMode = (1u << 11),
+        kFlagFastPollingMode = (1u << 10),
     };
 
     BitFlags<Flags> mFlags; // Internal state flags

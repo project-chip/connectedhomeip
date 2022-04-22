@@ -158,7 +158,7 @@ private:
     Optional<Transport::OutgoingGroupSession> mSessionBobToFriends;
 };
 
-// LoopbackMessagingContext enriches MessagingContext with a async loopback transport
+// LoopbackMessagingContext enriches MessagingContext with an async loopback transport
 class LoopbackMessagingContext : public LoopbackTransportManager, public MessagingContext
 {
 public:

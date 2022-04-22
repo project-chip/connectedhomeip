@@ -99,8 +99,8 @@ public:
     }
 
 private:
-    TransportMgr<LoopbackTransport> mTransportManager;
     Test::IOContext mIOContext;
+    TransportMgr<LoopbackTransport> mTransportManager;
 };
 
 } // namespace Test

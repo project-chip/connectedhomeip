@@ -36,8 +36,6 @@ namespace Test {
 class IOContext
 {
 public:
-    IOContext() {}
-
     /// Initialize the underlying layers and test suite pointer
     CHIP_ERROR Init();
 
@@ -65,6 +63,8 @@ class LoopbackTransportDelegate
 {
 public:
     virtual ~LoopbackTransportDelegate() {}
+
+    // Called by the loopback transport when it drops a message due to a nonzero mNumMessagesToDrop.
     virtual void OnMessageDropped() {}
 };
 
@@ -74,6 +74,7 @@ public:
     void InitLoopbackTransport(System::Layer * systemLayer) { mSystemLayer = systemLayer; }
     void ShutdownLoopbackTransport()
     {
+        // Packets are allocated from platform memory, we should release them before Platform::MemoryShutdown
         while (!mPendingMessageQueue.empty())
             mPendingMessageQueue.pop();
     }

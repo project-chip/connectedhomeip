@@ -677,7 +677,6 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(n
             chip::isCommandDispatched = false;
             GenerateInvokeRequest(apSuite, apContext, commandDatabuf, false /*aNeedCommandData*/, messageIsTimed);
             err = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), transactionIsTimed);
-            ctx.DrainAndServiceIO();
             NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
             NL_TEST_ASSERT(apSuite, chip::isCommandDispatched == (messageIsTimed == transactionIsTimed));
         }
