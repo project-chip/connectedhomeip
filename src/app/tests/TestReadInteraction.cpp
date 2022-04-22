@@ -64,11 +64,9 @@ chip::DataVersion kTestDataVersion2     = 5;
 class TestContext : public chip::Test::AppContext
 {
 public:
-    static int Initialize(void * context) = delete;
-
-    static int InitializeAsync(void * context)
+    static int Initialize(void * context)
     {
-        if (AppContext::InitializeAsync(context) != SUCCESS)
+        if (AppContext::Initialize(context) != SUCCESS)
             return FAILURE;
 
         auto * ctx = static_cast<TestContext *>(context);
@@ -105,7 +103,6 @@ private:
 };
 
 TestContext sContext;
-auto & sLoopback = sContext.GetLoopback();
 
 class TestEventGenerator : public chip::app::EventLoggingDelegate
 {
@@ -2609,7 +2606,7 @@ nlTestSuite sSuite =
 {
     "TestReadInteraction",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 // clang-format on
