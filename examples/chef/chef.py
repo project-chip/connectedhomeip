@@ -222,12 +222,14 @@ Notes:
     #
 
     queuePrint(f"Target is set to {options.sampleDeviceTypeName}")
-    paths["genFolder"] = paths["rootSampleFolder"] + f"/out/{options.sampleDeviceTypeName}/zap-generated/"
+    paths["genFolder"] = paths["rootSampleFolder"] + \
+        f"/out/{options.sampleDeviceTypeName}/zap-generated/"
 
     queuePrint("Setting up environment...")
     if options.buildTarget == "esp32":
         if config['esp32']['IDF_PATH'] is None:
-            print('Path for esp32 SDK was not found. Make sure esp32.IDF_PATH is set on your config.yaml file')
+            print(
+                'Path for esp32 SDK was not found. Make sure esp32.IDF_PATH is set on your config.yaml file')
             exit(1)
         paths["platFolder"] = os.path.normpath(
             paths["rootSampleFolder"] + "/esp32")
@@ -238,7 +240,8 @@ Notes:
             exit(1)
         paths["platFolder"] = os.path.normpath(
             paths["rootSampleFolder"] + "/nrfconnect")
-        queueCommand(f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/zephyr-env.sh')
+        queueCommand(
+            f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/zephyr-env.sh')
         queueCommand("export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb")
     elif options.buildTarget == "linux":
         pass
@@ -389,7 +392,8 @@ true''')
         queuePrint("Flashing target")
         if options.buildTarget == "esp32":
             if config['esp32']['TTY'] is None:
-                print('The path for the serial enumeration for esp32 is not set. Make sure esp32.TTY is set on your config.yaml file')
+                print(
+                    'The path for the serial enumeration for esp32 is not set. Make sure esp32.TTY is set on your config.yaml file')
                 exit(1)
             queueCommand(f"cd {paths['rootSampleFolder']}/esp32")
             if options.doErase:
@@ -411,7 +415,8 @@ true''')
         queuePrint("Starting terminal...")
         if options.buildTarget == "esp32":
             if config['esp32']['TTY'] is None:
-                print('The path for the serial enumeration for esp32 is not set. Make sure esp32.TTY is set on your config.yaml file')
+                print(
+                    'The path for the serial enumeration for esp32 is not set. Make sure esp32.TTY is set on your config.yaml file')
                 exit(1)
             queueCommand(f"cd {paths['rootSampleFolder']}/esp32")
             queueCommand(f"idf.py -p {config['esp32']['TTY']} monitor")
