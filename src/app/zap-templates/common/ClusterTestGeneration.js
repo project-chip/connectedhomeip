@@ -623,7 +623,7 @@ function checkNumberSanity(value, errorContext)
 function chip_tests_item_parameters(options)
 {
   if (this.isWait) {
-      return asBlocks.call(this, Promise.resolve([]), options);
+    return asBlocks.call(this, Promise.resolve([]), options);
   }
 
   const commandValues = this.arguments.values;
