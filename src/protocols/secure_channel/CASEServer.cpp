@@ -29,14 +29,11 @@ using namespace ::chip::Credentials;
 
 namespace chip {
 
-CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-                                                     SessionManager * sessionManager, FabricTable * fabrics,
-                                                     SessionResumptionStorage * sessionResumptionStorage,
+CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, SessionManager * sessionManager,
+                                                     FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage,
                                                      Credentials::GroupDataProvider * responderGroupDataProvider)
 {
-    VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(responderGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 

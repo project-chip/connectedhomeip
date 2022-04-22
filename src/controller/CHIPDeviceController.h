@@ -279,6 +279,15 @@ private:
     CHIP_ERROR ProcessControllerNOCChain(const ControllerInitParams & params);
 };
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+using UdcTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
+#if INET_CONFIG_ENABLE_IPV4
+                                     ,
+                                     Transport::UDP /* IPv4 */
+#endif
+                                     >;
+#endif
+
 /**
  * @brief
  *   The commissioner applications can use this class to pair new/unpaired CHIP devices. The application is
@@ -579,8 +588,8 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     UserDirectedCommissioningServer * mUdcServer = nullptr;
     // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
-    DeviceIPTransportMgr * mUdcTransportMgr = nullptr;
-    uint16_t mUdcListenPort                 = CHIP_UDC_PORT;
+    UdcTransportMgr * mUdcTransportMgr = nullptr;
+    uint16_t mUdcListenPort            = CHIP_UDC_PORT;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);

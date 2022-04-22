@@ -260,8 +260,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mCASESessionManager.Init(&DeviceLayer::SystemLayer(), caseSessionManagerConfig);
     SuccessOrExit(err);
 
-    err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mTransports, &mSessions, &mFabrics, mSessionResumptionStorage,
-                                                    mGroupsProvider);
+    err =
+        mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mSessions, &mFabrics, mSessionResumptionStorage, mGroupsProvider);
     SuccessOrExit(err);
 
     // This code is necessary to restart listening to existing groups after a reboot
@@ -305,7 +305,7 @@ void Server::RejoinExistingMulticastGroups()
                     Transport::PeerAddress::Multicast(fabric.GetFabricIndex(), groupInfo.group_id), true);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(AppServer, "Error when trying to join Group %" PRIu16 " of fabric index %u : %" CHIP_ERROR_FORMAT,
+                    ChipLogError(AppServer, "Error when trying to join Group %u of fabric index %u : %" CHIP_ERROR_FORMAT,
                                  groupInfo.group_id, fabric.GetFabricIndex(), err.Format());
 
                     // We assume the failure is caused by a network issue or a lack of rescources; neither of which will be solved

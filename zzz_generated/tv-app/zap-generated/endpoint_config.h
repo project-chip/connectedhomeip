@@ -285,44 +285,49 @@
             /* 371 - SupportedStreamingProtocols, */                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* Endpoint: 2, Cluster: Level Control (server), big-endian */                                                         \
+            /* Endpoint: 1, Cluster: Application Launcher (server), big-endian */                                                  \
                                                                                                                                    \
             /* 375 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x01,                                                                                                \
                                                                                                                                    \
-            /* Endpoint: 2, Cluster: Audio Output (server), big-endian */                                                          \
+            /* Endpoint: 2, Cluster: Level Control (server), big-endian */                                                         \
                                                                                                                                    \
             /* 379 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x01,                                                                                                \
                                                                                                                                    \
+            /* Endpoint: 2, Cluster: Audio Output (server), big-endian */                                                          \
+                                                                                                                                   \
+            /* 383 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x01,                                                                                                \
+                                                                                                                                   \
             /* Endpoint: 3, Cluster: Media Playback (server), big-endian */                                                        \
                                                                                                                                    \
-            /* 383 - StartTime, */                                                                                                 \
+            /* 387 - StartTime, */                                                                                                 \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF,                                                                        \
                                                                                                                                    \
-            /* 391 - Duration, */                                                                                                  \
+            /* 395 - Duration, */                                                                                                  \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 399 - PlaybackSpeed, */                                                                                             \
+            /* 403 - PlaybackSpeed, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 403 - SeekRangeEnd, */                                                                                              \
+            /* 407 - SeekRangeEnd, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 411 - SeekRangeStart, */                                                                                            \
+            /* 415 - SeekRangeStart, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
             /* Endpoint: 3, Cluster: Content Launcher (server), big-endian */                                                      \
                                                                                                                                    \
-            /* 419 - SupportedStreamingProtocols, */                                                                               \
+            /* 423 - SupportedStreamingProtocols, */                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 423 - FeatureMap, */                                                                                                \
+            /* 427 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x01,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 4, Cluster: Content Launcher (server), big-endian */                                                      \
                                                                                                                                    \
-            /* 427 - SupportedStreamingProtocols, */                                                                               \
+            /* 431 - SupportedStreamingProtocols, */                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
     }
 
@@ -586,50 +591,55 @@
             /* 371 - SupportedStreamingProtocols, */                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* Endpoint: 2, Cluster: Level Control (server), little-endian */                                                      \
+            /* Endpoint: 1, Cluster: Application Launcher (server), little-endian */                                               \
                                                                                                                                    \
             /* 375 - FeatureMap, */                                                                                                \
             0x01, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* Endpoint: 2, Cluster: Audio Output (server), little-endian */                                                       \
+            /* Endpoint: 2, Cluster: Level Control (server), little-endian */                                                      \
                                                                                                                                    \
             /* 379 - FeatureMap, */                                                                                                \
             0x01, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
+            /* Endpoint: 2, Cluster: Audio Output (server), little-endian */                                                       \
+                                                                                                                                   \
+            /* 383 - FeatureMap, */                                                                                                \
+            0x01, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
             /* Endpoint: 3, Cluster: Media Playback (server), little-endian */                                                     \
                                                                                                                                    \
-            /* 383 - StartTime, */                                                                                                 \
+            /* 387 - StartTime, */                                                                                                 \
             0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 391 - Duration, */                                                                                                  \
+            /* 395 - Duration, */                                                                                                  \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 399 - PlaybackSpeed, */                                                                                             \
+            /* 403 - PlaybackSpeed, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 403 - SeekRangeEnd, */                                                                                              \
+            /* 407 - SeekRangeEnd, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 411 - SeekRangeStart, */                                                                                            \
+            /* 415 - SeekRangeStart, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
             /* Endpoint: 3, Cluster: Content Launcher (server), little-endian */                                                   \
                                                                                                                                    \
-            /* 419 - SupportedStreamingProtocols, */                                                                               \
+            /* 423 - SupportedStreamingProtocols, */                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 423 - FeatureMap, */                                                                                                \
+            /* 427 - FeatureMap, */                                                                                                \
             0x01, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 4, Cluster: Content Launcher (server), little-endian */                                                   \
                                                                                                                                    \
-            /* 427 - SupportedStreamingProtocols, */                                                                               \
+            /* 431 - SupportedStreamingProtocols, */                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
     }
 
 #endif // BIGENDIAN_CPU
 
-#define GENERATED_DEFAULTS_COUNT (86)
+#define GENERATED_DEFAULTS_COUNT (87)
 
 #define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
 #define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
@@ -662,7 +672,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 305
+#define GENERATED_ATTRIBUTE_COUNT 306
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -995,8 +1005,9 @@
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* CatalogList */       \
             { 0x00000001, ZAP_TYPE(STRUCT), 0,                                                                                     \
               ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                  \
-              ZAP_EMPTY_DEFAULT() },                                       /* CurrentApp */                                        \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                   \
+              ZAP_EMPTY_DEFAULT() },                                                /* CurrentApp */                               \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(375) }, /* FeatureMap */                               \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },          /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 2, Cluster: On/Off (server) */                                                                            \
             { 0x00000000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* OnOff */                                         \
@@ -1025,7 +1036,7 @@
             { 0x00004000, ZAP_TYPE(INT8U), 1,                                                                                      \
               ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                          \
               ZAP_SIMPLE_DEFAULT(255) },                                            /* start up current level */                   \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(375) }, /* FeatureMap */                               \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(379) }, /* FeatureMap */                               \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(5) },          /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 2, Cluster: Descriptor (server) */                                                                        \
@@ -1038,7 +1049,7 @@
             /* Endpoint: 2, Cluster: Audio Output (server) */                                                                      \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* OutputList */        \
             { 0x00000001, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },                               /* CurrentOutput */     \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(379) },                        /* FeatureMap */        \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(383) },                        /* FeatureMap */        \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                 /* ClusterRevision */   \
                                                                                                                                    \
             /* Endpoint: 3, Cluster: Descriptor (server) */                                                                        \
@@ -1050,20 +1061,20 @@
                                                                                                                                    \
             /* Endpoint: 3, Cluster: Media Playback (server) */                                                                    \
             { 0x00000000, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },                                   /* CurrentState */  \
-            { 0x00000001, ZAP_TYPE(EPOCH_US), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(383) }, /* StartTime */     \
-            { 0x00000002, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(391) },   /* Duration */      \
+            { 0x00000001, ZAP_TYPE(EPOCH_US), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(387) }, /* StartTime */     \
+            { 0x00000002, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(395) },   /* Duration */      \
             { 0x00000003, ZAP_TYPE(STRUCT), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                \
               ZAP_EMPTY_DEFAULT() },                                                                         /* SampledPosition */ \
-            { 0x00000004, ZAP_TYPE(SINGLE), 4, 0, ZAP_LONG_DEFAULTS_INDEX(399) },                            /* PlaybackSpeed */   \
-            { 0x00000005, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(403) }, /* SeekRangeEnd */    \
-            { 0x00000006, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(411) }, /* SeekRangeStart */  \
+            { 0x00000004, ZAP_TYPE(SINGLE), 4, 0, ZAP_LONG_DEFAULTS_INDEX(403) },                            /* PlaybackSpeed */   \
+            { 0x00000005, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(407) }, /* SeekRangeEnd */    \
+            { 0x00000006, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(415) }, /* SeekRangeStart */  \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                   /* ClusterRevision */ \
                                                                                                                                    \
             /* Endpoint: 3, Cluster: Content Launcher (server) */                                                                  \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* AcceptHeader */      \
             { 0x00000001, ZAP_TYPE(BITMAP32), 4, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                     \
-              ZAP_LONG_DEFAULTS_INDEX(419) },                                       /* SupportedStreamingProtocols */              \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(423) }, /* FeatureMap */                               \
+              ZAP_LONG_DEFAULTS_INDEX(423) },                                       /* SupportedStreamingProtocols */              \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(427) }, /* FeatureMap */                               \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },          /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 3, Cluster: Application Basic (server) */                                                                 \
@@ -1090,7 +1101,7 @@
             /* Endpoint: 4, Cluster: Content Launcher (server) */                                                                  \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* AcceptHeader */      \
             { 0x00000001, ZAP_TYPE(BITMAP32), 4, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                     \
-              ZAP_LONG_DEFAULTS_INDEX(427) },                              /* SupportedStreamingProtocols */                       \
+              ZAP_LONG_DEFAULTS_INDEX(431) },                              /* SupportedStreamingProtocols */                       \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                   \
                                                                                                                                    \
             /* Endpoint: 4, Cluster: Application Basic (server) */                                                                 \
@@ -1736,8 +1747,8 @@
       /* Endpoint: 1, Cluster: Application Launcher (server) */ \
       .clusterId = 0x0000050C,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(218), \
-      .attributeCount = 3, \
-      .clusterSize = 2, \
+      .attributeCount = 4, \
+      .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 79 ) ,\
@@ -1746,7 +1757,7 @@
   { \
       /* Endpoint: 2, Cluster: On/Off (server) */ \
       .clusterId = 0x00000006,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(221), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(222), \
       .attributeCount = 2, \
       .clusterSize = 3, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
@@ -1757,7 +1768,7 @@
   { \
       /* Endpoint: 2, Cluster: Level Control (server) */ \
       .clusterId = 0x00000008,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(223), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(224), \
       .attributeCount = 16, \
       .clusterSize = 27, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
@@ -1768,7 +1779,7 @@
   { \
       /* Endpoint: 2, Cluster: Descriptor (server) */ \
       .clusterId = 0x0000001D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(239), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(240), \
       .attributeCount = 5, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1779,7 +1790,7 @@
   { \
       /* Endpoint: 2, Cluster: Audio Output (server) */ \
       .clusterId = 0x0000050B,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(244), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(245), \
       .attributeCount = 4, \
       .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1790,7 +1801,7 @@
   { \
       /* Endpoint: 3, Cluster: Descriptor (server) */ \
       .clusterId = 0x0000001D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(248), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(249), \
       .attributeCount = 5, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1801,7 +1812,7 @@
   { \
       /* Endpoint: 3, Cluster: Media Playback (server) */ \
       .clusterId = 0x00000506,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(253), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(254), \
       .attributeCount = 8, \
       .clusterSize = 39, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1812,7 +1823,7 @@
   { \
       /* Endpoint: 3, Cluster: Content Launcher (server) */ \
       .clusterId = 0x0000050A,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(261), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(262), \
       .attributeCount = 4, \
       .clusterSize = 10, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1823,7 +1834,7 @@
   { \
       /* Endpoint: 3, Cluster: Application Basic (server) */ \
       .clusterId = 0x0000050D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(265), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(266), \
       .attributeCount = 9, \
       .clusterSize = 106, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1834,7 +1845,7 @@
   { \
       /* Endpoint: 3, Cluster: Account Login (server) */ \
       .clusterId = 0x0000050E,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(274), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(275), \
       .attributeCount = 1, \
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1845,7 +1856,7 @@
   { \
       /* Endpoint: 4, Cluster: Descriptor (server) */ \
       .clusterId = 0x0000001D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(275), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(276), \
       .attributeCount = 5, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1856,7 +1867,7 @@
   { \
       /* Endpoint: 4, Cluster: Content Launcher (server) */ \
       .clusterId = 0x0000050A,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(280), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(281), \
       .attributeCount = 3, \
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1867,7 +1878,7 @@
   { \
       /* Endpoint: 4, Cluster: Application Basic (server) */ \
       .clusterId = 0x0000050D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(283), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(284), \
       .attributeCount = 9, \
       .clusterSize = 106, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1878,7 +1889,7 @@
   { \
       /* Endpoint: 5, Cluster: Descriptor (server) */ \
       .clusterId = 0x0000001D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(292), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(293), \
       .attributeCount = 5, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1889,7 +1900,7 @@
   { \
       /* Endpoint: 5, Cluster: Application Basic (server) */ \
       .clusterId = 0x0000050D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(297), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(298), \
       .attributeCount = 8, \
       .clusterSize = 106, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1908,7 +1919,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 26, 587 }, { ZAP_CLUSTER_INDEX(26), 10, 74 }, { ZAP_CLUSTER_INDEX(36), 4, 37 },                    \
+        { ZAP_CLUSTER_INDEX(0), 26, 587 }, { ZAP_CLUSTER_INDEX(26), 10, 78 }, { ZAP_CLUSTER_INDEX(36), 4, 37 },                    \
             { ZAP_CLUSTER_INDEX(40), 5, 157 }, { ZAP_CLUSTER_INDEX(45), 3, 112 }, { ZAP_CLUSTER_INDEX(48), 2, 106 },               \
     }
 
@@ -1921,7 +1932,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (39)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (1073)
+#define ATTRIBUTE_MAX_SIZE (1077)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (6)

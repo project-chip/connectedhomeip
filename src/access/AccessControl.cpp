@@ -219,7 +219,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
         constexpr size_t kMaxCatsToLog = 6;
         char catLogBuf[kMaxCatsToLog * kCharsPerCatForLogging];
         ChipLogProgress(DataManagement,
-                        "AccessControl: checking f=%u a=%c s=0x" ChipLogFormatX64 " t=%s c=" ChipLogFormatMEI " e=%" PRIu16 " p=%c",
+                        "AccessControl: checking f=%u a=%c s=0x" ChipLogFormatX64 " t=%s c=" ChipLogFormatMEI " e=%u p=%c",
                         subjectDescriptor.fabricIndex, GetAuthModeStringForLogging(subjectDescriptor.authMode),
                         ChipLogValueX64(subjectDescriptor.subject),
                         GetCatStringForLogging(catLogBuf, sizeof(catLogBuf), subjectDescriptor.cats),

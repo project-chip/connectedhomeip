@@ -38,10 +38,10 @@ constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
 CHIP_ERROR AmebaWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     CHIP_ERROR err;
-    size_t ssidLen        = 0;
-    size_t credentialsLen = 0;
-    mpScanCallback    = nullptr;
-    mpConnectCallback = nullptr;
+    size_t ssidLen         = 0;
+    size_t credentialsLen  = 0;
+    mpScanCallback         = nullptr;
+    mpConnectCallback      = nullptr;
     mpStatusChangeCallback = networkStatusChangeCallback;
 
     err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiCredentialsKeyName, mSavedNetwork.credentials,
@@ -59,7 +59,7 @@ CHIP_ERROR AmebaWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChan
     mSavedNetwork.credentialsLen = credentialsLen;
     mSavedNetwork.ssidLen        = ssidLen;
 
-    mStagingNetwork   = mSavedNetwork;
+    mStagingNetwork = mSavedNetwork;
     return err;
 }
 
@@ -268,7 +268,7 @@ void AmebaWiFiDriver::OnNetworkStatusChange()
     Network configuredNetwork;
     rtw_wifi_setting_t mWiFiSetting;
     CHIP_GetWiFiConfig(&mWiFiSetting);
-    bool staEnable = (mWiFiSetting.mode == RTW_MODE_STA || mWiFiSetting.mode == RTW_MODE_STA_AP);
+    bool staEnable    = (mWiFiSetting.mode == RTW_MODE_STA || mWiFiSetting.mode == RTW_MODE_STA_AP);
     bool staConnected = (mWiFiSetting.ssid[0] != 0);
 
     CHIP_ERROR err = GetConfiguredNetwork(configuredNetwork);

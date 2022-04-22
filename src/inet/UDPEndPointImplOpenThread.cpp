@@ -82,17 +82,16 @@ void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, 
     payload->SetDataLength(static_cast<uint16_t>(msgLen + sizeof(IPPacketInfo)));
 
     ep->Retain();
-    CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, p = payload.Get()] {
-        ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p));
+    auto * buf     = std::move(payload).UnsafeRelease();
+    CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, buf] {
+        ep->HandleDataReceived(System::PacketBufferHandle::Adopt(buf));
         ep->Release();
     });
-    if (err == CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
-        // If ScheduleLambda() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).
-        static_cast<void>(std::move(payload).UnsafeRelease());
-    }
-    else
-    {
+        // Make sure we properly clean up buf and ep, since our lambda will not
+        // run.
+        payload = System::PacketBufferHandle::Adopt(buf);
         ep->Release();
     }
 }

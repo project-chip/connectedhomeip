@@ -330,11 +330,8 @@ CHIP_ERROR DeviceController::ComputePASEVerifier(uint32_t iterations, uint32_t s
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 {
     return ControllerDeviceInitParams{
-        .transportMgr       = mSystemState->TransportMgr(),
-        .sessionManager     = mSystemState->SessionMgr(),
-        .exchangeMgr        = mSystemState->ExchangeMgr(),
-        .udpEndPointManager = mSystemState->UDPEndPointManager(),
-        .fabricsTable       = mSystemState->Fabrics(),
+        .sessionManager = mSystemState->SessionMgr(),
+        .exchangeMgr    = mSystemState->ExchangeMgr(),
     };
 }
 
@@ -365,7 +362,7 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
-    mUdcTransportMgr = chip::Platform::New<DeviceIPTransportMgr>();
+    mUdcTransportMgr = chip::Platform::New<UdcTransportMgr>();
     ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(mSystemState->UDPEndPointManager())
                                                     .SetAddressType(Inet::IPAddressType::kIPv6)
                                                     .SetListenPort(static_cast<uint16_t>(mUdcListenPort))
@@ -613,18 +610,10 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     VerifyOrExit(device != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     mDeviceInPASEEstablishment = device;
+    device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress);
 
-    {
-        FabricIndex fabricIndex = mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : kUndefinedFabricIndex;
-        device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress, fabricIndex);
-    }
-
-    if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
-    {
-        device->SetAddress(params.GetPeerAddress().GetIPAddress());
-    }
 #if CONFIG_NETWORK_LAYER_BLE
-    else
+    if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
     {
         if (params.HasConnectionObject())
         {
@@ -641,11 +630,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     }
 #endif
     // TODO: In some cases like PASE over IP, CRA and CRI values from commissionable node service should be used
-    session = mSystemState->SessionMgr()->CreateUnauthenticatedSession(params.GetPeerAddress(), device->GetMRPConfig());
+    session = mSystemState->SessionMgr()->CreateUnauthenticatedSession(params.GetPeerAddress(), device->GetRemoteMRPConfig());
     VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NO_MEMORY);
-
-    // TODO - Remove use of SetActive/IsActive from CommissioneeDeviceProxy
-    device->SetActive(true);
 
     // Allocate the exchange immediately before calling PASESession::Pair.
     //

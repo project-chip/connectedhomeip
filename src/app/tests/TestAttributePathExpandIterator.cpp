@@ -107,7 +107,7 @@ void TestAllWildcard(nlTestSuite * apSuite, void * apContext)
 
     for (app::AttributePathExpandIterator iter(&clusInfo); iter.Get(path); iter.Next())
     {
-        ChipLogDetail(AppServer, "Visited Attribute: 0x%04" PRIX16 " / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
+        ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
         NL_TEST_ASSERT(apSuite, index < ArraySize(paths) && paths[index] == path);
         index++;
@@ -130,7 +130,7 @@ void TestWildcardEndpoint(nlTestSuite * apSuite, void * apContext)
 
     for (app::AttributePathExpandIterator iter(&clusInfo); iter.Get(path); iter.Next())
     {
-        ChipLogDetail(AppServer, "Visited Attribute: 0x%04" PRIX16 " / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
+        ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
         NL_TEST_ASSERT(apSuite, index < ArraySize(paths) && paths[index] == path);
         index++;
@@ -156,7 +156,7 @@ void TestWildcardCluster(nlTestSuite * apSuite, void * apContext)
 
     for (app::AttributePathExpandIterator iter(&clusInfo); iter.Get(path); iter.Next())
     {
-        ChipLogDetail(AppServer, "Visited Attribute: 0x%04" PRIX16 " / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
+        ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
         NL_TEST_ASSERT(apSuite, index < ArraySize(paths) && paths[index] == path);
         index++;
@@ -182,7 +182,7 @@ void TestWildcardClusterGlobalAttributeNotInMetadata(nlTestSuite * apSuite, void
 
     for (app::AttributePathExpandIterator iter(&clusInfo); iter.Get(path); iter.Next())
     {
-        ChipLogDetail(AppServer, "Visited Attribute: 0x%04" PRIX16 " / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
+        ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
         NL_TEST_ASSERT(apSuite, index < ArraySize(paths) && paths[index] == path);
         index++;
@@ -212,7 +212,7 @@ void TestWildcardAttribute(nlTestSuite * apSuite, void * apContext)
 
     for (app::AttributePathExpandIterator iter(&clusInfo); iter.Get(path); iter.Next())
     {
-        ChipLogDetail(AppServer, "Visited Attribute: 0x%04" PRIX16 " / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
+        ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
         NL_TEST_ASSERT(apSuite, index < ArraySize(paths) && paths[index] == path);
         index++;
@@ -236,7 +236,7 @@ void TestNoWildcard(nlTestSuite * apSuite, void * apContext)
 
     for (app::AttributePathExpandIterator iter(&clusInfo); iter.Get(path); iter.Next())
     {
-        ChipLogDetail(AppServer, "Visited Attribute: 0x%04" PRIX16 " / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
+        ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
         NL_TEST_ASSERT(apSuite, index < ArraySize(paths) && paths[index] == path);
         index++;
@@ -349,7 +349,7 @@ void TestMultipleClusInfo(nlTestSuite * apSuite, void * apContext)
 
     for (app::AttributePathExpandIterator iter(&clusInfo1); iter.Get(path); iter.Next())
     {
-        ChipLogDetail(AppServer, "Visited Attribute: 0x%04" PRIX16 " / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
+        ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
         NL_TEST_ASSERT(apSuite, index < ArraySize(paths) && paths[index] == path);
         index++;

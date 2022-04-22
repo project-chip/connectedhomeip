@@ -651,8 +651,6 @@ public:
 #endif
     }
 
-    PacketBuffer * Get() const { return mBuffer; }
-
 protected:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     // For use via LwIPPacketBufferView only.
@@ -678,6 +676,8 @@ private:
         }
         return PacketBufferHandle(buffer);
     }
+
+    PacketBuffer * Get() const { return mBuffer; }
 
     bool operator==(const PacketBufferHandle & aOther) { return mBuffer == aOther.mBuffer; }
 

@@ -827,7 +827,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         {
             vendorId = 0;
         }
-        ChipLogProgress(DeviceLayer, "  Vendor Id: %" PRIu16 " (0x%" PRIX16 ")", vendorId, vendorId);
+        ChipLogProgress(DeviceLayer, "  Vendor Id: %u (0x%X)", vendorId, vendorId);
     }
 
     {
@@ -836,7 +836,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         {
             productId = 0;
         }
-        ChipLogProgress(DeviceLayer, "  Product Id: %" PRIu16 " (0x%" PRIX16 ")", productId, productId);
+        ChipLogProgress(DeviceLayer, "  Product Id: %u (0x%X)", productId, productId);
     }
 
     {
@@ -845,7 +845,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         {
             hardwareVer = 0;
         }
-        ChipLogProgress(DeviceLayer, "  Hardware Version: %" PRIu16, hardwareVer);
+        ChipLogProgress(DeviceLayer, "  Hardware Version: %u", hardwareVer);
     }
 
     CommissionableDataProvider * cdp = GetCommissionableDataProvider();
@@ -865,7 +865,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         {
             setupDiscriminator = 0xFFFF;
         }
-        ChipLogProgress(DeviceLayer, "  Setup Discriminator (0xFFFF for UNKNOWN/ERROR): %" PRIu16 " (0x%" PRIX16 ")",
+        ChipLogProgress(DeviceLayer, "  Setup Discriminator (0xFFFF for UNKNOWN/ERROR): %u (0x%X)",
                         setupDiscriminator, setupDiscriminator);
     }
 
@@ -875,7 +875,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         err = GetManufacturingDate(year, month, dayOfMonth);
         if (err == CHIP_NO_ERROR)
         {
-            ChipLogProgress(DeviceLayer, "  Manufacturing Date: %04" PRIu16 "/%02u/%02u", year, month, dayOfMonth);
+            ChipLogProgress(DeviceLayer, "  Manufacturing Date: %04u/%02u/%02u", year, month, dayOfMonth);
         }
         else
         {

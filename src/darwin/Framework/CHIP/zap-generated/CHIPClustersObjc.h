@@ -16245,23 +16245,23 @@ typedef NS_OPTIONS(uint32_t, CHIPThermostatFeature) {
     CHIPThermostatFeatureAutomode = 0x20,
 };
 
-typedef NS_ENUM(uint8_t, CHIPFanControlFanMode) {
-    CHIPFanControlFanModeOff = 0x00,
-    CHIPFanControlFanModeLow = 0x01,
-    CHIPFanControlFanModeMedium = 0x02,
-    CHIPFanControlFanModeHigh = 0x03,
-    CHIPFanControlFanModeOn = 0x04,
-    CHIPFanControlFanModeAuto = 0x05,
-    CHIPFanControlFanModeSmart = 0x06,
+typedef NS_ENUM(uint8_t, CHIPFanControlFanModeSequenceType) {
+    CHIPFanControlFanModeSequenceTypeOffLowMedHigh = 0x00,
+    CHIPFanControlFanModeSequenceTypeOffLowHigh = 0x01,
+    CHIPFanControlFanModeSequenceTypeOffLowMedHighAuto = 0x02,
+    CHIPFanControlFanModeSequenceTypeOffLowHighAuto = 0x03,
+    CHIPFanControlFanModeSequenceTypeOffOnAuto = 0x04,
+    CHIPFanControlFanModeSequenceTypeOffOn = 0x05,
 };
 
-typedef NS_ENUM(uint8_t, CHIPFanControlFanModeSequence) {
-    CHIPFanControlFanModeSequenceOffLowMedHigh = 0x00,
-    CHIPFanControlFanModeSequenceOffLowHigh = 0x01,
-    CHIPFanControlFanModeSequenceOffLowMedHighAuto = 0x02,
-    CHIPFanControlFanModeSequenceOffLowHighAuto = 0x03,
-    CHIPFanControlFanModeSequenceOffOnAuto = 0x04,
-    CHIPFanControlFanModeSequenceOffOn = 0x05,
+typedef NS_ENUM(uint8_t, CHIPFanControlFanModeType) {
+    CHIPFanControlFanModeTypeOff = 0x00,
+    CHIPFanControlFanModeTypeLow = 0x01,
+    CHIPFanControlFanModeTypeMedium = 0x02,
+    CHIPFanControlFanModeTypeHigh = 0x03,
+    CHIPFanControlFanModeTypeOn = 0x04,
+    CHIPFanControlFanModeTypeAuto = 0x05,
+    CHIPFanControlFanModeTypeSmart = 0x06,
 };
 
 typedef NS_OPTIONS(uint32_t, CHIPFanControlFeature) {
