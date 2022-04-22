@@ -103,7 +103,7 @@ static void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, ch
     }
 }
 
-static void BoundDeviceContextReleaseHandler(chip::BindingManagerContext * context)
+static void BoundDeviceContextReleaseHandler(void * context)
 {
     (void) context;
 }

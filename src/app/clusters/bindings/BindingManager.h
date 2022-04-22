@@ -64,7 +64,7 @@ using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry & bindin
  * Application callback function when a context used in NotifyBoundClusterChanged will not be needed and should be
  * released.
  */
-using BoundDeviceContextReleaseHandler = void (*)(BindingManagerContext * context);
+using BoundDeviceContextReleaseHandler = void (*)(void * context);
 
 struct BindingManagerInitParams
 {
@@ -136,7 +136,7 @@ public:
      * be initiated. The BoundDeviceChangedHandler will be called once the session is established.
      *
      */
-    CHIP_ERROR NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, BindingManagerContext * context);
+    CHIP_ERROR NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context);
 
     static BindingManager & GetInstance() { return sBindingManager; }
 

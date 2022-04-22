@@ -60,10 +60,10 @@ void BindingHandler::OnInvokeCommandFailure(DeviceProxy * aDevice, BindingData &
         // Allocate new object to make sure its life time will be appropriate.
         BindingHandler::BindingData * data = Platform::New<BindingHandler::BindingData>();
         *data                              = aBindingData;
-        BindingManagerContext * context    = Platform::New<BindingManagerContext>(static_cast<void *>(data));
 
         // Establish new CASE session and retrasmit command that was not applied.
-        error = BindingManager::GetInstance().NotifyBoundClusterChanged(aBindingData.EndpointId, aBindingData.ClusterId, context);
+        error = BindingManager::GetInstance().NotifyBoundClusterChanged(aBindingData.EndpointId, aBindingData.ClusterId,
+                                                                        static_cast<void *>(data));
     }
     else
     {
@@ -226,13 +226,11 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & bi
     }
 }
 
-void BindingHandler::LightSwitchContextReleaseHandler(BindingManagerContext * context)
+void BindingHandler::LightSwitchContextReleaseHandler(void * context)
 {
     VerifyOrReturn(context != nullptr, LOG_ERR("Invalid context for Light switch context release handler"););
 
-    // Release the internal context stored in BindingManagerContext and then the BindingManagerContext itself.
-    Platform::Delete(static_cast<BindingData *>(context->GetContext()));
-    Platform::Delete(context);
+    Platform::Delete(static_cast<BindingData *>(context));
 }
 
 void BindingHandler::InitInternal(intptr_t aArg)
@@ -309,8 +307,7 @@ void BindingHandler::SwitchWorkerHandler(intptr_t aContext)
 {
     VerifyOrReturn(aContext != 0, LOG_ERR("Invalid Swich data"));
 
-    BindingData * data              = reinterpret_cast<BindingData *>(aContext);
-    BindingManagerContext * context = Platform::New<BindingManagerContext>(static_cast<void *>(data));
+    BindingData * data = reinterpret_cast<BindingData *>(aContext);
     LOG_INF("Notify Bounded Cluster | endpoint: %d cluster: %d", data->EndpointId, data->ClusterId);
-    BindingManager::GetInstance().NotifyBoundClusterChanged(data->EndpointId, data->ClusterId, context);
+    BindingManager::GetInstance().NotifyBoundClusterChanged(data->EndpointId, data->ClusterId, static_cast<void *>(data));
 }
