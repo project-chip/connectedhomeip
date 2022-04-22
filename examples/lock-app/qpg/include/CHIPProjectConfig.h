@@ -180,3 +180,5 @@
  * @brief Defines the maximum number of WriteClient, limits the number of active write transactions on client.
  */
 #define CHIP_IM_MAX_NUM_WRITE_CLIENT 2
+
+#define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
