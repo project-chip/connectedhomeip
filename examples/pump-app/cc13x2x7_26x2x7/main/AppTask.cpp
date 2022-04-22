@@ -321,19 +321,29 @@ void AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aActor)
     // Turn off the pump state LED if in an STOPPED state.
     if (aAction == PumpManager::START_ACTION)
     {
+        BitFlags<PumpConfigurationAndControl::PumpStatus> pumpStatus;
         PLAT_LOG("Pump start completed");
         LED_stopBlinking(sAppGreenHandle);
         LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
         LED_stopBlinking(sAppRedHandle);
         LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
+        // Signal to the PCC cluster, that the pump is running
+        PumpConfigurationAndControl::Attributes::PumpStatus::Get(1, &pumpStatus);
+        pumpStatus.Set(PumpConfigurationAndControl::PumpStatus::kRunning);
+        PumpConfigurationAndControl::Attributes::PumpStatus::Set(1, pumpStatus);
     }
     else if (aAction == PumpManager::STOP_ACTION)
     {
+        BitFlags<PumpConfigurationAndControl::PumpStatus> pumpStatus;
         PLAT_LOG("Pump stop completed");
         LED_stopBlinking(sAppGreenHandle);
         LED_setOff(sAppGreenHandle);
         LED_stopBlinking(sAppRedHandle);
         LED_setOff(sAppRedHandle);
+        // Signal to the PCC cluster, that the pump is NOT running
+        PumpConfigurationAndControl::Attributes::PumpStatus::Get(1, &pumpStatus);
+        pumpStatus.Clear(PumpConfigurationAndControl::PumpStatus::kRunning);
+        PumpConfigurationAndControl::Attributes::PumpStatus::Set(1, pumpStatus);
     }
     if (aActor == AppEvent::kEventType_ButtonLeft)
     {

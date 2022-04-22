@@ -51,10 +51,12 @@ static void updateAttributeLinks(EndpointId endpoint)
 {
     PumpControlMode controlMode;
     PumpOperationMode operationMode;
+    BitFlags<PumpStatus> pumpStatus;
 
     // Get the current control- and operation modes
     Attributes::ControlMode::Get(endpoint, &controlMode);
     Attributes::OperationMode::Get(endpoint, &operationMode);
+    Attributes::PumpStatus::Get(endpoint, &pumpStatus);
 
     switch (operationMode)
     {
@@ -71,15 +73,15 @@ static void updateAttributeLinks(EndpointId endpoint)
         {
         case RemoteSensorType::kFlowSensor:
             Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantFlow);
-            Attributes::PumpStatus::Set(endpoint, PumpStatus::kRemoteFlow);
+            pumpStatus.Set(PumpStatus::kRemoteFlow);
+            pumpStatus.Clear(PumpStatus::kRemotePressure);
+            pumpStatus.Clear(PumpStatus::kRemoteTemperature);
             break;
         case RemoteSensorType::kPressureSensor:
             Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantPressure);
-            Attributes::PumpStatus::Set(endpoint, PumpStatus::kRemotePressure);
             break;
         case RemoteSensorType::kTemperatureSensor:
             Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantTemperature);
-            Attributes::PumpStatus::Set(endpoint, PumpStatus::kRemoteTemperature);
             break;
         case RemoteSensorType::kNoSensor:
             // The pump is controlled by a setpoint, as defined by
@@ -89,6 +91,9 @@ static void updateAttributeLinks(EndpointId endpoint)
             // ConstantSpeed, ConstantPressure, ProportionalPressure,
             // ConstantFlow, ConstantTemperature or Automatic
             Attributes::EffectiveControlMode::Set(endpoint, controlMode);
+            pumpStatus.Clear(PumpStatus::kRemotePressure);
+            pumpStatus.Clear(PumpStatus::kRemoteFlow);
+            pumpStatus.Clear(PumpStatus::kRemotePressure);
             break;
         }
         // Set the overall effective operation mode to Normal
@@ -117,12 +122,14 @@ static void updateAttributeLinks(EndpointId endpoint)
     }
     break;
 
-    case PumpOperationMode::kLocal:
+    case PumpOperationMode::kLocal: {
         Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kLocal);
         Attributes::EffectiveControlMode::Set(endpoint, controlMode);
-        Attributes::PumpStatus::Set(endpoint, PumpStatus::kLocalOverride);
-        break;
+        pumpStatus.Set(PumpStatus::kLocalOverride);
     }
+    break;
+    }
+    Attributes::PumpStatus::Set(endpoint, pumpStatus);
 }
 } // namespace
 
