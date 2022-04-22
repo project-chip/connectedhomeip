@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,7 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#pragma once
+
+#include "OTAHelper.h"
 
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
@@ -35,14 +36,15 @@ BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 #endif
 } // namespace
-
-class InitOTA
+void OTAHelpers::InitOTARequestor()
 {
-public:
-    static InitOTA & Instance(void)
-    {
-        static InitOTA sInitOTA;
-        return sInitOTA;
-    }
-    void InitOTARequestor(void);
-};
+
+#if CONFIG_ENABLE_OTA_REQUESTOR
+    SetRequestorInstance(&gRequestorCore);
+    gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
+    gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    gImageProcessor.SetOTADownloader(&gDownloader);
+    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+#endif
+}

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,17 +15,13 @@
  *    limitations under the License.
  */
 
-#include "InitOTAR.h"
-
-void InitOTA::InitOTARequestor()
+class OTAHelpers
 {
-
-#if CONFIG_ENABLE_OTA_REQUESTOR
-    SetRequestorInstance(&gRequestorCore);
-    gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-    gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
-    gImageProcessor.SetOTADownloader(&gDownloader);
-    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-#endif
-}
+public:
+    static OTAHelpers & Instance(void)
+    {
+        static OTAHelpers sInitOTA;
+        return sInitOTA;
+    }
+    void InitOTARequestor(void);
+};

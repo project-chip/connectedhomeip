@@ -20,7 +20,7 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/lighting-app"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/lighting-app/lighting-common/color_format"
                       "${CMAKE_CURRENT_LIST_DIR}/include"
-		      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip"
+		      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
                       SRC_DIRS
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"

@@ -37,11 +37,11 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/server/Dnssd.h>
 #include <app/util/util.h>
-#include <examples/platform/esp32/ota/InitOTAR.h>
 #include <lib/support/CodeUtils.h>
+#include <ota/OTAHelper.h>
 
 static const char * TAG                      = "light-app-callbacks";
-constexpr uint32_t mInitOTARequestorDelaySec = 3;
+constexpr uint32_t kInitOTARequestorDelaySec = 3;
 
 extern LEDWidget AppLED;
 
@@ -153,22 +153,22 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
 
 void InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
 {
-    InitOTA::Instance().InitOTARequestor();
+    OTAHelpers::Instance().InitOTARequestor();
 }
 
 void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event)
 {
-    static bool IsOTAInitialized = false;
+    static bool isOTAInitialized = false;
     if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
     {
         ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
         chip::app::DnssdServer::Instance().StartServer();
 
-        if (!IsOTAInitialized)
+        if (!isOTAInitialized)
         {
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(mInitOTARequestorDelaySec),
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
                                                         InitOTARequestorHandler, nullptr);
-            IsOTAInitialized = true;
+            isOTAInitialized = true;
         }
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
@@ -179,6 +179,13 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     {
         ESP_LOGI(TAG, "IPv6 Server ready...");
         chip::app::DnssdServer::Instance().StartServer();
+
+        if (!isOTAInitialized)
+        {
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
+                                                        InitOTARequestorHandler, nullptr);
+            isOTAInitialized = true;
+        }
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {
