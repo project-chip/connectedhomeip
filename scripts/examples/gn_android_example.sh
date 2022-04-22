@@ -16,7 +16,7 @@
 #    limitations under the License.
 #
 
-set -ex
+set -e
 
 # Build script for GN examples GitHub workflow.
 
