@@ -55,7 +55,7 @@ private:
     Messaging::ExchangeManager * mExchangeManager        = nullptr;
     SessionResumptionStorage * mSessionResumptionStorage = nullptr;
 
-    Optional<CASESession> mPairingSession; // TOOD: use a pool to enable concurrent CASE session.
+    Optional<CASESession> mPairingSession; // TODO: use a pool to enable concurrent CASE session.
     SessionManager * mSessionManager = nullptr;
 
     FabricTable * mFabrics                              = nullptr;

@@ -276,15 +276,15 @@ exit:
         mState = State::kError;
     }
     VerifyOrDie(SanityCheck());
-    // EstablishSession is a API from delegate side, so we don't call OnSessionEstablishmentDone here, the delegate awares the error
-    // by return value.
+    // EstablishSession is called by our delegate, so we don't call OnSessionEstablishmentDone here.  The delegate
+    // will be notified of errors via our return value.
     return err;
 }
 
 void CASESession::OnResponseTimeout(ExchangeContext * ec)
 {
     ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %u",
-                 static_cast<uint8_t>(mState));
+                 to_underlying(mState));
     AbortExchange();
     mState = State::kError;
     mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
@@ -1742,7 +1742,7 @@ exit:
     if (err == CHIP_ERROR_INVALID_MESSAGE_TYPE)
     {
         ChipLogError(SecureChannel, "Received message (type %d) cannot be handled in %d state.", to_underlying(msgType),
-                     static_cast<uint8_t>(mState));
+                     to_underlying(mState));
     }
 
     if (err != CHIP_NO_ERROR)
