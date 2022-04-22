@@ -99,20 +99,6 @@ static bool readExtFlashImgHeader(NVS_Handle handle, imgFixedHdr_t * header)
     return (status == NVS_STATUS_SUCCESS);
 }
 
-static bool eraseExtFlashHeader(NVS_Handle handle)
-{
-    int_fast16_t status;
-    NVS_Attrs regionAttrs;
-    unsigned int sectors;
-
-    NVS_getAttrs(handle, &regionAttrs);
-    /* calculate the number of sectors to erase */
-    sectors = (sizeof(imgFixedHdr_t) + (regionAttrs.sectorSize - 1)) / regionAttrs.sectorSize;
-    status  = NVS_erase(handle, IMG_START, sectors * regionAttrs.sectorSize);
-
-    return (status == NVS_STATUS_SUCCESS);
-}
-
 /* makes room for the new block if needed */
 static bool writeExtFlashImgPages(NVS_Handle handle, size_t bytesWritten, MutableByteSpan block)
 {
