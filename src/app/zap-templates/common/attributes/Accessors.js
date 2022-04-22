@@ -17,7 +17,7 @@
 
 const zapPath      = '../../../../../third_party/zap/repo/dist/src-electron/';
 const ListHelper   = require('../../common/ListHelper.js');
-const StringHelper = require(zapPath + 'generator/helper-string-matter.js')
+const StringHelper = require('../../common/StringHelper.js');
 const appHelper    = require('../../templates/app/helper.js');
 const cHelper      = require(zapPath + 'generator/helper-c.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')

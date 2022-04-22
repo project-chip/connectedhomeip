@@ -4,6 +4,7 @@
     "helpers": [
         "partials/helper.js",
         "common/ListHelper.js",
+        "common/StringHelper.js",
         "common/ChipTypesHelper.js",
         "templates/app/helper.js",
         "templates/chip/helper.js"

@@ -28,7 +28,7 @@ const zclQuery          = require(zapPath + 'db/query-zcl.js')
 
 const { Deferred }    = require('./Deferred.js');
 const ListHelper      = require('./ListHelper.js');
-const StringHelper    = require(zapPath + 'generator/helper-string-matter.js');
+const StringHelper    = require('./StringHelper.js');
 const ChipTypesHelper = require('./ChipTypesHelper.js');
 
 // Helper for better error reporting.

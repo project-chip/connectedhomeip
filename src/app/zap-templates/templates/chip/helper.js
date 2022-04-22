@@ -23,7 +23,7 @@ const iteratorUtil = require(zapPath + 'util/iterator-util.js');
 const queryAccess  = require(zapPath + 'db/query-access')
 
 const { asBlocks, ensureClusters } = require('../../common/ClustersHelper.js');
-const StringHelper                 = require(zapPath + 'generator/helper-string-matter.js');
+const StringHelper                 = require('../../common/StringHelper.js');
 const ChipTypesHelper              = require('../../common/ChipTypesHelper.js');
 
 function throwErrorIfUndefined(item, errorMsg, conditions)
