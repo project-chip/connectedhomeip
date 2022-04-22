@@ -117,6 +117,8 @@ public:
     static constexpr Key kConfigKey_WiFiPSK            = EFR32ConfigKey(kMatterConfig_KeyBase, 0x0D);
     static constexpr Key kConfigKey_WiFiSEC            = EFR32ConfigKey(kMatterConfig_KeyBase, 0x0E);
     static constexpr Key kConfigKey_GroupKeyBase       = EFR32ConfigKey(kMatterConfig_KeyBase, 0x0F);
+    static constexpr Key kConfigKey_LockUser           = EFR32ConfigKey(kMatterConfig_KeyBase, 0x10);
+    static constexpr Key kConfigKey_Credential         = EFR32ConfigKey(kMatterConfig_KeyBase, 0x11);
     static constexpr Key kConfigKey_GroupKeyMax =
         EFR32ConfigKey(kMatterConfig_KeyBase, 0x1E); // Allows 16 Group Keys to be created.
     static constexpr Key kConfigKey_UniqueId = EFR32ConfigKey(kMatterFactory_KeyBase, 0x1F);

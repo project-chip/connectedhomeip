@@ -14,7 +14,6 @@
 
 # add this gni as import in your build args to use pigweed in the example
 # 'import("//with_pw_rpc.gni")'
-# *WIP* pigweed is not fully integrated in this EFR example yet
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/config/efr32/lib/pw_rpc/pw_rpc.gni")
@@ -24,6 +23,5 @@ efr32_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 chip_enable_pw_rpc = true
 chip_enable_openthread = true
-chip_openthread_ftd = true
 
 cpp_standard = "gnu++17"
