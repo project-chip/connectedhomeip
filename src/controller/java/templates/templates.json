@@ -4,6 +4,7 @@
     "helpers": [
         "../../../app/zap-templates/common/ChipTypesHelper.js",
         "../../../app/zap-templates/common/ListHelper.js",
+        "../../../app/zap-templates/common/StringHelper.js",
         "../../../app/zap-templates/partials/helper.js",
         "../../../app/zap-templates/templates/app/helper.js",
         "../../../app/zap-templates/templates/chip/helper.js",

@@ -26,7 +26,7 @@ const cHelper      = require(zapPath + 'generator/helper-c.js')
 const string       = require(zapPath + 'util/string.js')
 const dbEnum       = require(zapPath + '../src-shared/db-enum.js')
 
-const StringHelper    = require(zapPath + 'generator/helper-string-matter.js')
+const StringHelper    = require('../../common/StringHelper.js');
 const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
 
 zclHelper['isEvent'] = function (db, event_name, packageId) {

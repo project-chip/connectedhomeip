@@ -2,6 +2,7 @@
     "name": "CHIP Tests templates",
     "version": "chip-v1",
     "helpers": [
+        "../../../zap-templates/common/StringHelper.js",
         "../../../zap-templates/templates/app/helper.js",
         "../../../zap-templates/templates/chip/helper.js"
     ],
