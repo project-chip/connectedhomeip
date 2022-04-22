@@ -57,7 +57,6 @@ QueueHandle_t sAppEventQueue;
 bool sIsThreadProvisioned     = false;
 bool sIsThreadEnabled         = false;
 bool sHaveBLEConnections      = false;
-bool sHaveServiceConnectivity = false;
 
 uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
 

@@ -174,10 +174,15 @@ config("optimize_zero") {
   ldflags = cflags
 }
 
+config("optimize_debug") {
+  cflags = [ "-O${optimize_debug_level}" ]
+  ldflags = cflags
+}
+
 config("optimize_default") {
   if (is_debug) {
     if (optimize_debug) {
-      configs = [ "$dir_pw_build:optimize_debugging" ]
+      configs = [ ":optimize_debug" ]
     } else {
       configs = [ ":optimize_zero" ]
     }
