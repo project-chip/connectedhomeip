@@ -226,7 +226,7 @@ CHIP_ERROR AppTask::Init()
         EFR32_LOG("funct timer create failed");
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
-    
+
     EFR32_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
     //Initial lock state
