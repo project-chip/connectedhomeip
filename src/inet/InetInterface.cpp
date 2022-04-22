@@ -126,24 +126,14 @@ bool InterfaceAddressIterator::Next()
     if (mNetifAddrList == nullptr)
     {
         mNetifAddrList = otIp6GetUnicastAddresses(Inet::globalOtInstance);
-
-        if (mNetifAddrList == nullptr)
-        {
-            return false;
-        }
-        mCurAddr = const_cast<otNetifAddress *>(mNetifAddrList);
+        mCurAddr       = mNetifAddrList;
     }
     else if (mCurAddr != nullptr)
     {
         mCurAddr = mCurAddr->mNext;
     }
 
-    if (mCurAddr == nullptr)
-    {
-        return false;
-    }
-
-    return true;
+    return (mCurAddr != nullptr);
 }
 CHIP_ERROR InterfaceAddressIterator::GetAddress(IPAddress & outIPAddress)
 {

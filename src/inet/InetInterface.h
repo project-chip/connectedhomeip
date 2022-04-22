@@ -541,7 +541,7 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
     const otNetifAddress * mNetifAddrList;
-    otNetifAddress * mCurAddr;
+    const otNetifAddress * mCurAddr;
 #endif // #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 };
 
