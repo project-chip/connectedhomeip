@@ -35,7 +35,6 @@ Checks: >
   -clang-analyzer-security.insecureAPI.strcpy,
   -clang-analyzer-nullability.NullablePassedToNonnull,
   -clang-analyzer-optin.performance.Padding,
-  -clang-analyzer-security.insecureAPI.bzero,
   -clang-analyzer-unix.cstring.NullArg,
   -clang-analyzer-security.insecureAPI.rand,
   -clang-analyzer-core.NonNullParamChecker,
