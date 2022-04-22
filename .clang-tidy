@@ -41,8 +41,6 @@ Checks: >
   -clang-analyzer-core.NonNullParamChecker,
   -clang-analyzer-nullability.NullPassedToNonnull,
   -clang-analyzer-unix.Malloc,
-  -clang-analyzer-valist.Unterminated,
-  -clang-analyzer-cplusplus.NewDeleteLeaks,
   -clang-diagnostic-implicit-int-conversion
 WarningsAsErrors: '*'
 HeaderFilterRegex: '(src|examples|zzz_generated|credentials).*(?<!third_party.*repo)'
