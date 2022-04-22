@@ -17,15 +17,15 @@
  */
 
 #include "TvCastingApp-JNI.h"
+#include "JNIDACProvider.h"
+#include <app/server/Server.h>
 #include <app/server/java/AndroidAppServerWrapper.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
-#include "JNIDACProvider.h"
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <app/server/Server.h>
 
 using namespace chip;
 
@@ -97,7 +97,8 @@ JNI_METHOD(jboolean, openBasicCommissioningWindow)(JNIEnv *, jobject, jint durat
     ChipLogProgress(AppServer, "JNI_METHOD openBasicCommissioningWindow called with duration %d", duration);
 
     Server::GetInstance().GetFabricTable().DeleteAllFabrics();
-    CHIP_ERROR err = Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(System::Clock::Seconds16(duration));
+    CHIP_ERROR err =
+        Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(System::Clock::Seconds16(duration));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "GetCommissioningWindowManager failed: %" CHIP_ERROR_FORMAT, err.Format());
