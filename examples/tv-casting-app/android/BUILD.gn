@@ -57,10 +57,10 @@ android_library("java") {
   ]
 
   sources = [
-    "App/app/src/main/jni/com/chip/casting/TvCastingApp.java",
-    "App/app/src/main/jni/com/chip/casting/TvCastingAppCallback.java",
     "App/app/src/main/jni/com/chip/casting/DACProvider.java",
     "App/app/src/main/jni/com/chip/casting/DACProviderStub.java",
+    "App/app/src/main/jni/com/chip/casting/TvCastingApp.java",
+    "App/app/src/main/jni/com/chip/casting/TvCastingAppCallback.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
