@@ -47,7 +47,7 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
-    if(state.Value() == DlLockState::kUnlocked)
+    if (state.Value() == DlLockState::kUnlocked)
         mState = kState_UnlockCompleted;
     else
         mState = kState_LockCompleted;
@@ -62,8 +62,10 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
 bool LockManager::ReadConfigValues()
 {
     size_t outLen;
-    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_LockUser, reinterpret_cast<uint8_t *> (&mLockUser), sizeof(LockUserInfo), outLen);
-    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_Credential, reinterpret_cast<uint8_t *> (&mLockCredentials), sizeof(LockCredentialInfo), outLen);
+    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUser), sizeof(LockUserInfo),
+                                    outLen);
+    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
+                                    sizeof(LockCredentialInfo), outLen);
     return true;
 }
 
@@ -244,7 +246,8 @@ bool LockManager::Unlock(chip::EndpointId endpointId, const Optional<chip::ByteS
 bool LockManager::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const
 {
     chip::ByteSpan credentialData(mLockCredentials.credentialData, mLockCredentials.credentialDataSize);
-    ChipLogProgress(Zcl, "Door Lock App: LockManager::GetUser [endpoint=%d,userIndex=%hu] pin =%s", mEndpointId, userIndex, (char *) &(mLockCredentials.credentialData));
+    ChipLogProgress(Zcl, "Door Lock App: LockManager::GetUser [endpoint=%d,userIndex=%hu] pin =%s", mEndpointId, userIndex,
+                    (char *) &(mLockCredentials.credentialData));
 
     const auto & userInDb = mLockUser;
     user.userStatus       = userInDb.userStatus;
@@ -281,9 +284,8 @@ bool LockManager::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::F
                     "Door Lock App: LockManager::SetUser "
                     "[endpoint=%d,userIndex=%d,creator=%d,modifier=%d,userName=%s,uniqueId=%ld "
                     "userStatus=%u,userType=%u,credentialRule=%u,credentials=%p,totalCredentials=%u]",
-                    mEndpointId, userIndex, creator, modifier, userName.data(), uniqueId,
-                    to_underlying(userStatus), to_underlying(usertype), to_underlying(credentialRule), credentials,
-                    totalCredentials);
+                    mEndpointId, userIndex, creator, modifier, userName.data(), uniqueId, to_underlying(userStatus),
+                    to_underlying(usertype), to_underlying(credentialRule), credentials, totalCredentials);
 
     auto & userInStorage = mLockUser;
 
@@ -295,9 +297,8 @@ bool LockManager::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::F
 
     if (totalCredentials > sizeof(DOOR_LOCK_MAX_CREDENTIALS_PER_USER))
     {
-        ChipLogError(
-            Zcl, "Cannot set user - total number of credentials is too big [endpoint=%d,index=%d,totalCredentials=%u]",
-            mEndpointId, userIndex, totalCredentials);
+        ChipLogError(Zcl, "Cannot set user - total number of credentials is too big [endpoint=%d,index=%d,totalCredentials=%u]",
+                     mEndpointId, userIndex, totalCredentials);
         return false;
     }
 
@@ -316,7 +317,8 @@ bool LockManager::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::F
         userInStorage.credentials[i] = credentials[i];
     }
 
-    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&userInStorage), sizeof(LockUserInfo));
+    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&userInStorage),
+                                     sizeof(LockUserInfo));
 
     ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", mEndpointId, userIndex);
 
@@ -369,7 +371,8 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, DlCredentialStatus 
 
     mLockCredentials.credentialDataSize = credentialData.size();
 
-    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&credentialInStorage), sizeof(LockCredentialInfo));
+    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&credentialInStorage),
+                                     sizeof(LockCredentialInfo));
 
     ChipLogProgress(Zcl, "Successfully set the credential [credentialType=%u]", to_underlying(credentialType));
 
@@ -394,7 +397,7 @@ const char * LockManager::lockStateToString(DlLockState lockState) const
 bool LockManager::setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, DlOperationError & err)
 {
     DlLockState curState = DlLockState::kLocked;
-    if(mState == kState_UnlockCompleted)
+    if (mState == kState_UnlockCompleted)
         curState = DlLockState::kUnlocked;
 
     if (curState == lockState)

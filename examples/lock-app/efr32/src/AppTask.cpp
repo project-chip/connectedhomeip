@@ -26,15 +26,15 @@
 #include "qrcodegen.h"
 #endif // DISPLAY_ENABLED
 #include "sl_simple_led_instances.h"
+#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
 
-#include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
+#include <app/clusters/identify-server/identify-server.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -106,7 +106,7 @@ bool sIsThreadProvisioned = false;
 bool sIsThreadEnabled     = false;
 #endif /* CHIP_ENABLE_OPENTHREAD */
 bool sHaveBLEConnections = false;
-bool configValueSet = false;
+bool configValueSet      = false;
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 
@@ -229,7 +229,7 @@ CHIP_ERROR AppTask::Init()
 
     EFR32_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
-    //Initial lock state
+    // Initial lock state
     chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state;
     chip::EndpointId endpointId{ 1 };
     chip::DeviceLayer::PlatformMgr().LockChipStack();
@@ -250,7 +250,7 @@ CHIP_ERROR AppTask::Init()
     sStatusLED.Init(SYSTEM_STATE_LED);
     sLockLED.Init(LOCK_STATE_LED);
 
-    if(state.Value() == DlLockState::kUnlocked)
+    if (state.Value() == DlLockState::kUnlocked)
     {
         sLockLED.Set(true);
     }
@@ -298,7 +298,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     while (true)
     {
         // Users and credentials should be checked once from nvm flash on boot
-        if(!configValueSet)
+        if (!configValueSet)
         {
             LockMgr().ReadConfigValues();
             configValueSet = true;
@@ -528,7 +528,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
             // Set lock status LED back to show state of lock.
-            //sLockLED.Set(LockMgr().isLocked(1));
+            // sLockLED.Set(LockMgr().isLocked(1));
 
             sAppTask.CancelTimer();
 
@@ -590,7 +590,6 @@ void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
     {
         sAppTask.mSyncClusterToButtonAction = true;
     }
-
 }
 
 void AppTask::ActionCompleted(LockManager::Action_t aAction)
@@ -617,10 +616,10 @@ void AppTask::ActionCompleted(LockManager::Action_t aAction)
 void AppTask::ActionRequest(int32_t aActor, LockManager::Action_t aAction)
 {
     AppEvent event;
-    event.Type              = AppEvent::kEventType_Lock;
-    event.LockEvent.Actor   = aActor;
-    event.LockEvent.Action  = aAction;
-    event.Handler           = LockActionEventHandler;
+    event.Type             = AppEvent::kEventType_Lock;
+    event.LockEvent.Actor  = aActor;
+    event.LockEvent.Action = aAction;
+    event.Handler          = LockActionEventHandler;
     PostEvent(&event);
 }
 
@@ -670,13 +669,14 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 
 void AppTask::UpdateClusterState(intptr_t context)
 {
-    bool unlocked = LockMgr().NextState();
+    bool unlocked        = LockMgr().NextState();
     DlLockState newState = unlocked ? DlLockState::kUnlocked : DlLockState::kLocked;
 
     DlOperationSource source = DlOperationSource::kUnspecified;
 
     // write the new lock value
-    EmberAfStatus status = DoorLockServer::Instance().SetLockState(1, newState, source) ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
+    EmberAfStatus status =
+        DoorLockServer::Instance().SetLockState(1, newState, source) ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
