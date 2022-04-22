@@ -263,7 +263,7 @@ bool LockManager::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & us
 
     ChipLogDetail(Zcl,
                   "Found occupied user "
-                  "[endpoint=%d,name=\"%.*s\",credentialsCount=%zu,uniqueId=%lx,type=%u,credentialRule=%u,"
+                  "[endpoint=%d,name=\"%.*s\",credentialsCount=%u,uniqueId=%lx,type=%u,credentialRule=%u,"
                   "createdBy=%d,lastModifiedBy=%d]",
                   mEndpointId, static_cast<int>(user.userName.size()), user.userName.data(), user.credentials.size(),
                   user.userUniqueId, to_underlying(user.userType), to_underlying(user.credentialRule), user.createdBy,
@@ -278,10 +278,9 @@ bool LockManager::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::F
 {
     ChipLogProgress(Zcl,
                     "Door Lock App: LockManager::SetUser "
-                    "[endpoint=%d,userIndex=%" PRIu16 ",creator=%d,modifier=%d,userName=\"%.*s\",uniqueId=%" PRIx32
-                    ",userStatus=%u,userType=%u,"
-                    "credentialRule=%u,credentials=%p,totalCredentials=%zu]",
-                    mEndpointId, userIndex, creator, modifier, static_cast<int>(userName.size()), userName.data(), uniqueId,
+                    "[endpoint=%d,userIndex=%d,creator=%d,modifier=%d,userName=%s,uniqueId=%ld "
+                    "userStatus=%u,userType=%u,credentialRule=%u,credentials=%p,totalCredentials=%u]",
+                    mEndpointId, userIndex, creator, modifier, userName.data(), uniqueId,
                     to_underlying(userStatus), to_underlying(usertype), to_underlying(credentialRule), credentials,
                     totalCredentials);
 
@@ -296,7 +295,7 @@ bool LockManager::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::F
     if (totalCredentials > sizeof(DOOR_LOCK_MAX_CREDENTIALS_PER_USER))
     {
         ChipLogError(
-            Zcl, "Cannot set user - total number of credentials is too big [endpoint=%d,index=%d" PRIu16 ",totalCredentials=%zu]",
+            Zcl, "Cannot set user - total number of credentials is too big [endpoint=%d,index=%d,totalCredentials=%u]",
             mEndpointId, userIndex, totalCredentials);
         return false;
     }
@@ -339,7 +338,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, DlCredentialType cr
     credential.credentialType = credentialInStorage.credentialType;
     credential.credentialData = chip::ByteSpan(credentialInStorage.credentialData);
 
-    ChipLogDetail(Zcl, "Found occupied credential [type=%u,dataSize=%zu]", to_underlying(credential.credentialType),
+    ChipLogDetail(Zcl, "Found occupied credential [type=%u,dataSize=%u]", to_underlying(credential.credentialType),
                   credential.credentialData.size());
 
     return true;
@@ -350,7 +349,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, DlCredentialStatus 
 {
     ChipLogProgress(Zcl,
                     "Door Lock App: LockManager::SetCredential "
-                    "[credentialStatus=%u,credentialType=%u,credentialDataSize=%zu]",
+                    "[credentialStatus=%u,credentialType=%u,credentialDataSize=%u]",
                     to_underlying(credentialStatus), to_underlying(credentialType), credentialData.size());
 
     auto & credentialInStorage = mLockCredentials;
@@ -358,7 +357,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, DlCredentialStatus 
     {
         ChipLogError(Zcl,
                      "Cannot get the credential - data size exceeds limit "
-                     "[dataSize=%zu,maxDataSize=%zu]",
+                     "[dataSize=%u,maxDataSize=%u]",
                      credentialData.size(), DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE);
         return false;
     }
