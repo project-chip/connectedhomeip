@@ -57,6 +57,10 @@
 #include <net/net_if.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#include <inet/UDPEndPointImplOpenThread.h>
+#endif
+
 #include <stdio.h>
 #include <string.h>
 
@@ -105,15 +109,31 @@ bool InterfaceIterator::Next()
     // TODO : Cleanup #17346
     return false;
 }
+
+InterfaceAddressIterator::InterfaceAddressIterator()
+{
+    mNetifAddrList = nullptr;
+    mCurAddr       = nullptr;
+}
+
 bool InterfaceAddressIterator::HasCurrent()
 {
-    return mIntfIter.HasCurrent();
+    return (mNetifAddrList != nullptr) ? (mCurAddr != nullptr) : Next();
 }
 
 bool InterfaceAddressIterator::Next()
 {
-    // TODO : Cleanup #17346
-    return false;
+    if (mNetifAddrList == nullptr)
+    {
+        mNetifAddrList = otIp6GetUnicastAddresses(Inet::globalOtInstance);
+        mCurAddr       = mNetifAddrList;
+    }
+    else if (mCurAddr != nullptr)
+    {
+        mCurAddr = mCurAddr->mNext;
+    }
+
+    return (mCurAddr != nullptr);
 }
 CHIP_ERROR InterfaceAddressIterator::GetAddress(IPAddress & outIPAddress)
 {
@@ -122,7 +142,7 @@ CHIP_ERROR InterfaceAddressIterator::GetAddress(IPAddress & outIPAddress)
         return CHIP_ERROR_SENTINEL;
     }
 
-    outIPAddress = IPAddress((*(mAddrInfoList[mCurAddrIndex].mAddress)));
+    outIPAddress = IPAddress(mCurAddr->mAddress);
     return CHIP_NO_ERROR;
 }
 
