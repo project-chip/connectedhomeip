@@ -41,13 +41,13 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
                          InteractionType aInteractionType) :
     mManagementCallback(apCallback)
 {
-    mpExchangeMgr               = apExchangeContext->GetExchangeMgr();
-    mpExchangeCtx               = apExchangeContext;
-    mInteractionType            = aInteractionType;
-    mInitiatorNodeId            = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId();
-    mSubjectDescriptor          = apExchangeContext->GetSessionHandle()->GetSubjectDescriptor();
-    mLastWrittenEventsBytes     = 0;
-    mSubscriptionStartTimestamp = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
+    mpExchangeMgr                = apExchangeContext->GetExchangeMgr();
+    mpExchangeCtx                = apExchangeContext;
+    mInteractionType             = aInteractionType;
+    mInitiatorNodeId             = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId();
+    mSubjectDescriptor           = apExchangeContext->GetSessionHandle()->GetSubjectDescriptor();
+    mLastWrittenEventsBytes      = 0;
+    mSubscriptionStartGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
     if (apExchangeContext != nullptr)
     {
         apExchangeContext->SetDelegate(this);
@@ -376,7 +376,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     }
     ReturnErrorOnFailure(err);
 
-    // Ensure the read transaction don't exceed the resources dedicated to read transactions.
+    // Ensure the read transaction doesn't exceed the resources dedicated to read transactions.
     VerifyOrReturnError(InteractionModelEngine::GetInstance()->CanEstablishReadTransaction(this), CHIP_ERROR_NO_MEMORY);
 
     ReturnErrorOnFailure(readRequestParser.GetIsFabricFiltered(&mIsFabricFiltered));

@@ -779,13 +779,11 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *
  * The default value comes from 3sub per fabric * max number of fabrics, then reserve 1 read client for each fabric.
  *
- * Note that there is one fabric for rotation slack, so the actual number of fabrics should be CHIP_CONFIG_MAX_FABRICS - 1.
- *
- * TODO: (#17085) Should be changed to (CHIP_CONFIG_MAX_FABRICS - 1) * 4 after we can hold more read handlers on more concise
+ * TODO: (#17085) Should be changed to (CHIP_CONFIG_MAX_FABRICS * 4) after we can hold more read handlers on more concise
  * devices.
  */
 #ifndef CHIP_IM_MAX_NUM_READ_HANDLER
-#define CHIP_IM_MAX_NUM_READ_HANDLER ((CHIP_CONFIG_MAX_FABRICS - 1) * 3)
+#define CHIP_IM_MAX_NUM_READ_HANDLER (CHIP_CONFIG_MAX_FABRICS * 3)
 #endif
 
 /**
@@ -804,14 +802,11 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *
  * The default value comes from 3path per subsctipion * 3sub per fabric * max number of fabrics, then reserve 1 read client with 9
  * paths for each fabric.
- *
- * Note: CHIP_CONFIG_MAX_FABRICS = actual max number of fabrics + 1 reserved for rotation, so CHIP_CONFIG_MAX_FABRICS - 1 is the
- * actual maximum number of fabrics supported.
  */
 #ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
-// #define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS ((CHIP_CONFIG_MAX_FABRICS - 1) * 18)
+// #define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS (CHIP_CONFIG_MAX_FABRICS * 18)
 // TODO: (#17085) Should be 3 sub * 3 path + 9 path (for read) = 18
-#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS ((CHIP_CONFIG_MAX_FABRICS - 1) * 13)
+#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS (CHIP_CONFIG_MAX_FABRICS * 13)
 #endif
 
 /**
