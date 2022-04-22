@@ -290,7 +290,6 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
     //    a synchronous model, the exchange is still open, and the status response is sent to the WriteHandler.
     // 5. WriteHandler::OnMessageReceived is invoked, and it correctly asserts.
     //
-    ctx.EnableAsyncDispatch();
 
     constexpr bool allBooleans[] = { true, false };
     for (auto messageIsTimed : allBooleans)
@@ -335,8 +334,6 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
             NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
         }
     }
-
-    ctx.DisableAsyncDispatch();
 }
 
 const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
@@ -490,7 +487,7 @@ int Test_Setup(void * inContext)
 {
     VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
 
-    VerifyOrReturnError(TestContext::InitializeAsync(inContext) == SUCCESS, FAILURE);
+    VerifyOrReturnError(TestContext::Initialize(inContext) == SUCCESS, FAILURE);
 
     TestContext & ctx = *static_cast<TestContext *>(inContext);
     gTestStorage.ClearStorage();

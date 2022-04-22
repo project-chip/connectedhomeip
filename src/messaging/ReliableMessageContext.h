@@ -198,9 +198,6 @@ protected:
         /// When set, signifies that this exchange is waiting for a call to SendMessage.
         kFlagWillSendMessage = (1u << 8),
 
-        /// When set, signifies that we are currently in the middle of HandleMessage.
-        kFlagHandlingMessage = (1u << 9),
-
         /// When set, we have had Close() or Abort() called on us already.
         kFlagClosed = (1u << 10),
 

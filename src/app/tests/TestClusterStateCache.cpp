@@ -625,7 +625,7 @@ nlTestSuite theSuite =
 {
     "TestClusterStateCache",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 
