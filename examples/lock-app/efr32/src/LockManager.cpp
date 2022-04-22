@@ -62,7 +62,7 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
 bool LockManager::ReadConfigValues()
 {
     size_t outLen;
-    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_LockUser, reinterpret_cast<uint8_t *> (&mLockUser), sizeof(LockUserInfo), outLen);    
+    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_LockUser, reinterpret_cast<uint8_t *> (&mLockUser), sizeof(LockUserInfo), outLen);
     EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_Credential, reinterpret_cast<uint8_t *> (&mLockCredentials), sizeof(LockCredentialInfo), outLen);
     return true;
 }
