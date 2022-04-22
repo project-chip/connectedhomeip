@@ -76,7 +76,8 @@ public:
     {
         Retain(); // Put the test session in Active state
         SetFabricIndex(fabric);
-        ChipLogDetail(Inet, "SecureSession Allocated for test %p Type:%d LSID:%d", this, static_cast<int>(mSecureSessionType), mLocalSessionId);
+        ChipLogDetail(Inet, "SecureSession Allocated for test %p Type:%d LSID:%d", this, static_cast<int>(mSecureSessionType),
+                      mLocalSessionId);
     }
 
     /**
@@ -88,7 +89,8 @@ public:
     SecureSession(SecureSessionTable & table, Type secureSessionType, uint16_t localSessionId) :
         mTable(table), mState(State::kPairing), mSecureSessionType(secureSessionType), mLocalSessionId(localSessionId)
     {
-        ChipLogDetail(Inet, "SecureSession Allocated %p Type:%d LSID:%d", this, static_cast<int>(mSecureSessionType), mLocalSessionId);
+        ChipLogDetail(Inet, "SecureSession Allocated %p Type:%d LSID:%d", this, static_cast<int>(mSecureSessionType),
+                      mLocalSessionId);
     }
 
     /**
@@ -110,8 +112,10 @@ public:
         mState = State::kActive;
         ChipLogDetail(Inet, "SecureSession Active %p Type:%d LSID:%d", this, static_cast<int>(mSecureSessionType), mLocalSessionId);
     }
-    ~SecureSession() override {
-        ChipLogDetail(Inet, "SecureSession Released %p Type:%d LSID:%d", this, static_cast<int>(mSecureSessionType), mLocalSessionId);
+    ~SecureSession() override
+    {
+        ChipLogDetail(Inet, "SecureSession Released %p Type:%d LSID:%d", this, static_cast<int>(mSecureSessionType),
+                      mLocalSessionId);
     }
 
     SecureSession(SecureSession &&)      = delete;

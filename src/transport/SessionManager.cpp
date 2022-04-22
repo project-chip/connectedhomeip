@@ -779,7 +779,8 @@ Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId pe
 {
     SecureSession * found = nullptr;
     mSecureSessions.ForEachSession([&peerNodeId, &type, &found](auto session) {
-        if (session->IsActiveSession() && session->GetPeer() == peerNodeId && (!type.HasValue() || type.Value() == session->GetSecureSessionType()))
+        if (session->IsActiveSession() && session->GetPeer() == peerNodeId &&
+            (!type.HasValue() || type.Value() == session->GetSecureSessionType()))
         {
             found = session;
             return Loop::Break;
