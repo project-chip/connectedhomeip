@@ -204,9 +204,9 @@ private:
     CHIP_ERROR ValidateSigmaResumeMIC(const ByteSpan & resumeMIC, const ByteSpan & initiatorRandom, const ByteSpan & resumptionID,
                                       const ByteSpan & skInfo, const ByteSpan & nonce);
 
-    // For CASESession to not leak, after each action (OnMessageReceived/OnResponseTimeout), it must end with a state where either the
-    // establishment is done, or it's waiting for a message from other side with response timer being set. This function ensures that we
-    // are indeed in such state. It is called and verifed after each action.
+    // For CASESession to not leak, after each action (OnMessageReceived/OnResponseTimeout), it must end with a state where either
+    // the establishment is done, or it's waiting for a message from other side with response timer being set. This function ensures
+    // that we are indeed in such state. It is called and verifed after each action.
     bool SanityCheck() const;
 
     void OnSuccessStatusReport() override;
