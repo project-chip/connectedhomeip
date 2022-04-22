@@ -141,8 +141,8 @@ public class MainActivity extends AppCompatActivity {
     registerReceiver(broadcastReceiver, new IntentFilter("com.matter.tv.server.appagent.remove"));
 
     ContentAppDiscoveryService.getRecieverInstance().registerSelf(this.getApplicationContext());
-    ContentAppDiscoveryService.getRecieverInstance().initializeMatterApps(this.getApplicationContext());
-
+    ContentAppDiscoveryService.getRecieverInstance()
+        .initializeMatterApps(this.getApplicationContext());
   }
 
   private class ContentAppListAdapter extends ArrayAdapter<Entry<String, String>> {

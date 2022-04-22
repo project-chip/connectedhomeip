@@ -10,12 +10,8 @@ import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
-
-import androidx.annotation.Nullable;
-
-import com.matter.tv.server.utils.ResourceUtils;
 import com.matter.tv.app.api.MatterIntentConstants;
-
+import com.matter.tv.server.utils.ResourceUtils;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -130,16 +126,15 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
 
   public void initializeMatterApps(Context context) {
     Set<String> matterApps = getMatterApps(context);
-    for (String matterApp:matterApps) {
+    for (String matterApp : matterApps) {
       handlePackageAdded(context, matterApp);
     }
   }
 
   private Set<String> getMatterApps(Context context) {
     PackageManager pm = context.getPackageManager();
-    List<ResolveInfo> receivers = pm.queryBroadcastReceivers(
-            new Intent(MatterIntentConstants.ACTION_MATTER_COMMAND),
-            0);
+    List<ResolveInfo> receivers =
+        pm.queryBroadcastReceivers(new Intent(MatterIntentConstants.ACTION_MATTER_COMMAND), 0);
 
     Set<String> matterApps = new HashSet<>();
     if (receivers.isEmpty()) {
@@ -149,8 +144,7 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
 
     for (ResolveInfo receiver : receivers) {
       if (receiver != null && receiver.activityInfo != null) {
-        Log.i("Activity Info found. Package Name is %s",
-                receiver.activityInfo.packageName);
+        Log.i("Activity Info found. Package Name is %s", receiver.activityInfo.packageName);
         matterApps.add(receiver.activityInfo.packageName);
       }
     }
