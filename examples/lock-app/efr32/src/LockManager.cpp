@@ -102,7 +102,6 @@ bool LockManager::InitiateAction(int32_t aActor, Action_t aAction)
         action_initiated = true;
 
         new_state = kState_LockInitiated;
-
     }
 
     if (action_initiated)

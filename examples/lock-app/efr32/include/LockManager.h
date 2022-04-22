@@ -102,7 +102,6 @@ public:
     bool ReadConfigValues();
 
 private:
-
     bool GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const;
     bool SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier, const chip::CharSpan & userName,
                  uint32_t uniqueId, DlUserStatus userStatus, DlUserType usertype, DlCredentialRule credentialRule,
