@@ -305,6 +305,7 @@ template("bl602_sdk") {
       "${chip_root}/third_party/mbedtls/repo/library/ccm.c",
       "${chip_root}/third_party/mbedtls/repo/library/cipher.c",
       "${chip_root}/third_party/mbedtls/repo/library/cipher_wrap.c",
+      "${chip_root}/third_party/mbedtls/repo/library/constant_time.c",
       "${chip_root}/third_party/mbedtls/repo/library/ctr_drbg.c",
       "${chip_root}/third_party/mbedtls/repo/library/ecdh.c",
       "${chip_root}/third_party/mbedtls/repo/library/ecdsa.c",
