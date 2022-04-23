@@ -114,4 +114,3 @@ To get the list of parameters for a specific command, run the built executable
 with the target cluster name and the target command name
 
     $ chip-tool-darwin onoff on
-
