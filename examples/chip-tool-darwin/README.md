@@ -115,8 +115,3 @@ with the target cluster name and the target command name
 
     $ chip-tool-darwin onoff on
 
-# Command Reference
-
-## Command Details
-
-[Cluster Commands](../../zzz_generated/chip-tool-darwin/zap-generated/README_CLUSTER_COMMANDS.md)
