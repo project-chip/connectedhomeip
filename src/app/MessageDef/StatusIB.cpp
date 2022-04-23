@@ -45,7 +45,10 @@ CHIP_ERROR StatusIB::Parser::DecodeStatusIB(StatusIB & aStatusIB) const
     reader.Init(mReader);
     while (CHIP_NO_ERROR == reader.Next())
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Tag::kStatus):
@@ -75,7 +78,10 @@ CHIP_ERROR StatusIB::Parser::CheckSchemaValidity() const
     reader.Init(mReader);
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         if (!(TagPresenceMask & (1 << to_underlying(Tag::kStatus))))
         {
             TagPresenceMask |= (1 << to_underlying(Tag::kStatus));

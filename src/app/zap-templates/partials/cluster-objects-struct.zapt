@@ -119,7 +119,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
     err = reader.EnterContainer(outer);
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR) {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
             {{#zcl_struct_items}}
