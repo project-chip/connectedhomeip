@@ -285,7 +285,6 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
 
     SetDropAckDebug(false);
     SetAckPending(false);
-    SetMsgRcvdFromPeer(false);
 
     // Do not request Ack for multicast
     SetAutoRequestAck(!session->IsGroupSession());

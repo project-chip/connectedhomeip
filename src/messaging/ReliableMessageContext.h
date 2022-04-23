@@ -129,24 +129,6 @@ public:
      */
     bool IsAckPending() const;
 
-    /**
-     *  Determine whether at least one message has been received
-     *  on this exchange from peer.
-     *
-     *  @return Returns 'true' if message received, else 'false'.
-     */
-    bool HasRcvdMsgFromPeer() const;
-
-    /**
-     *  Set if a message has been received from the peer
-     *  on this exchange.
-     *
-     *  @param[in]  inMsgRcvdFromPeer  A Boolean indicating whether (true) or not
-     *                                 (false) a message has been received
-     *                                 from the peer on this exchange context.
-     */
-    void SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer);
-
     /// Determine whether there is message hasn't been acknowledged.
     bool IsMessageNotAcked() const;
 
@@ -192,17 +174,14 @@ protected:
         /// some message we have needed to acknowledge in the past.
         kFlagAckMessageCounterIsValid = (1u << 6),
 
-        /// When set, signifies that at least one message has been received from peer on this exchange context.
-        kFlagMsgRcvdFromPeer = (1u << 7),
-
         /// When set, signifies that this exchange is waiting for a call to SendMessage.
-        kFlagWillSendMessage = (1u << 8),
+        kFlagWillSendMessage = (1u << 7),
 
         /// When set, we have had Close() or Abort() called on us already.
-        kFlagClosed = (1u << 9),
+        kFlagClosed = (1u << 8),
 
         /// When set, signifies that the exchange is requesting Sleepy End Device fast-polling mode.
-        kFlagFastPollingMode = (1u << 10),
+        kFlagFastPollingMode = (1u << 9),
     };
 
     BitFlags<Flags> mFlags; // Internal state flags
@@ -244,11 +223,6 @@ inline bool ReliableMessageContext::IsAckPending() const
     return mFlags.Has(Flags::kFlagAckPending);
 }
 
-inline bool ReliableMessageContext::HasRcvdMsgFromPeer() const
-{
-    return mFlags.Has(Flags::kFlagMsgRcvdFromPeer);
-}
-
 inline bool ReliableMessageContext::IsMessageNotAcked() const
 {
     return mFlags.Has(Flags::kFlagMessageNotAcked);
@@ -272,11 +246,6 @@ inline bool ReliableMessageContext::IsRequestingFastPollingMode() const
 inline void ReliableMessageContext::SetAutoRequestAck(bool autoReqAck)
 {
     mFlags.Set(Flags::kFlagAutoRequestAck, autoReqAck);
-}
-
-inline void ReliableMessageContext::SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer)
-{
-    mFlags.Set(Flags::kFlagMsgRcvdFromPeer, inMsgRcvdFromPeer);
 }
 
 inline void ReliableMessageContext::SetAckPending(bool inAckPending)
