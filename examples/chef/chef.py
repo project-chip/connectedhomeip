@@ -360,11 +360,13 @@ true''')
                 f"cp build/$(git rev-parse HEAD)-{options.sampleDeviceTypeName}.tar.xz {paths['scriptFolder']}")
         elif options.buildTarget == "nrfconnect":
             queueCommand(f"cd {paths['rootSampleFolder']}/nrfconnect")
+            nrf_build_cmd = "west build -b nrf52840dk_nrf52840"
+            nrf_build_options = []
             if options.doClean:
-                # queueCommand(f"rm -rf {paths['rootSampleFolder']}/nrfconnect/build")
-                queueCommand(f"west build -b nrf52840dk_nrf52840 -p always")
-            else:
-                queueCommand(f"west build -b nrf52840dk_nrf52840")
+                nrf_build_options.append("-p always")
+            if options.doRPC:
+                nrf_build_options.append("-- -DOVERLAY_CONFIG=rpc.overlay")
+            queueCommand(nrf_build_cmd + " ".join(nrf_build_options))
         elif options.buildTarget == "linux":
             queueCommand(f"cd {paths['rootSampleFolder']}/linux")
             queueCommand(f'''
