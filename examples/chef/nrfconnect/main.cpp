@@ -34,6 +34,14 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#include <logging/log.h>
+
+#ifdef CONFIG_ENABLE_PW_RPC
+#include "Rpc.h"
+#endif
+
+LOG_MODULE_REGISTER(app, CONFIG_MATTER_LOG_LEVEL);
+
 using namespace chip;
 using namespace chip::Shell;
 using namespace chip::DeviceLayer;
@@ -44,7 +52,13 @@ constexpr int kExtDiscoveryTimeoutSecs = 20;
 
 CHIP_ERROR main()
 {
-    CHIP_ERROR err = chip::Platform::MemoryInit();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    #ifdef CONFIG_ENABLE_PW_RPC
+        rpc::Init();
+    #endif
+
+    err = chip::Platform::MemoryInit();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Platform::MemoryInit() failed");
