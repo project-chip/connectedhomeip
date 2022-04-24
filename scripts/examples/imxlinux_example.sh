@@ -31,14 +31,14 @@ fi
 env
 
 PLATFORM_CFLAGS='-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"'
-PKG_CONFIG_PATH=${IMX_SDK_ROOT}/sysroots/cortexa53-crypto-poky-linux/lib/aarch64-linux-gnu/pkgconfig \
+PKG_CONFIG_PATH=$IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux/lib/aarch64-linux-gnu/pkgconfig \
     gn gen --check --fail-on-unused-args --root="$1" "$2" --args="target_os=\"linux\" target_cpu=\"arm64\" arm_arch=\"armv8-a\"
 import(\"//build_overrides/build.gni\")
-sysroot=\"${IMX_SDK_ROOT}/sysroots/cortexa53-crypto-poky-linux\"
+sysroot=\"$IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux\"
 target_cflags=[ \"$PLATFORM_CFLAGS\" ]
 custom_toolchain=\"\${build_root}/toolchain/custom\"
-target_cc=\"${IMX_SDK_ROOT}/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc\"
-target_cxx=\"${IMX_SDK_ROOT}/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++\"
-target_ar=\"${IMX_SDK_ROOT}/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar\""
+target_cc=\"$IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc\"
+target_cxx=\"$IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++\"
+target_ar=\"$IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar\""
 
 ninja -C "$2"
