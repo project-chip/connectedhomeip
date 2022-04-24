@@ -719,6 +719,7 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
     // If didEvictHandler is false, means the loop above evicted all subscriptions from the current fabric but we still don't have
     // enough resources for the new subscription, this should never happen.
     // This is safe as long as we have rejected subscriptions without a fabric associated (with a PASE session) before.
+    // Note: Spec#5141: should reject subscription requests on PASE sessions.
     VerifyOrDieWithMsg(didEvictHandler, DataManagement, "Failed to get required resources by evicting existing subscriptions.");
 
     // We have ensured enough resources by the logic above.
@@ -756,9 +757,9 @@ bool InteractionModelEngine::CanEstablishReadTransaction(const ReadHandler * apR
         return allowUnlimited;
     }
 
-    return (apReadHandler->GetAttributePathCount() <= kReservedPathsPerReadRequests &&
-            apReadHandler->GetEventPathCount() <= kReservedPathsPerReadRequests &&
-            apReadHandler->GetDataVersionFilterCount() <= kReservedPathsPerReadRequests) ||
+    return (apReadHandler->GetAttributePathCount() <= kReservedPathsPerReadRequest &&
+            apReadHandler->GetEventPathCount() <= kReservedPathsPerReadRequest &&
+            apReadHandler->GetDataVersionFilterCount() <= kReservedPathsPerReadRequest) ||
         allowUnlimited;
 }
 

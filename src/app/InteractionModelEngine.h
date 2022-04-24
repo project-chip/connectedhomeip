@@ -89,7 +89,7 @@ public:
      */
     static constexpr size_t kMinSupportedSubscriptionsPerFabric           = 2;
     static constexpr size_t kMinSupportedPathsPerSubscription             = 2;
-    static constexpr size_t kReservedPathsPerReadRequests                 = 9;
+    static constexpr size_t kReservedPathsPerReadRequest                  = 9;
     static constexpr size_t kReservedReadHandlersPerFabricForReadRequests = 1;
 
     // TODO: Per spec, the above numbers should be 3, 3, 9, 1, however, we use a lower limit to reduce the memory usage and should
@@ -232,8 +232,8 @@ public:
 
     /**
      * We only allow one active read transaction per fabric, and the number of paths used is limited by
-     * kReservedPathsPerReadRequests. This function will check if the given ReadHandler will exceed the limitations for the fabric
-     * accessed.
+     * kReservedPathsPerReadRequest. This function will check if the given ReadHandler will exceed the limitations for the accessing
+     * fabric.
      *
      * TODO: (#17418) We are now reserving resources for read requests, could be changed to similar algorithm for read resources
      * minimas.
@@ -449,16 +449,12 @@ private:
     WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
 
-    // CHIP_CONFIG_MAX_FABRICS = actual max number of fabrics + 1 reserved for rotation, so CHIP_CONFIG_MAX_FABRICS - 1 is the
-    // actual maximum number of fabrics supported.
-    static constexpr size_t kReservedHandlersForReads =
-        static_cast<int32_t>(kReservedReadHandlersPerFabricForReadRequests) * (CHIP_CONFIG_MAX_FABRICS);
-    static constexpr size_t kReservedPathsForReads =
-        static_cast<int32_t>(kReservedPathsPerReadRequests) * kReservedHandlersForReads;
+    static constexpr size_t kReservedHandlersForReads = kReservedReadHandlersPerFabricForReadRequests * (CHIP_CONFIG_MAX_FABRICS);
+    static constexpr size_t kReservedPathsForReads    = kReservedPathsPerReadRequest * kReservedHandlersForReads;
 
 #if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS >= CHIP_CONFIG_MAX_FABRICS *
-                          (kMinSupportedPathsPerSubscription * kMinSupportedSubscriptionsPerFabric + kReservedPathsPerReadRequests),
+                          (kMinSupportedPathsPerSubscription * kMinSupportedSubscriptionsPerFabric + kReservedPathsPerReadRequest),
                   "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS is too small to match the requirements of spec 8.5.1");
     static_assert(CHIP_IM_MAX_NUM_READ_HANDLER >= CHIP_CONFIG_MAX_FABRICS *
                           (kMinSupportedSubscriptionsPerFabric + kReservedReadHandlersPerFabricForReadRequests),
