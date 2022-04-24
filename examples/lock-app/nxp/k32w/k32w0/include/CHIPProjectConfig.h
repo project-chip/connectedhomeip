@@ -162,7 +162,7 @@
  *
  * @brief Defines the maximum number of CommandHandler, limits the number of active commands transactions on server.
  */
-#define CHIP_IM_MAX_NUM_COMMAND_HANDLER 2
+#define CHIP_IM_MAX_NUM_COMMAND_HANDLER 1
 
 /**
  * @def CHIP_IM_MAX_NUM_WRITE_HANDLER
