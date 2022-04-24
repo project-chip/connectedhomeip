@@ -32,7 +32,17 @@ CHIP_ERROR TestCommand::RunCommand()
 
 CHIP_ERROR TestCommand::WaitForCommissionee(chip::NodeId nodeId)
 {
-    CurrentCommissioner().ReleaseOperationalDevice(nodeId);
+    chip::FabricIndex fabricIndex;
+
+    ReturnErrorOnFailure(CurrentCommissioner().GetFabricIndex(&fabricIndex));
+
+    //
+    // There's a chance the commissionee may have rebooted before this call here as part of a test flow
+    // or is just starting out fresh outright. Let's make sure we're not re-using any cached CASE sessions
+    // that will now be stale and mismatched with the peer, causing subsequent interactions to fail.
+    //
+    CurrentCommissioner().SessionMgr()->ExpireAllPairings(chip::ScopedNodeId(nodeId, fabricIndex));
+
     return CurrentCommissioner().GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 

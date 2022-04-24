@@ -58,9 +58,8 @@ public:
      */
     enum class Type : uint8_t
     {
-        kUndefined = 0,
-        kPASE      = 1,
-        kCASE      = 2,
+        kPASE = 1,
+        kCASE = 2,
         // kPending denotes a secure session object that is internally
         // reserved by the stack before and during session establishment.
         //
@@ -71,6 +70,8 @@ public:
         kPending = 3,
     };
 
+    // TODO: This constructor should be private.  Tests should allocate a
+    // kPending session and then call Activate(), just like non-test code does.
     SecureSession(Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId,
                   FabricIndex fabric, const ReliableMessageProtocolConfig & config) :
         mSecureSessionType(secureSessionType),
@@ -97,15 +98,15 @@ public:
      *   PASE, setting internal state according to the parameters used and
      *   discovered during session establishment.
      */
-    void Activate(Type secureSessionType, NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric,
+    void Activate(Type secureSessionType, const ScopedNodeId & peer, CATValues peerCATs, uint16_t peerSessionId,
                   const ReliableMessageProtocolConfig & config)
     {
         mSecureSessionType = secureSessionType;
-        mPeerNodeId        = peerNodeId;
+        mPeerNodeId        = peer.GetNodeId();
         mPeerCATs          = peerCATs;
         mPeerSessionId     = peerSessionId;
         mMRPConfig         = config;
-        SetFabricIndex(fabric);
+        SetFabricIndex(peer.GetFabricIndex());
     }
     ~SecureSession() override { NotifySessionReleased(); }
 
@@ -142,6 +143,9 @@ public:
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
 
     Type GetSecureSessionType() const { return mSecureSessionType; }
+    bool IsCASESession() const { return GetSecureSessionType() == Type::kCASE; }
+    bool IsPASESession() const { return GetSecureSessionType() == Type::kPASE; }
+    bool IsActiveSession() const { return GetSecureSessionType() != Type::kPending; }
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     CATValues GetPeerCATs() const { return mPeerCATs; }
 

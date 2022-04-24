@@ -343,9 +343,9 @@ function asPrintFormat(type)
       case 'uint8_t':
         return '%u';
       case 'int16_t':
-        return '%" PRId16 "';
+        return '%d';
       case 'uint16_t':
-        return '%" PRIu16 "';
+        return '%u';
       case 'int24_t':
         return '%" PRId32 "';
       case 'uint24_t':

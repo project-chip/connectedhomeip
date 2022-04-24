@@ -521,7 +521,7 @@ void RunTest(nlTestSuite * apSuite, TestContext & ctx, Instructions instructions
     testServer.mOnListWriteBegin = [&](const ConcreteAttributePath & aPath) {
         NL_TEST_ASSERT(apSuite, onGoingPath == ConcreteAttributePath());
         onGoingPath = aPath;
-        ChipLogProgress(Zcl, "OnListWriteBegin endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
+        ChipLogProgress(Zcl, "OnListWriteBegin endpoint=%u Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
                         aPath.mEndpointId, ChipLogValueMEI(aPath.mClusterId), ChipLogValueMEI(aPath.mAttributeId));
         if (instructions.onListWriteBeginActions)
         {
@@ -539,7 +539,7 @@ void RunTest(nlTestSuite * apSuite, TestContext & ctx, Instructions instructions
         NL_TEST_ASSERT(apSuite, onGoingPath == aPath);
         status.push_back(PathStatus(aPath, aWasSuccessful));
         onGoingPath = ConcreteAttributePath();
-        ChipLogProgress(Zcl, "OnListWriteEnd endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
+        ChipLogProgress(Zcl, "OnListWriteEnd endpoint=%u Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
                         aPath.mEndpointId, ChipLogValueMEI(aPath.mClusterId), ChipLogValueMEI(aPath.mAttributeId));
     };
 
@@ -727,7 +727,7 @@ nlTestSuite sSuite =
 {
     "TestWriteChunking",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 // clang-format on

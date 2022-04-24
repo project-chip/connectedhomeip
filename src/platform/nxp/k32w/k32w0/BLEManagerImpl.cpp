@@ -1183,7 +1183,7 @@ void BLEManagerImpl::HandleRXCharWrite(blekw_msg_t * msg)
 #if CHIP_DEVICE_CHIP0BLE_DEBUG
     ChipLogDetail(DeviceLayer,
                   "Write request/command received for"
-                  "CHIPoBLE RX characteristic (con %" PRIu16 ", len %" PRIu16 ")",
+                  "CHIPoBLE RX characteristic (con %u, len %u)",
                   att_wr_data->device_id, buf->DataLength());
 #endif
 

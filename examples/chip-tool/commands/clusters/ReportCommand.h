@@ -161,10 +161,11 @@ protected:
                 chipTool,
                 "\n%sAttribute commands targetting multiple paths needs to have: \n \t * One element with multiple ids (for "
                 "example 1 cluster id, 1 attribute id, 2 endpoint ids)\n\t * Or the same "
-                "number of ids (for examples 2 cluster ids, 2 attribute ids and 2 endpoint ids).\n The current command has %zu "
-                "cluster ids, %zu attribute ids, %zu endpoint ids.",
-                interactionType == chip::app::ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read", clusterCount,
-                attributeCount, endpointCount);
+                "number of ids (for examples 2 cluster ids, 2 attribute ids and 2 endpoint ids).\n The current command has %u "
+                "cluster ids, %u attribute ids, %u endpoint ids.",
+                interactionType == chip::app::ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read",
+                static_cast<unsigned int>(clusterCount), static_cast<unsigned int>(attributeCount),
+                static_cast<unsigned int>(endpointCount));
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
@@ -179,7 +180,7 @@ protected:
             chip::AttributeId attributeId = attributeIds.at((hasSameIdsCount || multipleAttributes) ? i : 0);
             chip::EndpointId endpointId   = endpointIds.at((hasSameIdsCount || multipleEndpoints) ? i : 0);
 
-            ChipLogProgress(chipTool, "\tcluster " ChipLogFormatMEI ", attribute: " ChipLogFormatMEI ", endpoint %" PRIu16,
+            ChipLogProgress(chipTool, "\tcluster " ChipLogFormatMEI ", attribute: " ChipLogFormatMEI ", endpoint %u",
                             ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId), endpointId);
             attributePathParams[i].mClusterId   = clusterId;
             attributePathParams[i].mAttributeId = attributeId;
@@ -262,14 +263,14 @@ protected:
         }
         else
         {
-            ChipLogError(
-                chipTool,
-                "\n%sEvent command targetting multiple paths needs to have: \n \t * One element with multiple ids (for "
-                "example 1 cluster id, 1 event id, 2 endpoint ids)\n\t * Or the same "
-                "number of ids (for examples 2 cluster ids, 2 event ids and 2 endpoint ids).\n The current command has %zu "
-                "cluster ids, %zu event ids, %zu endpoint ids.",
-                interactionType == chip::app::ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read", clusterCount,
-                eventCount, endpointCount);
+            ChipLogError(chipTool,
+                         "\n%sEvent command targetting multiple paths needs to have: \n \t * One element with multiple ids (for "
+                         "example 1 cluster id, 1 event id, 2 endpoint ids)\n\t * Or the same "
+                         "number of ids (for examples 2 cluster ids, 2 event ids and 2 endpoint ids).\n The current command has %u "
+                         "cluster ids, %u event ids, %u endpoint ids.",
+                         interactionType == chip::app::ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read",
+                         static_cast<unsigned int>(clusterCount), static_cast<unsigned int>(eventCount),
+                         static_cast<unsigned int>(endpointCount));
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
@@ -283,7 +284,7 @@ protected:
             chip::EventId eventId       = eventIds.at((hasSameIdsCount || multipleEvents) ? i : 0);
             chip::EndpointId endpointId = endpointIds.at((hasSameIdsCount || multipleEndpoints) ? i : 0);
 
-            ChipLogProgress(chipTool, "\tcluster " ChipLogFormatMEI ", event: " ChipLogFormatMEI ", endpoint %" PRIu16,
+            ChipLogProgress(chipTool, "\tcluster " ChipLogFormatMEI ", event: " ChipLogFormatMEI ", endpoint %u",
                             ChipLogValueMEI(clusterId), ChipLogValueMEI(eventId), endpointId);
             eventPathParams[i].mClusterId  = clusterId;
             eventPathParams[i].mEventId    = eventId;
@@ -293,7 +294,7 @@ protected:
         chip::app::ReadPrepareParams params(device->GetSecureSession().Value());
         params.mpEventPathParamsList        = eventPathParams;
         params.mEventPathParamsListSize     = pathsCount;
-        params.mEventNumber                 = mEventNumber.ValueOr(0);
+        params.mEventNumber                 = mEventNumber;
         params.mpAttributePathParamsList    = nullptr;
         params.mAttributePathParamsListSize = 0;
 

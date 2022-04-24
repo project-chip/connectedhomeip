@@ -65,8 +65,9 @@ public class MatterServant {
     // The order is important, must
     // first new TvApp to load dynamic library
     // then chipPlatform to prepare platform
-    // then TvApp.postInit to init app which needs platform
+    // then TvApp.preServerInit to initialize any server configuration
     // then start ChipAppServer
+    // then TvApp.postServerInit to init app platform
     mTvApp =
         new TvApp(
             (app, clusterId, endpoint) -> {
@@ -117,10 +118,12 @@ public class MatterServant {
     chipPlatform.updateCommissionableDataProviderData(
         null, null, 0, testSetupPasscode, testDiscriminator);
 
-    mTvApp.postInit();
+    mTvApp.preServerInit();
 
     chipAppServer = new ChipAppServer();
     chipAppServer.startApp();
+
+    mTvApp.postServerInit();
   }
 
   public void restart() {

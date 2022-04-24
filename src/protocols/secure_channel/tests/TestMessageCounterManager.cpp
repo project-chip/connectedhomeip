@@ -33,7 +33,6 @@
 #include <protocols/echo/Echo.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
-#include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
@@ -48,12 +47,8 @@ using namespace chip::Transport;
 using namespace chip::Messaging;
 using namespace chip::Protocols;
 
-using TestContext = chip::Test::MessagingContext;
-
+using TestContext = chip::Test::LoopbackMessagingContext;
 TestContext sContext;
-
-TransportMgr<Test::LoopbackTransport> gTransportMgr;
-chip::Test::IOContext gIOContext;
 
 const char PAYLOAD[] = "Hello!";
 
@@ -152,13 +147,8 @@ nlTestSuite sSuite =
  */
 int Initialize(void * aContext)
 {
-    // Initialize System memory and resources
-    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
-    VerifyOrReturnError(gIOContext.Init(&sSuite) == CHIP_NO_ERROR, FAILURE);
-    VerifyOrReturnError(gTransportMgr.Init("LOOPBACK") == CHIP_NO_ERROR, FAILURE);
-
     auto * ctx = static_cast<TestContext *>(aContext);
-    VerifyOrReturnError(ctx->Init(&sSuite, &gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(ctx->Init(&sSuite) == CHIP_NO_ERROR, FAILURE);
 
     return SUCCESS;
 }
@@ -169,8 +159,6 @@ int Initialize(void * aContext)
 int Finalize(void * aContext)
 {
     CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
-    gIOContext.Shutdown();
-    chip::Platform::MemoryShutdown();
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }
 

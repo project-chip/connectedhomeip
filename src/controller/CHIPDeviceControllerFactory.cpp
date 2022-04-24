@@ -179,18 +179,10 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     {
         stateParams.caseServer = chip::Platform::New<CASEServer>();
 
-        //
         // Enable listening for session establishment messages.
-        //
-        // We pass in a nullptr for the BLELayer since we're not permitting usage of BLE in this server modality for the controller,
-        // especially since it will interrupt other potential usages of BLE by the controller acting in a commissioning capacity.
-        //
         ReturnErrorOnFailure(stateParams.caseServer->ListenForSessionEstablishment(
-            stateParams.exchangeMgr, stateParams.transportMgr,
-#if CONFIG_NETWORK_LAYER_BLE
-            nullptr,
-#endif
-            stateParams.sessionMgr, stateParams.fabricTable, stateParams.sessionResumptionStorage, stateParams.groupDataProvider));
+            stateParams.exchangeMgr, stateParams.sessionMgr, stateParams.fabricTable, stateParams.sessionResumptionStorage,
+            stateParams.groupDataProvider));
 
         //
         // We need to advertise the port that we're listening to for unsolicited messages over UDP. However, we have both a IPv4

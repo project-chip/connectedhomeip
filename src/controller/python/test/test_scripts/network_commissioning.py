@@ -97,11 +97,27 @@ class NetworkCommissioningTests:
             (endpointId,
              Clusters.NetworkCommissioning.Attributes.ScanMaxTimeSeconds),
             (endpointId, Clusters.NetworkCommissioning.Attributes.MaxNetworks),
-            (endpointId, Clusters.NetworkCommissioning.Attributes.FeatureMap)],
+            (endpointId, Clusters.NetworkCommissioning.Attributes.FeatureMap),
+            (endpointId, Clusters.NetworkCommissioning.Attributes.AcceptedCommandList),
+            (endpointId, Clusters.NetworkCommissioning.Attributes.GeneratedCommandList)],
             returnClusterObject=True)
         self.log_interface_basic_info(
             res[endpointId][Clusters.NetworkCommissioning])
         logger.info(f"Finished getting basic information of the endpoint")
+
+        if res[endpointId][Clusters.NetworkCommissioning].acceptedCommandList != [
+                Clusters.NetworkCommissioning.Commands.ScanNetworks.command_id,
+                Clusters.NetworkCommissioning.Commands.AddOrUpdateWiFiNetwork.command_id,
+                Clusters.NetworkCommissioning.Commands.RemoveNetwork.command_id,
+                Clusters.NetworkCommissioning.Commands.ConnectNetwork.command_id,
+                Clusters.NetworkCommissioning.Commands.ReorderNetwork.command_id]:
+            raise AssertionError(f"Unexpected accepted command list for Thread interface")
+
+        if res[endpointId][Clusters.NetworkCommissioning].generatedCommandList != [
+                Clusters.NetworkCommissioning.Commands.ScanNetworksResponse.command_id,
+                Clusters.NetworkCommissioning.Commands.NetworkConfigResponse.command_id,
+                Clusters.NetworkCommissioning.Commands.ConnectNetworkResponse.command_id]:
+            raise AssertionError(f"Unexpected generated command list for Thread interface")
 
         # Read Last* attributes
         logger.info(f"Read Last* attributes")
@@ -210,10 +226,27 @@ class NetworkCommissioningTests:
             (endpointId,
              Clusters.NetworkCommissioning.Attributes.ScanMaxTimeSeconds),
             (endpointId, Clusters.NetworkCommissioning.Attributes.MaxNetworks),
-            (endpointId, Clusters.NetworkCommissioning.Attributes.FeatureMap)],
+            (endpointId, Clusters.NetworkCommissioning.Attributes.FeatureMap),
+            (endpointId, Clusters.NetworkCommissioning.Attributes.AcceptedCommandList),
+            (endpointId, Clusters.NetworkCommissioning.Attributes.GeneratedCommandList)],
             returnClusterObject=True)
         self.log_interface_basic_info(
             res[endpointId][Clusters.NetworkCommissioning])
+
+        if res[endpointId][Clusters.NetworkCommissioning].acceptedCommandList != [
+                Clusters.NetworkCommissioning.Commands.ScanNetworks.command_id,
+                Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork.command_id,
+                Clusters.NetworkCommissioning.Commands.RemoveNetwork.command_id,
+                Clusters.NetworkCommissioning.Commands.ConnectNetwork.command_id,
+                Clusters.NetworkCommissioning.Commands.ReorderNetwork.command_id]:
+            raise AssertionError(f"Unexpected accepted command list for Thread interface")
+
+        if res[endpointId][Clusters.NetworkCommissioning].generatedCommandList != [
+                Clusters.NetworkCommissioning.Commands.ScanNetworksResponse.command_id,
+                Clusters.NetworkCommissioning.Commands.NetworkConfigResponse.command_id,
+                Clusters.NetworkCommissioning.Commands.ConnectNetworkResponse.command_id]:
+            raise AssertionError(f"Unexpected generated command list for Thread interface")
+
         logger.info(f"Finished getting basic information of the endpoint")
 
         # Read Last* attributes

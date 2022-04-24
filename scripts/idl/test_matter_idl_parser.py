@@ -185,7 +185,7 @@ class TestParser(unittest.TestCase):
             server cluster WithCommands = 1 {
                 struct FreeStruct {}
                 request struct InParam {}
-                response struct OutParam {}
+                response struct OutParam = 223 {}
 
                 command WithoutArg(): DefaultSuccess = 123;
                 command InOutStuff(InParam): OutParam = 222;
@@ -200,8 +200,7 @@ class TestParser(unittest.TestCase):
                         Struct(name="FreeStruct", fields=[]),
                         Struct(name="InParam", fields=[],
                                tag=StructTag.REQUEST),
-                        Struct(name="OutParam", fields=[],
-                               tag=StructTag.RESPONSE),
+                        Struct(name="OutParam", fields=[], tag=StructTag.RESPONSE, code=223),
                     ],
                     commands=[
                         Command(name="WithoutArg", code=123,
@@ -219,7 +218,7 @@ class TestParser(unittest.TestCase):
         actual = parseText("""
             server cluster WithCommands = 1 {
                 request struct InParam {}
-                response struct OutParam {}
+                response struct OutParam = 4 {}
 
                 command WithoutArg(): DefaultSuccess = 1;
                 timed command access(invoke: manage) TimedCommand(InParam): OutParam = 2;
@@ -233,8 +232,7 @@ class TestParser(unittest.TestCase):
                     structs=[
                         Struct(name="InParam", fields=[],
                                tag=StructTag.REQUEST),
-                        Struct(name="OutParam", fields=[],
-                               tag=StructTag.RESPONSE),
+                        Struct(name="OutParam", fields=[], tag=StructTag.RESPONSE, code=4),
                     ],
                     commands=[
                         Command(name="WithoutArg", code=1,

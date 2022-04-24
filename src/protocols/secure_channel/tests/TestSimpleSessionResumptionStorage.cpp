@@ -87,6 +87,10 @@ void TestIndex(nlTestSuite * inSuite, void * inContext)
 
     chip::ScopedNodeId node(node1, fabric1);
 
+    chip::SessionResumptionStorage::SessionIndex index0o;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == sessionStorage.LoadIndex(index0o));
+    NL_TEST_ASSERT(inSuite, index0o.mSize == 0);
+
     chip::SessionResumptionStorage::SessionIndex index1;
     index1.mSize = 0;
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == sessionStorage.SaveIndex(index1));
@@ -116,6 +120,7 @@ static const nlTest sTests[] =
 {
     NL_TEST_DEF("TestLink", TestLink),
     NL_TEST_DEF("TestState", TestState),
+    NL_TEST_DEF("TestIndex", TestState),
 
     NL_TEST_SENTINEL()
 };

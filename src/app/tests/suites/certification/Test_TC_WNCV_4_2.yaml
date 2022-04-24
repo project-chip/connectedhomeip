@@ -65,7 +65,7 @@ tests:
     ### Step 2x ->  Check GoToTiltPercentage 30% Long-Run effects
     - label: "2a: TH sends GoToTiltPercentage command with 30 percent to DUT"
       command: "GoToTiltPercentage"
-      PICS: "WNCV_TL && PICS_CR_GOTOTILTPERCENTAGE"
+      PICS: "WNCV_TL && CR_GOTOTILTPERCENTAGE"
       arguments:
           values:
               - name: "tiltPercent100thsValue"
@@ -135,7 +135,7 @@ tests:
     ### Step 4x ->  Check GoToTiltPercentage 60.20% Long-Run effects
     - label: "4a: TH sends GoToTiltPercentage command with 60.20 percent to DUT"
       command: "GoToTiltPercentage"
-      PICS: "WNCV_TL && PICS_CR_GOTOTILTPERCENTAGE"
+      PICS: "WNCV_TL && CR_GOTOTILTPERCENTAGE"
       arguments:
           values:
               - name: "tiltPercent100thsValue"

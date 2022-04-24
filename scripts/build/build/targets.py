@@ -31,6 +31,7 @@ from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 from builders.bl602 import Bl602App, Bl602Board, Bl602Builder
+from builders.imx import IMXApp, IMXBuilder
 
 
 class Target:
@@ -239,10 +240,13 @@ def HostTargets():
     for target in targets:
         app_targets.append(target.Extend(
             'all-clusters', app=HostApp.ALL_CLUSTERS))
+        if (HostBoard.NATIVE.PlatformName() == 'darwin'):
+            app_targets.append(target.Extend(
+                'chip-tool-darwin', app=HostApp.CHIP_TOOL_DARWIN))
         app_targets.append(target.Extend('chip-tool', app=HostApp.CHIP_TOOL))
         app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
         app_targets.append(target.Extend('minmdns', app=HostApp.MIN_MDNS))
-        app_targets.append(target.Extend('door-lock', app=HostApp.LOCK))
+        app_targets.append(target.Extend('lock', app=HostApp.LOCK))
         app_targets.append(target.Extend('shell', app=HostApp.SHELL))
         app_targets.append(target.Extend(
             'ota-provider', app=HostApp.OTA_PROVIDER, enable_ble=False))
@@ -257,7 +261,7 @@ def HostTargets():
     builder.AppendVariant(name="test-group", validator=AcceptNameWithSubstrings(
         ['-all-clusters', '-chip-tool']), test_group=True),
     builder.AppendVariant(name="same-event-loop", validator=AcceptNameWithSubstrings(
-        ['-chip-tool']), separate_event_loop=False),
+        ['-chip-tool', '-chip-tool-darwin']), separate_event_loop=False),
     builder.AppendVariant(name="no-interactive", validator=AcceptNameWithSubstrings(
         ['-chip-tool']), interactive_mode=False),
     builder.AppendVariant(name="ipv6only", enable_ipv4=False),
@@ -536,6 +540,21 @@ def Bl602Targets():
     yield target.Extend('light', board=Bl602Board.BL602BOARD, app=Bl602App.LIGHT)
 
 
+def IMXTargets():
+    target = Target('imx', IMXBuilder)
+
+    yield target.Extend('chip-tool', app=IMXApp.CHIP_TOOL)
+    yield target.Extend('lighting-app', app=IMXApp.LIGHT)
+    yield target.Extend('thermostat', app=IMXApp.THERMOSTAT)
+    yield target.Extend('all-clusters-app', app=IMXApp.ALL_CLUSTERS)
+    yield target.Extend('ota-provider-app', app=IMXApp.OTA_PROVIDER)
+    yield target.Extend('chip-tool-release', app=IMXApp.CHIP_TOOL, release=True)
+    yield target.Extend('lighting-app-release', app=IMXApp.LIGHT, release=True)
+    yield target.Extend('thermostat-release', app=IMXApp.THERMOSTAT, release=True)
+    yield target.Extend('all-clusters-app-release', app=IMXApp.ALL_CLUSTERS, release=True)
+    yield target.Extend('ota-provider-app-release', app=IMXApp.OTA_PROVIDER, release=True)
+
+
 ALL = []
 
 target_generators = [
@@ -553,6 +572,7 @@ target_generators = [
     QorvoTargets(),
     TizenTargets(),
     Bl602Targets(),
+    IMXTargets(),
 ]
 
 for generator in target_generators:

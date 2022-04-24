@@ -45,23 +45,22 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     }
     else if (path.mClusterId == LevelControl::Id)
     {
-        ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %" PRIu16 ", length %" PRIu16,
+        ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(path.mAttributeId), type, *value, size);
 
         // WIP Apply attribute change to Light
     }
     else if (path.mClusterId == ColorControl::Id)
     {
-        ChipLogProgress(Zcl, "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %" PRIu16 ", length %" PRIu16,
+        ChipLogProgress(Zcl, "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(path.mAttributeId), type, *value, size);
 
         // WIP Apply attribute change to Light
     }
     else if (path.mClusterId == OnOffSwitchConfiguration::Id)
     {
-        ChipLogProgress(
-            Zcl, "OnOff Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %u Value: %" PRIu16 ", length %" PRIu16,
-            ChipLogValueMEI(path.mAttributeId), type, *value, size);
+        ChipLogProgress(Zcl, "OnOff Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                        ChipLogValueMEI(path.mAttributeId), type, *value, size);
 
         // WIP Apply attribute change to Light
     }

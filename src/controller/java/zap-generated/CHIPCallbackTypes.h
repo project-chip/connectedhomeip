@@ -479,6 +479,8 @@ typedef void (*CHIPDoorLockClusterNumberOfWeekDaySchedulesSupportedPerUserAttrib
     void *, chip::app::Clusters::DoorLock::Attributes::NumberOfWeekDaySchedulesSupportedPerUser::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterNumberOfYearDaySchedulesSupportedPerUserAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::NumberOfYearDaySchedulesSupportedPerUser::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterNumberOfHolidaySchedulesSupportedAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::NumberOfHolidaySchedulesSupported::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterMaxPINCodeLengthAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::MaxPINCodeLength::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterMinPINCodeLengthAttributeCallbackType)(
@@ -503,6 +505,10 @@ typedef void (*CHIPDoorLockClusterEnablePrivacyModeButtonAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::EnablePrivacyModeButton::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterWrongCodeEntryLimitAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::WrongCodeEntryLimit::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterUserCodeTemporaryDisableTimeAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::UserCodeTemporaryDisableTime::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterRequirePINforRemoteOperationAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::RequirePINforRemoteOperation::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterGeneratedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPDoorLockClusterAcceptedCommandListAttributeCallbackType)(
@@ -576,6 +582,24 @@ typedef void (*CHIPFanControlClusterFanModeAttributeCallbackType)(
     void *, chip::app::Clusters::FanControl::Attributes::FanMode::TypeInfo::DecodableArgType);
 typedef void (*CHIPFanControlClusterFanModeSequenceAttributeCallbackType)(
     void *, chip::app::Clusters::FanControl::Attributes::FanModeSequence::TypeInfo::DecodableArgType);
+typedef void (*CHIPFanControlClusterPercentSettingAttributeCallbackType)(
+    void *, chip::app::Clusters::FanControl::Attributes::PercentSetting::TypeInfo::DecodableArgType);
+typedef void (*CHIPFanControlClusterPercentCurrentAttributeCallbackType)(
+    void *, chip::app::Clusters::FanControl::Attributes::PercentCurrent::TypeInfo::DecodableArgType);
+typedef void (*CHIPFanControlClusterSpeedMaxAttributeCallbackType)(
+    void *, chip::app::Clusters::FanControl::Attributes::SpeedMax::TypeInfo::DecodableArgType);
+typedef void (*CHIPFanControlClusterSpeedSettingAttributeCallbackType)(
+    void *, chip::app::Clusters::FanControl::Attributes::SpeedSetting::TypeInfo::DecodableArgType);
+typedef void (*CHIPFanControlClusterSpeedCurrentAttributeCallbackType)(
+    void *, chip::app::Clusters::FanControl::Attributes::SpeedCurrent::TypeInfo::DecodableArgType);
+typedef void (*CHIPFanControlClusterRockSupportAttributeCallbackType)(
+    void *, chip::app::Clusters::FanControl::Attributes::RockSupport::TypeInfo::DecodableArgType);
+typedef void (*CHIPFanControlClusterRockSettingAttributeCallbackType)(
+    void *, chip::app::Clusters::FanControl::Attributes::RockSetting::TypeInfo::DecodableArgType);
+typedef void (*CHIPFanControlClusterWindSupportAttributeCallbackType)(
+    void *, chip::app::Clusters::FanControl::Attributes::WindSupport::TypeInfo::DecodableArgType);
+typedef void (*CHIPFanControlClusterWindSettingAttributeCallbackType)(
+    void *, chip::app::Clusters::FanControl::Attributes::WindSetting::TypeInfo::DecodableArgType);
 typedef void (*CHIPFanControlClusterGeneratedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::FanControl::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPFanControlClusterAcceptedCommandListAttributeCallbackType)(

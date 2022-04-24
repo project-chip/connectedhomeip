@@ -37,6 +37,8 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
+#include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
 #include <platform/Ameba/AmebaOTAImageProcessor.h>
 
 void * __dso_handle = 0;
@@ -87,9 +89,11 @@ static DeviceCallbacks EchoCallbacks;
 
 DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
-DefaultOTARequestorDriver gRequestorUser;
+ExtendedOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 AmebaOTAImageProcessor gImageProcessor;
+chip::ota::DefaultOTARequestorUserConsent gUserConsentProvider;
+static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kGranted;
 
 extern "C" void amebaQueryImageCmdHandler()
 {
@@ -119,13 +123,17 @@ static void InitOTARequestor(void)
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
+    if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
+    {
+        gUserConsentProvider.SetUserConsentState(gUserConsentState);
+        gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
+    }
+
     // Initialize and interconnect the Requestor and Image Processor objects -- END
 }
 
 static void InitServer(intptr_t context)
 {
-    InitOTARequestor();
-
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
@@ -134,6 +142,8 @@ static void InitServer(intptr_t context)
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     NetWorkCommissioningInstInit();
+
+    InitOTARequestor();
 }
 
 extern "C" void ChipTest(void)

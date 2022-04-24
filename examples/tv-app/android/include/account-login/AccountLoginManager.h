@@ -31,7 +31,10 @@ using GetSetupPINResponse  = chip::app::Clusters::AccountLogin::Commands::GetSet
 class AccountLoginManager : public AccountLoginDelegate
 {
 public:
-    inline void SetSetupPin(char * setupPin) override { return; };
+    AccountLoginManager() : AccountLoginManager("tempPin123"){};
+    AccountLoginManager(const char * setupPin);
+
+    inline void SetSetupPin(char * setupPin) override { CopyString(mSetupPin, sizeof(mSetupPin), setupPin); };
 
     bool HandleLogin(const CharSpan & tempAccountIdentifierString, const CharSpan & setupPinString) override;
     bool HandleLogout() override;
@@ -39,6 +42,10 @@ public:
                            const CharSpan & tempAccountIdentifierString) override;
     inline void GetSetupPin(char * setupPin, size_t setupPinSize, const CharSpan & tempAccountIdentifierString) override
     {
-        CopyString(setupPin, setupPinSize, "");
+        CopyString(setupPin, setupPinSize, mSetupPin);
     };
+
+protected:
+    static const size_t kSetupPinSize = 12;
+    char mSetupPin[kSetupPinSize];
 };

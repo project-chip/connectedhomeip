@@ -70,7 +70,7 @@ tests:
 
     - label: "2b: TH sends GoToTiltPercentage command with BadParam to DUT"
       command: "GoToTiltPercentage"
-      PICS: WNCV_TL && WNCV_PA_TL || WNCV_TL && PICS_CR_GOTOTILTPERCENTAGE
+      PICS: WNCV_TL && WNCV_PA_TL || WNCV_TL && CR_GOTOTILTPERCENTAGE
       arguments:
           values:
               - name: "TiltPercent100thsValue"
@@ -84,7 +84,7 @@ tests:
     ### Step 3x -> Verify the GoToTiltPercentage with 10001 as param
     - label: "3a: TH sends GoToTiltPercentage command with 10001 to DUT"
       command: "GoToTiltPercentage"
-      PICS: WNCV_TL && WNCV_PA_TL || WNCV_TL && PICS_CR_GOTOTILTPERCENTAGE
+      PICS: WNCV_TL && WNCV_PA_TL || WNCV_TL && CR_GOTOTILTPERCENTAGE
       arguments:
           values:
               - name: "TiltPercent100thsValue"
@@ -98,7 +98,7 @@ tests:
     ### Step 4x -> Verify the GoToTiltPercentage with 0xFFFF as param
     - label: "4a: TH sends GoToTiltPercentage command with 0xFFFF to DUT"
       command: "GoToTiltPercentage"
-      PICS: WNCV_TL && WNCV_PA_TL || WNCV_TL && PICS_CR_GOTOTILTPERCENTAGE
+      PICS: WNCV_TL && WNCV_PA_TL || WNCV_TL && CR_GOTOTILTPERCENTAGE
       arguments:
           values:
               - name: "TiltPercent100thsValue"

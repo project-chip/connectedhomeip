@@ -144,6 +144,16 @@ public:
      */
     virtual CHIP_ERROR Shutdown();
 
+    SessionManager * SessionMgr()
+    {
+        if (mSystemState)
+        {
+            return mSystemState->SessionMgr();
+        }
+
+        return nullptr;
+    }
+
     CHIP_ERROR GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port);
 
     /**
@@ -268,6 +278,15 @@ private:
 
     CHIP_ERROR ProcessControllerNOCChain(const ControllerInitParams & params);
 };
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+using UdcTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
+#if INET_CONFIG_ENABLE_IPV4
+                                     ,
+                                     Transport::UDP /* IPv4 */
+#endif
+                                     >;
+#endif
 
 /**
  * @brief
@@ -449,7 +468,7 @@ public:
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
-    void OnSessionEstablished() override;
+    void OnSessionEstablished(const SessionHandle & session) override;
 
     void RendezvousCleanup(CHIP_ERROR status);
 
@@ -569,8 +588,8 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     UserDirectedCommissioningServer * mUdcServer = nullptr;
     // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
-    DeviceIPTransportMgr * mUdcTransportMgr = nullptr;
-    uint16_t mUdcListenPort                 = CHIP_UDC_PORT;
+    UdcTransportMgr * mUdcTransportMgr = nullptr;
+    uint16_t mUdcListenPort            = CHIP_UDC_PORT;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);

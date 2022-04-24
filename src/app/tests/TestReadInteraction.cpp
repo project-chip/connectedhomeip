@@ -64,11 +64,9 @@ chip::DataVersion kTestDataVersion2     = 5;
 class TestContext : public chip::Test::AppContext
 {
 public:
-    static int Initialize(void * context) = delete;
-
-    static int InitializeAsync(void * context)
+    static int Initialize(void * context)
     {
-        if (AppContext::InitializeAsync(context) != SUCCESS)
+        if (AppContext::Initialize(context) != SUCCESS)
             return FAILURE;
 
         auto * ctx = static_cast<TestContext *>(context);
@@ -105,7 +103,6 @@ private:
 };
 
 TestContext sContext;
-auto & sLoopback = sContext.GetLoopback();
 
 class TestEventGenerator : public chip::app::EventLoggingDelegate
 {
@@ -753,7 +750,7 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
     readPrepareParams.mEventPathParamsListSize     = 1;
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 2;
-    readPrepareParams.mEventNumber                 = 1;
+    readPrepareParams.mEventNumber.SetValue(1);
 
     {
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
@@ -1062,7 +1059,7 @@ void TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport(nlTest
         ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
         readPrepareParams.mpEventPathParamsList    = eventPathParams;
         readPrepareParams.mEventPathParamsListSize = 1;
-        readPrepareParams.mEventNumber             = 1;
+        readPrepareParams.mEventNumber.SetValue(1);
 
         MockInteractionModelApp delegate;
         NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
@@ -1093,7 +1090,7 @@ void TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport(nlTest
         ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
         readPrepareParams.mpEventPathParamsList    = eventPathParams;
         readPrepareParams.mEventPathParamsListSize = 1;
-        readPrepareParams.mEventNumber             = 1;
+        readPrepareParams.mEventNumber.SetValue(1);
 
         MockInteractionModelApp delegate;
         NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
@@ -2609,7 +2606,7 @@ nlTestSuite sSuite =
 {
     "TestReadInteraction",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 // clang-format on

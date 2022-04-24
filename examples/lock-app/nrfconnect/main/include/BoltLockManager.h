@@ -19,65 +19,54 @@
 
 #pragma once
 
+#include <lib/core/ClusterEnums.h>
+
+#include <zephyr.h>
+
 #include <cstdint>
 
-#include "AppEvent.h"
-
-struct k_timer;
+class AppEvent;
 
 class BoltLockManager
 {
 public:
-    enum Action_t
+    enum class State : uint8_t
     {
-        LOCK_ACTION = 0,
-        UNLOCK_ACTION,
-
-        INVALID_ACTION
+        kLockingInitiated = 0,
+        kLockingCompleted,
+        kUnlockingInitiated,
+        kUnlockingCompleted,
     };
 
-    enum State_t
-    {
-        kState_LockingInitiated = 0,
-        kState_LockingCompleted,
-        kState_UnlockingInitiated,
-        kState_UnlockingCompleted,
-    };
+    using OperationSource     = chip::app::Clusters::DoorLock::DlOperationSource;
+    using StateChangeCallback = void (*)(State, OperationSource);
 
-    void Init();
-    bool IsUnlocked();
-    void EnableAutoRelock(bool aOn);
-    void SetAutoLockDuration(uint32_t aDurationInSecs);
-    bool IsActionInProgress();
-    bool InitiateAction(int32_t aActor, Action_t aAction);
+    static constexpr uint32_t kActuatorMovementTimeMs = 2000;
 
-    typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
-    typedef void (*Callback_fn_completed)(Action_t, int32_t aActor);
-    void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
+    void Init(StateChangeCallback callback);
+
+    State GetState() const { return mState; }
+    bool IsLocked() const { return mState == State::kLockingCompleted; }
+
+    void Lock(OperationSource source);
+    void Unlock(OperationSource source);
 
 private:
-    friend BoltLockManager & BoltLockMgr(void);
-    State_t mState;
+    void SetState(State state, OperationSource source);
 
-    Callback_fn_initiated mActionInitiated_CB;
-    Callback_fn_completed mActionCompleted_CB;
+    static void ActuatorTimerEventHandler(k_timer * timer);
+    static void ActuatorAppEventHandler(AppEvent * aEvent);
+    friend BoltLockManager & BoltLockMgr();
 
-    bool mAutoRelock;
-    uint32_t mAutoLockDuration;
-    bool mAutoLockTimerArmed;
-    int32_t mCurrentActor;
-
-    void CancelTimer(void);
-    void StartTimer(uint32_t aTimeoutMs);
-
-    static void TimerEventHandler(k_timer * timer);
-    static void AutoReLockTimerEventHandler(AppEvent * aEvent);
-    static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
+    State mState                             = State::kLockingCompleted;
+    StateChangeCallback mStateChangeCallback = nullptr;
+    OperationSource mActuatorOperationSource = OperationSource::kButton;
+    k_timer mActuatorTimer                   = {};
 
     static BoltLockManager sLock;
 };
 
-inline BoltLockManager & BoltLockMgr(void)
+inline BoltLockManager & BoltLockMgr()
 {
     return BoltLockManager::sLock;
 }

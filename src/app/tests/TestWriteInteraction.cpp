@@ -276,22 +276,6 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 
     TestContext & ctx = *static_cast<TestContext *>(apContext);
 
-    //
-    // We have to enable async dispatch here to ensure that the exchange
-    // gets correctly closed out in the test below. Otherwise, the following happens:
-    //
-    // 1. WriteHandler generates a response upon OnWriteRequest being called.
-    // 2. Since there is no matching active client-side exchange for that request, the IM engine
-    //    handles it incorrectly and treats it like an unsolicited message.
-    // 3. It is invalid to receive a WriteResponse as an unsolicited message so it correctly sends back
-    //    a StatusResponse containing an error to that message.
-    // 4. Without unwinding the existing call stack, a response is received on the same exchange that the handler
-    //    generated a WriteResponse on. This exchange should have been closed in a normal execution model, but in
-    //    a synchronous model, the exchange is still open, and the status response is sent to the WriteHandler.
-    // 5. WriteHandler::OnMessageReceived is invoked, and it correctly asserts.
-    //
-    ctx.EnableAsyncDispatch();
-
     constexpr bool allBooleans[] = { true, false };
     for (auto messageIsTimed : allBooleans)
     {
@@ -329,14 +313,11 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
             }
 
             ctx.DrainAndServiceIO();
-            ctx.DrainAndServiceIO();
 
             Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
             NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
         }
     }
-
-    ctx.DisableAsyncDispatch();
 }
 
 const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
@@ -490,7 +471,7 @@ int Test_Setup(void * inContext)
 {
     VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
 
-    VerifyOrReturnError(TestContext::InitializeAsync(inContext) == SUCCESS, FAILURE);
+    VerifyOrReturnError(TestContext::Initialize(inContext) == SUCCESS, FAILURE);
 
     TestContext & ctx = *static_cast<TestContext *>(inContext);
     gTestStorage.ClearStorage();

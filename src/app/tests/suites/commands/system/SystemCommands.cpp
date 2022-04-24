@@ -16,6 +16,8 @@
  *
  */
 
+#include <lib/support/StringBuilder.h>
+
 #include "SystemCommands.h"
 
 namespace {
@@ -26,14 +28,15 @@ const char * getScriptsFolder()
 }
 } // namespace
 
-CHIP_ERROR SystemCommands::Start(uint16_t discriminator)
+constexpr size_t kCommandMaxLen = 256;
+
+CHIP_ERROR SystemCommands::Start(uint16_t discriminator, uint16_t port, const char * kvs)
 {
     const char * scriptDir            = getScriptsFolder();
     constexpr const char * scriptName = "Start.py";
 
-    char command[128];
-    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s %u", scriptDir, scriptName, discriminator) >= 0,
-                        CHIP_ERROR_INTERNAL);
+    char command[kCommandMaxLen];
+    ReturnErrorOnFailure(CreateCommonCommandArgs(command, sizeof(command), scriptDir, scriptName, discriminator, port, kvs));
     return RunInternal(command);
 }
 
@@ -47,14 +50,13 @@ CHIP_ERROR SystemCommands::Stop()
     return RunInternal(command);
 }
 
-CHIP_ERROR SystemCommands::Reboot(uint16_t discriminator)
+CHIP_ERROR SystemCommands::Reboot(uint16_t discriminator, uint16_t port, const char * kvs)
 {
     const char * scriptDir            = getScriptsFolder();
     constexpr const char * scriptName = "Reboot.py";
 
-    char command[128];
-    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s %u", scriptDir, scriptName, discriminator) >= 0,
-                        CHIP_ERROR_INTERNAL);
+    char command[kCommandMaxLen];
+    ReturnErrorOnFailure(CreateCommonCommandArgs(command, sizeof(command), scriptDir, scriptName, discriminator, port, kvs));
     return RunInternal(command);
 }
 
@@ -72,4 +74,33 @@ CHIP_ERROR SystemCommands::RunInternal(const char * command)
 {
     VerifyOrReturnError(system(command) == 0, CHIP_ERROR_INTERNAL);
     return ContinueOnChipMainThread(CHIP_NO_ERROR);
+}
+
+CHIP_ERROR SystemCommands::CreateCommonCommandArgs(char * commandBuffer, size_t commandBufferSize, const char * scriptDir,
+                                                   const char * scriptName, uint16_t discriminator, uint16_t port, const char * kvs)
+{
+    chip::StringBuilder<kCommandMaxLen> builder;
+    builder.Add(scriptDir);
+    builder.Add(scriptName);
+
+    // Add any applicable optional command line options
+    if (discriminator != 0xFFFF)
+    {
+        builder.Add(" --discriminator ");
+        builder.Add(discriminator);
+    }
+    if (port != CHIP_PORT)
+    {
+        builder.Add(" --secured-device-port ");
+        builder.Add(port);
+    }
+    if (kvs != nullptr)
+    {
+        builder.Add(" --KVS ");
+        builder.Add(kvs);
+    }
+    VerifyOrReturnError(builder.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    strncpy(commandBuffer, builder.c_str(), commandBufferSize);
+
+    return CHIP_NO_ERROR;
 }

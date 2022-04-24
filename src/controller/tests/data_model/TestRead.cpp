@@ -1755,7 +1755,7 @@ nlTestSuite sSuite =
 {
     "TestRead",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 // clang-format on

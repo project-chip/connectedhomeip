@@ -72,6 +72,7 @@ static CHIP_ERROR PrintAllCommands()
                     "  restartmdns <commissioningMode> (disabled|enabled_basic|enabled_enhanced)   Start Mdns with given "
                     "settings. Usage: commissionee "
                     "restartmdns enabled_basic\r\n");
+    streamer_printf(sout, "  startbcm                   Start basic commissioning mode. Usage: commissionee startbcm\r\n");
     streamer_printf(sout, "\r\n");
 
     return CHIP_NO_ERROR;
@@ -84,7 +85,7 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
         return PrintAllCommands();
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    else if (strcmp(argv[0], "sendudc") == 0)
+    if (strcmp(argv[0], "sendudc") == 0)
     {
         char * eptr;
         chip::Inet::IPAddress commissioner;
@@ -132,7 +133,11 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
         }
         return PrintAllCommands();
     }
-
+    if (strcmp(argv[0], "startbcm") == 0)
+    {
+        Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+        return CHIP_NO_ERROR;
+    }
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
 

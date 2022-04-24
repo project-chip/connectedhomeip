@@ -39,7 +39,7 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
         ESP_LOGI(tag, "%s", formattedMsg);
         break;
     case kLogCategory_Detail:
-        ESP_LOGV(tag, "%s", formattedMsg);
+        ESP_LOGD(tag, "%s", formattedMsg);
         break;
     }
 }

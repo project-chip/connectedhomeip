@@ -64,7 +64,6 @@ tests:
           value: 1
 
     - label: "Reads the attribute: EffectiveControlMode"
-      disabled: true
       command: "readAttribute"
       attribute: "EffectiveControlMode"
       PICS: A_EFFECTIVECONTROLMODE
@@ -79,7 +78,6 @@ tests:
           value: 2
 
     - label: "Reads the attribute: EffectiveControlMode"
-      disabled: true
       command: "readAttribute"
       attribute: "EffectiveControlMode"
       PICS: A_EFFECTIVECONTROLMODE
@@ -94,7 +92,6 @@ tests:
           value: 3
 
     - label: "Reads the attribute: EffectiveControlMode"
-      disabled: true
       command: "readAttribute"
       attribute: "EffectiveControlMode"
       PICS: A_EFFECTIVECONTROLMODE
@@ -109,7 +106,6 @@ tests:
           value: 5
 
     - label: "Reads the attribute: EffectiveControlMode"
-      disabled: true
       command: "readAttribute"
       attribute: "EffectiveControlMode"
       PICS: A_EFFECTIVECONTROLMODE
@@ -124,7 +120,6 @@ tests:
           value: 7
 
     - label: "Reads the attribute: EffectiveControlMode"
-      disabled: true
       command: "readAttribute"
       attribute: "EffectiveControlMode"
       PICS: A_EFFECTIVECONTROLMODE

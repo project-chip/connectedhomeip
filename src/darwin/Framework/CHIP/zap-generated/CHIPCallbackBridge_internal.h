@@ -436,6 +436,12 @@ typedef void (*ThermostatClusterThermostatSystemModeAttributeCallback)(void *,
                                                                        chip::app::Clusters::Thermostat::ThermostatSystemMode);
 typedef void (*NullableThermostatClusterThermostatSystemModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatSystemMode> &);
+typedef void (*FanControlClusterFanModeSequenceTypeAttributeCallback)(void *, chip::app::Clusters::FanControl::FanModeSequenceType);
+typedef void (*NullableFanControlClusterFanModeSequenceTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeSequenceType> &);
+typedef void (*FanControlClusterFanModeTypeAttributeCallback)(void *, chip::app::Clusters::FanControl::FanModeType);
+typedef void (*NullableFanControlClusterFanModeTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeType> &);
 typedef void (*ColorControlClusterColorLoopActionAttributeCallback)(void *, chip::app::Clusters::ColorControl::ColorLoopAction);
 typedef void (*NullableColorControlClusterColorLoopActionAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorLoopAction> &);
@@ -599,6 +605,9 @@ typedef void (*TestClusterNullableBitmap64AttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> &);
 typedef void (*TestClusterNullableStructStructAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> &);
+typedef void (*WindowCoveringConfigStatusAttributeCallback)(void *,
+                                                            chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus>);
+typedef void (*WindowCoveringModeAttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>);
 
 class CHIPDefaultSuccessCallbackBridge : public CHIPCallbackBridge<DefaultSuccessCallback>
 {
@@ -8099,6 +8108,59 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class CHIPWindowCoveringConfigStatusAttributeCallbackBridge : public CHIPCallbackBridge<WindowCoveringConfigStatusAttributeCallback>
+{
+public:
+    CHIPWindowCoveringConfigStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                          bool keepAlive = false) :
+        CHIPCallbackBridge<WindowCoveringConfigStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value);
+};
+
+class CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge
+    : public CHIPWindowCoveringConfigStatusAttributeCallbackBridge
+{
+public:
+    CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      CHIPActionBlock action,
+                                                                      SubscriptionEstablishedHandler establishedHandler) :
+        CHIPWindowCoveringConfigStatusAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPWindowCoveringModeAttributeCallbackBridge : public CHIPCallbackBridge<WindowCoveringModeAttributeCallback>
+{
+public:
+    CHIPWindowCoveringModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                  bool keepAlive = false) :
+        CHIPCallbackBridge<WindowCoveringModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value);
+};
+
+class CHIPWindowCoveringModeAttributeCallbackSubscriptionBridge : public CHIPWindowCoveringModeAttributeCallbackBridge
+{
+public:
+    CHIPWindowCoveringModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              CHIPActionBlock action,
+                                                              SubscriptionEstablishedHandler establishedHandler) :
+        CHIPWindowCoveringModeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
 class CHIPWindowCoveringGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<WindowCoveringGeneratedCommandListListAttributeCallback>
 {
@@ -13994,6 +14056,121 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPFanControlClusterFanModeSequenceTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<FanControlClusterFanModeSequenceTypeAttributeCallback>
+{
+public:
+    CHIPFanControlClusterFanModeSequenceTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<FanControlClusterFanModeSequenceTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::FanControl::FanModeSequenceType value);
+};
+
+class CHIPFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge
+    : public CHIPFanControlClusterFanModeSequenceTypeAttributeCallbackBridge
+{
+public:
+    CHIPFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        CHIPFanControlClusterFanModeSequenceTypeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableFanControlClusterFanModeSequenceTypeAttributeCallback>
+{
+public:
+    CHIPNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullableFanControlClusterFanModeSequenceTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                          keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeSequenceType> & value);
+};
+
+class CHIPNullableFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge
+    : public CHIPNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge
+{
+public:
+    CHIPNullableFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPFanControlClusterFanModeTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<FanControlClusterFanModeTypeAttributeCallback>
+{
+public:
+    CHIPFanControlClusterFanModeTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                            bool keepAlive = false) :
+        CHIPCallbackBridge<FanControlClusterFanModeTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::FanControl::FanModeType value);
+};
+
+class CHIPFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge
+    : public CHIPFanControlClusterFanModeTypeAttributeCallbackBridge
+{
+public:
+    CHIPFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        CHIPActionBlock action,
+                                                                        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPFanControlClusterFanModeTypeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullableFanControlClusterFanModeTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableFanControlClusterFanModeTypeAttributeCallback>
+{
+public:
+    CHIPNullableFanControlClusterFanModeTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullableFanControlClusterFanModeTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeType> & value);
+};
+
+class CHIPNullableFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge
+    : public CHIPNullableFanControlClusterFanModeTypeAttributeCallbackBridge
+{
+public:
+    CHIPNullableFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullableFanControlClusterFanModeTypeAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
