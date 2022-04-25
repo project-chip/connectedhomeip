@@ -72,23 +72,13 @@ CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & aCurTime)
 
 CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & aCurTime)
 {
-    struct timeval tv;
-    if (gettimeofday(&tv, nullptr) != 0)
+    Clock::Microseconds64 curTimeUs;
+    CHIP_ERROR err = GetClock_RealTime(curTimeUs);
+    if (err == CHIP_NO_ERROR)
     {
-        return CHIP_ERROR_POSIX(errno);
+        aCurTime = std::chrono::duration_cast<Clock::Milliseconds64>(curTimeUs);
     }
-    if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
-    {
-        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
-    }
-    if (tv.tv_usec < 0)
-    {
-        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
-    }
-    static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
-    aCurTime =
-        Clock::Milliseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000)) + (static_cast<uint64_t>(tv.tv_usec) / 1000));
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR ClockImpl::SetClock_RealTime(Clock::Microseconds64 aNewCurTime)
