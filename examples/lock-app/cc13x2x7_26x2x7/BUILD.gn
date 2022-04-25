@@ -26,13 +26,6 @@ import("${ti_simplelink_sdk_build_root}/ti_simplelink_sdk.gni")
 
 assert(current_os == "freertos")
 
-declare_args() {
-  device_vid = "0xFFF1"
-  device_pid = "0x8006"
-  software_ver = "0x0001"
-  software_ver_str = "1.0d1"
-}
-
 project_dir = "${chip_root}/examples/lock-app/cc13x2x7_26x2x7"
 
 ti_simplelink_sdk("sdk") {
@@ -79,11 +72,6 @@ ti_sysconfig("sysconfig") {
 
 ti_simplelink_executable("lock_app") {
   output_name = "chip-${ti_simplelink_board}-lock-example.out"
-
-  device_vid = device_vid
-  device_pid = device_pid
-  software_ver = software_ver
-  software_ver_str = software_ver_str
 
   sources = [
     "${project_dir}/main/AppTask.cpp",
