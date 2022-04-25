@@ -807,6 +807,10 @@ typedef struct
     bool hasTargetPositionTiltPercent100thsValue;
     uint16_t targetPositionTiltPercent100thsValue;
 #endif
+#ifdef ZCL_USING_MODE_SELECT_CLUSTER_SERVER
+    bool hasCurrentModeValue;
+    uint8_t currentModeValue;
+#endif
 } EmberAfSceneTableEntry;
 
 #if !defined(EMBER_AF_PLUGIN_MESSAGING_CLIENT)

@@ -215,6 +215,9 @@ void emAfPluginScenesServerPrintInfo(void)
             emberAfCorePrint(" Window percent100ths Lift %5u, Tilt %5u", entry.targetPositionLiftPercent100thsValue,
                              entry.targetPositionTiltPercent100thsValue);
 #endif
+#ifdef ZCL_USING_MODE_SELECT_CLUSTER_SERVER
+            emberAfCorePrint(" Current mode %3u", entry.currentModeValue);
+#endif
         }
         emberAfCorePrintln("%s", "");
     }
@@ -589,6 +592,12 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(chip::FabricIndex fa
                             "targetPositionTiltPercent100ths", (uint8_t *) &entry.targetPositionTiltPercent100thsValue,
                             sizeof(entry.targetPositionTiltPercent100thsValue));
 #endif
+#ifdef ZCL_USING_MODE_SELECT_CLUSTER_SERVER
+    entry.hasCurrentModeValue =
+        readServerAttribute(endpoint, ZCL_MODE_SELECT_CLUSTER_ID, ZCL_CURRENT_MODE_ATTRIBUTE_ID,
+                            "currentMode", (uint8_t *) &entry.currentModeValue,
+                            sizeof(entry.currentModeValue));
+#endif
 
     // When creating a new entry, the name is set to the null string (i.e., the
     // length is set to zero) and the transition time is set to zero.  The scene
@@ -740,6 +749,14 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::FabricIndex fab
                                      (uint8_t *) &entry.targetPositionTiltPercent100thsValue, ZCL_INT16U_ATTRIBUTE_TYPE);
             }
 #endif
+#ifdef ZCL_USING_MODE_SELECT_CLUSTER_SERVER
+            if (entry.hasCurrentModeValue)
+            {
+                writeServerAttribute(endpoint, ZCL_MODE_SELECT_CLUSTER_ID,
+                                     ZCL_MODE_SELECT_CLUSTER_ID, "CurrentMode",
+                                     (uint8_t *) &entry.currentModeValue, ZCL_INT8U_ATTRIBUTE_TYPE);
+            }
+#endif
             emberAfScenesMakeValid(endpoint, sceneId, groupId);
             return EMBER_ZCL_STATUS_SUCCESS;
         }
@@ -846,6 +863,9 @@ bool emberAfPluginScenesServerParseAddScene(
         entry.hasCurrentPositionTiltPercentageValue   = false;
         entry.hasTargetPositionLiftPercent100thsValue = false;
         entry.hasTargetPositionTiltPercent100thsValue = false;
+#endif
+#ifdef ZCL_USING_MODE_CLUSTER_SERVER
+        entry.hasCurrentModeValue = false;
 #endif
     }
 
@@ -1030,6 +1050,16 @@ bool emberAfPluginScenesServerParseAddScene(
             // If additional Window Covering extensions are added, adjust the index
             // and length variables here.
             break;
+#endif
+#ifdef ZCL_USING_MODE_SELECT_CLUSTER_SERVER
+        case ZCL_MODE_SELECT_CLUSTER_ID:
+            // We only know of one extension for the On/Off cluster and it is just one
+            // byte, which means we can skip some logic for this cluster.  If other
+            // extensions are added in this cluster, more logic will be needed here.
+            entry.hasCurrentModeValue = true;
+            entry.currentModeValue = emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+
+
 #endif
 #endif // if 0 disabling all the code.
         default:
@@ -1274,6 +1304,14 @@ bool emberAfPluginScenesServerParseViewScene(app::CommandHandler * commandObj, c
                         }
                     }
                 }
+            }
+    #endif
+    #ifdef ZCL_USING_MODE_SELECT_CLUSTER_SERVER
+            if (entry.hasCurrentMode)
+            {
+                emberAfPutInt16uInResp(ZCL_CURRENT_MODE_ATTRIBUTE_ID);
+                emberAfPutInt8uInResp(1); // length
+                emberAfPutInt8uInResp(entry.currentModeValue);
             }
     #endif
         }
