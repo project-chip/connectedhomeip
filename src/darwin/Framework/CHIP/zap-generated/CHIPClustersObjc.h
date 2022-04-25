@@ -21340,6 +21340,16 @@ typedef NS_OPTIONS(uint32_t, CHIPOnOffFeature) {
     CHIPOnOffFeatureLighting = 0x1,
 };
 
+typedef NS_ENUM(uint8_t, CHIPLevelControlMoveMode) {
+    CHIPLevelControlMoveModeUp = 0x00,
+    CHIPLevelControlMoveModeDown = 0x01,
+};
+
+typedef NS_ENUM(uint8_t, CHIPLevelControlStepMode) {
+    CHIPLevelControlStepModeUp = 0x00,
+    CHIPLevelControlStepModeDown = 0x01,
+};
+
 typedef NS_OPTIONS(uint32_t, CHIPLevelControlFeature) {
     CHIPLevelControlFeatureOnOff = 0x1,
     CHIPLevelControlFeatureLighting = 0x2,
@@ -22475,6 +22485,19 @@ typedef NS_ENUM(uint16_t, CHIPIasZoneType) {
     CHIPIasZoneTypeInvalidZoneType = 0xFFFF,
 };
 
+typedef NS_OPTIONS(uint16_t, CHIPIasZoneStatus) {
+    CHIPIasZoneStatusAlarm1 = 0x1,
+    CHIPIasZoneStatusAlarm2 = 0x2,
+    CHIPIasZoneStatusTamper = 0x4,
+    CHIPIasZoneStatusBattery = 0x8,
+    CHIPIasZoneStatusSupervisionReports = 0x10,
+    CHIPIasZoneStatusRestoreReports = 0x20,
+    CHIPIasZoneStatusTrouble = 0x40,
+    CHIPIasZoneStatusAC = 0x80,
+    CHIPIasZoneStatusTest = 0x100,
+    CHIPIasZoneStatusBatteryDefect = 0x200,
+};
+
 typedef NS_ENUM(uint8_t, CHIPIasAceAlarmStatus) {
     CHIPIasAceAlarmStatusNoAlarm = 0x00,
     CHIPIasAceAlarmStatusBurglar = 0x01,
@@ -22550,6 +22573,9 @@ typedef NS_ENUM(uint16_t, CHIPIasAceIasZoneType) {
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> xml cleanup, Regen and zap repo update
 typedef NS_OPTIONS(uint16_t, CHIPIasAceIasZoneStatus) {
     CHIPIasAceIasZoneStatusAlarm1 = 0x1,
     CHIPIasAceIasZoneStatusAlarm2 = 0x2,
@@ -22575,8 +22601,11 @@ typedef NS_OPTIONS(uint8_t, CHIPIasWdWarningInfo) {
     CHIPIasWdWarningInfoSirenLevel = 0x3,
 };
 
+<<<<<<< HEAD
 =======
 >>>>>>> Changes for cleaner regen
+=======
+>>>>>>> xml cleanup, Regen and zap repo update
 typedef NS_ENUM(uint8_t, CHIPChannelStatus) {
     CHIPChannelStatusSuccess = 0x00,
     CHIPChannelStatusMultipleMatches = 0x01,
