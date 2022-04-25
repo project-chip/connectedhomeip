@@ -141,16 +141,14 @@ Ninja to build the executable.
 -   Run the build to produce a default executable. By default on Linux both the
     TI SimpleLink SDK and Sysconfig are located in a `ti` folder in the user's
     home directory, and you must provide the absolute path to them. For example
-    `/home/username/ti/simplelink_cc13xx_cc26xx_sdk_5_30_03_01_eng` and
-    `/home/username/ti/sysconfig_1.10.0`. On Windows the default directory is
+    `/home/username/ti/sysconfig_1.11.0`. On Windows the default directory is
     `C:\ti`. Take note of this install path, as it will be used in the next
     step.
 
     ```
     $ cd ~/connectedhomeip/examples/lock-app/cc13x2x7_26x2x7
-    $ export TI_SIMPLELINK_SDK_ROOT=$HOME/ti/simplelink_cc13xx_cc26xx_sdk_5_30_03_01_eng
     $ export TI_SYSCONFIG_ROOT=$HOME/ti/sysconfig_1.10.0
-    $ gn gen out/debug --args="ti_simplelink_sdk_root=\"${TI_SIMPLELINK_SDK_ROOT}\" ti_sysconfig_root=\"${TI_SYSCONFIG_ROOT}\""
+    $ gn gen out/debug --args="ti_sysconfig_root=\"${TI_SYSCONFIG_ROOT}\""
     $ ninja -C out/debug
 
     ```
