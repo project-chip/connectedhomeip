@@ -245,8 +245,8 @@ static void CauseReadClientFailure(uint64_t deviceId, dispatch_queue_t queue, vo
 }
 
 typedef void (^ReportCallback)(NSArray * _Nullable value, NSError * _Nullable error);
-typedef void (^DataReportCallback)(NSArray * _Nullable value);
-typedef void (^ErrorCallback)(NSError * _Nullable error);
+typedef void (^DataReportCallback)(NSArray * value);
+typedef void (^ErrorCallback)(NSError * error);
 
 namespace {
 
@@ -365,9 +365,9 @@ private:
                 maxInterval:(uint16_t)maxInterval
                      params:(nullable CHIPSubscribeParams *)params
              cacheContainer:(CHIPAttributeCacheContainer * _Nullable)attributeCacheContainer
-     attributeReportHandler:(void (^)(NSArray * _Nullable value))attributeReportHandler
-         eventReportHandler:(void (^)(NSArray * _Nullable value))eventReportHandler
-               errorHandler:(void (^)(NSError * _Nullable error))errorHandler
+     attributeReportHandler:(void (^)(NSArray * value))attributeReportHandler
+         eventReportHandler:(void (^)(NSArray * value))eventReportHandler
+               errorHandler:(void (^)(NSError * error))errorHandler
     subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler
 {
     DeviceProxy * device = [self internalDevice];

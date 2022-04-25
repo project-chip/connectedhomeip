@@ -159,7 +159,7 @@ extern NSString * const kCHIPArrayValueType;
  *
  * subscriptionEstablished block, if not nil, will be called once the
  * subscription is established.  This will be _after_ the first (priming) call
- * to reportHandler.  Note that if the CHIPSubscribeParams are set to
+ * to both report handlers.  Note that if the CHIPSubscribeParams are set to
  * automatically resubscribe this can end up being called more than once.
  */
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
@@ -167,9 +167,9 @@ extern NSString * const kCHIPArrayValueType;
                 maxInterval:(uint16_t)maxInterval
                      params:(nullable CHIPSubscribeParams *)params
              cacheContainer:(CHIPAttributeCacheContainer * _Nullable)attributeCacheContainer
-     attributeReportHandler:(void (^)(NSArray * _Nullable value))attributeReportHandler
-         eventReportHandler:(void (^)(NSArray * _Nullable value))eventReportHandler
-               errorHandler:(void (^)(NSError * _Nullable error))errorHandler
+     attributeReportHandler:(void (^)(NSArray * value))attributeReportHandler
+         eventReportHandler:(void (^)(NSArray * value))eventReportHandler
+               errorHandler:(void (^)(NSError * error))errorHandler
     subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;
 
 /**
