@@ -174,8 +174,7 @@ static CHIP_ERROR CmdAppServerClusters(int argc, char ** argv)
     {
         EndpointId endpoint = emberAfEndpointFromIndex(i);
 
-        VerifyOrReturnError(emberAfClusterCount(endpoint, server) <= UINT8_MAX, CHIP_ERROR_INCORRECT_STATE);
-        uint8_t clusterCount = static_cast<uint8_t>(emberAfClusterCount(endpoint, server));
+        uint8_t clusterCount = emberAfClusterCount(endpoint, server);
 
         streamer_printf(streamer_get(), "Endpoint %d:\r\n", endpoint);
 
