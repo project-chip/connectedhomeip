@@ -16,10 +16,6 @@ control.
 ## Prerequisites
 
 -   Requires building and running the app to a physical device on iOS >= 15.4.
-    -   At time of writing 15.4 is in beta and the current active iOS version is
-        15.3.1. For detailed instructions on how to install the iOS 15.4 beta
-        onto your device visit
-        [beta.apple.com](https://beta.apple.com/sp/betaprogram/enroll#ios)
 
 ## Building the Application
 

@@ -65,22 +65,37 @@ server cluster AccessControl = 31 {
   }
 
   // Response structures are used for command outputs
-  response struct ConnectNetworkResponse {
+  // Responses are encoded as a command and use a unique ID for encoding
+  response struct ConnectNetworkResponse = 123 {
     CHAR_STRING debugText = 1;
     INT32S errorValue = 2;
   }
 
+  // events can be specified with a type (critical/info) and may contain data
+  critical event StartUp = 0 {
+       INT32U softwareVersion = 0;
+  }
+
+  // no-data events are supported
+  info event Leave = 2 {
+  }
+
+  // events default to 'view' privilege however this can be modified
+  info event access(read: manage) RestrictedEvent = 3 {
+  }
 
   attribute AccessControlEntry acl[] = 0;    // attributes are read-write by default
   attribute ExtensionEntry extension[] = 1;  // and require a (spec defined) number
 
-  // attributes may be read-only as well
-  // "global" specifies that this attribute number is generally available and
-  // reused across all clusters.
+  // Access control privileges on attributes default to:
   //
-  // TODO: it is unclear if this helps codegen or readability  so the "global"
-  //       attribute may be removed in the future.
-  readonly global attribute int16u clusterRevision = 65533;
+  // access(read: view, write: operate)
+  //
+  // These defaults can be modified to any of view/operate/manage/administer roles.
+  attribute access(read: manage, write: administer) int32u customAcl = 3;
+
+  // attributes may be read-only as well
+  readonly attribute int16u clusterRevision = 65533;
 
   // Commands have spec-defined numbers which are used for over-the-wire
   // invocation.
@@ -97,6 +112,13 @@ server cluster AccessControl = 31 {
   // Some commands may take no inputs at all
   command On(): DefaultSuccess = 2;
   command Off(): DefaultSuccess = 3;
+
+  // command invocation default to "operate" privilege, however these
+  // can be modified as well
+  command access(invoke: administer) Off(): DefaultSuccess = 4;
+
+  // command invocation can require timed invoke usage
+  timed command RequiresTimedInvok(): DefaultSuccess = 4;
 }
 
 // A client cluster represents something that is used by an app

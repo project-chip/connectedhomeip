@@ -35,6 +35,7 @@
 #include <atomic>
 #include <ble/BleUUID.h>
 #include <controller/CHIPDeviceController.h>
+#include <controller/CommissioningWindowOpener.h>
 #include <controller/java/AndroidClusterExceptions.h>
 #include <credentials/CHIPCert.h>
 #include <jni.h>
@@ -47,6 +48,7 @@
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/Protocols.h>
 #include <pthread.h>
+#include <system/SystemClock.h>
 #include <vector>
 
 #include <platform/android/AndroidChipPlatform-JNI.h>
@@ -160,9 +162,9 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
     ChipLogProgress(Controller, "newDeviceController() called");
     std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer> opCredsIssuer(
         new chip::Controller::AndroidOperationalCredentialsIssuer());
-    wrapper = AndroidDeviceControllerWrapper::AllocateNew(sJVM, self, kLocalDeviceId, &DeviceLayer::SystemLayer(),
-                                                          DeviceLayer::TCPEndPointManager(), DeviceLayer::UDPEndPointManager(),
-                                                          std::move(opCredsIssuer), &err);
+    wrapper = AndroidDeviceControllerWrapper::AllocateNew(sJVM, self, kLocalDeviceId, chip::kUndefinedCATs,
+                                                          &DeviceLayer::SystemLayer(), DeviceLayer::TCPEndPointManager(),
+                                                          DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), &err);
     SuccessOrExit(err);
 
     // Create and start the IO thread. Must be called after Controller()->Init
@@ -452,14 +454,6 @@ JNI_METHOD(void, disconnectDevice)(JNIEnv * env, jobject self, jlong handle, jlo
     wrapper->Controller()->ReleaseOperationalDevice(deviceId);
 }
 
-JNI_METHOD(jboolean, isActive)(JNIEnv * env, jobject self, jlong handle)
-{
-    chip::DeviceLayer::StackLock lock;
-
-    DeviceProxy * chipDevice = reinterpret_cast<DeviceProxy *>(handle);
-    return chipDevice->IsActive();
-}
-
 JNI_METHOD(void, shutdownSubscriptions)(JNIEnv * env, jobject self, jlong handle, jlong devicePtr)
 {
     chip::DeviceLayer::StackLock lock;
@@ -584,7 +578,6 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::SetupPayload setupPayload;
 
     DeviceProxy * chipDevice = reinterpret_cast<DeviceProxy *>(devicePtr);
     if (chipDevice == nullptr)
@@ -593,10 +586,10 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
         return false;
     }
 
-    AndroidDeviceControllerWrapper * wrapper           = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    DeviceController::CommissioningWindowOption option = DeviceController::CommissioningWindowOption::kOriginalSetupCode;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    err = wrapper->Controller()->OpenCommissioningWindow(chipDevice->GetDeviceId(), duration, 0, 0, option, setupPayload);
+    err = AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(wrapper->Controller(), chipDevice->GetDeviceId(),
+                                                                      System::Clock::Seconds16(duration));
 
     if (err != CHIP_NO_ERROR)
     {
@@ -612,9 +605,6 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::SetupPayload setupPayload;
-    setupPayload.discriminator = discriminator;
-    setupPayload.setUpPINCode  = setupPinCode;
 
     DeviceProxy * chipDevice = reinterpret_cast<DeviceProxy *>(devicePtr);
     if (chipDevice == nullptr)
@@ -623,11 +613,12 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
         return false;
     }
 
-    AndroidDeviceControllerWrapper * wrapper           = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    DeviceController::CommissioningWindowOption option = DeviceController::CommissioningWindowOption::kTokenWithProvidedPIN;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    err = wrapper->Controller()->OpenCommissioningWindow(chipDevice->GetDeviceId(), duration, iteration, discriminator, option,
-                                                         setupPayload);
+    chip::SetupPayload setupPayload;
+    err = AutoCommissioningWindowOpener::OpenCommissioningWindow(
+        wrapper->Controller(), chipDevice->GetDeviceId(), System::Clock::Seconds16(duration), iteration, discriminator,
+        MakeOptional(static_cast<uint32_t>(setupPinCode)), NullOptional, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -636,6 +627,17 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
     }
 
     return true;
+}
+
+JNI_METHOD(void, shutdownCommissioning)
+(JNIEnv * env, jobject self, jlong handle)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    err                                      = wrapper->Controller()->Shutdown();
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error invoking shutdownCommissioning: %s", ErrorStr(err)));
 }
 
 JNI_METHOD(jbyteArray, getAttestationChallenge)

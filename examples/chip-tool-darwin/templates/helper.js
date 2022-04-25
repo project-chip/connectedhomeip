@@ -15,38 +15,6 @@
  *    limitations under the License.
  */
 
-// Import helpers from zap core
-const zapPath                       = '../../../third_party/zap/repo/dist/src-electron/';
-const { asB_locks, ensureClusters } = require('../../../src/app/zap-templates/common/ClustersHelper.js');
-const templateUtil                  = require(zapPath + 'generator/template-util.js');
-const zclHelper                     = require(zapPath + 'generator/helper-zcl.js');
-const zclQuery                      = require(zapPath + 'db/query-zcl.js');
-
-const ChipTypesHelper = require('../../../src/app/zap-templates/common/ChipTypesHelper.js');
-
-function asHyphenatedLower(name)
-{
-  name = name.replace(/\s+/g, '').replace(/\.?([A-Z])/g, function(x) {
-    return '-' + x
-  })
-  return name.substring(1).toLowerCase();
-}
-
-function toLowerCase(name)
-{
-  return name.toLowerCase();
-}
-
-function getCommands()
-{
-  return ensureClusters(this).getClientCommands(this.name);
-}
-
-function hasCommands()
-{
-  return getCommands.call(this).then(commands => { return !!commands.length });
-}
-
 function hasArguments()
 {
   return !!this.arguments.length
@@ -55,7 +23,4 @@ function hasArguments()
 //
 // Module exports
 //
-exports.asHyphenatedLower = asHyphenatedLower;
-exports.hasCommands       = hasCommands;
-exports.toLowerCase       = toLowerCase
-exports.hasArguments      = hasArguments;
+exports.hasArguments = hasArguments;

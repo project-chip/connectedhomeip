@@ -27,7 +27,8 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConfigurationManager.h>
-#include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/DiagnosticDataProvider.h>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <platform/nxp/k32w/k32w0/K32W0Config.h>
 
 #include "fsl_power.h"
@@ -49,8 +50,14 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
-    bool failSafeArmed;
     uint32_t rebootCount = 0;
+
+    // Save out software version on first boot
+    if (!K32WConfig::ConfigValueExists(K32WConfig::kConfigKey_SoftwareVersion))
+    {
+        err = StoreSoftwareVersion(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+        SuccessOrExit(err);
+    }
 
     if (K32WConfig::ConfigValueExists(K32WConfig::kCounterKey_RebootCount))
     {
@@ -75,7 +82,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!K32WConfig::ConfigValueExists(K32WConfig::kCounterKey_BootReason))
     {
-        err = StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED);
+        err = StoreBootReason(to_underlying(BootReasonType::kUnspecified));
         SuccessOrExit(err);
     }
 
@@ -85,12 +92,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     // TODO: Initialize the global GroupKeyStore object here
 
-    // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
-    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
-    {
-        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
-        InitiateFactoryReset();
-    }
     err = CHIP_NO_ERROR;
 
 exit:
@@ -117,31 +118,40 @@ CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOp
     return WriteConfigValue(K32WConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
+CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint32_t & softwareVer)
+{
+    return ReadConfigValue(K32WConfig::kConfigKey_SoftwareVersion, softwareVer);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareVersion(uint32_t softwareVer)
+{
+    return WriteConfigValue(K32WConfig::kConfigKey_SoftwareVersion, softwareVer);
+}
+
 CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 {
-    bootReason = EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED;
-    uint8_t reason;
-    reason = POWER_GetResetCause();
+    bootReason     = to_underlying(BootReasonType::kUnspecified);
+    uint8_t reason = POWER_GetResetCause();
 
     if (reason == RESET_UNDEFINED)
     {
-        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED;
+        bootReason = to_underlying(BootReasonType::kUnspecified);
     }
     else if ((reason == RESET_POR) || (reason == RESET_EXT_PIN))
     {
-        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT;
+        bootReason = to_underlying(BootReasonType::kPowerOnReboot);
     }
     else if (reason == RESET_BOR)
     {
-        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_BROWN_OUT_RESET;
+        bootReason = to_underlying(BootReasonType::kBrownOutReset);
     }
     else if (reason == RESET_SW_REQ)
     {
-        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET;
+        bootReason = to_underlying(BootReasonType::kSoftwareReset);
     }
     else if (reason == RESET_WDT)
     {
-        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET;
+        bootReason = to_underlying(BootReasonType::kSoftwareWatchdogReset);
         /* Reboot can be due to hardware or software watchdog */
     }
 

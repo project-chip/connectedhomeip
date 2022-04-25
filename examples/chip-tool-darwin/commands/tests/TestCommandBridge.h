@@ -34,7 +34,6 @@ public:
     TestCommandBridge(const char * _Nonnull commandName)
         : CHIPCommandBridge(commandName)
     {
-        AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
         AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
         AddArgument("PICS", &mPICSFilePath);
     }
@@ -78,11 +77,11 @@ public:
         });
     }
 
-    void UserPrompt(NSString * _Nonnull message) { NextTest(); }
+    void UserPrompt(NSString * _Nonnull message, NSString * _Nullable expectedValue = nil) { NextTest(); }
 
     void WaitForCommissionee(chip::NodeId nodeId)
     {
-        CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+        CHIPDeviceController * controller = CurrentCommissioner();
         VerifyOrReturn(controller != nil, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
 
         [controller getConnectedDevice:nodeId
@@ -101,7 +100,6 @@ public:
 protected:
     dispatch_queue_t _Nullable mCallbackQueue;
     CHIPDevice * _Nullable mConnectedDevice;
-    chip::NodeId mNodeId;
 
     void Wait()
     {
@@ -230,7 +228,7 @@ protected:
     template <typename T> bool CheckValue(const char * _Nonnull itemName, NSError * _Nullable current, T expected)
     {
 
-        NSNumber * currentValue = @([CHIPError errorToCHIPErrorCode:current].AsInteger());
+        NSNumber * currentValue = @(current.code);
         return CheckValue(itemName, currentValue, @(expected));
     }
 

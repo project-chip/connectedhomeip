@@ -153,8 +153,14 @@ public:
         kWrongState        = 2
     };
 
-    // Handler for the AnnounceOTAProvider command
-    virtual EmberAfStatus HandleAnnounceOTAProvider(
+    // Reset any relevant states
+    virtual void Reset(void) = 0;
+
+    /**
+     * Called to handle an AnnounceOTAProvider command and is responsible for sending the status. The caller is responsible for
+     * validating fields in the command.
+     */
+    virtual void HandleAnnounceOTAProvider(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) = 0;
 
@@ -165,7 +171,7 @@ public:
     virtual OTATriggerResult TriggerImmediateQuery() = 0;
 
     // Internal API meant for use by OTARequestorDriver to send the QueryImage command and start the image update process
-    // with the Provider currently set in the OTARequestor
+    // with the preset provider
     virtual void TriggerImmediateQueryInternal() = 0;
 
     // Download image
@@ -180,14 +186,19 @@ public:
     // Initiate the session to send NotifyUpdateApplied command
     virtual void NotifyUpdateApplied() = 0;
 
-    // Get image update progress in percents unit
-    virtual CHIP_ERROR GetUpdateProgress(EndpointId endpointId, chip::app::DataModel::Nullable<uint8_t> & progress) = 0;
+    // Get the value of the UpdateStateProgress attribute (in percentage) of the OTA Software Update Requestor Cluster on the given
+    // endpoint
+    virtual CHIP_ERROR GetUpdateStateProgressAttribute(EndpointId endpointId,
+                                                       chip::app::DataModel::Nullable<uint8_t> & progress) = 0;
 
     // Get the value of the UpdateState attribute of the OTA Software Update Requestor Cluster on the given endpoint
-    virtual CHIP_ERROR GetState(EndpointId endpointId, OTAUpdateStateEnum & state) = 0;
+    virtual CHIP_ERROR GetUpdateStateAttribute(EndpointId endpointId, OTAUpdateStateEnum & state) = 0;
 
     // Get the current state of the OTA update
     virtual OTAUpdateStateEnum GetCurrentUpdateState() = 0;
+
+    // Get the target version of the OTA update
+    virtual uint32_t GetTargetVersion() = 0;
 
     // Application directs the Requestor to cancel image update in progress. All the Requestor state is
     // cleared, UpdateState is reset to Idle

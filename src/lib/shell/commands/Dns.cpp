@@ -50,7 +50,7 @@ public:
         {
             streamer_printf(streamer_get(), "   IP address: %s\r\n", nodeData.mAddress[i].ToString(ipAddressBuf));
         }
-        streamer_printf(streamer_get(), "   Port: %" PRIu16 "\r\n", nodeData.mPort);
+        streamer_printf(streamer_get(), "   Port: %u\r\n", nodeData.mPort);
 
         auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
 
@@ -80,13 +80,13 @@ public:
 
         streamer_printf(streamer_get(), "DNS browse succeeded: \r\n");
         streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.hostName);
-        streamer_printf(streamer_get(), "   Vendor ID: %" PRIu16 "\r\n", nodeData.vendorId);
-        streamer_printf(streamer_get(), "   Product ID: %" PRIu16 "\r\n", nodeData.productId);
-        streamer_printf(streamer_get(), "   Long discriminator: %" PRIu16 "\r\n", nodeData.longDiscriminator);
-        streamer_printf(streamer_get(), "   Device type: %" PRIu16 "\r\n", nodeData.deviceType);
+        streamer_printf(streamer_get(), "   Vendor ID: %u\r\n", nodeData.vendorId);
+        streamer_printf(streamer_get(), "   Product ID: %u\r\n", nodeData.productId);
+        streamer_printf(streamer_get(), "   Long discriminator: %u\r\n", nodeData.longDiscriminator);
+        streamer_printf(streamer_get(), "   Device type: %u\r\n", nodeData.deviceType);
         streamer_printf(streamer_get(), "   Device name: %s\n", nodeData.deviceName);
         streamer_printf(streamer_get(), "   Commissioning mode: %d\r\n", static_cast<int>(nodeData.commissioningMode));
-        streamer_printf(streamer_get(), "   Pairing hint: %" PRIu16 "\r\n", nodeData.pairingHint);
+        streamer_printf(streamer_get(), "   Pairing hint: %u\r\n", nodeData.pairingHint);
         streamer_printf(streamer_get(), "   Pairing instruction: %s\r\n", nodeData.pairingInstruction);
         streamer_printf(streamer_get(), "   Rotating ID %s\r\n", rotatingId);
 
@@ -123,8 +123,8 @@ CHIP_ERROR ResolveHandler(int argc, char ** argv)
     streamer_printf(streamer_get(), "Resolving ...\r\n");
 
     PeerId peerId;
-    peerId.SetCompressedFabricId(strtoull(argv[0], NULL, 10));
-    peerId.SetNodeId(strtoull(argv[1], NULL, 10));
+    peerId.SetCompressedFabricId(strtoull(argv[0], nullptr, 10));
+    peerId.SetNodeId(strtoull(argv[1], nullptr, 10));
 
     return sResolverProxy.ResolveNodeId(peerId, Inet::IPAddressType::kAny);
 }

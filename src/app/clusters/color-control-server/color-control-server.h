@@ -68,6 +68,8 @@
 
 #define REPORT_FAILED 0xFF
 
+using chip::app::Clusters::ColorControl::ColorControlFeature;
+
 /**
  * @brief color-control-server class
  */
@@ -141,6 +143,8 @@ public:
      * Functions Definitions
      *********************************************************/
     static ColorControlServer & Instance();
+
+    bool HasFeature(chip::EndpointId endpoint, ColorControlFeature feature);
     EmberAfStatus stopAllColorTransitions(chip::EndpointId endpoint);
     bool stopMoveStepCommand(chip::EndpointId, uint8_t optionsMask, uint8_t optionsOverride);
 

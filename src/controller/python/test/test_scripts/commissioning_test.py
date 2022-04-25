@@ -68,13 +68,24 @@ def main():
         help="Address of the device",
         metavar="<device-addr>",
     )
+    optParser.add_option(
+        "-p",
+        "--paa-trust-store-path",
+        action="store",
+        dest="paaTrustStorePath",
+        default='',
+        type='str',
+        help="Path that contains valid and trusted PAA Root Certificates.",
+        metavar="<paa-trust-store-path>"
+    )
 
     (options, remainingArgs) = optParser.parse_args(sys.argv[1:])
 
     timeoutTicker = TestTimeout(options.testTimeout)
     timeoutTicker.start()
 
-    test = BaseTestHelper(nodeid=112233, testCommissioner=True)
+    test = BaseTestHelper(
+        nodeid=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=True)
 
     logger.info("Testing discovery")
     FailIfNot(test.TestDiscovery(discriminator=TEST_DISCRIMINATOR),

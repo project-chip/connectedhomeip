@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 18.12.4. [TC-MC-10.4] Launch Content Verification (DUT as Client)
 
@@ -23,13 +24,13 @@ tests:
     - label:
           "DUT sends a LaunchContent command to the TH with a search parameter
           and string, and AutoPlay flag set to false"
-      verification:
-          "./chip-tool contentlauncher launch-content-request 0 'Star Wars' 1 1"
+      verification: |
+          ./chip-tool contentlauncher launch-content-request 0 'Star Wars' 1 1
       disabled: true
 
     - label:
           "DUT sends a LaunchContent command to the TH with a search parameter
           and string, and AutoPlay flag set to true"
-      verification:
-          "./chip-tool contentlauncher launch-content-request 1 'Star Wars' 1 1"
+      verification: |
+          ./chip-tool contentlauncher launch-content-request 1 'Star Wars' 1 1
       disabled: true

@@ -28,6 +28,7 @@
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DeviceInfoProvider.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -57,18 +58,32 @@ UserLabelAttrAccess gAttrAccess;
 CHIP_ERROR UserLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    DeviceLayer::AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabels> labelList;
 
-    if (DeviceLayer::PlatformMgr().GetUserLabelList(endpoint, labelList) == CHIP_NO_ERROR)
+    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
+
+    if (provider)
     {
-        err = aEncoder.EncodeList([&labelList](const auto & encoder) -> CHIP_ERROR {
-            for (auto label : labelList)
-            {
-                ReturnErrorOnFailure(encoder.Encode(label));
-            }
+        DeviceLayer::DeviceInfoProvider::UserLabelIterator * it = provider->IterateUserLabel(endpoint);
 
-            return CHIP_NO_ERROR;
-        });
+        if (it)
+        {
+            err = aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
+                UserLabel::Structs::LabelStruct::Type userlabel;
+
+                while (it->Next(userlabel))
+                {
+                    ReturnErrorOnFailure(encoder.Encode(userlabel));
+                }
+
+                return CHIP_NO_ERROR;
+            });
+
+            it->Release();
+        }
+        else
+        {
+            err = aEncoder.EncodeEmptyList();
+        }
     }
     else
     {
@@ -80,10 +95,14 @@ CHIP_ERROR UserLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeValu
 
 CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
-    EndpointId endpoint = aPath.mEndpointId;
+    EndpointId endpoint                        = aPath.mEndpointId;
+    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
+
+    VerifyOrReturnError(provider != nullptr, CHIP_ERROR_NOT_IMPLEMENTED);
+
     if (!aPath.IsListItemOperation())
     {
-        DeviceLayer::AttributeList<Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabels> labelList;
+        DeviceLayer::AttributeList<Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabelListLength> labelList;
         LabelList::TypeInfo::DecodableType decodablelist;
 
         ReturnErrorOnFailure(aDecoder.Decode(decodablelist));
@@ -96,21 +115,16 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath &
         }
         ReturnErrorOnFailure(iter.GetStatus());
 
-        return DeviceLayer::PlatformMgr().SetUserLabelList(endpoint, labelList);
+        return provider->SetUserLabelList(endpoint, labelList);
     }
-    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         Structs::LabelStruct::DecodableType entry;
-        DeviceLayer::AttributeList<Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabels> labelList;
-        ReturnErrorOnFailure(DeviceLayer::PlatformMgr().GetUserLabelList(endpoint, labelList));
         ReturnErrorOnFailure(aDecoder.Decode(entry));
-        ReturnErrorOnFailure(labelList.add(entry));
-        return DeviceLayer::PlatformMgr().SetUserLabelList(endpoint, labelList);
+        return provider->AppendUserLabel(endpoint, entry);
     }
-    else
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
+
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR UserLabelAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)

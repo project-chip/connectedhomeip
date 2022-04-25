@@ -267,17 +267,15 @@ CHIP_ERROR TestAttrAccess::WriteListInt8uAttribute(const ConcreteDataAttributePa
 
         return iter.GetStatus();
     }
-    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         VerifyOrReturnError(gListUint8DataLen < kAttributeListLength, CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(aDecoder.Decode(gListUint8Data[gListUint8DataLen]));
         gListUint8DataLen++;
         return CHIP_NO_ERROR;
     }
-    else
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
+
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR TestAttrAccess::ReadListOctetStringAttribute(AttributeValueEncoder & aEncoder)
@@ -316,7 +314,7 @@ CHIP_ERROR TestAttrAccess::WriteListOctetStringAttribute(const ConcreteDataAttri
 
         return iter.GetStatus();
     }
-    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         ByteSpan entry;
         ReturnErrorOnFailure(aDecoder.Decode(entry));
@@ -328,10 +326,8 @@ CHIP_ERROR TestAttrAccess::WriteListOctetStringAttribute(const ConcreteDataAttri
         gListOctetStringDataLen++;
         return CHIP_NO_ERROR;
     }
-    else
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
+
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR TestAttrAccess::ReadListLongOctetStringAttribute(AttributeValueEncoder & aEncoder)
@@ -368,7 +364,7 @@ CHIP_ERROR TestAttrAccess::WriteListLongOctetStringAttribute(const ConcreteDataA
 
         return iter.GetStatus();
     }
-    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         ByteSpan entry;
         ReturnErrorOnFailure(aDecoder.Decode(entry));
@@ -378,10 +374,8 @@ CHIP_ERROR TestAttrAccess::WriteListLongOctetStringAttribute(const ConcreteDataA
         gListLongOctetStringLen++;
         return CHIP_NO_ERROR;
     }
-    else
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
+
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR TestAttrAccess::ReadListStructOctetStringAttribute(AttributeValueEncoder & aEncoder)
@@ -434,7 +428,7 @@ CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(const ConcreteDat
 
         return CHIP_NO_ERROR;
     }
-    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType entry;
         ReturnErrorOnFailure(aDecoder.Decode(entry));
@@ -451,10 +445,8 @@ CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(const ConcreteDat
         gListOperationalCertLen++;
         return CHIP_NO_ERROR;
     }
-    else
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
+
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR TestAttrAccess::ReadListNullablesAndOptionalsStructAttribute(AttributeValueEncoder & aEncoder)
@@ -481,7 +473,7 @@ CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(const C
 
         return CHIP_NO_ERROR;
     }
-    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         // And we only support one entry in the list.
         VerifyOrReturnError(count == 0, CHIP_ERROR_INVALID_ARGUMENT);
@@ -524,10 +516,8 @@ CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(const C
 
         return CHIP_NO_ERROR;
     }
-    else
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
+
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR TestAttrAccess::ReadStructAttribute(AttributeValueEncoder & aEncoder)
@@ -664,7 +654,7 @@ CHIP_ERROR TestAttrAccess::WriteListFabricScopedAttribute(const ConcreteDataAttr
         gListFabricScopedAttributeLen = dstIndex;
         return iter.GetStatus();
     }
-    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         VerifyOrReturnError(gListFabricScopedAttributeLen < kAttributeListLength, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -675,10 +665,8 @@ CHIP_ERROR TestAttrAccess::WriteListFabricScopedAttribute(const ConcreteDataAttr
         gListFabricScopedAttributeLen++;
         return CHIP_NO_ERROR;
     }
-    else
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
+
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 } // namespace
@@ -714,11 +702,7 @@ bool emberAfTestClusterClusterTestSpecificCallback(CommandHandler * apCommandObj
 {
     TestSpecificResponse::Type responseData;
     responseData.returnValue = 7;
-    CHIP_ERROR err           = apCommandObj->AddResponseData(commandPath, responseData);
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(Zcl, "Test Cluster: failed to send TestSpecific response: %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    apCommandObj->AddResponse(commandPath, responseData);
     return true;
 }
 
@@ -738,11 +722,7 @@ bool emberAfTestClusterClusterTestAddArgumentsCallback(CommandHandler * apComman
 
     TestAddArgumentsResponse::Type responseData;
     responseData.returnValue = static_cast<uint8_t>(commandData.arg1 + commandData.arg2);
-    CHIP_ERROR err           = apCommandObj->AddResponseData(commandPath, responseData);
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(Zcl, "Test Cluster: failed to send TestAddArguments response: %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    apCommandObj->AddResponse(commandPath, responseData);
     return true;
 }
 
@@ -750,11 +730,7 @@ static bool SendBooleanResponse(CommandHandler * commandObj, const ConcreteComma
 {
     Commands::BooleanResponse::Type response;
     response.value = value;
-    CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);
-    if (err != CHIP_NO_ERROR)
-    {
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure);
-    }
+    commandObj->AddResponse(commandPath, response);
     return true;
 }
 
@@ -811,7 +787,7 @@ bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
         return true;
     }
-    commandObj->AddResponseData(commandPath, responseData);
+    commandObj->AddResponse(commandPath, responseData);
     return true;
 }
 
@@ -827,7 +803,7 @@ bool emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
         return true;
     }
-    commandObj->AddResponseData(commandPath, responseData);
+    commandObj->AddResponse(commandPath, responseData);
     return true;
 }
 
@@ -923,7 +899,7 @@ bool emberAfTestClusterClusterTestListInt8UReverseRequestCallback(
         Commands::TestListInt8UReverseResponse::Type responseData;
         if (count == 0)
         {
-            SuccessOrExit(commandObj->AddResponseData(commandPath, responseData));
+            commandObj->AddResponse(commandPath, responseData);
             return true;
         }
         size_t cur = count;
@@ -937,7 +913,7 @@ bool emberAfTestClusterClusterTestListInt8UReverseRequestCallback(
         VerifyOrExit(cur == 0, );
         VerifyOrExit(iter.GetStatus() == CHIP_NO_ERROR, );
         responseData.arg1 = DataModel::List<uint8_t>(responseBuf.Get(), count);
-        SuccessOrExit(commandObj->AddResponseData(commandPath, responseData));
+        commandObj->AddResponse(commandPath, responseData);
         return true;
     }
 
@@ -953,11 +929,7 @@ bool emberAfTestClusterClusterTestEnumsRequestCallback(CommandHandler * commandO
     response.arg1 = commandData.arg1;
     response.arg2 = commandData.arg2;
 
-    CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);
-    if (err != CHIP_NO_ERROR)
-    {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-    }
+    commandObj->AddResponse(commandPath, response);
     return true;
 }
 
@@ -979,11 +951,7 @@ bool emberAfTestClusterClusterTestNullableOptionalRequestCallback(
         response.originalValue.Emplace(commandData.arg1.Value());
     }
 
-    CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);
-    if (err != CHIP_NO_ERROR)
-    {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-    }
+    commandObj->AddResponse(commandPath, response);
     return true;
 }
 
@@ -1000,11 +968,7 @@ bool emberAfTestClusterClusterSimpleStructEchoRequestCallback(CommandHandler * c
     response.arg1.g = commandData.arg1.g;
     response.arg1.h = commandData.arg1.h;
 
-    CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);
-    if (err != CHIP_NO_ERROR)
-    {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-    }
+    commandObj->AddResponse(commandPath, response);
     return true;
 }
 

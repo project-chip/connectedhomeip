@@ -241,15 +241,39 @@ bool emberAfEndpointIsEnabled(chip::EndpointId endpoint);
 uint8_t emberAfGetClusterCountForEndpoint(chip::EndpointId endpoint);
 const EmberAfCluster * emberAfGetClusterByIndex(chip::EndpointId endpoint, uint8_t clusterIndex);
 
-uint16_t emberAfGetDeviceIdForEndpoint(chip::EndpointId endpoint);
+//
+// Retrieve the device type list associated with a specific endpoint.
+//
+const chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::EndpointId endpoint, CHIP_ERROR & err);
+
+//
+// Over-ride the device type list current associated with an endpoint with a user-provided list. The buffers backing
+// that list have to live as long as the endpoint is enabled.
+//
+// NOTE: It is the application's responsibility to free the existing list that is being replaced if needed.
+//
+CHIP_ERROR emberAfSetDeviceTypeList(chip::EndpointId endpoint, chip::Span<const EmberAfDeviceType> deviceTypeList);
+
+// Register a dynamic endpoint. This involves registering descriptors that describe
+// the composition of the endpoint (encapsulated in the 'ep' argument) as well as providing
+// storage for data versions.
+//
 // dataVersionStorage.size() needs to be at least as large as the number of
 // server clusters on this endpoint.  If it's not, the endpoint will not be able
 // to store data versions, which may break consumers.
 //
-// The memory backing dataVersionStorage needs to stay alive until this dynamic
+// The memory backing dataVersionStorage needs to remain allocated until this dynamic
 // endpoint is cleared.
-EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, EmberAfEndpointType * ep, uint16_t deviceId,
-                                        uint8_t deviceVersion, const chip::Span<chip::DataVersion> & dataVersionStorage);
+//
+// An optional device type list can be passed in as well. If provided, the memory
+// backing the list needs to remain allocated until this dynamic endpoint is cleared.
+//
+// An optional parent endpoint id should be passed for child endpoints of composed device.
+//
+EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
+                                        const chip::Span<chip::DataVersion> & dataVersionStorage,
+                                        chip::Span<const EmberAfDeviceType> deviceTypeList = {},
+                                        chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
 
@@ -279,10 +303,3 @@ chip::Optional<chip::AttributeId> emberAfGetServerAttributeIdByIndex(chip::Endpo
  * @return true if registration was successful.
  */
 bool registerAttributeAccessOverride(chip::app::AttributeAccessInterface * attrOverride);
-
-/**
- * Find an attribute access override, if any, that is registered for the given
- * endpoint and cluster id.  This might be an override specific to the given
- * endpoint, or might be one registered for all endpoints.
- */
-chip::app::AttributeAccessInterface * findAttributeAccessOverride(chip::EndpointId endpointId, chip::ClusterId clusterId);

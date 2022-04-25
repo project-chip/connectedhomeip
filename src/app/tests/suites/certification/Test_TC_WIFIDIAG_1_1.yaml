@@ -36,38 +36,31 @@ tests:
           constraints:
               type: list
 
+    # issue: 16654 and 13645
     # Various tests disabled for now until
     # https://github.com/project-chip/connectedhomeip/pull/14755 is
     # fixed and the SDK has the right types.
     - label: "Reads SecurityType attribute from DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "SecurityType"
       response:
           value: null
 
     - label: "Reads SecurityType attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "SecurityType"
       response:
           constraints:
               type: enum
 
-    - label: "Reads WiFiVersion attribute from DUT"
-      disabled: true
-      command: "readAttribute"
-      attribute: "WiFiVersion"
-      response:
-          value: null
-
     - label: "Reads WiFiVersion attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "WiFiVersion"
       response:
           constraints:
               type: enum
+              minValue: 0
+              maxValue: 5
 
     - label: "Reads ChannelNumber attribute from DUT"
       disabled: true
@@ -77,7 +70,6 @@ tests:
           value: null
 
     - label: "Reads ChannelNumber attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "ChannelNumber"
       response:
@@ -92,7 +84,6 @@ tests:
           value: null
 
     - label: "Reads RSSI attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "RSSI"
       response:
@@ -194,7 +185,6 @@ tests:
     # Disabled because this fails on Linux because we have no Wi-Fi interface.
     - label: "Reads CurrentMaxRate attribute from DUT"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "CurrentMaxRate"
       response:
@@ -203,7 +193,6 @@ tests:
     # Disabled because this fails on Linux because we have no Wi-Fi interface.
     - label: "Reads CurrentMaxRate attribute constraints"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "CurrentMaxRate"
       response:

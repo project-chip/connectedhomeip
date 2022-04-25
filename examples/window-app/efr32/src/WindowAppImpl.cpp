@@ -26,7 +26,9 @@
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#ifdef QR_CODE_ENABLED
 #include <qrcodegen.h>
+#endif // QR_CODE_ENABLED
 #include <sl_simple_button_instances.h>
 #include <sl_simple_led_instances.h>
 #include <sl_system_kernel.h>
@@ -181,9 +183,6 @@ CHIP_ERROR WindowAppImpl::Init()
     LEDWidget::InitGpio();
     mStatusLED.Init(APP_STATE_LED);
     mActionLED.Init(APP_ACTION_LED);
-
-    // Print setup info on LCD if available
-    UpdateLCD();
 
     return CHIP_NO_ERROR;
 }
@@ -413,14 +412,14 @@ void WindowAppImpl::UpdateLCD()
     if (mState.isThreadProvisioned)
 #else
     if (mState.isWiFiProvisioned)
-#endif
+#endif // CHIP_ENABLE_OPENTHREAD
     {
         Cover & cover = GetCover();
         chip::app::DataModel::Nullable<uint16_t> lift;
         chip::app::DataModel::Nullable<uint16_t> tilt;
 
         chip::DeviceLayer::PlatformMgr().LockChipStack();
-        EmberAfWcType type = TypeGet(cover.mEndpoint);
+        Type type = TypeGet(cover.mEndpoint);
 
         Attributes::CurrentPositionLift::Get(cover.mEndpoint, lift);
         Attributes::CurrentPositionTilt::Get(cover.mEndpoint, tilt);
@@ -428,9 +427,10 @@ void WindowAppImpl::UpdateLCD()
 
         if (!tilt.IsNull() && !lift.IsNull())
         {
-            LcdPainter::Paint(type, static_cast<uint8_t>(lift.Value()), static_cast<uint8_t>(tilt.Value()), mIcon);
+            LcdPainter::Paint(type, lift.Value(), tilt.Value(), mIcon);
         }
     }
+#ifdef QR_CODE_ENABLED
     else
     {
         if (GetQRCode(mQRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
@@ -438,7 +438,8 @@ void WindowAppImpl::UpdateLCD()
             LCDWriteQRCode((uint8_t *) mQRCode.c_str());
         }
     }
-#endif
+#endif // QR_CODE_ENABLED
+#endif // DISPLAY_ENABLED
 }
 
 void WindowAppImpl::OnMainLoop()

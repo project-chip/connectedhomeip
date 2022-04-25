@@ -41,6 +41,7 @@
 #include "on-off-server.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/data-model/Nullable.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
@@ -166,6 +167,19 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, uint8_t comm
             emberAfOnOffClusterLevelControlEffectCallback(endpoint, newValue);
         }
 #endif
+#ifdef EMBER_AF_PLUGIN_MODE_SELECT
+        // If OnMode is not a null value, then change the current mode to it.
+        if (emberAfContainsServer(endpoint, ModeSelect::Id) &&
+            emberAfContainsAttribute(endpoint, ModeSelect::Id, ModeSelect::Attributes::OnMode::Id, true))
+        {
+            ModeSelect::Attributes::OnMode::TypeInfo::Type onMode;
+            if (ModeSelect::Attributes::OnMode::Get(endpoint, onMode) == EMBER_ZCL_STATUS_SUCCESS && !onMode.IsNull())
+            {
+                emberAfOnOffClusterPrintln("Changing Current Mode to %x", onMode.Value());
+                status = ModeSelect::Attributes::CurrentMode::Set(endpoint, onMode.Value());
+            }
+        }
+#endif
     }
     else // Set Off
     {
@@ -232,40 +246,71 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
         // 0xff      This value cannot happen.
         // null       Set the OnOff attribute to its previous value.
 
-        // Initialize startUpOnOff to No action value 0xFE
-        app::DataModel::Nullable<uint8_t> startUpOnOff;
-        EmberAfStatus status = Attributes::StartUpOnOff::Get(endpoint, startUpOnOff);
+        bool onOffValueForStartUp = 0;
+        EmberAfStatus status      = getOnOffValueForStartUp(endpoint, onOffValueForStartUp);
         if (status == EMBER_ZCL_STATUS_SUCCESS)
         {
-            // Initialise updated value to 0
-            bool updatedOnOff = 0;
-            status            = Attributes::OnOff::Get(endpoint, &updatedOnOff);
-            if (status == EMBER_ZCL_STATUS_SUCCESS)
+            status = setOnOffValue(endpoint, onOffValueForStartUp, false);
+        }
+
+#ifdef EMBER_AF_PLUGIN_MODE_SELECT
+        // If OnMode is not a null value, then change the current mode to it.
+        if (onOffValueForStartUp && emberAfContainsServer(endpoint, ModeSelect::Id) &&
+            emberAfContainsAttribute(endpoint, ModeSelect::Id, ModeSelect::Attributes::OnMode::Id, true))
+        {
+            ModeSelect::Attributes::OnMode::TypeInfo::Type onMode;
+            if (ModeSelect::Attributes::OnMode::Get(endpoint, onMode) == EMBER_ZCL_STATUS_SUCCESS && !onMode.IsNull())
             {
-                if (!startUpOnOff.IsNull())
-                {
-                    switch (startUpOnOff.Value())
-                    {
-                    case EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_OFF:
-                        updatedOnOff = 0; // Off
-                        break;
-                    case EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_ON:
-                        updatedOnOff = 1; // On
-                        break;
-                    case EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_TOGGLE:
-                        updatedOnOff = !updatedOnOff;
-                        break;
-                    default:
-                        // All other values 0x03- 0xFE are reserved - no action.
-                        break;
-                    }
-                }
-                status = Attributes::OnOff::Set(endpoint, updatedOnOff);
+                emberAfOnOffClusterPrintln("Changing Current Mode to %x", onMode.Value());
+                status = ModeSelect::Attributes::CurrentMode::Set(endpoint, onMode.Value());
             }
         }
+#endif
     }
 #endif // IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
     emberAfPluginOnOffClusterServerPostInitCallback(endpoint);
+}
+
+/** @brief Get the OnOff value when server starts.
+ *
+ * This function determines how StartUpOnOff affects the OnOff value when the server starts.
+ *
+ * @param endpoint   Ver.: always
+ * @param onOffValueForStartUp Ver.: always
+ */
+EmberAfStatus OnOffServer::getOnOffValueForStartUp(chip::EndpointId endpoint, bool & onOffValueForStartUp)
+{
+    app::DataModel::Nullable<OnOff::OnOffStartUpOnOff> startUpOnOff;
+    EmberAfStatus status = Attributes::StartUpOnOff::Get(endpoint, startUpOnOff);
+    if (status == EMBER_ZCL_STATUS_SUCCESS)
+    {
+        // Initialise updated value to 0
+        bool updatedOnOff = 0;
+        status            = Attributes::OnOff::Get(endpoint, &updatedOnOff);
+        if (status == EMBER_ZCL_STATUS_SUCCESS)
+        {
+            if (!startUpOnOff.IsNull())
+            {
+                switch (startUpOnOff.Value())
+                {
+                case OnOff::OnOffStartUpOnOff::kOff:
+                    updatedOnOff = 0; // Off
+                    break;
+                case OnOff::OnOffStartUpOnOff::kOn:
+                    updatedOnOff = 1; // On
+                    break;
+                case OnOff::OnOffStartUpOnOff::kTogglePreviousOnOff:
+                    updatedOnOff = !updatedOnOff;
+                    break;
+                default:
+                    // All other values 0x03- 0xFE are reserved - no action.
+                    break;
+                }
+            }
+            onOffValueForStartUp = updatedOnOff;
+        }
+    }
+    return status;
 }
 
 bool OnOffServer::offCommand(const app::ConcreteCommandPath & commandPath)

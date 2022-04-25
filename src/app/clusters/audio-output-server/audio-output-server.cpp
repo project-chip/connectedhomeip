@@ -25,6 +25,7 @@
 #include <app/clusters/audio-output-server/audio-output-delegate.h>
 #include <app/clusters/audio-output-server/audio-output-server.h>
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
@@ -50,14 +51,14 @@ Delegate * gDelegateTable[kAudioOutputDelegateTableSize] = { nullptr };
 Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::AudioOutput::Id);
-    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+    return (ep == 0xFFFF ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
 {
     if (delegate == nullptr)
     {
-        ChipLogError(Zcl, "Audio Output has no delegate set for endpoint:%" PRIu16, endpoint);
+        ChipLogProgress(Zcl, "Audio Output has no delegate set for endpoint:%u", endpoint);
         return true;
     }
     return false;
@@ -79,6 +80,20 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     else
     {
     }
+}
+
+bool HasFeature(chip::EndpointId endpoint, AudioOutputFeature feature)
+{
+    bool hasFeature     = false;
+    uint32_t featureMap = 0;
+
+    EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
+    if (EMBER_ZCL_STATUS_SUCCESS == status)
+    {
+        hasFeature = (featureMap & chip::to_underlying(feature));
+    }
+
+    return hasFeature;
 }
 
 } // namespace AudioOutput

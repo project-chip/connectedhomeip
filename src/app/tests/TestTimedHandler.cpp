@@ -111,7 +111,7 @@ void TestTimedHandler::TestFollowingMessageFastEnough(nlTestSuite * aSuite, void
     TestContext & ctx = *static_cast<TestContext *>(aContext);
 
     System::PacketBufferHandle payload;
-    GenerateTimedRequest(aSuite, 50, payload);
+    GenerateTimedRequest(aSuite, 500, payload);
 
     TestExchangeDelegate delegate;
     ExchangeContext * exchange = ctx.NewExchangeToAlice(&delegate);

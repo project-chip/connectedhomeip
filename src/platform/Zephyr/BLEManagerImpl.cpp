@@ -443,15 +443,15 @@ CHIP_ERROR BLEManagerImpl::HandleGAPConnect(const ChipDeviceEvent * event)
 
     if (connEvent->HciResult == BT_HCI_ERR_SUCCESS)
     {
-        ChipLogProgress(DeviceLayer, "BLE connection established (ConnId: 0x%02" PRIx16 ")", bt_conn_index(connEvent->BtConn));
+        ChipLogProgress(DeviceLayer, "BLE connection established (ConnId: 0x%02x)", bt_conn_index(connEvent->BtConn));
         mGAPConns++;
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "BLE connection failed (reason: 0x%02" PRIx16 ")", connEvent->HciResult);
+        ChipLogError(DeviceLayer, "BLE connection failed (reason: 0x%02x)", connEvent->HciResult);
     }
 
-    ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%" PRIu16, NumConnections(), CONFIG_BT_MAX_CONN);
+    ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", NumConnections(), CONFIG_BT_MAX_CONN);
 
     mFlags.Set(Flags::kAdvertisingRefreshNeeded);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
@@ -465,7 +465,7 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
 {
     const BleConnEventType * connEvent = &event->Platform.BleConnEvent;
 
-    ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (reason 0x%02" PRIx16 ")", connEvent->HciResult);
+    ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (reason 0x%02x)", connEvent->HciResult);
 
     mGAPConns--;
 
@@ -495,7 +495,7 @@ exit:
     // Unref bt_conn before scheduling DriveBLEState.
     bt_conn_unref(connEvent->BtConn);
 
-    ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%" PRIu16, NumConnections(), CONFIG_BT_MAX_CONN);
+    ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", NumConnections(), CONFIG_BT_MAX_CONN);
 
     ChipDeviceEvent disconnectEvent;
     disconnectEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
@@ -513,8 +513,7 @@ CHIP_ERROR BLEManagerImpl::HandleTXCharCCCDWrite(const ChipDeviceEvent * event)
 {
     const BleCCCWriteEventType * writeEvent = &event->Platform.BleCCCWriteEvent;
 
-    ChipLogDetail(DeviceLayer, "ConnId: 0x%02" PRIx16 ", New CCCD value: 0x%04" PRIx16, bt_conn_index(writeEvent->BtConn),
-                  writeEvent->Value);
+    ChipLogDetail(DeviceLayer, "ConnId: 0x%02x, New CCCD value: 0x%04x", bt_conn_index(writeEvent->BtConn), writeEvent->Value);
 
     // If the client has requested to enable notifications and if it is not yet subscribed
     if (writeEvent->Value != 0 && SetSubscribed(writeEvent->BtConn))
@@ -522,7 +521,7 @@ CHIP_ERROR BLEManagerImpl::HandleTXCharCCCDWrite(const ChipDeviceEvent * event)
         // Alert the BLE layer that CHIPoBLE "subscribe" has been received and increment the bt_conn reference counter.
         HandleSubscribeReceived(writeEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
 
-        ChipLogProgress(DeviceLayer, "CHIPoBLE connection established (ConnId: 0x%02" PRIx16 ", GATT MTU: %" PRIu16 ")",
+        ChipLogProgress(DeviceLayer, "CHIPoBLE connection established (ConnId: 0x%02x, GATT MTU: %u)",
                         bt_conn_index(writeEvent->BtConn), GetMTU(writeEvent->BtConn));
 
         // Post a CHIPoBLEConnectionEstablished event to the DeviceLayer and the application.
@@ -549,8 +548,7 @@ CHIP_ERROR BLEManagerImpl::HandleRXCharWrite(const ChipDeviceEvent * event)
 {
     const BleRXWriteEventType * writeEvent = &event->Platform.BleRXWriteEvent;
 
-    ChipLogDetail(DeviceLayer, "Write request received for CHIPoBLE RX (ConnId 0x%02" PRIx16 ")",
-                  bt_conn_index(writeEvent->BtConn));
+    ChipLogDetail(DeviceLayer, "Write request received for CHIPoBLE RX (ConnId 0x%02x)", bt_conn_index(writeEvent->BtConn));
 
     HandleWriteReceived(writeEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX,
                         PacketBufferHandle::Adopt(writeEvent->Data));
@@ -563,7 +561,7 @@ CHIP_ERROR BLEManagerImpl::HandleTXCharComplete(const ChipDeviceEvent * event)
 {
     const BleTXCompleteEventType * completeEvent = &event->Platform.BleTXCompleteEvent;
 
-    ChipLogDetail(DeviceLayer, "Notification for CHIPoBLE TX done (ConnId 0x%02" PRIx16 ")", bt_conn_index(completeEvent->BtConn));
+    ChipLogDetail(DeviceLayer, "Notification for CHIPoBLE TX done (ConnId 0x%02x)", bt_conn_index(completeEvent->BtConn));
 
     // Signal the BLE Layer that the outstanding notification is complete.
     HandleIndicationConfirmation(completeEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
@@ -683,7 +681,7 @@ uint16_t BLEManagerImpl::_NumConnections(void)
 
 bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
-    ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (ConnId %02" PRIx16 ")", bt_conn_index(conId));
+    ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (ConnId %02x)", bt_conn_index(conId));
     return bt_conn_disconnect(conId, BT_HCI_ERR_REMOTE_USER_TERM_CONN) == 0;
 }
 
@@ -714,7 +712,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 
     VerifyOrExit(IsSubscribed(conId) == true, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    ChipLogDetail(DeviceLayer, "Sending notification for CHIPoBLE TX (ConnId %02" PRIx16 ", len %u)", index, pBuf->DataLength());
+    ChipLogDetail(DeviceLayer, "Sending notification for CHIPoBLE TX (ConnId %02x, len %u)", index, pBuf->DataLength());
 
     params->uuid      = nullptr;
     params->attr      = &sChipoBleAttributes[kCHIPoBLE_CCC_AttributeIndex];
@@ -891,7 +889,7 @@ exit:
 ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gatt_attr * attr, void * buf, uint16_t len,
                                      uint16_t offset)
 {
-    ChipLogDetail(DeviceLayer, "Read request received for CHIPoBLE C3 (ConnId 0x%02" PRIx16 ")", bt_conn_index(conId));
+    ChipLogDetail(DeviceLayer, "Read request received for CHIPoBLE C3 (ConnId 0x%02x)", bt_conn_index(conId));
 
     if (sInstance.c3CharDataBufferHandle.IsNull())
     {

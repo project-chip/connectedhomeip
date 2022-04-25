@@ -3,13 +3,14 @@ FROM connectedhomeip/chip-build:${VERSION}
 
 # Setup Ameba
 ARG AMEBA_DIR=/opt/ameba
+ARG TAG_NAME=ameba_update_2022_04_05
 RUN set -x \
     && apt-get update \
     && mkdir ${AMEBA_DIR} \
     && cd ${AMEBA_DIR} \
     && git clone --progress -b cmake_build https://github.com/pankore/ambd_sdk_with_chip_non_NDA.git \
     && cd ambd_sdk_with_chip_non_NDA \
-    && git reset --hard b647c19 \
+    && git checkout -f ${TAG_NAME} \
     && git submodule update --depth 1 --init --progress \
     && cd project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp/toolchain \
     && cat asdk/asdk-10.3.0-linux-newlib-build-3638-x86_64.tar.bz2.part* > asdk/asdk-10.3.0-linux-newlib-build-3638-x86_64.tar.bz2 \

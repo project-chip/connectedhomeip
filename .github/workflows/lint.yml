@@ -36,6 +36,7 @@ jobs:
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
+
             - name: Check broken links
               # On-push disabled until the job can run fully green
               # At that point the step should be enabled.
@@ -57,6 +58,22 @@ jobs:
               if: always()
               run: |
                   git grep -n "PRI.8" -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)third_party/lwip/repo/lwip/src/include/lwip/arch.h' && exit 1 || exit 0
+                  
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+            # to avoid our grep regexp matching itself.
+            - name: Check for use of PRI*16, which are not supported on some libcs.
+              if: always()
+              run: |
+                  git grep -n "PRI.16" -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)third_party/lwip/repo/lwip/src/include/lwip/arch.h' && exit 1 || exit 0
+                  
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+            # to avoid our grep regexp matching itself.
+            - name: Check for use of %zu, which are not supported on some libcs.
+              if: always()
+              run: |
+                  git grep -n "%zu" -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
 
             # Comments like '{{! ... }}' should be used in zap files
             - name: Do not allow TODO in generated files
@@ -67,3 +84,8 @@ jobs:
             - name: Check for disallowed include files
               if: always()
               run: scripts/tools/check_includes.sh
+
+            - name: Ensure all PICS are set for tests (to true or false)
+              if: always()
+              run: |
+                  scripts/tools/check_test_pics.py src/app/tests/suites/certification/ci-pics-values src/app/tests/suites/certification/PICS.yaml

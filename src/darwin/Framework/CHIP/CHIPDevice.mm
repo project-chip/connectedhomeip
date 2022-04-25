@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#import "CHIPAttributeCacheContainer_Internal.h"
 #import "CHIPAttributeTLVValueDecoder_Internal.h"
 #import "CHIPCallbackBridgeBase_internal.h"
 #import "CHIPCluster.h"
@@ -28,6 +29,7 @@
 
 #include <app/AttributePathParams.h>
 #include <app/BufferedReadCallback.h>
+#include <app/ClusterStateCache.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
 #include <app/util/error-mapping.h>
@@ -236,7 +238,7 @@ typedef void (^ReportCallback)(NSArray * _Nullable value, NSError * _Nullable er
 
 namespace {
 
-class SubscriptionCallback final : public ReadClient::Callback {
+class SubscriptionCallback final : public ClusterStateCache::Callback {
 public:
     SubscriptionCallback(dispatch_queue_t queue, ReportCallback reportCallback,
         SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler)
@@ -247,10 +249,21 @@ public:
     {
     }
 
+    SubscriptionCallback(dispatch_queue_t queue, ReportCallback reportCallback,
+        SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler, void (^onDoneHandler)(void))
+        : mQueue(queue)
+        , mReportCallback(reportCallback)
+        , mSubscriptionEstablishedHandler(subscriptionEstablishedHandler)
+        , mBufferedReadAdapter(*this)
+        , mOnDoneHandler(onDoneHandler)
+    {
+    }
+
     BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
 
     // We need to exist to get a ReadClient, so can't take this as a constructor argument.
     void AdoptReadClient(std::unique_ptr<ReadClient> aReadClient) { mReadClient = std::move(aReadClient); }
+    void AdoptAttributeCache(std::unique_ptr<ClusterStateCache> aAttributeCache) { mAttributeCache = std::move(aAttributeCache); }
 
 private:
     void OnReportBegin() override;
@@ -293,7 +306,9 @@ private:
     //    error callback, but not both, by tracking whether we have a queued-up
     //    deletion.
     std::unique_ptr<ReadClient> mReadClient;
+    std::unique_ptr<ClusterStateCache> mAttributeCache;
     bool mHaveQueuedDeletion = false;
+    void (^mOnDoneHandler)(void) = nil;
 };
 
 } // anonymous namespace
@@ -302,6 +317,7 @@ private:
                 minInterval:(uint16_t)minInterval
                 maxInterval:(uint16_t)maxInterval
                      params:(nullable CHIPSubscribeParams *)params
+             cacheContainer:(CHIPAttributeCacheContainer * _Nullable)attributeCacheContainer
               reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
     subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler
 {
@@ -323,9 +339,25 @@ private:
     readParams.mKeepSubscriptions
         = (params != nil) && (params.keepPreviousSubscriptions != nil) && [params.keepPreviousSubscriptions boolValue];
 
-    auto callback = std::make_unique<SubscriptionCallback>(queue, reportHandler, subscriptionEstablishedHandler);
-    auto readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
-        callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
+    std::unique_ptr<SubscriptionCallback> callback;
+    std::unique_ptr<ReadClient> readClient;
+    std::unique_ptr<ClusterStateCache> attributeCache;
+    if (attributeCacheContainer) {
+        __weak CHIPAttributeCacheContainer * weakPtr = attributeCacheContainer;
+        callback = std::make_unique<SubscriptionCallback>(queue, reportHandler, subscriptionEstablishedHandler, ^{
+            CHIPAttributeCacheContainer * container = weakPtr;
+            if (container) {
+                container.cppAttributeCache = nullptr;
+            }
+        });
+        attributeCache = std::make_unique<ClusterStateCache>(*callback.get());
+        readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
+            attributeCache->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
+    } else {
+        callback = std::make_unique<SubscriptionCallback>(queue, reportHandler, subscriptionEstablishedHandler);
+        readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
+            callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
+    }
 
     CHIP_ERROR err;
     if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
@@ -344,6 +376,11 @@ private:
         return;
     }
 
+    if (attributeCacheContainer) {
+        attributeCacheContainer.cppAttributeCache = attributeCache.get();
+        // ClusterStateCache will be deleted when OnDone is called or an error is encountered as well.
+        callback->AdoptAttributeCache(std::move(attributeCache));
+    }
     // Callback and ReadClient will be deleted when OnDone is called or an error is
     // encountered.
     callback->AdoptReadClient(std::move(readClient));
@@ -1310,6 +1347,10 @@ void SubscriptionCallback::OnError(CHIP_ERROR aError) { ReportError([CHIPError e
 
 void SubscriptionCallback::OnDone()
 {
+    if (mOnDoneHandler) {
+        mOnDoneHandler();
+        mOnDoneHandler = nil;
+    }
     if (!mHaveQueuedDeletion) {
         delete this;
         return; // Make sure we touch nothing else.
@@ -1363,8 +1404,13 @@ void SubscriptionCallback::ReportError(NSError * _Nullable err)
     __block ReportCallback callback = mReportCallback;
     __block auto * myself = this;
     mReportCallback = nil;
+    __auto_type onDoneHandler = mOnDoneHandler;
+    mOnDoneHandler = nil;
     dispatch_async(mQueue, ^{
         callback(nil, err);
+        if (onDoneHandler) {
+            onDoneHandler();
+        }
 
         // Deletion of our ReadClient (and hence of ourselves, since the
         // ReadClient has a pointer to us) needs to happen on the Matter work

@@ -32,7 +32,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-telink:0.5.58
+            image: connectedhomeip/chip-build-telink:0.5.59
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -42,10 +42,11 @@ jobs:
               with:
                   action: actions/checkout@v3
                   with: |
-                      submodules: true
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform telink
 
             - name: Set up environment for size reports
               if: ${{ !env.ACT }}

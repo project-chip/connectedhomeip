@@ -31,13 +31,13 @@
 #include <app/DeviceProxy.h>
 #include <app/util/attribute-filter.h>
 #include <app/util/basic-types.h>
+#include <credentials/GroupDataProvider.h>
 #include <lib/address_resolve/AddressResolve.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/secure_channel/CASESession.h>
-#include <protocols/secure_channel/SessionIDAllocator.h>
 #include <system/SystemLayer.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
@@ -48,20 +48,22 @@ namespace chip {
 
 struct DeviceProxyInitParams
 {
-    SessionManager * sessionManager          = nullptr;
-    Messaging::ExchangeManager * exchangeMgr = nullptr;
-    SessionIDAllocator * idAllocator         = nullptr;
-    FabricTable * fabricTable                = nullptr;
-    CASEClientPoolDelegate * clientPool      = nullptr;
+    SessionManager * sessionManager                     = nullptr;
+    SessionResumptionStorage * sessionResumptionStorage = nullptr;
+    Messaging::ExchangeManager * exchangeMgr            = nullptr;
+    FabricTable * fabricTable                           = nullptr;
+    CASEClientPoolDelegate * clientPool                 = nullptr;
+    Credentials::GroupDataProvider * groupDataProvider  = nullptr;
 
     Optional<ReliableMessageProtocolConfig> mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Missing();
 
     CHIP_ERROR Validate() const
     {
         ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        // sessionResumptionStorage can be nullptr when resumption is disabled
         ReturnErrorCodeIf(exchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(idAllocator == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(groupDataProvider == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(clientPool == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         return CHIP_NO_ERROR;
@@ -83,18 +85,26 @@ typedef void (*OnDeviceConnectionFailure)(void * context, PeerId peerId, CHIP_ER
  *    - Expose to consumers the secure session for talking to the device.
  */
 class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy,
-                                          SessionReleaseDelegate,
+                                          public SessionReleaseDelegate,
                                           public SessionEstablishmentDelegate,
                                           public AddressResolve::NodeListener
 {
 public:
     ~OperationalDeviceProxy() override;
+
+    //
+    // TODO: Should not be PeerId, but rather, ScopedNodeId
+    //
     OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId) : mSecureSession(*this)
     {
-        VerifyOrReturn(params.Validate() == CHIP_NO_ERROR);
+        mInitParams = params;
+        if (params.Validate() != CHIP_NO_ERROR)
+        {
+            mState = State::Uninitialized;
+            return;
+        }
 
         mSystemLayer = params.exchangeMgr->GetSessionManager()->SystemLayer();
-        mInitParams  = params;
         mPeerId      = peerId;
         mFabricInfo  = params.fabricTable->FindFabricWithCompressedId(peerId.GetCompressedFabricId());
         mState       = State::NeedsAddress;
@@ -130,6 +140,10 @@ public:
 
     bool IsConnecting() const { return mState == State::Connecting; }
 
+    //////////// SessionEstablishmentDelegate Implementation ///////////////
+    void OnSessionEstablished(const SessionHandle & session) override;
+    void OnSessionEstablishmentError(CHIP_ERROR error) override;
+
     /**
      *   Called when a connection is closing.
      *   The object releases all resources associated with the connection.
@@ -140,7 +154,7 @@ public:
     {
         mDeviceAddress = ToPeerAddress(nodeResolutionData);
 
-        mMRPConfig = nodeResolutionData.GetMRPConfig();
+        mRemoteMRPConfig = nodeResolutionData.GetMRPConfig();
 
         if (mState == State::NeedsAddress)
         {
@@ -152,15 +166,6 @@ public:
      *  Mark any open session with the device as expired.
      */
     CHIP_ERROR Disconnect() override;
-
-    /**
-     * Use SetConnectedSession if 'this' object is a newly allocated device proxy.
-     * It will take an existing session, such as the one established
-     * during commissioning, and use it for this device proxy.
-     *
-     * Note: Avoid using this function generally as it is Deprecated
-     */
-    void SetConnectedSession(const SessionHandle & handle);
 
     NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
 
@@ -176,15 +181,11 @@ public:
 
     bool MatchesSession(const SessionHandle & session) const { return mSecureSession.Contains(session); }
 
-    uint8_t GetNextSequenceNumber() override { return mSequenceNumber++; };
-
     CHIP_ERROR ShutdownSubscriptions() override;
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mInitParams.exchangeMgr; }
 
     chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.ToOptional(); }
-
-    bool GetAddress(Inet::IPAddress & addr, uint16_t & port) const override;
 
     Transport::PeerAddress GetPeerAddress() const { return mDeviceAddress; }
 
@@ -240,6 +241,8 @@ private:
     FabricInfo * mFabricInfo;
     System::Layer * mSystemLayer;
 
+    // mCASEClient is only non-null if we are in State::Connecting or just
+    // allocated it as part of an attempt to enter State::Connecting.
     CASEClient * mCASEClient = nullptr;
 
     PeerId mPeerId;
@@ -252,8 +255,6 @@ private:
 
     SessionHolderWithDelegate mSecureSession;
 
-    uint8_t mSequenceNumber = 0;
-
     Callback::CallbackDeque mConnectionSuccess;
     Callback::CallbackDeque mConnectionFailure;
 
@@ -262,20 +263,31 @@ private:
 
     CHIP_ERROR EstablishConnection();
 
+    /*
+     * This checks to see if an existing CASE session exists to the peer within the SessionManager
+     * and if one exists, to load that into mSecureSession.
+     *
+     * Returns true if a valid session was found, false otherwise.
+     *
+     */
+    bool AttachToExistingSecureSession();
+
     bool IsSecureConnected() const override { return mState == State::SecureConnected; }
 
-    static void HandleCASEConnected(void * context, CASEClient * client);
-    static void HandleCASEConnectionFailure(void * context, CASEClient * client, CHIP_ERROR error);
-
-    static void CloseCASESessionTask(System::Layer * layer, void * context);
-
-    void CloseCASESession();
+    void CleanupCASEClient();
 
     void EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
                                     Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
-    void DequeueConnectionSuccessCallbacks(bool executeCallback);
-    void DequeueConnectionFailureCallbacks(CHIP_ERROR error, bool executeCallback);
+    /*
+     * This dequeues all failure and success callbacks and appropriately
+     * invokes either set depending on the value of error.
+     *
+     * If error == CHIP_NO_ERROR, only success callbacks are invoked.
+     * Otherwise, only failure callbacks are invoked.
+     *
+     */
+    void DequeueConnectionCallbacks(CHIP_ERROR error);
 };
 
 } // namespace chip

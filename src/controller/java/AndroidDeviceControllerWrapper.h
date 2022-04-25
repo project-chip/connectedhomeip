@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020-2021 Project CHIP Authors
+ *   Copyright (c) 2020-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,7 @@
 #include <jni.h>
 
 #include <controller/CHIPDeviceController.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <lib/support/TimeUtils.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
@@ -72,7 +73,7 @@ public:
     using AndroidOperationalCredentialsIssuerPtr = std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer>;
 
     static AndroidDeviceControllerWrapper * AllocateNew(JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId,
-                                                        chip::System::Layer * systemLayer,
+                                                        const chip::CATValues & cats, chip::System::Layer * systemLayer,
                                                         chip::Inet::EndPointManager<chip::Inet::TCPEndPoint> * tcpEndPointManager,
                                                         chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager,
                                                         AndroidOperationalCredentialsIssuerPtr opCredsIssuer,
@@ -83,6 +84,8 @@ private:
 
     ChipDeviceControllerPtr mController;
     AndroidOperationalCredentialsIssuerPtr mOpCredsIssuer;
+    // TODO: This may need to be injected as a GroupDataProvider*
+    chip::Credentials::GroupDataProviderImpl mGroupDataProvider;
 
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;

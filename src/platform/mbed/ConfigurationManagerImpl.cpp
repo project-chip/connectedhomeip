@@ -30,7 +30,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #undef sleep
 
-#include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include <platform/ConfigurationManager.h>
 

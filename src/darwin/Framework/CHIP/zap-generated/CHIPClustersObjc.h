@@ -73,6 +73,63 @@ NS_ASSUME_NONNULL_BEGIN
                                            queue:(dispatch_queue_t)queue
                                completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (void)readAttributeSubjectsPerAccessControlEntryWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                            NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeSubjectsPerAccessControlEntryWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                params:(CHIPSubscribeParams * _Nullable)params
+                                               subscriptionEstablished:
+                                                   (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                         reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                           NSError * _Nullable error))reportHandler;
++ (void)readAttributeSubjectsPerAccessControlEntryWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                            endpoint:(NSNumber *)endpoint
+                                                               queue:(dispatch_queue_t)queue
+                                                   completionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeTargetsPerAccessControlEntryWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                           NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeTargetsPerAccessControlEntryWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                               params:(CHIPSubscribeParams * _Nullable)params
+                                              subscriptionEstablished:
+                                                  (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                        reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                          NSError * _Nullable error))reportHandler;
++ (void)readAttributeTargetsPerAccessControlEntryWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                           endpoint:(NSNumber *)endpoint
+                                                              queue:(dispatch_queue_t)queue
+                                                  completionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                        NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeAccessControlEntriesPerFabricWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                            NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeAccessControlEntriesPerFabricWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                params:(CHIPSubscribeParams * _Nullable)params
+                                               subscriptionEstablished:
+                                                   (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                         reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                           NSError * _Nullable error))reportHandler;
++ (void)readAttributeAccessControlEntriesPerFabricWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                            endpoint:(NSNumber *)endpoint
+                                                               queue:(dispatch_queue_t)queue
+                                                   completionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
 /**
@@ -1347,6 +1404,24 @@ NS_ASSUME_NONNULL_BEGIN
                                        endpoint:(NSNumber *)endpoint
                                           queue:(dispatch_queue_t)queue
                               completionHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeCapabilityMinimaWithCompletionHandler:(void (^)(CHIPBasicClusterCapabilityMinimaStruct * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeCapabilityMinimaWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
+                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                            reportHandler:(void (^)(CHIPBasicClusterCapabilityMinimaStruct * _Nullable value,
+                                                              NSError * _Nullable error))reportHandler;
++ (void)readAttributeCapabilityMinimaWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                               endpoint:(NSNumber *)endpoint
+                                                  queue:(dispatch_queue_t)queue
+                                      completionHandler:(void (^)(CHIPBasicClusterCapabilityMinimaStruct * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
@@ -3795,6 +3870,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)clearCredentialWithParams:(CHIPDoorLockClusterClearCredentialParams *)params
                 completionHandler:(StatusCompletion)completionHandler;
+- (void)clearHolidayScheduleWithParams:(CHIPDoorLockClusterClearHolidayScheduleParams *)params
+                     completionHandler:(StatusCompletion)completionHandler;
 - (void)clearUserWithParams:(CHIPDoorLockClusterClearUserParams *)params completionHandler:(StatusCompletion)completionHandler;
 - (void)clearWeekDayScheduleWithParams:(CHIPDoorLockClusterClearWeekDayScheduleParams *)params
                      completionHandler:(StatusCompletion)completionHandler;
@@ -3803,6 +3880,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)getCredentialStatusWithParams:(CHIPDoorLockClusterGetCredentialStatusParams *)params
                     completionHandler:(void (^)(CHIPDoorLockClusterGetCredentialStatusResponseParams * _Nullable data,
                                           NSError * _Nullable error))completionHandler;
+- (void)getHolidayScheduleWithParams:(CHIPDoorLockClusterGetHolidayScheduleParams *)params
+                   completionHandler:(void (^)(CHIPDoorLockClusterGetHolidayScheduleResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completionHandler;
 - (void)getUserWithParams:(CHIPDoorLockClusterGetUserParams *)params
         completionHandler:
             (void (^)(CHIPDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
@@ -3817,6 +3897,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setCredentialWithParams:(CHIPDoorLockClusterSetCredentialParams *)params
               completionHandler:(void (^)(CHIPDoorLockClusterSetCredentialResponseParams * _Nullable data,
                                     NSError * _Nullable error))completionHandler;
+- (void)setHolidayScheduleWithParams:(CHIPDoorLockClusterSetHolidayScheduleParams *)params
+                   completionHandler:(StatusCompletion)completionHandler;
 - (void)setUserWithParams:(CHIPDoorLockClusterSetUserParams *)params completionHandler:(StatusCompletion)completionHandler;
 - (void)setWeekDayScheduleWithParams:(CHIPDoorLockClusterSetWeekDayScheduleParams *)params
                    completionHandler:(StatusCompletion)completionHandler;
@@ -3989,6 +4071,25 @@ NS_ASSUME_NONNULL_BEGIN
                                                                           queue:(dispatch_queue_t)queue
                                                               completionHandler:(void (^)(NSNumber * _Nullable value,
                                                                                     NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeNumberOfHolidaySchedulesSupportedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeNumberOfHolidaySchedulesSupportedWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                    params:(CHIPSubscribeParams * _Nullable)params
+                                                   subscriptionEstablished:
+                                                       (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                             reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                               NSError * _Nullable error))reportHandler;
++ (void)readAttributeNumberOfHolidaySchedulesSupportedWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                                endpoint:(NSNumber *)endpoint
+                                                                   queue:(dispatch_queue_t)queue
+                                                       completionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                             NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeMaxPINCodeLengthWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
@@ -4215,6 +4316,32 @@ NS_ASSUME_NONNULL_BEGIN
                                                      queue:(dispatch_queue_t)queue
                                          completionHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeUserCodeTemporaryDisableTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                           NSError * _Nullable error))completionHandler;
+- (void)writeAttributeUserCodeTemporaryDisableTimeWithValue:(NSNumber * _Nonnull)value
+                                          completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeUserCodeTemporaryDisableTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                               params:(CHIPSubscribeParams * _Nullable)params
+                                              subscriptionEstablished:
+                                                  (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                        reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                          NSError * _Nullable error))reportHandler;
++ (void)readAttributeUserCodeTemporaryDisableTimeWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                           endpoint:(NSNumber *)endpoint
+                                                              queue:(dispatch_queue_t)queue
+                                                  completionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                        NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeRequirePINforRemoteOperationWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                           NSError * _Nullable error))completionHandler;
+- (void)writeAttributeRequirePINforRemoteOperationWithValue:(NSNumber * _Nonnull)value
+                                          completionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
@@ -4870,6 +4997,166 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (void)readAttributePercentSettingWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributePercentSettingWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributePercentSettingWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
+                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                          reportHandler:
+                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributePercentSettingWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                             endpoint:(NSNumber *)endpoint
+                                                queue:(dispatch_queue_t)queue
+                                    completionHandler:
+                                        (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributePercentCurrentWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributePercentCurrentWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
+                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                          reportHandler:
+                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributePercentCurrentWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                             endpoint:(NSNumber *)endpoint
+                                                queue:(dispatch_queue_t)queue
+                                    completionHandler:
+                                        (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeSpeedMaxWithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeSpeedMaxWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
+                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeSpeedMaxWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                       endpoint:(NSNumber *)endpoint
+                                          queue:(dispatch_queue_t)queue
+                              completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeSpeedSettingWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeSpeedSettingWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeSpeedSettingWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
+                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                        reportHandler:
+                                            (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeSpeedSettingWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                           endpoint:(NSNumber *)endpoint
+                                              queue:(dispatch_queue_t)queue
+                                  completionHandler:
+                                      (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeSpeedCurrentWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeSpeedCurrentWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
+                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                        reportHandler:
+                                            (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeSpeedCurrentWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                           endpoint:(NSNumber *)endpoint
+                                              queue:(dispatch_queue_t)queue
+                                  completionHandler:
+                                      (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeRockSupportWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeRockSupportWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
+                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeRockSupportWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                          endpoint:(NSNumber *)endpoint
+                                             queue:(dispatch_queue_t)queue
+                                 completionHandler:
+                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeRockSettingWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeRockSettingWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeRockSettingWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
+                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeRockSettingWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                          endpoint:(NSNumber *)endpoint
+                                             queue:(dispatch_queue_t)queue
+                                 completionHandler:
+                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeWindSupportWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeWindSupportWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
+                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeWindSupportWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                          endpoint:(NSNumber *)endpoint
+                                             queue:(dispatch_queue_t)queue
+                                 completionHandler:
+                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeWindSettingWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeWindSettingWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeWindSettingWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
+                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeWindSettingWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                          endpoint:(NSNumber *)endpoint
+                                             queue:(dispatch_queue_t)queue
+                                 completionHandler:
+                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
 /**
@@ -5303,6 +5590,25 @@ NS_ASSUME_NONNULL_BEGIN
                                                     queue:(dispatch_queue_t)queue
                                         completionHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeSupportsConcurrentConnectionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                           NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeSupportsConcurrentConnectionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                               params:(CHIPSubscribeParams * _Nullable)params
+                                              subscriptionEstablished:
+                                                  (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                        reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                          NSError * _Nullable error))reportHandler;
++ (void)readAttributeSupportsConcurrentConnectionWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                           endpoint:(NSNumber *)endpoint
+                                                              queue:(dispatch_queue_t)queue
+                                                  completionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                        NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
@@ -7177,22 +7483,40 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)changeToModeWithParams:(CHIPModeSelectClusterChangeToModeParams *)params
              completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeCurrentModeWithCompletionHandler:(void (^)(
-                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)readAttributeDescriptionWithCompletionHandler:(void (^)(
+                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * CHIPSubscribeParams.
  */
-- (void)subscribeAttributeCurrentModeWithMinInterval:(NSNumber * _Nonnull)minInterval
+- (void)subscribeAttributeDescriptionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeCurrentModeWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeDescriptionWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
                                           endpoint:(NSNumber *)endpoint
                                              queue:(dispatch_queue_t)queue
                                  completionHandler:
-                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+                                     (void (^)(NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeStandardNamespaceWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeStandardNamespaceWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
+                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                             reportHandler:
+                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeStandardNamespaceWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                endpoint:(NSNumber *)endpoint
+                                                   queue:(dispatch_queue_t)queue
+                                       completionHandler:
+                                           (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeSupportedModesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
@@ -7212,24 +7536,26 @@ NS_ASSUME_NONNULL_BEGIN
                                     completionHandler:
                                         (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeOnModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)writeAttributeOnModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)readAttributeCurrentModeWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * CHIPSubscribeParams.
  */
-- (void)subscribeAttributeOnModeWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                    maxInterval:(NSNumber * _Nonnull)maxInterval
-                                         params:(CHIPSubscribeParams * _Nullable)params
-                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeOnModeWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                     endpoint:(NSNumber *)endpoint
-                                        queue:(dispatch_queue_t)queue
-                            completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeCurrentModeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
+                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeCurrentModeWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                          endpoint:(NSNumber *)endpoint
+                                             queue:(dispatch_queue_t)queue
+                                 completionHandler:
+                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeStartUpModeWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeStartUpModeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * CHIPSubscribeParams.
@@ -7245,22 +7571,21 @@ NS_ASSUME_NONNULL_BEGIN
                                  completionHandler:
                                      (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeDescriptionWithCompletionHandler:(void (^)(
-                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)readAttributeOnModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeOnModeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * CHIPSubscribeParams.
  */
-- (void)subscribeAttributeDescriptionWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                         maxInterval:(NSNumber * _Nonnull)maxInterval
-                                              params:(CHIPSubscribeParams * _Nullable)params
-                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeDescriptionWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                          endpoint:(NSNumber *)endpoint
-                                             queue:(dispatch_queue_t)queue
-                                 completionHandler:
-                                     (void (^)(NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeOnModeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
+                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeOnModeWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                     endpoint:(NSNumber *)endpoint
+                                        queue:(dispatch_queue_t)queue
+                            completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
@@ -7318,6 +7643,23 @@ NS_ASSUME_NONNULL_BEGIN
                                    completionHandler:
                                        (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
+                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeFeatureMapWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                         endpoint:(NSNumber *)endpoint
+                                            queue:(dispatch_queue_t)queue
+                                completionHandler:
+                                    (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 /**
@@ -7359,7 +7701,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reorderNetworkWithParams:(CHIPNetworkCommissioningClusterReorderNetworkParams *)params
                completionHandler:(void (^)(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                      NSError * _Nullable error))completionHandler;
-- (void)scanNetworksWithParams:(CHIPNetworkCommissioningClusterScanNetworksParams *)params
+- (void)scanNetworksWithParams:(CHIPNetworkCommissioningClusterScanNetworksParams * _Nullable)params
              completionHandler:(void (^)(CHIPNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler;
 
@@ -14890,6 +15232,12 @@ typedef NS_ENUM(uint8_t, CHIPOnOffEffectIdentifier) {
     CHIPOnOffEffectIdentifierDyingLight = 0x01,
 };
 
+typedef NS_ENUM(uint8_t, CHIPOnOffStartUpOnOff) {
+    CHIPOnOffStartUpOnOffOff = 0x00,
+    CHIPOnOffStartUpOnOffOn = 0x01,
+    CHIPOnOffStartUpOnOffTogglePreviousOnOff = 0x02,
+};
+
 typedef NS_OPTIONS(uint8_t, CHIPOnOffControl) {
     CHIPOnOffControlAcceptOnlyWhenOn = 0x1,
 };
@@ -15207,6 +15555,14 @@ typedef NS_OPTIONS(uint32_t, CHIPNetworkCommissioningFeature) {
     CHIPNetworkCommissioningFeatureEthernetNetworkInterface = 0x4,
 };
 
+typedef NS_OPTIONS(uint8_t, CHIPNetworkCommissioningWiFiSecurity) {
+    CHIPNetworkCommissioningWiFiSecurityUnencrypted = 0x1,
+    CHIPNetworkCommissioningWiFiSecurityWepPersonal = 0x2,
+    CHIPNetworkCommissioningWiFiSecurityWpaPersonal = 0x4,
+    CHIPNetworkCommissioningWiFiSecurityWpa2Personal = 0x8,
+    CHIPNetworkCommissioningWiFiSecurityWpa3Personal = 0x10,
+};
+
 typedef NS_ENUM(uint8_t, CHIPDiagnosticLogsLogsIntent) {
     CHIPDiagnosticLogsLogsIntentEndUserSupport = 0x00,
     CHIPDiagnosticLogsLogsIntentNetworkDiag = 0x01,
@@ -15375,6 +15731,10 @@ typedef NS_ENUM(uint8_t, CHIPOperationalCredentialsOperationalCertStatus) {
 typedef NS_ENUM(uint8_t, CHIPGroupKeyManagementGroupKeySecurityPolicy) {
     CHIPGroupKeyManagementGroupKeySecurityPolicyTrustFirst = 0x00,
     CHIPGroupKeyManagementGroupKeySecurityPolicyCacheAndSync = 0x01,
+};
+
+typedef NS_OPTIONS(uint32_t, CHIPModeSelectFeature) {
+    CHIPModeSelectFeatureDEPONOFF = 0x1,
 };
 
 typedef NS_ENUM(uint8_t, CHIPDoorLockDlAlarmCode) {
@@ -15713,14 +16073,63 @@ typedef NS_OPTIONS(uint32_t, CHIPDoorLockFeature) {
     CHIPDoorLockFeatureNotifications = 0x200,
 };
 
-typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringWcConfigStatus) {
-    CHIPWindowCoveringWcConfigStatusOperational = 0x1,
-    CHIPWindowCoveringWcConfigStatusOnline = 0x2,
-    CHIPWindowCoveringWcConfigStatusOpenAndUpCommandsReversed = 0x4,
-    CHIPWindowCoveringWcConfigStatusLiftPositionAware = 0x8,
-    CHIPWindowCoveringWcConfigStatusTiltPositionAware = 0x10,
-    CHIPWindowCoveringWcConfigStatusLiftEncoderControlled = 0x20,
-    CHIPWindowCoveringWcConfigStatusTiltEncoderControlled = 0x40,
+typedef NS_ENUM(uint8_t, CHIPWindowCoveringEndProductType) {
+    CHIPWindowCoveringEndProductTypeRollerShade = 0x00,
+    CHIPWindowCoveringEndProductTypeRomanShade = 0x01,
+    CHIPWindowCoveringEndProductTypeBalloonShade = 0x02,
+    CHIPWindowCoveringEndProductTypeWovenWood = 0x03,
+    CHIPWindowCoveringEndProductTypePleatedShade = 0x04,
+    CHIPWindowCoveringEndProductTypeCellularShade = 0x05,
+    CHIPWindowCoveringEndProductTypeLayeredShade = 0x06,
+    CHIPWindowCoveringEndProductTypeLayeredShade2D = 0x07,
+    CHIPWindowCoveringEndProductTypeSheerShade = 0x08,
+    CHIPWindowCoveringEndProductTypeTiltOnlyInteriorBlind = 0x09,
+    CHIPWindowCoveringEndProductTypeInteriorBlind = 0x0A,
+    CHIPWindowCoveringEndProductTypeVerticalBlindStripCurtain = 0x0B,
+    CHIPWindowCoveringEndProductTypeInteriorVenetianBlind = 0x0C,
+    CHIPWindowCoveringEndProductTypeExteriorVenetianBlind = 0x0D,
+    CHIPWindowCoveringEndProductTypeLateralLeftCurtain = 0x0E,
+    CHIPWindowCoveringEndProductTypeLateralRightCurtain = 0x0F,
+    CHIPWindowCoveringEndProductTypeCentralCurtain = 0x10,
+    CHIPWindowCoveringEndProductTypeRollerShutter = 0x11,
+    CHIPWindowCoveringEndProductTypeExteriorVerticalScreen = 0x12,
+    CHIPWindowCoveringEndProductTypeAwningTerracePatio = 0x13,
+    CHIPWindowCoveringEndProductTypeAwningVerticalScreen = 0x14,
+    CHIPWindowCoveringEndProductTypeTiltOnlyPergola = 0x15,
+    CHIPWindowCoveringEndProductTypeSwingingShutter = 0x16,
+    CHIPWindowCoveringEndProductTypeSlidingShutter = 0x17,
+    CHIPWindowCoveringEndProductTypeUnknown = 0xFF,
+};
+
+typedef NS_ENUM(uint8_t, CHIPWindowCoveringType) {
+    CHIPWindowCoveringTypeRollerShade = 0x00,
+    CHIPWindowCoveringTypeRollerShade2Motor = 0x01,
+    CHIPWindowCoveringTypeRollerShadeExterior = 0x02,
+    CHIPWindowCoveringTypeRollerShadeExterior2Motor = 0x03,
+    CHIPWindowCoveringTypeDrapery = 0x04,
+    CHIPWindowCoveringTypeAwning = 0x05,
+    CHIPWindowCoveringTypeShutter = 0x06,
+    CHIPWindowCoveringTypeTiltBlindTiltOnly = 0x07,
+    CHIPWindowCoveringTypeTiltBlindLiftAndTilt = 0x08,
+    CHIPWindowCoveringTypeProjectorScreen = 0x09,
+    CHIPWindowCoveringTypeUnknown = 0xFF,
+};
+
+typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringConfigStatus) {
+    CHIPWindowCoveringConfigStatusOperational = 0x1,
+    CHIPWindowCoveringConfigStatusOnlineReserved = 0x2,
+    CHIPWindowCoveringConfigStatusLiftMovementReversed = 0x4,
+    CHIPWindowCoveringConfigStatusLiftPositionAware = 0x8,
+    CHIPWindowCoveringConfigStatusTiltPositionAware = 0x10,
+    CHIPWindowCoveringConfigStatusLiftEncoderControlled = 0x20,
+    CHIPWindowCoveringConfigStatusTiltEncoderControlled = 0x40,
+};
+
+typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringMode) {
+    CHIPWindowCoveringModeMotorDirectionReversed = 0x1,
+    CHIPWindowCoveringModeCalibrationMode = 0x2,
+    CHIPWindowCoveringModeMaintenanceMode = 0x4,
+    CHIPWindowCoveringModeLedFeedback = 0x8,
 };
 
 typedef NS_OPTIONS(uint32_t, CHIPWindowCoveringWcFeature) {
@@ -15729,13 +16138,6 @@ typedef NS_OPTIONS(uint32_t, CHIPWindowCoveringWcFeature) {
     CHIPWindowCoveringWcFeaturePositionAwareLift = 0x4,
     CHIPWindowCoveringWcFeatureAbsolutePosition = 0x8,
     CHIPWindowCoveringWcFeaturePositionAwareTilt = 0x10,
-};
-
-typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringWcMode) {
-    CHIPWindowCoveringWcModeMotorDirectionReversed = 0x1,
-    CHIPWindowCoveringWcModeCalibrationMode = 0x2,
-    CHIPWindowCoveringWcModeMaintenanceMode = 0x4,
-    CHIPWindowCoveringWcModeLEDFeedback = 0x8,
 };
 
 typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringWcOperationalStatus) {
@@ -15843,6 +16245,48 @@ typedef NS_OPTIONS(uint32_t, CHIPThermostatFeature) {
     CHIPThermostatFeatureAutomode = 0x20,
 };
 
+typedef NS_ENUM(uint8_t, CHIPFanControlFanModeSequenceType) {
+    CHIPFanControlFanModeSequenceTypeOffLowMedHigh = 0x00,
+    CHIPFanControlFanModeSequenceTypeOffLowHigh = 0x01,
+    CHIPFanControlFanModeSequenceTypeOffLowMedHighAuto = 0x02,
+    CHIPFanControlFanModeSequenceTypeOffLowHighAuto = 0x03,
+    CHIPFanControlFanModeSequenceTypeOffOnAuto = 0x04,
+    CHIPFanControlFanModeSequenceTypeOffOn = 0x05,
+};
+
+typedef NS_ENUM(uint8_t, CHIPFanControlFanModeType) {
+    CHIPFanControlFanModeTypeOff = 0x00,
+    CHIPFanControlFanModeTypeLow = 0x01,
+    CHIPFanControlFanModeTypeMedium = 0x02,
+    CHIPFanControlFanModeTypeHigh = 0x03,
+    CHIPFanControlFanModeTypeOn = 0x04,
+    CHIPFanControlFanModeTypeAuto = 0x05,
+    CHIPFanControlFanModeTypeSmart = 0x06,
+};
+
+typedef NS_OPTIONS(uint32_t, CHIPFanControlFeature) {
+    CHIPFanControlFeatureMultiSpeed = 0x1,
+    CHIPFanControlFeatureAuto = 0x2,
+    CHIPFanControlFeatureRocking = 0x4,
+    CHIPFanControlFeatureWind = 0x8,
+};
+
+typedef NS_OPTIONS(uint8_t, CHIPFanControlRockSupportMask) {
+    CHIPFanControlRockSupportMaskRockLeftRight = 0x1,
+    CHIPFanControlRockSupportMaskRockUpDown = 0x2,
+    CHIPFanControlRockSupportMaskRockRound = 0x4,
+};
+
+typedef NS_OPTIONS(uint8_t, CHIPFanControlWindSettingMask) {
+    CHIPFanControlWindSettingMaskSleepWind = 0x1,
+    CHIPFanControlWindSettingMaskNaturalWind = 0x2,
+};
+
+typedef NS_OPTIONS(uint8_t, CHIPFanControlWindSupportMask) {
+    CHIPFanControlWindSupportMaskSleepWind = 0x1,
+    CHIPFanControlWindSupportMaskNaturalWind = 0x2,
+};
+
 typedef NS_ENUM(uint8_t, CHIPColorControlColorLoopAction) {
     CHIPColorControlColorLoopActionDeactivate = 0x00,
     CHIPColorControlColorLoopActionActivateFromColorLoopStartEnhancedHue = 0x01,
@@ -15895,6 +16339,14 @@ typedef NS_OPTIONS(uint16_t, CHIPColorControlColorCapabilities) {
     CHIPColorControlColorCapabilitiesColorLoopSupported = 0x4,
     CHIPColorControlColorCapabilitiesXYAttributesSupported = 0x8,
     CHIPColorControlColorCapabilitiesColorTemperatureSupported = 0x10,
+};
+
+typedef NS_OPTIONS(uint32_t, CHIPColorControlFeature) {
+    CHIPColorControlFeatureHueAndSaturation = 0x1,
+    CHIPColorControlFeatureEnhancedHue = 0x2,
+    CHIPColorControlFeatureColorLoop = 0x4,
+    CHIPColorControlFeatureXY = 0x8,
+    CHIPColorControlFeatureColorTemperature = 0x10,
 };
 
 typedef NS_OPTIONS(uint8_t, CHIPColorControlColorLoopUpdateFlags) {
@@ -16254,8 +16706,8 @@ typedef NS_ENUM(uint8_t, CHIPAudioOutputOutputType) {
     CHIPAudioOutputOutputTypeOther = 0x05,
 };
 
-typedef NS_OPTIONS(uint32_t, CHIPAudioOutputAudiouOutputFeature) {
-    CHIPAudioOutputAudiouOutputFeatureNameUpdates = 0x1,
+typedef NS_OPTIONS(uint32_t, CHIPAudioOutputFeature) {
+    CHIPAudioOutputFeatureNameUpdates = 0x1,
 };
 
 typedef NS_ENUM(uint8_t, CHIPApplicationLauncherStatus) {

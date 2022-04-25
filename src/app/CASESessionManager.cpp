@@ -21,8 +21,10 @@
 
 namespace chip {
 
-CHIP_ERROR CASESessionManager::Init(chip::System::Layer * systemLayer)
+CHIP_ERROR CASESessionManager::Init(chip::System::Layer * systemLayer, const CASESessionManagerConfig & params)
 {
+    ReturnErrorOnFailure(params.sessionInitParams.Validate());
+    mConfig = params;
     return AddressResolve::Resolver::Instance().Init(systemLayer);
 }
 
@@ -31,41 +33,21 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::C
 {
     Dnssd::ResolvedNodeData resolutionData;
 
-    bool nodeIDWasResolved =
-#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-        (mConfig.dnsCache != nullptr && mConfig.dnsCache->Lookup(peerId, resolutionData) == CHIP_NO_ERROR);
-#else
-        false;
-#endif
-
-    ChipLogDetail(CASESessionManager,
-                  "FindOrEstablishSession: PeerId = " ChipLogFormatX64 ":" ChipLogFormatX64 ", NodeIdWasResolved = %d",
-                  ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()), nodeIDWasResolved);
+    ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = " ChipLogFormatX64 ":" ChipLogFormatX64,
+                  ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));
 
     OperationalDeviceProxy * session = FindExistingSession(peerId);
     if (session == nullptr)
     {
-        ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing session found");
+        ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing OperationalDeviceProxy instance found");
 
-        // TODO - Implement LRU to evict least recently used session to handle mActiveSessions pool exhaustion
-        if (nodeIDWasResolved)
-        {
-            session = mConfig.devicePool->Allocate(mConfig.sessionInitParams, peerId, resolutionData);
-        }
-        else
-        {
-            session = mConfig.devicePool->Allocate(mConfig.sessionInitParams, peerId);
-        }
+        session = mConfig.devicePool->Allocate(mConfig.sessionInitParams, peerId);
 
         if (session == nullptr)
         {
             onFailure->mCall(onFailure->mContext, peerId, CHIP_ERROR_NO_MEMORY);
             return CHIP_ERROR_NO_MEMORY;
         }
-    }
-    else if (nodeIDWasResolved)
-    {
-        session->OnNodeIdResolved(resolutionData);
     }
 
     CHIP_ERROR err = session->Connect(onConnection, onFailure);
@@ -95,20 +77,6 @@ void CASESessionManager::ReleaseAllSessions()
 
 CHIP_ERROR CASESessionManager::GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr)
 {
-#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-    if (mConfig.dnsCache != nullptr)
-    {
-        Dnssd::ResolvedNodeData resolutionData;
-        // TODO(andy31415): DNS caching is generally not populated, need to move
-        // caching into a the address resolve layer and not have a global one anymore.
-        if (mConfig.dnsCache->Lookup(peerId, resolutionData) == CHIP_NO_ERROR)
-        {
-            addr = OperationalDeviceProxy::ToPeerAddress(resolutionData);
-            return CHIP_NO_ERROR;
-        }
-    }
-#endif
-
     OperationalDeviceProxy * session = FindExistingSession(peerId);
     VerifyOrReturnError(session != nullptr, CHIP_ERROR_NOT_CONNECTED);
     addr = session->GetPeerAddress();

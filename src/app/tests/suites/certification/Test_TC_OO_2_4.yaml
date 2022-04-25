@@ -16,112 +16,209 @@ name: 3.2.4. [TC-OO-2.4] Startup functionality with server as DUT
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "On/Off"
+    endpoint: 1
+    discriminator:
+        type: INT16U
+        defaultValue: 3840
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: ""
-      disabled: true
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "TH sends On command to DUT"
-      verification: "./chip-tool onoff on 1 1 StatusIB = { status = 0x00, },"
-      disabled: true
+      command: "On"
 
     - label: "TH writes a value of 0 to StartUpOnOff attribute of DUT"
-      verification:
-          "./chip-tool onoff write start-up-on-off 0 1 1 StatusIB = { status =
-          0x00, },"
-      disabled: true
+      command: "writeAttribute"
+      attribute: "StartUpOnOff"
+      arguments:
+          value: 0
+
+    - label: "TH reads the StartUpOnOff attribute from the DUT"
+      command: "readAttribute"
+      attribute: "StartUpOnOff"
+      response:
+          value: 0
 
     - label: "Power off DUT"
-      verification: ""
-      disabled: true
+      cluster: "SystemCommands"
+      endpoint: 0
+      command: "Reboot"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: discriminator
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Power on DUT"
-      verification: ""
       disabled: true
 
     - label: "TH reads the OnOff attribute from the DUT"
-      verification: "./chip-tool onoff read on-off 1 1 OnOff: FALSE"
-      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0
 
     - label: "TH writes a value of 1 to StartUpOnOff attribute of DUT"
-      verification:
-          "./chip-tool onoff write start-up-on-off 1 1 1 StatusIB = { status =
-          0x00, },"
-      disabled: true
+      command: "writeAttribute"
+      attribute: "StartUpOnOff"
+      arguments:
+          value: 1
 
     - label: "Power off DUT"
-      verification: ""
-      disabled: true
+      cluster: "SystemCommands"
+      endpoint: 0
+      command: "Reboot"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: discriminator
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Power on DUT"
-      verification: ""
       disabled: true
 
     - label: "TH reads the OnOff attribute from the DUT"
-      verification: "./chip-tool onoff read on-off 1 1 OnOff: TRUE"
-      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
 
     - label: "TH writes a value of 2 to StartUpOnOff attribute of DUT"
-      verification:
-          "./chip-tool onoff write start-up-on-off 2 1 1 StatusIB = { status =
-          0x00, },"
-      disabled: true
+      command: "writeAttribute"
+      attribute: "StartUpOnOff"
+      arguments:
+          value: 2
 
     - label: "Power off DUT"
-      verification: ""
-      disabled: true
+      cluster: "SystemCommands"
+      endpoint: 0
+      command: "Reboot"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: discriminator
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Power on DUT"
-      verification: ""
       disabled: true
 
     - label: "TH reads the OnOff attribute from the DUT"
-      verification: "./chip-tool onoff read on-off 1 1 OnOff: FALSE"
-      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0
 
     - label: "Power off DUT"
-      verification: ""
-      disabled: true
+      cluster: "SystemCommands"
+      endpoint: 0
+      command: "Reboot"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: discriminator
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Power on DUT"
-      verification: ""
       disabled: true
 
     - label: "TH reads the OnOff attribute from the DUT"
-      verification: "./chip-tool onoff read on-off 1 1 OnOff: TRUE"
-      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
 
     - label: "TH writes NULL to StartUpOnOff attribute of DUT"
-      verification: "(how to perform this in chip-tool?)"
-      disabled: true
+      command: "writeAttribute"
+      attribute: "StartUpOnOff"
+      arguments:
+          value: null
 
     - label: "Power off DUT"
-      verification: ""
-      disabled: true
+      cluster: "SystemCommands"
+      endpoint: 0
+      command: "Reboot"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: discriminator
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Power on DUT"
-      verification: ""
       disabled: true
 
     - label: "TH reads the OnOff attribute from the DUT"
-      verification: "./chip-tool onoff read on-off 1 1 OnOff: TRUE"
-      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
 
     - label: "TH sends Off command to DUT"
-      verification: "./chip-tool onoff off 1 1 StatusIB = { status = 0x00, },"
-      disabled: true
+      command: "Off"
 
     - label: "Power off DUT"
-      verification: ""
-      disabled: true
+      cluster: "SystemCommands"
+      endpoint: 0
+      command: "Reboot"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: discriminator
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Power on DUT"
-      verification: ""
       disabled: true
 
     - label: "TH reads the OnOff attribute from the DUT"
-      verification: "./chip-tool onoff read on-off 1 1 OnOff: FALSE"
-      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0

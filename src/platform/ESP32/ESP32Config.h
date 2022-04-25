@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
 #include <string.h>
 
 namespace chip {
@@ -78,6 +76,11 @@ public:
     static const Key kConfigKey_Spake2pIterationCount;
     static const Key kConfigKey_Spake2pSalt;
     static const Key kConfigKey_Spake2pVerifier;
+    static const Key kConfigKey_DACCert;
+    static const Key kConfigKey_DACPrivateKey;
+    static const Key kConfigKey_DACPublicKey;
+    static const Key kConfigKey_PAICert;
+    static const Key kConfigKey_CertDeclaration;
 
     // CHIP Counter keys
     static const Key kCounterKey_RebootCount;
@@ -106,6 +109,9 @@ public:
     static CHIP_ERROR ClearNamespace(const char * ns);
 
     static void RunConfigUnitTest(void);
+
+private:
+    static const char * GetPartitionLabelByNamespace(const char * ns);
 };
 
 struct ESP32Config::Key

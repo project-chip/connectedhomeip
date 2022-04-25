@@ -47,11 +47,22 @@ MEM_RAM0_SIZE          = 0x0015c00;
 MEM_RAM1_BASE          = 0x4020000;
 MEM_RAM1_SIZE          = 0x10000;
 
+/* internal flash size: 640K */
+m_int_flash_size       = 0xA0000;
+m_int_sector_size      = 512;
+
+/* first 8K: SSBL, next 8K: SSBL update region */
+m_app_start            = DEFINED(__app_load_address__) ? __app_load_address__ : 0x0;
+
+/* sizeof(BOOT_BLOCK_T) + sizeof(IMAGE_CERT_T) + SIGNATURE_LEN + alignment = 1024 bytes */
+m_app_meta_data        = 0x400;
+
+/* 640K (Total Flash size) - 16K (SSBL + SSBL update region) - 8.5K (PSECT) - m_app_meta_data */
+m_app_size     = DEFINED(__app_stated_size__) ? __app_stated_size__ : 0x9FC00;
+
 MEMORY
 {
-  /* Define each memory region. RAM0 definition leaves the first 1kB for the
-     boot code */
-  Flash640 (rx) : ORIGIN = 0, LENGTH = 0x00a0000            /* 640K bytes (alias Flash) */
+  Flash640 (rx) : ORIGIN = m_app_start, LENGTH = m_app_size
   RAM0 (rwx)    : ORIGIN = 0x4000400,  LENGTH = 0x0015c00   /* 87K bytes (alias RAM) */
   RAM1 (rwx)    : ORIGIN = 0x4020000,  LENGTH = 0x10000     /* 64K bytes (alias RAM2) */
 }
@@ -60,7 +71,7 @@ MEMORY
 __top_RAM1      = MEM_RAM1_BASE + MEM_RAM1_SIZE; /* 64K bytes */
 
 /* To be improved. At this moment the second RAM bank is dedicated entirely to heap + stack. */
-HEAP_SIZE = DEFINED(HEAP_SIZE) ? HEAP_SIZE : 0xF000;
+HEAP_SIZE = DEFINED(HEAP_SIZE) ? HEAP_SIZE : 0x10000;
 
 /* set external flash properties - external flash is present on the DK6 board */
 m_ext_flash_size          = 0x00100000;
@@ -75,7 +86,9 @@ NV_STORAGE_SECTOR_SIZE    = m_ext_flash_sector_size;
 NV_STORAGE_START_ADDRESS  = m_ext_flash_size - 1;
 NV_STORAGE_END_ADDRESS    = NV_STORAGE_START_ADDRESS - NV_STORAGE_SIZE + 1;
 
-m_app_size                = 0x00a0000; /* 640K */
+INT_STORAGE_START         = m_int_flash_size - 17 * m_int_sector_size - 1;
+INT_STORAGE_END           = INT_STORAGE_START;
+INT_STORAGE_SIZE          = INT_STORAGE_START - INT_STORAGE_END;
 
 __ram_vector_table__      = 1;
 vector_table_size         = 0x120;
@@ -328,5 +341,4 @@ SECTIONS
     PROVIDE(_pvHeapLimit = _pvHeapStart + (HEAP_SIZE));
 
     __StackLimit = _vStackTop - STACK_SIZE;
-   ASSERT (LENGTH(Flash640) >= (_etext + SIZEOF(.data)), "Application does not fit into flash!")
 }

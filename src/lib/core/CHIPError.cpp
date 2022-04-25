@@ -62,9 +62,6 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 #if !CHIP_CONFIG_SHORT_ERROR_STR
     switch (err.AsInteger())
     {
-    case CHIP_ERROR_TOO_MANY_CONNECTIONS.AsInteger():
-        desc = "Too many connections";
-        break;
     case CHIP_ERROR_SENDING_BLOCKED.AsInteger():
         desc = "Sending blocked";
         break;
@@ -407,32 +404,20 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_INVALID_FABRIC_ID.AsInteger():
         desc = "Invalid Fabric Id";
         break;
+    case CHIP_ERROR_TOO_MANY_CONNECTIONS.AsInteger():
+        desc = "Too many connections";
+        break;
+    case CHIP_ERROR_SHUT_DOWN.AsInteger():
+        desc = "The operation was cancelled because a shut down was initiated";
+        break;
+    case CHIP_ERROR_CANCELLED.AsInteger():
+        desc = "The operation has been cancelled";
+        break;
     case CHIP_ERROR_DRBG_ENTROPY_SOURCE_FAILED.AsInteger():
         desc = "DRBG entropy source failed to generate entropy data";
         break;
-    case CHIP_ERROR_NO_TAKE_AUTH_DELEGATE.AsInteger():
-        desc = "No TAKE auth delegate set";
-        break;
-    case CHIP_ERROR_TAKE_RECONFIGURE_REQUIRED.AsInteger():
-        desc = "TAKE requires a reconfigure";
-        break;
-    case CHIP_ERROR_TAKE_REAUTH_POSSIBLE.AsInteger():
-        desc = "TAKE can do a reauthentication";
-        break;
-    case CHIP_ERROR_INVALID_TAKE_PARAMETER.AsInteger():
-        desc = "TAKE received an invalid parameter";
-        break;
-    case CHIP_ERROR_UNSUPPORTED_TAKE_CONFIGURATION.AsInteger():
-        desc = "TAKE Unsupported configuration";
-        break;
-    case CHIP_ERROR_TAKE_TOKEN_IDENTIFICATION_FAILED.AsInteger():
-        desc = "TAKE token identification failed";
-        break;
-    case CHIP_ERROR_INVALID_TOKENPAIRINGBUNDLE.AsInteger():
-        desc = "Invalid Token Pairing Bundle";
-        break;
-    case CHIP_ERROR_UNSUPPORTED_TOKENPAIRINGBUNDLE_VERSION.AsInteger():
-        desc = "Unsupported Token Pairing Bundle version";
+    case CHIP_ERROR_FABRIC_EXISTS.AsInteger():
+        desc = "Trying to add a NOC for a fabric that already exists";
         break;
     case CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER.AsInteger():
         desc = "Key not found error code received from peer";
@@ -641,11 +626,20 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED.AsInteger():
         desc = "Duplicate message received";
         break;
+    case CHIP_ERROR_INVALID_PUBLIC_KEY.AsInteger():
+        desc = "Invalid public key";
+        break;
+    case CHIP_ERROR_FABRIC_MISMATCH_ON_ICA.AsInteger():
+        desc = "Fabric mismatch on ICA";
+        break;
     case CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW.AsInteger():
         desc = "Message id out of window";
         break;
     case CHIP_ERROR_REBOOT_SIGNAL_RECEIVED.AsInteger():
         desc = "Termination signal is received";
+        break;
+    case CHIP_ERROR_NO_SHARED_TRUSTED_ROOT.AsInteger():
+        desc = "No shared trusted root";
         break;
     case CHIP_ERROR_IM_STATUS_CODE_RECEIVED.AsInteger():
         desc = "Interaction Model Error";
@@ -689,14 +683,35 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB.AsInteger():
         desc = "Malformed Interaction Model Data Version Filter IB";
         break;
-    case CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE.AsInteger():
-        desc = "Malformed Interaction Model Status Response Message";
+    case CHIP_ERROR_NOT_FOUND.AsInteger():
+        desc = "The item referenced in the function call was not found";
         break;
     case CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE.AsInteger():
         desc = "Malformed Interaction Model Timed Request Message";
         break;
+    case CHIP_ERROR_INVALID_FILE_IDENTIFIER.AsInteger():
+        desc = "The file identifier, encoded in the first few bytes of a processed file, has unexpected value";
+        break;
     case CHIP_ERROR_BUSY.AsInteger():
         desc = "The Resource is busy and cannot process the request";
+        break;
+    case CHIP_ERROR_MAX_RETRY_EXCEEDED.AsInteger():
+        desc = "The maximum retry limit has been exceeded";
+        break;
+    case CHIP_ERROR_PROVIDER_LIST_EXHAUSTED.AsInteger():
+        desc = "The provider list has been exhausted";
+        break;
+    case CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS.AsInteger():
+        desc = "Another commissioning in progress";
+        break;
+    case CHIP_ERROR_INVALID_SCHEME_PREFIX.AsInteger():
+        desc = "The scheme field contains an invalid prefix";
+        break;
+    case CHIP_ERROR_MISSING_URI_SEPARATOR.AsInteger():
+        desc = "The URI separator is missing";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Status Response Message";
         break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR

@@ -25,6 +25,7 @@
 #import <CHIP/CHIPDevice.h>
 
 #import "CHIPErrorTestUtils.h"
+#import "CHIPTestStorage.h"
 
 #import <app/util/af-enums.h>
 
@@ -45,14 +46,18 @@ static const uint32_t kSetupPINCode = 20202021;
 static const uint16_t kRemotePort = 5540;
 static const uint16_t kLocalPort = 5541;
 static NSString * kAddress = @"::1";
+static uint16_t kTestVendorId = 0xFFF1u;
 
 // This test suite reuses a device object to speed up the test process for CI.
 // The following global variable holds the reference to the device object.
 static CHIPDevice * mConnectedDevice;
 
+// Singleton controller we use.
+static CHIPDeviceController * sController = nil;
+
 static void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_t queue)
 {
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    CHIPDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
     [controller getConnectedDevice:kDeviceId
@@ -135,17 +140,30 @@ static CHIPDevice * GetConnectedDevice(void)
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
 
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    __auto_type * factory = [MatterControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * storage = [[CHIPTestStorage alloc] init];
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
+    factoryParams.port = @(kLocalPort);
+
+    BOOL ok = [factory startup:factoryParams];
+    XCTAssertTrue(ok);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nil];
+    params.vendorId = kTestVendorId;
+    params.fabricId = 1;
+
+    // TODO: Once we have a non-nil keypair, use startControllerOnNewFabric.
+    CHIPDeviceController * controller = [factory startControllerOnExistingFabric:params];
     XCTAssertNotNil(controller);
+
+    sController = controller;
 
     CHIPDeviceTestPairingDelegate * pairing = [[CHIPDeviceTestPairingDelegate alloc] initWithExpectation:expectation];
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
 
-    [controller setListenPort:kLocalPort];
     [controller setPairingDelegate:pairing queue:callbackQueue];
-
-    BOOL started = [controller startup:nil vendorId:0 nocSigner:nil];
-    XCTAssertTrue(started);
 
     NSError * error;
     [controller pairDevice:kDeviceId
@@ -171,11 +189,13 @@ static CHIPDevice * GetConnectedDevice(void)
 
 - (void)shutdownStack
 {
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    CHIPDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
-    BOOL stopped = [controller shutdown];
-    XCTAssertTrue(stopped);
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    [[MatterControllerFactory sharedInstance] shutdown];
 }
 
 - (void)waitForCommissionee
@@ -683,21 +703,30 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ cleanSubscriptionExpectation ] timeout:kTimeoutInSeconds];
 
     __auto_type attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    CHIPDeviceController * controller = sController;
     XCTAssertNotNil(controller);
     XCTestExpectation * subscribeExpectation = [self expectationWithDescription:@"Subscription complete"];
 
     NSLog(@"Subscribing...");
-    [attributeCacheContainer subscribeWithDeviceController:controller
-                                                  deviceId:kDeviceId
-                                                    params:nil
-                                               clientQueue:queue
-                                                completion:^(NSError * _Nullable error) {
-                                                    NSLog(@"Subscription complete with error: %@", error);
-                                                    XCTAssertNil(error);
-                                                    [subscribeExpectation fulfill];
-                                                }];
-    [self waitForExpectations:[NSArray arrayWithObject:subscribeExpectation] timeout:kTimeoutInSeconds];
+    __block void (^reportHandler)(NSArray * _Nullable value, NSError * _Nullable error);
+    [device subscribeWithQueue:queue
+        minInterval:2
+        maxInterval:60
+        params:nil
+        cacheContainer:attributeCacheContainer
+        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Received report: %@, error: %@", value, error);
+            if (reportHandler) {
+                __auto_type handler = reportHandler;
+                reportHandler = nil;
+                handler(value, error);
+            }
+        }
+        subscriptionEstablished:^{
+            NSLog(@"Subscription established");
+            [subscribeExpectation fulfill];
+        }];
+    [self waitForExpectations:@[ subscribeExpectation ] timeout:60];
 
     // Invoke command to set the attribute to a known state
     XCTestExpectation * commandExpectation = [self expectationWithDescription:@"Command invoked"];
@@ -712,11 +741,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     }];
     [self waitForExpectations:[NSArray arrayWithObject:commandExpectation] timeout:kTimeoutInSeconds];
 
-    // Wait till reports arrive from accessory. It turned out accessory could generate very lengthy initial reports.
+    // Wait till reports arrive from accessory.
     NSLog(@"Waiting for reports from accessory...");
-    __auto_type idleExpectation = [self expectationWithDescription:@"Must not break out of idle"];
-    idleExpectation.inverted = YES;
-    [self waitForExpectations:[NSArray arrayWithObject:idleExpectation] timeout:60];
+    sleep(5);
 
     // Read cache
     NSLog(@"Reading from cache...");
@@ -749,6 +776,22 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         }];
     [self waitForExpectations:[NSArray arrayWithObject:newSubscriptionEstablished] timeout:kTimeoutInSeconds];
 
+    __auto_type reportExpectation = [self expectationWithDescription:@"Report handler called"];
+    reportHandler = ^(NSArray * _Nullable value, NSError * _Nullable error) {
+        NSLog(@"Report received: %@, error: %@", value, error);
+        for (CHIPAttributeReport * report in value) {
+            if ([report.path.endpoint isEqualToNumber:@1] && [report.path.cluster isEqualToNumber:@6] &&
+                [report.path.attribute isEqualToNumber:@0]) {
+                NSLog(@"Report value for OnOff: %@", report.value);
+                XCTAssertNotNil(report.value);
+                XCTAssertTrue([report.value isKindOfClass:[NSNumber class]]);
+                XCTAssertEqual([report.value boolValue], NO);
+                [reportExpectation fulfill];
+                break;
+            }
+        }
+    };
+
     NSLog(@"Invoking another command...");
     commandExpectation = [self expectationWithDescription:@"Command invoked"];
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
@@ -760,12 +803,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Wait till reports arrive from accessory.
     NSLog(@"Waiting for reports from accessory...");
-    idleExpectation = [self expectationWithDescription:@"Must not break out of idle"];
-    idleExpectation.inverted = YES;
-    [self waitForExpectations:[NSArray arrayWithObject:idleExpectation] timeout:3];
+    [self waitForExpectations:@[ reportExpectation ] timeout:kTimeoutInSeconds];
 
     NSLog(@"Disconnect accessory to test cache...");
-    idleExpectation = [self expectationWithDescription:@"Must not break out of idle"];
+    __auto_type idleExpectation = [self expectationWithDescription:@"Must not break out of idle"];
     idleExpectation.inverted = YES;
     [self waitForExpectations:[NSArray arrayWithObject:idleExpectation] timeout:10];
 

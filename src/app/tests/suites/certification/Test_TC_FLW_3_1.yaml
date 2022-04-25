@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 3.3.1. [TC-FLW-3.1] Attributes with client as DUT
 
@@ -21,21 +22,26 @@ config:
 
 tests:
     - label: "Commission DUT to TH"
-      verification: ""
+      verification: |
+
       disabled: true
 
     - label: "DUT reads attribute value from TH."
-      verification: "./chip-tool flowmeasurement read measured-value 1 1"
+      verification: |
+          ./chip-tool flowmeasurement read measured-value 1 1
       disabled: true
 
     - label: "DUT reads attribute value from TH."
-      verification: "./chip-tool flowmeasurement read min-measured-value 1 1"
+      verification: |
+          ./chip-tool flowmeasurement read min-measured-value 1 1
       disabled: true
 
     - label: "DUT reads attribute value from TH."
-      verification: "./chip-tool flowmeasurement read max-measured-value 1 1"
+      verification: |
+          ./chip-tool flowmeasurement read max-measured-value 1 1
       disabled: true
 
     - label: "DUT reads attribute value from TH."
-      verification: "chip-tool flowmeasurement read tolerance 1 1"
+      verification: |
+          chip-tool flowmeasurement read tolerance 1 1
       disabled: true

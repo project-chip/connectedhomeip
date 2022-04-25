@@ -139,8 +139,8 @@ CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallba
 
         timer->mTimerSource = timerSource;
         dispatch_source_set_timer(
-            timerSource, dispatch_walltime(NULL, static_cast<int64_t>(Clock::Milliseconds64(delay).count() * NSEC_PER_MSEC)), 0,
-            2 * NSEC_PER_MSEC);
+            timerSource, dispatch_walltime(nullptr, static_cast<int64_t>(Clock::Milliseconds64(delay).count() * NSEC_PER_MSEC)),
+            DISPATCH_TIME_FOREVER, 2 * NSEC_PER_MSEC);
         dispatch_source_set_event_handler(timerSource, ^{
             dispatch_source_cancel(timerSource);
             dispatch_release(timerSource);

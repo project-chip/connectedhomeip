@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -33,10 +33,13 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/TestGroupData.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 
 using namespace chip;
 
@@ -47,6 +50,15 @@ using Py_GenerateNOCChainFunc         = void (*)(void * pyContext, const char * 
                                          Controller::OnNOCChainGeneration onNocChainGenerationFunc);
 using Py_SetNodeIdForNextNOCRequest   = void (*)(void * pyContext, NodeId nodeId);
 using Py_SetFabricIdForNextNOCRequest = void (*)(void * pyContext, FabricId fabricId);
+
+namespace {
+const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStore(const char * paaTrustStorePath)
+{
+    static chip::Credentials::FileAttestationTrustStore attestationTrustStore{ paaTrustStorePath };
+
+    return &attestationTrustStore;
+}
+} // namespace
 
 namespace chip {
 namespace Controller {
@@ -59,18 +71,19 @@ public:
 
     CHIP_ERROR Initialize(PersistentStorageDelegate & storageDelegate) { return mExampleOpCredsIssuer.Initialize(storageDelegate); }
 
-    CHIP_ERROR GenerateNOCChain(NodeId nodeId, FabricId fabricId, const Crypto::P256PublicKey & pubKey, MutableByteSpan & rcac,
-                                MutableByteSpan & icac, MutableByteSpan & noc)
+    CHIP_ERROR GenerateNOCChain(NodeId nodeId, FabricId fabricId, const CATValues & cats, const Crypto::P256PublicKey & pubKey,
+                                MutableByteSpan & rcac, MutableByteSpan & icac, MutableByteSpan & noc)
     {
-        return mExampleOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, fabricId, pubKey, rcac, icac, noc);
+        return mExampleOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, fabricId, cats, pubKey, rcac, icac, noc);
     }
 
 private:
-    CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & attestationSignature, const ByteSpan & DAC,
-                                const ByteSpan & PAI, const ByteSpan & PAA,
+    CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
+                                const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
                                 Callback::Callback<OnNOCChainGeneration> * onCompletion) override
     {
-        return mExampleOpCredsIssuer.GenerateNOCChain(csrElements, attestationSignature, DAC, PAI, PAA, onCompletion);
+        return mExampleOpCredsIssuer.GenerateNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, DAC, PAI,
+                                                      onCompletion);
     }
 
     void SetNodeIdForNextNOCRequest(NodeId nodeId) override { mExampleOpCredsIssuer.SetNodeIdForNextNOCRequest(nodeId); }
@@ -85,19 +98,188 @@ private:
 } // namespace chip
 
 extern chip::Controller::Python::StorageAdapter * pychip_Storage_GetStorageAdapter();
-extern chip::Controller::Python::StorageAdapter * sStorageAdapter;
+extern chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 extern chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
-bool sTestCommissionerUsed = false;
+
 class TestCommissioner : public chip::Controller::AutoCommissioner
 {
 public:
-    TestCommissioner() : AutoCommissioner() {}
+    TestCommissioner() { Reset(); }
     ~TestCommissioner() {}
+    CHIP_ERROR SetCommissioningParameters(const chip::Controller::CommissioningParameters & params) override
+    {
+        mIsWifi   = false;
+        mIsThread = false;
+        if (params.GetWiFiCredentials().HasValue())
+        {
+            mIsWifi = true;
+        }
+        else if (params.GetThreadOperationalDataset().HasValue())
+        {
+            mIsThread = true;
+        }
+        return chip::Controller::AutoCommissioner::SetCommissioningParameters(params);
+    }
     CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err,
                                          chip::Controller::CommissioningDelegate::CommissioningReport report) override
     {
-        sTestCommissionerUsed = true;
+        mTestCommissionerUsed = true;
+        if (mFailOnReportAfterStage == report.stageCompleted)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+        if (mSimulateFailureOnStage == report.stageCompleted)
+        {
+            // Pretend we received an error from the device during this stage
+            err = CHIP_ERROR_INTERNAL;
+        }
         return chip::Controller::AutoCommissioner::CommissioningStepFinished(err, report);
+    }
+    // This will cause the COMMISSIONER to fail after the given stage. Setting this to kSecurePairing will cause the
+    // StartCommissioning call to fail.
+    bool SimulateFailAfter(chip::Controller::CommissioningStage stage)
+    {
+        ChipLogProgress(Controller, "setting simulate fail after stage %s", chip::Controller::StageToString(stage));
+        if (!ValidStage(stage) && stage != chip::Controller::CommissioningStage::kError)
+        {
+            return false;
+        }
+        mSimulateFailureOnStage = stage;
+        return true;
+    }
+    bool SimulateFailOnReport(chip::Controller::CommissioningStage stage)
+    {
+        if (!ValidStage(stage) && stage != chip::Controller::CommissioningStage::kError)
+        {
+            return false;
+        }
+        mFailOnReportAfterStage = stage;
+        return true;
+    }
+    bool CheckCallbacks()
+    {
+        bool successFailureOk;
+        bool updatesOk;
+        if (mFailOnReportAfterStage != chip::Controller::CommissioningStage::kError)
+        {
+            successFailureOk = mReceivedCommissioningFailureStage == mFailOnReportAfterStage && !mReceivedCommissioningSuccess;
+            updatesOk        = StatusUpdatesOk(mFailOnReportAfterStage);
+        }
+        else if (mSimulateFailureOnStage != chip::Controller::CommissioningStage::kError)
+        {
+            successFailureOk = mReceivedCommissioningFailureStage == mSimulateFailureOnStage && !mReceivedCommissioningSuccess;
+            updatesOk        = StatusUpdatesOk(mSimulateFailureOnStage);
+        }
+        else
+        {
+            successFailureOk = mReceivedCommissioningSuccess;
+            updatesOk        = StatusUpdatesOk(chip::Controller::CommissioningStage::kError);
+        }
+        ChipLogProgress(Controller, "Checking callbacks: success failure ok? %d updates ok? %d", successFailureOk, updatesOk);
+        return successFailureOk && updatesOk;
+    }
+    bool CheckPaseConnection(NodeId nodeId)
+    {
+        bool paseShouldBeOpen = false;
+        if (chip::to_underlying(mFailOnReportAfterStage) >=
+                chip::to_underlying(chip::Controller::CommissioningStage::kWiFiNetworkSetup) ||
+            chip::to_underlying(mSimulateFailureOnStage) >=
+                chip::to_underlying(chip::Controller::CommissioningStage::kWiFiNetworkSetup))
+        {
+            // Pase should be open still
+            paseShouldBeOpen = true;
+        }
+        CommissioneeDeviceProxy * proxy;
+        bool paseIsOpen =
+            (chip::Controller::AutoCommissioner::GetCommissioner()->GetDeviceBeingCommissioned(nodeId, &proxy) == CHIP_NO_ERROR);
+        ChipLogProgress(Controller, "Checking pase connection state: Should be open? %d is open? %d", paseShouldBeOpen, paseIsOpen);
+
+        return paseShouldBeOpen == paseIsOpen;
+    }
+    void Reset()
+    {
+        mTestCommissionerUsed              = false;
+        mReceivedCommissioningSuccess      = false;
+        mReceivedCommissioningFailureStage = chip::Controller::CommissioningStage::kError;
+        for (size_t i = 0; i < kNumCommissioningStages; ++i)
+        {
+            mReceivedStageSuccess[i] = false;
+            mReceivedStageFailure[i] = false;
+        }
+        mSimulateFailureOnStage = chip::Controller::CommissioningStage::kError;
+        mFailOnReportAfterStage = chip::Controller::CommissioningStage::kError;
+    }
+    bool GetTestCommissionerUsed() { return mTestCommissionerUsed; }
+    void OnCommissioningSuccess(chip::PeerId peerId) { mReceivedCommissioningSuccess = true; }
+    void OnCommissioningFailure(chip::PeerId peerId, CHIP_ERROR error, chip::Controller::CommissioningStage stageFailed,
+                                chip::Optional<chip::Credentials::AttestationVerificationResult> additionalErrorInfo)
+    {
+        mReceivedCommissioningFailureStage = stageFailed;
+    }
+    void OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::CommissioningStage stageCompleted, CHIP_ERROR error)
+    {
+        if (error == CHIP_NO_ERROR)
+        {
+            mReceivedStageSuccess[chip::to_underlying(stageCompleted)] = true;
+        }
+        else
+        {
+            mReceivedStageFailure[chip::to_underlying(stageCompleted)] = true;
+        }
+    }
+
+private:
+    static constexpr uint8_t kNumCommissioningStages = chip::to_underlying(chip::Controller::CommissioningStage::kCleanup) + 1;
+    chip::Controller::CommissioningStage mSimulateFailureOnStage            = chip::Controller::CommissioningStage::kError;
+    chip::Controller::CommissioningStage mFailOnReportAfterStage            = chip::Controller::CommissioningStage::kError;
+    bool mTestCommissionerUsed                                              = false;
+    bool mReceivedCommissioningSuccess                                      = false;
+    chip::Controller::CommissioningStage mReceivedCommissioningFailureStage = chip::Controller::CommissioningStage::kError;
+    bool mReceivedStageSuccess[kNumCommissioningStages];
+    bool mReceivedStageFailure[kNumCommissioningStages];
+    bool mIsWifi   = false;
+    bool mIsThread = false;
+    bool ValidStage(chip::Controller::CommissioningStage stage)
+    {
+        if (!mIsWifi &&
+            (stage == chip::Controller::CommissioningStage::kWiFiNetworkEnable ||
+             stage == chip::Controller::CommissioningStage::kWiFiNetworkSetup))
+        {
+            return false;
+        }
+        if (!mIsThread &&
+            (stage == chip::Controller::CommissioningStage::kThreadNetworkEnable ||
+             stage == chip::Controller::CommissioningStage::kThreadNetworkSetup))
+        {
+            return false;
+        }
+        if (stage == chip::Controller::CommissioningStage::kError || stage == chip::Controller::CommissioningStage::kSecurePairing)
+        {
+            return false;
+        }
+        return true;
+    }
+    bool StatusUpdatesOk(chip::Controller::CommissioningStage failedStage)
+    {
+        // Because we're just simulating a failure here, we will have received a success callback even for the failed stage.
+        for (uint8_t i = 0; i < kNumCommissioningStages; ++i)
+        {
+            if (mReceivedStageFailure[i])
+            {
+                return false;
+            }
+            if (!ValidStage(static_cast<chip::Controller::CommissioningStage>(i)))
+            {
+                continue;
+            }
+            // Anything above our current stage we won't have received a callback for. We also expect that the "failed" stage will
+            // have a success callback because we're just faking the failure here and overwriting error.
+            if (i == chip::to_underlying(failedStage))
+            {
+                break;
+            }
+        }
+        return true;
     }
 };
 TestCommissioner sTestCommissioner;
@@ -127,9 +309,24 @@ void * pychip_OpCreds_InitializeDelegate(void * pyContext, uint32_t fabricCreden
     return context.release();
 }
 
+void pychip_OnCommissioningSuccess(PeerId peerId)
+{
+    sTestCommissioner.OnCommissioningSuccess(peerId);
+}
+void pychip_OnCommissioningFailure(chip::PeerId peerId, CHIP_ERROR error, chip::Controller::CommissioningStage stageFailed,
+                                   chip::Optional<chip::Credentials::AttestationVerificationResult> additionalErrorInfo)
+{
+    sTestCommissioner.OnCommissioningFailure(peerId, error, stageFailed, additionalErrorInfo);
+}
+void pychip_OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::CommissioningStage stageCompleted, CHIP_ERROR err)
+{
+    return sTestCommissioner.OnCommissioningStatusUpdate(peerId, stageCompleted, err);
+}
+
 ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * context,
                                                          chip::Controller::DeviceCommissioner ** outDevCtrl, uint8_t fabricIndex,
-                                                         FabricId fabricId, chip::NodeId nodeId, bool useTestCommissioner)
+                                                         FabricId fabricId, chip::NodeId nodeId, const char * paaTrustStorePath,
+                                                         bool useTestCommissioner)
 {
     ChipLogDetail(Controller, "Creating New Device Controller");
 
@@ -139,8 +336,8 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     VerifyOrReturnError(devCtrl != nullptr, CHIP_ERROR_NO_MEMORY.AsInteger());
 
     // Initialize device attestation verifier
-    // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
-    const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+    const chip::Credentials::AttestationTrustStore * testingRootStore = GetTestFileAttestationTrustStore(
+        paaTrustStorePath == nullptr ? "./credentials/development/paa-root-certs" : paaTrustStorePath);
     SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
 
     chip::Crypto::P256Keypair ephemeralKey;
@@ -159,11 +356,11 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     ReturnErrorCodeIf(!rcac.Alloc(Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY.AsInteger());
     MutableByteSpan rcacSpan(rcac.Get(), Controller::kMaxCHIPDERCertLength);
 
-    err = context->mAdapter->GenerateNOCChain(nodeId, fabricId, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
+    err = context->mAdapter->GenerateNOCChain(nodeId, fabricId, chip::kUndefinedCATs, ephemeralKey.Pubkey(), rcacSpan, icacSpan,
+                                              nocSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     Controller::SetupParams initParams;
-    initParams.storageDelegate                = sStorageAdapter;
     initParams.pairingDelegate                = &sPairingDelegate;
     initParams.operationalCredentialsDelegate = context->mAdapter.get();
     initParams.operationalKeypair             = &ephemeralKey;
@@ -175,9 +372,31 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     if (useTestCommissioner)
     {
         initParams.defaultCommissioner = &sTestCommissioner;
+        sPairingDelegate.SetCommissioningSuccessCallback(pychip_OnCommissioningSuccess);
+        sPairingDelegate.SetCommissioningFailureCallback(pychip_OnCommissioningFailure);
+        sPairingDelegate.SetCommissioningStatusUpdateCallback(pychip_OnCommissioningStatusUpdate);
     }
 
     err = Controller::DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, *devCtrl);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
+
+    // Setup IPK in Group Data Provider for controller after Commissioner init which sets-up the fabric table entry
+    FabricInfo * fabricInfo = devCtrl->GetFabricInfo();
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INTERNAL.AsInteger());
+
+    uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
+    chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
+
+    err = fabricInfo->GetCompressedId(compressedFabricIdSpan);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
+
+    ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
+                    static_cast<unsigned>(fabricInfo->GetFabricIndex()));
+    ChipLogByteSpan(Support, compressedFabricIdSpan);
+
+    chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+    err = chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricInfo->GetFabricIndex(), defaultIpk,
+                                                  compressedFabricIdSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     *outDevCtrl = devCtrl.release();
@@ -192,7 +411,7 @@ void pychip_OpCreds_FreeDelegate(OpCredsContext * context)
 
 ChipError::StorageType pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl)
 {
-    if (devCtrl != NULL)
+    if (devCtrl != nullptr)
     {
         devCtrl->Shutdown();
         delete devCtrl;
@@ -203,7 +422,32 @@ ChipError::StorageType pychip_DeviceController_DeleteDeviceController(chip::Cont
 
 bool pychip_TestCommissionerUsed()
 {
-    return sTestCommissionerUsed;
+    return sTestCommissioner.GetTestCommissionerUsed();
+}
+
+bool pychip_TestCommissioningCallbacks()
+{
+    return sTestCommissioner.CheckCallbacks();
+}
+
+bool pychip_TestPaseConnection(NodeId nodeId)
+{
+    return sTestCommissioner.CheckPaseConnection(nodeId);
+}
+
+void pychip_ResetCommissioningTests()
+{
+    sTestCommissioner.Reset();
+}
+
+// Returns True if this is a valid test, false otherwise
+bool pychip_SetTestCommissionerSimulateFailureOnStage(uint8_t failStage)
+{
+    return sTestCommissioner.SimulateFailAfter(static_cast<chip::Controller::CommissioningStage>(failStage));
+}
+bool pychip_SetTestCommissionerSimulateFailureOnReport(uint8_t failStage)
+{
+    return sTestCommissioner.SimulateFailOnReport(static_cast<chip::Controller::CommissioningStage>(failStage));
 }
 
 } // extern "C"

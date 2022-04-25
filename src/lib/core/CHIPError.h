@@ -1472,15 +1472,15 @@ using CHIP_ERROR = ::chip::ChipError;
  * @brief
  *   The operation cancelled because a shut down was initiated
  */
-#define CHIP_ERROR_SHUT_DOWN                     CHIP_CORE_ERROR(0x73)
+#define CHIP_ERROR_SHUT_DOWN                                   CHIP_CORE_ERROR(0x73)
 
 /**
- * @def CHIP_ERROR_SHUT_DOWN
+ * @def CHIP_ERROR_CANCELLED
  *
  * @brief
  *   The operation has been cancelled, generally by calling a cancel/abort request.
  */
-#define CHIP_ERROR_CANCELLED                     CHIP_CORE_ERROR(0x74)
+#define CHIP_ERROR_CANCELLED                                   CHIP_CORE_ERROR(0x74)
 
 /**
  *  @def CHIP_ERROR_DRBG_ENTROPY_SOURCE_FAILED
@@ -1500,77 +1500,28 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_TLV_TAG_NOT_FOUND                           CHIP_CORE_ERROR(0x76)
 
-/**
- *  @def CHIP_ERROR_INVALID_TOKENPAIRINGBUNDLE
- *
- *  @brief
- *    A token pairing bundle is invalid.
- *
- */
-#define CHIP_ERROR_INVALID_TOKENPAIRINGBUNDLE                  CHIP_CORE_ERROR(0x77)
+// unused CHIP_CORE_ERROR(0x77)
+
+// unused CHIP_CORE_ERROR(0x78)
+
+// unused CHIP_CORE_ERROR(0x79)
+
+// unused CHIP_CORE_ERROR(0x7a)
+
+// unused CHIP_CORE_ERROR(0x7b)
+
+// unused CHIP_CORE_ERROR(0x7c)
+
+// unused CHIP_CORE_ERROR(0x7d)
 
 /**
- *  @def CHIP_ERROR_UNSUPPORTED_TOKENPAIRINGBUNDLE_VERSION
+ *  @def CHIP_ERROR_FABRIC_EXISTS
  *
  *  @brief
- *    A token pairing bundle is invalid.
+ *    The fabric with the given fabric id and root public key already exists.
  *
  */
-#define CHIP_ERROR_UNSUPPORTED_TOKENPAIRINGBUNDLE_VERSION      CHIP_CORE_ERROR(0x78)
-
-/**
- *  @def CHIP_ERROR_NO_TAKE_AUTH_DELEGATE
- *
- *  @brief
- *    No TAKE authentication delegate is set.
- *
- */
-#define CHIP_ERROR_NO_TAKE_AUTH_DELEGATE                       CHIP_CORE_ERROR(0x79)
-
-/**
- *  @def CHIP_ERROR_TAKE_RECONFIGURE_REQUIRED
- *
- *  @brief
- *    TAKE requires a reconfigure.
- *
- */
-#define CHIP_ERROR_TAKE_RECONFIGURE_REQUIRED                   CHIP_CORE_ERROR(0x7a)
-
-/**
- *  @def CHIP_ERROR_TAKE_REAUTH_POSSIBLE
- *
- *  @brief
- *    TAKE can do a reauthentication.
- *
- */
-#define CHIP_ERROR_TAKE_REAUTH_POSSIBLE                        CHIP_CORE_ERROR(0x7b)
-
-/**
- *  @def CHIP_ERROR_INVALID_TAKE_PARAMETER
- *
- *  @brief
- *    Received an invalid TAKE parameter.
- *
- */
-#define CHIP_ERROR_INVALID_TAKE_PARAMETER                      CHIP_CORE_ERROR(0x7c)
-
-/**
- *  @def CHIP_ERROR_UNSUPPORTED_TAKE_CONFIGURATION
- *
- *  @brief
- *    This configuration is not supported by TAKE.
- *
- */
-#define CHIP_ERROR_UNSUPPORTED_TAKE_CONFIGURATION              CHIP_CORE_ERROR(0x7d)
-
-/**
- *  @def CHIP_ERROR_TAKE_TOKEN_IDENTIFICATION_FAILED
- *
- *  @brief
- *    The TAKE Token Identification failed.
- *
- */
-#define CHIP_ERROR_TAKE_TOKEN_IDENTIFICATION_FAILED            CHIP_CORE_ERROR(0x7e)
+#define CHIP_ERROR_FABRIC_EXISTS                               CHIP_CORE_ERROR(0x7e)
 
 /**
  *  @def CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER
@@ -2255,7 +2206,7 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_IB         CHIP_CORE_ERROR(0xcc)
 
 /**
- * @def CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_MESSAGE
+ * @def CHIP_ERROR_IM_MALFORMED_INVOKE_REQUEST_MESSAGE
  *
  * @brief
  *   The InvokeResponseMessage is malformed: it either does not contain
@@ -2335,15 +2286,6 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_IM_MALFORMED_EVENT_REPORT_IB             CHIP_CORE_ERROR(0xd5)
 
-/*
- * @def CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS
- *
- * @brief
- *   Indicates that the commissioning window on the device is already open, and another
- *   commissioning is in progress
- */
-#define CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS           CHIP_CORE_ERROR(0xd6)
-
 /**
  * @def CHIP_ERROR_IM_MALFORMED_CLUSTER_PATH_IB
  *
@@ -2351,7 +2293,7 @@ using CHIP_ERROR = ::chip::ChipError;
  *   The ClusterPathIB is malformed: it either does not contain
  *   the required elements
  */
-#define CHIP_ERROR_IM_MALFORMED_CLUSTER_PATH_IB             CHIP_CORE_ERROR(0xd6)
+#define CHIP_ERROR_IM_MALFORMED_CLUSTER_PATH_IB                CHIP_CORE_ERROR(0xd6)
 
 /**
  * @def CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB
@@ -2369,31 +2311,6 @@ using CHIP_ERROR = ::chip::ChipError;
  *   The item referenced in the function call was not found
  */
 #define CHIP_ERROR_NOT_FOUND                                       CHIP_CORE_ERROR(0xd8)
-
-/**
- * @def CHIP_ERROR_INVALID_SCHEME_PREFIX
- *
- * @brief
- *   The scheme field contains an invalid prefix
- */
-#define CHIP_ERROR_INVALID_SCHEME_PREFIX             CHIP_CORE_ERROR(0xd6)
-
-/**
- * @def CHIP_ERROR_MISSING_URI_SEPARATOR
- *
- * @brief
- *   The URI separator is missing
- */
-#define CHIP_ERROR_MISSING_URI_SEPARATOR             CHIP_CORE_ERROR(0xd7)
-
-/**
- * @def CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE
- *
- * @brief
- *   The Attribute DataElement is malformed: it either does not contain
- *   the required elements
- */
-#define CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE                    CHIP_CORE_ERROR(0xd8)
 
 /**
  * @def CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE
@@ -2419,7 +2336,57 @@ using CHIP_ERROR = ::chip::ChipError;
  * @brief
  *   The Resource is busy and cannot process the request. Trying again might work.
  */
-#define CHIP_ERROR_BUSY                     CHIP_CORE_ERROR(0xdb)
+#define CHIP_ERROR_BUSY                                        CHIP_CORE_ERROR(0xdb)
+
+/**
+  * @def CHIP_ERROR_MAX_RETRY_EXCEEDED
+  *
+  * @brief
+  *   The maximum retry limit has been exceeded.
+  */
+ #define CHIP_ERROR_MAX_RETRY_EXCEEDED                         CHIP_CORE_ERROR(0xdc)
+
+ /**
+  * @def CHIP_ERROR_PROVIDER_LIST_EXHAUSTED
+  *
+  * @brief
+  *   The provider list has been exhausted.
+  */
+ #define CHIP_ERROR_PROVIDER_LIST_EXHAUSTED                    CHIP_CORE_ERROR(0xdd)
+
+/*
+ * @def CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS
+ *
+ * @brief
+ *   Indicates that the commissioning window on the device is already open, and another
+ *   commissioning is in progress
+ */
+#define CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS           CHIP_CORE_ERROR(0xde)
+
+/**
+ * @def CHIP_ERROR_INVALID_SCHEME_PREFIX
+ *
+ * @brief
+ *   The scheme field contains an invalid prefix
+ */
+#define CHIP_ERROR_INVALID_SCHEME_PREFIX                      CHIP_CORE_ERROR(0xdf)
+
+/**
+ * @def CHIP_ERROR_MISSING_URI_SEPARATOR
+ *
+ * @brief
+ *   The URI separator is missing
+ */
+#define CHIP_ERROR_MISSING_URI_SEPARATOR                      CHIP_CORE_ERROR(0xe0)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE
+ *
+ * @brief
+ *   The Attribute DataElement is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE      CHIP_CORE_ERROR(0xe1)
 
 /**
  *  @}
@@ -2428,8 +2395,8 @@ using CHIP_ERROR = ::chip::ChipError;
 // clang-format on
 
 // !!!!! IMPORTANT !!!!!  If you add new CHIP errors, please update the translation
-// of error codes to strings in CHIPError.cpp, and add them to unittest
-// in test-apps/TestErrorStr.cpp
+// of error codes to strings in CHIPError.cpp, and add them to kTestElements[]
+// in core/tests/TestCHIPErrorStr.cpp
 
 namespace chip {
 

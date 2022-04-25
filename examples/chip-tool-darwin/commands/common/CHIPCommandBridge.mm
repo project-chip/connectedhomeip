@@ -21,6 +21,7 @@
 #import "CHIPToolKeypair.h"
 #import <CHIP/CHIPDeviceController.h>
 #include <core/CHIPBuildConfig.h>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
 
 const uint16_t kListenPort = 5541;
@@ -29,21 +30,43 @@ static CHIPToolPersistentStorageDelegate * storage = nil;
 CHIP_ERROR CHIPCommandBridge::Run()
 {
     ChipLogProgress(chipTool, "Running Command");
+    NSData * ipk;
     CHIPToolKeypair * nocSigner = [[CHIPToolKeypair alloc] init];
     storage = [[CHIPToolPersistentStorageDelegate alloc] init];
 
-    mController = [CHIPDeviceController sharedController];
-    if (mController == nil) {
-        ChipLogError(chipTool, "Controller is nil");
+    auto factory = [MatterControllerFactory sharedInstance];
+    if (factory == nil) {
+        ChipLogError(chipTool, "Controller factory is nil");
         return CHIP_ERROR_INTERNAL;
     }
 
-    [mController setListenPort:kListenPort];
-    [mController setKeyValueStoreManagerPath:"/tmp/chip_kvs_darwin"];
+    auto params = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
+    params.port = @(kListenPort);
+    params.startServer = YES;
+    params.kvsPath = @("/tmp/chip_kvs_darwin");
 
-    [nocSigner createOrLoadKeys:storage];
+    if ([factory startup:params] == NO) {
+        ChipLogError(chipTool, "Controller factory startup failed");
+        return CHIP_ERROR_INTERNAL;
+    }
 
-    if (![mController startup:storage vendorId:0 nocSigner:nocSigner]) {
+    ReturnLogErrorOnFailure([nocSigner createOrLoadKeys:storage]);
+
+    ipk = [nocSigner getIPK];
+
+    auto controllerParams = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nocSigner];
+    controllerParams.vendorId = chip::VendorId::TestVendor1;
+    controllerParams.fabricId = 1;
+    controllerParams.ipk = ipk;
+
+    // We're not sure whether we're creating a new fabric or using an
+    // existing one, so just try both.
+    mController = [factory startControllerOnExistingFabric:controllerParams];
+    if (mController == nil) {
+        // Maybe we didn't have this fabric yet.
+        mController = [factory startControllerOnNewFabric:controllerParams];
+    }
+    if (mController == nil) {
         ChipLogError(chipTool, "Controller startup failure.");
         return CHIP_ERROR_INTERNAL;
     }
@@ -59,25 +82,15 @@ CHIPDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mContro
 CHIP_ERROR CHIPCommandBridge::ShutdownCommissioner()
 {
     ChipLogProgress(chipTool, "Shutting down controller");
-    BOOL result = [CurrentCommissioner() shutdown];
-    if (!result) {
-        ChipLogError(chipTool, "Unable to shut down controller");
-        return CHIP_ERROR_INTERNAL;
-    }
+    [CurrentCommissioner() shutdown];
+
+    [[MatterControllerFactory sharedInstance] shutdown];
 
     return CHIP_NO_ERROR;
 }
 
-#if !CONFIG_USE_SEPARATE_EVENTLOOP
-static void OnResponseTimeout(chip::System::Layer *, void * appState)
-{
-    (reinterpret_cast<CHIPCommandBridge *>(appState))->SetCommandExitStatus(CHIP_ERROR_TIMEOUT);
-}
-#endif // !CONFIG_USE_SEPARATE_EVENTLOOP
-
 CHIP_ERROR CHIPCommandBridge::StartWaiting(chip::System::Clock::Timeout duration)
 {
-#if CONFIG_USE_SEPARATE_EVENTLOOP
     chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
     auto waitingUntil = std::chrono::system_clock::now() + std::chrono::duration_cast<std::chrono::seconds>(duration);
     {
@@ -87,23 +100,15 @@ CHIP_ERROR CHIPCommandBridge::StartWaiting(chip::System::Clock::Timeout duration
         }
     }
     LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
-#else
-    ReturnLogErrorOnFailure(chip::DeviceLayer::SystemLayer().StartTimer(duration, OnResponseTimeout, this));
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
-#endif // CONFIG_USE_SEPARATE_EVENTLOOP
 
     return mCommandExitStatus;
 }
 
 void CHIPCommandBridge::StopWaiting()
 {
-#if CONFIG_USE_SEPARATE_EVENTLOOP
     {
         std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
         mWaitingForResponse = false;
     }
     cvWaitingForResponse.notify_all();
-#else // CONFIG_USE_SEPARATE_EVENTLOOP
-    LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
-#endif // CONFIG_USE_SEPARATE_EVENTLOOP
 }

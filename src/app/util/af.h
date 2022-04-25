@@ -79,6 +79,8 @@
 /** @name Attribute Storage */
 // @{
 
+static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
+
 /**
  * @brief locate attribute metadata
  *
@@ -286,6 +288,11 @@ extern EmberAfDefinedEndpoint emAfEndpoints[];
 chip::EndpointId emberAfEndpointFromIndex(uint16_t index);
 
 /**
+ * @brief Returns root endpoint of a composed bridged device
+ */
+chip::EndpointId emberAfParentEndpointFromIndex(uint16_t index);
+
+/**
  * Returns the index of a given endpoint.  Will return 0xFFFF if this is not a
  * valid endpoint id or if the endpoint is disabled.
  */
@@ -308,16 +315,6 @@ uint16_t emberAfFindClusterClientEndpointIndex(chip::EndpointId endpoint, chip::
  * looking only for standard clusters.
  */
 uint16_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId clusterId);
-
-/**
- * @brief Macro that takes index of endpoint, and returns device Id for it
- */
-#define emberAfDeviceIdFromIndex(index) (emAfEndpoints[(index)].deviceId)
-
-/**
- * @brief Macro that takes index of endpoint, and returns device version for it
- */
-#define emberAfDeviceVersionFromIndex(index) (emAfEndpoints[(index)].deviceVersion)
 
 /**
  * @brief Macro that returns the primary endpoint.
@@ -594,11 +591,6 @@ uint8_t emberAfGetAddressIndex(void);
  *   on the host to prevent frequent EZSP transactions.
  */
 EmberNetworkStatus emberAfNetworkState(void);
-
-/**
- * @brief Get this node's radio channel for the current network.
- */
-uint8_t emberAfGetRadioChannel(void);
 
 /**
  * @brief Returns the current network parameters.

@@ -103,6 +103,19 @@ CHIP_ERROR ChipLinuxStorage::ReadValue(const char * key, bool & val)
     return retval;
 }
 
+CHIP_ERROR ChipLinuxStorage::ReadValue(const char * key, uint16_t & val)
+{
+    CHIP_ERROR retval = CHIP_NO_ERROR;
+
+    mLock.lock();
+
+    retval = ChipLinuxStorageIni::GetUInt16Value(key, val);
+
+    mLock.unlock();
+
+    return retval;
+}
+
 CHIP_ERROR ChipLinuxStorage::ReadValue(const char * key, uint32_t & val)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
@@ -169,6 +182,15 @@ CHIP_ERROR ChipLinuxStorage::WriteValue(const char * key, bool val)
     }
 
     return retval;
+}
+
+CHIP_ERROR ChipLinuxStorage::WriteValue(const char * key, uint16_t val)
+{
+    char buf[16];
+
+    snprintf(buf, sizeof(buf), "%u", val);
+
+    return WriteValueStr(key, buf);
 }
 
 CHIP_ERROR ChipLinuxStorage::WriteValue(const char * key, uint32_t val)

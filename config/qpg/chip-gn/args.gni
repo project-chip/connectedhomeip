@@ -27,6 +27,7 @@ chip_build_tests = false
 chip_monolithic_tests = false
 chip_inet_config_enable_tcp_endpoint = false
 chip_build_libshell = false
+chip_enable_ota_requestor = true
 qpg_ar = "arm-none-eabi-ar"
 qpg_cc = "arm-none-eabi-gcc"
 qpg_cxx = "arm-none-eabi-g++"

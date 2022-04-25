@@ -258,6 +258,20 @@
 #endif // CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC
 
 /**
+ * CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+ *
+ * Whether a device supports "concurrent connection commissioning mode" (1) or
+ * or "non-concurrenct connection commissioning mode" (0).
+ *
+ * See section "5.5. Commissioning Flows" in spec for definition.
+ *
+ * The default value is to support concurrent connection.
+ */
+#ifndef CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+#define CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION 1
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+
+/**
  * CHIP_DEVICE_CONFIG_USER_SELECTED_MODE_TIMEOUT_SEC
  *
  * The default amount of time (in whole seconds) that the device will remain in "user selected"
@@ -1012,16 +1026,6 @@
 #define CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH (0x10000)
 #endif
 
-/**
- *  @def CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY
- *
- *  @brief
- *    The Global event id counter (eidc) persisted storage key.
- */
-#ifndef CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY "global-eidc"
-#endif
-
 // -------------------- Software Update Manager Configuration --------------------
 
 /**
@@ -1163,31 +1167,12 @@
 // -------------------- Device DNS-SD Configuration --------------------
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY
- *
- * Enable MDNS commissionable node advertising when not yet provisioned.
- *
- * This should be 1 for WiFi SoftAP devices, ethernet devices, and (probably) bridge devices
- *
- * This should be 0 for Thread/BLE devices and WiFi/BLE devices
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY 0
-#else
-#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY 1
-#endif
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS
  *
  * Time in seconds that a factory new device will advertise commissionable node discovery.
- *
- * Only valid when CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY==1
  */
 #ifndef CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS
-#define CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS 15 * 60
+#define CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS (15 * 60)
 #endif
 
 /**
@@ -1252,11 +1237,13 @@
  * Default time in seconds that a device will advertise commissionable node discovery
  * after commissioning mode ends. This value can be overridden by the user.
  *
- * Only valid when CCHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY==1
+ * Only valid when CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY==1
  */
 #define CHIP_DEVICE_CONFIG_DISCOVERY_DISABLED 0
 #define CHIP_DEVICE_CONFIG_DISCOVERY_NO_TIMEOUT -1
-#define CHIP_DEVICE_CONFIG_EXTENDED_DISCOVERY_TIMEOUT_SECS CHIP_DEVICE_CONFIG_DISCOVERY_NO_TIMEOUT
+#ifndef CHIP_DEVICE_CONFIG_EXTENDED_DISCOVERY_TIMEOUT_SECS
+#define CHIP_DEVICE_CONFIG_EXTENDED_DISCOVERY_TIMEOUT_SECS (15 * 60)
+#endif
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE

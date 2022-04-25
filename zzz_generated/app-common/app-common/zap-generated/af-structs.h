@@ -215,6 +215,13 @@ typedef struct _BatFaultChangeType
     /* TYPE WARNING: array array defaults to */ uint8_t * previous;
 } BatFaultChangeType;
 
+// Struct for CapabilityMinimaStruct
+typedef struct _CapabilityMinimaStruct
+{
+    uint16_t CaseSessionsPerFabric;
+    uint16_t SubscriptionsPerFabric;
+} CapabilityMinimaStruct;
+
 // Struct for ChannelInfo
 typedef struct _ChannelInfo
 {
@@ -542,12 +549,12 @@ typedef struct _TestListStructOctet
 // Struct for ThreadInterfaceScanResult
 typedef struct _ThreadInterfaceScanResult
 {
-    uint64_t PanId;
+    uint16_t PanId;
     uint64_t ExtendedPanId;
     chip::CharSpan NetworkName;
     uint16_t Channel;
     uint8_t Version;
-    uint64_t ExtendedAddress;
+    chip::ByteSpan ExtendedAddress;
     int8_t RSSI;
     uint8_t LQI;
 } ThreadInterfaceScanResult;

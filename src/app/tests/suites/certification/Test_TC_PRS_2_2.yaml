@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 3.2.2. [TC-PRS-2.2] Primary functionality with server as DUT
 
@@ -21,19 +22,22 @@ config:
 
 tests:
     - label: "Commission DUT to TH"
-      verification: ""
+      verification: |
+
       disabled: true
 
     - label: "TH reads MeasuredValue attribute from DUT"
-      verification:
-          "./chip-tool pressuremeasurement read measured-value 1 1 Verify
-          response: cluster id: 0x0403 Attribute: 0"
+      verification: |
+          ./chip-tool pressuremeasurement read measured-value 1 1
+          Verify response: cluster id: 0x0403 Attribute: 0
       disabled: true
 
     - label: "Operate on device to change the pressure significantly"
-      verification: ""
+      verification: |
+
       disabled: true
 
     - label: "after a few seconds, TH reads MeasuredValue attribute from DUT"
-      verification: ""
+      verification: |
+
       disabled: true

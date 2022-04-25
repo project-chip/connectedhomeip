@@ -53,11 +53,61 @@ limitations under the License.
     <define>FAN_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <attribute side="server" code="0x0000" define="FAN_CONTROL_FAN_MODE" type="ENUM8" min="0x00" max="0x06" writable="true" default="0x05" optional="false">fan mode</attribute>
-    <!-- FAN_MODE -->
-    <attribute side="server" code="0x0001" define="FAN_CONTROL_FAN_MODE_SEQUENCE" type="ENUM8" min="0x00" max="0x04" writable="true" default="0x02" optional="false">fan mode sequence</attribute>
-    <!-- FAN_MODE_SEQUENCE -->
+    <attribute side="server" code="0x0000" define="FAN_MODE" type="FanModeType" min="0" max="6" writable="true" default="0" optional="false">fan mode</attribute>
+    <attribute side="server" code="0x0001" define="FAN_MODE_SEQUENCE" type="FanModeSequenceType" min="0" max="5" writable="true" default="2" optional="false">fan mode sequence</attribute>
+    <attribute side="server" code="0x0002" define="PERCENT_SETTING" type="INT8U" min="0" max="100" writable="true" default="0" optional="false">percent setting</attribute>
+    <attribute side="server" code="0x0003" define="PERCENT_CURRENT" type="INT8U" min="0" max="100" writable="false" default="0" optional="false">percent current</attribute>
+    <attribute side="server" code="0x0004" define="SPEED_MAX" type="INT8U" min="1" max="100" writable="false" default="1" optional="true">speed max</attribute>
+    <attribute side="server" code="0x0005" define="SPEED_SETTING" type="INT8U" min="0" max="100" writable="true" default="0" optional="true">speed setting</attribute>
+    <attribute side="server" code="0x0006" define="SPEED_CURRENT" type="INT8U" min="0" max="100" writable="false" default="0" optional="true">speed current</attribute>
+    <attribute side="server" code="0x0007" define="ROCK_SUPPORT" type="BITMAP8" writable="false" default="0x00" optional="true">rock support</attribute> 
+    <attribute side="server" code="0x0008" define="ROCK_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">rock setting</attribute>
+    <attribute side="server" code="0x0009" define="WIND_SUPPORT" type="BITMAP8" writable="false" default="0x00" optional="true">wind support</attribute>
+    <attribute side="server" code="0x000A" define="WIND_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">wind setting</attribute>                            
   </cluster>
+  <!-- Fan Control Cluster data types -->  
+  <enum name="FanModeType" type="ENUM8">
+    <cluster code="0x0202"/>
+    <item name="Off" value="0x00"/>
+    <item name="Low" value="0x01"/>
+    <item name="Medium" value="0x02"/>
+    <item name="High" value="0x03"/>
+    <item name="On" value="0x04"/>
+    <item name="Auto" value="0x05"/>
+    <item name="Smart" value="0x06"/>
+  </enum>
+  <enum name="FanModeSequenceType" type="ENUM8">
+    <cluster code="0x0202"/>
+    <item name="Off/Low/Med/High" value="0x00"/>
+    <item name="Off/Low/High" value="0x01"/>
+    <item name="Off/Low/Med/High/Auto" value="0x02"/>
+    <item name="Off/Low/High/Auto" value="0x03"/>
+    <item name="Off/On/Auto" value="0x04"/>
+    <item name="Off/On" value="0x05"/>
+  </enum>  
+  <bitmap name="FanControlFeature" type="BITMAP32">
+    <cluster code="0x0202" />
+    <field name="MultiSpeed" mask="0x01" />
+    <field name="Auto" mask="0x02" />
+    <field name="Rocking" mask="0x04" />
+    <field name="Wind" mask="0x08" />
+  </bitmap>
+  <bitmap name="RockSupportMask" type="BITMAP8">
+      <cluster code="0x0202" />
+      <field name="RockLeftRight" mask="0x01" />
+      <field name="RockUpDown" mask="0x02" />
+      <field  name="RockRound" mask="0x04" />
+  </bitmap>
+  <bitmap name="WindSupportMask" type="BITMAP8">
+      <cluster code="0x0202" />
+      <field name="SleepWind" mask="0x01" />
+      <field name="NaturalWind" mask="0x02" />
+  </bitmap>
+  <bitmap name="WindSettingMask" type="BITMAP8">
+      <cluster code="0x0202" />
+      <field name="SleepWind" mask="0x01" />
+      <field name="NaturalWind" mask="0x02" />
+  </bitmap>    
   <cluster>
     <name>Dehumidification Control</name>
     <domain>HVAC</domain>
@@ -84,8 +134,16 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <attribute side="server" code="0x0000" define="TEMPERATURE_DISPLAY_MODE" type="ENUM8" min="0x00" max="0x01" writable="true" default="0x00" optional="false">temperature display mode</attribute>
-    <attribute side="server" code="0x0001" define="KEYPAD_LOCKOUT" type="ENUM8" min="0x00" max="0x05" writable="true" default="0x00" optional="false">keypad lockout</attribute>
-    <attribute side="server" code="0x0002" define="SCHEDULE_PROGRAMMING_VISIBILITY" type="ENUM8" min="0x00" max="0x01" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">schedule programming visibility</attribute>
+    <attribute side="server" code="0x0001" define="KEYPAD_LOCKOUT" type="ENUM8" min="0x00" max="0x05" writable="true" default="0x00" optional="false">
+      <description>keypad lockout</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0002" define="SCHEDULE_PROGRAMMING_VISIBILITY" type="ENUM8" min="0x00" max="0x01" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">
+      <description>schedule programming visibility</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
   </cluster>
   <cluster>
     <name>Color Control</name>
@@ -95,7 +153,7 @@ limitations under the License.
     <define>COLOR_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
+    <globalAttribute side="either" code="0xFFFD" value="5"/>
     <attribute side="server" code="0x0000" define="COLOR_CONTROL_CURRENT_HUE" type="INT8U" min="0x00" max="0xFE" writable="false" reportable="true" default="0x00" optional="true">current hue</attribute>
     <!-- CURRENT_HUE -->
     <attribute side="server" code="0x0001" define="COLOR_CONTROL_CURRENT_SATURATION" type="INT8U" min="0x00" max="0xFE" writable="false" reportable="true" default="0x00" optional="true">current saturation</attribute>
@@ -154,30 +212,78 @@ limitations under the License.
     <!-- PRIMARY_6_Y -->
     <attribute side="server" code="0x002A" define="COLOR_CONTROL_PRIMARY_6_INTENSITY" type="INT8U" min="0x00" max="0xFF" writable="false" optional="true">primary 6 intensity</attribute>
     <!-- PRIMARY_6_INTENSITY -->
-    <attribute side="server" code="0x0030" define="COLOR_CONTROL_WHITE_POINT_X" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">white point x</attribute>
+    <attribute side="server" code="0x0030" define="COLOR_CONTROL_WHITE_POINT_X" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>white point x</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- WHITE_POINT_X -->
-    <attribute side="server" code="0x0031" define="COLOR_CONTROL_WHITE_POINT_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">white point y</attribute>
+    <attribute side="server" code="0x0031" define="COLOR_CONTROL_WHITE_POINT_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>white point y</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- WHITE_POINT_Y -->
-    <attribute side="server" code="0x0032" define="COLOR_CONTROL_COLOR_POINT_R_X" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">color point r x</attribute>
+    <attribute side="server" code="0x0032" define="COLOR_CONTROL_COLOR_POINT_R_X" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>color point r x</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- COLOR_POINT_R_X -->
-    <attribute side="server" code="0x0033" define="COLOR_CONTROL_COLOR_POINT_R_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">color point r y</attribute>
+    <attribute side="server" code="0x0033" define="COLOR_CONTROL_COLOR_POINT_R_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>color point r y</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- COLOR_POINT_R_Y -->
-    <attribute side="server" code="0x0034" define="COLOR_CONTROL_COLOR_POINT_R_INTENSITY" type="INT8U" writable="true" optional="true">color point r intensity</attribute>
+    <attribute side="server" code="0x0034" define="COLOR_CONTROL_COLOR_POINT_R_INTENSITY" type="INT8U" writable="true" optional="true">
+      <description>color point r intensity</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- COLOR_POINT_R_INTENSITY -->
-    <attribute side="server" code="0x0036" define="COLOR_CONTROL_COLOR_POINT_G_X" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">color point g x</attribute>
+    <attribute side="server" code="0x0036" define="COLOR_CONTROL_COLOR_POINT_G_X" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>color point g x</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- COLOR_POINT_G_X -->
-    <attribute side="server" code="0x0037" define="COLOR_CONTROL_COLOR_POINT_G_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">color point g y</attribute>
+    <attribute side="server" code="0x0037" define="COLOR_CONTROL_COLOR_POINT_G_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>color point g y</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- COLOR_POINT_G_Y -->
-    <attribute side="server" code="0x0038" define="COLOR_CONTROL_COLOR_POINT_G_INTENSITY" type="INT8U" writable="true" optional="true">color point g intensity</attribute>
+    <attribute side="server" code="0x0038" define="COLOR_CONTROL_COLOR_POINT_G_INTENSITY" type="INT8U" writable="true" optional="true">
+      <description>color point g intensity</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- COLOR_POINT_G_INTENSITY -->
-    <attribute side="server" code="0x003A" define="COLOR_CONTROL_COLOR_POINT_B_X" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">color point b x</attribute>
+    <attribute side="server" code="0x003A" define="COLOR_CONTROL_COLOR_POINT_B_X" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>color point b x</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- COLOR_POINT_B_X -->
-    <attribute side="server" code="0x003B" define="COLOR_CONTROL_COLOR_POINT_B_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">color point b y</attribute>
+    <attribute side="server" code="0x003B" define="COLOR_CONTROL_COLOR_POINT_B_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>color point b y</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- COLOR_POINT_B_Y -->
-    <attribute side="server" code="0x003C" define="COLOR_CONTROL_COLOR_POINT_B_INTENSITY" type="INT8U" writable="true" optional="true">color point b intensity</attribute>
+    <attribute side="server" code="0x003C" define="COLOR_CONTROL_COLOR_POINT_B_INTENSITY" type="INT8U" writable="true" optional="true">
+      <description>color point b intensity</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- COLOR_POINT_B_INTENSITY -->
     <attribute side="server" code="0x400D" define="COLOR_CONTROL_TEMPERATURE_LEVEL_MIN_MIREDS" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false" introducedIn="l&amp;o-1.0-15-0014-04">couple color temp to level min-mireds</attribute>
-    <attribute side="server" code="0x4010" define="START_UP_COLOR_TEMPERATURE_MIREDS" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="false" introducedIn="l&amp;o-1.0-15-0014-04">start up color temperature mireds</attribute>
+    <attribute side="server" code="0x4010" define="START_UP_COLOR_TEMPERATURE_MIREDS" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="false" introducedIn="l&amp;o-1.0-15-0014-04">
+      <description>start up color temperature mireds</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <command source="client" code="0x00" name="MoveToHue" optional="true" cli="zcl color-control movetohue">
       <description>
         Move to specified hue.
@@ -284,6 +390,14 @@ limitations under the License.
       <arg name="optionsOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
     </command>
   </cluster>
+  <bitmap name="ColorControlFeature" type="BITMAP32">
+    <cluster code="0x0300" />
+    <field name="HueAndSaturation" mask="0x01" />
+    <field name="EnhancedHue" mask="0x02" />
+    <field name="ColorLoop" mask="0x04" />
+    <field name="XY" mask="0x08" />
+    <field name="ColorTemperature" mask="0x10" />
+  </bitmap>
   <cluster>
     <name>Ballast Configuration</name>
     <domain>Lighting</domain>
@@ -322,15 +436,51 @@ limitations under the License.
     <attribute side="server" code="0x0000" define="OCCUPANCY" type="BITMAP8" min="0x00" max="0x01" writable="false" reportable="true" optional="false">occupancy</attribute>
     <attribute side="server" code="0x0001" define="OCCUPANCY_SENSOR_TYPE" type="ENUM8" min="0x00" max="0xFE" writable="false" optional="false">occupancy sensor type</attribute>
     <attribute side="server" code="0x0002" define="OCCUPANCY_SENSOR_TYPE_BITMAP" type="BITMAP8" min="0x00" max="0x07" writable="false" optional="false">occupancy sensor type bitmap</attribute>
-    <attribute side="server" code="0x0010" define="PIR_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">PIR occupied to unoccupied delay</attribute>
-    <attribute side="server" code="0x0011" define="PIR_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">PIR unoccupied to occupied delay</attribute>
-    <attribute side="server" code="0x0012" define="PIR_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">PIR unoccupied to occupied threshold</attribute>
-    <attribute side="server" code="0x0020" define="ULTRASONIC_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">ultrasonic occupied to unoccupied delay</attribute>
-    <attribute side="server" code="0x0021" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">ultrasonic unoccupied to occupied delay</attribute>
-    <attribute side="server" code="0x0022" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">ultrasonic unoccupied to occupied threshold</attribute>
-    <attribute side="server" code="0x0030" define="PHYSICAL_CONTACT_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">physical contact occupied to unoccupied delay</attribute>
-    <attribute side="server" code="0x0031" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">physical contact unoccupied to occupied delay</attribute>
-    <attribute side="server" code="0x0032" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">physical contact unoccupied to occupied threshold</attribute>
+    <attribute side="server" code="0x0010" define="PIR_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
+      <description>PIR occupied to unoccupied delay</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0011" define="PIR_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
+      <description>PIR unoccupied to occupied delay</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0012" define="PIR_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
+      <description>PIR unoccupied to occupied threshold</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0020" define="ULTRASONIC_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
+      <description>ultrasonic occupied to unoccupied delay</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0021" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
+      <description>ultrasonic unoccupied to occupied delay</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0022" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
+      <description>ultrasonic unoccupied to occupied threshold</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0030" define="PHYSICAL_CONTACT_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
+      <description>physical contact occupied to unoccupied delay</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0031" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
+      <description>physical contact unoccupied to occupied delay</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0032" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
+      <description>physical contact unoccupied to occupied threshold</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
   </cluster>
   <cluster>
     <name>Carbon Monoxide Concentration Measurement</name>

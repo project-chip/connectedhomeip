@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <platform/PlatformManager.h>
 
 namespace chip {
 namespace rpc {
@@ -35,31 +36,44 @@ public:
 
     virtual void DeviceTypeList(const ::chip_rpc_Endpoint & request, ServerWriter<::chip_rpc_DeviceType> & writer)
     {
-        constexpr uint16_t kInvalidEndpointIndex = 0xFFFF;
-        uint16_t index                           = emberAfIndexFromEndpoint(request.endpoint);
-        if (index == kInvalidEndpointIndex)
+        DeviceLayer::StackLock lock;
+        CHIP_ERROR err;
+
+        auto deviceTypeList = emberAfDeviceTypeListFromEndpoint(request.endpoint, err);
+        if (err != CHIP_NO_ERROR)
         {
             writer.Finish(pw::Status::InvalidArgument());
             return;
         }
 
-        chip_rpc_DeviceType out{ .device_type = emberAfDeviceIdFromIndex(index) };
-        writer.Write(out);
+        if (deviceTypeList.size())
+        {
+            //
+            // TODO: Need to update the Pigweed proto definition to actually represent this
+            //       as a list of device types.
+            //
+            chip_rpc_DeviceType out{ .device_type = deviceTypeList.data()[0].deviceId };
+            writer.Write(out);
+        }
+
         writer.Finish();
     }
 
     void ServerList(const ::chip_rpc_Endpoint & request, ServerWriter<::chip_rpc_Cluster> & writer)
     {
+        DeviceLayer::StackLock lock;
         ClusterList(request.endpoint, true /*server*/, writer);
     }
 
     void ClientList(const ::chip_rpc_Endpoint & request, ServerWriter<::chip_rpc_Cluster> & writer)
     {
+        DeviceLayer::StackLock lock;
         ClusterList(request.endpoint, false /*server*/, writer);
     }
 
     void PartsList(const ::chip_rpc_Endpoint & request, ServerWriter<::chip_rpc_Endpoint> & writer)
     {
+        DeviceLayer::StackLock lock;
         if (request.endpoint == 0x00)
         {
             for (uint16_t index = 0; index < emberAfEndpointCount(); index++)

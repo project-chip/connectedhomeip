@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 3.3.4. [TC-DM-3.4] Network Commissioning Attributes [DUT - Commissioner]
 
@@ -21,9 +22,11 @@ config:
 
 tests:
     - label: "if (PICS_WIFI) DUT reads MaxNetworks attribute on TH"
-      verification: "./chip-tool networkcommissioning read max-networks 1 0"
+      verification: |
+          ./chip-tool networkcommissioning read max-networks 1 0
       disabled: true
 
     - label: "if (PICS_WIFI) DUT reads Networks attribute on TH"
-      verification: "./chip-tool networkcommissioning read networks 1 0"
+      verification: |
+          ./chip-tool networkcommissioning read networks 1 0
       disabled: true

@@ -66,6 +66,7 @@ RUN set -x \
     && wget -r -nd --no-parent -q -A 'libsystemd-*.armv7l.rpm' http://download.tizen.org/releases/milestone/tizen/unified/latest/repos/standard/packages/armv7l/ \
     && wget -r -nd --no-parent -q -A 'capi-network-nsd-*.armv7l.rpm' http://download.tizen.org/snapshots/tizen/unified/latest/repos/standard/packages/armv7l/ \
     && wget -r -nd --no-parent -q -A 'libnsd-dns-sd-*.armv7l.rpm' http://download.tizen.org/snapshots/tizen/unified/latest/repos/standard/packages/armv7l/ \
+    && wget -r -nd --no-parent -q -A 'capi-network-thread-*.armv7l.rpm' http://download.tizen.org/snapshots/tizen/unified/latest/repos/standard/packages/armv7l/ \
     && unrpm ./*.rpm \
     && cp usr/lib/pkgconfig/openssl1.1.pc usr/lib/pkgconfig/openssl.pc \
     && rm usr/lib/libdns_sd.so \

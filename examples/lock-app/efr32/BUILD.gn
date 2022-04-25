@@ -61,21 +61,26 @@ declare_args() {
   show_qr_code = true
 }
 
+# Sanity check
+assert(!(chip_enable_wifi && chip_enable_openthread))
+assert(!(use_rs911x && chip_enable_openthread))
+assert(!(use_wf200 && chip_enable_openthread))
+if (chip_enable_wifi) {
+  assert(use_rs911x || use_wf200)
+}
+
 # BRD4166A --> ThunderBoard Sense 2 (No LCD)
 if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
   show_qr_code = false
 }
-if (use_rs911x || use_wf200) {
+
+# Enables LCD on supported devices
+lcd_on = show_qr_code
+
+# WiFi settings
+if (chip_enable_wifi) {
   wifi_sdk_dir = "${chip_root}/third_party/efr32_sdk/repo/matter/wifi"
-  if (use_rs911x) {
-    wiseconnect_sdk_root = "${chip_root}/third_party/wiseconnect-wifi-bt-sdk"
-    import("${wifi_sdk_dir}/rs911x/rs911x.gni")
-  } else {
-    import("${wifi_sdk_dir}/wf200/wf200.gni")
-  }
-}
-efr32_lwip_defs = [ "LWIP_NETIF_API=1" ]
-if (use_rs911x || use_wf200) {
+  efr32_lwip_defs = [ "LWIP_NETIF_API=1" ]
   efr32_lwip_defs += [
     "LWIP_IPV4=1",
     "LWIP_ARP=1",
@@ -84,6 +89,14 @@ if (use_rs911x || use_wf200) {
     "LWIP_IPV6_ND=1",
     "LWIP_IGMP=1",
   ]
+
+  if (use_rs911x) {
+    wiseconnect_sdk_root =
+        "${chip_root}/third_party/efr32_sdk/wiseconnect-wifi-bt-sdk"
+    import("${wifi_sdk_dir}/rs911x/rs911x.gni")
+  } else {
+    import("${wifi_sdk_dir}/wf200/wf200.gni")
+  }
 }
 
 efr32_sdk("sdk") {
@@ -119,16 +132,24 @@ efr32_sdk("sdk") {
     include_dirs += wf200_plat_incs
   }
 
-  if (use_rs911x_sockets) {
-    include_dirs += [ "${examples_plat_dir}/wifi/rsi-sockets" ]
-    defines += rs911x_sock_defs
-  } else {
-    # Using LWIP instead of the native TCP/IP stack
-    # Thread also uses LWIP
-    #
-    defines += efr32_lwip_defs
-  }
-  if (use_rs911x || use_wf200) {
+  # WiFi Settings
+  if (chip_enable_wifi) {
+    if (use_rs911x) {
+      defines += rs911x_defs
+      include_dirs += rs911x_plat_incs
+    } else if (use_wf200) {
+      defines += wf200_defs
+      include_dirs += wf200_plat_incs
+    }
+
+    if (use_rs911x_sockets) {
+      include_dirs += [ "${examples_plat_dir}/wifi/rsi-sockets" ]
+      defines += rs911x_sock_defs
+    } else {
+      # Using LWIP instead of the native TCP/IP stack
+      defines += efr32_lwip_defs
+    }
+
     if (sl_wfx_config_softap) {
       defines += [ "SL_WFX_CONFIG_SOFTAP" ]
     }
@@ -160,7 +181,6 @@ efr32_executable("lock_app") {
 
   deps = [
     ":sdk",
-    "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
@@ -168,7 +188,9 @@ efr32_executable("lock_app") {
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
     "${examples_plat_dir}:efr-matter-shell",
   ]
-  if (!use_rs911x && !use_wf200) {
+
+  # OpenThread Settings
+  if (chip_enable_openthread) {
     deps += [
       "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
       "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
@@ -192,36 +214,43 @@ efr32_executable("lock_app") {
     sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
   }
 
-  if (use_rs911x) {
-    sources += rs911x_src_plat
+  # WiFi Settings
+  if (chip_enable_wifi) {
+    if (use_rs911x) {
+      sources += rs911x_src_plat
 
-    # All the stuff from wiseconnect
-    sources += rs911x_src_sapi
+      # All the stuff from wiseconnect
+      sources += rs911x_src_sapi
 
-    # Apparently - the rsi library needs this (though we may not use use it)
-    sources += rs911x_src_sock
-    include_dirs += rs911x_inc_plat
+      # Apparently - the rsi library needs this (though we may not use use it)
+      sources += rs911x_src_sock
+      include_dirs += rs911x_inc_plat
 
-    if (use_rs911x_sockets) {
-      #
-      # Using native sockets inside RS911x
-      #
-      include_dirs += rs911x_sock_inc
-    } else {
-      #
-      # We use LWIP - not built-in sockets
-      #
-      sources += rs911x_src_lwip
+      if (use_rs911x_sockets) {
+        #
+        # Using native sockets inside RS911x
+        #
+        include_dirs += rs911x_sock_inc
+      } else {
+        #
+        # We use LWIP - not built-in sockets
+        #
+        sources += rs911x_src_lwip
+      }
+    } else if (use_wf200) {
+      sources += wf200_plat_src
+      include_dirs += wf200_plat_incs
     }
-  } else if (use_wf200) {
-    sources += wf200_plat_src
-    include_dirs += wf200_plat_incs
   }
 
-  if (show_qr_code) {
+  if (lcd_on) {
     sources += [ "${examples_plat_dir}/display/lcd.c" ]
-
     defines += [ "DISPLAY_ENABLED" ]
+    if (show_qr_code) {
+      defines += [ "QR_CODE_ENABLED" ]
+
+      deps += [ "${chip_root}/examples/common/QRCode" ]
+    }
   }
 
   if (chip_enable_pw_rpc) {
@@ -282,7 +311,9 @@ efr32_executable("lock_app") {
       "-fstack-usage",
     ]
   }
-  if (use_rs911x || use_wf200) {
+
+  # WiFi Settings
+  if (chip_enable_wifi) {
     ldflags += [
       "-Wl,--defsym",
       "-Wl,SILABS_WIFI=1",

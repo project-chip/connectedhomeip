@@ -40,6 +40,21 @@ if (chip_project_config_include_dirs == [] &&
   chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 }
 
+if (chip_device_platform == "cc13x2_26x2") {
+  import("//build_overrides/ti_simplelink_sdk.gni")
+} else if (chip_device_platform == "efr32") {
+  import("//build_overrides/efr32_sdk.gni")
+} else if (chip_device_platform == "qpg") {
+  import("//build_overrides/qpg_sdk.gni")
+  import("${qpg_sdk_build_root}/qpg_sdk.gni")
+} else if (chip_device_platform == "k32w0") {
+  import("//build_overrides/k32w0_sdk.gni")
+} else if (chip_device_platform == "p6") {
+  import("//build_overrides/p6.gni")
+} else if (chip_device_platform == "cyw30739") {
+  import("//build_overrides/cyw30739_sdk.gni")
+}
+
 buildconfig_header("system_buildconfig") {
   header = "SystemBuildConfig.h"
   header_dir = "system"
@@ -59,7 +74,7 @@ buildconfig_header("system_buildconfig") {
     "CHIP_WITH_NLFAULTINJECTION=${chip_with_nlfaultinjection}",
     "CHIP_SYSTEM_CONFIG_USE_DISPATCH=${chip_system_config_use_dispatch}",
     "CHIP_SYSTEM_CONFIG_USE_LWIP=${chip_system_config_use_lwip}",
-    "CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP=${chip_system_config_use_open_thread_udp}",
+    "CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT=${chip_system_config_use_open_thread_inet_endpoints}",
     "CHIP_SYSTEM_CONFIG_USE_SOCKETS=${chip_system_config_use_sockets}",
     "CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK=false",
     "CHIP_SYSTEM_CONFIG_POSIX_LOCKING=${chip_system_config_posix_locking}",
@@ -115,11 +130,23 @@ source_set("system_config_header") {
     "${chip_root}/src:includes",
   ]
 
-  public_deps = [ ":system_buildconfig" ]
+  public_deps = [
+    ":system_buildconfig",
+    "${chip_root}/src/platform:platform_buildconfig",
+  ]
 
   if (target_cpu != "esp32") {
     if (chip_system_config_use_lwip) {
       public_deps += [ "${chip_root}/src/lwip" ]
+    } else {
+      if (chip_device_platform == "efr32") {
+        public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
+      }
+      if (chip_device_platform == "qpg") {
+        public_deps += [ "${qpg_sdk_build_root}:qpg_sdk" ]
+      }
+
+      # Add platform here as needed.
     }
   }
 }

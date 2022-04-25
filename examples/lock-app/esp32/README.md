@@ -24,13 +24,13 @@ The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
 
 -   Clone the Espressif ESP-IDF and checkout
-    [v4.4 release](https://github.com/espressif/esp-idf/releases/tag/v4.4)
+    [v4.4.1 release](https://github.com/espressif/esp-idf/releases/tag/v4.4.1)
 
           $ mkdir ${HOME}/tools
           $ cd ${HOME}/tools
           $ git clone https://github.com/espressif/esp-idf.git
           $ cd esp-idf
-          $ git checkout v4.4
+          $ git checkout v4.4.1
           $ git submodule update --init
           $ ./install.sh
 
@@ -97,18 +97,14 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
 ## Commissioning and cluster control
 
-Commissioning can be carried out using WiFi, BLE or Bypass.
+Commissioning can be carried out using WiFi or BLE.
 
 1.  Set the `Rendezvous Mode` for commissioning using menuconfig; the default
     Rendezvous mode is BLE.
 
          $ idf.py menuconfig
 
-Select the Rendezvous Mode via `Demo -> Rendezvous Mode`. If Rendezvous Mode is
-Bypass then set the credentials of the WiFi Network (i.e. SSID and Password from
-menuconfig).
-
-`idf.py menuconfig -> Component config -> CHIP Device Layer -> WiFi Station Options`
+Select the Rendezvous Mode via `Demo -> Rendezvous Mode`.
 
 2.  Now flash the device with the same command as before. (Use the right `/dev`
     device)
@@ -216,7 +212,7 @@ Build or install the [rpc console](../../common/pigweed/rpc_console/README.md)
 
 Start the console
 
-    python -m chip_rpc.console --device /dev/ttyUSB0
+    chip-console --device /dev/ttyUSB0
 
 From within the console you can then invoke rpcs:
 

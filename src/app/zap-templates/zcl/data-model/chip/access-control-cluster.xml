@@ -38,7 +38,7 @@ limitations under the License.
     <item name="Changed" value="0x00"/>
     <item name="Added" value="0x01"/>
     <item name="Removed" value="0x02"/>
-  </enum>  
+  </enum>
 
   <struct name="Target">
     <cluster code="0x001F"/>
@@ -58,8 +58,8 @@ limitations under the License.
 
   <struct name="ExtensionEntry">
     <cluster code="0x001F"/>
-    <item fieldId="1" name="Data" type="OCTET_STRING" length="254"/>
-    <item fieldId="0xFE" name="FabricIndex" type="fabric_idx"/>
+    <item fieldId="1" name="Data" type="OCTET_STRING" length="128" isFabricSensitive="true"/>
+    <item fieldId="0xFE" name="FabricIndex" type="fabric_idx" isFabricSensitive="true"/>
   </struct>
 
   <cluster>
@@ -70,22 +70,39 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>The Access Control Cluster exposes a data model view of a
-      Node’s Access Control List (ACL), which codifies the rules used to manage
-      and enforce Access Control for the Node’s endpoints and their associated
+      Node's Access Control List (ACL), which codifies the rules used to manage
+      and enforce Access Control for the Node's endpoints and their associated
       cluster instances.</description>
-    <!-- Base data types -->
+
     <attribute side="server" code="0x0000" define="ACL" type="ARRAY" entryType="AccessControlEntry" writable="true">
-        <description>ACL</description>
-        <access op="read" privilege="administer"/>
-        <access op="write" privilege="administer"/>        
-        <access modifier="fabric-scoped"/>
+      <description>ACL</description>
+      <access op="read" privilege="administer"/>
+      <access op="write" privilege="administer"/>
+      <access modifier="fabric-scoped"/>
     </attribute>
+
     <attribute side="server" code="0x0001" define="EXTENSION" type="ARRAY" entryType="ExtensionEntry" writable="true">
-        <description>Extension</description>
-        <access op="read" privilege="administer"/>
-        <access op="write" privilege="administer"/>        
-        <access modifier="fabric-scoped"/>
+      <description>Extension</description>
+      <access op="read" privilege="administer"/>
+      <access op="write" privilege="administer"/>
+      <access modifier="fabric-scoped"/>
     </attribute>
+
+    <attribute side="server" code="0x0002" define="SUBJECTS_PER_ACCESS_CONTROL_ENTRY" type="int16u" writable="false">
+      <description>SubjectsPerAccessControlEntry</description>
+      <access op="read" privilege="view"/>
+    </attribute>
+
+    <attribute side="server" code="0x0003" define="TARGETS_PER_ACCESS_CONTROL_ENTRY" type="int16u" writable="false">
+      <description>TargetsPerAccessControlEntry</description>
+      <access op="read" privilege="view"/>
+    </attribute>
+
+    <attribute side="server" code="0x0004" define="ACCESS_CONTROL_ENTRIES_PER_FABRIC" type="int16u" writable="false">
+      <description>AccessControlEntriesPerFabric</description>
+      <access op="read" privilege="view"/>
+    </attribute>
+
     <event side="server" code="0x0000" name="AccessControlEntryChanged" priority="info" optional="false">
       <description>The cluster SHALL send AccessControlEntryChanged events whenever its ACL attribute data is changed by an Administrator.</description>
       <field id="1" name="AdminNodeID" type="node_id" isNullable="true"/>
@@ -93,6 +110,7 @@ limitations under the License.
       <field id="3" name="ChangeType" type="ChangeTypeEnum"/>
       <field id="4" name="LatestValue" type="AccessControlEntry" isNullable="true"/>
       <field id="0xFE" name="AdminFabricIndex" type="fabric_idx"/>
+      <access op="read" privilege="administer"/>
     </event>
     <event side="server" code="0x0001" name="AccessControlExtensionChanged" priority="info" optional="false">
       <description>The cluster SHALL send AccessControlExtensionChanged events whenever its extension attribute data is changed by an Administrator.</description>
@@ -101,6 +119,7 @@ limitations under the License.
       <field id="3" name="ChangeType" type="ChangeTypeEnum"/>
       <field id="4" name="LatestValue" type="ExtensionEntry" isNullable="true"/>
       <field id="0xFE" name="AdminFabricIndex" type="fabric_idx"/>
-    </event>    
+      <access op="read" privilege="administer"/>
+    </event>
   </cluster>
 </configurator>

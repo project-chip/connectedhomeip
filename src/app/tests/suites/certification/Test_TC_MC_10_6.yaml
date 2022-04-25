@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 18.12.6. [TC-MC-10.6] Launch URL Verification (DUT as Client)
 
@@ -23,28 +24,27 @@ tests:
     - label:
           "DUT sends a LaunchURL command to the TH with a known good content URL
           string"
-      verification:
-          "./chip-tool contentlauncher launch-urlrequest https://csa-iot.org/ 1
-          1"
+      verification: |
+          ./chip-tool contentlauncher launch-urlrequest https://csa-iot.org/ 1 1
       disabled: true
 
     - label:
           "DUT sends a LaunchURL command to the TH with a known good content URL
           string and a display string"
-      verification:
-          "./chip-tool contentlauncher launch-urlrequest https://csa-iot.org/
-          'Test content' 1 1"
+      verification: |
+          ./chip-tool contentlauncher launch-urlrequest  https://csa-iot.org/  'Test content' 1 1
       disabled: true
 
     - label:
           "DUT sends a LaunchURL command to the TH with a known good content URL
           string and a brand information object."
-      verification: "Not supported by chip-tool"
+      verification: |
+          Not supported by chip-tool
       disabled: true
 
     - label:
           "DUT sends a LaunchURL command to the DUT with a known unreachable
           content URL string."
-      verification:
-          "./chip-tool contentlauncher launch-urlrequest https://badurl 1 1"
+      verification: |
+          ./chip-tool contentlauncher launch-urlrequest  https://badurl 1 1
       disabled: true

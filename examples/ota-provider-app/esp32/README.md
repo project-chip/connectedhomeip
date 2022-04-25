@@ -41,6 +41,34 @@ idf.py -p <OTAProviderSerialPort> flash
 ./out/debug/chip-tool pairing ble-wifi 12345 <ssid> <passphrase> 20202021 3841
 ```
 
+## Access control list requirements
+
+Commissioner or Administrator should install necessary ACL entries at
+commissioning time or later to enable processing of QueryImage commands from OTA
+Requestors on their fabric, otherwise that OTA Provider will not be usable by
+OTA Requestors.
+
+Since the ACL attribute contains a list of entries, we cannot append a single
+entry to it. So, read the ACL entries and append an entry which grants operate
+privileges to all nodes for the OTA Provider cluster (0x0029) on every endpoint.
+
+-   Read the ACL attribute
+
+```
+./out/debug/chip-tool accesscontrol read acl 12345 0
+```
+
+-   Write the ACL attribute
+
+```
+out/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": [{"cluster": 41, "endpoint": null, "deviceType": null}]}]' 12345 0
+```
+
+First entry created as part of commissioning which grants administer privilege
+to the node ID 112233 (default controller node ID) for all clusters on every
+endpoint. Seconds entry is the new entry being added which grants operate
+privileges to all nodes for the OTA Provider cluster (0x0029) on every endpoint
+
 ## Set delayed action time (Optional)
 
 -   Set delayed action time in the Query Image Response and Apply Update

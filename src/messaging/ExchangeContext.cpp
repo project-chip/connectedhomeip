@@ -348,6 +348,7 @@ void ExchangeContext::OnSessionReleased()
     {
         // Exchange is already being closed. It may occur when closing an exchange after sending
         // RemoveFabric response which triggers removal of all sessions for the given fabric.
+        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(this);
         return;
     }
 
@@ -414,8 +415,7 @@ void ExchangeContext::NotifyResponseTimeout()
     MessageHandled();
 }
 
-CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const PayloadHeader & payloadHeader,
-                                          const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
+CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const PayloadHeader & payloadHeader, MessageFlags msgFlags,
                                           PacketBufferHandle && msgBuf)
 {
     // We hold a reference to the ExchangeContext here to
@@ -456,8 +456,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         MessageHandled();
     });
 
-    ReturnErrorOnFailure(
-        mDispatch.OnMessageReceived(messageCounter, payloadHeader, peerAddress, msgFlags, GetReliableMessageContext()));
+    ReturnErrorOnFailure(mDispatch.OnMessageReceived(messageCounter, payloadHeader, msgFlags, GetReliableMessageContext()));
 
     if (IsAckPending() && !mDelegate)
     {

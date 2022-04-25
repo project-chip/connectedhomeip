@@ -23,6 +23,30 @@
 
 namespace chip {
 
+CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager)
+{
+    auto handle = sessionManager.AllocateSession();
+    VerifyOrReturnError(handle.HasValue(), CHIP_ERROR_NO_MEMORY);
+    mSecureSessionHolder.Grab(handle.Value());
+    mSessionManager = &sessionManager;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PairingSession::ActivateSecureSession(const Transport::PeerAddress & peerAddress)
+{
+    Transport::SecureSession * secureSession = mSecureSessionHolder->AsSecureSession();
+
+    uint16_t peerSessionId = GetPeerSessionId();
+    ChipLogDetail(Inet, "New secure session created for device " ChipLogFormatScopedNodeId ", LSID:%d PSID:%d!",
+                  ChipLogValueScopedNodeId(GetPeer()), secureSession->GetLocalSessionId(), peerSessionId);
+    secureSession->Activate(GetSecureSessionType(), GetPeer(), GetPeerCATs(), peerSessionId, mRemoteMRPConfig);
+    secureSession->SetPeerAddress(peerAddress);
+    ReturnErrorOnFailure(DeriveSecureSession(secureSession->GetCryptoContext()));
+    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR PairingSession::EncodeMRPParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpConfig,
                                                TLV::TLVWriter & tlvWriter)
 {
@@ -58,7 +82,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
     if (TLV::TagNumFromTag(tlvReader.GetTag()) == 1)
     {
         ReturnErrorOnFailure(tlvReader.Get(tlvElementValue));
-        mMRPConfig.mIdleRetransTimeout = System::Clock::Milliseconds32(tlvElementValue);
+        mRemoteMRPConfig.mIdleRetransTimeout = System::Clock::Milliseconds32(tlvElementValue);
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
         CHIP_ERROR err = tlvReader.Next();
@@ -71,9 +95,29 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
 
     VerifyOrReturnError(TLV::TagNumFromTag(tlvReader.GetTag()) == 2, CHIP_ERROR_INVALID_TLV_TAG);
     ReturnErrorOnFailure(tlvReader.Get(tlvElementValue));
-    mMRPConfig.mActiveRetransTimeout = System::Clock::Milliseconds32(tlvElementValue);
+    mRemoteMRPConfig.mActiveRetransTimeout = System::Clock::Milliseconds32(tlvElementValue);
 
     return tlvReader.ExitContainer(containerType);
+}
+
+void PairingSession::Clear()
+{
+    if (mSessionManager != nullptr)
+    {
+        if (mSecureSessionHolder && !mSecureSessionHolder->AsSecureSession()->IsActiveSession())
+        {
+            // Make sure to clean up our pending session, since we're the only
+            // ones who have access to it do do so.
+            mSessionManager->ExpirePairing(mSecureSessionHolder.Get());
+        }
+    }
+
+    mPeerSessionId.ClearValue();
+    // If we called ExpirePairing above, the holder has already released the
+    // session (due to it being destroyed).  If not, we need to release it.
+    // Release is idempotent, so it's OK to just call it here.
+    mSecureSessionHolder.Release();
+    mSessionManager = nullptr;
 }
 
 } // namespace chip

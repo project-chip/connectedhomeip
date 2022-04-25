@@ -48,6 +48,7 @@ IGNORE: Set[str] = {
     '/platform/nxp/',
     '/platform/Tizen/',
     '/platform/P6/',
+    '/platform/bouffalolab/BL602',
     r'POSIX\.h$',
 }
 
@@ -102,7 +103,7 @@ DENY: Set[str] = {
 ALLOW: Dict[str, Set[str]] = {
 
     # Not intended for embedded clients (#11705).
-    'src/app/AttributeCache.h': {'list', 'map', 'set', 'vector'},
+    'src/app/ClusterStateCache.h': {'list', 'map', 'set', 'vector', 'queue'},
     'src/app/BufferedReadCallback.h': {'vector'},
 
     # Itself in DENY.
@@ -128,6 +129,9 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/clusters/media-playback-server/media-playback-delegate.h': {'list'},
     'src/app/clusters/target-navigator-server/target-navigator-delegate.h': {'list'},
 
+    'src/credentials/attestation_verifier/FileAttestationTrustStore.h': {'vector'},
+    'src/credentials/attestation_verifier/FileAttestationTrustStore.cpp': {'string'},
+
     'src/setup_payload/AdditionalDataPayload.h': {'string'},
     'src/setup_payload/AdditionalDataPayloadParser.cpp': {'vector'},
     'src/setup_payload/Base38Decode.h': {'string', 'vector'},
@@ -140,4 +144,6 @@ ALLOW: Dict[str, Set[str]] = {
     'src/setup_payload/SetupPayloadHelper.h': {'string'},
     'src/setup_payload/SetupPayload.h': {'map', 'string', 'vector'},
 
+    # Uses platform-define to switch between list and array
+    'src/lib/dnssd/minimal_mdns/ResponseSender.h': {'list'},
 }

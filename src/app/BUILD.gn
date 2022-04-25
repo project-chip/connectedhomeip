@@ -22,13 +22,30 @@ declare_args() {
   # Enable strict schema checks.
   chip_enable_schema_check =
       is_debug && (current_os == "linux" || current_os == "mac")
+
+  # Logging verbosity control for Access Control implementation
+  #
+  # If set to > 0, it is desired to get additional logging on all
+  # access control checks for better debugging ability.
+  #
+  # If set to > 1, it is desired to log every single check
+  chip_access_control_policy_logging_verbosity = 0
+  if (is_debug && (current_os == "linux" || current_os == "mac")) {
+    chip_access_control_policy_logging_verbosity = 2
+  }
+
+  chip_enable_session_resumption = true
 }
 
 buildconfig_header("app_buildconfig") {
   header = "AppBuildConfig.h"
   header_dir = "app"
 
-  defines = [ "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=${chip_enable_schema_check}" ]
+  defines = [
+    "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=${chip_enable_schema_check}",
+    "CHIP_CONFIG_ENABLE_SESSION_RESUMPTION=${chip_enable_session_resumption}",
+    "CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY=${chip_access_control_policy_logging_verbosity}",
+  ]
 }
 
 static_library("app") {
@@ -36,8 +53,6 @@ static_library("app") {
 
   sources = [
     "AttributeAccessInterface.cpp",
-    "AttributeCache.cpp",
-    "AttributeCache.h",
     "AttributePathExpandIterator.cpp",
     "AttributePathExpandIterator.h",
     "AttributePathParams.h",
@@ -50,6 +65,8 @@ static_library("app") {
     "CASESessionManager.h",
     "ChunkedWriteCallback.cpp",
     "ChunkedWriteCallback.h",
+    "ClusterStateCache.cpp",
+    "ClusterStateCache.h",
     "CommandHandler.cpp",
     "CommandResponseHelper.h",
     "CommandSender.cpp",
@@ -134,6 +151,7 @@ static_library("app") {
     "MessageDef/TimedRequestMessage.cpp",
     "MessageDef/WriteRequestMessage.cpp",
     "MessageDef/WriteResponseMessage.cpp",
+    "OTAUserConsentCommon.h",
     "OperationalDeviceProxy.cpp",
     "OperationalDeviceProxy.h",
     "OperationalDeviceProxyPool.h",

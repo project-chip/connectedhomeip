@@ -37,6 +37,12 @@ public class TvApp {
 
   public native void nativeInit();
 
+  // called before Matter server is inited
+  public native void preServerInit();
+
+  // called after Matter server is inited
+  public native void postServerInit();
+
   public native void setKeypadInputManager(int endpoint, KeypadInputManager manager);
 
   public native void setWakeOnLanManager(int endpoint, WakeOnLanManager manager);
@@ -50,6 +56,14 @@ public class TvApp {
   public native void setMediaPlaybackManager(int endpoint, MediaPlaybackManager manager);
 
   public native void setChannelManager(int endpoint, ChannelManager manager);
+
+  public native void setOnOffManager(int endpoint, OnOffManager manager);
+
+  public native boolean setOnOff(int endpoint, boolean value);
+
+  public native void setLevelManager(int endpoint, LevelManager manager);
+
+  public native boolean setCurrentLevel(int endpoint, int value);
 
   public native void setDACProvider(DACProvider provider);
 

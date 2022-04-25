@@ -22,7 +22,6 @@
 #include <crypto/RandUtils.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <lib/dnssd/DnssdCache.h>
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/TxtFields.h>
 #include <lib/dnssd/platform/Dnssd.h>
@@ -445,7 +444,7 @@ void DiscoveryImplPlatform::HandleDnssdPublish(void * context, const char * type
     }
     else
     {
-        ChipLogProgress(Discovery, "mDNS service published error: %s", chip::ErrorStr(error));
+        ChipLogError(Discovery, "mDNS service published error: %s", chip::ErrorStr(error));
     }
 }
 
@@ -490,16 +489,17 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
     ReturnErrorOnFailure(ChipDnssdPublishService(&service, HandleDnssdPublish, this));
 
 #ifdef DETAIL_LOGGING
-    printf("printEntries port=%u, mTextEntrySize=%zu, mSubTypeSize=%zu\n", port, textEntrySize, subTypeSize);
+    printf("printEntries port=%u, mTextEntrySize=%u, mSubTypeSize=%u\n", port, static_cast<unsigned int>(textEntrySize),
+           static_cast<unsigned int>(subTypeSize));
 
     for (size_t i = 0; i < textEntrySize; i++)
     {
-        printf(" entry [%zu] : %s %s\n", i, textEntries[i].mKey, (char *) (textEntries[i].mData));
+        printf(" entry [%u] : %s %s\n", static_cast<unsigned int>(i), textEntries[i].mKey, (char *) (textEntries[i].mData));
     }
 
     for (size_t i = 0; i < subTypeSize; i++)
     {
-        printf(" type [%zu] : %s\n", i, subTypes[i]);
+        printf(" type [%u] : %s\n", static_cast<unsigned int>(i), subTypes[i]);
     }
 #endif
 
@@ -524,8 +524,7 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
 #define PUBLISH_RECORDS(Type)                                                                                                      \
     ReturnErrorOnFailure(PublishService(k##Type##ServiceName, textEntries, textEntrySize, subTypes, subTypeSize, params));         \
     m##Type##NodeAdvertisingParams = params;                                                                                       \
-    mIs##Type##NodePublishing      = true;                                                                                         \
-    return CHIP_NO_ERROR;
+    mIs##Type##NodePublishing      = true;
 
 CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParameters & params)
 {
@@ -538,6 +537,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     ADD_PTR_RECORD(CompressedFabricId);
 
     PUBLISH_RECORDS(Operational);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameters & params)
@@ -557,21 +558,21 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissioner)
     {
         PUBLISH_RECORDS(Commissioner);
+        return CHIP_NO_ERROR;
     }
-    else
-    {
-        ADD_TXT_RECORD(LongDiscriminator);
-        ADD_TXT_RECORD(CommissioningMode);
-        ADD_TXT_RECORD(RotatingDeviceId);
-        ADD_TXT_RECORD(PairingHint);
-        ADD_TXT_RECORD(PairingInstruction);
 
-        ADD_PTR_RECORD(ShortDiscriminator);
-        ADD_PTR_RECORD(LongDiscriminator);
-        ADD_PTR_RECORD(CommissioningMode);
+    ADD_TXT_RECORD(LongDiscriminator);
+    ADD_TXT_RECORD(CommissioningMode);
+    ADD_TXT_RECORD(RotatingDeviceId);
+    ADD_TXT_RECORD(PairingHint);
+    ADD_TXT_RECORD(PairingInstruction);
 
-        PUBLISH_RECORDS(Commissionable);
-    }
+    ADD_PTR_RECORD(ShortDiscriminator);
+    ADD_PTR_RECORD(LongDiscriminator);
+    ADD_PTR_RECORD(CommissioningMode);
+
+    PUBLISH_RECORDS(Commissionable);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiscoveryImplPlatform::RemoveServices()
@@ -646,6 +647,18 @@ CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mDelegate->Retain();
 
+    if (filter.type == DiscoveryFilterType::kInstanceName)
+    {
+        // when we have the instance name, no need to browse, only need to resolve
+        DnssdService service;
+
+        ReturnErrorOnFailure(MakeServiceSubtype(service.mName, sizeof(service.mName), filter));
+        strncpy(service.mType, kCommissionableServiceName, sizeof(service.mType));
+        service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolUdp;
+        service.mAddressType = Inet::IPAddressType::kAny;
+        return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeResolve, mDelegate);
+    }
+
     char serviceName[kMaxCommissionableServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionableNode));
 
@@ -657,6 +670,18 @@ CHIP_ERROR ResolverProxy::FindCommissioners(DiscoveryFilter filter)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mDelegate->Retain();
+
+    if (filter.type == DiscoveryFilterType::kInstanceName)
+    {
+        // when we have the instance name, no need to browse, only need to resolve
+        DnssdService service;
+
+        ReturnErrorOnFailure(MakeServiceSubtype(service.mName, sizeof(service.mName), filter));
+        strncpy(service.mType, kCommissionerServiceName, sizeof(service.mType));
+        service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolUdp;
+        service.mAddressType = Inet::IPAddressType::kAny;
+        return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeResolve, mDelegate);
+    }
 
     char serviceName[kMaxCommissionerServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionerNode));

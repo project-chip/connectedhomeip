@@ -23,16 +23,17 @@
  */
 
 #include <access/SubjectDescriptor.h>
-#include <app/ClusterInfo.h>
 #include <app/EventLoggingDelegate.h>
 #include <app/EventLoggingTypes.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
+#include <app/ObjectList.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/CHIPCounter.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -46,7 +47,6 @@
 
 namespace {
 
-static const chip::NodeId kTestDeviceNodeId1      = 0x18B4300000000001ULL;
 static const chip::ClusterId kLivenessClusterId   = 0x00000022;
 static const uint32_t kLivenessChangeEvent        = 1;
 static const chip::EndpointId kTestEndpointId1    = 2;
@@ -68,6 +68,11 @@ public:
 
         auto * ctx = static_cast<TestContext *>(context);
 
+        if (ctx->mEventCounter.Init(0) != CHIP_NO_ERROR)
+        {
+            return FAILURE;
+        }
+
         chip::app::LogStorageResources logStorageResources[] = {
             { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
             { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
@@ -76,7 +81,7 @@ public:
 
         chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(),
                                                           sizeof(logStorageResources) / sizeof(logStorageResources[0]),
-                                                          gCircularEventBuffer, logStorageResources, nullptr, 0, nullptr);
+                                                          gCircularEventBuffer, logStorageResources, &ctx->mEventCounter);
 
         return SUCCESS;
     }
@@ -90,6 +95,9 @@ public:
 
         return SUCCESS;
     }
+
+private:
+    chip::MonotonicallyIncreasingCounter mEventCounter;
 };
 
 void ENFORCE_FORMAT(1, 2) SimpleDumpWriter(const char * aFormat, ...)
@@ -111,7 +119,7 @@ void PrintEventLog()
     chip::app::EventManagement::GetInstance().GetEventReader(reader, chip::app::PriorityLevel::Debug, &bufWrapper);
 
     chip::TLV::Utilities::Count(reader, elementCount, false);
-    printf("Found %zu elements\n", elementCount);
+    printf("Found %u elements\n", static_cast<unsigned int>(elementCount));
     chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
 }
 
@@ -129,11 +137,12 @@ static void CheckLogState(nlTestSuite * apSuite, chip::app::EventManagement & aL
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, elementCount == expectedNumEvents);
-    printf("elementCount vs expectedNumEvents : %zu vs %zu \n", elementCount, expectedNumEvents);
+    printf("elementCount vs expectedNumEvents : %u vs %u \n", static_cast<unsigned int>(elementCount),
+           static_cast<unsigned int>(expectedNumEvents));
 }
 
 static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & alogMgmt, chip::EventNumber startingEventNumber,
-                            size_t expectedNumEvents, chip::app::ClusterInfo * clusterInfo)
+                            size_t expectedNumEvents, chip::app::ObjectList<chip::app::EventPathParams> * clusterInfo)
 {
     CHIP_ERROR err;
     chip::TLV::TLVReader reader;
@@ -150,8 +159,8 @@ static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & 
     err = chip::TLV::Utilities::Count(reader, totalNumElements, false);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    printf("totalNumElements vs expectedNumEvents vs eventCount : %zu vs %zu vs %zu \n", totalNumElements, expectedNumEvents,
-           eventCount);
+    printf("totalNumElements vs expectedNumEvents vs eventCount : %u vs %u vs %u \n", static_cast<unsigned int>(totalNumElements),
+           static_cast<unsigned int>(expectedNumEvents), static_cast<unsigned int>(eventCount));
     NL_TEST_ASSERT(apSuite, totalNumElements == expectedNumEvents && totalNumElements == eventCount);
     reader.Init(backingStore, writer.GetLengthWritten());
     chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
@@ -224,22 +233,20 @@ static void CheckLogEventWithEvictToNextBuffer(nlTestSuite * apSuite, void * apC
     NL_TEST_ASSERT(apSuite, (eid4 + 1) == eid5);
     NL_TEST_ASSERT(apSuite, (eid5 + 1) == eid6);
 
-    chip::app::ClusterInfo testClusterInfo1;
-    testClusterInfo1.mNodeId     = kTestDeviceNodeId1;
-    testClusterInfo1.mEndpointId = kTestEndpointId1;
-    testClusterInfo1.mClusterId  = kLivenessClusterId;
-    chip::app::ClusterInfo testClusterInfo2;
-    testClusterInfo2.mNodeId     = kTestDeviceNodeId1;
-    testClusterInfo2.mEndpointId = kTestEndpointId2;
-    testClusterInfo2.mClusterId  = kLivenessClusterId;
-    testClusterInfo2.mEventId    = kLivenessChangeEvent;
+    chip::app::ObjectList<chip::app::EventPathParams> testEventPathParams1;
+    testEventPathParams1.mValue.mEndpointId = kTestEndpointId1;
+    testEventPathParams1.mValue.mClusterId  = kLivenessClusterId;
+    chip::app::ObjectList<chip::app::EventPathParams> testEventPathParams2;
+    testEventPathParams2.mValue.mEndpointId = kTestEndpointId2;
+    testEventPathParams2.mValue.mClusterId  = kLivenessClusterId;
+    testEventPathParams2.mValue.mEventId    = kLivenessChangeEvent;
 
-    CheckLogReadOut(apSuite, logMgmt, 0, 3, &testClusterInfo1);
-    CheckLogReadOut(apSuite, logMgmt, 1, 2, &testClusterInfo1);
-    CheckLogReadOut(apSuite, logMgmt, 2, 1, &testClusterInfo1);
-    CheckLogReadOut(apSuite, logMgmt, 3, 3, &testClusterInfo2);
-    CheckLogReadOut(apSuite, logMgmt, 4, 2, &testClusterInfo2);
-    CheckLogReadOut(apSuite, logMgmt, 5, 1, &testClusterInfo2);
+    CheckLogReadOut(apSuite, logMgmt, 0, 3, &testEventPathParams1);
+    CheckLogReadOut(apSuite, logMgmt, 1, 2, &testEventPathParams1);
+    CheckLogReadOut(apSuite, logMgmt, 2, 1, &testEventPathParams1);
+    CheckLogReadOut(apSuite, logMgmt, 3, 3, &testEventPathParams2);
+    CheckLogReadOut(apSuite, logMgmt, 4, 2, &testEventPathParams2);
+    CheckLogReadOut(apSuite, logMgmt, 5, 1, &testEventPathParams2);
 }
 
 static void CheckLogEventWithDiscardLowEvent(nlTestSuite * apSuite, void * apContext)

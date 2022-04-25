@@ -58,18 +58,55 @@ public:
      */
     enum class Type : uint8_t
     {
-        kUndefined = 0,
-        kPASE      = 1,
-        kCASE      = 2,
+        kPASE = 1,
+        kCASE = 2,
+        // kPending denotes a secure session object that is internally
+        // reserved by the stack before and during session establishment.
+        //
+        // Although the stack can tolerate eviction of these (releasing one
+        // out from under the holder would exhibit as CHIP_ERROR_INCORRECT_STATE
+        // during CASE or PASE), intent is that we should not and would leave
+        // these untouched until CASE or PASE complete.
+        kPending = 3,
     };
 
+    // TODO: This constructor should be private.  Tests should allocate a
+    // kPending session and then call Activate(), just like non-test code does.
     SecureSession(Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId,
                   FabricIndex fabric, const ReliableMessageProtocolConfig & config) :
         mSecureSessionType(secureSessionType),
         mPeerNodeId(peerNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId),
-        mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
+        mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()),
+        mLastPeerActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
     {
         SetFabricIndex(fabric);
+    }
+
+    /**
+     * @brief
+     *   Construct a secure session object to associate with a pending secure
+     *   session establishment attempt.  The object for the pending session
+     *   receives a local session ID, but no other state.
+     */
+    SecureSession(uint16_t localSessionId) :
+        SecureSession(Type::kPending, localSessionId, kUndefinedNodeId, CATValues{}, 0, kUndefinedFabricIndex, GetLocalMRPConfig())
+    {}
+
+    /**
+     * @brief
+     *   Activate a pending Secure Session that had been reserved during CASE or
+     *   PASE, setting internal state according to the parameters used and
+     *   discovered during session establishment.
+     */
+    void Activate(Type secureSessionType, const ScopedNodeId & peer, CATValues peerCATs, uint16_t peerSessionId,
+                  const ReliableMessageProtocolConfig & config)
+    {
+        mSecureSessionType = secureSessionType;
+        mPeerNodeId        = peer.GetNodeId();
+        mPeerCATs          = peerCATs;
+        mPeerSessionId     = peerSessionId;
+        mMRPConfig         = config;
+        SetFabricIndex(peer.GetFabricIndex());
     }
     ~SecureSession() override { NotifySessionReleased(); }
 
@@ -83,6 +120,7 @@ public:
     const char * GetSessionTypeString() const override { return "secure"; };
 #endif
 
+    ScopedNodeId GetPeer() const override;
     Access::SubjectDescriptor GetSubjectDescriptor() const override;
 
     bool RequireMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }
@@ -105,6 +143,9 @@ public:
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
 
     Type GetSecureSessionType() const { return mSecureSessionType; }
+    bool IsCASESession() const { return GetSecureSessionType() == Type::kCASE; }
+    bool IsPASESession() const { return GetSecureSessionType() == Type::kPASE; }
+    bool IsActiveSession() const { return GetSecureSessionType() != Type::kPending; }
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     CATValues GetPeerCATs() const { return mPeerCATs; }
 
@@ -115,39 +156,49 @@ public:
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
     uint16_t GetPeerSessionId() const { return mPeerSessionId; }
 
-    // Should only be called for PASE sessions, which start with undefined fabric,
-    // to migrate to a newly commissioned fabric after successful
-    // OperationalCredentialsCluster::AddNOC
-    CHIP_ERROR NewFabric(FabricIndex fabricIndex)
+    // Called when AddNOC has gone through sufficient success that we need to switch the
+    // session to reflect a new fabric if it was a PASE session
+    CHIP_ERROR AdoptFabricIndex(FabricIndex fabricIndex)
     {
-#if 0
-        // TODO(#13711): this check won't work until the issue is addressed
-        if (mSecureSessionType == Type::kPASE)
+        // It's not legal to augment session type for non-PASE
+        if (mSecureSessionType != Type::kPASE)
         {
-            SetFabricIndex(fabricIndex);
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
-#else
         SetFabricIndex(fabricIndex);
-#endif
         return CHIP_NO_ERROR;
     }
 
     System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
+    System::Clock::Timestamp GetLastPeerActivityTime() const { return mLastPeerActivityTime; }
     void MarkActive() { mLastActivityTime = System::SystemClock().GetMonotonicTimestamp(); }
+    void MarkActiveRx()
+    {
+        mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp();
+        MarkActive();
+    }
+
+    bool IsPeerActive() { return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) < kMinActiveTime); }
+
+    System::Clock::Timestamp GetMRPBaseTimeout() override
+    {
+        return IsPeerActive() ? GetMRPConfig().mActiveRetransTimeout : GetMRPConfig().mIdleRetransTimeout;
+    }
 
     CryptoContext & GetCryptoContext() { return mCryptoContext; }
 
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
 private:
-    const Type mSecureSessionType;
-    const NodeId mPeerNodeId;
-    const CATValues mPeerCATs;
+    Type mSecureSessionType;
+    NodeId mPeerNodeId;
+    CATValues mPeerCATs;
     const uint16_t mLocalSessionId;
-    const uint16_t mPeerSessionId;
+    uint16_t mPeerSessionId;
 
     PeerAddress mPeerAddress;
-    System::Clock::Timestamp mLastActivityTime;
+    System::Clock::Timestamp mLastActivityTime;     ///< Timestamp of last tx or rx
+    System::Clock::Timestamp mLastPeerActivityTime; ///< Timestamp of last rx
     ReliableMessageProtocolConfig mMRPConfig;
     CryptoContext mCryptoContext;
     SessionMessageCounter mSessionMessageCounter;

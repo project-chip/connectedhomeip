@@ -31,15 +31,18 @@ public:
     AutoCommissioner();
     ~AutoCommissioner() override;
     CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params) override;
+    const CommissioningParameters & GetCommissioningParameters() const override;
     void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) override;
 
     CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy) override;
 
     CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
 
-private:
+protected:
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
-    CommissioningStage GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr);
+    DeviceCommissioner * GetCommissioner() { return mCommissioner; }
+
+private:
     void ReleaseDAC();
     void ReleasePAI();
 
@@ -52,6 +55,7 @@ private:
     CHIP_ERROR NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, AesCcm128KeySpan ipk, NodeId adminSubject);
     Optional<System::Clock::Timeout> GetCommandTimeout(CommissioningStage stage) const;
     EndpointId GetEndpoint(const CommissioningStage & stage) const;
+    CommissioningStage GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr);
 
     DeviceCommissioner * mCommissioner                               = nullptr;
     CommissioneeDeviceProxy * mCommissioneeDeviceProxy               = nullptr;
@@ -62,6 +66,7 @@ private:
     uint8_t mSsid[CommissioningParameters::kMaxSsidLen];
     uint8_t mCredentials[CommissioningParameters::kMaxCredentialsLen];
     uint8_t mThreadOperationalDataset[CommissioningParameters::kMaxThreadDatasetLen];
+    char mCountryCode[CommissioningParameters::kMaxCountryCodeLen];
 
     bool mNeedsNetworkSetup = false;
     ReadCommissioningInfo mDeviceCommissioningInfo;

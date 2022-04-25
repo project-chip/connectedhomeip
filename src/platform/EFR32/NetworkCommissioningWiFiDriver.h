@@ -30,39 +30,6 @@ constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
 constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
 } // namespace
 
-// class SlScanResponseIterator : public Iterator<WiFiScanResponse>
-// {
-// public:
-//     SlScanResponseIterator(const size_t size, const wifi_ap_record_t * scanResults) : mSize(size), mpScanResults(scanResults) {}
-//     size_t Count() override { return mSize; }
-//     bool Next(WiFiScanResponse & item) override
-//     {
-//         if (mIternum >= mSize)
-//         {
-//             return false;
-//         }
-
-//         item.security = mpScanResults[mIternum].authmode;
-//         item.ssidLen =
-//             strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid),
-//             chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
-//         item.channel  = mpScanResults[mIternum].primary;
-//         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-//         item.rssi     = mpScanResults[mIternum].rssi;
-//         memcpy(item.ssid, mpScanResults[mIternum].ssid, item.ssidLen);
-//         memcpy(item.bssid, mpScanResults[mIternum].bssid, 6);
-
-//         mIternum++;
-//         return true;
-//     }
-//     void Release() override {}
-
-// private:
-//     const size_t mSize;
-//     const wifi_ap_record_t * mpScanResults;
-//     size_t mIternum = 0;
-// };
-
 template <typename T>
 class SlScanResponseIterator : public Iterator<T>
 {
@@ -142,17 +109,18 @@ public:
     CHIP_ERROR CommitConfiguration() override;
     CHIP_ERROR RevertConfiguration() override;
 
-    Status RemoveNetwork(ByteSpan networkId) override;
-    Status ReorderNetwork(ByteSpan networkId, uint8_t index) override;
+    Status RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) override;
+    Status ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText) override;
     void ConnectNetwork(ByteSpan networkId, ConnectCallback * callback) override;
 
     // WiFiDriver
-    Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials) override;
+    Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
+                              uint8_t & outNetworkIndex) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
 
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
 
-    uint8_t ConvertSecuritytype(uint8_t security);
+    chip::BitFlags<WiFiSecurity> ConvertSecuritytype(uint8_t security);
 
     void OnConnectWiFiNetwork();
     static SlWiFiDriver & GetInstance()

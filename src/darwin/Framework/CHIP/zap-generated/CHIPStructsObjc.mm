@@ -204,6 +204,19 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPBasicClusterCapabilityMinimaStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _caseSessionsPerFabric = @(0);
+
+        _subscriptionsPerFabric = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPOtaSoftwareUpdateRequestorClusterProviderLocation
 - (instancetype)init
 {
@@ -297,7 +310,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _version = @(0);
 
-        _extendedAddress = @(0);
+        _extendedAddress = [NSData data];
 
         _rssi = @(0);
 

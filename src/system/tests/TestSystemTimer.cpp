@@ -78,13 +78,13 @@ public:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 template <class LayerImpl>
-class LayerEvents<LayerImpl, typename std::enable_if<std::is_base_of<LayerImplLwIP, LayerImpl>::value>::type>
+class LayerEvents<LayerImpl, typename std::enable_if<std::is_base_of<LayerImplFreeRTOS, LayerImpl>::value>::type>
 {
 public:
     static bool HasServiceEvents() { return true; }
     static void ServiceEvents(Layer & aLayer)
     {
-        LayerImplLwIP & layer = static_cast<LayerImplLwIP &>(aLayer);
+        LayerImplFreeRTOS & layer = static_cast<LayerImplFreeRTOS &>(aLayer);
         if (layer.IsInitialized())
         {
             layer.HandlePlatformTimer();

@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     31.6.1. [TC-SU-2.5] Tests the different scenarios on the DUT based on the
@@ -25,30 +26,26 @@ tests:
     - label:
           "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
           field is set to 'Proceed' DelayedActionTime is set to 0."
-      verification:
-          "Verify that the DUT starts updating its software. Once the update is
-          finished verify the software version on the DUT to match the version
-          downloaded for the software update. Verify on the OTA-P/TH that there
-          is no other ApplyUpdateRequest from the DUT."
+      verification: |
+          Verify that the DUT starts updating its software.
+          Once the update is finished verify the software version on the DUT to match the version downloaded for the software update.
+          Verify on the OTA-P/TH that there is no other ApplyUpdateRequest from the DUT.
       disabled: true
 
     - label:
           "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
           field is set to 'Proceed' DelayedActionTime is set to 5 minutes"
-      verification:
-          "Run the OTA Provider App using the command: ./chip-ota-provider-app
-          -f sw_image.txt -t 300 Verify that the DUT starts updating its
-          software after 5 minutes. Once the update is finished verify the
-          software version on the DUT to match the version downloaded for the
-          software update."
+      verification: |
+          Run the OTA Provider App using the command:
+          ./chip-ota-provider-app -f sw_image.txt -t 300
+
+          Verify that the DUT starts updating its software after 5 minutes. Once the update is finished verify the software version on the DUT to match the version downloaded for the software update.
       disabled: true
 
     - label:
           "IF (PICS_DT_Vendor_Specific) Apply the OTA Update on DUT using vendor
           specific mechanism."
-      verification:
-          "Use vendor specific steps to apply OTA Update and verify that the DUT
-          starts updating its software. Once the update is finished verify the
-          software version on the DUT to match the version downloaded for the
-          software update."
+      verification: |
+          Use vendor specific steps to apply OTA Update and verify that the DUT starts updating its software.
+          Once the update is finished verify the software version on the DUT to match the version downloaded for the software update.
       disabled: true

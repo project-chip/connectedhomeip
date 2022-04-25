@@ -16,6 +16,11 @@
  *    limitations under the License.
  */
 
+// Included for the default AccessControlDelegate logging enables/disables.
+// See `chip_access_control_policy_logging_verbosity` in `src/app/BUILD.gn` for
+// the levels available.
+#include <app/AppBuildConfig.h>
+
 #include "AccessControl.h"
 
 namespace {
@@ -71,7 +76,7 @@ constexpr bool IsValidGroupNodeId(NodeId aNodeId)
     return chip::IsGroupId(aNodeId) && chip::IsValidGroupId(chip::GroupIdFromNodeId(aNodeId));
 }
 
-#if CHIP_PROGRESS_LOGGING
+#if CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
 char GetAuthModeStringForLogging(AuthMode authMode)
 {
@@ -152,7 +157,7 @@ char GetPrivilegeStringForLogging(Privilege privilege)
     return 'u';
 }
 
-#endif // CHIP_PROGRESS_LOGGING
+#endif // CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
 } // namespace
 
@@ -162,18 +167,18 @@ namespace Access {
 AccessControl::Entry::Delegate AccessControl::Entry::mDefaultDelegate;
 AccessControl::EntryIterator::Delegate AccessControl::EntryIterator::mDefaultDelegate;
 
-CHIP_ERROR AccessControl::Init(AccessControl::Delegate * delegate)
+CHIP_ERROR AccessControl::Init(AccessControl::Delegate * delegate, DeviceTypeResolver & deviceTypeResolver)
 {
     VerifyOrReturnError(!IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     ChipLogProgress(DataManagement, "AccessControl: initializing");
 
-    // delegate can never be null. This was already checked
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     CHIP_ERROR retval = delegate->Init();
     if (retval == CHIP_NO_ERROR)
     {
-        mDelegate = delegate;
+        mDelegate           = delegate;
+        mDeviceTypeResolver = &deviceTypeResolver;
     }
 
     return retval;
@@ -188,35 +193,64 @@ CHIP_ERROR AccessControl::Finish()
     return retval;
 }
 
+CHIP_ERROR AccessControl::RemoveFabric(FabricIndex fabricIndex)
+{
+    ChipLogProgress(DataManagement, "AccessControl: removing fabric %u", fabricIndex);
+
+    CHIP_ERROR err;
+    do
+    {
+        err = DeleteEntry(0, &fabricIndex);
+    } while (err == CHIP_NO_ERROR);
+
+    // Sentinel error is OK, just means there was no such entry.
+    ReturnErrorCodeIf(err != CHIP_ERROR_SENTINEL, err);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                                 Privilege requestPrivilege)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-#if CHIP_PROGRESS_LOGGING
+#if CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
     {
         constexpr size_t kMaxCatsToLog = 6;
         char catLogBuf[kMaxCatsToLog * kCharsPerCatForLogging];
         ChipLogProgress(DataManagement,
-                        "AccessControl: checking f=%u a=%c s=0x" ChipLogFormatX64 " t=%s c=" ChipLogFormatMEI " e=%" PRIu16 " p=%c",
+                        "AccessControl: checking f=%u a=%c s=0x" ChipLogFormatX64 " t=%s c=" ChipLogFormatMEI " e=%u p=%c",
                         subjectDescriptor.fabricIndex, GetAuthModeStringForLogging(subjectDescriptor.authMode),
                         ChipLogValueX64(subjectDescriptor.subject),
                         GetCatStringForLogging(catLogBuf, sizeof(catLogBuf), subjectDescriptor.cats),
                         ChipLogValueMEI(requestPath.cluster), requestPath.endpoint, GetPrivilegeStringForLogging(requestPrivilege));
     }
-#endif
+#endif // CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
-    // TODO(#13867): this will go away
-    if (mDelegate->TemporaryCheckOverride())
     {
-        ChipLogProgress(DataManagement, "AccessControl: temporary check override (this will go away)");
-        return CHIP_NO_ERROR;
+        CHIP_ERROR result = mDelegate->Check(subjectDescriptor, requestPath, requestPrivilege);
+        if (result != CHIP_ERROR_NOT_IMPLEMENTED)
+        {
+#if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
+            ChipLogProgress(DataManagement, "AccessControl: %s (delegate)",
+                            (result == CHIP_NO_ERROR) ? "allowed" : (result == CHIP_ERROR_ACCESS_DENIED) ? "denied" : "error");
+#else
+            if (result != CHIP_NO_ERROR)
+            {
+                ChipLogProgress(DataManagement, "AccessControl: %s (delegate)",
+                                (result == CHIP_ERROR_ACCESS_DENIED) ? "denied" : "error");
+            }
+#endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
+            return result;
+        }
     }
 
     // Operational PASE not supported for v1.0, so PASE implies commissioning, which has highest privilege.
     if (subjectDescriptor.authMode == AuthMode::kPase)
     {
+#if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
         ChipLogProgress(DataManagement, "AccessControl: implicit admin (PASE)");
+#endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
         return CHIP_NO_ERROR;
     }
 
@@ -307,7 +341,11 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                 {
                     continue;
                 }
-                // TODO(#14431): device type target not yet supported (add lookup/match when supported)
+                if (target.flags & Entry::Target::kDeviceType &&
+                    !mDeviceTypeResolver->IsDeviceTypeOnEndpoint(target.deviceType, requestPath.endpoint))
+                {
+                    continue;
+                }
                 targetMatched = true;
                 break;
             }
@@ -316,8 +354,12 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                 continue;
             }
         }
-
         // Entry passed all checks: access is allowed.
+
+#if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
+        ChipLogProgress(DataManagement, "AccessControl: allowed");
+#endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
+
         return CHIP_NO_ERROR;
     }
 
@@ -343,9 +385,11 @@ bool AccessControl::IsValid(const Entry & entry)
     SuccessOrExit(entry.GetSubjectCount(subjectCount));
     SuccessOrExit(entry.GetTargetCount(targetCount));
 
+#if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
     ChipLogProgress(DataManagement, "AccessControl: validating f=%u p=%c a=%c s=%d t=%d", fabricIndex,
                     GetPrivilegeStringForLogging(privilege), GetAuthModeStringForLogging(authMode), static_cast<int>(subjectCount),
                     static_cast<int>(targetCount));
+#endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
     // Fabric index must be defined.
     VerifyOrExit(fabricIndex != kUndefinedFabricIndex, log = "invalid fabric index");
@@ -365,7 +409,9 @@ bool AccessControl::IsValid(const Entry & entry)
         SuccessOrExit(entry.GetSubject(i, subject));
         const bool kIsCase  = authMode == AuthMode::kCase;
         const bool kIsGroup = authMode == AuthMode::kGroup;
+#if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
         ChipLogProgress(DataManagement, "  validating subject 0x" ChipLogFormatX64, ChipLogValueX64(subject));
+#endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
         VerifyOrExit((kIsCase && IsValidCaseNodeId(subject)) || (kIsGroup && IsValidGroupNodeId(subject)), log = "invalid subject");
     }
 
@@ -381,8 +427,6 @@ bool AccessControl::IsValid(const Entry & entry)
                          (!kHasEndpoint || IsValidEndpointId(target.endpoint)) &&
                          (!kHasDeviceType || IsValidDeviceTypeId(target.deviceType)),
                      log = "invalid target");
-        // TODO(#14431): device type target not yet supported (remove check when supported)
-        VerifyOrExit(!kHasDeviceType, log = "device type target not yet supported");
     }
 
     return true;

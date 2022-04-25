@@ -18,53 +18,27 @@
 
 #include <app/util/basic-types.h>
 #include <lib/core/GroupId.h>
-#include <lib/core/ReferenceCounted.h>
 #include <lib/support/Pool.h>
 #include <transport/Session.h>
 
 namespace chip {
 namespace Transport {
 
-#ifndef NDEBUG
-class GroupSessionDeleter
-{
-public:
-    static void Release(IncomingGroupSession * entry) {}
-    static void Release(OutgoingGroupSession * entry) {}
-};
-#endif
-
 class IncomingGroupSession : public Session
-#ifndef NDEBUG
-    // The group session is ephemeral, its lifespan is controlled by whoever is using it. To prevent the object being destroyed
-    // while there are still SessionHandle or SessionHolder pointing to it, we enforce a reference counter check at its destruction
-    // in debug build.
-    ,
-                             public ReferenceCounted<IncomingGroupSession, GroupSessionDeleter, 0>
-#endif
 {
 public:
     IncomingGroupSession(GroupId group, FabricIndex fabricIndex, NodeId sourceNodeId) : mGroupId(group), mSourceNodeId(sourceNodeId)
     {
         SetFabricIndex(fabricIndex);
     }
-    ~IncomingGroupSession() override
-    {
-        NotifySessionReleased();
-#ifndef NDEBUG
-        VerifyOrDie(GetReferenceCount() == 0);
-#endif
-    }
-
-#ifndef NDEBUG
-    void Retain() override { ReferenceCounted<IncomingGroupSession, GroupSessionDeleter, 0>::Retain(); }
-    void Release() override { ReferenceCounted<IncomingGroupSession, GroupSessionDeleter, 0>::Release(); }
-#endif
+    ~IncomingGroupSession() override { NotifySessionReleased(); }
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kGroupIncoming; }
 #if CHIP_PROGRESS_LOGGING
     const char * GetSessionTypeString() const override { return "incoming group"; };
 #endif
+
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(mSourceNodeId, GetFabricIndex()); }
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
@@ -84,6 +58,8 @@ public:
         return cfg;
     }
 
+    System::Clock::Timestamp GetMRPBaseTimeout() override { return System::Clock::kZero; }
+
     System::Clock::Milliseconds32 GetAckTimeout() const override
     {
         VerifyOrDie(false);
@@ -100,36 +76,17 @@ private:
 };
 
 class OutgoingGroupSession : public Session
-#ifndef NDEBUG
-    // The group session is ephemeral, its lifespan is controlled by whoever is using it. To prevent the object being destroyed
-    // while there are still SessionHandle or SessionHolder pointing to it, we enforce a reference counter check at its destruction
-    // in debug build.
-    ,
-                             public ReferenceCounted<OutgoingGroupSession, GroupSessionDeleter, 0>
-#endif
 {
 public:
-    OutgoingGroupSession(GroupId group, FabricIndex fabricIndex, NodeId sourceNodeId) : mGroupId(group), mSourceNodeId(sourceNodeId)
-    {
-        SetFabricIndex(fabricIndex);
-    }
-    ~OutgoingGroupSession() override
-    {
-        NotifySessionReleased();
-#ifndef NDEBUG
-        VerifyOrDie(GetReferenceCount() == 0);
-#endif
-    }
-
-#ifndef NDEBUG
-    void Retain() override { ReferenceCounted<OutgoingGroupSession, GroupSessionDeleter, 0>::Retain(); }
-    void Release() override { ReferenceCounted<OutgoingGroupSession, GroupSessionDeleter, 0>::Release(); }
-#endif
+    OutgoingGroupSession(GroupId group, FabricIndex fabricIndex) : mGroupId(group) { SetFabricIndex(fabricIndex); }
+    ~OutgoingGroupSession() override { NotifySessionReleased(); }
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kGroupOutgoing; }
 #if CHIP_PROGRESS_LOGGING
     const char * GetSessionTypeString() const override { return "outgoing group"; };
 #endif
+
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(); }
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
@@ -145,6 +102,8 @@ public:
         return cfg;
     }
 
+    System::Clock::Timestamp GetMRPBaseTimeout() override { return System::Clock::kZero; }
+
     System::Clock::Milliseconds32 GetAckTimeout() const override
     {
         VerifyOrDie(false);
@@ -153,11 +112,8 @@ public:
 
     GroupId GetGroupId() const { return mGroupId; }
 
-    NodeId GetSourceNodeId() const { return mSourceNodeId; }
-
 private:
     const GroupId mGroupId;
-    const NodeId mSourceNodeId;
 };
 
 } // namespace Transport

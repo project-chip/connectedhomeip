@@ -35,26 +35,27 @@
 
 namespace chip {
 
+class SessionManager;
+
 class DLL_EXPORT PairingSession
 {
 public:
-    PairingSession(Transport::SecureSession::Type secureSessionType) : mSecureSessionType(secureSessionType) {}
-    virtual ~PairingSession() {}
+    virtual ~PairingSession() { Clear(); }
 
-    Transport::SecureSession::Type GetSecureSessionType() const { return mSecureSessionType; }
+    virtual Transport::SecureSession::Type GetSecureSessionType() const = 0;
+    virtual ScopedNodeId GetPeer() const                                = 0;
+    virtual CATValues GetPeerCATs() const                               = 0;
 
-    // TODO: the session should know which peer we are trying to connect to at start
-    // mPeerNodeId should be const and assigned at the construction, such that GetPeerNodeId will never return kUndefinedNodeId, and
-    // SetPeerNodeId is not necessary.
-    NodeId GetPeerNodeId() const { return mPeerNodeId; }
-
-    CATValues GetPeerCATs() const { return mPeerCATs; }
-
-    // TODO: the local key id should be allocateed at start
-    // mLocalSessionId should be const and assigned at the construction, such that GetLocalSessionId will always return a valid key
-    // id , and SetLocalSessionId is not necessary.
-    uint16_t GetLocalSessionId() const { return mLocalSessionId; }
-    bool IsValidLocalSessionId() const { return mLocalSessionId != kInvalidKeyId; }
+    Optional<uint16_t> GetLocalSessionId() const
+    {
+        Optional<uint16_t> localSessionId;
+        VerifyOrExit(mSecureSessionHolder, localSessionId = NullOptional);
+        VerifyOrExit(mSecureSessionHolder->GetSessionType() == Transport::Session::SessionType::kSecure,
+                     localSessionId = Optional<uint16_t>::Missing());
+        localSessionId.SetValue(mSecureSessionHolder->AsSecureSession()->GetLocalSessionId());
+    exit:
+        return localSessionId;
+    }
 
     uint16_t GetPeerSessionId() const
     {
@@ -63,29 +64,17 @@ public:
     }
     bool IsValidPeerSessionId() const { return mPeerSessionId.HasValue(); }
 
-    // TODO: decouple peer address into transport, such that pairing session do not need to handle peer address
-    const Transport::PeerAddress & GetPeerAddress() const { return mPeerAddress; }
-    Transport::PeerAddress & GetPeerAddress() { return mPeerAddress; }
-
     /**
      * @brief
-     *   Derive a secure session from the paired session. The API will return error
-     *   if called before pairing is established.
+     *   Derive a secure session from the paired session. The API will return error if called before pairing is established.
      *
-     * @param session     Reference to the secure session that will be
-     *                    initialized once pairing is complete
-     * @param role        Role of the new session (initiator or responder)
+     * @param session     Reference to the secure session that will be initialized once pairing is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    virtual CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) = 0;
+    virtual CHIP_ERROR DeriveSecureSession(CryptoContext & session) const = 0;
 
-    /**
-     * @brief
-     *   Get the MRP config that was communicated during the session establishment.
-     */
-    virtual const ReliableMessageProtocolConfig & GetMRPConfig() const { return mMRPConfig; }
-
-    void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
+    const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteMRPConfig; }
+    void SetRemoteMRPConfig(const ReliableMessageProtocolConfig & config) { mRemoteMRPConfig = config; }
 
     /**
      * Encode the provided MRP parameters using the provided TLV tag.
@@ -94,11 +83,18 @@ public:
                                           TLV::TLVWriter & tlvWriter);
 
 protected:
-    void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
-    void SetPeerCATs(CATValues peerCATs) { mPeerCATs = peerCATs; }
+    /**
+     * Allocate a secure session object from the passed session manager for the
+     * pending session establishment operation.
+     *
+     * @param sessionManager session manager from which to allocate a secure session object
+     * @return CHIP_ERROR The outcome of the allocation attempt
+     */
+    CHIP_ERROR AllocateSecureSession(SessionManager & sessionManager);
+
+    CHIP_ERROR ActivateSecureSession(const Transport::PeerAddress & peerAddress);
+
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
-    void SetLocalSessionId(uint16_t id) { mLocalSessionId = id; }
-    void SetPeerAddress(const Transport::PeerAddress & address) { mPeerAddress = address; }
     virtual void OnSuccessStatusReport() {}
     virtual CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode)
     {
@@ -153,7 +149,7 @@ protected:
 
     /**
      * Try to decode the current element (pointed by the TLV reader) as MRP parameters.
-     * If the MRP parameters are found, mMRPConfig is updated with the devoded values.
+     * If the MRP parameters are found, mRemoteMRPConfig is updated with the devoded values.
      *
      * MRP parameters are optional. So, if the TLV reader is not pointing to the MRP parameters,
      * the function is a noop.
@@ -164,31 +160,22 @@ protected:
     CHIP_ERROR DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TLV::ContiguousBufferTLVReader & tlvReader);
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
-    void Clear()
-    {
-        mPeerNodeId  = kUndefinedNodeId;
-        mPeerCATs    = kUndefinedCATs;
-        mPeerAddress = Transport::PeerAddress::Uninitialized();
-        mPeerSessionId.ClearValue();
-        mLocalSessionId = kInvalidKeyId;
-    }
+    void Clear();
+
+protected:
+    CryptoContext::SessionRole mRole;
+    SessionHolder mSecureSessionHolder;
+    // mSessionManager is set if we actually allocate a secure session, so we
+    // can clean it up later as needed.
+    SessionManager * mSessionManager = nullptr;
+
+    // mLocalMRPConfig is our config which is sent to the other end and used by the peer session.
+    // mRemoteMRPConfig is received from other end and set to our session.
+    Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
+    ReliableMessageProtocolConfig mRemoteMRPConfig = GetLocalMRPConfig();
 
 private:
-    const Transport::SecureSession::Type mSecureSessionType;
-    NodeId mPeerNodeId = kUndefinedNodeId;
-    CATValues mPeerCATs;
-
-    // TODO: the local key id should be allocateed at start
-    // then we can remove kInvalidKeyId
-    static constexpr uint16_t kInvalidKeyId = UINT16_MAX;
-    uint16_t mLocalSessionId                = kInvalidKeyId;
-
-    // TODO: decouple peer address into transport, such that pairing session do not need to handle peer address
-    Transport::PeerAddress mPeerAddress = Transport::PeerAddress::Uninitialized();
-
     Optional<uint16_t> mPeerSessionId;
-
-    ReliableMessageProtocolConfig mMRPConfig = GetLocalMRPConfig();
 };
 
 } // namespace chip

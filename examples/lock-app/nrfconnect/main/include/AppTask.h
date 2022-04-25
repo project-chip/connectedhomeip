@@ -36,18 +36,15 @@ class AppTask
 public:
     CHIP_ERROR StartApp();
 
-    void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);
     void PostEvent(AppEvent * event);
-    void UpdateClusterState();
+    void UpdateClusterState(BoltLockManager::State state, BoltLockManager::OperationSource source);
 
 private:
     friend AppTask & GetAppTask(void);
 
     CHIP_ERROR Init();
-    void InitOTARequestor();
 
-    static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(BoltLockManager::Action_t aAction, int32_t aActor);
+    static void LockStateChanged(BoltLockManager::State state, BoltLockManager::OperationSource source);
 
     void CancelTimer(void);
 

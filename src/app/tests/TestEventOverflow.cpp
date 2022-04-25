@@ -22,7 +22,6 @@
  *
  */
 
-#include <app/ClusterInfo.h>
 #include <app/EventLoggingDelegate.h>
 #include <app/EventLoggingTypes.h>
 #include <app/EventManagement.h>
@@ -32,6 +31,7 @@
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/CHIPCounter.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -60,6 +60,11 @@ public:
 
         auto * ctx = static_cast<TestContext *>(context);
 
+        if (ctx->mEventCounter.Init(0) != CHIP_NO_ERROR)
+        {
+            return FAILURE;
+        }
+
         chip::app::LogStorageResources logStorageResources[] = {
             { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
             { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
@@ -68,7 +73,7 @@ public:
 
         chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(),
                                                           sizeof(logStorageResources) / sizeof(logStorageResources[0]),
-                                                          gCircularEventBuffer, logStorageResources, nullptr, 0, nullptr);
+                                                          gCircularEventBuffer, logStorageResources, &ctx->mEventCounter);
 
         return SUCCESS;
     }
@@ -82,6 +87,9 @@ public:
 
         return SUCCESS;
     }
+
+private:
+    chip::MonotonicallyIncreasingCounter mEventCounter;
 };
 
 class TestEventGenerator : public chip::app::EventLoggingDelegate

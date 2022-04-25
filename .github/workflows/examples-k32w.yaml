@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-k32w:0.5.58
+            image: connectedhomeip/chip-build-k32w:0.5.64
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -43,10 +43,11 @@ jobs:
               with:
                   action: actions/checkout@v3
                   with: |
-                      submodules: true
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform k32w0
 
             - name: Set up environment for size reports
               if: ${{ !env.ACT }}
@@ -70,8 +71,8 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target k32w-light-release \
-                      --target k32w-light-tokenizer-release \
+                      --target k32w-light-ota-se \
+                      --target k32w-light-release-no-ota \
                       --target k32w-lock-low-power-release \
                       --target k32w-shell-release \
                       build \
@@ -82,7 +83,7 @@ jobs:
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     k32w k32w061+release light \
-                    out/artifacts/k32w-light-release/chip-k32w061-light-example \
+                    out/artifacts/k32w-light-release-no-ota/chip-k32w061-light-example \
                     /tmp/bloat_reports/
             - name: Get lock size stats
               timeout-minutes: 5

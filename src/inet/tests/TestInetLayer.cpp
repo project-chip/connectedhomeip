@@ -600,8 +600,8 @@ static CHIP_ERROR HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHan
 
     lPeerAddress.ToString(lPeerAddressBuffer);
 
-    printf("TCP message received from %s:%u (%zu bytes)\n", lPeerAddressBuffer, lPeerPort,
-           static_cast<size_t>(aBuffer->DataLength()));
+    printf("TCP message received from %s:%u (%u bytes)\n", lPeerAddressBuffer, lPeerPort,
+           static_cast<unsigned int>(aBuffer->DataLength()));
 
     lCheckPassed = HandleDataReceived(aBuffer, lCheckBuffer, lFirstValue);
     VerifyOrExit(lCheckPassed == true, lStatus = CHIP_ERROR_UNEXPECTED_EVENT);

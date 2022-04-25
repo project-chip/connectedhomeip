@@ -19,7 +19,7 @@ void CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value)
 
 void CHIPRemoveDomainValueForKey(NSString * domain, NSString * key)
 {
-    CFPreferencesSetAppValue((CFStringRef) key, NULL, (CFStringRef) domain);
+    CFPreferencesSetAppValue((CFStringRef) key, nullptr, (CFStringRef) domain);
     CFPreferencesAppSynchronize((CFStringRef) domain);
 }
 

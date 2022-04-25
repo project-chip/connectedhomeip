@@ -149,9 +149,7 @@ cloud-hosted playground.
 The following icon is present at the top of applicable guides that can be
 launched into the playground:
 
-<a href="https://www.w3schools.com">
-<img src="https://i.ibb.co/hR3yWsC/launch-playground.png" alt="drawing" width="130"/>
-</a>
+![Launch playground icon](https://i.ibb.co/hR3yWsC/launch-playground.png")
 <br></br>
 
 ## Guides
@@ -224,23 +222,20 @@ example, you can run:
 It provides some extra options, for example:
 
 ```
-  --app TEXT         Local application to use, omit to use external apps, use
-                     a path for a specific binary or use a filename to search
-                     under the current matter checkout.
-
-  --factoryreset     Remove app config and repl configs (/tmp/chip* and
-                     /tmp/repl*) before running the tests.
-
-  --app-params TEXT  The extra parameters passed to the device.
-  --script PATH      Test script to use.
-  --help             Show this message and exit.
+optional arguments:
+  -h, --help                show this help message and exit
+  --app APP                 Path to local application to use, omit to use external apps.
+  --factoryreset            Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests.
+  --app-args APP_ARGS       The extra parameters passed to the device side app.
+  --script SCRIPT           Path to the test script to use, omit to use the default test script (mobile-device-test.py).
+  --script-args SCRIPT_ARGS Arguments for the REPL test script
 ```
 
 You can pass your own flags for mobile-device-test.py by appending them to the
 command line with two dashes, for example:
 
 ```
-./scripts/tests/run_python_test.py --app chip-all-clusters-app --factoryreset -- -t 90 --disable-test ClusterObjectTests.TestTimedRequestTimeout
+./scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-no-ble-no-wifi-tsan-clang/chip-all-clusters-app --factoryreset --script-args "-t 90 --disable-test ClusterObjectTests.TestTimedRequestTimeout"
 ```
 
 will pass `-t 90 --disable-test ClusterObjectTests.TestTimedRequestTimeout` to

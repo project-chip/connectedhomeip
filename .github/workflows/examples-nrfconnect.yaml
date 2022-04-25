@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.5.58
+            image: connectedhomeip/chip-build-nrf-platform:0.5.64
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -44,10 +44,11 @@ jobs:
               with:
                   action: actions/checkout@v3
                   with: |
-                      submodules: true
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform nrfconnect
             - name: Detect changed paths
               uses: dorny/paths-filter@v2
               id: changed_paths
@@ -104,14 +105,14 @@ jobs:
               if: github.event_name == 'push' || steps.changed_paths.outputs.nrfconnect == 'true'
               timeout-minutes: 10
               run: |
-                  scripts/examples/nrfconnect_example.sh lighting-app nrf52840dongle_nrf52840 -DCONFIG_CHIP_ROTATING_DEVICE_ID=y
+                  scripts/examples/nrfconnect_example.sh lighting-app nrf52840dongle_nrf52840 -DCONF_FILE=prj_no_dfu.conf -DCONFIG_CHIP_ROTATING_DEVICE_ID=y
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf52840dongle_nrf52840 lighting-app \
                     examples/lighting-app/nrfconnect/build/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Lighting App on nRF52840 DK with RPC
               if: github.event_name == 'push' || steps.changed_paths.outputs.nrfconnect == 'true'
-              timeout-minutes: 10
+              timeout-minutes: 20
               run: |
                   scripts/examples/nrfconnect_example.sh lighting-app nrf52840dk_nrf52840 -DOVERLAY_CONFIG=rpc.overlay
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -175,7 +176,7 @@ jobs:
             - name: Build example nRF Connect SDK All Clusters App on nRF52840 DK
               timeout-minutes: 10
               run: |
-                  scripts/examples/nrfconnect_example.sh all-clusters-app nrf52840dk_nrf52840 -DBUILD_WITH_DFU=1
+                  scripts/examples/nrfconnect_example.sh all-clusters-app nrf52840dk_nrf52840 -DCONF_FILE=prj_dfu.conf
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf52840dk_nrf52840 all-clusters-app \
                     examples/all-clusters-app/nrfconnect/build/zephyr/zephyr.elf \

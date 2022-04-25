@@ -26,13 +26,82 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Zephyr/DiagnosticDataProviderImpl.h>
+#include <platform/Zephyr/SysHeapMalloc.h>
 
 #include <drivers/hwinfo.h>
+#include <sys/util.h>
+
+#ifdef CONFIG_MCUBOOT_IMG_MANAGER
+#include <dfu/mcuboot.h>
+#endif
 
 #include <malloc.h>
 
+#if CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
+
+#ifdef CONFIG_NEWLIB_LIBC_ALIGNED_HEAP_SIZE
+const size_t kMaxHeapSize = CONFIG_NEWLIB_LIBC_ALIGNED_HEAP_SIZE;
+#elif defined(CONFIG_NEWLIB_LIBC)
+extern char _end[];
+const size_t kMaxHeapSize = CONFIG_SRAM_BASE_ADDRESS + KB(CONFIG_SRAM_SIZE) - POINTER_TO_UINT(_end);
+#else
+#pragma error "Maximum heap size is required but unknown"
+#endif
+
+#endif
+
 namespace chip {
 namespace DeviceLayer {
+
+namespace {
+
+BootReasonType DetermineBootReason()
+{
+#ifdef CONFIG_HWINFO
+    uint32_t reason;
+
+    if (hwinfo_get_reset_cause(&reason) != 0)
+    {
+        return BootReasonType::kUnspecified;
+    }
+
+    // Bits returned by hwinfo_get_reset_cause() are accumulated between subsequent resets, so
+    // the reset cause must be cleared after reading in order to make sure it always contains
+    // information about the most recent boot only.
+    (void) hwinfo_clear_reset_cause();
+
+    // If no reset cause is provided, it indicates a power-on-reset.
+    if (reason == 0 || reason & (RESET_POR | RESET_PIN))
+    {
+        return BootReasonType::kPowerOnReboot;
+    }
+
+    if (reason & RESET_WATCHDOG)
+    {
+        return BootReasonType::kHardwareWatchdogReset;
+    }
+
+    if (reason & RESET_BROWNOUT)
+    {
+        return BootReasonType::kBrownOutReset;
+    }
+
+    if (reason & RESET_SOFTWARE)
+    {
+#ifdef CONFIG_MCUBOOT_IMG_MANAGER
+        if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
+        {
+            return BootReasonType::kSoftwareUpdateCompleted;
+        }
+#endif
+        return BootReasonType::kSoftwareReset;
+    }
+#endif
+
+    return BootReasonType::kUnspecified;
+}
+
+} // namespace
 
 DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 {
@@ -40,13 +109,22 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
     return sInstance;
 }
 
+inline DiagnosticDataProviderImpl::DiagnosticDataProviderImpl() : mBootReason(DetermineBootReason())
+{
+    ChipLogDetail(DeviceLayer, "Boot reason: %u", static_cast<uint16_t>(mBootReason));
+}
+
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
-#ifdef CONFIG_NEWLIB_LIBC
-    // This will return the amount of memory which has been allocated from the system, but is not
-    // used right now. Ideally, this value should be increased by the amount of memory which can
-    // be allocated from the system, but Zephyr does not expose that number.
-    currentHeapFree = mallinfo().fordblks;
+#ifdef CONFIG_CHIP_MALLOC_SYS_HEAP
+    Malloc::Stats stats;
+    ReturnErrorOnFailure(Malloc::GetStats(stats));
+
+    currentHeapFree = stats.free;
+    return CHIP_NO_ERROR;
+#elif CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
+    const auto stats = mallinfo();
+    currentHeapFree  = kMaxHeapSize - stats.arena + stats.fordblks;
     return CHIP_NO_ERROR;
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -55,7 +133,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeap
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
-#ifdef CONFIG_NEWLIB_LIBC
+#ifdef CONFIG_CHIP_MALLOC_SYS_HEAP
+    Malloc::Stats stats;
+    ReturnErrorOnFailure(Malloc::GetStats(stats));
+
+    currentHeapUsed = stats.used;
+    return CHIP_NO_ERROR;
+#elif CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
     currentHeapUsed = mallinfo().uordblks;
     return CHIP_NO_ERROR;
 #else
@@ -65,7 +149,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
-#ifdef CONFIG_NEWLIB_LIBC
+#ifdef CONFIG_CHIP_MALLOC_SYS_HEAP
+    Malloc::Stats stats;
+    ReturnErrorOnFailure(Malloc::GetStats(stats));
+
+    // TODO: use the maximum usage once that is implemented in Zephyr
+    currentHeapHighWatermark = stats.used;
+    return CHIP_NO_ERROR;
+#elif CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
     // ARM newlib does not provide a way to obtain the peak heap usage, so for now just return
     // the amount of memory allocated from the system which should be an upper bound of the peak
     // usage provided that the heap is not very fragmented.
@@ -121,48 +212,18 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
 {
 #if CONFIG_HWINFO
-    uint32_t reason = 0;
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    if (hwinfo_get_reset_cause(&reason) != 0)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    if (reason & (RESET_POR | RESET_PIN))
-    {
-        bootReason = BootReasonType::PowerOnReboot;
-    }
-    else if (reason & RESET_WATCHDOG)
-    {
-        bootReason = BootReasonType::SoftwareWatchdogReset;
-    }
-    else if (reason & RESET_BROWNOUT)
-    {
-        bootReason = BootReasonType::BrownOutReset;
-    }
-    else if (reason & (RESET_SOFTWARE | RESET_CPU_LOCKUP | RESET_DEBUG))
-    {
-        bootReason = BootReasonType::SoftwareReset;
-    }
-    else
-    {
-        bootReason = BootReasonType::Unspecified;
-    }
-
-    return err;
+    bootReason = mBootReason;
+    return CHIP_NO_ERROR;
 #else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
 {
-#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
     NetworkInterface * head = NULL;
 
     for (Inet::InterfaceIterator interfaceIterator; interfaceIterator.HasCurrent(); interfaceIterator.Next())
@@ -215,7 +276,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         // Assuming IPv6-only support
         Inet::InterfaceAddressIterator interfaceAddressIterator;
         uint8_t ipv6AddressesCount = 0;
-        while (interfaceAddressIterator.HasCurrent())
+        while (interfaceAddressIterator.HasCurrent() && ipv6AddressesCount < kMaxIPv6AddrCount)
         {
             if (interfaceAddressIterator.GetInterfaceId() == interfaceIterator.GetInterfaceId())
             {
@@ -223,8 +284,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 if (interfaceAddressIterator.GetAddress(ipv6Address) == CHIP_NO_ERROR)
                 {
                     memcpy(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], ipv6Address.Addr, kMaxIPv6AddrSize);
-                    ifp->Ipv6AddressSpans[ipv6AddressesCount] =
-                        ByteSpan(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], kMaxIPv6AddrSize);
+                    ifp->Ipv6AddressSpans[ipv6AddressesCount] = ByteSpan(ifp->Ipv6AddressesBuffer[ipv6AddressesCount]);
                     ipv6AddressesCount++;
                 }
             }
@@ -237,9 +297,6 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 
     *netifpp = head;
     return CHIP_NO_ERROR;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
 }
 
 void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * netifp)

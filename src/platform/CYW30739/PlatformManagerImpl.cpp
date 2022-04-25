@@ -25,7 +25,7 @@
 
 #include <platform/CYW30739/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl.cpp>
+#include <platform/internal/GenericPlatformManagerImpl.ipp>
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <hal/wiced_memory.h>
@@ -127,6 +127,11 @@ exit:
     return err;
 }
 
+CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
+{
+    return CHIP_NO_ERROR;
+}
+
 void PlatformManagerImpl::_LockChipStack(void)
 {
     const wiced_result_t result = wiced_rtos_lock_mutex(mMutex);
@@ -188,7 +193,7 @@ void PlatformManagerImpl::SetEventFlags(uint32_t flags)
 
 void PlatformManagerImpl::HandleTimerEvent(void)
 {
-    const CHIP_ERROR err = static_cast<System::LayerImplLwIP &>(DeviceLayer::SystemLayer()).HandlePlatformTimer();
+    const CHIP_ERROR err = static_cast<System::LayerImplFreeRTOS &>(DeviceLayer::SystemLayer()).HandlePlatformTimer();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "HandlePlatformTimer %ld", err.AsInteger());

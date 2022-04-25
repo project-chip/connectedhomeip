@@ -56,19 +56,19 @@ public:
             {
                 return CustomArgumentParser::PutOctetString(writer, tag, value);
             }
-            else if (IsUnsignedNumberPrefix(value))
+            if (IsUnsignedNumberPrefix(value))
             {
                 return CustomArgumentParser::PutUnsignedFromString(writer, tag, value);
             }
-            else if (IsSignedNumberPrefix(value))
+            if (IsSignedNumberPrefix(value))
             {
                 return CustomArgumentParser::PutSignedFromString(writer, tag, value);
             }
-            else if (IsFloatNumberPrefix(value))
+            if (IsFloatNumberPrefix(value))
             {
                 return CustomArgumentParser::PutFloatFromString(writer, tag, value);
             }
-            else if (IsDoubleNumberPrefix(value))
+            if (IsDoubleNumberPrefix(value))
             {
                 return CustomArgumentParser::PutDoubleFromString(writer, tag, value);
             }

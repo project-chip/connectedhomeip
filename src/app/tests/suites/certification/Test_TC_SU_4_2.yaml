@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     31.15.1. [TC-SU-4.2] Tests for verifying cluster attributes from Admin(DUT)
@@ -24,21 +25,21 @@ tests:
     - label:
           "DUT sends a read request to read the UpdatePossible attribute from
           the TH."
-      verification:
-          "Verify that the OTA Requestor App responds to the read command"
+      verification: |
+          Verify that the OTA Requestor App responds to the read command
       disabled: true
 
     - label:
           "DUT sends a read request to read the UpdateState attribute from the
           TH."
-      verification:
-          "Verify that the OTA Requestor App responds to the read command"
+      verification: |
+          Verify that the OTA Requestor App responds to the read command
       disabled: true
 
     - label:
           "TH should start initiating the Software update process. While the TH
           is downloading the image, DUT sends a read request to read the
           UpdateStateProgress attribute from the TH."
-      verification:
-          "Verify that the OTA Requestor App responds to the read command"
+      verification: |
+          Verify that the OTA Requestor App responds to the read command
       disabled: true

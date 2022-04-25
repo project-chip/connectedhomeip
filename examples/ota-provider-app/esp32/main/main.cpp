@@ -36,12 +36,13 @@
 #include <shell_extension/launch.h>
 
 using chip::Callback::Callback;
-using namespace ::chip;
-using namespace ::chip::Shell;
-using namespace ::chip::System;
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceManager;
-using namespace ::chip::DeviceLayer;
+using namespace chip;
+using namespace chip::Shell;
+using namespace chip::System;
+using namespace chip::Credentials;
+using namespace chip::DeviceManager;
+using namespace chip::DeviceLayer;
+using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 
 CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset);
 void OnTransferComplete(void * context);
@@ -69,7 +70,9 @@ app::Clusters::NetworkCommissioning::Instance
 
 static void InitServer(intptr_t context)
 {
-    chip::Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -124,8 +127,8 @@ static void InitServer(intptr_t context)
     ESP_LOGI(TAG, "The OTA image size: %d", otaImageLen);
     if (otaImageLen > 0)
     {
-        otaProvider.SetQueryImageBehavior(OTAProviderExample::kRespondWithUpdateAvailable);
-        otaProvider.SetOTAFilePath(otaFilename);
+        otaProvider.SetQueryImageStatus(OTAQueryStatus::kUpdateAvailable);
+        otaProvider.SetOTAFilePath(otaImagePath);
     }
 
     chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &otaProvider);

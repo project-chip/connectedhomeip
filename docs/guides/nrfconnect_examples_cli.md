@@ -10,10 +10,12 @@ To access the CLI console, use a serial terminal emulator of your choice, like
 Minicom or GNU Screen. Use the baud rate set to `115200`.
 
 For example, to start using the CLI console with Minicom, run the following
-command with _/dev/ttyACM0_ replaced with the device node name of your
+command with `/dev/ttyACM0` replaced with the device node name of your
 development kit:
 
-    $ minicom -D /dev/ttyACM0 -b 115200
+    ```
+    minicom -D /dev/ttyACM0 -b 115200
+    ```
 
 When you reboot the kit, you will see the boot logs in the console, similar to
 the following messages:

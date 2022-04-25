@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os
-
 from enum import Enum, auto
 
 from .gn import GnBuilder
@@ -51,30 +50,43 @@ class TizenBuilder(GnBuilder):
                  root,
                  runner,
                  app: TizenApp = TizenApp.LIGHT,
-                 board: TizenBoard = TizenBoard.ARM):
+                 board: TizenBoard = TizenBoard.ARM,
+                 enable_ble: bool = True,
+                 enable_wifi: bool = True,
+                 use_asan: bool = False,
+                 use_tsan: bool = False,
+                 ):
         super(TizenBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExampleName(), 'linux'),
             runner=runner)
+
         self.app = app
         self.board = board
+        self.extra_gn_options = []
+
+        if not enable_ble:
+            self.extra_gn_options.append('chip_config_network_layer_ble=false')
+        if not enable_wifi:
+            self.extra_gn_options.append('chip_enable_wifi=false')
+        if use_asan:
+            self.extra_gn_options.append('is_asan=true')
+        if use_tsan:
+            raise Exception("TSAN sanitizer not supported by Tizen toolchain")
 
     def GnBuildArgs(self):
         if 'TIZEN_HOME' not in os.environ:
             raise Exception(
-                "Environment TIZEN_HOME missing, cannot build tizen libraries")
-
-        return [
+                "Environment TIZEN_HOME missing, cannot build Tizen target")
+        return self.extra_gn_options + [
             'target_os="tizen"',
             'target_cpu="%s"' % self.board.TargetCpuName(),
             'sysroot="%s"' % os.environ['TIZEN_HOME'],
         ]
 
     def build_outputs(self):
-        items = {
+        return {
             '%s' % self.app.AppName():
                 os.path.join(self.output_dir, self.app.AppName()),
             '%s.map' % self.app.AppName():
                 os.path.join(self.output_dir, '%s.map' % self.app.AppName()),
         }
-
-        return items

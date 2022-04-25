@@ -42,18 +42,6 @@ struct UpdateDescription
     ByteSpan metadataForRequestor;
 };
 
-enum class UpdateFailureState
-{
-    kUnknown,
-    kIdle,
-    kQuerying,
-    kDownloading,
-    kApplying,
-    kNotifying,
-    kAwaitingNextAction,
-    kDelayedOnUserConsent,
-};
-
 enum class UpdateNotFoundReason
 {
     kBusy,
@@ -69,6 +57,13 @@ enum class IdleStateReason
     kInvalidSession,
 };
 
+// The current selected OTA Requestor timer to be running
+enum class SelectedTimer
+{
+    kPeriodicQueryTimer,
+    kWatchdogTimer,
+};
+
 // Interface class to abstract the OTA-related business logic. Each application
 // must implement this interface. All calls must be non-blocking unless stated otherwise
 class OTARequestorDriver
@@ -78,23 +73,26 @@ public:
 
     virtual ~OTARequestorDriver() = default;
 
-    /// Return if the device provides UI for asking a user for consent before downloading a software image
+    /// Return true if the device has the ability to ask the user for consent before downloading a software image
     virtual bool CanConsent() = 0;
 
     /// Return maximum supported download block size
     virtual uint16_t GetMaxDownloadBlockSize() { return 1024; }
 
-    /// Called when an error occurs at any OTA requestor operation
-    virtual void HandleError(UpdateFailureState state, CHIP_ERROR error) = 0;
+    /// Set maximum supported download block size
+    virtual void SetMaxDownloadBlockSize(uint16_t maxDownloadBlockSize) = 0;
+
+    /// Called when OTA Requestor has exited the Idle state for which the driver may need to take various actions
+    virtual void HandleIdleStateExit() = 0;
 
     // Called when the OTA Requestor has entered the Idle state for which the driver may need to take various actions
-    virtual void HandleIdleState(IdleStateReason reason) = 0;
+    virtual void HandleIdleStateEnter(IdleStateReason reason) = 0;
 
     /// Called when the latest query found a software update
     virtual void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) = 0;
 
     /// Called when the latest query did not find any software update
-    virtual void UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay) = 0;
+    virtual CHIP_ERROR UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay) = 0;
 
     /// Called when the download of a new software image has finished
     virtual void UpdateDownloaded() = 0;
@@ -114,13 +112,13 @@ public:
     /// Inform the driver that the device commissioning has completed
     virtual void OTACommissioningCallback() = 0;
 
-    virtual void
     /// Driver portion of the logic for processing the AnnounceOTAProviders command
+    virtual void
     ProcessAnnounceOTAProviders(const ProviderLocationType & providerLocation,
                                 app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason) = 0;
 
     /// Direct the driver to trigger the QueryImage command. The driver may choose to execute some internal
-    /// logic and will then call an OTARequestor API to actually send the command. The purpose of this
+    /// logic and will then call an OTARequestorInterface API to actually send the command. The purpose of this
     /// function is to allow implementation-specific logic (such as possibly cancelling an ongoing update)
     /// to be executed before triggering the image update process
     virtual void SendQueryImage() = 0;
@@ -128,7 +126,7 @@ public:
     // Driver picks the OTA Provider that should be used for the next query and update. The Provider is picked according to
     // the driver's internal logic such as, for example, traversing the default providers list.
     // Returns true if there is a Provider available for the next query, returns false otherwise.
-    // [in] listExhausted - set to TRUE if the list of providers has been traversed until the end and has looped
+    // @param[out] listExhausted - set to TRUE if the list of providers has been traversed until the end and has looped
     // back to the beginning.
     virtual bool GetNextProviderLocation(ProviderLocationType & providerLocation, bool & listExhausted) = 0;
 };

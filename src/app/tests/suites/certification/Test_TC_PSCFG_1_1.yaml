@@ -16,75 +16,50 @@ name: 63.1.1. [TC-PSCFG-1.1] Global attributes with server as DUT
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Power Source Configuration"
     endpoint: 0
 
 tests:
     - label: "Commission DUT to TH"
-      verification: ""
-      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "TH reads the ClusterRevision attribute from the DUT"
-      verification:
-          "./chip-tool powersourceconfiguration read cluster-revision 1234 0 The
-          response should look like this: [1641813555.191189][38097:38102]
-          CHIP:DMG: ReportDataMessage = [1641813555.191325][38097:38102]
-          CHIP:DMG: { [1641813555.191381][38097:38102] CHIP:DMG:
-          AttributeReportIBs = [1641813555.191456][38097:38102] CHIP:DMG: [
-          [1641813555.191627][38097:38102] CHIP:DMG: AttributeReportIB =
-          [1641813555.191842][38097:38102] CHIP:DMG: {
-          [1641813555.191910][38097:38102] CHIP:DMG: AttributeDataIB =
-          [1641813555.191979][38097:38102] CHIP:DMG: {
-          [1641813555.192062][38097:38102] CHIP:DMG: DataVersion = 0x0,
-          [1641813555.192134][38097:38102] CHIP:DMG: AttributePathIB =
-          [1641813555.192212][38097:38102] CHIP:DMG: {
-          [1641813555.192302][38097:38102] CHIP:DMG: Endpoint = 0x0,
-          [1641813555.192386][38097:38102] CHIP:DMG: Cluster = 0x2e,
-          [1641813555.192471][38097:38102] CHIP:DMG: Attribute = 0x0000_FFFD,
-          [1641813555.192545][38097:38102] CHIP:DMG: }
-          [1641813555.192625][38097:38102] CHIP:DMG:
-          [1641813555.192697][38097:38102] CHIP:DMG: Data = 1,
-          [1641813555.192775][38097:38102] CHIP:DMG: },
-          [1641813555.192849][38097:38102] CHIP:DMG:
-          [1641813555.192913][38097:38102] CHIP:DMG: },
-          [1641813555.192984][38097:38102] CHIP:DMG:
-          [1641813555.193044][38097:38102] CHIP:DMG: ],
-          [1641813555.193115][38097:38102] CHIP:DMG:
-          [1641813555.193173][38097:38102] CHIP:DMG: SuppressResponse = true,
-          [1641813555.193227][38097:38102] CHIP:DMG: }
-          [1641813555.193482][38097:38102] CHIP:TOO:
-          PowerSourceConfiguration.ClusterRevision response: 1"
-      disabled: true
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
 
     - label: "TH reads the AttributeList attribute from the DUT"
-      verification:
-          "./chip-tool powersourceconfiguration read attribute-list 1234 0 The
-          response should look like this: [CHIP:DMG: SuppressResponse = true,
-          [CHIP:DMG: } [CHIP:TOO: GeneralCommissioning.AttributeList response: 5
-          entries [CHIP:TOO: [1]: 0 [CHIP:TOO: [2]: 65529 [CHIP:TOO: [3]: 65530
-          [CHIP:TOO: [4]: 65531 [CHIP:TOO: [5]: 65533"
-      disabled: true
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
 
     - label: "TH reads the AcceptedCommandList attribute from the DUT"
-      verification:
-          "./chip-tool powersourceconfiguration read
-          client-generated-command-list 1234 0 [...]
-          [1646048092.858800][36301:36306] CHIP:TOO: Endpoint: 0 Cluster:
-          0x0000_002E Attribute 0x0000_FFF9 DataVersion: 502821112
-          [1646048092.858890][36301:36306] CHIP:TOO: AcceptedCommandList: 0
-          entries"
-      disabled: true
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
 
     - label: "TH reads the GeneratedCommandList attribute from the DUT"
-      verification:
-          "./chip-tool powersourceconfiguration read
-          server-generated-command-list 1234 0 [...]
-          [1646048186.753316][36310:36315] CHIP:TOO: Endpoint: 0 Cluster:
-          0x0000_002E Attribute 0x0000_FFF8 DataVersion: 502821112
-          [1646048186.753391][36310:36315] CHIP:TOO: GeneratedCommandList: 0
-          entries"
-      disabled: true
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          constraints:
+              type: list
 
+    #issue #11053 disabled steps below Global attributes missing from YAML framework
     - label: "TH reads the EventList attribute from the DUT"
-      verification: "Not supported in SDK yet"
       disabled: true
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list

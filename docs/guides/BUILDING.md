@@ -182,7 +182,7 @@ To run all tests, run:
 ninja -C out/host check
 ```
 
-To run only the tests in src/inet/tests, you can run:
+To run only the tests in `src/inet/tests`, you can run:
 
 ```
 ninja -C out/host src/inet/tests:tests_run
@@ -281,13 +281,14 @@ gn desc out/unified '//src/controller(//build/toolchain/host:linux_x64_clang)'
 ```
 
 Note: Some platforms that can be built as part of the unified build require
-downloading additional SDKs. To add these to the build, the location of the SDK
-installation must be provided as a build argument. For example, to add the
-Simplelink cc13x2_26x2 examples to the unified build, install the
-[SDK](https://ti.com/chip_sdk) and add the following build arguments:
+downloading additional tools. To add these to the build, the location must be
+provided as a build argument. For example, to add the Simplelink cc13x2_26x2
+examples to the unified build, install
+[SysConfig](https://www.ti.com/tool/SYSCONFIG) and add the following build
+arguments:
 
 ```
-gn gen out/unified --args="target_os=\"all\" enable_ti_simplelink_builds=true ti_simplelink_sdk_root=\"/path/to/sdk\" ti_sysconfig_root=\"/path/to/sysconfig\""
+gn gen out/unified --args="target_os=\"all\" enable_ti_simplelink_builds=true ti_sysconfig_root=\"/path/to/sysconfig\""
 ```
 
 ## Getting help

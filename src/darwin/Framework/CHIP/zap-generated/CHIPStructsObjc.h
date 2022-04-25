@@ -110,6 +110,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPBasicClusterCapabilityMinimaStruct : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull caseSessionsPerFabric;
+@property (strong, nonatomic) NSNumber * _Nonnull subscriptionsPerFabric;
+- (instancetype)init;
+@end
+
 @interface CHIPOtaSoftwareUpdateRequestorClusterProviderLocation : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull providerNodeID;
 @property (strong, nonatomic) NSNumber * _Nonnull endpoint;
@@ -152,7 +158,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull networkName;
 @property (strong, nonatomic) NSNumber * _Nonnull channel;
 @property (strong, nonatomic) NSNumber * _Nonnull version;
-@property (strong, nonatomic) NSNumber * _Nonnull extendedAddress;
+@property (strong, nonatomic) NSData * _Nonnull extendedAddress;
 @property (strong, nonatomic) NSNumber * _Nonnull rssi;
 @property (strong, nonatomic) NSNumber * _Nonnull lqi;
 - (instancetype)init;

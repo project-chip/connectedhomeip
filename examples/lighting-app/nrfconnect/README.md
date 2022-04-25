@@ -5,10 +5,8 @@ dimmable light bulb. It uses buttons to test changing the lighting and device
 states and LEDs to show the state of these changes. You can use this example as
 a reference for creating your own application.
 
-<p align="center">
-  <img src="../../platform/nrfconnect/doc/images/Logo_RGB_H-small.png" alt="Nordic Semiconductor logo"/>
-  <img src="../../platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
-</p>
+![Nordic Smiconductor logo](../../platform/nrfconnect/doc/images/Logo_RGB_H-small.png)
+![nRF52840 DK](../../platform/nrfconnect/doc/images/nRF52840-DK-small.png)
 
 The example is based on
 [Matter](https://github.com/project-chip/connectedhomeip) and Nordic
@@ -36,6 +34,7 @@ into an existing Matter network and can be controlled by this network.
     -   [Building with Pigweed RPCs](#building-with-pigweed-rpcs)
     -   [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
 -   [Configuring the example](#configuring-the-example)
+    -   [Example build types](#example-build-types)
 -   [Flashing and debugging](#flashing-and-debugging)
     -   [Flashing on the development kits](#nrfdks_flashing)
     -   [Flashing on the nRF52840 Dongle](#nrf52840dongle_flashing)
@@ -264,7 +263,9 @@ NFC.
 Before building the example, check out the Matter repository and sync submodules
 using the following command:
 
+        ```
         $ git submodule update --init
+        ```
 
 The example requires a specific revision of the nRF Connect SDK. You can either
 install it along with the related tools directly on your system or use a Docker
@@ -282,18 +283,24 @@ To use the Docker container for setup, complete the following steps:
 1.  If you do not have the nRF Connect SDK installed yet, create a directory for
     it by running the following command:
 
+        ```
         $ mkdir ~/nrfconnect
+        ```
 
 2.  Download the latest version of the nRF Connect SDK Docker image by running
     the following command:
 
+        ```
         $ docker pull nordicsemi/nrfconnect-chip
+        ```
 
 3.  Start Docker with the downloaded image by running the following command,
     customized to your needs as described below:
 
+         ```
          $ docker run --rm -it -e RUNAS=$(id -u) -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip \
              -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" nordicsemi/nrfconnect-chip
+         ```
 
     In this command:
 
@@ -313,8 +320,10 @@ To use the Docker container for setup, complete the following steps:
 4.  Update the nRF Connect SDK to the most recent supported revision, by running
     the following command:
 
+         ```
          $ cd /var/chip
          $ python3 scripts/setup/nrfconnect/update_ncs.py --update
+         ```
 
 Now you can proceed with the [Building](#building) instruction.
 
@@ -341,16 +350,20 @@ To use the native shell for setup, complete the following steps:
     nRF Connect SDK installation directory, and _toolchain-dir_ with the path to
     GNU Arm Embedded Toolchain.
 
+         ```
          $ source nrfconnect-dir/zephyr/zephyr-env.sh
          $ export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
          $ export GNUARMEMB_TOOLCHAIN_PATH=toolchain-dir
+         ```
 
 4.  Update the nRF Connect SDK to the most recent supported revision by running
     the following command (replace _matter-dir_ with the path to Matter
     repository directory):
 
+         ```
          $ cd matter-dir
          $ python3 scripts/setup/nrfconnect/update_ncs.py --update
+         ```
 
 Now you can proceed with the [Building](#building) instruction.
 
@@ -365,13 +378,17 @@ environment:
 
 1.  Navigate to the example's directory:
 
+        ```
         $ cd examples/lighting-app/nrfconnect
+        ```
 
 2.  Run the following command to build the example, with _build-target_ replaced
     with the build target name of the Nordic Semiconductor's kit you own, for
     example `nrf52840dk_nrf52840`:
 
-         $ west build -b build-target
+        ```
+        $ west build -b build-target
+        ```
 
     You only need to specify the build target on the first build. See
     [Requirements](#requirements) for the build target names of compatible kits.
@@ -384,14 +401,18 @@ If you're planning to build the example for a different kit or make changes to
 the configuration, remove all build artifacts before building. To do so, use the
 following command:
 
+    ```
     $ rm -r build
+    ```
 
 ### Building with release configuration
 
 To build the example with release configuration that disables the diagnostic
 features like logs and command-line interface, run the following command:
 
-    $ west build -b build-target -- -DOVERLAY_CONFIG=third_party/connectedhomeip/config/nrfconnect/app/release.conf
+    ```
+    $ west build -b build-target -- -DCONF_FILE=prj_release.conf
+    ```
 
 Remember to replace _build-target_ with the build target name of the Nordic
 Semiconductor's kit you own.
@@ -404,7 +425,9 @@ host computer. To build the example with the RPC server, run the following
 command with _build-target_ replaced with the build target name of the Nordic
 Semiconductor's kit you own:
 
+    ```
     $ west build -b build-target -- -DOVERLAY_CONFIG=rpc.overlay
+    ```
 
 ### Building with Device Firmware Upgrade support
 
@@ -414,13 +437,17 @@ To enable DFU over Bluetooth LE, run the following command with _build-target_
 replaced with the build target name of the Nordic Semiconductor kit you are
 using (for example `nrf52840dk_nrf52840`):
 
-    $ west build -b build-target -- -DBUILD_WITH_DFU=BLE
+    ```
+    $ west build -b build-target -- -DCONFIG_CHIP_DFU_OVER_BT_SMP=y
+    ```
 
 To completely disable support for both DFU methods, run the following command
 with _build-target_ replaced with the build target name of the Nordic
 Semiconductor kit you are using (for example `nrf52840dk_nrf52840`):
 
-    $ west build -b build-target -- -DBUILD_WITH_DFU=OFF
+    ```
+    $ west build -b build-target -- -DCONF_FILE=prj_no_dfu.conf
+    ```
 
 > **Note**:
 >
@@ -434,29 +461,10 @@ Semiconductor kit you are using (for example `nrf52840dk_nrf52840`):
 > Currently the multi-image mode is only available for the DFU over Bluetooth LE
 > method.
 
-#### Changing Device Firmware Upgrade configuration
-
-To change the default DFU configuration, edit the following overlay files
-corresponding to the selected configuration:
-
--   `overlay-mcuboot_qspi_nor_support.conf` - general file enabling MCUboot and
-    QSPI NOR support, used by all DFU configurations
--   `overlay-single_image_smp_dfu_support.conf` - file enabling single-image DFU
-    over Bluetooth LE using SMP
--   `overlay-multi_image_smp_dfu_support.conf` - file enabling multi-image DFU
-    over Bluetooth LE using SMP
--   `overlay-ota_requestor.conf` - file enabling Matter OTA Requestor support.
-
-The files are located in the `config/nrfconnect/app` directory. You can also
-define the desired options in your example's `prj.conf` file.
-
 #### Changing bootloader configuration
 
-To change the default MCUboot configuration, edit the
-`mcuboot_single_image_dfu.conf` or `mcuboot_multi_image_dfu.conf` overlay files
-depending on whether the build target device supports multi-image DFU (nRF5340
-DK) or single-image DFU (nRF52840 DK). The files are located in the
-`configuration` directory.
+To change the default MCUboot configuration, edit the `prj.conf` file located in
+the `child_image/mcuboot` directory.
 
 Make sure to keep the configuration consistent with changes made to the
 application configuration. This is necessary for the configuration to work, as
@@ -473,7 +481,7 @@ purposes. You can change these settings by defining
 This example uses this option to define using an external flash.
 
 To modify the flash settings of your board (that is, your _build-target_, for
-example `nrf52840dk_nrf52840`), edit the `pm_static.yml` file located in the
+example `nrf52840dk_nrf52840`), edit the `pm_static_dfu.yml` file located in the
 `configuration/build-target/` directory.
 
 <hr>
@@ -488,13 +496,45 @@ using the menuconfig utility.
 To open the menuconfig utility, run the following command from the example
 directory:
 
+    ```
     $ west build -b build-target -t menuconfig
+    ```
 
 Remember to replace _build-target_ with the build target name of the Nordic
 Semiconductor's kit you own.
 
 Changes done with menuconfig will be lost if the `build` directory is deleted.
 To make them persistent, save the configuration options in the `prj.conf` file.
+
+### Example build types
+
+The example uses different configuration files depending on the supported
+features. Configuration files are provided for different build types and they
+are located in the application root directory.
+
+The `prj.conf` file represents a debug build type. Other build types are covered
+by dedicated files with the build type added as a suffix to the prj part, as per
+the following list. For example, the release build type file name is
+`prj_release.conf`. If a board has other configuration files, for example
+associated with partition layout or child image configuration, these follow the
+same pattern.
+
+Before you start testing the application, you can select one of the build types
+supported by the sample. This sample supports the following build types,
+depending on the selected board:
+
+-   debug -- Debug version of the application - can be used to enable additional
+    features for verifying the application behavior, such as logs or
+    command-line shell. It can be used only for the nRF52840 DK and nRF5340 DK,
+    as those platforms have DFU enabled by default.
+-   release -- Release version of the application - can be used to enable only
+    the necessary application functionalities to optimize its performance. It
+    can be used only for the nRF52840 DK and nRF5340 DK, as those platforms have
+    DFU enabled by default.
+-   no_dfu -- Debug version of the application without Device Firmware Upgrade
+    feature support - can be used for the nRF52840 DK, nRF5340 DK and nRF52840
+    Dongle.
+
 For more information, see the
 [Configuring nRF Connect SDK examples](../../../docs/guides/nrfconnect_examples_configuration.md)
 page.
@@ -515,7 +555,9 @@ the nRF52840 Dongle.
 To flash the application to the device, use the west tool and run the following
 command from the example directory:
 
+        ```
         $ west flash --erase
+        ```
 
 If you have multiple development kits connected, west will prompt you to pick
 the correct one.
@@ -523,7 +565,9 @@ the correct one.
 To debug the application on target, run the following command from the example
 directory:
 
+        ```
         $ west debug
+        ```
 
 <a name="nrf52840dongle_flashing"></a>
 
@@ -563,13 +607,17 @@ Build or install the [rpc console](../../common/pigweed/rpc_console/README.md)
 
 Start the console
 
-        $ python -m chip_rpc.console --device /dev/ttyUSB0
+        ```
+        $ chip-console --device /dev/ttyUSB0
+        ```
 
 From within the console you can then invoke rpcs:
 
+        ```python
         rpcs.chip.rpc.Lighting.Get()
 
         rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))
+        ```
 
 ## Device Tracing
 

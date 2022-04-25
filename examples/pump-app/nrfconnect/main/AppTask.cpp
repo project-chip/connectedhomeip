@@ -37,11 +37,7 @@
 #include <system/SystemClock.h>
 
 #if CONFIG_CHIP_OTA_REQUESTOR
-#include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
-#include <platform/nrfconnect/OTAImageProcessorImpl.h>
+#include "OTAUtil.h"
 #endif
 
 #include <dk_buttons_and_leds.h>
@@ -64,7 +60,7 @@ using namespace ::chip::DeviceLayer;
 
 namespace {
 
-LOG_MODULE_DECLARE(app);
+LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
 k_timer sFunctionTimer;
 
@@ -76,14 +72,6 @@ LEDWidget sUnusedLED_1;
 bool sIsThreadProvisioned = false;
 bool sIsThreadEnabled     = false;
 bool sHaveBLEConnections  = false;
-
-#if CONFIG_CHIP_OTA_REQUESTOR
-DefaultOTARequestorStorage sRequestorStorage;
-GenericOTARequestorDriver sOTARequestorDriver;
-OTAImageProcessorImpl sOTAImageProcessor;
-chip::BDXDownloader sBDXDownloader;
-chip::OTARequestor sOTARequestor;
-#endif
 
 } // namespace
 
@@ -158,8 +146,13 @@ CHIP_ERROR AppTask::Init()
 
     // Initialize CHIP server
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    InitOTARequestor();
-    ReturnErrorOnFailure(chip::Server::GetInstance().Init());
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
+    ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+#if CONFIG_CHIP_OTA_REQUESTOR
+    InitBasicOTARequestor();
+#endif
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
@@ -175,18 +168,6 @@ CHIP_ERROR AppTask::Init()
     }
 
     return err;
-}
-
-void AppTask::InitOTARequestor()
-{
-#if CONFIG_CHIP_OTA_REQUESTOR
-    sOTAImageProcessor.SetOTADownloader(&sBDXDownloader);
-    sBDXDownloader.SetImageProcessorDelegate(&sOTAImageProcessor);
-    sOTARequestorDriver.Init(&sOTARequestor, &sOTAImageProcessor);
-    sRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    sOTARequestor.Init(chip::Server::GetInstance(), sRequestorStorage, sOTARequestorDriver, sBDXDownloader);
-    chip::SetRequestorInstance(&sOTARequestor);
-#endif
 }
 
 CHIP_ERROR AppTask::StartApp()
@@ -371,11 +352,6 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
 {
     if (aEvent->ButtonEvent.PinNo != THREAD_START_BUTTON)
         return;
-
-    if (chip::Server::GetInstance().AddTestCommissioning() != CHIP_NO_ERROR)
-    {
-        LOG_ERR("Failed to add test pairing");
-    }
 
     if (!ConnectivityMgr().IsThreadProvisioned())
     {

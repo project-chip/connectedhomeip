@@ -1295,8 +1295,6 @@ NS_ASSUME_NONNULL_BEGIN
         _expiryLengthSeconds = @(0);
 
         _breadcrumb = @(0);
-
-        _timeoutMs = @(0);
     }
     return self;
 }
@@ -1320,13 +1318,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _location = @(0);
+        _newRegulatoryConfig = @(0);
 
         _countryCode = @"";
 
         _breadcrumb = @(0);
-
-        _timeoutMs = @(0);
     }
     return self;
 }
@@ -1363,9 +1359,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _ssid = [NSData data];
+        _ssid = nil;
 
-        _breadcrumb = @(0);
+        _breadcrumb = nil;
     }
     return self;
 }
@@ -1378,7 +1374,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _networkingStatus = @(0);
 
-        _debugText = @"";
+        _debugText = nil;
 
         _wiFiScanResults = nil;
 
@@ -1397,7 +1393,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _credentials = [NSData data];
 
-        _breadcrumb = @(0);
+        _breadcrumb = nil;
     }
     return self;
 }
@@ -1410,7 +1406,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _operationalDataset = [NSData data];
 
-        _breadcrumb = @(0);
+        _breadcrumb = nil;
     }
     return self;
 }
@@ -1423,7 +1419,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _networkID = [NSData data];
 
-        _breadcrumb = @(0);
+        _breadcrumb = nil;
     }
     return self;
 }
@@ -1436,7 +1432,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _networkingStatus = @(0);
 
-        _debugText = @"";
+        _debugText = nil;
+
+        _networkIndex = nil;
     }
     return self;
 }
@@ -1449,7 +1447,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _networkID = [NSData data];
 
-        _breadcrumb = @(0);
+        _breadcrumb = nil;
     }
     return self;
 }
@@ -1462,9 +1460,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _networkingStatus = @(0);
 
-        _debugText = @"";
+        _debugText = nil;
 
-        _errorValue = @(0);
+        _errorValue = nil;
     }
     return self;
 }
@@ -1479,7 +1477,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _networkIndex = @(0);
 
-        _breadcrumb = @(0);
+        _breadcrumb = nil;
     }
     return self;
 }
@@ -2445,7 +2443,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _liftPercentageValue = @(0);
 
-        _liftPercent100thsValue = @(0);
+        _liftPercent100thsValue = nil;
     }
     return self;
 }
@@ -2469,7 +2467,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _tiltPercentageValue = @(0);
 
-        _tiltPercent100thsValue = @(0);
+        _tiltPercent100thsValue = nil;
     }
     return self;
 }

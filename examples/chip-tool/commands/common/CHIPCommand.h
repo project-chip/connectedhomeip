@@ -22,6 +22,7 @@
 #include "Command.h"
 #include <commands/common/CredentialIssuerCommands.h>
 #include <commands/example/ExampleCredentialIssuerCommands.h>
+#include <credentials/GroupDataProviderImpl.h>
 
 #pragma once
 
@@ -52,11 +53,16 @@ public:
     using PeerId                 = ::chip::PeerId;
     using PeerAddress            = ::chip::Transport::PeerAddress;
 
+    static constexpr uint16_t kMaxGroupsPerFabric    = 5;
+    static constexpr uint16_t kMaxGroupKeysPerFabric = 8;
+
     CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds) :
         Command(commandName), mCredIssuerCmds(credIssuerCmds)
     {
         AddArgument("paa-trust-store-path", &mPaaTrustStorePath);
         AddArgument("commissioner-name", &mCommissionerName);
+        AddArgument("commissioner-nodeid", 0, UINT64_MAX, &mCommissionerNodeId);
+        AddArgument("commissioner-fabricid", 0, UINT64_MAX, &mCommissionerNodeId);
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace_file", &mTraceFile);
         AddArgument("trace_log", 0, 1, &mTraceLog);
@@ -91,6 +97,7 @@ protected:
 
     PersistentStorage mDefaultStorage;
     PersistentStorage mCommissionerStorage;
+    chip::Credentials::GroupDataProviderImpl mGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
     CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();
@@ -102,12 +109,17 @@ protected:
     ChipDeviceCommissioner & CurrentCommissioner();
 
 private:
+    CHIP_ERROR MaybeSetUpStack();
+    CHIP_ERROR MaybeTearDownStack();
+
     CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId,
                                       const chip::Credentials::AttestationTrustStore * trustStore);
     CHIP_ERROR ShutdownCommissioner(std::string key);
     chip::FabricId CurrentCommissionerId();
-    std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
+    static std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
     chip::Optional<char *> mCommissionerName;
+    chip::Optional<chip::NodeId> mCommissionerNodeId;
+    chip::Optional<chip::FabricId> mCommissionerFabricId;
     chip::Optional<uint16_t> mBleAdapterId;
     chip::Optional<char *> mPaaTrustStorePath;
 

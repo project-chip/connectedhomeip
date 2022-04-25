@@ -35,6 +35,7 @@ chip_test_suite("tests") {
     "TestFold.cpp",
     "TestIntrusiveList.cpp",
     "TestOwnerOf.cpp",
+    "TestPersistedCounter.cpp",
     "TestPool.cpp",
     "TestPrivateHeap.cpp",
     "TestSafeInt.cpp",
@@ -55,15 +56,6 @@ chip_test_suite("tests") {
 
   if (current_os != "mbed") {
     test_sources += [ "TestCHIPArgParser.cpp" ]
-  }
-
-  if (current_os == "linux" || current_os == "mac") {
-    # persisted counter unit test uses file-based persistent storage
-    test_sources += [ "TestPersistedCounter.cpp" ]
-    sources += [
-      "TestPersistedStorageImplementation.cpp",
-      "TestPersistedStorageImplementation.h",
-    ]
   }
 
   cflags = [ "-Wconversion" ]

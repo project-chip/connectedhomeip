@@ -195,7 +195,6 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint64_t chip64bitAttr;
     uint32_t chip32bitAttr;
-    OID attrOID;
 
     switch (id)
     {
@@ -243,23 +242,22 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
                 PrintArgError("%s: Invalid value specified for chip node-id attribute: %s\n", progName, arg);
                 return false;
             }
-            attrOID = kOID_AttributeType_ChipNodeId;
+            err = gSubjectDN.AddAttribute_MatterNodeId(chip64bitAttr);
             break;
         case kCertType_FirmwareSigning:
-            attrOID = kOID_AttributeType_ChipFirmwareSigningId;
+            err = gSubjectDN.AddAttribute_MatterFirmwareSigningId(chip64bitAttr);
             break;
         case kCertType_ICA:
-            attrOID = kOID_AttributeType_ChipICAId;
+            err = gSubjectDN.AddAttribute_MatterICACId(chip64bitAttr);
             break;
         case kCertType_Root:
-            attrOID = kOID_AttributeType_ChipRootId;
+            err = gSubjectDN.AddAttribute_MatterRCACId(chip64bitAttr);
             break;
         default:
             PrintArgError("%s: Certificate type argument should be specified prior to subject attribute: %s\n", progName, arg);
             return false;
         }
 
-        err = gSubjectDN.AddAttribute(attrOID, chip64bitAttr);
         if (err != CHIP_NO_ERROR)
         {
             fprintf(stderr, "Failed to add subject DN attribute: %s\n", chip::ErrorStr(err));
@@ -268,15 +266,14 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
 
     case 'a':
-        if (!ParseInt(arg, chip32bitAttr, 16) || chip::IsValidCASEAuthTag(chip32bitAttr))
+        if (!ParseInt(arg, chip32bitAttr, 16) || !chip::IsValidCASEAuthTag(chip32bitAttr))
         {
             PrintArgError("%s: Invalid value specified for the subject CASE Authenticated Tag (CAT) attribute: %s\n", progName,
                           arg);
             return false;
         }
-        attrOID = kOID_AttributeType_ChipCASEAuthenticatedTag;
 
-        err = gSubjectDN.AddAttribute(attrOID, chip32bitAttr);
+        err = gSubjectDN.AddAttribute_MatterCASEAuthTag(chip32bitAttr);
         if (err != CHIP_NO_ERROR)
         {
             fprintf(stderr, "Failed to add subject DN attribute: %s\n", chip::ErrorStr(err));
@@ -298,7 +295,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
             return false;
         }
 
-        err = gSubjectDN.AddAttribute(kOID_AttributeType_ChipFabricId, chip64bitAttr);
+        err = gSubjectDN.AddAttribute_MatterFabricId(chip64bitAttr);
         if (err != CHIP_NO_ERROR)
         {
             fprintf(stderr, "Failed to add Fabric Id attribute to the subject DN: %s\n", chip::ErrorStr(err));
@@ -307,7 +304,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
 
     case 'c':
-        err = gSubjectDN.AddAttribute(kOID_AttributeType_CommonName, chip::CharSpan::fromCharString(arg), false);
+        err = gSubjectDN.AddAttribute_CommonName(chip::CharSpan::fromCharString(arg), false);
         if (err != CHIP_NO_ERROR)
         {
             fprintf(stderr, "Failed to add Common Name attribute to the subject DN: %s\n", chip::ErrorStr(err));

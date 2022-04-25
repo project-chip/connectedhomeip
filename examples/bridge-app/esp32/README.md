@@ -86,38 +86,48 @@ The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
 
 -   Clone the Espressif ESP-IDF and checkout
-    [v4.4 release](https://github.com/espressif/esp-idf/releases/tag/v4.4)
+    [v4.4.1 release](https://github.com/espressif/esp-idf/releases/tag/v4.4.1)
 
+          ```
           $ mkdir ${HOME}/tools
           $ cd ${HOME}/tools
           $ git clone https://github.com/espressif/esp-idf.git
           $ cd esp-idf
-          $ git checkout v4.4
+          $ git checkout v4.4.1
           $ git submodule update --init
           $ ./install.sh
+          ```
 
 -   Install ninja-build
 
+          ```
           $ sudo apt-get install ninja-build
+          ```
 
 Currently building in VSCode _and_ deploying from native is not supported, so
 make sure the IDF_PATH has been exported(See the manual setup steps above).
 
 -   Setting up the environment
 
+        ```
         $ cd ${HOME}/tools/esp-idf
         $ ./install.sh
         $ . ./export.sh
         $ cd {path-to-connectedhomeip}
+        ```
 
     To download and install packages.
 
+        ```
         $ source ./scripts/bootstrap.sh
         $ source ./scripts/activate.sh
+        ```
 
     If packages are already installed then simply activate them.
 
+        ```
         $ source ./scripts/activate.sh
+        ```
 
 -   Configuration Options
 
@@ -127,7 +137,9 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
 -   To build the demo application.
 
+          ```
           $ idf.py build
+          ```
 
 -   After building the application, to flash it outside of VSCode, connect your
     device via USB. Then run the following command to flash the demo application
@@ -138,7 +150,9 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
     before flashing. For ESP32-DevKitC devices this is labeled in the
     [functional description diagram](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-devkitc.html#functional-description).
 
+          ```
           $ idf.py -p /dev/tty.SLAB_USBtoUART flash monitor
+          ```
 
     Note: Some users might have to install the
     [VCP driver](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
@@ -151,33 +165,37 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
 -   If desired, the monitor can be run again like so:
 
+          ```
           $ idf.py -p /dev/tty.SLAB_USBtoUART monitor
+          ```
 
 ## Commissioning and cluster control
 
-Commissioning can be carried out using WiFi, BLE or Bypass.
+Commissioning can be carried out using WiFi or BLE.
 
 1.  Set the `Rendezvous Mode` for commissioning using menuconfig; the default
     Rendezvous mode is BLE.
 
+         ```
          $ idf.py menuconfig
+         ```
 
-Select the Rendezvous Mode via `Demo -> Rendezvous Mode`. If Rendezvous Mode is
-Bypass then set the credentials of the WiFi Network (i.e. SSID and Password from
-menuconfig).
-
-`idf.py menuconfig -> Component config -> CHIP Device Layer -> WiFi Station Options`
+Select the Rendezvous Mode via `Demo -> Rendezvous Mode`.
 
 2.  Now flash the device with the same command as before. (Use the right `/dev`
     device)
 
-          $ idf.py -p /dev/tty.SLAB_USBtoUART flash monitor
+         ```
+         $ idf.py -p /dev/tty.SLAB_USBtoUART flash monitor
+         ```
 
 3.  The device should boot up. When device connects to your network, you will
     see a log like this on the device console.
 
-          I (5524) chip[DL]: SYSTEM_EVENT_STA_GOT_IP
-          I (5524) chip[DL]: IPv4 address changed on WiFi station interface: <IP_ADDRESS>...
+         ```
+         I (5524) chip[DL]: SYSTEM_EVENT_STA_GOT_IP
+         I (5524) chip[DL]: IPv4 address changed on WiFi station interface: <IP_ADDRESS>...
+         ```
 
 4.  Use
     [python based device controller](https://github.com/project-chip/connectedhomeip/tree/master/src/controller/python)
@@ -192,7 +210,9 @@ menuconfig).
 Note: The ESP32 does not support 5GHz networks. Also, the Device will persist
 your network configuration. To erase it, simply run.
 
+    ```
     $ idf.py -p /dev/tty.SLAB_USBtoUART erase_flash
+    ```
 
 -   Once ESP32 is up and running, we need to set up a device controller to
     perform commissioning and cluster control.
@@ -229,7 +249,9 @@ remote device, as well as the network credentials to use.
 The command below uses the default values hard-coded into the debug versions of
 the ESP32 all-clusters-app to commission it onto a Wi-Fi network:
 
+    ```
     $ ./out/debug/chip-tool pairing ble-wifi 12344321 ${SSID} ${PASSWORD} 20202021 3840
+    ```
 
 Parameters:
 
@@ -244,6 +266,8 @@ Parameters:
 To use the Client to send Matter commands, run the built executable and pass it
 the target cluster name, the target command name as well as an endpoint id.
 
+    ```
     $ ./out/debug/chip-tool onoff on 12344321 2
+    ```
 
 The client will send a single command packet and then exit.

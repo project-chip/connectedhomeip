@@ -170,7 +170,7 @@ void PacketBufferHandle::InternalRightSize()
     {
         mBuffer = lNewPacket;
         SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
-        ChipLogProgress(chipSystemLayer, "PacketBuffer: RightSize Copied");
+        ChipLogDetail(chipSystemLayer, "PacketBuffer: RightSize Copied");
     }
 }
 
@@ -470,7 +470,12 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
 #elif CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
 
     static_cast<void>(lBlockSize);
-
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING && CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
+    if (!sBufferPoolMutex.isInitialized())
+    {
+        Mutex::Init(sBufferPoolMutex);
+    }
+#endif
     LOCK_BUF_POOL();
 
     lPacket = PacketBuffer::sFreeList;

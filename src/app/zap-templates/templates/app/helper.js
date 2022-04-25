@@ -120,6 +120,7 @@ var endpointClusterWithInit = [
   'Scenes',
   'Time Format Localization',
   'Thermostat',
+  'Mode Select',
 ];
 var endpointClusterWithAttributeChanged = [
   'Bridged Device Basic',
@@ -129,7 +130,12 @@ var endpointClusterWithAttributeChanged = [
   'Window Covering',
 ];
 var endpointClusterWithPreAttribute = [
-  'IAS Zone', 'Door Lock', 'Thermostat User Interface Configuration', 'Time Format Localization', 'Localization Configuration'
+  'IAS Zone',
+  'Door Lock',
+  'Thermostat User Interface Configuration',
+  'Time Format Localization',
+  'Localization Configuration',
+  'Mode Select',
 ];
 var endpointClusterWithMessageSent = [ 'IAS Zone' ];
 
@@ -337,9 +343,9 @@ function asPrintFormat(type)
       case 'uint8_t':
         return '%u';
       case 'int16_t':
-        return '%" PRId16 "';
+        return '%d';
       case 'uint16_t':
-        return '%" PRIu16 "';
+        return '%u';
       case 'int24_t':
         return '%" PRId32 "';
       case 'uint24_t':
@@ -748,7 +754,6 @@ function isWeaklyTypedEnum(label)
     "AttributeWritePermission",
     "BarrierControlBarrierPosition",
     "BarrierControlMovingState",
-    "BootReasonType",
     "ColorControlOptions",
     "ColorLoopAction",
     "ColorLoopDirection",
@@ -785,8 +790,6 @@ function isWeaklyTypedEnum(label)
     "StatusCode",
     "StepMode",
     "TemperatureDisplayMode",
-    "WcEndProductType",
-    "WcType",
     "WiFiVersionType",
   ].includes(label);
 }

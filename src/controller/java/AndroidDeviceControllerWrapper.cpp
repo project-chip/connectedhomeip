@@ -31,6 +31,7 @@
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/TestGroupData.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/KeyValueStoreManager.h>
 
@@ -62,7 +63,7 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
 
 AndroidDeviceControllerWrapper *
 AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId,
-                                            chip::System::Layer * systemLayer,
+                                            const chip::CATValues & cats, chip::System::Layer * systemLayer,
                                             chip::Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager,
                                             chip::Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager,
                                             AndroidOperationalCredentialsIssuerPtr opCredsIssuerPtr, CHIP_ERROR * errInfoOnFailure)
@@ -124,11 +125,21 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
     initParams.bleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
 #endif
     initParams.listenPort                      = CHIP_PORT + 1;
-    setupParams.storageDelegate                = wrapper.get();
     setupParams.pairingDelegate                = wrapper.get();
     setupParams.operationalCredentialsDelegate = opCredsIssuer;
-    initParams.fabricIndependentStorage        = setupParams.storageDelegate;
+    initParams.fabricIndependentStorage        = wrapper.get();
 
+    wrapper->mGroupDataProvider.SetStorageDelegate(wrapper.get());
+
+    CHIP_ERROR err = wrapper->mGroupDataProvider.Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        *errInfoOnFailure = err;
+        return nullptr;
+    }
+    initParams.groupDataProvider = &wrapper->mGroupDataProvider;
+
+    // TODO: Init IPK Epoch Key in opcreds issuer, so that commissionees get the right IPK
     opCredsIssuer->Initialize(*wrapper.get(), wrapper.get()->mJavaObjectRef);
 
     Platform::ScopedMemoryBuffer<uint8_t> noc;
@@ -163,8 +174,8 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
         return nullptr;
     }
 
-    *errInfoOnFailure = opCredsIssuer->GenerateNOCChainAfterValidation(nodeId, /* fabricId = */ 1, ephemeralKey.Pubkey(), rcacSpan,
-                                                                       icacSpan, nocSpan);
+    *errInfoOnFailure = opCredsIssuer->GenerateNOCChainAfterValidation(nodeId, /* fabricId = */ 1, cats, ephemeralKey.Pubkey(),
+                                                                       rcacSpan, icacSpan, nocSpan);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;
@@ -181,6 +192,35 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
         return nullptr;
     }
     *errInfoOnFailure = DeviceControllerFactory::GetInstance().SetupCommissioner(setupParams, *wrapper->Controller());
+    if (*errInfoOnFailure != CHIP_NO_ERROR)
+    {
+        return nullptr;
+    }
+
+    // Setup IPK
+    chip::FabricInfo * fabricInfo = wrapper->Controller()->GetFabricInfo();
+    if (fabricInfo == nullptr)
+    {
+        *errInfoOnFailure = CHIP_ERROR_INTERNAL;
+        return nullptr;
+    }
+
+    uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
+    chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
+
+    *errInfoOnFailure = fabricInfo->GetCompressedId(compressedFabricIdSpan);
+    if (*errInfoOnFailure != CHIP_NO_ERROR)
+    {
+        return nullptr;
+    }
+    ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
+                    static_cast<unsigned>(fabricInfo->GetFabricIndex()));
+    ChipLogByteSpan(Support, compressedFabricIdSpan);
+
+    chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+
+    *errInfoOnFailure = chip::Credentials::SetSingleIpkEpochKey(&wrapper->mGroupDataProvider, fabricInfo->GetFabricIndex(),
+                                                                defaultIpk, compressedFabricIdSpan);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;

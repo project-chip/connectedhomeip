@@ -21,15 +21,15 @@
 #include <platform/ConnectivityManager.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include <platform/internal/GenericConnectivityManagerImpl_BLE.cpp>
+#include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <platform/internal/GenericConnectivityManagerImpl_Thread.cpp>
+#include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
+#include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 #endif
 
 #include <platform/Ameba/NetworkCommissioningDriver.h>
@@ -72,6 +72,10 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 
     // Set callback functions from chip_porting
     chip_connmgr_set_callback_func((chip_connmgr_callback)(conn_callback_dispatcher), this);
+
+    // Register WiFi event handlers
+    wifi_reg_event_handler(WIFI_EVENT_CONNECT, ConnectivityManagerImpl::RtkWiFiStationConnectedHandler, NULL);
+    wifi_reg_event_handler(WIFI_EVENT_DISCONNECT, ConnectivityManagerImpl::RtkWiFiStationDisconnectedHandler, NULL);
 
     // Ensure that station mode is enabled.
     wifi_on(RTW_MODE_STA);
@@ -147,6 +151,15 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         }
         DriveStationState();
         DHCPProcess();
+    }
+    if (event->Type == DeviceEventType::kRtkWiFiStationDisconnectedEvent)
+    {
+        ChipLogProgress(DeviceLayer, "WiFiStationDisconnected");
+        NetworkCommissioning::AmebaWiFiDriver::GetInstance().SetLastDisconnectReason(event);
+        if (mWiFiStationState == kWiFiStationState_Connecting)
+        {
+            ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
+        }
     }
     if (event->Type == DeviceEventType::kRtkWiFiScanCompletedEvent)
     {
@@ -540,7 +553,6 @@ void ConnectivityManagerImpl::DriveStationState()
                 ChipLogProgress(DeviceLayer, "Attempting to connect WiFi station interface");
                 rtw_wifi_setting_t wifi_info;
                 CHIP_GetWiFiConfig(&wifi_info);
-                wifi_reg_event_handler(WIFI_EVENT_CONNECT, ConnectivityManagerImpl::RtkWiFiStationConnectedHandler, NULL);
                 wifi_connect((char *) wifi_info.ssid, RTW_SECURITY_WPA_WPA2_MIXED, (char *) wifi_info.password,
                              strlen((const char *) wifi_info.ssid), strlen((const char *) wifi_info.password), 0, NULL);
                 ChangeWiFiStationState(kWiFiStationState_Connecting);
@@ -593,6 +605,7 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
     {
         ChipLogProgress(DeviceLayer, "WiFi station state change: %d -> %d", (mWiFiStationState), (newState));
         mWiFiStationState = newState;
+        SystemLayer().ScheduleLambda([]() { NetworkCommissioning::AmebaWiFiDriver::GetInstance().OnNetworkStatusChange(); });
     }
 }
 
@@ -783,6 +796,14 @@ void ConnectivityManagerImpl::RtkWiFiStationConnectedHandler(char * buf, int buf
     ChipDeviceEvent event;
     memset(&event, 0, sizeof(event));
     event.Type = DeviceEventType::kRtkWiFiStationConnectedEvent;
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void ConnectivityManagerImpl::RtkWiFiStationDisconnectedHandler(char * buf, int buf_len, int flags, void * userdata)
+{
+    ChipDeviceEvent event;
+    memset(&event, 0, sizeof(event));
+    event.Type = DeviceEventType::kRtkWiFiStationDisconnectedEvent;
     PlatformMgr().PostEventOrDie(&event);
 }
 

@@ -30,7 +30,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <platform/Zephyr/DiagnosticDataProviderImpl.h>
-#include <platform/internal/GenericPlatformManagerImpl_Zephyr.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_Zephyr.ipp>
 
 #include <drivers/entropy.h>
 #include <malloc.h>

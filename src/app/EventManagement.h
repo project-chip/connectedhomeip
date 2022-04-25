@@ -29,12 +29,12 @@
 #include "EventLoggingDelegate.h"
 #include "EventLoggingTypes.h"
 #include <access/SubjectDescriptor.h>
-#include <app/ClusterInfo.h>
 #include <app/MessageDef/EventDataIB.h>
 #include <app/MessageDef/StatusIB.h>
+#include <app/ObjectList.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCircularTLVBuffer.h>
-#include <lib/support/PersistedCounter.h>
+#include <lib/support/CHIPCounter.h>
 #include <messaging/ExchangeMgr.h>
 #include <system/SystemMutex.h>
 
@@ -108,12 +108,6 @@ private:
 
     PriorityLevel mPriority = PriorityLevel::Invalid; ///< The buffer is the final bucket for events of this priority.  Events of
                                                       ///< lesser priority are dropped when they get bumped out of this buffer
-
-    // The counter we're going to actually use.
-    MonotonicallyIncreasingCounter * mpEventNumberCounter = nullptr;
-
-    // The backup counter to use if no counter is provided for us.
-    MonotonicallyIncreasingCounter mNonPersistedCounter;
 
     size_t mRequiredSpaceForEvicted = 0; ///< Required space for previous buffer to evict event to new buffer
 };
@@ -197,13 +191,11 @@ public:
      *
      * @param[in] apLogStorageResources  An array of LogStorageResources for each priority level.
      *
+     * @param[in] apEventNumberCounter   A counter to use for event numbers.
+     *
      */
     void Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
-              const LogStorageResources * const apLogStorageResources, Platform::PersistedStorage::Key * apCounterKey,
-              uint32_t aCounterEpoch, PersistedCounter * apPersistedCounter);
-
-    void InitializeCounter(Platform::PersistedStorage::Key * apCounterKey, uint32_t aCounterEpoch,
-                           PersistedCounter * apPersistedCounter);
+              const LogStorageResources * const apLogStorageResources, MonotonicallyIncreasingCounter * apEventNumberCounter);
 
     static EventManagement & GetInstance();
 
@@ -225,13 +217,14 @@ public:
      * @param[in] apCircularEventBuffer  An array of CircularEventBuffer for each priority level.
      * @param[in] apLogStorageResources  An array of LogStorageResources for each priority level.
      *
+     * @param[in] apEventNumberCounter   A counter to use for event numbers.
+     *
      * @note This function must be called prior to the logging being used.
      */
     static void CreateEventManagement(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
                                       CircularEventBuffer * apCircularEventBuffer,
                                       const LogStorageResources * const apLogStorageResources,
-                                      Platform::PersistedStorage::Key * apCounterKey, uint32_t aCounterEpoch,
-                                      PersistedCounter * apPersistedCounter);
+                                      MonotonicallyIncreasingCounter * apEventNumberCounter);
 
     static void DestroyEventManagement();
 
@@ -320,7 +313,7 @@ public:
      * specified by read/subscribe request.
      *
      * @param[in] aWriter     The writer to use for event storage
-     * @param[in] apClusterInfolist the interested cluster info list with event path inside
+     * @param[in] apEventPathList the interested EventPathParams list
      *
      * @param[in,out] aEventMin On input, the Event number is the one we're fetching.  On
      *                         completion, the event number of the next one we plan to fetch.
@@ -340,8 +333,9 @@ public:
      *                                       available.
      *
      */
-    CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, ClusterInfo * apClusterInfolist, EventNumber & aEventMin,
-                                size_t & aEventCount, const Access::SubjectDescriptor & aSubjectDescriptor);
+    CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, const ObjectList<EventPathParams> * apEventPathList,
+                                EventNumber & aEventMin, size_t & aEventCount,
+                                const Access::SubjectDescriptor & aSubjectDescriptor);
 
     /**
      * @brief
@@ -517,13 +511,10 @@ private:
     System::Mutex mAccessLock;
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
-    // The counter we're going to actually use.
+    // The counter we're going to use for event numbers.
     MonotonicallyIncreasingCounter * mpEventNumberCounter = nullptr;
 
-    // The backup counter to use if no counter is provided for us.
-    MonotonicallyIncreasingCounter mNonPersistedCounter;
-
-    EventNumber mLastEventNumber = 0; ///< Last event Number vended for this priority
+    EventNumber mLastEventNumber = 0; ///< Last event Number vended
     Timestamp mLastEventTimestamp;    ///< The timestamp of the last event in this buffer
 };
 } // namespace app

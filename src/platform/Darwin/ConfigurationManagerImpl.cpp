@@ -26,10 +26,11 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/Darwin/DiagnosticDataProviderImpl.h>
 #include <platform/Darwin/PosixConfig.h>
-#include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
@@ -43,6 +44,7 @@
 #include <IOKit/network/IOEthernetController.h>
 #include <IOKit/network/IOEthernetInterface.h>
 #include <IOKit/network/IONetworkInterface.h>
+#include <IOKit/network/IONetworkMedium.h>
 #endif // TARGET_OS_OSX
 
 namespace chip {
@@ -98,15 +100,26 @@ CHIP_ERROR GetMACAddressFromInterfaces(io_iterator_t primaryInterfaceIterator, u
 
     while ((interfaceService = IOIteratorNext(primaryInterfaceIterator)))
     {
-        CFTypeRef MACAddressAsCFData = nullptr;
-        kernResult                   = IORegistryEntryGetParentEntry(interfaceService, kIOServicePlane, &controllerService);
+        CFTypeRef MACAddressAsCFData   = nullptr;
+        CFTypeRef linkStatusAsCFNumber = nullptr;
+        kernResult                     = IORegistryEntryGetParentEntry(interfaceService, kIOServicePlane, &controllerService);
         VerifyOrExit(KERN_SUCCESS == kernResult, err = CHIP_ERROR_INTERNAL);
 
-        MACAddressAsCFData = IORegistryEntryCreateCFProperty(controllerService, CFSTR(kIOMACAddress), kCFAllocatorDefault, 0);
-        VerifyOrExit(MACAddressAsCFData != nullptr, err = CHIP_ERROR_INTERNAL);
+        linkStatusAsCFNumber = IORegistryEntryCreateCFProperty(controllerService, CFSTR(kIOLinkStatus), kCFAllocatorDefault, 0);
+        VerifyOrExit(linkStatusAsCFNumber != nullptr, err = CHIP_ERROR_INTERNAL);
 
-        CFDataGetBytes((CFDataRef) MACAddressAsCFData, CFRangeMake(0, kIOEthernetAddressSize), buf);
-        CFRelease(MACAddressAsCFData);
+        uint64_t linkStatus;
+        CFNumberGetValue((CFNumberRef) linkStatusAsCFNumber, CFNumberType::kCFNumberLongType, &linkStatus);
+        CFRelease(linkStatusAsCFNumber);
+
+        if ((linkStatus & kIONetworkLinkValid) && (linkStatus & kIONetworkLinkActive))
+        {
+            MACAddressAsCFData = IORegistryEntryCreateCFProperty(controllerService, CFSTR(kIOMACAddress), kCFAllocatorDefault, 0);
+            VerifyOrExit(MACAddressAsCFData != nullptr, err = CHIP_ERROR_INTERNAL);
+
+            CFDataGetBytes((CFDataRef) MACAddressAsCFData, CFRangeMake(0, kIOEthernetAddressSize), buf);
+            CFRelease(MACAddressAsCFData);
+        }
 
         kernResult = IOObjectRelease(controllerService);
         VerifyOrExit(KERN_SUCCESS == kernResult, err = CHIP_ERROR_INTERNAL);
@@ -141,6 +154,16 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     // Initialize the generic implementation base class.
     ReturnErrorOnFailure(Internal::GenericConfigurationManagerImpl<PosixConfig>::Init());
 
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_VendorId))
+    {
+        ReturnErrorOnFailure(StoreVendorId(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID));
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_ProductId))
+    {
+        ReturnErrorOnFailure(StoreProductId(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID));
+    }
+
     uint32_t rebootCount;
     if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_RebootCount))
     {
@@ -160,7 +183,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_BootReason))
     {
-        ReturnErrorOnFailure(StoreBootReason(BootReasonType::Unspecified));
+        ReturnErrorOnFailure(StoreBootReason(to_underlying(BootReasonType::kUnspecified)));
     }
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_RegulatoryLocation))
@@ -205,6 +228,26 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
     ChipLogError(DeviceLayer, "InitiateFactoryReset not implemented");
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetVendorId(uint16_t & vendorId)
+{
+    return ReadConfigValue(PosixConfig::kConfigKey_VendorId, vendorId);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetProductId(uint16_t & productId)
+{
+    return ReadConfigValue(PosixConfig::kConfigKey_ProductId, productId);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreVendorId(uint16_t vendorId)
+{
+    return WriteConfigValue(PosixConfig::kConfigKey_VendorId, vendorId);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreProductId(uint16_t productId)
+{
+    return WriteConfigValue(PosixConfig::kConfigKey_ProductId, productId);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
@@ -290,6 +333,11 @@ CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, bool & val)
     return PosixConfig::ReadConfigValue(key, val);
 }
 
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint16_t & val)
+{
+    return PosixConfig::ReadConfigValue(key, val);
+}
+
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint32_t & val)
 {
     return PosixConfig::ReadConfigValue(key, val);
@@ -311,6 +359,11 @@ CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(Key key, uint8_t * buf, 
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, bool val)
+{
+    return PosixConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint16_t val)
 {
     return PosixConfig::WriteConfigValue(key, val);
 }

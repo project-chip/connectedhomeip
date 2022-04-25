@@ -85,6 +85,17 @@ void NetWorkCommissioningInstInit()
     sWiFiNetworkCommissioningInstance.Init();
 }
 
+static void InitServer(intptr_t context)
+{
+    // Init ZCL Data Model
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+}
+
 CHIP_ERROR AppTask::StartAppTask()
 {
     sAppEventQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), sAppEventQueueBuffer, &sAppEventQueueStruct);
@@ -117,11 +128,8 @@ CHIP_ERROR AppTask::Init()
             }
         },
         0);
-    // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 
     // Initialise WSTK buttons PB0 and PB1 (including debounce).
     ButtonHandler::Init();
@@ -153,7 +161,6 @@ CHIP_ERROR AppTask::Init()
     sStatusLED.Init(SYSTEM_STATE_LED);
     sLightLED.Init(LIGHT_LED);
     sLightLED.Set(LightMgr().IsLightOn());
-    UpdateClusterState();
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -445,7 +452,7 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
 
     if (sAppTask.mSyncClusterToButtonAction)
     {
-        UpdateClusterState();
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
         sAppTask.mSyncClusterToButtonAction = false;
     }
 }
@@ -504,7 +511,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
-void AppTask::UpdateClusterState(void)
+void AppTask::UpdateClusterState(intptr_t context)
 {
     uint8_t newValue = LightMgr().IsLightOn();
 

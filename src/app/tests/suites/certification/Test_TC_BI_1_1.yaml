@@ -74,7 +74,6 @@ tests:
               type: list
 
     - label: "Read the global attribute: AcceptedCommandList"
-      disabled: true
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -82,7 +81,6 @@ tests:
               type: list
 
     - label: "Read the global attribute: GeneratedCommandList"
-      disabled: true
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

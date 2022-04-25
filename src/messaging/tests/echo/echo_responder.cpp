@@ -44,7 +44,6 @@ namespace {
 chip::Protocols::Echo::EchoServer gEchoServer;
 chip::TransportMgr<chip::Transport::UDP> gUDPManager;
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
-chip::SecurePairingUsingTestSecret gTestPairing;
 chip::SessionHolder gSession;
 
 // Callback handler when a CHIP EchoRequest is received.
@@ -58,7 +57,7 @@ void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::Syst
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
+    chip::Transport::PeerAddress peer(chip::Transport::Type::kUndefined);
     bool useTCP      = false;
     bool disableEcho = false;
 
@@ -123,8 +122,8 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
     }
 
-    err = gSessionManager.NewPairing(gSession, peer, chip::kTestControllerNodeId, &gTestPairing,
-                                     chip::CryptoContext::SessionRole::kResponder, gFabricIndex);
+    err = gSessionManager.InjectPaseSessionWithTestKey(gSession, 1, chip::kTestControllerNodeId, 1, gFabricIndex, peer,
+                                                       chip::CryptoContext::SessionRole::kResponder);
     SuccessOrExit(err);
 
     if (!disableEcho)

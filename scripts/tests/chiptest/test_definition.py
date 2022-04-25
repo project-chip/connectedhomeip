@@ -15,6 +15,7 @@
 
 import logging
 import os
+import sys
 import threading
 import time
 import typing
@@ -24,6 +25,7 @@ from enum import Enum, auto
 from random import randrange
 
 TEST_NODE_ID = '0x12344321'
+DEVELOPMENT_PAA_LIST = './credentials/development/paa-root-certs'
 
 
 class App:
@@ -36,13 +38,14 @@ class App:
         self.cv_stopped = threading.Condition()
         self.stopped = False
         self.lastLogIndex = 0
+        self.kvs = '/tmp/chip_kvs'
 
-    def start(self, discriminator):
+    def start(self, options=None):
         if not self.process:
             # Make sure to assign self.process before we do any operations that
             # might fail, so attempts to kill us on failure actually work.
             self.process, self.outpipe, errpipe = self.__startServer(
-                self.runner, self.command, discriminator)
+                self.runner, self.command, options)
             self.waitForAnyAdvertisement()
             self.__updateSetUpCode()
             with self.cv_stopped:
@@ -63,18 +66,9 @@ class App:
             return True
         return False
 
-    def reboot(self, discriminator):
-        if self.process:
-            self.stop()
-            self.start(discriminator)
-            return True
-        return False
-
     def factoryReset(self):
-        storage = '/tmp/chip_kvs'
-        if os.path.exists(storage):
-            os.unlink(storage)
-
+        if os.path.exists(self.kvs):
+            os.unlink(self.kvs)
         return True
 
     def waitForAnyAdvertisement(self):
@@ -106,12 +100,18 @@ class App:
                 while self.stopped:
                     self.cv_stopped.wait()
 
-    def __startServer(self, runner, command, discriminator):
-        logging.debug(
-            'Executing application under test with discriminator %s.' %
-            discriminator)
-        app_cmd = command + ['--discriminator', str(discriminator)]
-        app_cmd = app_cmd + ['--interface-id', str(-1)]
+    def __startServer(self, runner, command, options):
+        app_cmd = command + ['--interface-id', str(-1)]
+
+        if not options:
+            logging.debug('Executing application under test with default args')
+        else:
+            logging.debug('Executing application under test with the following args:')
+            for key, value in options.items():
+                logging.debug('   %s: %s' % (key, value))
+                app_cmd = app_cmd + [key, value]
+                if key == '--KVS':
+                    self.kvs = value
         return runner.RunSubprocess(app_cmd, name='APP ', wait=False)
 
     def __waitFor(self, waitForString, server_process, outpipe):
@@ -144,14 +144,14 @@ class App:
 class TestTarget(Enum):
     ALL_CLUSTERS = auto()
     TV = auto()
-    DOOR_LOCK = auto()
+    LOCK = auto()
 
 
 @dataclass
 class ApplicationPaths:
     chip_tool: typing.List[str]
     all_clusters_app: typing.List[str]
-    door_lock_app: typing.List[str]
+    lock_app: typing.List[str]
     tv_app: typing.List[str]
 
 
@@ -200,7 +200,7 @@ class TestDefinition:
     run_name: str
     target: TestTarget
 
-    def Run(self, runner, apps_register, paths: ApplicationPaths):
+    def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str):
         """
         Executes the given test case using the provided runner for execution.
         """
@@ -211,8 +211,8 @@ class TestDefinition:
                 app_cmd = paths.all_clusters_app
             elif self.target == TestTarget.TV:
                 app_cmd = paths.tv_app
-            elif self.target == TestTarget.DOOR_LOCK:
-                app_cmd = paths.door_lock_app
+            elif self.target == TestTarget.LOCK:
+                app_cmd = paths.lock_app
             else:
                 raise Exception("Unknown test target - "
                                 "don't know which application to run")
@@ -237,14 +237,21 @@ class TestDefinition:
             # Remove server application storage (factory reset),
             # so it will be commissionable again.
             app.factoryReset()
-            app.start(str(randrange(1, 4096)))
+            app.start()
+            pairing_cmd = tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode]
+            if sys.platform != 'darwin':
+                pairing_cmd.append('--paa-trust-store-path')
+                pairing_cmd.append(DEVELOPMENT_PAA_LIST)
 
-            runner.RunSubprocess(
-                tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode],
-                name='PAIR', dependencies=[apps_register])
+            runner.RunSubprocess(pairing_cmd,
+                                 name='PAIR', dependencies=[apps_register])
 
+            test_cmd = tool_cmd + ['tests', self.run_name] + ['--PICS', pics_file]
+            if sys.platform != 'darwin':
+                test_cmd.append('--paa-trust-store-path')
+                test_cmd.append(DEVELOPMENT_PAA_LIST)
             runner.RunSubprocess(
-                tool_cmd + ['tests', self.run_name],
+                test_cmd,
                 name='TEST', dependencies=[apps_register])
 
         except Exception:

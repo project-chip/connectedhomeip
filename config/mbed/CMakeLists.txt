@@ -275,7 +275,6 @@ chip_gn_arg_bool  ("chip_build_tests"                     CONFIG_CHIP_BUILD_TEST
 chip_gn_arg_bool  ("chip_monolithic_tests"                CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                  CONFIG_CHIP_LIB_SHELL)
 chip_gn_arg_bool  ("chip_with_platform_mbedtls"           CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
-chip_gn_arg_bool  ("chip_bypass_rendezvous"               CONFIG_CHIP_BYPASS_RENDEZVOUS)
 chip_gn_arg_bool  ("chip_build_pw_rpc_lib"                CONFIG_CHIP_PW_RPC)
 chip_gn_arg_bool  ("chip_enable_data_model"               CONFIG_CHIP_DATA_MODEL)
 if (CONFIG_CHIP_PW_RPC)
@@ -473,9 +472,9 @@ if (CONFIG_CHIP_OTA_REQUESTOR)
 
     target_sources(${APP_TARGET} PRIVATE
         ${CHIP_ROOT}/examples/platform/mbed/ota/OTARequestorDriverImpl.cpp
-        ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
-        ${CHIP_ROOT}/src/app/clusters/ota-requestor/GenericOTARequestorDriver.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
         ${CHIP_ROOT}/src/platform/mbed/OTAImageProcessorImpl.cpp
     )

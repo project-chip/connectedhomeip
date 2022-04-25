@@ -56,7 +56,6 @@ private:
 
     friend AppTask & GetAppTask(void);
     CHIP_ERROR Init();
-    void InitOTARequestor();
 
     static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor);
     static void ActionCompleted(LightingManager::Action_t aAction, int32_t aActor);

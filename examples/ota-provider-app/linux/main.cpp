@@ -16,13 +16,13 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/ota-provider/DefaultOTAProviderUserConsent.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <app/clusters/ota-provider/ota-provider.h>
 #include <app/server/Server.h>
 #include <app/util/util.h>
 #include <json/json.h>
 #include <ota-provider-common/BdxOtaSender.h>
-#include <ota-provider-common/DefaultUserConsentProvider.h>
 #include <ota-provider-common/OTAProviderExample.h>
 
 #include "AppMain.h"
@@ -43,35 +43,33 @@ using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 // TODO: this should probably be done dynamically
 constexpr chip::EndpointId kOtaProviderEndpoint = 0;
 
+constexpr uint16_t kOptionUpdateAction              = 'a';
+constexpr uint16_t kOptionUserConsentNeeded         = 'c';
 constexpr uint16_t kOptionFilepath                  = 'f';
+constexpr uint16_t kOptionImageUri                  = 'i';
 constexpr uint16_t kOptionOtaImageList              = 'o';
+constexpr uint16_t kOptionDelayedApplyActionTimeSec = 'p';
 constexpr uint16_t kOptionQueryImageStatus          = 'q';
+constexpr uint16_t kOptionDelayedQueryActionTimeSec = 't';
+constexpr uint16_t kOptionUserConsentState          = 'u';
 constexpr uint16_t kOptionIgnoreQueryImage          = 'x';
 constexpr uint16_t kOptionIgnoreApplyUpdate         = 'y';
-constexpr uint16_t kOptionUserConsentState          = 'u';
-constexpr uint16_t kOptionUpdateAction              = 'a';
-constexpr uint16_t kOptionDelayedQueryActionTimeSec = 't';
-constexpr uint16_t kOptionDelayedApplyActionTimeSec = 'p';
-constexpr uint16_t kOptionSoftwareVersion           = 's';
-constexpr uint16_t kOptionSoftwareVersionStr        = 'S';
-constexpr uint16_t kOptionUserConsentNeeded         = 'c';
 
 OTAProviderExample gOtaProvider;
-chip::ota::DefaultUserConsentProvider gUserConsentProvider;
+chip::ota::DefaultOTAProviderUserConsent gUserConsentProvider;
 
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
-static OTAProviderExample::QueryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUnknown;
-static OTAApplyUpdateAction gOptionUpdateAction                       = OTAApplyUpdateAction::kProceed;
-static uint32_t gDelayedQueryActionTimeSec                            = 0;
-static uint32_t gDelayedApplyActionTimeSec                            = 0;
-static const char * gOtaFilepath                                      = nullptr;
-static const char * gOtaImageListFilepath                             = nullptr;
-static chip::ota::UserConsentState gUserConsentState                  = chip::ota::UserConsentState::kUnknown;
-static bool gUserConsentNeeded                                        = false;
-static chip::Optional<uint32_t> gSoftwareVersion;
-static const char * gSoftwareVersionString = nullptr;
-static uint32_t gIgnoreQueryImageCount     = 0;
-static uint32_t gIgnoreApplyUpdateCount    = 0;
+static OTAQueryStatus gQueryImageStatus              = OTAQueryStatus::kUpdateAvailable;
+static OTAApplyUpdateAction gOptionUpdateAction      = OTAApplyUpdateAction::kProceed;
+static uint32_t gDelayedQueryActionTimeSec           = 0;
+static uint32_t gDelayedApplyActionTimeSec           = 0;
+static const char * gOtaFilepath                     = nullptr;
+static const char * gOtaImageListFilepath            = nullptr;
+static const char * gImageUri                        = nullptr;
+static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kUnknown;
+static bool gUserConsentNeeded                       = false;
+static uint32_t gIgnoreQueryImageCount               = 0;
+static uint32_t gIgnoreApplyUpdateCount              = 0;
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
 static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
@@ -151,6 +149,9 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             gOtaFilepath = aValue;
         }
         break;
+    case kOptionImageUri:
+        gImageUri = aValue;
+        break;
     case kOptionOtaImageList:
         kOptionOtaImageListSelected = true;
         if (0 != access(aValue, R_OK))
@@ -169,22 +170,17 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         break;
     case kOptionQueryImageStatus:
-        if (aValue == NULL)
+        if (strcmp(aValue, "updateAvailable") == 0)
         {
-            PrintArgError("%s: ERROR: NULL queryImageStatus parameter\n", aProgram);
-            retval = false;
-        }
-        else if (strcmp(aValue, "updateAvailable") == 0)
-        {
-            gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
+            gQueryImageStatus = OTAQueryStatus::kUpdateAvailable;
         }
         else if (strcmp(aValue, "busy") == 0)
         {
-            gQueryImageBehavior = OTAProviderExample::kRespondWithBusy;
+            gQueryImageStatus = OTAQueryStatus::kBusy;
         }
         else if (strcmp(aValue, "updateNotAvailable") == 0)
         {
-            gQueryImageBehavior = OTAProviderExample::kRespondWithNotAvailable;
+            gQueryImageStatus = OTAQueryStatus::kNotAvailable;
         }
         else
         {
@@ -199,12 +195,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         gIgnoreApplyUpdateCount = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
     case kOptionUpdateAction:
-        if (aValue == NULL)
-        {
-            PrintArgError("%s: ERROR: NULL applyUpdateAction parameter\n", aProgram);
-            retval = false;
-        }
-        else if (strcmp(aValue, "proceed") == 0)
+        if (strcmp(aValue, "proceed") == 0)
         {
             gOptionUpdateAction = OTAApplyUpdateAction::kProceed;
         }
@@ -229,12 +220,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         gDelayedApplyActionTimeSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
     case kOptionUserConsentState:
-        if (aValue == NULL)
-        {
-            PrintArgError("%s: ERROR: NULL UserConsent parameter\n", aProgram);
-            retval = false;
-        }
-        else if (strcmp(aValue, "granted") == 0)
+        if (strcmp(aValue, "granted") == 0)
         {
             gUserConsentState = chip::ota::UserConsentState::kGranted;
         }
@@ -252,27 +238,8 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             retval = false;
         }
         break;
-    case kOptionSoftwareVersion:
-        gSoftwareVersion.SetValue(static_cast<uint32_t>(strtoul(aValue, NULL, 0)));
-        break;
     case kOptionUserConsentNeeded:
         gUserConsentNeeded = true;
-        break;
-    case kOptionSoftwareVersionStr:
-        if (aValue == NULL)
-        {
-            PrintArgError("%s: ERROR: NULL SoftwareVersionStr parameter\n", aProgram);
-            retval = false;
-        }
-        else if ((strlen(aValue) < 1 || strlen(aValue) > 64))
-        {
-            PrintArgError("%s: ERROR: SoftwareVersionStr parameter length is out of range \n", aProgram);
-            retval = false;
-        }
-        else
-        {
-            gSoftwareVersionString = aValue;
-        }
         break;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
@@ -284,59 +251,56 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 }
 
 OptionDef cmdLineOptionsDef[] = {
+    { "applyUpdateAction", chip::ArgParser::kArgumentRequired, kOptionUpdateAction },
+    { "userConsentNeeded", chip::ArgParser::kNoArgument, kOptionUserConsentNeeded },
     { "filepath", chip::ArgParser::kArgumentRequired, kOptionFilepath },
+    { "imageUri", chip::ArgParser::kArgumentRequired, kOptionImageUri },
     { "otaImageList", chip::ArgParser::kArgumentRequired, kOptionOtaImageList },
+    { "delayedApplyActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedApplyActionTimeSec },
     { "queryImageStatus", chip::ArgParser::kArgumentRequired, kOptionQueryImageStatus },
+    { "delayedQueryActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedQueryActionTimeSec },
+    { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
     { "ignoreQueryImage", chip::ArgParser::kArgumentRequired, kOptionIgnoreQueryImage },
     { "ignoreApplyUpdate", chip::ArgParser::kArgumentRequired, kOptionIgnoreApplyUpdate },
-    { "applyUpdateAction", chip::ArgParser::kArgumentRequired, kOptionUpdateAction },
-    { "delayedQueryActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedQueryActionTimeSec },
-    { "delayedApplyActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedApplyActionTimeSec },
-    { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
-    { "softwareVersion", chip::ArgParser::kArgumentRequired, kOptionSoftwareVersion },
-    { "softwareVersionStr", chip::ArgParser::kArgumentRequired, kOptionSoftwareVersionStr },
-    { "UserConsentNeeded", chip::ArgParser::kNoArgument, kOptionUserConsentNeeded },
     {},
 };
 
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
-                             "  -f/--filepath <file>\n"
-                             "        Path to a file containing an OTA image\n"
-                             "  -o/--otaImageList <file>\n"
-                             "        Path to a file containing a list of OTA images\n"
-                             "  -q/--queryImageStatus <updateAvailable | busy | updateNotAvailable>\n"
-                             "        Value for the Status field in the first QueryImageResponse.\n"
-                             "        For all subsequent responses, the value of updateAvailable will be used.\n"
-                             "  -x/--ignoreQueryImage <num_times_to_ignore>\n"
-                             "        The number of times to ignore the QueryImage Command and not send a response.\n"
-                             "  -y/--ignoreApplyUpdate <num_times_to_ignore>\n"
-                             "        The number of times to ignore the ApplyUpdate Request and not send a response.\n"
-                             "  -a/--applyUpdateAction <proceed | awaitNextAction | discontinue>\n"
+                             "  -a, --applyUpdateAction <proceed | awaitNextAction | discontinue>\n"
                              "        Value for the Action field in the first ApplyUpdateResponse.\n"
                              "        For all subsequent responses, the value of proceed will be used.\n"
-                             "  -t/--delayedQueryActionTimeSec <time>\n"
-                             "        Value in seconds for the first DelayedActionTime field in the QueryImageResponse.\n"
-                             "        Value will revert back to 0 seconds on subsequent QueryImageResponses.\n"
-                             "  -p/--delayedApplyActionTimeSec <time>\n"
-                             "        Value in seconds for the first DelayedActionTime field in the ApplyUpdateResponse.\n"
-                             "        Value will revert back to 0 seconds on subsequent ApplyUpdateResponses.\n"
-                             "  -u/--userConsentState <granted | denied | deferred>\n"
+                             "  -c, --userConsentNeeded\n"
+                             "        If supplied, value of the UserConsentNeeded field in the QueryImageResponse\n"
+                             "        is set to true. This is only applicable if value of the RequestorCanConsent\n"
+                             "        field in QueryImage Command is true.\n"
+                             "        Otherwise, value of the UserConsentNeeded field is false.\n"
+                             "  -f, --filepath <file path>\n"
+                             "        Path to a file containing an OTA image\n"
+                             "  -i, --imageUri <uri>\n"
+                             "        Value for the ImageURI field in the QueryImageResponse.\n"
+                             "        If none is supplied, a valid URI is generated.\n"
+                             "  -o, --otaImageList <file path>\n"
+                             "        Path to a file containing a list of OTA images\n"
+                             "  -p, --delayedApplyActionTimeSec <time in seconds>\n"
+                             "        Value for the DelayedActionTime field in the first ApplyUpdateResponse.\n"
+                             "        For all subsequent responses, the value of zero will be used.\n"
+                             "  -q, --queryImageStatus <updateAvailable | busy | updateNotAvailable>\n"
+                             "        Value for the Status field in the first QueryImageResponse.\n"
+                             "        For all subsequent responses, the value of updateAvailable will be used.\n"
+                             "  -t, --delayedQueryActionTimeSec <time in seconds>\n"
+                             "        Value for the DelayedActionTime field in the first QueryImageResponse.\n"
+                             "        For all subsequent responses, the value of zero will be used.\n"
+                             "  -u, --userConsentState <granted | denied | deferred>\n"
                              "        The user consent state for the first QueryImageResponse. For all subsequent\n"
-                             "        responses, the value of granted state will be used.\n"
-                             "        granted: Status field in QueryImageResponse is set to updateAvailable\n"
-                             "        denied: Status field in QueryImageResponse is set to updateNotAvailable\n"
-                             "        deferred: Status field in QueryImageResponse is set to busy\n"
-                             "        -q/--queryImageStatus overrides this option\n"
-                             "  -s/--softwareVersion <version>\n"
-                             "        Value for the SoftwareVersion field in the QueryImageResponse\n"
-                             "        -o/--otaImageList overrides this option\n"
-                             "  -S/--softwareVersionStr <version string>\n"
-                             "        Value for the SoftwareVersionString field in the QueryImageResponse\n"
-                             "        -o/--otaImageList overrides this option\n"
-                             "  -c/--UserConsentNeeded\n"
-                             "        If provided, and value of RequestorCanConsent field in QueryImage Command is true,\n"
-                             "        then value of UserConsentNeeded field in the QueryImageResponse is set to true.\n"
-                             "        Else, value of UserConsentNeeded is false.\n" };
+                             "        responses, the value of granted will be used.\n"
+                             "        Note that --queryImageStatus overrides this option.\n"
+                             "        granted: Status field in the first QueryImageResponse is set to updateAvailable\n"
+                             "        denied: Status field in the first QueryImageResponse is set to updateNotAvailable\n"
+                             "        deferred: Status field in the first QueryImageResponse is set to busy\n"
+                             "  -x, --ignoreQueryImage <ignore count>\n"
+                             "        The number of times to ignore the QueryImage Command and not send a response.\n"
+                             "  -y, --ignoreApplyUpdate <ignore count>\n"
+                             "        The number of times to ignore the ApplyUpdateRequest Command and not send a response.\n" };
 
 OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
 
@@ -361,20 +325,17 @@ void ApplicationInit()
         gOtaProvider.SetOTAFilePath(gOtaFilepath);
     }
 
-    gOtaProvider.SetQueryImageBehavior(gQueryImageBehavior);
+    if (gImageUri != nullptr)
+    {
+        gOtaProvider.SetImageUri(gImageUri);
+    }
+
     gOtaProvider.SetIgnoreQueryImageCount(gIgnoreQueryImageCount);
     gOtaProvider.SetIgnoreApplyUpdateCount(gIgnoreApplyUpdateCount);
+    gOtaProvider.SetQueryImageStatus(gQueryImageStatus);
     gOtaProvider.SetApplyUpdateAction(gOptionUpdateAction);
     gOtaProvider.SetDelayedQueryActionTimeSec(gDelayedQueryActionTimeSec);
     gOtaProvider.SetDelayedApplyActionTimeSec(gDelayedApplyActionTimeSec);
-    if (gSoftwareVersion.HasValue())
-    {
-        gOtaProvider.SetSoftwareVersion(gSoftwareVersion.Value());
-    }
-    if (gSoftwareVersionString)
-    {
-        gOtaProvider.SetSoftwareVersionString(gSoftwareVersionString);
-    }
 
     if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
     {
@@ -395,6 +356,12 @@ void ApplicationInit()
         std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates;
         ParseJsonFileAndPopulateCandidates(gOtaImageListFilepath, candidates);
         gOtaProvider.SetOTACandidates(candidates);
+    }
+
+    if ((gOtaFilepath == nullptr) && (gOtaImageListFilepath == nullptr))
+    {
+        ChipLogError(SoftwareUpdate, "Either an OTA file or image list file must be specified");
+        chipDie();
     }
 
     chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &gOtaProvider);

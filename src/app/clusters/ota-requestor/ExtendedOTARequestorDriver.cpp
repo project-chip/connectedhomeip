@@ -17,6 +17,7 @@
 
 #include "ExtendedOTARequestorDriver.h"
 #include "OTARequestorInterface.h"
+#include <app/server/Server.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -31,9 +32,9 @@ bool ExtendedOTARequestorDriver::CanConsent()
 {
     bool localConfigDisabled = false;
     VerifyOrdo(DeviceLayer::ConfigurationMgr().GetLocalConfigDisabled(localConfigDisabled) == CHIP_NO_ERROR,
-               ChipLogProgress(SoftwareUpdate, "Failed to get local config disabled, using as false"));
+               ChipLogProgress(SoftwareUpdate, "Failed to get local config disabled, assuming not disabled"));
 
-    // If local config is disabled, we can't consent.
+    // User consent delegation SHALL NOT be used if a Node is configured with the LocalConfigDisabled attribute set to True
     return localConfigDisabled == false;
 }
 
@@ -48,7 +49,6 @@ void ExtendedOTARequestorDriver::UpdateAvailable(const UpdateDescription & updat
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(SoftwareUpdate, "Failed to get user consent subject");
-            HandleError(UpdateFailureState::kDelayedOnUserConsent, err);
             return;
         }
 
@@ -57,7 +57,7 @@ void ExtendedOTARequestorDriver::UpdateAvailable(const UpdateDescription & updat
         return;
     }
 
-    GenericOTARequestorDriver::UpdateAvailable(update, delay);
+    DefaultOTARequestorDriver::UpdateAvailable(update, delay);
 }
 
 void ExtendedOTARequestorDriver::PollUserConsentState()
@@ -81,7 +81,13 @@ CHIP_ERROR ExtendedOTARequestorDriver::GetUserConsentSubject(chip::ota::UserCons
         return CHIP_ERROR_INTERNAL;
     }
 
-    // TODO: As we cannot use the src/app/Server.h in here so, figure out a way to get the node id.
+    FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(subject.fabricIndex);
+    if (fabricInfo == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "Cannot find fabric");
+        return CHIP_ERROR_INTERNAL;
+    }
+    subject.requestorNodeId = fabricInfo->GetPeerId().GetNodeId();
 
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetVendorId(subject.requestorVendorId));
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetProductId(subject.requestorProductId));

@@ -37,10 +37,11 @@ jobs:
               with:
                   action: actions/checkout@v3
                   with: |
-                      submodules: true
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform darwin
             - name: Setup Environment
               run: brew install openssl pkg-config python@3.9
             - name: Fix pkgconfig link
@@ -91,11 +92,11 @@ jobs:
               run: xcodebuild clean
               working-directory: src/darwin/Framework
             - name: Build example chip-tool-darwin
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: |
                   scripts/examples/gn_build_example.sh examples/chip-tool-darwin out/debug chip_config_network_layer_ble=false is_asan=true
             - name: Build example All Clusters Server
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: |
                   scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
             - name: Build example OTA Provider
@@ -110,10 +111,10 @@ jobs:
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true
             - name: Run Framework Tests
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: |
                   mkdir -p /tmp/darwin/framework-tests
-                  ../../../out/debug/chip-all-clusters-app > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
+                  ../../../out/debug/chip-all-clusters-app --interface-id -1 > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
                   xcodebuild test -target "CHIP" -scheme "CHIP Framework Tests" -sdk macosx OTHER_CFLAGS='${inherited} -Werror -Wno-incomplete-umbrella' > >(tee /tmp/darwin/framework-tests/darwin-tests.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-err.log >&2)
               working-directory: src/darwin/Framework
             - name: Uploading log files

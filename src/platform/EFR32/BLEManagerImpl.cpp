@@ -76,6 +76,14 @@ namespace {
 #define BLE_CONFIG_RF_PATH_GAIN_TX (0)
 #define BLE_CONFIG_RF_PATH_GAIN_RX (0)
 
+// Default Connection  parameters
+#define BLE_CONFIG_MIN_INTERVAL (16) // Time = Value x 1.25 ms = 30ms
+#define BLE_CONFIG_MAX_INTERVAL (80) // Time = Value x 1.25 ms = 100ms
+#define BLE_CONFIG_LATENCY (0)
+#define BLE_CONFIG_TIMEOUT (100)          // Time = Value x 10 ms = 1s
+#define BLE_CONFIG_MIN_CE_LENGTH (0)      // Leave to min value
+#define BLE_CONFIG_MAX_CE_LENGTH (0xFFFF) // Leave to max value
+
 TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
 
 /* Bluetooth stack configuration parameters (see "UG136: Silicon Labs Bluetooth C Application Developer's Guide" for
@@ -249,6 +257,8 @@ void BLEManagerImpl::bluetoothStackEventHandler(void * p_arg)
                 RAIL_GetVersion(&railVer, true);
                 ChipLogProgress(DeviceLayer, "RAIL version:, v%d.%d.%d-b%d", railVer.major, railVer.minor, railVer.rev,
                                 railVer.build);
+                sl_bt_connection_set_default_parameters(BLE_CONFIG_MIN_INTERVAL, BLE_CONFIG_MAX_INTERVAL, BLE_CONFIG_LATENCY,
+                                                        BLE_CONFIG_TIMEOUT, BLE_CONFIG_MIN_CE_LENGTH, BLE_CONFIG_MAX_CE_LENGTH);
             }
             break;
 
@@ -257,7 +267,7 @@ void BLEManagerImpl::bluetoothStackEventHandler(void * p_arg)
             }
             break;
             case sl_bt_evt_connection_parameters_id: {
-                // ChipLogProgress(DeviceLayer, "Connection parameter ID received. Nothing to do");
+                // ChipLogProgress(DeviceLayer, "Connection parameter ID received");
             }
             break;
             case sl_bt_evt_connection_phy_status_id: {
@@ -304,6 +314,11 @@ void BLEManagerImpl::bluetoothStackEventHandler(void * p_arg)
             /* Software Timer event */
             case sl_bt_evt_system_soft_timer_id: {
                 sInstance.HandleSoftTimerEvent(bluetooth_evt);
+            }
+            break;
+
+            case sl_bt_evt_connection_remote_used_features_id: {
+                // ChipLogProgress(DeviceLayer, "link layer features supported by the remote device");
             }
             break;
 
@@ -961,7 +976,7 @@ void BLEManagerImpl::HandleRXCharWrite(volatile sl_bt_msg_t * evt)
     buf = System::PacketBufferHandle::NewWithData(data, writeLen, 0, 0);
     VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
-    ChipLogDetail(DeviceLayer, "Write request/command received for CHIPoBLE RX characteristic (con %" PRIu16 ", len %" PRIu16 ")",
+    ChipLogDetail(DeviceLayer, "Write request/command received for CHIPoBLE RX characteristic (con %u, len %u)",
                   evt->data.evt_gatt_server_user_write_request.connection, buf->DataLength());
 
     // Post an event to the CHIP queue to deliver the data into the CHIP stack.

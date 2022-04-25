@@ -25,7 +25,7 @@
 #include <logging/log.h>
 #include <zephyr.h>
 
-LOG_MODULE_DECLARE(app);
+LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 
 static k_timer sStartTimer;
 

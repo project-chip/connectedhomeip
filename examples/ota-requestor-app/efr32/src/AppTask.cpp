@@ -21,8 +21,10 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "LEDWidget.h"
+#ifdef DISPLAY_ENABLED
 #include "lcd.h"
 #include "qrcodegen.h"
+#endif // DISPLAY_ENABLED
 #include "sl_simple_led_instances.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -33,9 +35,9 @@
 #include <app/util/attribute-storage.h>
 
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
 #include <platform/EFR32/OTAImageProcessorImpl.h>
 
 #include <assert.h>
@@ -98,9 +100,9 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 // Global OTA objects
-OTARequestor gRequestorCore;
+DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
-DeviceLayer::GenericOTARequestorDriver gRequestorUser;
+DeviceLayer::DefaultOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 
@@ -125,7 +127,9 @@ CHIP_ERROR AppTask::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Initialize device attestation config
@@ -542,7 +546,7 @@ void AppTask::InitOTARequestor()
 
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
-    gImageProcessor.SetOTAImageFile(CharSpan("test.txt"));
+    gImageProcessor.SetOTAImageFile("test.txt");
     gImageProcessor.SetOTADownloader(&gDownloader);
 
     // Connect the Downloader and Image Processor objects

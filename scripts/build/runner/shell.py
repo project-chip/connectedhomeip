@@ -64,7 +64,8 @@ class ShellRunner:
         if title:
             logging.info(title)
 
-        with subprocess.Popen(cmd, cwd=self.root_dir, stdout=outpipe, stderr=errpipe) as s:
+        with subprocess.Popen(cmd, cwd=self.root_dir,
+                              stdout=outpipe, stderr=errpipe) as s:
             outpipe.close()
             errpipe.close()
             code = s.wait()

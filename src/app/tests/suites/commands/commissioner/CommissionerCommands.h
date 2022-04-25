@@ -27,8 +27,9 @@ public:
     CommissionerCommands(){};
     ~CommissionerCommands() override{};
 
-    virtual CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err)             = 0;
-    virtual chip::Controller::DeviceCommissioner & GetCurrentCommissioner() = 0;
+    virtual void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) = 0;
+    virtual CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err)                              = 0;
+    virtual chip::Controller::DeviceCommissioner & GetCurrentCommissioner()                  = 0;
 
     CHIP_ERROR PairWithQRCode(chip::NodeId nodeId, const chip::CharSpan payload);
     CHIP_ERROR PairWithManualCode(chip::NodeId nodeId, const chip::CharSpan payload);

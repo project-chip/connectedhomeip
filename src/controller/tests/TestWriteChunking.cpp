@@ -37,8 +37,12 @@
 #include <messaging/tests/MessagingContext.h>
 #include <nlunit-test.h>
 
+#include <memory>
+#include <utility>
+
 using TestContext = chip::Test::AppContext;
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace {
@@ -67,6 +71,7 @@ public:
     static void TestBadChunking(nlTestSuite * apSuite, void * apContext);
     static void TestConflictWrite(nlTestSuite * apSuite, void * apContext);
     static void TestNonConflictWrite(nlTestSuite * apSuite, void * apContext);
+    static void TestTransactionalList(nlTestSuite * apSuite, void * apContext);
 
 private:
 };
@@ -124,6 +129,25 @@ public:
 
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder) override;
+
+    void OnListWriteBegin(const app::ConcreteAttributePath & aPath) override
+    {
+        if (mOnListWriteBegin)
+        {
+            mOnListWriteBegin(aPath);
+        }
+    }
+
+    void OnListWriteEnd(const app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful) override
+    {
+        if (mOnListWriteEnd)
+        {
+            mOnListWriteEnd(aPath, aWriteWasSuccessful);
+        }
+    }
+
+    std::function<void(const app::ConcreteAttributePath & path)> mOnListWriteBegin;
+    std::function<void(const app::ConcreteAttributePath & path, bool wasSuccessful)> mOnListWriteEnd;
 } testServer;
 
 CHIP_ERROR TestAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
@@ -136,22 +160,20 @@ CHIP_ERROR TestAttrAccess::Write(const app::ConcreteDataAttributePath & aPath, a
     // We only care about the number of attribute data.
     if (!aPath.IsListItemOperation())
     {
-        app::DataModel::DecodableList<ByteSpan> list;
+        app::DataModel::Nullable<app::DataModel::DecodableList<ByteSpan>> list;
         CHIP_ERROR err = aDecoder.Decode(list);
         ChipLogError(Zcl, "Decode result: %s", err.AsString());
         return err;
     }
-    else if (aPath.mListOp == app::ConcreteDataAttributePath::ListOperation::AppendItem)
+    if (aPath.mListOp == app::ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         ByteSpan listItem;
         CHIP_ERROR err = aDecoder.Decode(listItem);
         ChipLogError(Zcl, "Decode result: %s", err.AsString());
         return err;
     }
-    else
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
+
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 /*
@@ -173,7 +195,7 @@ void TestWriteChunking::TestListChunking(nlTestSuite * apSuite, void * apContext
     InitDataModelHandler(&ctx.GetExchangeManager());
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage));
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
@@ -247,7 +269,7 @@ void TestWriteChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
     InitDataModelHandler(&ctx.GetExchangeManager());
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage));
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
@@ -328,7 +350,7 @@ void TestWriteChunking::TestConflictWrite(nlTestSuite * apSuite, void * apContex
     InitDataModelHandler(&ctx.GetExchangeManager());
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage));
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
@@ -404,7 +426,7 @@ void TestWriteChunking::TestNonConflictWrite(nlTestSuite * apSuite, void * apCon
     InitDataModelHandler(&ctx.GetExchangeManager());
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage));
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
@@ -454,6 +476,239 @@ void TestWriteChunking::TestNonConflictWrite(nlTestSuite * apSuite, void * apCon
     emberAfClearDynamicEndpoint(0);
 }
 
+namespace TestTransactionalListInstructions {
+
+using PathStatus = std::pair<app::ConcreteAttributePath, bool>;
+
+enum class Operations : uint8_t
+{
+    kNoop,
+    kShutdownWriteClient,
+};
+
+enum class ListData : uint8_t
+{
+    kNull,
+    kList,
+    kBadValue,
+};
+
+struct Instructions
+{
+    // The paths used in write request
+    std::vector<ConcreteAttributePath> paths;
+    // The type of content of the list, it should be an empty vector or its size should equals to the list of paths.
+    std::vector<ListData> data;
+    // operations on OnListWriteBegin and OnListWriteEnd on the server side.
+    std::function<Operations(const app::ConcreteAttributePath & path)> onListWriteBeginActions;
+    // The expected status when OnListWriteEnd is called. In the same order as paths
+    std::vector<bool> expectedStatus;
+};
+
+void RunTest(nlTestSuite * apSuite, TestContext & ctx, Instructions instructions)
+{
+    CHIP_ERROR err     = CHIP_NO_ERROR;
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    TestWriteCallback writeCallback;
+    std::unique_ptr<WriteClient> writeClient = std::make_unique<WriteClient>(
+        &ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
+        static_cast<uint16_t>(900) /* use a smaller chunk so we only need a few attributes in the write request. */);
+
+    ConcreteAttributePath onGoingPath = ConcreteAttributePath();
+    std::vector<PathStatus> status;
+
+    testServer.mOnListWriteBegin = [&](const ConcreteAttributePath & aPath) {
+        NL_TEST_ASSERT(apSuite, onGoingPath == ConcreteAttributePath());
+        onGoingPath = aPath;
+        ChipLogProgress(Zcl, "OnListWriteBegin endpoint=%u Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
+                        aPath.mEndpointId, ChipLogValueMEI(aPath.mClusterId), ChipLogValueMEI(aPath.mAttributeId));
+        if (instructions.onListWriteBeginActions)
+        {
+            switch (instructions.onListWriteBeginActions(aPath))
+            {
+            case Operations::kNoop:
+                break;
+            case Operations::kShutdownWriteClient:
+                // By setting writeClient to nullptr, we actually shutdown the write interaction to simulate a timeout.
+                writeClient = nullptr;
+            }
+        }
+    };
+    testServer.mOnListWriteEnd = [&](const ConcreteAttributePath & aPath, bool aWasSuccessful) {
+        NL_TEST_ASSERT(apSuite, onGoingPath == aPath);
+        status.push_back(PathStatus(aPath, aWasSuccessful));
+        onGoingPath = ConcreteAttributePath();
+        ChipLogProgress(Zcl, "OnListWriteEnd endpoint=%u Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
+                        aPath.mEndpointId, ChipLogValueMEI(aPath.mClusterId), ChipLogValueMEI(aPath.mAttributeId));
+    };
+
+    ByteSpan list[kTestListLength];
+    uint8_t badList[kTestListLength];
+
+    if (instructions.data.size() == 0)
+    {
+        instructions.data = std::vector<ListData>(instructions.paths.size(), ListData::kList);
+    }
+    NL_TEST_ASSERT(apSuite, instructions.paths.size() == instructions.data.size());
+
+    for (size_t i = 0; i < instructions.paths.size(); i++)
+    {
+        const auto & p = instructions.paths[i];
+        switch (instructions.data[i])
+        {
+        case ListData::kNull: {
+            DataModel::Nullable<uint8_t> null; // The actual type is not important since we will only put a null value.
+            err = writeClient->EncodeAttribute(AttributePathParams(p.mEndpointId, p.mClusterId, p.mAttributeId), null);
+            break;
+        }
+        case ListData::kList: {
+            err = writeClient->EncodeAttribute(AttributePathParams(p.mEndpointId, p.mClusterId, p.mAttributeId),
+                                               DataModel::List<ByteSpan>(list, kTestListLength));
+            break;
+        }
+        case ListData::kBadValue: {
+            err = writeClient->EncodeAttribute(AttributePathParams(p.mEndpointId, p.mClusterId, p.mAttributeId),
+                                               DataModel::List<uint8_t>(badList, kTestListLength));
+            break;
+        }
+        }
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    }
+
+    err = writeClient->SendWriteRequest(sessionHandle);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(15),
+                                    [&]() { return ctx.GetExchangeManager().GetNumActiveExchanges() == 0; });
+
+    NL_TEST_ASSERT(apSuite, onGoingPath == app::ConcreteAttributePath());
+    NL_TEST_ASSERT(apSuite, status.size() == instructions.expectedStatus.size());
+
+    for (size_t i = 0; i < status.size(); i++)
+    {
+        NL_TEST_ASSERT(apSuite, status[i] == PathStatus(instructions.paths[i], instructions.expectedStatus[i]));
+    }
+
+    testServer.mOnListWriteBegin = nullptr;
+    testServer.mOnListWriteEnd   = nullptr;
+}
+
+} // namespace TestTransactionalListInstructions
+
+void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apContext)
+{
+    using namespace TestTransactionalListInstructions;
+
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    // Initialize the ember side server logic
+    InitDataModelHandler(&ctx.GetExchangeManager());
+
+    // Register our fake dynamic endpoint.
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+
+    // Register our fake attribute access interface.
+    registerAttributeAccessOverride(&testServer);
+
+    // Test 1: we should receive transaction notifications
+    ChipLogProgress(Zcl, "Test 1: we should receive transaction notifications");
+    RunTest(apSuite, ctx,
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .expectedStatus = { true },
+            });
+
+    ChipLogProgress(Zcl, "Test 2: we should receive transaction notifications for incomplete list operations");
+    RunTest(
+        apSuite, ctx,
+        Instructions{
+            .paths                   = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+            .onListWriteBeginActions = [&](const app::ConcreteAttributePath & aPath) { return Operations::kShutdownWriteClient; },
+            .expectedStatus          = { false },
+        });
+
+    ChipLogProgress(Zcl, "Test 3: we should receive transaction notifications for every list in the transaction");
+    RunTest(apSuite, ctx,
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
+                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute2) },
+                .expectedStatus = { true, true },
+            });
+
+    ChipLogProgress(Zcl, "Test 4: we should receive transaction notifications with the status of each list");
+    RunTest(apSuite, ctx,
+            Instructions{
+                .paths = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
+                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute2) },
+                .onListWriteBeginActions =
+                    [&](const app::ConcreteAttributePath & aPath) {
+                        if (aPath.mAttributeId == kTestListAttribute2)
+                        {
+                            return Operations::kShutdownWriteClient;
+                        }
+                        return Operations::kNoop;
+                    },
+                .expectedStatus = { true, false },
+            });
+
+    ChipLogProgress(Zcl,
+                    "Test 5: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
+                    "null value before non null values");
+    RunTest(apSuite, ctx,
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
+                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .data           = { ListData::kNull, ListData::kList },
+                .expectedStatus = { true },
+            });
+
+    ChipLogProgress(Zcl,
+                    "Test 6: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
+                    "null value after non null values");
+    RunTest(apSuite, ctx,
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
+                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .data           = { ListData::kList, ListData::kNull },
+                .expectedStatus = { true },
+            });
+
+    ChipLogProgress(Zcl,
+                    "Test 7: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
+                    "null value between non null values");
+    RunTest(apSuite, ctx,
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
+                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
+                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .data           = { ListData::kList, ListData::kNull, ListData::kList },
+                .expectedStatus = { true },
+            });
+
+    ChipLogProgress(Zcl, "Test 8: transactional list callbacks will be called for nullable lists");
+    RunTest(apSuite, ctx,
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .data           = { ListData::kNull },
+                .expectedStatus = { true },
+            });
+
+    ChipLogProgress(Zcl,
+                    "Test 9: for nullable lists, we should receive notifications for unsuccessful writes when non-fatal occurred "
+                    "during processing the requests");
+    RunTest(apSuite, ctx,
+            Instructions{
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .data           = { ListData::kBadValue },
+                .expectedStatus = { false },
+            });
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+    emberAfClearDynamicEndpoint(0);
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
@@ -461,6 +716,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestBadChunking", TestWriteChunking::TestBadChunking),
     NL_TEST_DEF("TestConflictWrite", TestWriteChunking::TestConflictWrite),
     NL_TEST_DEF("TestNonConflictWrite", TestWriteChunking::TestNonConflictWrite),
+    NL_TEST_DEF("TestTransactionalList", TestWriteChunking::TestTransactionalList),
     NL_TEST_SENTINEL()
 };
 

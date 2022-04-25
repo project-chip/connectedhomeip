@@ -41,8 +41,6 @@
 #include "stdio.h"
 #include "timers.h"
 
-#include "RNG_Interface.h"
-
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
 #include "PWR_Configuration.h"
 #endif
@@ -100,7 +98,7 @@ namespace {
 #define CONTROLLER_TASK_STACK_SIZE (gControllerTaskStackSize_c / sizeof(StackType_t))
 
 /* host task configuration */
-#define HOST_TASK_PRIORITY (3U)
+#define HOST_TASK_PRIORITY (4U)
 #define HOST_TASK_STACK_SIZE (gHost_TaskStackSize_c / sizeof(StackType_t))
 
 /* ble app task configuration */
@@ -159,9 +157,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     // Initialize the Chip BleLayer.
     err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
-
-    (void) RNG_Init();
-    RNG_SetPseudoRandomNoSeed(NULL);
 
     /* Initialization of message wait events -
      * used for receiving BLE Stack events */
@@ -1188,7 +1183,7 @@ void BLEManagerImpl::HandleRXCharWrite(blekw_msg_t * msg)
 #if CHIP_DEVICE_CHIP0BLE_DEBUG
     ChipLogDetail(DeviceLayer,
                   "Write request/command received for"
-                  "CHIPoBLE RX characteristic (con %" PRIu16 ", len %" PRIu16 ")",
+                  "CHIPoBLE RX characteristic (con %u, len %u)",
                   att_wr_data->device_id, buf->DataLength());
 #endif
 

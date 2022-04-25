@@ -21,19 +21,23 @@ The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
 
 -   Clone the Espressif ESP-IDF and checkout
-    [v4.4 release](https://github.com/espressif/esp-idf/releases/tag/v4.4)
+    [v4.4.1 release](https://github.com/espressif/esp-idf/releases/tag/v4.4.1)
 
+          ```
           $ mkdir ${HOME}/tools
           $ cd ${HOME}/tools
           $ git clone https://github.com/espressif/esp-idf.git
           $ cd esp-idf
-          $ git checkout v4.4
+          $ git checkout v4.4.1
           $ git submodule update --init
           $ ./install.sh
+          ```
 
 -   Install ninja-build
 
+          ```
           $ sudo apt-get install ninja-build
+          ```
 
 ### To build the application, follow these steps:
 
@@ -42,29 +46,39 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
 -   Setting up the environment
 
+        ```
         $ cd ${HOME}/tools/esp-idf
         $ ./install.sh
         $ . ./export.sh
         $ cd {path-to-connectedhomeip}
+        ```
 
     To download and install packages.
 
+        ```
         $ source ./scripts/bootstrap.sh
         $ source ./scripts/activate.sh
+        ```
 
     If packages are already installed then simply activate them.
 
+        ```
         $ source ./scripts/activate.sh
+        ```
 
 -   Select IDF Target
 
+        ```
         $ idf.py set-target esp32(or esp32c3)
+        ```
 
 -   Configuration Options
 
         To choose from the different configuration options, run menuconfig
 
+          ```
           $ idf.py menuconfig
+          ```
 
         This example uses UART0 for serial communication. You can change this through
         `PW RPC Example Configuration`. As a result, the console has been shifted to UART1
@@ -84,7 +98,9 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
     before flashing. For ESP32-DevKitC devices this is labeled in the
     [functional description diagram](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-devkitc.html#functional-description).
 
+          ```
           $ idf.py flash -p /dev/tty.SLAB_USBtoUART
+          ```
 
     Note: Some users might have to install the
     [VCP driver](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
@@ -96,10 +112,13 @@ Build or install the [rpc console](../../common/pigweed/rpc_console/README.md)
 
 Start the console:
 
-    $ python -m chip_rpc.console --device /dev/ttyUSB0 -b 115200
+    ```
+    $ chip-console --device /dev/ttyUSB0 -b 115200
+    ```
 
 An example flow of performing a scan, connecting, and getting the IPv6 address:
 
+    ```
     scan = rpcs.chip.rpc.WiFi.StartScan(pw_rpc_timeout_s=5)
     ap = next(filter(lambda a: b"SSID\000" in a.ssid, next(scan.responses()).aps))
 
@@ -107,3 +126,4 @@ An example flow of performing a scan, connecting, and getting the IPv6 address:
     rpcs.chip.rpc.WiFi.Connect(connect, pw_rpc_timeout_s=10)
 
     rpcs.chip.rpc.WiFi.GetIP6Address()
+    ```

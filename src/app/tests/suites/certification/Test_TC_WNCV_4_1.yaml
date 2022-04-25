@@ -65,7 +65,7 @@ tests:
     ### Step 2x ->  Check GoToLiftPercentage 25% Long-Run effects
     - label: "2a: TH sends GoToLiftPercentage command with 25 percent to DUT"
       command: "GoToLiftPercentage"
-      PICS: "WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE"
+      PICS: "WNCV_LF && CR_GOTOLIFTPERCENTAGE"
       arguments:
           values:
               - name: "liftPercent100thsValue"
@@ -135,7 +135,7 @@ tests:
     ### Step 4x ->  Check GoToLiftPercentage 75.20% Long-Run effects
     - label: "4a: TH sends GoToLiftPercentage command with 75.20 percent to DUT"
       command: "GoToLiftPercentage"
-      PICS: "WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE"
+      PICS: "WNCV_LF && CR_GOTOLIFTPERCENTAGE"
       arguments:
           values:
               - name: "liftPercent100thsValue"

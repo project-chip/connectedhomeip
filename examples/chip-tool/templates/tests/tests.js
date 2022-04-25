@@ -92,7 +92,6 @@ function getManualTests()
   ];
 
   const GeneralCommissioning = [
-    'Test_TC_GC_1_1',
     'Test_TC_GC_1_2',
     'Test_TC_GC_1_3',
   ];
@@ -105,11 +104,9 @@ function getManualTests()
 
   const Identify = [
     'Test_TC_I_2_2',
-    'Test_TC_I_2_3',
   ];
 
   const IlluminanceMeasurement = [
-    'Test_TC_ILL_2_1',
     'Test_TC_ILL_2_2',
   ];
 
@@ -136,7 +133,6 @@ function getManualTests()
     'Test_TC_MC_4_1',
     'Test_TC_MC_8_2',
     'Test_TC_MC_9_2',
-    'Test_TC_MC_10_1',
     'Test_TC_MC_10_2',
     'Test_TC_MC_10_3',
     'Test_TC_MC_10_4',
@@ -148,9 +144,7 @@ function getManualTests()
     'Test_TC_MF_1_1',
     'Test_TC_MF_1_2',
     'Test_TC_MF_1_3',
-    'Test_TC_MF_1_4',
     'Test_TC_MF_1_5',
-    'Test_TC_MF_1_6',
     'Test_TC_MF_1_7',
     'Test_TC_MF_1_8',
     'Test_TC_MF_1_9',
@@ -176,7 +170,6 @@ function getManualTests()
   ];
 
   const ModeSelect = [
-    'Test_TC_MOD_1_1',
     'Test_TC_MOD_1_2',
     'Test_TC_MOD_2_1',
     'Test_TC_MOD_2_2',
@@ -203,7 +196,6 @@ function getManualTests()
   ];
 
   const PowerSourceConfiguration = [
-    'Test_TC_PSCFG_1_1',
     'Test_TC_PSCFG_2_1',
     'Test_TC_PSCFG_3_1',
   ];
@@ -226,7 +218,6 @@ function getManualTests()
   ];
 
   const WindowCovering = [
-    'Test_TC_WNCV_2_3',
     'Test_TC_WNCV_6_1',
   ];
 
@@ -238,10 +229,6 @@ function getManualTests()
     'Test_TC_OCC_2_3',
     'Test_TC_OCC_2_4',
     'Test_TC_OCC_3_1',
-  ];
-
-  const OnOff = [
-    'Test_TC_OO_2_4',
   ];
 
   const PressureMeasurement = [
@@ -279,7 +266,6 @@ function getManualTests()
     WindowCovering, //
     FlowMeasurement, //
     OccupancySensing, //
-    OnOff, //
     PressureMeasurement, //
     PowerSource, //
 
@@ -355,13 +341,19 @@ function getTests()
     'Test_TC_FLW_2_2',
   ];
 
+  const GeneralCommissioning = [
+    'Test_TC_GC_1_1',
+  ];
+
   const Identify = [
     'Test_TC_I_1_1',
     'Test_TC_I_2_1',
+    'Test_TC_I_2_3',
   ];
 
   const IlluminanceMeasurement = [
     'Test_TC_ILL_1_1',
+    'Test_TC_ILL_2_1',
   ];
 
   const OccupancySensing = [
@@ -378,6 +370,10 @@ function getTests()
     'Test_TC_LVL_4_1',
     'Test_TC_LVL_5_1',
     'Test_TC_LVL_6_1',
+  ];
+
+  const UserLabel = [
+    'Test_TC_LC_1_2',
   ];
 
   const MediaControl = [
@@ -416,6 +412,16 @@ function getTests()
     'Test_TC_MC_7_2',
     'Test_TC_MC_8_1',
     'Test_TC_MC_9_1',
+    'Test_TC_MC_10_1',
+  ];
+
+  const ModeSelect = [
+    'Test_TC_MOD_1_1',
+  ];
+
+  const MultipleFabrics = [
+    'Test_TC_MF_1_4',
+    'Test_TC_MF_1_6',
   ];
 
   const OnOff = [
@@ -423,6 +429,7 @@ function getTests()
     'Test_TC_OO_2_1',
     'Test_TC_OO_2_2',
     'Test_TC_OO_2_3',
+    'Test_TC_OO_2_4',
   ];
 
   const PowerSource = [
@@ -443,10 +450,18 @@ function getTests()
     'Test_TC_PCC_2_4',
   ];
 
+  const PowerSourceConfiguration = [
+    'Test_TC_PSCFG_1_1',
+  ];
+
   const RelativeHumidityMeasurement = [
     'Test_TC_RH_1_1',
     'Test_TC_RH_2_1',
     'Test_TC_RH_2_2',
+  ];
+
+  const SecureChannel = [
+    'Test_TC_SC_4_2',
   ];
 
   const Switch = [
@@ -486,6 +501,7 @@ function getTests()
     'Test_TC_WNCV_1_1',
     'Test_TC_WNCV_2_1',
     'Test_TC_WNCV_2_2',
+    'Test_TC_WNCV_2_3',
     'Test_TC_WNCV_2_4',
     'Test_TC_WNCV_2_5',
     'Test_TC_WNCV_3_1',
@@ -497,6 +513,7 @@ function getTests()
     'Test_TC_WNCV_4_2',
     'Test_TC_WNCV_4_3',
     'Test_TC_WNCV_4_4',
+    'Test_TC_WNCV_4_5',
   ];
 
   const TV = [
@@ -525,11 +542,14 @@ function getTests()
     'TestConfigVariables',
     'TestDescriptorCluster',
     'TestBasicInformation',
+    'TestGeneralCommissioning',
     'TestIdentifyCluster',
     'TestOperationalCredentialsCluster',
     'TestModeSelectCluster',
     'TestSystemCommands',
     'TestBinding',
+    'TestUserLabelCluster',
+    'TestArmFailSafe',
   ];
 
   const MultiAdmin = [
@@ -550,6 +570,7 @@ function getTests()
     'DL_UsersAndCredentials',
     'DL_LockUnlock',
     'DL_Schedules',
+    'Test_TC_DL_1_3',
   ];
 
   const Groups = [
@@ -568,21 +589,27 @@ function getTests()
     ElectricalMeasurement, //
     EthernetNetworkDiagnostics, //
     FlowMeasurement, //
+    GeneralCommissioning, //
     Identify, //
     IlluminanceMeasurement, //
     LevelControl, //
     MediaControl, //
+    ModeSelect, //
+    MultipleFabrics, //
     OccupancySensing, //
     OnOff, //
     PowerSource, //
     PressureMeasurement, //
     PumpConfigurationControl, //
+    PowerSourceConfiguration, //
     RelativeHumidityMeasurement, //
+    SecureChannel, //
     Switch, //
     TemperatureMeasurement, //
     Thermostat, //
     ThermostatUserConfiguration, //
     ThreadNetworkDiagnostics, //
+    UserLabel, //
     WiFiNetworkDiagnostics, //
     WindowCovering, //
     TV, //

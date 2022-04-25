@@ -104,7 +104,6 @@ class RunContext:
 )
 @click.option(
     '--chip-tool',
-    default=FindBinaryPath('chip-tool'),
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
 def main(context, log_level, target, target_glob, target_skip_glob,
@@ -114,6 +113,9 @@ def main(context, log_level, target, target_glob, target_skip_glob,
     if no_log_timestamps:
         log_fmt = '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
+
+    if chip_tool is None:
+        chip_tool = FindBinaryPath('chip-tool')
 
     # Figures out selected test that match the given name(s)
     all_tests = [test for test in chiptest.AllTests(chip_tool)]
@@ -165,25 +167,36 @@ def cmd_list(context):
     help='Number of iterations to run')
 @click.option(
     '--all-clusters-app',
-    default=FindBinaryPath('chip-all-clusters-app'),
     help='what all clusters app to use')
 @click.option(
-    '--door-lock-app',
-    default=FindBinaryPath('chip-door-lock-app'),
-    help='what door lock app to use')
+    '--lock-app',
+    help='what lock app to use')
 @click.option(
     '--tv-app',
-    default=FindBinaryPath('chip-tv-app'),
     help='what tv app to use')
+@click.option(
+    '--pics-file',
+    type=click.Path(exists=True),
+    default="src/app/tests/suites/certification/ci-pics-values",
+    help='PICS file to use for test runs.')
 @click.pass_context
-def cmd_run(context, iterations, all_clusters_app, door_lock_app, tv_app):
+def cmd_run(context, iterations, all_clusters_app, lock_app, tv_app, pics_file):
     runner = chiptest.runner.Runner()
+
+    if all_clusters_app is None:
+        all_clusters_app = FindBinaryPath('chip-all-clusters-app')
+
+    if lock_app is None:
+        lock_app = FindBinaryPath('chip-lock-app')
+
+    if tv_app is None:
+        tv_app = FindBinaryPath('chip-tv-app')
 
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(
         chip_tool=[context.obj.chip_tool],
         all_clusters_app=[all_clusters_app],
-        door_lock_app=[door_lock_app],
+        lock_app=[lock_app],
         tv_app=[tv_app]
     )
 
@@ -210,7 +223,7 @@ def cmd_run(context, iterations, all_clusters_app, door_lock_app, tv_app):
         for test in context.obj.tests:
             test_start = time.time()
             try:
-                test.Run(runner, apps_register, paths)
+                test.Run(runner, apps_register, paths, pics_file)
                 test_end = time.time()
                 logging.info('%-20s - Completed in %0.2f seconds' %
                              (test.name, (test_end - test_start)))

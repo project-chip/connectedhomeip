@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 10.2.4. [TC-DM-2.4] Operational Credential Attributes [DUT - Commissioner]
 
@@ -21,23 +22,26 @@ config:
 
 tests:
     - label: "Commission TH to DUT"
-      verification: ""
+      verification: |
+
       disabled: true
 
     - label: "DUT reads the NOCs attribute from TH"
-      verification: "./chip-tool operationalcredentials read nocs 1 0"
+      verification: |
+          ./chip-tool operationalcredentials read nocs 1 0
       disabled: true
 
     - label: "DUT reads the Fabrics attribute from TH"
-      verification: "./chip-tool operationalcredentials read fabrics 1 0"
+      verification: |
+          ./chip-tool operationalcredentials read fabrics 1 0
       disabled: true
 
     - label: "DUT reads the SupportedFabrics attribute from TH"
-      verification:
-          "./chip-tool operationalcredentials read supported-fabrics 1 0"
+      verification: |
+          ./chip-tool operationalcredentials read supported-fabrics 1 0
       disabled: true
 
     - label: "DUT reads the CommissionedFabrics attribute from TH"
-      verification:
-          "./chip-tool operationalcredentials read commissioned-fabrics 1 0"
+      verification: |
+          ./chip-tool operationalcredentials read commissioned-fabrics 1 0
       disabled: true

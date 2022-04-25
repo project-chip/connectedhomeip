@@ -31,8 +31,9 @@
 
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
 #include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
-#include <platform/GenericOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
 #endif
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -67,8 +68,9 @@ static Button_Handle sAppRightHandle;
 AppTask AppTask::sAppTask;
 
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
-static OTARequestor sRequestorCore;
-static GenericOTARequestorDriver sRequestorUser;
+static DefaultOTARequestor sRequestorCore;
+static DefaultOTARequestorStorage sRequestorStorage;
+static DefaultOTARequestorDriver sRequestorUser;
 static BDXDownloader sDownloader;
 static OTAImageProcessorImpl sImageProcessor;
 
@@ -77,7 +79,8 @@ void InitializeOTARequestor(void)
     // Initialize and interconnect the Requestor and Image Processor objects
     SetRequestorInstance(&sRequestorCore);
 
-    sRequestorCore.Init(&Server::GetInstance(), &sRequestorUser, &sDownloader);
+    sRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    sRequestorCore.Init(chip::Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader);
     sImageProcessor.SetOTADownloader(&sDownloader);
     sDownloader.SetImageProcessorDelegate(&sImageProcessor);
     sRequestorUser.Init(&sRequestorCore, &sImageProcessor);
@@ -159,7 +162,9 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");
-    chip::Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -199,6 +204,10 @@ int AppTask::Init()
     PumpMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     ConfigurationMgr().LogDeviceConfig();
+
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+    InitializeOTARequestor();
+#endif
 
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));

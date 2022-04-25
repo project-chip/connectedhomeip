@@ -34,18 +34,19 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
+#include <lib/core/ScopedNodeId.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Span.h>
 
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-#define CASE_OPS_KEY 0xCA5EECC0
-#endif
-
 namespace chip {
 
-static constexpr FabricIndex kMinValidFabricIndex     = 1;
-static constexpr FabricIndex kMaxValidFabricIndex     = std::min<FabricIndex>(UINT8_MAX - 1, CHIP_CONFIG_MAX_FABRICS);
+static constexpr FabricIndex kMinValidFabricIndex = 1;
+static constexpr FabricIndex kMaxValidFabricIndex = UINT8_MAX - 1;
+
+static_assert(kMinValidFabricIndex <= CHIP_CONFIG_MAX_FABRICS, "Must support some fabrics.");
+static_assert(CHIP_CONFIG_MAX_FABRICS <= kMaxValidFabricIndex, "Max fabric count out of range.");
+
 static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 
 static_assert(kUndefinedFabricIndex < chip::kMinValidFabricIndex, "Undefined fabric index should not be valid");
@@ -64,11 +65,7 @@ static_assert(kUndefinedFabricIndex < chip::kMinValidFabricIndex, "Undefined fab
 class DLL_EXPORT FabricInfo
 {
 public:
-    FabricInfo()
-    {
-        Reset();
-        mFabric = kUndefinedFabricIndex;
-    }
+    FabricInfo() { Reset(); }
 
     // Returns a span into our internal storage.
     CharSpan GetFabricLabel() const { return CharSpan(mFabricLabel, strnlen(mFabricLabel, kFabricLabelMaxLengthInBytes)); }
@@ -85,6 +82,8 @@ public:
     }
 
     NodeId GetNodeId() const { return mOperationalId.GetNodeId(); }
+    ScopedNodeId GetScopedNodeId() const { return ScopedNodeId(mOperationalId.GetNodeId(), mFabricIndex); }
+    ScopedNodeId GetScopedNodeIdForNode(const NodeId node) const { return ScopedNodeId(node, mFabricIndex); }
     // TODO(#15049): Refactor/rename PeerId to OperationalId or OpId throughout source
     PeerId GetPeerId() const { return mOperationalId; }
     PeerId GetPeerIdForNode(const NodeId node) const
@@ -95,7 +94,7 @@ public:
     }
 
     FabricId GetFabricId() const { return mFabricId; }
-    FabricIndex GetFabricIndex() const { return mFabric; }
+    FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
     CompressedFabricId GetCompressedId() const { return mOperationalId.GetCompressedFabricId(); }
 
@@ -110,20 +109,16 @@ public:
 
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
 
-    Crypto::P256Keypair * GetOperationalKey()
+    Crypto::P256Keypair * GetOperationalKey() const
     {
         if (mOperationalKey == nullptr)
         {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
             mOperationalKey = chip::Platform::New<Crypto::P256KeypairHSM>();
-            mOperationalKey->SetKeyId(CASE_OPS_KEY);
+            mOperationalKey->CreateOperationalKey(mFabricIndex);
 #else
             mOperationalKey = chip::Platform::New<Crypto::P256Keypair>();
-#endif
             mOperationalKey->Initialize();
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-            // Set provisioned_key = true , so that key is not deleted from HSM.
-            mOperationalKey->provisioned_key = true;
 #endif
         }
         return mOperationalKey;
@@ -139,12 +134,6 @@ public:
     CHIP_ERROR SetNOCCert(const chip::ByteSpan & cert) { return SetCert(mNOCCert, cert); }
 
     bool IsInitialized() const { return IsOperationalNodeId(mOperationalId.GetNodeId()); }
-
-    CHIP_ERROR GenerateDestinationID(const ByteSpan & ipk, const ByteSpan & random, NodeId destNodeId,
-                                     MutableByteSpan & destinationId) const;
-
-    CHIP_ERROR MatchDestinationID(const ByteSpan & destinationId, const ByteSpan & initiatorRandom, const ByteSpan * ipkList,
-                                  size_t ipkListEntries);
 
     // TODO - Refactor storing and loading of fabric info from persistent storage.
     //        The op cert array doesn't need to be in RAM except when it's being
@@ -197,6 +186,7 @@ public:
             mOperationalKey = nullptr;
         }
         ReleaseOperationalCerts();
+        mFabricIndex = kUndefinedFabricIndex;
     }
 
     CHIP_ERROR SetFabricInfo(FabricInfo & fabric);
@@ -225,14 +215,14 @@ private:
 
     PeerId mOperationalId;
 
-    FabricIndex mFabric                                 = kUndefinedFabricIndex;
+    FabricIndex mFabricIndex                            = kUndefinedFabricIndex;
     uint16_t mVendorId                                  = VendorId::NotSpecified;
     char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
 
 #ifdef ENABLE_HSM_CASE_OPS_KEY
-    Crypto::P256KeypairHSM * mOperationalKey = nullptr;
+    mutable Crypto::P256KeypairHSM * mOperationalKey = nullptr;
 #else
-    Crypto::P256Keypair * mOperationalKey = nullptr;
+    mutable Crypto::P256Keypair * mOperationalKey = nullptr;
 #endif
 
     MutableByteSpan mRootCert;
@@ -372,7 +362,7 @@ private:
 class DLL_EXPORT FabricTable
 {
 public:
-    FabricTable() { Reset(); }
+    FabricTable() {}
     ~FabricTable();
 
     CHIP_ERROR Store(FabricIndex index);
@@ -390,19 +380,13 @@ public:
      * can release the memory associated with input parameter after the call is complete.
      *
      * If the call is successful, the assigned fabric index is returned as output parameter.
+     * The fabric information will also be persisted to storage.
      */
     CHIP_ERROR AddNewFabric(FabricInfo & fabric, FabricIndex * assignedIndex);
-
-    void ReleaseFabricIndex(FabricIndex fabricIndex);
 
     FabricInfo * FindFabric(Credentials::P256PublicKeySpan rootPubKey, FabricId fabricId);
     FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
     FabricInfo * FindFabricWithCompressedId(CompressedFabricId fabricId);
-
-    FabricIndex FindDestinationIDCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom,
-                                           const ByteSpan * ipkList, size_t ipkListEntries);
-
-    void Reset();
 
     CHIP_ERROR Init(PersistentStorageDelegate * storage);
     CHIP_ERROR AddFabricDelegate(FabricTableDelegate * delegate);
@@ -415,13 +399,45 @@ public:
     ConstFabricIterator end() const { return cend(); }
 
 private:
+    static constexpr size_t IndexInfoTLVMaxSize()
+    {
+        // We have a single next-available index and an array of anonymous-tagged
+        // fabric indices.
+        //
+        // The max size of the list is (1 byte control + bytes for actual value)
+        // times max number of list items, plus one byte for the list terminator.
+        return TLV::EstimateStructOverhead(sizeof(FabricIndex), CHIP_CONFIG_MAX_FABRICS * (1 + sizeof(FabricIndex)) + 1);
+    }
+
+    /**
+     * UpdateNextAvailableFabricIndex should only be called when
+     * mNextAvailableFabricIndex has a value and that value stops being
+     * available.  It will set mNextAvailableFabricIndex to the next available
+     * value, or no value if there is none available.
+     */
+    void UpdateNextAvailableFabricIndex();
+
+    /**
+     * Store our current fabric index state: what our next available index is
+     * and what indices we're using right now.
+     */
+    CHIP_ERROR StoreFabricIndexInfo() const;
+
+    /**
+     * Read our fabric index info from the given TLV reader and set up the
+     * fabric table accordingly.
+     */
+    CHIP_ERROR ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader);
+
     FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
     PersistentStorageDelegate * mStorage = nullptr;
 
     FabricTableDelegate * mDelegate = nullptr;
 
-    FabricIndex mNextAvailableFabricIndex = kMinValidFabricIndex;
-    uint8_t mFabricCount                  = 0;
+    // We may not have an mNextAvailableFabricIndex if our table is as large as
+    // it can go and is full.
+    Optional<FabricIndex> mNextAvailableFabricIndex;
+    uint8_t mFabricCount = 0;
 };
 
 } // namespace chip

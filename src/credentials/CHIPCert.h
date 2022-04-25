@@ -231,6 +231,15 @@ public:
     CHIP_ERROR AddAttribute(chip::ASN1::OID oid, uint64_t val);
 
     /**
+     * @brief Add CASE Authenticated Tags (CATs) attributes to the DN.
+     *
+     * @param cats    Array of CAT values.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR AddCATs(const chip::CATValues & cats);
+
+    /**
      * @brief Add string attribute to the DN.
      *
      * @param oid     String OID for DN attribute.
@@ -241,6 +250,86 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR AddAttribute(chip::ASN1::OID oid, CharSpan val, bool isPrintableString);
+
+    inline CHIP_ERROR AddAttribute_CommonName(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_CommonName, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_Surname(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_Surname, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_SerialNumber(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_SerialNumber, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_CountryName(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_CountryName, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_LocalityName(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_LocalityName, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_StateOrProvinceName(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_StateOrProvinceName, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_OrganizationName(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_OrganizationName, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_OrganizationalUnitName(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_OrganizationalUnitName, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_Title(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_Title, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_Name(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_Name, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_GivenName(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_GivenName, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_Initials(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_Initials, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_GenerationQualifier(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_GenerationQualifier, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_DNQualifier(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_DNQualifier, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_Pseudonym(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_Pseudonym, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_DomainComponent(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_DomainComponent, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_MatterNodeId(uint64_t val) { return AddAttribute(ASN1::kOID_AttributeType_MatterNodeId, val); }
+    inline CHIP_ERROR AddAttribute_MatterFirmwareSigningId(uint64_t val)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_MatterFirmwareSigningId, val);
+    }
+    inline CHIP_ERROR AddAttribute_MatterICACId(uint64_t val) { return AddAttribute(ASN1::kOID_AttributeType_MatterICACId, val); }
+    inline CHIP_ERROR AddAttribute_MatterRCACId(uint64_t val) { return AddAttribute(ASN1::kOID_AttributeType_MatterRCACId, val); }
+    inline CHIP_ERROR AddAttribute_MatterFabricId(uint64_t val)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_MatterFabricId, val);
+    }
+    inline CHIP_ERROR AddAttribute_MatterCASEAuthTag(CASEAuthTag val)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_MatterCASEAuthTag, val);
+    }
 
     /**
      * @brief Determine type of a CHIP certificate.
@@ -268,6 +357,11 @@ public:
     CHIP_ERROR GetCertFabricId(uint64_t & fabricId) const;
 
     /**
+     * @brief Encode ChipDN attributes in TLV form.
+     **/
+    CHIP_ERROR EncodeToTLV(chip::TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    /**
      * @brief Decode ChipDN attributes from TLV encoded format.
      *
      * @param reader  A TLVReader positioned at the ChipDN TLV list.
@@ -279,6 +373,13 @@ public:
      **/
     CHIP_ERROR EncodeToASN1(ASN1::ASN1Writer & writer) const;
 
+    /**
+     * @brief Decode ChipDN attributes from ASN1 encoded format.
+     *
+     * @param reader  A ASN1Reader positioned at the ChipDN ASN1 list.
+     **/
+    CHIP_ERROR DecodeFromASN1(ASN1::ASN1Reader & reader);
+
     bool IsEqual(const ChipDN & other) const;
 
     /**
@@ -288,6 +389,7 @@ public:
      **/
     bool IsEmpty() const { return RDNCount() == 0; }
 
+    static_assert((CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES) >= 5, "Spec requires at least 5 RDN to be supported per Matter TLV cert");
     ChipRDN rdn[CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES];
 
     uint8_t RDNCount() const;
@@ -306,7 +408,7 @@ using P256ECDSASignatureSpan = FixedByteSpan<Crypto::kP256_ECDSA_Signature_Lengt
 /**
  *  @brief  A data structure for holding a P256 Public Key, without the ownership of it.
  */
-using P256PublicKeySpan = FixedByteSpan<Crypto::kP256_Point_Length>;
+using P256PublicKeySpan = FixedByteSpan<Crypto::kP256_PublicKey_Length>;
 
 /**
  *  @brief  A data structure for holding a P256 Integer, without the ownership of it.
@@ -707,9 +809,9 @@ CHIP_ERROR ChipEpochToASN1Time(uint32_t epochTime, chip::ASN1::ASN1UniversalTime
  **/
 inline bool IsChip64bitDNAttr(chip::ASN1::OID oid)
 {
-    return (oid == chip::ASN1::kOID_AttributeType_ChipNodeId || oid == chip::ASN1::kOID_AttributeType_ChipFirmwareSigningId ||
-            oid == chip::ASN1::kOID_AttributeType_ChipICAId || oid == chip::ASN1::kOID_AttributeType_ChipRootId ||
-            oid == chip::ASN1::kOID_AttributeType_ChipFabricId);
+    return (oid == chip::ASN1::kOID_AttributeType_MatterNodeId || oid == chip::ASN1::kOID_AttributeType_MatterFirmwareSigningId ||
+            oid == chip::ASN1::kOID_AttributeType_MatterICACId || oid == chip::ASN1::kOID_AttributeType_MatterRCACId ||
+            oid == chip::ASN1::kOID_AttributeType_MatterFabricId);
 }
 
 /**
@@ -717,7 +819,7 @@ inline bool IsChip64bitDNAttr(chip::ASN1::OID oid)
  **/
 inline bool IsChip32bitDNAttr(chip::ASN1::OID oid)
 {
-    return (oid == chip::ASN1::kOID_AttributeType_ChipCASEAuthenticatedTag);
+    return (oid == chip::ASN1::kOID_AttributeType_MatterCASEAuthTag);
 }
 
 /**
@@ -859,7 +961,7 @@ CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ByteSpan & opcert, NodeId * nod
 /**
  * Extract Public Key from a chip certificate in ByteSpan TLV-encoded form.
  * This does not perform any sort of validation on the certificate structure
- * structure than parsing it.
+ * other than parsing it.
  *
  * Can return any error that can be returned from parsing the cert.
  */
@@ -868,11 +970,27 @@ CHIP_ERROR ExtractPublicKeyFromChipCert(const ByteSpan & chipCert, P256PublicKey
 /**
  * Extract Subject Key Identifier from a chip certificate in ByteSpan TLV-encoded form.
  * This does not perform any sort of validation on the certificate structure
- * structure than parsing it.
+ * other than parsing it.
  *
  * Can return any error that can be returned from parsing the cert.
  */
 CHIP_ERROR ExtractSKIDFromChipCert(const ByteSpan & chipCert, CertificateKeyId & skid);
+
+/**
+ * Extract Subject Distinguished Name (DN) from a chip certificate in ByteSpan TLV-encoded form.
+ * It is required that the certificate in the chipCert buffer stays valid while the `dn` output is used.
+ *
+ * Can return any error that can be returned from parsing the cert.
+ */
+CHIP_ERROR ExtractSubjectDNFromChipCert(const ByteSpan & chipCert, ChipDN & dn);
+
+/**
+ * Extract Subject Distinguished Name (DN) from a chip certificate in ByteSpan X509 DER-encoded form.
+ * It is required that the certificate in the chipCert buffer stays valid while the `dn` output is used.
+ *
+ * Can return any error that can be returned from converting and parsing the cert.
+ */
+CHIP_ERROR ExtractSubjectDNFromX509Cert(const ByteSpan & x509Cert, ChipDN & dn);
 
 } // namespace Credentials
 } // namespace chip

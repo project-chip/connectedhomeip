@@ -58,9 +58,13 @@ follow these steps:
 -   Setup ESP32 QEMU. This will build QEMU and install necessary artifacts to
     run unit tests.
 
-          $ source idf.sh
-          $ ./qemu_setup.sh
+          ```
+          source idf.sh
+          ./qemu_setup.sh
+          ```
 
 -   Run specific unit tests
 
-          $ idf make -C build/chip/src/crypto/tests check
+          ```
+          idf make -C build/chip/src/crypto/tests check
+          ```

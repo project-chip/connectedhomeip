@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     22.1.27. [TC-MF-1.27] Open commissioning window - durations max and max+1
@@ -23,37 +24,43 @@ config:
 
 tests:
     - label: "Reset DUT_CR to factory defaults"
-      verification: ""
+      verification: |
+
       disabled: true
 
     - label: "DUT_CR starts a commissioning process with TH_CE using BCM"
-      verification:
-          "1. Provision the device using your DUT controller(use above
-          instructions) , "
+      verification: |
+          1. Provision the device using your DUT controller(use above instructions) ,
       disabled: true
 
     - label:
           "DUT_CR opens a commissioning window on TH_CE with a value of 15
           minutes"
-      verification:
-          "On your DUT controller, open commissioning window using BCM, Below is
-          an example when using chip tool as controller ./chip-tool
-          administratorcommissioning open-basic-commissioning-window 900 1 0"
+      verification: |
+          On your DUT controller, open commissioning window using BCM,
+
+          Below is an example when using chip tool as controller
+
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 900 1 0
       disabled: true
 
     - label: "Wait for commissioning Window to Timeout"
-      verification: "Wait for commissioning Window to Timeout"
+      verification: |
+          Wait for commissioning Window to Timeout
       disabled: true
 
     - label:
           "DUT_CR opens a commissioning window on TH_CE with a value of 901
           seconds"
-      verification:
-          "On your DUT controller, open commissioning window using BCM, Below is
-          an example when using chip tool as controller ./chip-tool
-          administratorcommissioning open-basic-commissioning-window 901 1 0"
+      verification: |
+          On your DUT controller, open commissioning window using BCM,
+
+          Below is an example when using chip tool as controller
+
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 901 1 0
       disabled: true
 
     - label: "Wait for commissioning Window to Timeout"
-      verification: "Wait for commissioning Window to Timeout"
+      verification: |
+          Wait for commissioning Window to Timeout
       disabled: true

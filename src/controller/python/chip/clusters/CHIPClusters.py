@@ -49,6 +49,24 @@ class ChipClusters:
                     "reportable": True,
                     "writable": True,
                 },
+                0x00000002: {
+                    "attributeName": "SubjectsPerAccessControlEntry",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000003: {
+                    "attributeName": "TargetsPerAccessControlEntry",
+                    "attributeId": 0x00000003,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000004: {
+                    "attributeName": "AccessControlEntriesPerFabric",
+                    "attributeId": 0x00000004,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFF8: {
                     "attributeName": "GeneratedCommandList",
                     "attributeId": 0x0000FFF8,
@@ -601,6 +619,12 @@ class ChipClusters:
                     "attributeName": "UniqueID",
                     "attributeId": 0x00000012,
                     "type": "str",
+                    "reportable": True,
+                },
+                0x00000013: {
+                    "attributeName": "CapabilityMinima",
+                    "attributeId": 0x00000013,
+                    "type": "",
                     "reportable": True,
                 },
                 0x0000FFF8: {
@@ -1837,6 +1861,13 @@ class ChipClusters:
                         "credentialIndex": "int",
                     },
                 },
+            0x00000013: {
+                    "commandId": 0x00000013,
+                    "commandName": "ClearHolidaySchedule",
+                    "args": {
+                        "holidayIndex": "int",
+                    },
+                },
             0x0000001D: {
                     "commandId": 0x0000001D,
                     "commandName": "ClearUser",
@@ -1866,6 +1897,13 @@ class ChipClusters:
                     "args": {
                         "credentialType": "int",
                         "credentialIndex": "int",
+                    },
+                },
+            0x00000012: {
+                    "commandId": 0x00000012,
+                    "commandName": "GetHolidaySchedule",
+                    "args": {
+                        "holidayIndex": "int",
                     },
                 },
             0x0000001B: {
@@ -1909,6 +1947,16 @@ class ChipClusters:
                         "userIndex": "int",
                         "userStatus": "int",
                         "userType": "int",
+                    },
+                },
+            0x00000011: {
+                    "commandId": 0x00000011,
+                    "commandName": "SetHolidaySchedule",
+                    "args": {
+                        "holidayIndex": "int",
+                        "localStartTime": "int",
+                        "localEndTime": "int",
+                        "operatingMode": "int",
                     },
                 },
             0x0000001A: {
@@ -2018,6 +2066,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x00000016: {
+                    "attributeName": "NumberOfHolidaySchedulesSupported",
+                    "attributeId": 0x00000016,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x00000017: {
                     "attributeName": "MaxPINCodeLength",
                     "attributeId": 0x00000017,
@@ -2095,6 +2149,19 @@ class ChipClusters:
                     "attributeId": 0x00000030,
                     "type": "int",
                     "reportable": True,
+                    "writable": True,
+                },
+                0x00000031: {
+                    "attributeName": "UserCodeTemporaryDisableTime",
+                    "attributeId": 0x00000031,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000033: {
+                    "attributeName": "RequirePINforRemoteOperation",
+                    "attributeId": 0x00000033,
+                    "type": "bool",
                     "writable": True,
                 },
                 0x0000FFF8: {
@@ -2339,6 +2406,64 @@ class ChipClusters:
                     "reportable": True,
                     "writable": True,
                 },
+                0x00000002: {
+                    "attributeName": "PercentSetting",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000003: {
+                    "attributeName": "PercentCurrent",
+                    "attributeId": 0x00000003,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000004: {
+                    "attributeName": "SpeedMax",
+                    "attributeId": 0x00000004,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000005: {
+                    "attributeName": "SpeedSetting",
+                    "attributeId": 0x00000005,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000006: {
+                    "attributeName": "SpeedCurrent",
+                    "attributeId": 0x00000006,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000007: {
+                    "attributeName": "RockSupport",
+                    "attributeId": 0x00000007,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000008: {
+                    "attributeName": "RockSetting",
+                    "attributeId": 0x00000008,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000009: {
+                    "attributeName": "WindSupport",
+                    "attributeId": 0x00000009,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000000A: {
+                    "attributeName": "WindSetting",
+                    "attributeId": 0x0000000A,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
+                },
                 0x0000FFF8: {
                     "attributeName": "GeneratedCommandList",
                     "attributeId": 0x0000FFF8,
@@ -2475,7 +2600,6 @@ class ChipClusters:
                     "args": {
                         "expiryLengthSeconds": "int",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
                     },
                 },
             0x00000004: {
@@ -2488,10 +2612,9 @@ class ChipClusters:
                     "commandId": 0x00000002,
                     "commandName": "SetRegulatoryConfig",
                     "args": {
-                        "location": "int",
+                        "newRegulatoryConfig": "int",
                         "countryCode": "str",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
                     },
                 },
             },
@@ -2519,6 +2642,12 @@ class ChipClusters:
                     "attributeName": "LocationCapability",
                     "attributeId": 0x00000003,
                     "type": "int",
+                    "reportable": True,
+                },
+                0x00000004: {
+                    "attributeName": "SupportsConcurrentConnection",
+                    "attributeId": 0x00000004,
+                    "type": "bool",
                     "reportable": True,
                 },
                 0x0000FFF8: {
@@ -3471,35 +3600,42 @@ class ChipClusters:
             },
             "attributes": {
                 0x00000000: {
-                    "attributeName": "CurrentMode",
+                    "attributeName": "Description",
                     "attributeId": 0x00000000,
-                    "type": "int",
+                    "type": "str",
                     "reportable": True,
                 },
                 0x00000001: {
-                    "attributeName": "SupportedModes",
+                    "attributeName": "StandardNamespace",
                     "attributeId": 0x00000001,
-                    "type": "",
+                    "type": "int",
                     "reportable": True,
                 },
                 0x00000002: {
-                    "attributeName": "OnMode",
+                    "attributeName": "SupportedModes",
                     "attributeId": 0x00000002,
-                    "type": "int",
+                    "type": "",
                     "reportable": True,
-                    "writable": True,
                 },
                 0x00000003: {
-                    "attributeName": "StartUpMode",
+                    "attributeName": "CurrentMode",
                     "attributeId": 0x00000003,
                     "type": "int",
                     "reportable": True,
                 },
                 0x00000004: {
-                    "attributeName": "Description",
+                    "attributeName": "StartUpMode",
                     "attributeId": 0x00000004,
-                    "type": "str",
+                    "type": "int",
                     "reportable": True,
+                    "writable": True,
+                },
+                0x00000005: {
+                    "attributeName": "OnMode",
+                    "attributeId": 0x00000005,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
                 },
                 0x0000FFF8: {
                     "attributeName": "GeneratedCommandList",
@@ -3516,6 +3652,12 @@ class ChipClusters:
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFC: {
+                    "attributeName": "FeatureMap",
+                    "attributeId": 0x0000FFFC,
                     "type": "int",
                     "reportable": True,
                 },

@@ -27,7 +27,7 @@
 #include <platform/Ameba/AmebaConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <wifi_conf.h>
@@ -47,7 +47,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     uint32_t rebootCount;
-    bool failSafeArmed;
 
     // Force initialization of NVS namespaces if they doesn't already exist.
     err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipFactory);
@@ -55,6 +54,30 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipConfig);
     SuccessOrExit(err);
     err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipCounters);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace2(AmebaConfig::kConfigNamespace_ChipFabric1);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace2(AmebaConfig::kConfigNamespace_ChipFabric2);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace2(AmebaConfig::kConfigNamespace_ChipFabric3);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace2(AmebaConfig::kConfigNamespace_ChipFabric4);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace2(AmebaConfig::kConfigNamespace_ChipFabric5);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipACL);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipGroupMsgCounters);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipAttributes);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipBindingTable);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipOTA);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipDNS);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipOthers);
     SuccessOrExit(err);
 
     if (AmebaConfig::ConfigValueExists(AmebaConfig::kCounterKey_RebootCount))
@@ -80,7 +103,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!AmebaConfig::ConfigValueExists(AmebaConfig::kCounterKey_BootReason))
     {
-        err = StoreBootReason(BootReasonType::Unspecified);
+        err = StoreBootReason(to_underlying(BootReasonType::kUnspecified));
         SuccessOrExit(err);
     }
 
@@ -88,12 +111,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     err = Internal::GenericConfigurationManagerImpl<AmebaConfig>::Init();
     SuccessOrExit(err);
 
-    // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
-    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
-    {
-        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
-        InitiateFactoryReset();
-    }
     err = CHIP_NO_ERROR;
 
 exit:

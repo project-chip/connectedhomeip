@@ -78,8 +78,8 @@ public:
     //
     // dataVersionStorage.size() needs to be at least as big as the number of
     // server clusters in the EmberAfEndpointType passed in.
-    EndpointId AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType,
-                             const Span<DataVersion> & dataVersionStorage);
+    EndpointId AddContentApp(ContentApp * app, EmberAfEndpointType * ep, const Span<DataVersion> & dataVersionStorage,
+                             const Span<const EmberAfDeviceType> & deviceTypeList);
 
     // remove app from the platform.
     // returns the endpoint id where the app was, or 0 if app was not loaded

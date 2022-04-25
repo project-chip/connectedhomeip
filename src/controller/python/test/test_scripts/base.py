@@ -35,6 +35,7 @@ import chip.clusters.Attribute as Attribute
 from chip.ChipStack import *
 import chip.FabricAdmin
 import copy
+import secrets
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -167,13 +168,15 @@ class TestResult:
 
 
 class BaseTestHelper:
-    def __init__(self, nodeid: int, testCommissioner: bool = False):
+    def __init__(self, nodeid: int, paaTrustStorePath: str, testCommissioner: bool = False):
         self.chipStack = ChipStack('/tmp/repl_storage.json')
         self.fabricAdmin = chip.FabricAdmin.FabricAdmin(
             fabricId=1, fabricIndex=1)
-        self.devCtrl = self.fabricAdmin.NewController(nodeid, testCommissioner)
+        self.devCtrl = self.fabricAdmin.NewController(
+            nodeid, paaTrustStorePath, testCommissioner)
         self.controllerNodeId = nodeid
         self.logger = logger
+        self.paaTrustStorePath = paaTrustStorePath
 
     def _WaitForOneDiscoveredDevice(self, timeoutSeconds: int = 2):
         print("Waiting for device responses...")
@@ -232,6 +235,29 @@ class BaseTestHelper:
         self.logger.info("Device finished key exchange.")
         return True
 
+    def TestCommissionFailure(self, nodeid: int, failAfter: int):
+        self.devCtrl.ResetTestCommissioner()
+        a = self.devCtrl.SetTestCommissionerSimulateFailureOnStage(failAfter)
+        if not a:
+            # We're not going to hit this stage during commissioning so no sense trying, just say it was fine.
+            return True
+
+        self.logger.info(
+            "Commissioning device, expecting failure after stage {}".format(failAfter))
+        self.devCtrl.Commission(nodeid)
+        return self.devCtrl.CheckTestCommissionerCallbacks() and self.devCtrl.CheckTestCommissionerPaseConnection(nodeid)
+
+    def TestCommissionFailureOnReport(self, nodeid: int, failAfter: int):
+        self.devCtrl.ResetTestCommissioner()
+        a = self.devCtrl.SetTestCommissionerSimulateFailureOnReport(failAfter)
+        if not a:
+            # We're not going to hit this stage during commissioning so no sense trying, just say it was fine.
+            return True
+        self.logger.info(
+            "Commissioning device, expecting failure on report for stage {}".format(failAfter))
+        self.devCtrl.Commission(nodeid)
+        return self.devCtrl.CheckTestCommissionerCallbacks() and self.devCtrl.CheckTestCommissionerPaseConnection(nodeid)
+
     def TestKeyExchange(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Conducting key exchange with device {}".format(ip))
         if not self.devCtrl.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
@@ -244,18 +270,97 @@ class BaseTestHelper:
     def TestUsedTestCommissioner(self):
         return self.devCtrl.GetTestCommissionerUsed()
 
+    def TestFailsafe(self, nodeid: int):
+        self.logger.info("Testing arm failsafe")
+
+        self.logger.info("Setting failsafe on CASE connection")
+        err, resp = self.devCtrl.ZCLSend("GeneralCommissioning", "ArmFailSafe", nodeid,
+                                         0, 0, dict(expiryLengthSeconds=60, breadcrumb=1), blocking=True)
+        if err != 0:
+            self.logger.error(
+                "Failed to send arm failsafe command error is {} with im response{}".format(err, resp))
+            return False
+
+        if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningError.kOk:
+            self.logger.error(
+                "Incorrect response received from arm failsafe - wanted OK, received {}".format(resp))
+            return False
+
+        self.logger.info(
+            "Attempting to open basic commissioning window - this should fail since the failsafe is armed")
+        try:
+            res = asyncio.run(self.devCtrl.SendCommand(
+                nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180), timedRequestTimeoutMs=10000))
+            # we actually want the exception here because we want to see a failure, so return False here
+            self.logger.error(
+                'Incorrectly succeeded in opening basic commissioning window')
+            return False
+        except Exception as ex:
+            pass
+
+        # TODO: pipe through the commissioning window opener so we can test enhanced properly. The pake verifier is just garbage because none of of the functions to calculate
+        # it or serialize it are available right now. However, this command should fail BEFORE that becomes an issue.
+        discriminator = 1111
+        salt = secrets.token_bytes(16)
+        iterations = 2000
+        # not the right size or the right contents, but it won't matter
+        verifier = secrets.token_bytes(32)
+        self.logger.info(
+            "Attempting to open enhanced commissioning window - this should fail since the failsafe is armed")
+        try:
+            res = asyncio.run(self.devCtrl.SendCommand(nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
+                commissioningTimeout=180, PAKEVerifier=verifier, discriminator=discriminator, iterations=iterations, salt=salt), timedRequestTimeoutMs=10000))
+            # we actually want the exception here because we want to see a failure, so return False here
+            self.logger.error(
+                'Incorrectly succeeded in opening enhanced commissioning window')
+            return False
+        except Exception as ex:
+            pass
+
+        self.logger.info("Disarming failsafe on CASE connection")
+        err, resp = self.devCtrl.ZCLSend("GeneralCommissioning", "ArmFailSafe", nodeid,
+                                         0, 0, dict(expiryLengthSeconds=0, breadcrumb=1), blocking=True)
+        if err != 0:
+            self.logger.error(
+                "Failed to send arm failsafe command error is {} with im response{}".format(err, resp))
+            return False
+
+        self.logger.info(
+            "Opening Commissioning Window - this should succeed since the failsafe was just disarmed")
+        try:
+            res = asyncio.run(self.devCtrl.SendCommand(
+                nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180), timedRequestTimeoutMs=10000))
+        except Exception as ex:
+            self.logger.error(
+                'Failed to open commissioning window after disarming failsafe')
+            return False
+
+        self.logger.info(
+            "Attempting to arm failsafe over CASE - this should fail since the commissioning window is open")
+        err, resp = self.devCtrl.ZCLSend("GeneralCommissioning", "ArmFailSafe", nodeid,
+                                         0, 0, dict(expiryLengthSeconds=60, breadcrumb=1), blocking=True)
+        if err != 0:
+            self.logger.error(
+                "Failed to send arm failsafe command error is {} with im response{}".format(err, resp))
+            return False
+        if resp.errorCode is Clusters.GeneralCommissioning.Enums.CommissioningError.kBusyWithOtherAdmin:
+            return True
+        return False
+
     async def TestMultiFabric(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Opening Commissioning Window")
 
-        await self.devCtrl.SendCommand(nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(100), timedRequestTimeoutMs=10000)
+        await self.devCtrl.SendCommand(nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180), timedRequestTimeoutMs=10000)
 
         self.logger.info("Creating 2nd Fabric Admin")
-        fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId=2, fabricIndex=2)
+        self.fabricAdmin2 = chip.FabricAdmin.FabricAdmin(
+            fabricId=2, fabricIndex=2)
 
         self.logger.info("Creating Device Controller on 2nd Fabric")
-        devCtrl2 = fabricAdmin2.NewController(self.controllerNodeId)
+        self.devCtrl2 = self.fabricAdmin2.NewController(
+            self.controllerNodeId, self.paaTrustStorePath)
 
-        if not devCtrl2.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
+        if not self.devCtrl2.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
             self.logger.info(
                 "Failed to finish key exchange with device {}".format(ip))
             return False
@@ -280,8 +385,10 @@ class BaseTestHelper:
             fabricId=1, fabricIndex=1)
         fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId=2, fabricIndex=2)
 
-        self.devCtrl = self.fabricAdmin.NewController(self.controllerNodeId)
-        self.devCtrl2 = fabricAdmin2.NewController(self.controllerNodeId)
+        self.devCtrl = self.fabricAdmin.NewController(
+            self.controllerNodeId, self.paaTrustStorePath)
+        self.devCtrl2 = fabricAdmin2.NewController(
+            self.controllerNodeId, self.paaTrustStorePath)
 
         data1 = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False)
         data2 = await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False)
@@ -298,15 +405,14 @@ class BaseTestHelper:
         data2 = await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)], fabricFiltered=False)
 
         # Read out current fabric from each fabric, and both should be different.
-        currentFabric1 = data1[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
-        currentFabric2 = data2[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
+        self.currentFabric1 = data1[0][Clusters.OperationalCredentials][
+            Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
+        self.currentFabric2 = data2[0][Clusters.OperationalCredentials][
+            Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
         if (self.currentFabric1 == self.currentFabric2):
             self.logger.error(
                 "Got back fabric indices that match for two different fabrics!")
             return False
-
-        # devCtrl2.Shutdown()
-        # fabricAdmin2.Shutdown()
 
         return True
 
@@ -576,8 +682,8 @@ class BaseTestHelper:
             "Location": "XX",
             "HardwareVersion": 0,
             "HardwareVersionString": "TEST_VERSION",
-            "SoftwareVersion": 0,
-            "SoftwareVersionString": "prerelease",
+            "SoftwareVersion": 1,
+            "SoftwareVersionString": "1.0",
         }
         failed_zcl = {}
         for basic_attr, expected_value in basic_cluster_attrs.items():

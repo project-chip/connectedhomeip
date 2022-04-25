@@ -18,6 +18,8 @@
 
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/PeerId.h>
+#include <lib/core/ScopedNodeId.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <transport/SessionHolder.h>
 #include <transport/raw/PeerAddress.h>
@@ -29,6 +31,8 @@ class SecureSession;
 class UnauthenticatedSession;
 class IncomingGroupSession;
 class OutgoingGroupSession;
+
+constexpr System::Clock::Milliseconds32 kMinActiveTime = System::Clock::Milliseconds32(4000);
 
 class Session
 {
@@ -65,9 +69,11 @@ public:
     virtual void Retain() {}
     virtual void Release() {}
 
+    virtual ScopedNodeId GetPeer() const                               = 0;
     virtual Access::SubjectDescriptor GetSubjectDescriptor() const     = 0;
     virtual bool RequireMRP() const                                    = 0;
     virtual const ReliableMessageProtocolConfig & GetMRPConfig() const = 0;
+    virtual System::Clock::Timestamp GetMRPBaseTimeout()               = 0;
     virtual System::Clock::Milliseconds32 GetAckTimeout() const        = 0;
 
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
@@ -81,6 +87,8 @@ public:
     {
         return GetSessionType() == SessionType::kGroupIncoming || GetSessionType() == SessionType::kGroupOutgoing;
     }
+
+    bool IsSecureSession() const { return GetSessionType() == SessionType::kSecure; }
 
 protected:
     // This should be called by sub-classes at the very beginning of the destructor, before any data field is disposed, such that

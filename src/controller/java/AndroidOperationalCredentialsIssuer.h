@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,6 +31,7 @@
 
 #include <controller/OperationalCredentialsDelegate.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CASEAuthTag.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/CodeUtils.h>
@@ -46,8 +47,8 @@ class DLL_EXPORT AndroidOperationalCredentialsIssuer : public OperationalCredent
 public:
     virtual ~AndroidOperationalCredentialsIssuer() {}
 
-    CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & attestationSignature, const ByteSpan & DAC,
-                                const ByteSpan & PAI, const ByteSpan & PAA,
+    CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
+                                const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
                                 Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
 
     void SetNodeIdForNextNOCRequest(NodeId nodeId) override
@@ -81,8 +82,9 @@ public:
      * This method is expected to be called once all the checks (e.g. device attestation, CSR verification etc)
      * have been completed, or not required (e.g. for self trusted devices such as commissioner apps).
      */
-    CHIP_ERROR GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId, const Crypto::P256PublicKey & pubkey,
-                                               MutableByteSpan & rcac, MutableByteSpan & icac, MutableByteSpan & noc);
+    CHIP_ERROR GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId, const CATValues & cats,
+                                               const Crypto::P256PublicKey & pubkey, MutableByteSpan & rcac, MutableByteSpan & icac,
+                                               MutableByteSpan & noc);
 
 private:
     Crypto::P256Keypair mIssuer;

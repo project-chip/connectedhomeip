@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     19.8.3. [TC-IDM-6.3] Events Read Interaction from DUT to TH [DUT -
@@ -23,7 +24,8 @@ config:
 
 tests:
     - label: "DUT sends Read Request Message to the TH for a supported event."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool any  read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
       disabled: true

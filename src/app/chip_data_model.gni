@@ -94,6 +94,7 @@ template("chip_data_model") {
       "${_app_root}/util/ember-print.cpp",
       "${_app_root}/util/error-mapping.cpp",
       "${_app_root}/util/message.cpp",
+      "${_app_root}/util/privilege-storage.cpp",
       "${_app_root}/util/util.cpp",
       "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]
@@ -131,12 +132,12 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}-server.cpp",
           "${_app_root}/clusters/${cluster}/BDXDownloader.cpp",
           "${_app_root}/clusters/${cluster}/BDXDownloader.h",
+          "${_app_root}/clusters/${cluster}/DefaultOTARequestor.cpp",
+          "${_app_root}/clusters/${cluster}/DefaultOTARequestorDriver.cpp",
           "${_app_root}/clusters/${cluster}/DefaultOTARequestorStorage.cpp",
           "${_app_root}/clusters/${cluster}/DefaultOTARequestorStorage.h",
-          "${_app_root}/clusters/${cluster}/DefaultOTARequestorUserConsentProvider.h",
+          "${_app_root}/clusters/${cluster}/DefaultOTARequestorUserConsent.h",
           "${_app_root}/clusters/${cluster}/ExtendedOTARequestorDriver.cpp",
-          "${_app_root}/clusters/${cluster}/GenericOTARequestorDriver.cpp",
-          "${_app_root}/clusters/${cluster}/OTARequestor.cpp",
           "${_app_root}/clusters/${cluster}/OTARequestorStorage.h",
         ]
       } else if (cluster == "bindings") {

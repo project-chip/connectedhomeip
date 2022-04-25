@@ -137,8 +137,11 @@ bool WiFiDriverImpl::NetworkMatch(const WiFiNetwork & network, ByteSpan networkI
     return networkId.size() == network.ssidLen && memcmp(networkId.data(), network.ssid, network.ssidLen) == 0;
 }
 
-Status WiFiDriverImpl::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials)
+Status WiFiDriverImpl::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
+                                          uint8_t & outNetworkIndex)
 {
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
     VerifyOrReturnError(mStagingNetwork.ssidLen == 0 || NetworkMatch(mStagingNetwork, ssid), Status::kBoundsExceeded);
     VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetwork.credentials), Status::kOutOfRange);
     VerifyOrReturnError(ssid.size() <= sizeof(mStagingNetwork.ssid), Status::kOutOfRange);
@@ -152,8 +155,10 @@ Status WiFiDriverImpl::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials)
     return Status::kSuccess;
 }
 
-Status WiFiDriverImpl::RemoveNetwork(ByteSpan networkId)
+Status WiFiDriverImpl::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
 
     // Use empty ssid for representing invalid network
@@ -161,8 +166,9 @@ Status WiFiDriverImpl::RemoveNetwork(ByteSpan networkId)
     return Status::kSuccess;
 }
 
-Status WiFiDriverImpl::ReorderNetwork(ByteSpan networkId, uint8_t index)
+Status WiFiDriverImpl::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
+    outDebugText.reduce_size(0);
     // Only one network is supported now
     VerifyOrReturnError(index == 0, Status::kOutOfRange);
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
@@ -255,7 +261,7 @@ void WiFiDriverImpl::ConnectNetwork(ByteSpan networkId, ConnectCallback * callba
 exit:
     if (status != Status::kSuccess)
     {
-        ChipLogError(DeviceLayer, "Connect WiFi network failed: 0x%" PRIx16, int(status));
+        ChipLogError(DeviceLayer, "Connect WiFi network failed: 0x%x", int(status));
         if (callback)
         {
             callback->OnResult(status, CharSpan(), 0);
@@ -380,7 +386,7 @@ void WiFiDriverImpl::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * call
 exit:
     if (status != Status::kSuccess)
     {
-        ChipLogError(DeviceLayer, "Scan WiFi networks failed: 0x%" PRIx16, int(status));
+        ChipLogError(DeviceLayer, "Scan WiFi networks failed: 0x%x", int(status));
         if (callback)
         {
             callback->OnFinished(status, CharSpan(), nullptr);

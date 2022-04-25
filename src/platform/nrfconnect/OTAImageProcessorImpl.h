@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,24 +32,64 @@ class OTAImageProcessorImpl : public OTAImageProcessorInterface
 public:
     static constexpr size_t kBufferSize = CONFIG_CHIP_OTA_REQUESTOR_BUFFER_SIZE;
 
+    enum class ImageType : uint8_t
+    {
+        kAppImage = 0,
+        kNetImage = 1
+    };
+
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; };
+
+    struct OTAImage
+    {
+        OTAImageContentHeader::FileInfo * mFileInfo;
+        ImageType mImageType;
+        uint64_t mCurrentOffset;
+    };
 
     CHIP_ERROR PrepareDownload() override;
     CHIP_ERROR Finalize() override;
     CHIP_ERROR Abort() override;
     CHIP_ERROR Apply() override;
-    CHIP_ERROR ProcessBlock(ByteSpan & block) override;
+    CHIP_ERROR ProcessBlock(ByteSpan & aBlock) override;
     bool IsFirstImageRun() override;
     CHIP_ERROR ConfirmCurrentImage() override;
 
 private:
     CHIP_ERROR PrepareDownloadImpl();
-    CHIP_ERROR ProcessHeader(ByteSpan & block);
+    CHIP_ERROR ProcessHeader(ByteSpan & aBlock);
+    CHIP_ERROR SwitchToNextImage(const ByteSpan & aRemainingData);
 
     OTADownloader * mDownloader = nullptr;
     OTAImageHeaderParser mHeaderParser;
     OTAImageContentHeaderParser mContentHeaderParser;
     uint8_t mBuffer[kBufferSize];
+    OTAImageContentHeader mContentHeader;
+    OTAImage mCurrentImage;
+};
+
+class ExtFlashHandler
+{
+public:
+    enum class Action : uint8_t
+    {
+        WAKE_UP,
+        SLEEP
+    };
+    virtual ~ExtFlashHandler() {}
+    virtual void DoAction(Action aAction);
+};
+
+class OTAImageProcessorImplPMDevice : public OTAImageProcessorImpl
+{
+public:
+    explicit OTAImageProcessorImplPMDevice(ExtFlashHandler & aHandler);
+    CHIP_ERROR PrepareDownload() override;
+    CHIP_ERROR Abort() override;
+    CHIP_ERROR Apply() override;
+
+private:
+    ExtFlashHandler & mHandler;
 };
 
 } // namespace DeviceLayer

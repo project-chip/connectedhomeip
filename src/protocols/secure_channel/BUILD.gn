@@ -4,20 +4,22 @@ static_library("secure_channel") {
   output_name = "libSecureChannel"
 
   sources = [
+    "CASEDestinationId.cpp",
+    "CASEDestinationId.h",
     "CASEServer.cpp",
     "CASEServer.h",
     "CASESession.cpp",
     "CASESession.h",
-    "CASESessionCache.cpp",
-    "CASESessionCache.h",
     "PASESession.cpp",
     "PASESession.h",
     "RendezvousParameters.h",
     "SessionEstablishmentDelegate.h",
     "SessionEstablishmentExchangeDispatch.cpp",
     "SessionEstablishmentExchangeDispatch.h",
-    "SessionIDAllocator.cpp",
-    "SessionIDAllocator.h",
+    "SessionResumptionStorage.cpp",
+    "SessionResumptionStorage.h",
+    "SimpleSessionResumptionStorage.cpp",
+    "SimpleSessionResumptionStorage.h",
     "StatusReport.cpp",
     "StatusReport.h",
   ]

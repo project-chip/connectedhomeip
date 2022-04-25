@@ -66,24 +66,49 @@ void CHIPSetNextAvailableDeviceID(uint64_t id)
 
 static CHIPToolPersistentStorageDelegate * storage = nil;
 
+static uint16_t kTestVendorId = 0xFFF1u;
+
+static CHIPDeviceController * sController = nil;
+
 CHIPDeviceController * InitializeCHIP(void)
 {
     static dispatch_once_t onceToken;
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     dispatch_once(&onceToken, ^{
-        storage = [[CHIPToolPersistentStorageDelegate alloc] init];
-        [controller startup:storage vendorId:0 nocSigner:nil];
+        CHIPToolPersistentStorageDelegate * storage = [[CHIPToolPersistentStorageDelegate alloc] init];
+        __auto_type * factory = [MatterControllerFactory sharedInstance];
+        __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
+        if (![factory startup:factoryParams]) {
+            return;
+        }
+
+        __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nil];
+        params.vendorId = kTestVendorId;
+        params.fabricId = 1;
+
+        // We're not sure whether we have a fabric configured already; try as if
+        // we did, and if not fall back to creating a new one.
+        sController = [factory startControllerOnExistingFabric:params];
+        if (sController == nil) {
+            sController = [factory startControllerOnNewFabric:params];
+        }
     });
 
-    return controller;
+    return sController;
 }
 
-void CHIPRestartController(CHIPDeviceController * controller)
+CHIPDeviceController * CHIPRestartController(CHIPDeviceController * controller)
 {
     NSLog(@"Shutting down the stack");
     [controller shutdown];
+
     NSLog(@"Starting up the stack");
-    [controller startup:storage vendorId:0 nocSigner:nil];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nil];
+    params.vendorId = kTestVendorId;
+    params.fabricId = 1;
+
+    sController = [[MatterControllerFactory sharedInstance] startControllerOnExistingFabric:params];
+
+    return sController;
 }
 
 uint64_t CHIPGetLastPairedDeviceId(void)

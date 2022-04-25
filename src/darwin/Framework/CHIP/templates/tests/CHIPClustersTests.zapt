@@ -8,6 +8,7 @@
 #import <CHIP/CHIPTestClustersObjc.h>
 
 #import "CHIPErrorTestUtils.h"
+#import "CHIPTestStorage.h"
 
 #import <app/util/af-enums.h>
 
@@ -26,10 +27,14 @@ const uint32_t kSetupPINCode = 20202021;
 const uint16_t kRemotePort = 5540;
 const uint16_t kLocalPort = 5541;
 NSString * kAddress = @"::1";
+static uint16_t kTestVendorId = 0xFFF1u;
 
 // This test suite reuses a device object to speed up the test process for CI.
 // The following global variable holds the reference to the device object.
 static CHIPDevice * mConnectedDevice;
+
+// Singleton controller we use.
+static CHIPDeviceController * sController = nil;
 
 // Test Util APIs
 void WaitForMs(XCTestExpectation * expectation, dispatch_queue_t queue, unsigned int ms)
@@ -49,9 +54,15 @@ void UserPrompt(XCTestExpectation * expectation, dispatch_queue_t queue, NSStrin
     [expectation fulfill];
 }
 
+// Stub for reboot target device.
+void Reboot(XCTestExpectation * expectation, dispatch_queue_t queue, uint16_t discriminator)
+{
+    [expectation fulfill];
+}
+
 void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_t queue, uint64_t deviceId)
 {
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    CHIPDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
     [controller getConnectedDevice:deviceId
@@ -86,8 +97,7 @@ CHIPDevice * GetConnectedDevice(void)
 - (void)onPairingComplete:(NSError *)error
 {
     XCTAssertEqual(error.code, 0);
-    [_expectation fulfill];
-    _expectation = nil;
+    // Keep waiting for onCommissioningComplete
 }
 
 - (void)onCommissioningComplete:(NSError *)error
@@ -119,17 +129,30 @@ CHIPDevice * GetConnectedDevice(void)
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
 
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    __auto_type * factory = [MatterControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * storage = [[CHIPTestStorage alloc] init];
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
+    factoryParams.port = @(kLocalPort);
+
+    BOOL ok = [factory startup:factoryParams];
+    XCTAssertTrue(ok);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nil];
+    params.vendorId = kTestVendorId;
+    params.fabricId = 1;
+
+    // TODO: Once we have a non-nil keypair, use startControllerOnNewFabric.
+    CHIPDeviceController * controller = [factory startControllerOnExistingFabric:params];
     XCTAssertNotNil(controller);
+
+    sController = controller;
 
     CHIPToolPairingDelegate * pairing = [[CHIPToolPairingDelegate alloc] initWithExpectation:expectation];
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
 
-    [controller setListenPort:kLocalPort];
     [controller setPairingDelegate:pairing queue:callbackQueue];
-
-    BOOL started = [controller startup:nil vendorId:0 nocSigner:nil];
-    XCTAssertTrue(started);
 
     NSError * error;
     [controller pairDevice:nodeId
@@ -155,16 +178,19 @@ CHIPDevice * GetConnectedDevice(void)
 
 - (void)testShutdownStack
 {
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    CHIPDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
-    BOOL stopped = [controller shutdown];
-    XCTAssertTrue(stopped);
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    [[MatterControllerFactory sharedInstance] shutdown];
+    XCTAssertFalse([[MatterControllerFactory sharedInstance] isRunning]);
 }
 
 - (void)testReuseChipClusterObject
 {
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    CHIPDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
     __block CHIPDevice * device;

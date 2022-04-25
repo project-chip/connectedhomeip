@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png" alt="ARM Mbed-OS logo"/>
-</p>
+![ARM Mbed-OS logo](https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png)
 
 <h1> Matter Arm Mbed OS Lock Example Application </h1>
 
@@ -256,7 +254,7 @@ parameters as arguments:
 
 Example:
 
-    python -m chip_rpc.console -d /dev/ttyUSB0 -b 115200 -o /tmp/pw_rpc.out
+    chip-console -d /dev/ttyUSB0 -b 115200 -o /tmp/pw_rpc.out
 
 To control the lock type the following command, where you define if 'on' state
 is true or false:

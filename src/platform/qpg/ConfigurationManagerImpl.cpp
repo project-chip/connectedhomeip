@@ -24,13 +24,13 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConfigurationManager.h>
-#include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/qpg/qpgConfig.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-#include <platform/internal/FactoryProvisioning.cpp>
+#include <platform/internal/FactoryProvisioning.ipp>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 
 #include <lib/support/CodeUtils.h>
@@ -50,21 +50,10 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
-    bool failSafeArmed;
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<QPGConfig>::Init();
-    SuccessOrExit(err);
 
-    // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
-    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
-    {
-        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
-        InitiateFactoryReset();
-    }
-    err = CHIP_NO_ERROR;
-
-exit:
     return err;
 }
 

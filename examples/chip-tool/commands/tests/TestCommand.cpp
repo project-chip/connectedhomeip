@@ -32,7 +32,17 @@ CHIP_ERROR TestCommand::RunCommand()
 
 CHIP_ERROR TestCommand::WaitForCommissionee(chip::NodeId nodeId)
 {
-    CurrentCommissioner().ReleaseOperationalDevice(nodeId);
+    chip::FabricIndex fabricIndex;
+
+    ReturnErrorOnFailure(CurrentCommissioner().GetFabricIndex(&fabricIndex));
+
+    //
+    // There's a chance the commissionee may have rebooted before this call here as part of a test flow
+    // or is just starting out fresh outright. Let's make sure we're not re-using any cached CASE sessions
+    // that will now be stale and mismatched with the peer, causing subsequent interactions to fail.
+    //
+    CurrentCommissioner().SessionMgr()->ExpireAllPairings(chip::ScopedNodeId(nodeId, fabricIndex));
+
     return CurrentCommissioner().GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
@@ -53,7 +63,7 @@ void TestCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHI
     auto * command = static_cast<TestCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Test command context is null"));
 
-    LogErrorOnFailure(command->ContinueOnChipMainThread(CHIP_NO_ERROR));
+    LogErrorOnFailure(command->ContinueOnChipMainThread(error));
 }
 
 void TestCommand::Exit(std::string message)
@@ -62,9 +72,9 @@ void TestCommand::Exit(std::string message)
     SetCommandExitStatus(CHIP_ERROR_INTERNAL);
 }
 
-void TestCommand::ThrowFailureResponse()
+void TestCommand::ThrowFailureResponse(CHIP_ERROR error)
 {
-    Exit("Expecting success response but got a failure response");
+    Exit(std::string("Expecting success response but got a failure response: ") + chip::ErrorStr(error));
 }
 
 void TestCommand::ThrowSuccessResponse()

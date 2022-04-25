@@ -36,7 +36,12 @@ config("includes") {
 }
 
 executable("chip-${chip_tests_zap_config}") {
-  sources = [ "main.cpp" ]
+  sources = [
+    "AppOptions.cpp",
+    "main.cpp",
+    "src/bridged-actions-stub.cpp",
+    "static-supported-modes-manager.cpp",
+  ]
 
   deps = [
     ":configuration",
@@ -44,6 +49,7 @@ executable("chip-${chip_tests_zap_config}") {
     "${chip_root}/src/app/tests/suites/commands/delay",
     "${chip_root}/src/app/tests/suites/commands/discovery",
     "${chip_root}/src/app/tests/suites/commands/log",
+    "${chip_root}/src/app/tests/suites/credentials:dac_provider",
     "${chip_root}/src/app/tests/suites/pics",
     "${chip_root}/src/lib",
   ]

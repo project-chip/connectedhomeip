@@ -10,6 +10,7 @@
 #include <commands/clusters/ComplexArgument.h>
 #include <commands/clusters/ClusterCommand.h>
 #include <commands/clusters/ReportCommand.h>
+#include <commands/clusters/SubscriptionsCommands.h>
 #include <commands/clusters/WriteAttributeCommand.h>
 
 {{> clusters_header}}
@@ -40,16 +41,16 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) command ({{asHex code 8}}) on endpoint %" PRIu16, endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) command ({{asHex code 8}}) on endpoint %u", endpointIds.at(0));
 
         return ClusterCommand::SendCommand(device, endpointIds.at(0), {{asHex parent.code 8}}, {{asHex code 8}}, mRequest);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) command ({{asHex code 8}}) on Group %" PRIu16, groupId);
+        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) command ({{asHex code 8}}) on Group %u", groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, {{asHex parent.code 8}}, {{asHex code 8}}, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, {{asHex parent.code 8}}, {{asHex code 8}}, mRequest);
     }
 
 private:
@@ -88,9 +89,9 @@ public:
         return WriteAttribute::SendCommand(device, endpointIds.at(0), {{asHex parent.code 8}}, {{asHex code 8}}, mValue);
     }
 
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, {{asHex parent.code 8}}, {{asHex code 8}}, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, {{asHex parent.code 8}}, {{asHex code 8}}, mValue);
     }
 
 private:
@@ -180,4 +181,5 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
 {{#zcl_clusters}}
     registerCluster{{asUpperCamelCase name}}(commands, credsIssuerConfig);
 {{/zcl_clusters}}
+    registerClusterSubscriptions(commands, credsIssuerConfig);
 }

@@ -196,7 +196,7 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
         LogErrorOnFailure(NotifyBindingsChanged());
         return CHIP_NO_ERROR;
     }
-    else if (path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    if (path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         TargetStructType target;
         ReturnErrorOnFailure(decoder.Decode(target));
@@ -233,7 +233,7 @@ void AddBindingEntry(const EmberBindingTableEntry & entry)
         if (err != CHIP_NO_ERROR)
         {
             // Unicast connection failure can happen if peer is offline. We'll retry connection on-demand.
-            ChipLogProgress(
+            ChipLogError(
                 Zcl, "Binding: Failed to create session for unicast binding to device " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
                 ChipLogValueX64(entry.nodeId), err.Format());
         }

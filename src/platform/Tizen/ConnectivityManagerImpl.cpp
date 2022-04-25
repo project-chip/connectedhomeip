@@ -28,15 +28,15 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include <platform/internal/GenericConnectivityManagerImpl_BLE.cpp>
+#include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <platform/internal/GenericConnectivityManagerImpl_Thread.cpp>
+#include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
+#include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 #endif
 
 using namespace ::chip;
@@ -52,6 +52,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     mWiFiStationMode              = kWiFiStationMode_Disabled;
     mWiFiAPMode                   = kWiFiAPMode_Disabled;
     mWiFiAPState                  = kWiFiAPState_NotActive;
@@ -59,7 +60,6 @@ CHIP_ERROR ConnectivityManagerImpl::_Init(void)
     mWiFiStationReconnectInterval = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
     mWiFiAPIdleTimeout            = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     WiFiMgr().Init();
 #endif
 
@@ -214,12 +214,12 @@ void ConnectivityManagerImpl::DeactivateWiFiManager(::chip::System::Layer * aLay
 {
     WiFiMgr().Deactivate();
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
     return WiFiMgr().Connect(ssid, key);
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 } // namespace DeviceLayer
 } // namespace chip

@@ -24,6 +24,7 @@ declare_args() {
   # Location of the efr32 SDK.
   efr32_sdk_root = "${chip_root}/third_party/efr32_sdk/repo"
   enable_openthread_cli = true
+  kvs_max_entries = 75
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
@@ -130,6 +131,8 @@ template("efr32_sdk") {
       "CORTEXM3_EFM32_MICRO",
       "EFR32_LOG_ENABLED=1",
       "NVM3_DEFAULT_NVM_SIZE=40960",
+      "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
+      "KVS_MAX_ENTRIES=${kvs_max_entries}",
       "EFR32_OPENTHREAD_API",
       "PHY=EMBER_PHY_RAIL",
       "CORTEXM3",
@@ -138,7 +141,6 @@ template("efr32_sdk") {
       "${efr32_mcu}=1",
       "${efr32_board}=1",
       "SL_SUPRESS_DEPRECATION_WARNINGS_SDK_3_1",
-      "CHIP_KVS_BASE_SECTOR_INDEX=((FLASH_SIZE/FLASH_PAGE_SIZE)-(CHIP_KVS_SECTOR_COUNT))",
       "__HEAP_SIZE=0",
       "SL_CATALOG_FREERTOS_KERNEL_PRESENT=1",
       "MBEDTLS_THREADING_C=1",
@@ -175,7 +177,8 @@ template("efr32_sdk") {
     # USART include files
     if ((defined(invoker.chip_enable_pw_rpc) && invoker.chip_enable_pw_rpc) ||
         chip_build_libshell || enable_openthread_cli ||
-        (defined(invoker.show_qr_code) && invoker.show_qr_code)) {
+        (defined(invoker.show_qr_code) && invoker.show_qr_code) ||
+        (defined(invoker.lcd_on) && invoker.lcd_on)) {
       defines += [ "CONFIG_ENABLE_UART" ]
 
       _include_dirs += [
@@ -217,10 +220,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a",
       ]
 
-      defines += [
-        "EFR32MG12",
-        "CHIP_KVS_SECTOR_COUNT=6",
-      ]
+      defines += [ "EFR32MG12" ]
     } else if (efr32_family == "efr32mg21") {
       _include_dirs += [
         "${efr32_sdk_root}/hardware/kit/EFR32MG21_${efr32_board}/config",
@@ -241,7 +241,6 @@ template("efr32_sdk") {
       defines += [
         "EFR32MG21",
         "EFR32_SERIES2_CONFIG1_MICRO",
-        "CHIP_KVS_SECTOR_COUNT=4",
       ]
     } else if (efr32_family == "efr32mg24") {
       _include_dirs += [
@@ -263,7 +262,6 @@ template("efr32_sdk") {
       defines += [
         "EFR32MG24",
         "EFR32_SERIES2_CONFIG4_MICRO",
-        "CHIP_KVS_SECTOR_COUNT=4",
       ]
     }
     if (use_wf200) {
@@ -285,6 +283,13 @@ template("efr32_sdk") {
       "-Wno-maybe-uninitialized",
       "-Wno-shadow",
     ]
+
+    if (defined(invoker.use_rs911x)) {
+      if (invoker.use_rs911x == true) {
+        #add compilation flags for rs991x build. This will be addressed directly in wiseconnect sdk in the next version release of that sdk
+        cflags += invoker.rs911x_cflags
+      }
+    }
 
     if (defined(invoker.defines)) {
       defines += invoker.defines
@@ -505,25 +510,24 @@ template("efr32_sdk") {
       }
     }
 
-    if (defined(invoker.show_qr_code)) {
-      if (invoker.show_qr_code) {
-        sources += [
-          "${efr32_sdk_root}/hardware/driver/memlcd/src/sl_memlcd.c",
-          "${efr32_sdk_root}/hardware/driver/memlcd/src/sl_memlcd_display.c",
-          "${efr32_sdk_root}/platform/middleware/glib/dmd/display/dmd_memlcd.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/bmp.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/glib.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/glib_bitmap.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/glib_circle.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/glib_font_narrow_6x8.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/glib_font_normal_8x8.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/glib_font_number_16x20.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/glib_line.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/glib_polygon.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/glib_rectangle.c",
-          "${efr32_sdk_root}/platform/middleware/glib/glib/glib_string.c",
-        ]
-      }
+    if ((defined(invoker.show_qr_code) && invoker.show_qr_code) ||
+        (defined(invoker.lcd_on) && invoker.lcd_on)) {
+      sources += [
+        "${efr32_sdk_root}/hardware/driver/memlcd/src/sl_memlcd.c",
+        "${efr32_sdk_root}/hardware/driver/memlcd/src/sl_memlcd_display.c",
+        "${efr32_sdk_root}/platform/middleware/glib/dmd/display/dmd_memlcd.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/bmp.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_bitmap.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_circle.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_font_narrow_6x8.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_font_normal_8x8.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_font_number_16x20.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_line.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_polygon.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_rectangle.c",
+        "${efr32_sdk_root}/platform/middleware/glib/glib/glib_string.c",
+      ]
     }
     if (use_wf200) {
       sources += [

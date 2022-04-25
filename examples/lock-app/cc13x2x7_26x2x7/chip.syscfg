@@ -22,7 +22,6 @@
 var AESCCM      = scripting.addModule("/ti/drivers/AESCCM");
 var AESECB      = scripting.addModule("/ti/drivers/AESECB");
 var Button      = scripting.addModule("/ti/drivers/apps/Button");
-var ECJPAKE     = scripting.addModule("/ti/drivers/ECJPAKE");
 var LED         = scripting.addModule("/ti/drivers/apps/LED");
 var NVS         = scripting.addModule("/ti/drivers/NVS");
 var RF          = scripting.addModule("/ti/drivers/RF");
@@ -43,7 +42,6 @@ var AESECB1     = AESECB.addInstance();
 var AESECB2     = AESECB.addInstance();
 var Button1     = Button.addInstance();
 var Button2     = Button.addInstance();
-var ECJPAKE     = ECJPAKE.addInstance();
 var NVS1        = NVS.addInstance();
 var NVS2        = NVS.addInstance();
 var SHA21       = SHA2.addInstance();

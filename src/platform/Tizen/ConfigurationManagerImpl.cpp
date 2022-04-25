@@ -28,9 +28,10 @@
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/Tizen/PosixConfig.h>
-#include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 namespace chip {
 namespace DeviceLayer {
@@ -45,7 +46,47 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 
 CHIP_ERROR ConfigurationManagerImpl::Init(void)
 {
-    return Internal::GenericConfigurationManagerImpl<PosixConfig>::Init();
+    CHIP_ERROR error;
+
+    error = Internal::GenericConfigurationManagerImpl<PosixConfig>::Init();
+    SuccessOrExit(error);
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_VendorId))
+    {
+        error = StoreVendorId(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
+        SuccessOrExit(error);
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_ProductId))
+    {
+        error = StoreProductId(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
+        SuccessOrExit(error);
+    }
+
+    error = CHIP_NO_ERROR;
+
+exit:
+    return error;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetVendorId(uint16_t & vendorId)
+{
+    return ReadConfigValue(PosixConfig::kConfigKey_VendorId, vendorId);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetProductId(uint16_t & productId)
+{
+    return ReadConfigValue(PosixConfig::kConfigKey_ProductId, productId);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreVendorId(uint16_t vendorId)
+{
+    return WriteConfigValue(PosixConfig::kConfigKey_VendorId, vendorId);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreProductId(uint16_t productId)
+{
+    return WriteConfigValue(PosixConfig::kConfigKey_ProductId, productId);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
@@ -75,6 +116,11 @@ CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, bool & val)
     return PosixConfig::ReadConfigValue(key, val);
 }
 
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint16_t & val)
+{
+    return PosixConfig::ReadConfigValue(key, val);
+}
+
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint32_t & val)
 {
     return PosixConfig::ReadConfigValue(key, val);
@@ -96,6 +142,11 @@ CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(Key key, uint8_t * buf, 
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, bool val)
+{
+    return PosixConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint16_t val)
 {
     return PosixConfig::WriteConfigValue(key, val);
 }

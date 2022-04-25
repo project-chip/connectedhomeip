@@ -253,34 +253,29 @@ void AddManyQueryResponders(nlTestSuite * inSuite, void * inContext)
     QueryResponder<1> q5;
     QueryResponder<1> q6;
     QueryResponder<1> q7;
-    QueryResponder<1> q8;
 
     // We should be able to re-add the same query responder as many times as we want.
-    for (size_t i = 0; i < ResponseSender::kMaxQueryResponders + 1; ++i)
+    // and it shold only count as one
+    constexpr size_t kAddLoopSize = 1000;
+    for (size_t i = 0; i < kAddLoopSize; ++i)
     {
         NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q1) == CHIP_NO_ERROR);
     }
 
-    // There are 7 total
+    // removing the only copy should clear out everything
+    responseSender.RemoveQueryResponder(&q1);
+    NL_TEST_ASSERT(inSuite, !responseSender.HasQueryResponders());
+
+    // At least 7 should be supported:
+    //   - 5 is the spec minimum
+    //   - 2 for commissionable and commisioner responders
+    NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q1) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q2) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q3) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q4) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q5) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q6) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q7) == CHIP_NO_ERROR);
-
-    // Last one should return a no memory error (no space)
-    NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q8) == CHIP_ERROR_NO_MEMORY);
-
-    // can make space
-    NL_TEST_ASSERT(inSuite, responseSender.RemoveQueryResponder(&q3) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q8) == CHIP_NO_ERROR);
-
-    // adding back does not fail
-    NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q8) == CHIP_NO_ERROR);
-
-    // still full and cannot add more
-    NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q3) == CHIP_ERROR_NO_MEMORY);
 }
 
 void PtrSrvTxtMultipleRespondersToInstance(nlTestSuite * inSuite, void * inContext)

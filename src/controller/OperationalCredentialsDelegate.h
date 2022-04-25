@@ -51,17 +51,19 @@ public:
      *
      *   The delegate will call `onCompletion` when the NOC certificate chain is ready.
      *
-     * @param[in] csrElements          CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
+     * @param[in] csrElements          CSR elements as per specifications section 11.18.5.6. NOCSR Elements.
+     * @param[in] csrNonce             CSR nonce as described in 6.4.6.1
      * @param[in] attestationSignature Attestation signature as per specifications section 11.22.7.6. CSRResponse Command.
+     * @param[in] attestationChallenge Attestation challenge as per 11.18.5.7
      * @param[in] DAC                  Device attestation certificate received from the device being commissioned
      * @param[in] PAI                  Product Attestation Intermediate certificate
-     * @param[in] PAA                  Product Attestation Authority certificate
      * @param[in] onCompletion         Callback handler to provide generated NOC chain to the caller of GenerateNOCChain()
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    virtual CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & attestationSignature, const ByteSpan & DAC,
-                                        const ByteSpan & PAI, const ByteSpan & PAA,
+    virtual CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
+                                        const ByteSpan & attestationSignature, const ByteSpan & attestationChallenge,
+                                        const ByteSpan & DAC, const ByteSpan & PAI,
                                         Callback::Callback<OnNOCChainGeneration> * onCompletion) = 0;
 
     /**

@@ -52,7 +52,8 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-// TODO: Maybe consider making this configurable?
+// TODO: Maybe consider making this configurable?  See also
+// CHIPControllerAccessControl.mm.
 constexpr EndpointId kSupportedEndpoint = 0;
 
 } // anonymous namespace
@@ -60,8 +61,8 @@ constexpr EndpointId kSupportedEndpoint = 0;
 namespace chip {
 namespace app {
 
-    using Protocols::InteractionModel::Status;
     using Access::SubjectDescriptor;
+    using Protocols::InteractionModel::Status;
 
     namespace {
 
@@ -152,12 +153,25 @@ namespace app {
         return false;
     }
 
+    const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
+    {
+        // Note: This test does not make use of the real attribute metadata.
+        static EmberAfAttributeMetadata stub = { .defaultValue = EmberAfDefaultOrMinMaxAttributeValue(uint16_t(0)) };
+        return &stub;
+    }
+
+    bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) { return false; }
+
     CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
         TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
     {
         Status status = DetermineAttributeStatus(aPath, /* aIsWrite = */ true);
         return aWriteHandler->AddStatus(aPath, status);
     }
+
+    // No attribute access overrides on iOS for now.
+    // TODO (#16806): This function can be moved to InteractionModelEngine.
+    AttributeAccessInterface * GetAttributeAccessOverride(EndpointId endpointId, ClusterId clusterId) { return nullptr; }
 
     void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVReader & aReader, CommandHandler * aCommandObj)
     {

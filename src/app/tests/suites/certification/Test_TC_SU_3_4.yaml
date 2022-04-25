@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     31.12.1. [TC-SU-3.4] Tests the scenarios on when a software update should be
@@ -25,9 +26,10 @@ tests:
     - label:
           "OTA-R/TH on completion of image download sends an
           ApplyUpdateRequestCommand to the DUT."
-      verification:
-          "Verify on the OTA Requestor logs [1645743059328] [97809:20280957]
-          CHIP: [SWU] ApplyUpdateResponse: [1645743059328] [97809:20280957]
-          CHIP: [SWU] action: 0 [1645743059328] [97809:20280957] CHIP: [SWU]
-          delayedActionTime: 0 seconds"
+      verification: |
+          Verify on the OTA Requestor logs
+
+          [1645743059328] [97809:20280957] CHIP: [SWU] ApplyUpdateResponse:
+          [1645743059328] [97809:20280957] CHIP: [SWU]   action: 0
+          [1645743059328] [97809:20280957] CHIP: [SWU]   delayedActionTime: 0 seconds
       disabled: true

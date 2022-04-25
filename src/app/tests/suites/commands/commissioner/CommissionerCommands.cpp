@@ -47,6 +47,37 @@ CHIP_ERROR CommissionerCommands::Unpair(chip::NodeId nodeId)
     return GetCurrentCommissioner().UnpairDevice(nodeId);
 }
 
+chip::app::StatusIB ConvertToStatusIB(CHIP_ERROR err)
+{
+    using chip::app::StatusIB;
+    using namespace chip;
+    using namespace chip::Protocols::InteractionModel;
+    using namespace chip::app::Clusters::OperationalCredentials;
+
+    if (CHIP_ERROR_INVALID_PUBLIC_KEY == err)
+    {
+        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidPublicKey));
+    }
+    if (CHIP_ERROR_WRONG_NODE_ID == err)
+    {
+        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNodeOpId));
+    }
+    if (CHIP_ERROR_UNSUPPORTED_CERT_FORMAT == err)
+    {
+        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNOC));
+    }
+    if (CHIP_ERROR_FABRIC_EXISTS == err)
+    {
+        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kFabricConflict));
+    }
+    if (CHIP_ERROR_INVALID_FABRIC_ID == err)
+    {
+        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidFabricIndex));
+    }
+
+    return StatusIB(err);
+}
+
 void CommissionerCommands::OnStatusUpdate(DevicePairingDelegate::Status status)
 {
     switch (status)
@@ -56,6 +87,7 @@ void CommissionerCommands::OnStatusUpdate(DevicePairingDelegate::Status status)
         break;
     case DevicePairingDelegate::Status::SecurePairingFailed:
         ChipLogError(chipTool, "Secure Pairing Failed");
+        OnResponse(ConvertToStatusIB(CHIP_ERROR_INCORRECT_STATE), nullptr);
         break;
     }
 }
@@ -65,26 +97,26 @@ void CommissionerCommands::OnPairingComplete(CHIP_ERROR err)
     if (CHIP_NO_ERROR != err)
     {
         ChipLogError(chipTool, "Pairing Complete Failure: %s", ErrorStr(err));
-        LogErrorOnFailure(ContinueOnChipMainThread(err));
+        OnResponse(ConvertToStatusIB(err), nullptr);
     }
 }
 
 void CommissionerCommands::OnPairingDeleted(CHIP_ERROR err)
 {
-    if (CHIP_NO_ERROR != err)
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(chipTool, "Pairing Delete Failure: %s", ErrorStr(err));
     }
 
-    LogErrorOnFailure(ContinueOnChipMainThread(err));
+    OnResponse(ConvertToStatusIB(err), nullptr);
 }
 
 void CommissionerCommands::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR err)
 {
-    if (CHIP_NO_ERROR != err)
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(chipTool, "Commissioning Complete Failure: %s", ErrorStr(err));
     }
 
-    LogErrorOnFailure(ContinueOnChipMainThread(err));
+    OnResponse(ConvertToStatusIB(err), nullptr);
 }

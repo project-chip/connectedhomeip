@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 3.1.3. [TC-GENDIAG-2.1] Event functionality test with server as DUT
 
@@ -21,20 +22,21 @@ config:
 
 tests:
     - label: "TH use chip-tool event read to get server event report"
-      verification:
-          "./chip-tool generaldiagnostics read-event hardware-fault-change 1 0"
+      verification: |
+          ./chip-tool generaldiagnostics read-event hardware-fault-change 1 0
       disabled: true
 
     - label: "TH use chip-tool event read to get server event report"
-      verification:
-          "./chip-tool generaldiagnostics read-event radio-fault-change 1 0"
+      verification: |
+          ./chip-tool generaldiagnostics read-event radio-fault-change 1 0
       disabled: true
 
     - label: "TH use chip-tool event read to get server event report"
-      verification:
-          "./chip-tool generaldiagnostics read-event network-fault-change 1 0"
+      verification: |
+          ./chip-tool generaldiagnostics read-event network-fault-change 1 0
       disabled: true
 
     - label: "TH use chip-tool event read to get server event report"
-      verification: "./chip-tool generaldiagnostics read-event boot-reason 1 0"
+      verification: |
+          ./chip-tool generaldiagnostics read-event boot-reason 1 0
       disabled: true
