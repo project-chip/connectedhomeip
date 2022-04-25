@@ -471,16 +471,7 @@ struct netif * UDPEndPointImplLwIP::FindNetifFromInterfaceId(InterfaceId aInterf
 
 IPPacketInfo * UDPEndPointImplLwIP::GetPacketInfo(const System::PacketBufferHandle & aBuffer)
 {
-    if (!aBuffer->EnsureReservedSize(sizeof(IPPacketInfo) + 3))
-    {
-        return nullptr;
-    }
-
-    uintptr_t lStart           = (uintptr_t) aBuffer->Start();
-    uintptr_t lPacketInfoStart = lStart - sizeof(IPPacketInfo);
-
-    // Align to a 4-byte boundary
-    return reinterpret_cast<IPPacketInfo *>(lPacketInfoStart & ~(sizeof(uint32_t) - 1));
+    return aBuffer->GetReserve<IPPacketInfo>();
 }
 
 } // namespace Inet
