@@ -139,7 +139,7 @@ CHIP_ERROR AppTask::Init()
     uint8_t maxLightLevel = kDefaultMaxLevel;
     Clusters::LevelControl::Attributes::MaxLevel::Get(kLightEndpointId, &maxLightLevel);
 
-    int ret = mPWMDevice.Init(LIGHTING_PWM_DEVICE, LIGHTING_PWM_CHANNEL, minLightLevel, maxLightLevel);
+    int ret = mPWMDevice.Init(LIGHTING_PWM_DEVICE, LIGHTING_PWM_CHANNEL, minLightLevel, maxLightLevel, maxLightLevel);
     if (ret != 0)
     {
         return chip::System::MapErrorZephyr(ret);
