@@ -1,7 +1,7 @@
 {{~#if isOptional~}} optional {{/if~}}
 {{~#if isNullable~}} nullable {{/if~}}
 
-{{type}}
+{{type}} 
   {{~#unless isArray~}} 
     {{~#if (isString type)~}}
       {{~#if maxLength~}} 
