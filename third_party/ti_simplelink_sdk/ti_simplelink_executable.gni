@@ -21,6 +21,19 @@ import("${chip_root}/src/platform/device.gni")
 import("ti_simplelink_board.gni")
 import("ti_simplelink_sdk.gni")
 
+declare_args() {
+  matter_device_vid = ""
+  matter_device_pid = ""
+  matter_software_ver = ""
+  matter_software_ver_str = ""
+}
+
+assert(matter_device_vid != "", "matter_device_vid must be specified")
+assert(matter_device_pid != "", "matter_device_pid must be specified")
+assert(matter_software_ver != "", "matter_software_ver must be specified")
+assert(matter_software_ver_str != "",
+       "matter_software_ver_str must be specified")
+
 template("ti_simplelink_executable") {
   simplelink_target_name = target_name
 
@@ -45,21 +58,12 @@ template("ti_simplelink_executable") {
     }
 
     # add OTA options if available
-    if (defined(invoker.device_vid)) {
-      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID=${invoker.device_vid}" ]
-    }
-    if (defined(invoker.device_pid)) {
-      defines +=
-          [ "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${invoker.device_pid}" ]
-    }
-    if (defined(invoker.software_ver)) {
-      defines += [
-        "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${invoker.software_ver}",
-      ]
-    }
-    if (defined(invoker.software_ver_str)) {
-      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${invoker.software_ver_str}\"" ]
-    }
+    defines += [
+      "CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID=${matter_device_vid}",
+      "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${matter_device_pid}",
+      "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${matter_software_ver}",
+      "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${matter_software_ver_str}\"",
+    ]
   }
 
   flashable_executable("${simplelink_target_name}.out") {
@@ -103,7 +107,7 @@ template("ti_simplelink_executable") {
         rebase_path(root_out_dir, root_build_dir),
         "7",
         "-hex1",
-        rebase_path("${root_out_dir}/${output_base_name}.hex", root_build_dir),
+        rebase_path("${root_out_dir}/${output_base_name}.hex", root_out_dir),
         "-o",
         output_base_name,
       ]
@@ -156,54 +160,20 @@ template("ti_simplelink_executable") {
         rebase_path("${root_out_dir}/${output_base_name}.ota", root_build_dir),
       ]
 
-      if (defined(invoker.device_vid)) {
-        args += [
-          "-v",
-          invoker.device_vid,
-        ]
-      } else {
-        args += [
-          "-v",
-          "0xFFF1",
-        ]
-      }
-      if (defined(invoker.device_pid)) {
-        args += [
-          "-p",
-          invoker.device_pid,
-        ]
-      } else {
-        args += [
-          "-p",
-          "0x8006",
-        ]
-      }
-      if (defined(invoker.software_ver)) {
-        args += [
-          "-vn",
-          invoker.software_ver,
-        ]
-      } else {
-        args += [
-          "-vn",
-          "0x0001",
-        ]
-      }
-      if (defined(invoker.software_ver_str)) {
-        args += [
-          "-vs",
-          invoker.software_ver_str,
-        ]
-      } else {
-        args += [
-          "-vs",
-          "1.0d1",
-        ]
-      }
+      args += [
+        "-v",
+        matter_device_vid,
+        "-p",
+        matter_device_pid,
+        "-vn",
+        matter_software_ver,
+        "-vs",
+        matter_software_ver_str,
+      ]
       if (defined(invoker.ota_digest)) {
         args += [
           "-da",
-          invoker.ota_digest,
+          matter_ota_digest,
         ]
       } else {
         args += [
