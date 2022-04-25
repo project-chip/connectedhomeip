@@ -646,7 +646,7 @@ class ClusterStructUsage {
   }
 }
 
-Clusters._addUsedStructureNames = async function (clusterName, startType, allKnownStructs) {
+Clusters._addUsedStructureNames = async function(clusterName, startType, allKnownStructs) {
   const struct = getStruct(allKnownStructs, startType.type);
   if (!struct) {
     return;
@@ -659,7 +659,7 @@ Clusters._addUsedStructureNames = async function (clusterName, startType, allKno
   }
 }
 
-Clusters._computeUsedStructureNames = async function (structs) {
+Clusters._computeUsedStructureNames = async function(structs) {
   // NOTE: this MUST be called only after attribute promise is resolved
   // as iteration of `get*ByClusterName` needs that data.
   for (const cluster of this._clusters) {
@@ -741,7 +741,8 @@ Clusters.init = async function(context, includeAll) {
 //
 // Helpers: All
 //
-function asBlocks(promise, options) {
+function asBlocks(promise, options)
+{
   return promise.then(data => templateUtil.collectBlocks(data, options, this))
 }
 
@@ -760,38 +761,46 @@ function ensureClusters(context, includeAll = false)
 //
 const kResponseFilter = (isResponse, item) => isResponse == item.isResponse;
 
-Clusters.ensureReady = function () {
-  ensureState(this.ready.running);
-  return this.ready;
+Clusters.ensureReady = function()
+{
+    ensureState(this.ready.running);
+    return this.ready;
 }
 
-Clusters.ensurePostProcessingDone = function () {
-  ensureState(this.ready.running);
-  return this.post_processing_ready;
+Clusters.ensurePostProcessingDone = function()
+{
+    ensureState(this.ready.running);
+    return this.post_processing_ready;
 }
 
-Clusters.getClusters = function () {
-  return this.ensureReady().then(() => this._clusters);
+Clusters.getClusters = function()
+{
+    return this.ensureReady().then(() => this._clusters);
 }
 
-Clusters.getEndPoints = function () {
-  return this.ensureReady().then(() => this._endpoints);
+Clusters.getEndPoints = function()
+{
+    return this.ensureReady().then(() => this._endpoints);
 }
 
-Clusters.getCommands = function () {
-  return this.ensureReady().then(() => this._commands.filter(kResponseFilter.bind(null, false)));
+Clusters.getCommands = function()
+{
+    return this.ensureReady().then(() => this._commands.filter(kResponseFilter.bind(null, false)));
 }
 
-Clusters.getResponses = function () {
-  return this.ensureReady().then(() => this._commands.filter(kResponseFilter.bind(null, true)));
+Clusters.getResponses = function()
+{
+    return this.ensureReady().then(() => this._commands.filter(kResponseFilter.bind(null, true)));
 }
 
-Clusters.getAttributes = function () {
-  return this.ensureReady().then(() => this._attributes);
+Clusters.getAttributes = function()
+{
+    return this.ensureReady().then(() => this._attributes);
 }
 
-Clusters.getEvents = function () {
-  return this.ensureReady().then(() => this._events);
+Clusters.getEvents = function()
+{
+    return this.ensureReady().then(() => this._events);
 }
 
 //
@@ -799,46 +808,54 @@ Clusters.getEvents = function () {
 //
 const kNameFilter = (name, item) => name.toLowerCase() == (item.clusterName || item.name).toLowerCase();
 
-Clusters.getCommandsByClusterName = function (name) {
-  return this.getCommands().then(items => items.filter(kNameFilter.bind(null, name)));
+Clusters.getCommandsByClusterName = function(name)
+{
+    return this.getCommands().then(items => items.filter(kNameFilter.bind(null, name)));
 }
 
-Clusters.getResponsesByClusterName = function (name) {
-  return this.getResponses().then(items => items.filter(kNameFilter.bind(null, name)));
+Clusters.getResponsesByClusterName = function(name)
+{
+    return this.getResponses().then(items => items.filter(kNameFilter.bind(null, name)));
 }
 
-Clusters.getAttributesByClusterName = function (name) {
-  return this.ensureReady().then(() => {
-    const clusterId = this._clusters.find(kNameFilter.bind(null, name)).id;
-    const filter = attribute => attribute.clusterId == clusterId;
-    return this.getAttributes().then(items => items.filter(filter));
-  });
+Clusters.getAttributesByClusterName = function(name)
+{
+    return this.ensureReady().then(() => {
+      const clusterId = this._clusters.find(kNameFilter.bind(null, name)).id;
+      const filter = attribute => attribute.clusterId == clusterId;
+      return this.getAttributes().then(items => items.filter(filter));
+    });
 }
 
-Clusters.getEventsByClusterName = function (name) {
-  return this.getEvents().then(items => items.filter(kNameFilter.bind(null, name)));
+Clusters.getEventsByClusterName = function(name)
+{
+    return this.getEvents().then(items => items.filter(kNameFilter.bind(null, name)));
 }
 
 //
 // Helpers: Get by Cluster Side
 //
 const kSideFilter = (side, item) => item.source ? ((item.source == side && item.outgoing) || (item.source != side && item.incoming))
-  : item.side == side;
+                                                : item.side == side;
 
-Clusters.getCommandsByClusterSide = function (side) {
-  return this.getCommands().then(items => items.filter(kSideFilter.bind(null, side)));
+Clusters.getCommandsByClusterSide = function(side)
+{
+    return this.getCommands().then(items => items.filter(kSideFilter.bind(null, side)));
 }
 
-Clusters.getResponsesByClusterSide = function (side) {
-  return this.getResponses().then(items => items.filter(kSideFilter.bind(null, side)));
+Clusters.getResponsesByClusterSide = function(side)
+{
+    return this.getResponses().then(items => items.filter(kSideFilter.bind(null, side)));
 }
 
-Clusters.getAttributesByClusterSide = function (side) {
-  return this.getAttributes().then(items => items.filter(kSideFilter.bind(null, side)));
+Clusters.getAttributesByClusterSide = function(side)
+{
+    return this.getAttributes().then(items => items.filter(kSideFilter.bind(null, side)));
 }
 
-Clusters.getEventsByClusterSide = function (side) {
-  return this.getEvents().then(items => items.filter(kSideFilter.bind(null, side)));
+Clusters.getEventsByClusterSide = function(side)
+{
+    return this.getEvents().then(items => items.filter(kSideFilter.bind(null, side)));
 }
 
 
@@ -847,24 +864,29 @@ Clusters.getEventsByClusterSide = function (side) {
 //
 const kClientSideFilter = kSideFilter.bind(null, 'client');
 
-Clusters.getClientClusters = function () {
-  return this.getClusters().then(items => items.filter(kClientSideFilter));
+Clusters.getClientClusters = function()
+{
+    return this.getClusters().then(items => items.filter(kClientSideFilter));
 }
 
-Clusters.getClientCommands = function (name) {
-  return this.getCommandsByClusterName(name).then(items => items.filter(kClientSideFilter));
+Clusters.getClientCommands = function(name)
+{
+    return this.getCommandsByClusterName(name).then(items => items.filter(kClientSideFilter));
 }
 
-Clusters.getClientResponses = function (name) {
-  return this.getResponsesByClusterName(name).then(items => items.filter(kClientSideFilter));
+Clusters.getClientResponses = function(name)
+{
+    return this.getResponsesByClusterName(name).then(items => items.filter(kClientSideFilter));
 }
 
-Clusters.getClientAttributes = function (name) {
-  return this.getAttributesByClusterName(name).then(items => items.filter(kClientSideFilter));
+Clusters.getClientAttributes = function(name)
+{
+    return this.getAttributesByClusterName(name).then(items => items.filter(kClientSideFilter));
 }
 
-Clusters.getClientEvents = function (name) {
-  return this.getEventsByClusterName(name).then(items => items.filter(kClientSideFilter));
+Clusters.getClientEvents = function(name)
+{
+    return this.getEventsByClusterName(name).then(items => items.filter(kClientSideFilter));
 }
 
 //
@@ -872,36 +894,44 @@ Clusters.getClientEvents = function (name) {
 //
 const kServerSideFilter = kSideFilter.bind(null, 'server');
 
-Clusters.getServerClusters = function () {
-  return this.getClusters().then(items => items.filter(kServerSideFilter));
+Clusters.getServerClusters = function()
+{
+    return this.getClusters().then(items => items.filter(kServerSideFilter));
 }
 
-Clusters.getServerCommands = function (name) {
-  return this.getCommandsByClusterName(name).then(items => items.filter(kServerSideFilter));
+Clusters.getServerCommands = function(name)
+{
+    return this.getCommandsByClusterName(name).then(items => items.filter(kServerSideFilter));
 }
 
-Clusters.getServerResponses = function (name) {
-  return this.getResponsesByClusterName(name).then(items => items.filter(kServerSideFilter));
+Clusters.getServerResponses = function(name)
+{
+    return this.getResponsesByClusterName(name).then(items => items.filter(kServerSideFilter));
 }
 
-Clusters.getServerAttributes = function (name) {
-  return this.getAttributesByClusterName(name).then(items => items.filter(kServerSideFilter));
+Clusters.getServerAttributes = function(name)
+{
+    return this.getAttributesByClusterName(name).then(items => items.filter(kServerSideFilter));
 }
 
-Clusters.getUsedStructureNames = function () {
-  return this.ensurePostProcessingDone().then(() => this._used_structure_names);
+Clusters.getUsedStructureNames = function()
+{
+    return this.ensurePostProcessingDone().then(() => this._used_structure_names);
 }
 
-Clusters.getStructuresByClusterName = function (name) {
-  return this.ensurePostProcessingDone().then(() => this._cluster_structures.structuresSpecificToCluster(name));
+Clusters.getStructuresByClusterName = function(name)
+{
+    return this.ensurePostProcessingDone().then(() => this._cluster_structures.structuresSpecificToCluster(name));
 }
 
-Clusters.getSharedStructs = function () {
-  return this.ensurePostProcessingDone().then(() => this._cluster_structures.structuresUsedByMultipleClusters());
+Clusters.getSharedStructs = function()
+{
+    return this.ensurePostProcessingDone().then(() => this._cluster_structures.structuresUsedByMultipleClusters());
 }
 
-Clusters.getServerEvents = function (name) {
-  return this.getEventsByClusterName(name).then(items => items.filter(kServerSideFilter));
+Clusters.getServerEvents = function(name)
+{
+    return this.getEventsByClusterName(name).then(items => items.filter(kServerSideFilter));
 }
 
 //
