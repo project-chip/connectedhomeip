@@ -161,32 +161,6 @@ namespace OnOffSwitchConfiguration {
 
 namespace LevelControl {
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for MoveMode
-enum class MoveMode : uint8_t
-{
-    kUp   = 0x00,
-    kDown = 0x01,
-};
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MoveMode                        = EmberAfMoveMode;
-#endif
-
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for StepMode
-enum class StepMode : uint8_t
-{
-    kUp   = 0x00,
-    kDown = 0x01,
-};
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using StepMode                        = EmberAfStepMode;
-#endif
-
 // Bitmap for LevelControlFeature
 enum class LevelControlFeature : uint32_t
 {
@@ -1973,21 +1947,6 @@ enum class IasZoneType : uint16_t
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IasZoneType                     = EmberAfIasZoneType;
 #endif
-
-// Bitmap for IasZoneStatus
-enum class IasZoneStatus : uint16_t
-{
-    kAlarm1             = 0x1,
-    kAlarm2             = 0x2,
-    kTamper             = 0x4,
-    kBattery            = 0x8,
-    kSupervisionReports = 0x10,
-    kRestoreReports     = 0x20,
-    kTrouble            = 0x40,
-    kAc                 = 0x80,
-    kTest               = 0x100,
-    kBatteryDefect      = 0x200,
-};
 } // namespace IasZone
 
 namespace IasAce {
@@ -2085,40 +2044,9 @@ enum class IasZoneType : uint16_t
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IasZoneType                     = EmberAfIasZoneType;
 #endif
-
-// Bitmap for IasZoneStatus
-enum class IasZoneStatus : uint16_t
-{
-    kAlarm1             = 0x1,
-    kAlarm2             = 0x2,
-    kTamper             = 0x4,
-    kBattery            = 0x8,
-    kSupervisionReports = 0x10,
-    kRestoreReports     = 0x20,
-    kTrouble            = 0x40,
-    kAc                 = 0x80,
-    kTest               = 0x100,
-    kBatteryDefect      = 0x200,
-};
 } // namespace IasAce
 
 namespace IasWd {
-
-// Bitmap for SquawkInfo
-enum class SquawkInfo : uint8_t
-{
-    kMode   = 0xF0,
-    kStrobe = 0x8,
-    kLevel  = 0x3,
-};
-
-// Bitmap for WarningInfo
-enum class WarningInfo : uint8_t
-{
-    kMode       = 0xF0,
-    kStrobe     = 0xC,
-    kSirenLevel = 0x3,
-};
 } // namespace IasWd
 
 namespace WakeOnLan {
@@ -2150,8 +2078,13 @@ enum class ChannelFeature : uint32_t
 
 namespace TargetNavigator {
 
+<<<<<<< HEAD
 // Enum for TargetNavigatorStatusEnum
 enum class TargetNavigatorStatusEnum : uint8_t
+=======
+// Enum for StatusEnumTargetNavigator
+enum class StatusEnumTargetNavigator : uint8_t
+>>>>>>> Reverting the changes to the zapt template files
 {
     kSuccess        = 0x00,
     kTargetNotFound = 0x01,
@@ -2161,8 +2094,22 @@ enum class TargetNavigatorStatusEnum : uint8_t
 
 namespace MediaPlayback {
 
+<<<<<<< HEAD
 // Enum for MediaPlaybackStatusEnum
 enum class MediaPlaybackStatusEnum : uint8_t
+=======
+// Enum for PlaybackStateEnum
+enum class PlaybackStateEnum : uint8_t
+{
+    kPlaying    = 0x00,
+    kPaused     = 0x01,
+    kNotPlaying = 0x02,
+    kBuffering  = 0x03,
+};
+
+// Enum for StatusEnumMediaPlayback
+enum class StatusEnumMediaPlayback : uint8_t
+>>>>>>> Reverting the changes to the zapt template files
 {
     kSuccess                = 0x00,
     kInvalidStateForCommand = 0x01,
@@ -2304,8 +2251,13 @@ enum class CecKeyCode : uint8_t
     kData                      = 0x76,
 };
 
+<<<<<<< HEAD
 // Enum for KeypadInputStatusEnum
 enum class KeypadInputStatusEnum : uint8_t
+=======
+// Enum for StatusEnumKeypadInput
+enum class StatusEnumKeypadInput : uint8_t
+>>>>>>> Reverting the changes to the zapt template files
 {
     kSuccess                  = 0x00,
     kUnsupportedKey           = 0x01,
@@ -2356,6 +2308,17 @@ enum class ParameterEnum : uint8_t
     kType       = 0x0C,
 };
 
+<<<<<<< HEAD
+=======
+// Enum for StatusEnumContentLauncher
+enum class StatusEnumContentLauncher : uint8_t
+{
+    kSuccess         = 0x00,
+    kUrlNotAvailable = 0x01,
+    kAuthFailed      = 0x02,
+};
+
+>>>>>>> Reverting the changes to the zapt template files
 // Bitmap for ContentLauncherFeature
 enum class ContentLauncherFeature : uint32_t
 {
@@ -2393,8 +2356,13 @@ enum class AudioOutputFeature : uint32_t
 
 namespace ApplicationLauncher {
 
+<<<<<<< HEAD
 // Enum for ApplicationLauncherStatusEnum
 enum class ApplicationLauncherStatusEnum : uint8_t
+=======
+// Enum for StatusEnumApplicationLauncher
+enum class StatusEnumApplicationLauncher : uint8_t
+>>>>>>> Reverting the changes to the zapt template files
 {
     kSuccess         = 0x00,
     kAppNotAvailable = 0x01,
