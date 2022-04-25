@@ -207,9 +207,7 @@ uint8_t emberAfClusterIndex(chip::EndpointId endpoint, chip::ClusterId cluster, 
     {
         if (clusters[i + clusterIndex[endpointIndex]] == cluster)
         {
-            VerifyOrDie(i <= UINT8_MAX);
-
-            return static_cast<uint8_t>(i);
+            return i;
         }
     }
     return UINT8_MAX;
