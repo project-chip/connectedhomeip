@@ -135,7 +135,7 @@ void AttributePathExpandIterator::PrepareAttributeIndexRange(const AttributePath
             {
                 if (GlobalAttributesNotInMetadata[idx] == aAttributePath.mAttributeId)
                 {
-                    mGlobalAttributeIndex = static_cast<uint8_t>(idx);
+                    mGlobalAttributeIndex = idx;
                     break;
                 }
             }
