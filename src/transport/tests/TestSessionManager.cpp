@@ -35,7 +35,7 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
-#include <transport/raw/tests/NetworkTestHelpers.h>
+#include <transport/tests/LoopbackTransportManager.h>
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
@@ -51,7 +51,7 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Test;
 
-using TestContext = chip::Test::IOContext;
+using TestContext = chip::Test::LoopbackTransportManager;
 
 TestContext sContext;
 
@@ -97,18 +97,16 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    TransportMgr<LoopbackTransport> transportMgr;
     FabricTable fabricTable;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
 
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
-    NL_TEST_ASSERT(
-        inSuite,
-        CHIP_NO_ERROR ==
-            sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager, &deviceStorage, &fabricTable));
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                           &fabricTable));
 }
 
 void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
@@ -127,18 +125,16 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("::1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    TransportMgr<LoopbackTransport> transportMgr;
     FabricTable fabricTable;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
 
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
-    NL_TEST_ASSERT(
-        inSuite,
-        CHIP_NO_ERROR ==
-            sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager, &deviceStorage, &fabricTable));
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                           &fabricTable));
 
     callback.mSuite = inSuite;
 
@@ -196,6 +192,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get(), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 
     // Let's send the max sized message and make sure it is received
@@ -210,6 +207,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get(), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
 
     uint16_t large_payload_len = sizeof(LARGE_PAYLOAD);
@@ -242,18 +240,16 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("::1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    TransportMgr<LoopbackTransport> transportMgr;
     FabricTable fabricTable;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
 
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
-    NL_TEST_ASSERT(
-        inSuite,
-        CHIP_NO_ERROR ==
-            sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager, &deviceStorage, &fabricTable));
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                           &fabricTable));
 
     callback.mSuite = inSuite;
 
@@ -313,15 +309,17 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get(), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    ctx.DrainAndServiceIO();
+    NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
+
     // Reset receive side message counter, or duplicated message will be denied.
     Transport::SecureSession * session = bobToAliceSession.Get()->AsSecureSession();
     session->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
-    NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
-
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get(), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
 
     sessionManager.Shutdown();
@@ -343,18 +341,16 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("::1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    TransportMgr<LoopbackTransport> transportMgr;
     FabricTable fabricTable;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
 
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
-    NL_TEST_ASSERT(
-        inSuite,
-        CHIP_NO_ERROR ==
-            sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager, &deviceStorage, &fabricTable));
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                           &fabricTable));
 
     callback.mSuite = inSuite;
 
@@ -414,6 +410,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get(), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 
     /* -------------------------------------------------------------------------------------------*/
@@ -434,6 +431,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get(), badMessageCounterMsg);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 
     /* -------------------------------------------------------------------------------------------*/
@@ -450,15 +448,17 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get(), badKeyIdMsg);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    ctx.DrainAndServiceIO();
+    NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
+
     /* -------------------------------------------------------------------------------------------*/
     session->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
-
-    NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 
     // Send the correct encrypted msg
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get(), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
 
     sessionManager.Shutdown();
@@ -480,18 +480,16 @@ void SendPacketWithOldCounterTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("::1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    TransportMgr<LoopbackTransport> transportMgr;
     FabricTable fabricTable;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
 
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
-    NL_TEST_ASSERT(
-        inSuite,
-        CHIP_NO_ERROR ==
-            sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager, &deviceStorage, &fabricTable));
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                           &fabricTable));
 
     callback.mSuite = inSuite;
 
@@ -550,6 +548,7 @@ void SendPacketWithOldCounterTest(nlTestSuite * inSuite, void * inContext)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get(), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 
     // Now advance our message counter by 5.
@@ -566,6 +565,7 @@ void SendPacketWithOldCounterTest(nlTestSuite * inSuite, void * inContext)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get(), newMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
 
     // Now resend our original message.  It should be rejected as a duplicate.
@@ -573,6 +573,7 @@ void SendPacketWithOldCounterTest(nlTestSuite * inSuite, void * inContext)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get(), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
 
     sessionManager.Shutdown();
@@ -594,18 +595,16 @@ void SendPacketWithTooOldCounterTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("::1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    TransportMgr<LoopbackTransport> transportMgr;
     FabricTable fabricTable;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
 
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
-    NL_TEST_ASSERT(
-        inSuite,
-        CHIP_NO_ERROR ==
-            sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager, &deviceStorage, &fabricTable));
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                           &fabricTable));
 
     callback.mSuite = inSuite;
 
@@ -664,6 +663,7 @@ void SendPacketWithTooOldCounterTest(nlTestSuite * inSuite, void * inContext)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get(), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 
     // Now advance our message counter by at least
@@ -682,6 +682,7 @@ void SendPacketWithTooOldCounterTest(nlTestSuite * inSuite, void * inContext)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get(), newMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
 
     // Now resend our original message.  It should be rejected as a duplicate.
@@ -689,6 +690,7 @@ void SendPacketWithTooOldCounterTest(nlTestSuite * inSuite, void * inContext)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get(), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
 
     sessionManager.Shutdown();

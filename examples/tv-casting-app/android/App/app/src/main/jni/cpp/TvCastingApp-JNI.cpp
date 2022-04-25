@@ -17,7 +17,11 @@
  */
 
 #include "TvCastingApp-JNI.h"
+#include "JNIDACProvider.h"
+#include <app/server/Server.h>
 #include <app/server/java/AndroidAppServerWrapper.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
@@ -79,8 +83,27 @@ JNI_METHOD(void, nativeInit)(JNIEnv *, jobject app)
     TvCastingAppJNIMgr().InitializeWithObjects(app);
 }
 
-// TBD: Temp dummy function for testing
-JNI_METHOD(void, doSomethingInCpp)(JNIEnv *, jobject, jint endpoint)
+JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
 {
-    ChipLogProgress(AppServer, "JNI_METHOD doSomethingInCpp called with endpoint %d", endpoint);
+    if (!chip::Credentials::IsDeviceAttestationCredentialsProviderSet())
+    {
+        JNIDACProvider * p = new JNIDACProvider(provider);
+        chip::Credentials::SetDeviceAttestationCredentialsProvider(p);
+    }
+}
+
+JNI_METHOD(jboolean, openBasicCommissioningWindow)(JNIEnv *, jobject, jint duration)
+{
+    ChipLogProgress(AppServer, "JNI_METHOD openBasicCommissioningWindow called with duration %d", duration);
+
+    Server::GetInstance().GetFabricTable().DeleteAllFabrics();
+    CHIP_ERROR err =
+        Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(System::Clock::Seconds16(duration));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "GetCommissioningWindowManager failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
+    }
+
+    return true;
 }

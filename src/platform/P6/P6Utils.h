@@ -23,6 +23,7 @@
 #include "whd_wlioctl.h"
 #include <cy_wcm.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <whd_events_int.h>
 
 typedef struct
 {
@@ -190,6 +191,7 @@ class P6Utils
 {
 public:
     static CHIP_ERROR IsAPEnabled(bool & apEnabled);
+    static CHIP_ERROR IsStationEnabled(bool & staEnabled);
     static bool IsStationProvisioned(void);
     static CHIP_ERROR IsStationConnected(bool & connected);
     static CHIP_ERROR StartWiFiLayer(void);

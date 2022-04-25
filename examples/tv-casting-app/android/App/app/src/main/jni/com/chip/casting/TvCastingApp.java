@@ -37,8 +37,10 @@ public class TvCastingApp {
 
   public native void nativeInit();
 
+  public native void setDACProvider(DACProvider provider);
+
   /** TBD: Temp dummy function for testing */
-  public native void doSomethingInCpp(int endpoint);
+  public native boolean openBasicCommissioningWindow(int duration);
 
   static {
     System.loadLibrary("TvCastingApp");
