@@ -31,28 +31,9 @@
 
 using namespace ::chip;
 
-struct LockUserInfo
-{
-    char userName[DOOR_LOCK_USER_NAME_BUFFER_SIZE];
-    DlCredential credentials[DOOR_LOCK_MAX_CREDENTIALS_PER_USER];
-    size_t totalCredentials;
-    uint32_t userUniqueId;
-    DlUserStatus userStatus;
-    DlUserType userType;
-    DlCredentialRule credentialRule;
-    chip::FabricIndex createdBy;
-    chip::FabricIndex lastModifiedBy;
-};
+#define DOOR_LOCK_MAX_CREDENTIAL_SIZE 8
 
 static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE = 20;
-
-struct LockCredentialInfo
-{
-    DlCredentialStatus status;
-    DlCredentialType credentialType;
-    uint8_t credentialData[DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE];
-    size_t credentialDataSize;
-};
 
 class LockManager
 {
@@ -90,10 +71,10 @@ public:
                  uint32_t uniqueId, DlUserStatus userStatus, DlUserType usertype, DlCredentialRule credentialRule,
                  const DlCredential * credentials, size_t totalCredentials);
 
-    bool GetCredential(chip::EndpointId endpointId, DlCredentialType credentialType,
+    bool GetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
                        EmberAfPluginDoorLockCredentialInfo & credential) const;
 
-    bool SetCredential(chip::EndpointId endpointId, DlCredentialStatus credentialStatus, DlCredentialType credentialType,
+    bool SetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus, DlCredentialType credentialType,
                        const chip::ByteSpan & credentialData);
 
     bool setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
@@ -120,8 +101,12 @@ private:
     static void AutoLockTimerEventHandler(AppEvent * aEvent);
     static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
 
-    LockUserInfo mLockUser;
-    LockCredentialInfo mLockCredentials;
+    EmberAfPluginDoorLockUserInfo mLockUser;
+    EmberAfPluginDoorLockCredentialInfo mLockCredentials;
+
+    char mUserName[DOOR_LOCK_MAX_USER_NAME_SIZE];
+    uint8_t mCredentialData[DOOR_LOCK_MAX_CREDENTIAL_SIZE];
+    DlCredential mCredentials[DOOR_LOCK_MAX_CREDENTIALS_PER_USER];
 
     static LockManager sLock;
 };

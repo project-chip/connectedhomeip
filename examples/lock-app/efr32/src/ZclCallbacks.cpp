@@ -87,13 +87,13 @@ bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const
 bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
                                         EmberAfPluginDoorLockCredentialInfo & credential)
 {
-    return LockMgr().GetCredential(endpointId, credentialType, credential);
+    return LockMgr().GetCredential(endpointId, credentialIndex, credentialType, credential);
 }
 
 bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
                                         DlCredentialType credentialType, const chip::ByteSpan & credentialData)
 {
-    return LockMgr().SetCredential(endpointId, credentialStatus, credentialType, credentialData);
+    return LockMgr().SetCredential(endpointId, credentialIndex, credentialStatus, credentialType, credentialData);
 }
 
 bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
