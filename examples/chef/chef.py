@@ -357,7 +357,7 @@ true''')
             queueCommand(f"cd {paths['rootSampleFolder']}/nrfconnect")
             if options.doClean:
                 # queueCommand(f"rm -rf {paths['rootSampleFolder']}/nrfconnect/build")
-                queueCommand(f"west build -b nrf52840dk_nrf52840")
+                queueCommand(f"west build -b nrf52840dk_nrf52840 -c")
             else:
                 queueCommand(f"west build -b nrf52840dk_nrf52840")
         elif options.buildTarget == "linux":
@@ -403,7 +403,7 @@ true''')
         elif options.buildTarget == "nrfconnect":
             queueCommand(f"cd {paths['rootSampleFolder']}/nrfconnect")
             if options.doErase:
-                queueCommand("rm -rf build")
+                queueCommand("west flash --erase")
             else:
                 queueCommand("west flash")
 

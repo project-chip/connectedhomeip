@@ -15,6 +15,7 @@
 #
 mainmenu "Matter nRF Connect Chef Example Application"
 
-rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"
-rsource "../../../config/nrfconnect/chip-module/Kconfig.features"
+#rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"
+#rsource "../../../config/nrfconnect/chip-module/Kconfig.features"
+rsource "../../../config/nrfconnect/chip-module/Kconfig"
 source "Kconfig.zephyr"
