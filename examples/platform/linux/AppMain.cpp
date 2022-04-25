@@ -40,8 +40,6 @@
 
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/KvsPersistentStorageDelegate.h>
-#include <platform/TestOnlyCommissionableDataProvider.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include "CommissionerMain.h"
@@ -69,7 +67,7 @@
 #include <signal.h>
 
 #include "AppMain.h"
-#include "LinuxCommissionableDataProvider.h"
+#include "CommissionableInit.h"
 
 using namespace chip;
 using namespace chip::ArgParser;
@@ -162,80 +160,6 @@ void SetupSignalHandlers()
     signal(SIGINT, OnSignalHandler);
 }
 
-CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, LinuxDeviceOptions & options)
-{
-    chip::Optional<uint32_t> setupPasscode;
-
-    if (options.payload.setUpPINCode != 0)
-    {
-        setupPasscode.SetValue(options.payload.setUpPINCode);
-    }
-    else if (!options.spake2pVerifier.HasValue())
-    {
-        uint32_t defaultTestPasscode = 0;
-        chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
-        VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupPasscode(defaultTestPasscode) == CHIP_NO_ERROR);
-
-        ChipLogError(Support,
-                     "*** WARNING: Using temporary passcode %u due to no neither --passcode or --spake2p-verifier-base64 "
-                     "given on command line. This is temporary and will disappear. Please update your scripts "
-                     "to explicitly configure onboarding credentials. ***",
-                     static_cast<unsigned>(defaultTestPasscode));
-        setupPasscode.SetValue(defaultTestPasscode);
-        options.payload.setUpPINCode = defaultTestPasscode;
-    }
-    else
-    {
-        // Passcode is 0, so will be ignored, and verifier will take over. Onboarding payload
-        // printed for debug will be invalid, but if the onboarding payload had been given
-        // properly to the commissioner later, PASE will succeed.
-    }
-
-    if (options.discriminator.HasValue())
-    {
-        options.payload.discriminator = options.discriminator.Value();
-    }
-    else
-    {
-        uint16_t defaultTestDiscriminator = 0;
-        chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
-        VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupDiscriminator(defaultTestDiscriminator) == CHIP_NO_ERROR);
-
-        ChipLogError(Support,
-                     "*** WARNING: Using temporary test discriminator %u due to --discriminator not "
-                     "given on command line. This is temporary and will disappear. Please update your scripts "
-                     "to explicitly configure discriminator. ***",
-                     static_cast<unsigned>(defaultTestDiscriminator));
-        options.payload.discriminator = defaultTestDiscriminator;
-    }
-
-    // Default to minimum PBKDF iterations
-    uint32_t spake2pIterationCount = chip::Crypto::kSpake2p_Min_PBKDF_Iterations;
-    if (options.spake2pIterations != 0)
-    {
-        spake2pIterationCount = options.spake2pIterations;
-    }
-    ChipLogError(Support, "PASE PBKDF iterations set to %u", static_cast<unsigned>(spake2pIterationCount));
-
-    return provider.Init(options.spake2pVerifier, options.spake2pSalt, spake2pIterationCount, setupPasscode,
-                         options.payload.discriminator);
-}
-
-CHIP_ERROR InitConfigurationManager(ConfigurationManagerImpl & configManager, LinuxDeviceOptions & options)
-{
-    if (options.payload.vendorID != 0)
-    {
-        configManager.StoreVendorId(options.payload.vendorID);
-    }
-
-    if (options.payload.productID != 0)
-    {
-        configManager.StoreProductId(options.payload.productID);
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 void Cleanup()
 {
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
@@ -305,12 +229,12 @@ int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
 
     // Init the commissionable data provider based on command line options
     // to handle custom verifiers, discriminators, etc.
-    err = InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
+    err = chip::examples::InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
     SuccessOrExit(err);
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
 
-    err = InitConfigurationManager(reinterpret_cast<ConfigurationManagerImpl &>(ConfigurationMgr()),
-                                   LinuxDeviceOptions::GetInstance());
+    err = chip::examples::InitConfigurationManager(reinterpret_cast<ConfigurationManagerImpl &>(ConfigurationMgr()),
+                                                   LinuxDeviceOptions::GetInstance());
     SuccessOrExit(err);
 
     err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
@@ -318,15 +242,21 @@ int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
 
     ConfigurationMgr().LogDeviceConfig();
 
-    PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
+    {
+        ChipLogProgress(NotSpecified, "==== Onboarding payload for Standard Commissioning Flow ====");
+        PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
+    }
 
-    // For testing of manual pairing code with custom commissioning flow
-    err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
-    SuccessOrExit(err);
+    {
+        // For testing of manual pairing code with custom commissioning flow
+        ChipLogProgress(NotSpecified, "==== Onboarding payload for Custom Commissioning Flows ====");
+        err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
+        SuccessOrExit(err);
 
-    LinuxDeviceOptions::GetInstance().payload.commissioningFlow = chip::CommissioningFlow::kCustom;
+        LinuxDeviceOptions::GetInstance().payload.commissioningFlow = chip::CommissioningFlow::kCustom;
 
-    PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
+        PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
+    }
 
 #if defined(PW_RPC_ENABLED)
     rpc::Init();
