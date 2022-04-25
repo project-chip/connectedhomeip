@@ -31,7 +31,8 @@ declare_args() {
 assert(matter_device_vid != "", "matter_device_vid must be specified")
 assert(matter_device_pid != "", "matter_device_pid must be specified")
 assert(matter_software_ver != "", "matter_software_ver must be specified")
-assert(matter_software_ver_str != "", "matter_software_ver_str must be specified")
+assert(matter_software_ver_str != "",
+       "matter_software_ver_str must be specified")
 
 template("ti_simplelink_executable") {
   simplelink_target_name = target_name
