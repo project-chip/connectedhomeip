@@ -249,6 +249,22 @@ function setDefaultResponse(test)
   const defaultResponseValues = [];
   setDefault(test[kResponseName], kValuesName, defaultResponseValues);
 
+  // Ensure only valid keywords are used for response values.
+  const values = test[kResponseName][kValuesName];
+  for (let i = 0; i < values.length; i++)
+  {
+    for (let key in values[i])
+    {
+      if (key == "name" || key == "value" || key == kConstraintsName || key == kSaveAsName)
+      {
+        continue;
+      }
+
+      const errorStr = `Unknown key "${key}"`;
+      throwError(test, errorStr);
+    }
+  }
+
   const defaultResponseConstraints = {};
   setDefault(test[kResponseName], kConstraintsName, defaultResponseConstraints);
 
