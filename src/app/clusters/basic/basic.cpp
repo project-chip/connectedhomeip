@@ -270,11 +270,10 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         Basic::Structs::CapabilityMinimaStruct::Type capabilityMinima;
 
         // TODO: These values must be set from something based on the SDK impl, but there are no such constants today.
-        constexpr uint16_t kMinCaseSessionsPerFabricMandatedBySpec  = 3;
-        constexpr uint16_t kMinSubscriptionsPerFabricMandatedBySpec = 3;
+        constexpr uint16_t kMinCaseSessionsPerFabricMandatedBySpec = 3;
 
         capabilityMinima.caseSessionsPerFabric  = kMinCaseSessionsPerFabricMandatedBySpec;
-        capabilityMinima.subscriptionsPerFabric = kMinSubscriptionsPerFabricMandatedBySpec;
+        capabilityMinima.subscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinSubscriptionsPerFabric();
 
         status = aEncoder.Encode(capabilityMinima);
         break;

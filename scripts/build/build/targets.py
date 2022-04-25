@@ -272,6 +272,7 @@ def HostTargets():
     builder.AppendVariant(name="libfuzzer", requires=[
                           "clang"], use_libfuzzer=True),
     builder.AppendVariant(name="clang", use_clang=True),
+    builder.AppendVariant(name="test", extra_tests=True),
 
     builder.WhitelistVariantNameForGlob('no-interactive-ipv6only')
     builder.WhitelistVariantNameForGlob('ipv6only')
