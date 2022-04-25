@@ -127,7 +127,7 @@ void AttributePathExpandIterator::PrepareAttributeIndexRange(const AttributePath
             // and overflow to 0 for the max index) to us not going through
             // non-metadata global attributes for this attribute.
             mGlobalAttributeIndex = UINT8_MAX;
-            for (uint8_t idx = 0; idx < ArraySize(GlobalAttributesNotInMetadata); ++idx)
+            for (size_t idx = 0; idx < ArraySize(GlobalAttributesNotInMetadata); ++idx)
             {
                 if (GlobalAttributesNotInMetadata[idx] == aAttributePath.mAttributeId)
                 {

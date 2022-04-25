@@ -437,23 +437,23 @@ EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberA
 
 void emberAfCopyInt16u(uint8_t * data, uint16_t index, uint16_t x)
 {
-    data[index]     = (uint8_t)(((x)) & 0xFF);
-    data[index + 1] = (uint8_t)(((x) >> 8) & 0xFF);
+    data[index]     = (uint8_t) (((x)) & 0xFF);
+    data[index + 1] = (uint8_t) (((x) >> 8) & 0xFF);
 }
 
 void emberAfCopyInt24u(uint8_t * data, uint16_t index, uint32_t x)
 {
-    data[index]     = (uint8_t)(((x)) & 0xFF);
-    data[index + 1] = (uint8_t)(((x) >> 8) & 0xFF);
-    data[index + 2] = (uint8_t)(((x) >> 16) & 0xFF);
+    data[index]     = (uint8_t) (((x)) & 0xFF);
+    data[index + 1] = (uint8_t) (((x) >> 8) & 0xFF);
+    data[index + 2] = (uint8_t) (((x) >> 16) & 0xFF);
 }
 
 void emberAfCopyInt32u(uint8_t * data, uint16_t index, uint32_t x)
 {
-    data[index]     = (uint8_t)(((x)) & 0xFF);
-    data[index + 1] = (uint8_t)(((x) >> 8) & 0xFF);
-    data[index + 2] = (uint8_t)(((x) >> 16) & 0xFF);
-    data[index + 3] = (uint8_t)(((x) >> 24) & 0xFF);
+    data[index]     = (uint8_t) (((x)) & 0xFF);
+    data[index + 1] = (uint8_t) (((x) >> 8) & 0xFF);
+    data[index + 2] = (uint8_t) (((x) >> 16) & 0xFF);
+    data[index + 3] = (uint8_t) (((x) >> 24) & 0xFF);
 }
 
 void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size)
@@ -520,7 +520,7 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
         // no length means nothing to compare.  Shouldn't even happen, since len is sizeof(some-integer-type).
         return 0;
     }
-    uint8_t i, j, k;
+
     if (signedNumber)
     { // signed number comparison
         if (len <= 4)
@@ -529,12 +529,12 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
             int32_t accum2 = 0x0;
             int32_t all1s  = -1;
 
-            for (i = 0; i < len; i++)
+            for (uint16_t i = 0; i < len; i++)
             {
-                j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
+                uint8_t j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
                 accum1 |= j << (8 * (len - 1 - i));
 
-                k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
+                uint8_t k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
                 accum2 |= k << (8 * (len - 1 - i));
             }
 
@@ -568,10 +568,10 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
     }
 
     // regular unsigned number comparison
-    for (i = 0; i < len; i++)
+    for (uint16_t i = 0; i < len; i++)
     {
-        j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
-        k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
+        uint8_t j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
+        uint8_t k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
 
         if (j > k)
         {

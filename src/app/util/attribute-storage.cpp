@@ -375,8 +375,8 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttribut
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     // Casting and calling a function pointer on the same line results in ignoring the return
     // of the call on gcc-arm-none-eabi-9-2019-q4-major
-    EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback)(
-        emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
+    EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback) (emberAfFindClusterFunction(
+        cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
     if (f != nullptr)
     {
         status = f(attributePath, attributeType, size, value);
@@ -404,7 +404,7 @@ static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
 // Calls the init functions.
 void emAfCallInits(void)
 {
-    uint8_t index;
+    uint16_t index;
     for (index = 0; index < emberAfEndpointCount(); index++)
     {
         if (emberAfEndpointIndexIsEnabled(index))
@@ -553,7 +553,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
 
     uint16_t attributeOffsetIndex = 0;
 
-    for (uint8_t ep = 0; ep < emberAfEndpointCount(); ep++)
+    for (uint16_t ep = 0; ep < emberAfEndpointCount(); ep++)
     {
         // Is this a dynamic endpoint?
         bool isDynamicEndpoint = (ep >= emberAfFixedEndpointCount());
@@ -702,7 +702,7 @@ const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endp
 
 uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
 {
-    for (uint8_t ep = 0; ep < emberAfEndpointCount(); ep++)
+    for (uint16_t ep = 0; ep < emberAfEndpointCount(); ep++)
     {
         // Check the endpoint id first, because that way we avoid examining the
         // endpoint type for endpoints that are not actually defined.
