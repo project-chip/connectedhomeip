@@ -37,12 +37,10 @@ namespace NetworkCommissioning {
 
 CHIP_ERROR TizenThreadDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
-    ByteSpan currentProvision;
     VerifyOrReturnError(ConnectivityMgrImpl().IsThreadAttached(), CHIP_NO_ERROR);
-    VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(currentProvision) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+    VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(mStagingNetwork) == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
-    mSavedNetwork.Init(currentProvision);
-    mStagingNetwork.Init(currentProvision);
+    mSavedNetwork.Init(mStagingNetwork.AsByteSpan());
 
     return CHIP_NO_ERROR;
 }
@@ -59,17 +57,16 @@ CHIP_ERROR TizenThreadDriver::RevertConfiguration()
     return CHIP_NO_ERROR;
 }
 
-Status TizenThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset)
+Status TizenThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
     uint8_t extpanid[kSizeExtendedPanId];
     uint8_t newExtpanid[kSizeExtendedPanId];
     Thread::OperationalDataset newDataset;
-
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
     newDataset.Init(operationalDataset);
-    VerifyOrReturnError(newDataset.IsCommissioned(), Status::kUnknownError);
+    VerifyOrReturnError(newDataset.IsCommissioned(), Status::kOutOfRange);
 
-    // We only support one active operational dataset. Add/Update based on either:
-    // Staging network not commissioned yet (active) or we are updating the dataset with same Extended Pan ID.
     VerifyOrReturnError(!mStagingNetwork.IsCommissioned() || memcmp(extpanid, newExtpanid, kSizeExtendedPanId) == 0,
                         Status::kBoundsExceeded);
 
@@ -77,14 +74,16 @@ Status TizenThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset)
     return Status::kSuccess;
 }
 
-Status TizenThreadDriver::RemoveNetwork(ByteSpan networkId)
+Status TizenThreadDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
     uint8_t extpanid[kSizeExtendedPanId];
     if (!mStagingNetwork.IsCommissioned())
     {
         return Status::kNetworkNotFound;
     }
-    else if (mStagingNetwork.GetExtendedPanId(extpanid) != CHIP_NO_ERROR)
+    if (mStagingNetwork.GetExtendedPanId(extpanid) != CHIP_NO_ERROR)
     {
         return Status::kUnknownError;
     }
@@ -95,14 +94,15 @@ Status TizenThreadDriver::RemoveNetwork(ByteSpan networkId)
     return Status::kSuccess;
 }
 
-Status TizenThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index)
+Status TizenThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
+    outDebugText.reduce_size(0);
     uint8_t extpanid[kSizeExtendedPanId];
     if (!mStagingNetwork.IsCommissioned())
     {
         return Status::kNetworkNotFound;
     }
-    else if (mStagingNetwork.GetExtendedPanId(extpanid) != CHIP_NO_ERROR)
+    if (mStagingNetwork.GetExtendedPanId(extpanid) != CHIP_NO_ERROR)
     {
         return Status::kUnknownError;
     }
@@ -129,7 +129,7 @@ void TizenThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * cal
     VerifyOrExit((networkId.size() == kSizeExtendedPanId && memcmp(networkId.data(), extpanid, kSizeExtendedPanId) == 0),
                  status = Status::kNetworkNotFound);
 
-    VerifyOrExit(DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork.AsByteSpan(), callback) == CHIP_NO_ERROR,
+    VerifyOrExit(DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork, callback) == CHIP_NO_ERROR,
                  status = Status::kUnknownError);
 
 exit:

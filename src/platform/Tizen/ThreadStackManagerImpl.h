@@ -52,7 +52,7 @@ public:
 
     void _OnPlatformEvent(const ChipDeviceEvent * event);
 
-    CHIP_ERROR _GetThreadProvision(ByteSpan & netInfo);
+    CHIP_ERROR _GetThreadProvision(Thread::OperationalDataset & dataset);
 
     CHIP_ERROR _SetThreadProvision(ByteSpan netInfo);
 
@@ -64,7 +64,8 @@ public:
 
     bool _IsThreadAttached();
 
-    CHIP_ERROR _AttachToThreadNetwork(ByteSpan netInfo, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
+    CHIP_ERROR _AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
+                                      NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
 
     CHIP_ERROR _SetThreadEnabled(bool val);
 
