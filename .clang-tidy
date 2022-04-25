@@ -5,7 +5,6 @@ Checks: >
   bugprone-*,
   -bugprone-not-null-terminated-result,
   -bugprone-suspicious-memory-comparison,
-  -bugprone-argument-comment,
   -bugprone-unused-return-value,
   -bugprone-branch-clone,
   -bugprone-easily-swappable-parameters,
