@@ -18883,6 +18883,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("current level", actualValue, 254));
             }
+
             VerifyOrReturn(CheckConstraintType("currentLevel", "", "uint8"));
             NextTest();
         }];
@@ -18905,6 +18906,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("remaining time", actualValue, 0U));
             }
+
             VerifyOrReturn(CheckConstraintType("remainingTime", "", "uint16"));
             NextTest();
         }];
@@ -18927,6 +18929,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("min level", actualValue, 0));
             }
+
             VerifyOrReturn(CheckConstraintType("minLevel", "", "uint8"));
             NextTest();
         }];
@@ -18967,6 +18970,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("current frequency", actualValue, 0U));
             }
+
             VerifyOrReturn(CheckConstraintType("currentFrequency", "", "uint16"));
             NextTest();
         }];
@@ -18989,6 +18993,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("min frequency", actualValue, 0U));
             }
+
             VerifyOrReturn(CheckConstraintType("minFrequency", "", "uint16"));
             NextTest();
         }];
@@ -19011,6 +19016,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("max frequency", actualValue, 0U));
             }
+
             VerifyOrReturn(CheckConstraintType("maxFrequency", "", "uint16"));
             NextTest();
         }];
@@ -19033,6 +19039,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("on off transition time", actualValue, 0U));
             }
+
             VerifyOrReturn(CheckConstraintType("onOffTransitionTime", "", "uint16"));
             NextTest();
         }];
@@ -19127,6 +19134,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("options", actualValue, 0));
             }
+
             VerifyOrReturn(CheckConstraintType("options", "", "map8"));
             NextTest();
         }];
@@ -19278,6 +19286,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("on off transition time", actualValue, 0U));
             }
+
             VerifyOrReturn(CheckConstraintType("onOffTransitionTime", "", "uint16"));
             NextTest();
         }];
@@ -19320,6 +19329,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("on off transition time", actualValue, 10U));
             }
+
             VerifyOrReturn(CheckConstraintType("onOffTransitionTime", "", "uint16"));
             NextTest();
         }];
@@ -19383,6 +19393,7 @@ private:
                 VerifyOrReturn(CheckValueNonNull("on level", actualValue));
                 VerifyOrReturn(CheckValue("on level", actualValue, 254));
             }
+
             VerifyOrReturn(CheckConstraintType("onLevel", "", "uint8"));
             NextTest();
         }];
@@ -19426,6 +19437,7 @@ private:
                 VerifyOrReturn(CheckValueNonNull("on transition time", actualValue));
                 VerifyOrReturn(CheckValue("on transition time", actualValue, 100U));
             }
+
             VerifyOrReturn(CheckConstraintType("onTransitionTime", "", "uint16"));
             NextTest();
         }];
@@ -19469,6 +19481,7 @@ private:
                 VerifyOrReturn(CheckValueNonNull("off transition time", actualValue));
                 VerifyOrReturn(CheckValue("off transition time", actualValue, 100U));
             }
+
             VerifyOrReturn(CheckConstraintType("offTransitionTime", "", "uint16"));
             NextTest();
         }];
@@ -19492,6 +19505,7 @@ private:
                 VerifyOrReturn(CheckValueNonNull("default move rate", actualValue));
                 VerifyOrReturn(CheckValue("default move rate", actualValue, 50));
             }
+
             VerifyOrReturn(CheckConstraintType("defaultMoveRate", "", "uint8"));
             NextTest();
         }];
@@ -19535,6 +19549,7 @@ private:
                 VerifyOrReturn(CheckValueNonNull("default move rate", actualValue));
                 VerifyOrReturn(CheckValue("default move rate", actualValue, 100));
             }
+
             VerifyOrReturn(CheckConstraintType("defaultMoveRate", "", "uint8"));
             NextTest();
         }];
@@ -19578,6 +19593,7 @@ private:
                 VerifyOrReturn(CheckValueNonNull("start up current level", actualValue));
                 VerifyOrReturn(CheckValue("start up current level", actualValue, 254));
             }
+
             VerifyOrReturn(CheckConstraintType("startUpCurrentLevel", "", "uint8"));
             NextTest();
         }];
@@ -20260,6 +20276,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("current level", actualValue, 1));
             }
+
             if (value != nil) {
                 VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentLevel", [value unsignedCharValue], 0));
             }
@@ -25105,6 +25122,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 1U));
             }
+
             VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
             NextTest();
         }];
@@ -29281,6 +29299,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("FeatureMap", actualValue, 0UL));
             }
+
             VerifyOrReturn(CheckConstraintType("featureMap", "", "map32"));
             NextTest();
         }];
@@ -35043,6 +35062,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("occupied cooling setpoint", actualValue, 2600));
             }
+
             VerifyOrReturn(CheckConstraintType("occupiedCoolingSetpoint", "", "int16"));
             if (value != nil) {
                 VerifyOrReturn(CheckConstraintMinValue<int16_t>("occupiedCoolingSetpoint", [value shortValue], 1600));
@@ -35181,6 +35201,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("occupied heating setpoint", actualValue, 2000));
             }
+
             VerifyOrReturn(CheckConstraintType("occupiedHeatingSetpoint", "", "int16"));
             if (value != nil) {
                 VerifyOrReturn(CheckConstraintMinValue<int16_t>("occupiedHeatingSetpoint", [value shortValue], 700));
@@ -35299,6 +35320,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("min heat setpoint limit", actualValue, 700));
             }
+
             VerifyOrReturn(CheckConstraintType("minHeatSetpointLimit", "", "int16"));
             if (value != nil) {
                 VerifyOrReturn(CheckConstraintMinValue<int16_t>("minHeatSetpointLimit", [value shortValue], 700));
@@ -35417,6 +35439,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("max heat setpoint limit", actualValue, 3000));
             }
+
             VerifyOrReturn(CheckConstraintType("maxHeatSetpointLimit", "", "int16"));
             if (value != nil) {
                 VerifyOrReturn(CheckConstraintMinValue<int16_t>("maxHeatSetpointLimit", [value shortValue], 700));
@@ -35540,6 +35563,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("min cool setpoint limit", actualValue, 1600));
             }
+
             VerifyOrReturn(CheckConstraintType("minCoolSetpointLimit", "", "int16"));
             if (value != nil) {
                 VerifyOrReturn(CheckConstraintMinValue<int16_t>("minCoolSetpointLimit", [value shortValue], 1600));
@@ -35683,6 +35707,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("max cool setpoint limit", actualValue, 3200));
             }
+
             VerifyOrReturn(CheckConstraintType("maxCoolSetpointLimit", "", "int16"));
             if (value != nil) {
                 VerifyOrReturn(CheckConstraintMinValue<int16_t>("maxCoolSetpointLimit", [value shortValue], 1600));
@@ -36017,6 +36042,7 @@ private:
                     id actualValue = value;
                     VerifyOrReturn(CheckValue("control sequence of operation", actualValue, 4));
                 }
+
                 VerifyOrReturn(CheckConstraintType("controlSequenceOfOperation", "", "enum8"));
                 if (value != nil) {
                     VerifyOrReturn(CheckConstraintMinValue<uint8_t>("controlSequenceOfOperation", [value unsignedCharValue], 0));
@@ -60004,6 +60030,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValueAsString("char_string", actualValue, @"NotDefault"));
             }
+
             if (value != nil) {
                 VerifyOrReturn(CheckConstraintNotValue("charString", value, readAttributeCharStringDefaultValue));
             }
@@ -60032,6 +60059,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValueAsString("char_string", actualValue, readAttributeCharStringNotDefaultValue));
             }
+
             if (value != nil) {
                 VerifyOrReturn(CheckConstraintNotValue("charString", value, readAttributeCharStringDefaultValue));
             }
@@ -60189,6 +60217,7 @@ private:
                 VerifyOrReturn(
                     CheckValueAsString("octet_string", actualValue, [[NSData alloc] initWithBytes:"NotDefault" length:10]));
             }
+
             if (value != nil) {
                 VerifyOrReturn(CheckConstraintNotValue("octetString", value, readAttributeOctetStringDefaultValue));
             }
@@ -60217,6 +60246,7 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValueAsString("octet_string", actualValue, readAttributeOctetStringNotDefaultValue));
             }
+
             if (value != nil) {
                 VerifyOrReturn(CheckConstraintNotValue("octetString", value, readAttributeOctetStringDefaultValue));
             }

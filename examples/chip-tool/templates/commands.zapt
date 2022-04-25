@@ -30,12 +30,10 @@ public:
         {{#zcl_command_arguments}}
         {{#if_chip_complex}}
         AddArgument("{{asUpperCamelCase label}}", &mComplex_{{asUpperCamelCase label}});
+        {{else if (isString type)}}
+        AddArgument("{{asUpperCamelCase label}}", &mRequest.{{asLowerCamelCase label}});
         {{else}}
-            {{#if_is_string type}}
-                AddArgument("{{asUpperCamelCase label}}", &mRequest.{{asLowerCamelCase label}});
-            {{else}}
-                AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mRequest.{{asLowerCamelCase label}});
-            {{/if_is_string}}
+        AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mRequest.{{asLowerCamelCase label}});
         {{/if_chip_complex}}
         {{/zcl_command_arguments}}
         ClusterCommand::AddArguments();
@@ -76,12 +74,10 @@ public:
         AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
         {{#if_chip_complex}}
         AddArgument("attr-value", &mComplex);
+        {{else if (isString type)}}
+        AddArgument("attr-value", &mValue);
         {{else}}
-            {{#if_is_string type}}
-                AddArgument("attr-value", &mValue);
-            {{else}}
-                AddArgument("attr-value", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mValue);
-            {{/if_is_string}}
+        AddArgument("attr-value", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mValue);
         {{/if_chip_complex}}
         WriteAttribute::AddArguments();
     }
