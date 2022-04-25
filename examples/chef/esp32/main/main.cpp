@@ -161,9 +161,7 @@ void printQRCode()
 void InitServer(intptr_t)
 {
     // Start IM server
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    chip::Server::GetInstance().Init(initParams);
+    chip::Server::GetInstance().Init();
 
     // Device Attestation & Onboarding codes
     chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
