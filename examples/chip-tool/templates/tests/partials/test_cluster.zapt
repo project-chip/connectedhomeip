@@ -203,8 +203,9 @@ class {{filename}}Suite: public TestCommand
     {
         SetIdentity(kIdentity{{asUpperCamelCase identity}});
         return {{command}}({{#chip_tests_item_parameters}}{{#not_first}},{{/not_first}}
+        {{#*inline "defaultValue"}}{{asTypedLiteral (chip_tests_config_get_default_value definedValue) (chip_tests_config_get_type definedValue)}}{{/inline}}
           {{~#if (chip_tests_config_has definedValue)~}}
-          m{{asUpperCamelCase definedValue}}.HasValue() ? m{{asUpperCamelCase definedValue}}.Value() : {{~#if (isString type)}}chip::CharSpan::fromCharString("{{asTypedLiteral (chip_tests_config_get_default_value definedValue) (chip_tests_config_get_type definedValue)}}"){{else}}{{asTypedLiteral (chip_tests_config_get_default_value definedValue) (chip_tests_config_get_type definedValue)}}{{/if~}}
+          m{{asUpperCamelCase definedValue}}.HasValue() ? m{{asUpperCamelCase definedValue}}.Value() : {{~#if (isString type)}}chip::CharSpan::fromCharString("{{>defaultValue}}"){{else}}{{>defaultValue}}{{/if~}}
           {{~else if (isString type)}}"{{definedValue}}"
           {{else}}{{definedValue}}
           {{~/if~}}
