@@ -583,7 +583,7 @@ features, read the following guide:
 ## Using the Client via PASE
 
 For testing chip-tool can stop after setting up a PASE session. Model commands
-can be issues via PASE as well.
+can be issued via PASE as well.
 
 ```bash
 # Start chip-tool interactively
