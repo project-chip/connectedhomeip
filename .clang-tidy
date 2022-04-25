@@ -4,7 +4,6 @@ Checks: >
   modernize-use-nullptr,
   bugprone-*,
   -bugprone-not-null-terminated-result,
-  -bugprone-suspicious-memory-comparison,
   -bugprone-unused-return-value,
   -bugprone-branch-clone,
   -bugprone-easily-swappable-parameters,
