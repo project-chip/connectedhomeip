@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,31 +25,62 @@
 	* This devicetree overlay ensures that default is overridden wherever it
 	* is set, as this application uses the RNG node for entropy exclusively.
 	*/
-
 	chosen {
 		zephyr,entropy = &rng;
 	};
 
 	/*
 	* By default, PWM module is only configured for led0 (LED1 on the board).
-	* The lighting-app, however, uses LED2 to show the state of the lighting,
-	* including its brightness level.
+	* The window-app, however, uses LED2 to show the state of the window cover,
+	* by using the LED's brightness level.
 	*/
 	aliases {
 		pwm-led1 = &pwm_led1;
+		pwm-led2 = &pwm_led2;
 	};
 
 	pwmleds {
 		pwm_led1: pwm_led_1 {
 			pwms = < &pwm0 0xe >;
 		};
+		pwm_led2: pwm_led_2 {
+			pwms = < &pwm1 0xf >;
+		};
 	};
+};
 
+/* Disable unused peripherals to reduce power consumption */
+&adc {
+	status = "disabled";
+};
+&uart1 {
+	status = "disabled";
+};
+&gpio1 {
+	status = "disabled";
+};
+&i2c0 {
+	status = "disabled";
+};
+&spi1 {
+	status = "disabled";
+};
+&spi3 {
+	status = "disabled";
+};
+&usbd {
+	status = "disabled";
 };
 
 &pwm0 {
 	/delete-property/ ch0-pin;
 	/delete-property/ ch0-inverted;
 	ch1-pin = < 0xe >;
+	ch1-inverted;
+};
+
+&pwm1 {
+	status = "okay";
+	ch1-pin = < 0xf >;
 	ch1-inverted;
 };

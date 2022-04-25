@@ -19,7 +19,7 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "LEDUtil.h"
-#include "binding-handler.h"
+#include "WindowCovering.h"
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -40,12 +40,9 @@
 #include <logging/log.h>
 #include <zephyr.h>
 
-using namespace ::chip;
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceLayer;
-
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
+#define MOVEMENT_START_WINDOW_TIMEOUT 2000
 #define APP_EVENT_QUEUE_SIZE 10
 #define BUTTON_PUSH_EVENT 1
 #define BUTTON_RELEASE_EVENT 0
@@ -54,11 +51,8 @@ LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
 
 static LEDWidget sStatusLED;
-static UnusedLedsWrapper<3> sUnusedLeds{ { DK_LED2, DK_LED3, DK_LED4 } };
+static UnusedLedsWrapper<1> sUnusedLeds{ { DK_LED4 } };
 static k_timer sFunctionTimer;
-
-constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
-
 namespace LedConsts {
 constexpr uint32_t kBlinkRate_ms{ 500 };
 namespace StatusLed {
@@ -73,6 +67,10 @@ constexpr uint32_t kOff_ms{ 950 };
 
 } // namespace StatusLed
 } // namespace LedConsts
+
+using namespace ::chip;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
 
 CHIP_ERROR AppTask::Init()
 {
@@ -126,14 +124,9 @@ CHIP_ERROR AppTask::Init()
         LOG_ERR("dk_buttons_init() failed");
         return chip::System::MapErrorZephyr(ret);
     }
-    err = InitBindingHandlers();
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("InitBindingHandlers() failed");
-    }
 
-    // Initialize timer user data
-    k_timer_init(&sFunctionTimer, &AppTask::TimerEventHandler, nullptr);
+    // Initialize function timer user data
+    k_timer_init(&sFunctionTimer, &AppTask::FunctionTimerTimeoutCallback, nullptr);
     k_timer_user_data_set(&sFunctionTimer, this);
 
     // Initialize CHIP server
@@ -145,8 +138,6 @@ CHIP_ERROR AppTask::Init()
 #if CONFIG_CHIP_OTA_REQUESTOR
     InitBasicOTARequestor();
 #endif
-    // We only have network commissioning on endpoint 0.
-    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
 
@@ -158,7 +149,11 @@ CHIP_ERROR AppTask::Init()
     if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("PlatformMgr().StartEventLoopTask() failed");
+        return err;
     }
+
+    WindowCovering::Instance().PositionLEDUpdate(WindowCovering::MoveType::LIFT);
+    WindowCovering::Instance().PositionLEDUpdate(WindowCovering::MoveType::TILT);
 
     return err;
 }
@@ -198,9 +193,25 @@ void AppTask::ButtonEventHandler(uint32_t aButtonState, uint32_t aHasChanged)
         event.Handler            = StartBLEAdvertisementHandler;
         PostEvent(&event);
     }
+
+    if (OPEN_BUTTON_MASK & aHasChanged)
+    {
+        event.ButtonEvent.PinNo  = OPEN_BUTTON;
+        event.ButtonEvent.Action = (OPEN_BUTTON_MASK & aButtonState) ? BUTTON_PUSH_EVENT : BUTTON_RELEASE_EVENT;
+        event.Handler            = OpenHandler;
+        PostEvent(&event);
+    }
+
+    if (CLOSE_BUTTON_MASK & aHasChanged)
+    {
+        event.ButtonEvent.PinNo  = CLOSE_BUTTON;
+        event.ButtonEvent.Action = (CLOSE_BUTTON_MASK & aButtonState) ? BUTTON_PUSH_EVENT : BUTTON_RELEASE_EVENT;
+        event.Handler            = CloseHandler;
+        PostEvent(&event);
+    }
 }
 
-void AppTask::TimerEventHandler(k_timer * aTimer)
+void AppTask::FunctionTimerTimeoutCallback(k_timer * aTimer)
 {
     if (!aTimer)
         return;
@@ -305,6 +316,85 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent *)
     }
 }
 
+void AppTask::OpenHandler(AppEvent * aEvent)
+{
+    if (!aEvent)
+        return;
+    if (aEvent->ButtonEvent.PinNo != OPEN_BUTTON || Instance().mMode != OperatingMode::Normal)
+        return;
+
+    if (aEvent->ButtonEvent.Action == BUTTON_PUSH_EVENT)
+    {
+        Instance().mOpenButtonIsPressed = true;
+        if (Instance().mCloseButtonIsPressed)
+        {
+            Instance().ToggleMoveType();
+        }
+    }
+    else if (aEvent->ButtonEvent.Action == BUTTON_RELEASE_EVENT)
+    {
+        if (!Instance().mCloseButtonIsPressed)
+        {
+            if (!Instance().mMoveTypeRecentlyChanged)
+            {
+                WindowCovering::Instance().SetSingleStepTarget(OperationalState::MovingUpOrOpen);
+            }
+            else
+            {
+                Instance().mMoveTypeRecentlyChanged = false;
+            }
+        }
+        Instance().mOpenButtonIsPressed = false;
+    }
+}
+
+void AppTask::CloseHandler(AppEvent * aEvent)
+{
+    if (!aEvent)
+        return;
+    if (aEvent->ButtonEvent.PinNo != CLOSE_BUTTON || Instance().mMode != OperatingMode::Normal)
+        return;
+
+    if (aEvent->ButtonEvent.Action == BUTTON_PUSH_EVENT)
+    {
+        Instance().mCloseButtonIsPressed = true;
+        if (Instance().mOpenButtonIsPressed)
+        {
+            Instance().ToggleMoveType();
+        }
+    }
+    else if (aEvent->ButtonEvent.Action == BUTTON_RELEASE_EVENT)
+    {
+        if (!Instance().mOpenButtonIsPressed)
+        {
+            if (!Instance().mMoveTypeRecentlyChanged)
+            {
+                WindowCovering::Instance().SetSingleStepTarget(OperationalState::MovingDownOrClose);
+            }
+            else
+            {
+                Instance().mMoveTypeRecentlyChanged = false;
+            }
+        }
+        Instance().mCloseButtonIsPressed = false;
+    }
+}
+
+void AppTask::ToggleMoveType()
+{
+    if (WindowCovering::Instance().GetMoveType() == WindowCovering::MoveType::LIFT)
+    {
+        WindowCovering::Instance().SetMoveType(WindowCovering::MoveType::TILT);
+        LOG_INF("Window covering move: tilt");
+    }
+    else
+    {
+        WindowCovering::Instance().SetMoveType(WindowCovering::MoveType::LIFT);
+        LOG_INF("Window covering move: lift");
+    }
+    mMoveTypeRecentlyChanged = true;
+}
+
 void AppTask::UpdateLedStateEventHandler(AppEvent * aEvent)
 {
     if (!aEvent)
@@ -350,13 +440,30 @@ void AppTask::UpdateStatusLED()
 #endif
 }
 
-void AppTask::ChipEventHandler(const ChipDeviceEvent * aEvent, intptr_t /* aArg */)
+void AppTask::ChipEventHandler(const ChipDeviceEvent * aEvent, intptr_t)
 {
     if (!aEvent)
         return;
     switch (aEvent->Type)
     {
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+        if (aEvent->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
+        {
+            if (NFCMgr().IsTagEmulationStarted())
+            {
+                LOG_INF("NFC Tag emulation is already started");
+            }
+            else
+            {
+                ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+            }
+        }
+        else if (aEvent->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
+        {
+            NFCMgr().StopTagEmulation();
+        }
+#endif
         Instance().mHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
         UpdateStatusLED();
         break;

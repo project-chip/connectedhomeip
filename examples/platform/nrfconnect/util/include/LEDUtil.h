@@ -19,7 +19,7 @@
 
 #include <array>
 
-// A lightweight wrrapper for unused LEDs
+// A lightweight wrapper for unused LEDs
 template <uint8_t size>
 class UnusedLedsWrapper
 {

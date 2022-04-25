@@ -1,6 +1,5 @@
 /*
- *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,12 +17,10 @@
 
 #pragma once
 
-#include "AppEvent.h"
-
 #include <cstdint>
 #include <drivers/gpio.h>
 
-class LightingManager
+class PWMDevice
 {
 public:
     enum Action_t : uint8_t
@@ -41,16 +38,18 @@ public:
         kState_Off,
     };
 
-    using LightingCallback_fn = void (*)(Action_t, int32_t);
+    using PWMCallback = void (*)(Action_t, int32_t);
 
-    int Init(const device * pwmDevice, uint32_t pwmChannel, uint8_t minLevel, uint8_t maxLevel);
+    int Init(const device * aPWMDevice, uint32_t aPWMChannel, uint8_t aMinLevel, uint8_t aMaxLevel);
     bool IsTurnedOn() const { return mState == kState_On; }
     uint8_t GetLevel() const { return mLevel; }
-    bool InitiateAction(Action_t aAction, int32_t aActor, uint16_t size, uint8_t * value);
-    void SetCallbacks(LightingCallback_fn aActionInitiated_CB, LightingCallback_fn aActionCompleted_CB);
+    uint8_t GetMinLevel() const { return mMinLevel; }
+    uint8_t GetMaxLevel() const { return mMaxLevel; }
+    bool InitiateAction(Action_t aAction, int32_t aActor, uint8_t * aValue);
+    void SetCallbacks(PWMCallback aActionInitiatedClb, PWMCallback aActionCompletedClb);
+    const device * GetDevice() { return mPwmDevice; }
 
 private:
-    friend LightingManager & LightingMgr();
     State_t mState;
     uint8_t mMinLevel;
     uint8_t mMaxLevel;
@@ -58,17 +57,10 @@ private:
     const device * mPwmDevice;
     uint32_t mPwmChannel;
 
-    LightingCallback_fn mActionInitiated_CB;
-    LightingCallback_fn mActionCompleted_CB;
+    PWMCallback mActionInitiatedClb;
+    PWMCallback mActionCompletedClb;
 
     void Set(bool aOn);
     void SetLevel(uint8_t aLevel);
     void UpdateLight();
-
-    static LightingManager sLight;
 };
-
-inline LightingManager & LightingMgr(void)
-{
-    return LightingManager::sLight;
-}
