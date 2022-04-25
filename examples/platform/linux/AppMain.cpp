@@ -234,7 +234,7 @@ int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
 
     err = err = chip::examples::InitConfigurationManager(reinterpret_cast<ConfigurationManagerImpl &>(ConfigurationMgr()),
-                                                          LinuxDeviceOptions::GetInstance());
+                                                         LinuxDeviceOptions::GetInstance());
     SuccessOrExit(err);
 
     err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);

@@ -38,9 +38,9 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include "CommissionableInit.h"
 #include "Device.h"
 #include "Options.h"
-#include "CommissionableInit.h"
 #include <app/server/Server.h>
 
 #include <cassert>
@@ -688,7 +688,7 @@ int main(int argc, char * argv[])
 
 #if CHIP_DEVICE_ENABLE_PORT_PARAMS
     // use a different service port to make testing possible with other sample devices running on same host
-    initParams.operationalServicePort        = LinuxDeviceOptions::GetInstance().securedDevicePort;
+    initParams.operationalServicePort = LinuxDeviceOptions::GetInstance().securedDevicePort;
 #endif
 
     initParams.interfaceId = LinuxDeviceOptions::GetInstance().interfaceId;
