@@ -103,7 +103,7 @@ uint16_t emberAfEndpointCount(void)
 
 uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint)
 {
-    static_assert(ArraySize(endpoints) < UINT16_MAX);
+    static_assert(ArraySize(endpoints) < UINT16_MAX, "Need to be able to return endpoint index as a 16-bit value.");
 
     for (size_t i = 0; i < ArraySize(endpoints); i++)
     {
