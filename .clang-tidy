@@ -23,7 +23,6 @@ Checks: >
   -bugprone-signed-char-misuse,
   -bugprone-copy-constructor-init,
   -clang-analyzer-core.CallAndMessage,
-  -clang-analyzer-core.UndefinedBinaryOperatorResult,
   -clang-analyzer-core.NullDereference,
   -clang-analyzer-optin.cplusplus.UninitializedObject,
   -clang-analyzer-optin.performance,

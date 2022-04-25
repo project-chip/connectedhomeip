@@ -313,7 +313,7 @@ private:
         case AttributeInstruction::kAttributeA: {
             ChipLogProgress(DataManagement, "\t\t -- Validating A");
 
-            Clusters::TestCluster::Attributes::Int16u::TypeInfo::DecodableType v;
+            Clusters::TestCluster::Attributes::Int16u::TypeInfo::DecodableType v = 0;
             err = cache->Get<Clusters::TestCluster::Attributes::Int16u::TypeInfo>(path, v);
             if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
             {

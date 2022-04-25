@@ -515,6 +515,11 @@ void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size)
 // default value of NULL is treated as all zeroes.
 int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t len, bool signedNumber)
 {
+    if (len == 0)
+    {
+        // no length means nothing to compare.  Shouldn't even happen, since len is sizeof(some-integer-type).
+        return 0;
+    }
     uint8_t i, j, k;
     if (signedNumber)
     { // signed number comparison
