@@ -776,9 +776,14 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @def CHIP_IM_MAX_NUM_READ_HANDLER
  *
  * @brief Defines the maximum number of ReadHandler, limits the number of active read transactions on server.
+ *
+ * The default value comes from 3sub per fabric * max number of fabrics, then reserve 1 read client for each fabric.
+ *
+ * TODO: (#17085) Should be changed to (CHIP_CONFIG_MAX_FABRICS * 4) after we can hold more read handlers on more concise
+ * devices.
  */
 #ifndef CHIP_IM_MAX_NUM_READ_HANDLER
-#define CHIP_IM_MAX_NUM_READ_HANDLER 4
+#define CHIP_IM_MAX_NUM_READ_HANDLER (CHIP_CONFIG_MAX_FABRICS * 3)
 #endif
 
 /**
@@ -794,9 +799,14 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @def CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
  *
  * @brief Defines the maximum number of path objects, limits the number of attributes being read or subscribed at the same time.
+ *
+ * The default value comes from 3path per subsctipion * 3sub per fabric * max number of fabrics, then reserve 1 read client with 9
+ * paths for each fabric.
  */
 #ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
-#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS 8
+// #define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS (CHIP_CONFIG_MAX_FABRICS * 18)
+// TODO: (#17085) Should be 3 sub * 3 path + 9 path (for read) = 18
+#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS (CHIP_CONFIG_MAX_FABRICS * 13)
 #endif
 
 /**

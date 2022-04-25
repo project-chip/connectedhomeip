@@ -26,6 +26,7 @@
 #include <string>
 
 using namespace ::chip;
+using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
 namespace DeviceLayer {
@@ -42,10 +43,11 @@ uint8_t NumAP; // no of network scanned
 CHIP_ERROR P6WiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     CHIP_ERROR err;
-    size_t ssidLen        = 0;
-    size_t credentialsLen = 0;
-    mpScanCallback        = nullptr;
-    mpConnectCallback     = nullptr;
+    size_t ssidLen         = 0;
+    size_t credentialsLen  = 0;
+    mpScanCallback         = nullptr;
+    mpConnectCallback      = nullptr;
+    mpStatusChangeCallback = networkStatusChangeCallback;
 
     err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiCredentialsKeyName, mSavedNetwork.credentials,
                                                    sizeof(mSavedNetwork.credentials), &credentialsLen);
@@ -63,11 +65,13 @@ CHIP_ERROR P6WiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     mSavedNetwork.credentialsLen = credentialsLen;
     mSavedNetwork.ssidLen        = ssidLen;
     mStagingNetwork              = mSavedNetwork;
+
     return err;
 }
 
 CHIP_ERROR P6WiFiDriver::Shutdown()
 {
+    mpStatusChangeCallback = nullptr;
     return CHIP_NO_ERROR;
 }
 
@@ -340,6 +344,42 @@ CHIP_ERROR GetConnectedNetwork(Network & network)
     network.networkIDLen = length;
 
     return CHIP_NO_ERROR;
+}
+
+void P6WiFiDriver::OnNetworkStatusChange()
+{
+    Network configuredNetwork;
+    bool staEnabled = false, staConnected = false;
+    VerifyOrReturn(P6Utils::IsStationEnabled(staEnabled) == CHIP_NO_ERROR);
+    VerifyOrReturn(staEnabled && mpStatusChangeCallback != nullptr);
+    CHIP_ERROR err = GetConnectedNetwork(configuredNetwork);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to get configured network when updating network status: %s", err.AsString());
+        return;
+    }
+    VerifyOrReturn(P6Utils::IsStationConnected(staConnected) == CHIP_NO_ERROR);
+    if (staConnected)
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(
+            Status::kSuccess, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)),
+            MakeOptional(GetLastDisconnectReason()));
+        return;
+    }
+    mpStatusChangeCallback->OnNetworkingStatusChange(
+        Status::kUnknownError, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)),
+        MakeOptional(GetLastDisconnectReason()));
+}
+
+CHIP_ERROR P6WiFiDriver::SetLastDisconnectReason(int32_t reason)
+{
+    mLastDisconnectedReason = reason;
+    return CHIP_NO_ERROR;
+}
+
+int32_t P6WiFiDriver::GetLastDisconnectReason()
+{
+    return mLastDisconnectedReason;
 }
 
 size_t P6WiFiDriver::WiFiNetworkIterator::Count()

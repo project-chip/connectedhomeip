@@ -85,7 +85,7 @@ typedef void (*OnDeviceConnectionFailure)(void * context, PeerId peerId, CHIP_ER
  *    - Expose to consumers the secure session for talking to the device.
  */
 class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy,
-                                          SessionReleaseDelegate,
+                                          public SessionReleaseDelegate,
                                           public SessionEstablishmentDelegate,
                                           public AddressResolve::NodeListener
 {
@@ -140,6 +140,10 @@ public:
 
     bool IsConnecting() const { return mState == State::Connecting; }
 
+    //////////// SessionEstablishmentDelegate Implementation ///////////////
+    void OnSessionEstablished(const SessionHandle & session) override;
+    void OnSessionEstablishmentError(CHIP_ERROR error) override;
+
     /**
      *   Called when a connection is closing.
      *   The object releases all resources associated with the connection.
@@ -150,7 +154,7 @@ public:
     {
         mDeviceAddress = ToPeerAddress(nodeResolutionData);
 
-        mMRPConfig = nodeResolutionData.GetMRPConfig();
+        mRemoteMRPConfig = nodeResolutionData.GetMRPConfig();
 
         if (mState == State::NeedsAddress)
         {
@@ -177,15 +181,11 @@ public:
 
     bool MatchesSession(const SessionHandle & session) const { return mSecureSession.Contains(session); }
 
-    uint8_t GetNextSequenceNumber() override { return mSequenceNumber++; };
-
     CHIP_ERROR ShutdownSubscriptions() override;
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mInitParams.exchangeMgr; }
 
     chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.ToOptional(); }
-
-    bool GetAddress(Inet::IPAddress & addr, uint16_t & port) const override;
 
     Transport::PeerAddress GetPeerAddress() const { return mDeviceAddress; }
 
@@ -241,6 +241,8 @@ private:
     FabricInfo * mFabricInfo;
     System::Layer * mSystemLayer;
 
+    // mCASEClient is only non-null if we are in State::Connecting or just
+    // allocated it as part of an attempt to enter State::Connecting.
     CASEClient * mCASEClient = nullptr;
 
     PeerId mPeerId;
@@ -252,8 +254,6 @@ private:
     State mState = State::Uninitialized;
 
     SessionHolderWithDelegate mSecureSession;
-
-    uint8_t mSequenceNumber = 0;
 
     Callback::CallbackDeque mConnectionSuccess;
     Callback::CallbackDeque mConnectionFailure;
@@ -274,12 +274,7 @@ private:
 
     bool IsSecureConnected() const override { return mState == State::SecureConnected; }
 
-    static void HandleCASEConnected(void * context, CASEClient * client);
-    static void HandleCASEConnectionFailure(void * context, CASEClient * client, CHIP_ERROR error);
-
-    static void CloseCASESessionTask(System::Layer * layer, void * context);
-
-    void CloseCASESession();
+    void CleanupCASEClient();
 
     void EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
                                     Callback::Callback<OnDeviceConnectionFailure> * onFailure);

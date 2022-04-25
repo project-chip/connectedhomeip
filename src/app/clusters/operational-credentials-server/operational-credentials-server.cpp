@@ -51,6 +51,9 @@
 #include <platform/DeviceControlServer.h>
 #include <string.h>
 #include <trace/trace.h>
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
@@ -382,7 +385,7 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Fabric index 0x%x was retrieved from storage. FabricId 0x" ChipLogFormatX64
-                       ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
+                       ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04X",
                        static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         fabricListChanged();
@@ -393,7 +396,7 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Fabric  index 0x%x was persisted to storage. FabricId " ChipLogFormatX64
-                       ", NodeId " ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
+                       ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",
                        static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         fabricListChanged();
@@ -918,7 +921,11 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
     // Prepare NOCSRElements structure
     {
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+        Crypto::P256KeypairHSM keypair;
+#else
         Crypto::P256Keypair keypair;
+#endif
         size_t csrLength           = Crypto::kMAX_CSR_Length;
         size_t nocsrLengthEstimate = 0;
         ByteSpan kNoVendorReserved;
@@ -929,7 +936,11 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
             gFabricBeingCommissioned.GetOperationalKey()->Clear();
         }
 
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+        keypair.CreateOperationalKey(gFabricBeingCommissioned.GetFabricIndex());
+#else
         keypair.Initialize();
+#endif
         SuccessOrExit(err = gFabricBeingCommissioned.SetOperationalKeypair(&keypair));
 
         // Generate the actual CSR from the ephemeral key

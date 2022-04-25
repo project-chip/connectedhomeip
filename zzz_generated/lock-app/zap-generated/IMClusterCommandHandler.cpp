@@ -163,6 +163,15 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
+        case Commands::UnlockWithTimeout::Id: {
+            Commands::UnlockWithTimeout::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfDoorLockClusterUnlockWithTimeoutCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         case Commands::SetWeekDaySchedule::Id: {
             Commands::SetWeekDaySchedule::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);

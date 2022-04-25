@@ -61,9 +61,9 @@ static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 class TestContext : public chip::Test::AppContext
 {
 public:
-    static int InitializeAsync(void * context)
+    static int Initialize(void * context)
     {
-        if (AppContext::InitializeAsync(context) != SUCCESS)
+        if (AppContext::Initialize(context) != SUCCESS)
             return FAILURE;
 
         auto * ctx = static_cast<TestContext *>(context);
@@ -119,7 +119,7 @@ void PrintEventLog()
     chip::app::EventManagement::GetInstance().GetEventReader(reader, chip::app::PriorityLevel::Debug, &bufWrapper);
 
     chip::TLV::Utilities::Count(reader, elementCount, false);
-    printf("Found %zu elements\n", elementCount);
+    printf("Found %u elements\n", static_cast<unsigned int>(elementCount));
     chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
 }
 
@@ -137,7 +137,8 @@ static void CheckLogState(nlTestSuite * apSuite, chip::app::EventManagement & aL
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, elementCount == expectedNumEvents);
-    printf("elementCount vs expectedNumEvents : %zu vs %zu \n", elementCount, expectedNumEvents);
+    printf("elementCount vs expectedNumEvents : %u vs %u \n", static_cast<unsigned int>(elementCount),
+           static_cast<unsigned int>(expectedNumEvents));
 }
 
 static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & alogMgmt, chip::EventNumber startingEventNumber,
@@ -158,8 +159,8 @@ static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & 
     err = chip::TLV::Utilities::Count(reader, totalNumElements, false);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    printf("totalNumElements vs expectedNumEvents vs eventCount : %zu vs %zu vs %zu \n", totalNumElements, expectedNumEvents,
-           eventCount);
+    printf("totalNumElements vs expectedNumEvents vs eventCount : %u vs %u vs %u \n", static_cast<unsigned int>(totalNumElements),
+           static_cast<unsigned int>(expectedNumEvents), static_cast<unsigned int>(eventCount));
     NL_TEST_ASSERT(apSuite, totalNumElements == expectedNumEvents && totalNumElements == eventCount);
     reader.Init(backingStore, writer.GetLengthWritten());
     chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
@@ -301,7 +302,7 @@ nlTestSuite sSuite =
 {
     "EventLogging",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 // clang-format on

@@ -40,6 +40,7 @@ pw_python_package("build_examples") {
     "builders/esp32.py",
     "builders/gn.py",
     "builders/host.py",
+    "builders/imx.py",
     "builders/infineon.py",
     "builders/k32w.py",
     "builders/mbed.py",

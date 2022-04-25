@@ -37,7 +37,6 @@
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/CASESession.h>
 #include <stdarg.h>
-#include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include "credentials/tests/CHIPCert_test_vectors.h"
 
@@ -51,7 +50,7 @@ using namespace chip::Transport;
 using namespace chip::Messaging;
 using namespace chip::Protocols;
 
-using TestContext = Test::LoopbackMessagingContext<>;
+using TestContext = Test::LoopbackMessagingContext;
 
 namespace {
 TestContext sContext;
@@ -75,7 +74,15 @@ class TestCASESecurePairingDelegate : public SessionEstablishmentDelegate
 public:
     void OnSessionEstablishmentError(CHIP_ERROR error) override { mNumPairingErrors++; }
 
-    void OnSessionEstablished() override { mNumPairingComplete++; }
+    void OnSessionEstablished(const SessionHandle & session) override
+    {
+        mSession.Grab(session);
+        mNumPairingComplete++;
+    }
+
+    SessionHolder & GetSessionHolder() { return mSession; }
+
+    SessionHolder mSession;
 
     // TODO: Rename mNumPairing* to mNumEstablishment*
     uint32_t mNumPairingErrors   = 0;
@@ -182,9 +189,6 @@ void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
     SessionManager sessionManager;
 
     NL_TEST_ASSERT(inSuite, pairing.GetSecureSessionType() == SecureSession::Type::kCASE);
-    CATValues peerCATs;
-    peerCATs = pairing.GetPeerCATs();
-    NL_TEST_ASSERT(inSuite, memcmp(&peerCATs, &kUndefinedCATs, sizeof(CATValues)) == 0);
 
     pairing.SetGroupDataProvider(&gDeviceGroupDataProvider);
     NL_TEST_ASSERT(inSuite,
@@ -210,18 +214,15 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * context = ctx.NewUnauthenticatedExchangeToBob(&pairing);
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.EstablishSession(sessionManager, Transport::PeerAddress(Transport::Type::kBle), nullptr, Node01_01,
-                                            nullptr, nullptr, nullptr) != CHIP_NO_ERROR);
+                   pairing.EstablishSession(sessionManager, nullptr, Node01_01, nullptr, nullptr, nullptr) != CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.EstablishSession(sessionManager, Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01,
-                                            nullptr, nullptr, nullptr) != CHIP_NO_ERROR);
+                   pairing.EstablishSession(sessionManager, fabric, Node01_01, nullptr, nullptr, nullptr) != CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.EstablishSession(sessionManager, Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01,
-                                            context, nullptr, &delegate) == CHIP_NO_ERROR);
+                   pairing.EstablishSession(sessionManager, fabric, Node01_01, context, nullptr, &delegate) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
@@ -241,8 +242,8 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * context1  = ctx.NewUnauthenticatedExchangeToBob(&pairing1);
 
     NL_TEST_ASSERT(inSuite,
-                   pairing1.EstablishSession(sessionManager, Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01,
-                                             context1, nullptr, &delegate) == CHIP_ERROR_BAD_REQUEST);
+                   pairing1.EstablishSession(sessionManager, fabric, Node01_01, context1, nullptr, &delegate) ==
+                       CHIP_ERROR_BAD_REQUEST);
     ctx.DrainAndServiceIO();
 
     gLoopback.mMessageSendError = CHIP_NO_ERROR;
@@ -274,8 +275,7 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
                    pairingAccessory.ListenForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, &delegateAccessory) ==
                        CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.EstablishSession(sessionManager, Transport::PeerAddress(Transport::Type::kBle), fabric,
-                                                        Node01_01, contextCommissioner, nullptr,
+                   pairingCommissioner.EstablishSession(sessionManager, fabric, Node01_01, contextCommissioner, nullptr,
                                                         &delegateCommissioner) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
@@ -310,11 +310,8 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     // Use the same session manager on both CASE client and server sides to validate that both
     // components may work simultaneously on a single device.
     NL_TEST_ASSERT(inSuite,
-                   gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &ctx.GetTransportMgr(),
-#if CONFIG_NETWORK_LAYER_BLE
-                                                                nullptr,
-#endif
-                                                                &ctx.GetSecureSessionManager(), &gDeviceFabrics, nullptr,
+                   gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &ctx.GetSecureSessionManager(),
+                                                                &gDeviceFabrics, nullptr,
                                                                 &gDeviceGroupDataProvider) == CHIP_NO_ERROR);
 
     ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(pairingCommissioner);
@@ -323,29 +320,25 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, fabric != nullptr);
 
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner->EstablishSession(ctx.GetSecureSessionManager(),
-                                                         Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01,
-                                                         contextCommissioner, nullptr, &delegateCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner->EstablishSession(ctx.GetSecureSessionManager(), fabric, Node01_01, contextCommissioner,
+                                                         nullptr, &delegateCommissioner) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 5);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 
-    // Validate that secure session can be created after the pairing
-    SessionHolder sessionHolder;
-    NL_TEST_ASSERT(inSuite,
-                   ctx.GetSecureSessionManager().NewPairing(sessionHolder, NullOptional, Node01_01, pairingCommissioner,
-                                                            CryptoContext::SessionRole::kInitiator,
-                                                            gCommissionerFabricIndex) == CHIP_NO_ERROR);
+    // Validate that secure session is created
+    SessionHolder & holder = delegateCommissioner.GetSessionHolder();
+    NL_TEST_ASSERT(inSuite, bool(holder));
+    NL_TEST_ASSERT(inSuite, holder->GetPeer() == fabric->GetScopedNodeIdForNode(Node01_01));
 
     auto * pairingCommissioner1 = chip::Platform::New<CASESession>();
     pairingCommissioner1->SetGroupDataProvider(&gCommissionerGroupDataProvider);
     ExchangeContext * contextCommissioner1 = ctx.NewUnauthenticatedExchangeToBob(pairingCommissioner1);
 
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner1->EstablishSession(ctx.GetSecureSessionManager(),
-                                                          Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01,
-                                                          contextCommissioner1, nullptr, &delegateCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner1->EstablishSession(ctx.GetSecureSessionManager(), fabric, Node01_01, contextCommissioner1,
+                                                          nullptr, &delegateCommissioner) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     chip::Platform::Delete(pairingCommissioner);
@@ -660,7 +653,6 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
 
     ctx.ConfigInitializeNodes(false);
     ReturnErrorOnFailure(ctx.Init());
-    ctx.EnableAsyncDispatch();
 
     gCommissionerFabrics.Init(&gCommissionerStorageDelegate);
     gDeviceFabrics.Init(&gDeviceStorageDelegate);

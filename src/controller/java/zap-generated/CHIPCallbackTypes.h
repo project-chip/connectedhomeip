@@ -479,6 +479,8 @@ typedef void (*CHIPDoorLockClusterNumberOfWeekDaySchedulesSupportedPerUserAttrib
     void *, chip::app::Clusters::DoorLock::Attributes::NumberOfWeekDaySchedulesSupportedPerUser::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterNumberOfYearDaySchedulesSupportedPerUserAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::NumberOfYearDaySchedulesSupportedPerUser::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterNumberOfHolidaySchedulesSupportedAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::NumberOfHolidaySchedulesSupported::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterMaxPINCodeLengthAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::MaxPINCodeLength::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterMinPINCodeLengthAttributeCallbackType)(
@@ -503,6 +505,10 @@ typedef void (*CHIPDoorLockClusterEnablePrivacyModeButtonAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::EnablePrivacyModeButton::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterWrongCodeEntryLimitAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::WrongCodeEntryLimit::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterUserCodeTemporaryDisableTimeAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::UserCodeTemporaryDisableTime::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterRequirePINforRemoteOperationAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::RequirePINforRemoteOperation::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterGeneratedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPDoorLockClusterAcceptedCommandListAttributeCallbackType)(

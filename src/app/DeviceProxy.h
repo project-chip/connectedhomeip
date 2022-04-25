@@ -47,8 +47,6 @@ public:
 
     virtual NodeId GetDeviceId() const = 0;
 
-    virtual bool GetAddress(Inet::IPAddress & addr, uint16_t & port) const { return false; }
-
     virtual CHIP_ERROR ShutdownSubscriptions() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     virtual CHIP_ERROR SendCommands(app::CommandSender * commandObj, chip::Optional<System::Clock::Timeout> timeout = NullOptional);
@@ -57,18 +55,14 @@ public:
 
     virtual chip::Optional<SessionHandle> GetSecureSession() const = 0;
 
-    virtual bool IsActive() const { return true; }
-
     virtual CHIP_ERROR SetPeerId(ByteSpan rcac, ByteSpan noc) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
-    const ReliableMessageProtocolConfig & GetMRPConfig() const { return mMRPConfig; }
+    const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteMRPConfig; }
 
 protected:
     virtual bool IsSecureConnected() const = 0;
 
-    virtual uint8_t GetNextSequenceNumber() = 0;
-
-    ReliableMessageProtocolConfig mMRPConfig = GetLocalMRPConfig();
+    ReliableMessageProtocolConfig mRemoteMRPConfig = GetLocalMRPConfig();
 };
 
 } // namespace chip

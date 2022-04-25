@@ -33,7 +33,6 @@
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
 #include <transport/SessionManager.h>
-#include <transport/TransportMgr.h>
 
 namespace chip {
 namespace Messaging {
@@ -240,8 +239,7 @@ private:
     CHIP_ERROR UnregisterUMH(Protocols::Id protocolId, int16_t msgType);
 
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, const SessionHandle & session,
-                           const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
-                           System::PacketBufferHandle && msgBuf) override;
+                           DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf) override;
 };
 
 } // namespace Messaging

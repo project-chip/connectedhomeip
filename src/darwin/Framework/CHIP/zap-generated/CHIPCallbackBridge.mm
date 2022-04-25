@@ -10422,6 +10422,54 @@ void CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBri
     }
 }
 
+void CHIPWindowCoveringConfigStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPWindowCoveringModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPWindowCoveringModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPWindowCoveringModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPWindowCoveringGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -16408,17 +16456,17 @@ void CHIPNullableThermostatClusterThermostatSystemModeAttributeCallbackSubscript
     }
 }
 
-void CHIPFanControlClusterFanModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FanControl::FanMode value)
+void CHIPFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::FanControl::FanModeSequenceType value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPFanControlClusterFanModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPFanControlClusterFanModeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -16432,8 +16480,8 @@ void CHIPFanControlClusterFanModeAttributeCallbackSubscriptionBridge::OnSubscrip
     }
 }
 
-void CHIPNullableFanControlClusterFanModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanMode> & value)
+void CHIPNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeSequenceType> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16444,9 +16492,9 @@ void CHIPNullableFanControlClusterFanModeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableFanControlClusterFanModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPNullableFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPNullableFanControlClusterFanModeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPNullableFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -16460,17 +16508,17 @@ void CHIPNullableFanControlClusterFanModeAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void CHIPFanControlClusterFanModeSequenceAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FanControl::FanModeSequence value)
+void CHIPFanControlClusterFanModeTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::FanControl::FanModeType value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPFanControlClusterFanModeSequenceAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPFanControlClusterFanModeSequenceAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -16484,8 +16532,8 @@ void CHIPFanControlClusterFanModeSequenceAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void CHIPNullableFanControlClusterFanModeSequenceAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeSequence> & value)
+void CHIPNullableFanControlClusterFanModeTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeType> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16496,9 +16544,9 @@ void CHIPNullableFanControlClusterFanModeSequenceAttributeCallbackBridge::OnSucc
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableFanControlClusterFanModeSequenceAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPNullableFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPNullableFanControlClusterFanModeSequenceAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPNullableFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }

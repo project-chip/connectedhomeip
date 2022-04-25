@@ -904,6 +904,9 @@ public final class ChipIdLookup {
       if (attributeId == 21L) {
         return "NumberOfYearDaySchedulesSupportedPerUser";
       }
+      if (attributeId == 22L) {
+        return "NumberOfHolidaySchedulesSupported";
+      }
       if (attributeId == 23L) {
         return "MaxPINCodeLength";
       }
@@ -939,6 +942,12 @@ public final class ChipIdLookup {
       }
       if (attributeId == 48L) {
         return "WrongCodeEntryLimit";
+      }
+      if (attributeId == 49L) {
+        return "UserCodeTemporaryDisableTime";
+      }
+      if (attributeId == 51L) {
+        return "RequirePINforRemoteOperation";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";

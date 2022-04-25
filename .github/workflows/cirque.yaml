@@ -38,7 +38,7 @@ jobs:
         # need to run with privilege, which isn't supported by job.XXX.contaner
         #  https://github.com/actions/container-action/issues/2
         #         container:
-        #             image: connectedhomeip/chip-build-cirque:0.5.58
+        #             image: connectedhomeip/chip-build-cirque:0.5.64
         #             volumes:
         #                 - "/tmp:/tmp"
         #                 - "/dev/pts:/dev/pts"
@@ -109,6 +109,7 @@ jobs:
                     -- ./gn_build.sh \
                     chip_build_tests=false \
                     chip_enable_wifi=false \
+                    chip_im_force_fabric_quota_check=true \
                     enable_host_gcc_build=true \
                     enable_host_gcc_mbedtls_build=false \
                     enable_host_clang_build=false \

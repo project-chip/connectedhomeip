@@ -63,7 +63,7 @@ void TestInteractionModelEngine::TestAttributePathParamsPushRelease(nlTestSuite 
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
-    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager());
+    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ObjectList<AttributePathParams> * attributePathParamsList = nullptr;
     AttributePathParams attributePathParams1;
@@ -113,7 +113,7 @@ nlTestSuite sSuite =
 {
     "TestInteractionModelEngine",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 // clang-format on

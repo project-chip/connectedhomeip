@@ -29,23 +29,14 @@ using namespace ::chip::Credentials;
 
 namespace chip {
 
-CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-#if CONFIG_NETWORK_LAYER_BLE
-                                                     Ble::BleLayer * bleLayer,
-#endif
-                                                     SessionManager * sessionManager, FabricTable * fabrics,
-                                                     SessionResumptionStorage * sessionResumptionStorage,
+CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, SessionManager * sessionManager,
+                                                     FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage,
                                                      Credentials::GroupDataProvider * responderGroupDataProvider)
 {
-    VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(responderGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-#if CONFIG_NETWORK_LAYER_BLE
-    mBleLayer = bleLayer;
-#endif
     mSessionManager           = sessionManager;
     mSessionResumptionStorage = sessionResumptionStorage;
     mFabrics                  = fabrics;
@@ -59,15 +50,6 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
 CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
 {
     ReturnErrorCodeIf(ec == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-#if CONFIG_NETWORK_LAYER_BLE
-    // Close all BLE connections now since a CASE handshake has been initiated.
-    if (mBleLayer != nullptr)
-    {
-        ChipLogProgress(Discovery, "CASE handshake initiated, closing all BLE Connections");
-        mBleLayer->CloseAllBleConnections();
-    }
-#endif
 
     // Setup CASE state machine using the credentials for the current fabric.
     GetSession().SetGroupDataProvider(mGroupDataProvider);
@@ -127,23 +109,10 @@ void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
     Cleanup();
 }
 
-void CASEServer::OnSessionEstablished()
+void CASEServer::OnSessionEstablished(const SessionHandle & session)
 {
-    ChipLogProgress(Inet, "CASE Session established. Setting up the secure channel.");
-    mSessionManager->ExpireAllPairings(GetSession().GetPeerNodeId(), GetSession().GetFabricIndex());
-
-    SessionHolder sessionHolder;
-    CHIP_ERROR err = mSessionManager->NewPairing(
-        sessionHolder, Optional<Transport::PeerAddress>::Value(GetSession().GetPeerAddress()), GetSession().GetPeerNodeId(),
-        &GetSession(), CryptoContext::SessionRole::kResponder, GetSession().GetFabricIndex());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Inet, "Failed in setting up secure channel: err %s", ErrorStr(err));
-        OnSessionEstablishmentError(err);
-        return;
-    }
-
-    ChipLogProgress(Inet, "CASE secure channel is available now.");
+    ChipLogProgress(Inet, "CASE Session established to peer: " ChipLogFormatScopedNodeId,
+                    ChipLogValueScopedNodeId(session->GetPeer()));
     Cleanup();
 }
 } // namespace chip

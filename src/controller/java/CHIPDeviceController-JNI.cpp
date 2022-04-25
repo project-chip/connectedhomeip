@@ -454,14 +454,6 @@ JNI_METHOD(void, disconnectDevice)(JNIEnv * env, jobject self, jlong handle, jlo
     wrapper->Controller()->ReleaseOperationalDevice(deviceId);
 }
 
-JNI_METHOD(jboolean, isActive)(JNIEnv * env, jobject self, jlong handle)
-{
-    chip::DeviceLayer::StackLock lock;
-
-    DeviceProxy * chipDevice = reinterpret_cast<DeviceProxy *>(handle);
-    return chipDevice->IsActive();
-}
-
 JNI_METHOD(void, shutdownSubscriptions)(JNIEnv * env, jobject self, jlong handle, jlong devicePtr)
 {
     chip::DeviceLayer::StackLock lock;
@@ -635,6 +627,17 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
     }
 
     return true;
+}
+
+JNI_METHOD(void, shutdownCommissioning)
+(JNIEnv * env, jobject self, jlong handle)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    err                                      = wrapper->Controller()->Shutdown();
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error invoking shutdownCommissioning: %s", ErrorStr(err)));
 }
 
 JNI_METHOD(jbyteArray, getAttestationChallenge)

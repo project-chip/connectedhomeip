@@ -54,6 +54,10 @@ qpg_executable("shell_app") {
     "${examples_plat_dir}:qpg-matter-shell",
   ]
 
+  #fixme Added lock-app dependency as linker errors get generated if no
+  #chip datamodel is given [import("${chip_root}/src/app/chip_data_model.gni")]
+  deps += [ "${chip_root}/examples/lock-app/lock-common" ]
+
   include_dirs = [ "include" ]
 
   defines = []

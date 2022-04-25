@@ -237,6 +237,8 @@ private:
     static char sWiFiIfName[IFNAMSIZ];
 #endif
 
+    static uint8_t sInterestedSSID[Internal::kMaxWiFiSSIDLength];
+    static uint8_t sInterestedSSIDLen;
     static NetworkCommissioning::WiFiDriver::ScanCallback * mpScanCallback;
     static NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
 };

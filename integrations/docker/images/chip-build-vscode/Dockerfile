@@ -12,6 +12,7 @@ FROM connectedhomeip/chip-build-ameba:${VERSION} AS ameba
 FROM connectedhomeip/chip-build-k32w:${VERSION} AS k32w
 FROM connectedhomeip/chip-build-imx:${VERSION} AS imx
 FROM connectedhomeip/chip-build-ti:${VERSION} AS ti
+FROM connectedhomeip/chip-build-zap:${VERSION} AS zap
 FROM connectedhomeip/chip-build:${VERSION}
 
 # qemu-src copied over because qemu directory contains symlinks to the src
@@ -45,6 +46,8 @@ COPY --from=k32w /opt/sdk/sdks /opt/sdk/sdks
 COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
 
 COPY --from=ti /opt/ti/sysconfig_1.11.0 /opt/ti/sysconfig_1.11.0
+
+COPY --from=zap /opt/zap /opt/zap
 
 # Android license file "acceping" is done by writing license hashes
 # into the 'licenses' subfolder. This allows any user (in particular

@@ -26,7 +26,10 @@
 
 const Start = {
   name : 'Start',
-  arguments : [ { 'name' : 'discriminator', type : 'INT16U' } ],
+  arguments : [
+    { 'name' : 'discriminator', type : 'INT16U', isOptional : true }, { 'name' : 'port', type : 'INT16U', isOptional : true },
+    { 'name' : 'kvs', type : 'CHAR_STRING', isOptional : true }
+  ],
   response : { arguments : [] }
 };
 
@@ -38,7 +41,10 @@ const Stop = {
 
 const Reboot = {
   name : 'Reboot',
-  arguments : [ { 'name' : 'discriminator', type : 'INT16U' } ],
+  arguments : [
+    { 'name' : 'discriminator', type : 'INT16U', isOptional : true }, { 'name' : 'port', type : 'INT16U', isOptional : true },
+    { 'name' : 'kvs', type : 'CHAR_STRING', isOptional : true }
+  ],
   response : { arguments : [] }
 };
 

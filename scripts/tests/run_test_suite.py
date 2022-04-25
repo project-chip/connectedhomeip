@@ -169,8 +169,8 @@ def cmd_list(context):
     '--all-clusters-app',
     help='what all clusters app to use')
 @click.option(
-    '--door-lock-app',
-    help='what door lock app to use')
+    '--lock-app',
+    help='what lock app to use')
 @click.option(
     '--tv-app',
     help='what tv app to use')
@@ -180,14 +180,14 @@ def cmd_list(context):
     default="src/app/tests/suites/certification/ci-pics-values",
     help='PICS file to use for test runs.')
 @click.pass_context
-def cmd_run(context, iterations, all_clusters_app, door_lock_app, tv_app, pics_file):
+def cmd_run(context, iterations, all_clusters_app, lock_app, tv_app, pics_file):
     runner = chiptest.runner.Runner()
 
     if all_clusters_app is None:
         all_clusters_app = FindBinaryPath('chip-all-clusters-app')
 
-    if door_lock_app is None:
-        door_lock_app = FindBinaryPath('chip-door-lock-app')
+    if lock_app is None:
+        lock_app = FindBinaryPath('chip-lock-app')
 
     if tv_app is None:
         tv_app = FindBinaryPath('chip-tv-app')
@@ -196,7 +196,7 @@ def cmd_run(context, iterations, all_clusters_app, door_lock_app, tv_app, pics_f
     paths = chiptest.ApplicationPaths(
         chip_tool=[context.obj.chip_tool],
         all_clusters_app=[all_clusters_app],
-        door_lock_app=[door_lock_app],
+        lock_app=[lock_app],
         tv_app=[tv_app]
     )
 

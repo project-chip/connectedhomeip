@@ -144,6 +144,6 @@ def PathsWithNetworkNamespaces(paths: ApplicationPaths) -> ApplicationPaths:
     return ApplicationPaths(
         chip_tool='ip netns exec tool'.split() + paths.chip_tool,
         all_clusters_app='ip netns exec app'.split() + paths.all_clusters_app,
-        door_lock_app='ip netns exec app'.split() + paths.door_lock_app,
+        lock_app='ip netns exec app'.split() + paths.lock_app,
         tv_app='ip netns exec app'.split() + paths.tv_app,
     )

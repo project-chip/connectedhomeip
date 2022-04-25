@@ -162,7 +162,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::LoadRootCertKeysFromKeyChain()
 
     chip::Crypto::P256SerializedKeypair serialized;
     if ([keypairData length] != serialized.Capacity()) {
-        NSLog(@"Keypair length %zu does not match expected length %zu", [keypairData length], serialized.Capacity());
+        NSLog(@"Keypair length %u does not match expected length %u", static_cast<unsigned int>([keypairData length]),
+            static_cast<unsigned int>(serialized.Capacity()));
         ClearSecretData(keypairData);
         return CHIP_ERROR_INTERNAL;
     }
@@ -199,7 +200,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::LoadIPKFromKeyChain()
 
     NSMutableData * ipkData = [[NSMutableData alloc] initWithBase64EncodedData:keyData options:0];
     if ([ipkData length] != mIPK.Length()) {
-        NSLog(@"IPK length %zu does not match expected length %zu", [ipkData length], mIPK.Length());
+        NSLog(@"IPK length %u does not match expected length %u", static_cast<unsigned int>([ipkData length]),
+            static_cast<unsigned int>(mIPK.Length()));
         ClearSecretData(ipkData);
         return CHIP_ERROR_INTERNAL;
     }
@@ -341,8 +343,11 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
         PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
             haveRootCert = (mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen) == CHIP_NO_ERROR));
         if (haveRootCert) {
+            uint64_t rcacId;
             rcac.reduce_size(rcacBufLen);
             ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(rcac, rcac_dn));
+            ReturnErrorOnFailure(rcac_dn.GetCertChipId(rcacId));
+            VerifyOrReturnError(rcacId == mIssuerId, CHIP_ERROR_INTERNAL);
         }
     }
     if (!haveRootCert) {

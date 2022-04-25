@@ -28,6 +28,7 @@
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <app/MessageDef/SubscribeRequestMessage.h>
 #include <app/MessageDef/SubscribeResponseMessage.h>
+#include <lib/core/CHIPTLVUtilities.hpp>
 #include <messaging/ExchangeContext.h>
 
 #include <app/ReadHandler.h>
@@ -40,12 +41,13 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
                          InteractionType aInteractionType) :
     mManagementCallback(apCallback)
 {
-    mpExchangeMgr           = apExchangeContext->GetExchangeMgr();
-    mpExchangeCtx           = apExchangeContext;
-    mInteractionType        = aInteractionType;
-    mInitiatorNodeId        = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId();
-    mSubjectDescriptor      = apExchangeContext->GetSessionHandle()->GetSubjectDescriptor();
-    mLastWrittenEventsBytes = 0;
+    mpExchangeMgr                = apExchangeContext->GetExchangeMgr();
+    mpExchangeCtx                = apExchangeContext;
+    mInteractionType             = aInteractionType;
+    mInitiatorNodeId             = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId();
+    mSubjectDescriptor           = apExchangeContext->GetSessionHandle()->GetSubjectDescriptor();
+    mLastWrittenEventsBytes      = 0;
+    mSubscriptionStartGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
     if (apExchangeContext != nullptr)
     {
         apExchangeContext->SetDelegate(this);
@@ -332,6 +334,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     ReturnErrorOnFailure(readRequestParser.CheckSchemaValidity());
 #endif
+
     err = readRequestParser.GetAttributeRequests(&attributePathListParser);
     if (err == CHIP_END_OF_TLV)
     {
@@ -373,6 +376,9 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     }
     ReturnErrorOnFailure(err);
 
+    // Ensure the read transaction doesn't exceed the resources dedicated to read transactions.
+    VerifyOrReturnError(InteractionModelEngine::GetInstance()->CanEstablishReadTransaction(this), CHIP_ERROR_NO_MEMORY);
+
     ReturnErrorOnFailure(readRequestParser.GetIsFabricFiltered(&mIsFabricFiltered));
     ReturnErrorOnFailure(readRequestParser.ExitContainer());
     MoveToState(HandlerState::GeneratingReports);
@@ -392,7 +398,6 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAtt
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
     aAttributePathListParser.GetReader(&reader);
-
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
         VerifyOrExit(TLV::AnonymousTag() == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
@@ -464,8 +469,8 @@ CHIP_ERROR ReadHandler::ProcessDataVersionFilterList(DataVersionFilterIBs::Parse
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
-    aDataVersionFilterListParser.GetReader(&reader);
 
+    aDataVersionFilterListParser.GetReader(&reader);
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
         VerifyOrReturnError(TLV::AnonymousTag() == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
@@ -496,7 +501,6 @@ CHIP_ERROR ReadHandler::ProcessEventPaths(EventPathIBs::Parser & aEventPathsPars
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
     aEventPathsParser.GetReader(&reader);
-
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
         VerifyOrReturnError(TLV::AnonymousTag() == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);

@@ -41,7 +41,6 @@ tests:
     # https://github.com/project-chip/connectedhomeip/pull/14755 is
     # fixed and the SDK has the right types.
     - label: "Reads SecurityType attribute from DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "SecurityType"
       response:
@@ -54,19 +53,14 @@ tests:
           constraints:
               type: enum
 
-    - label: "Reads WiFiVersion attribute from DUT"
-      disabled: true
-      command: "readAttribute"
-      attribute: "WiFiVersion"
-      response:
-          value: null
-
     - label: "Reads WiFiVersion attribute constraints"
       command: "readAttribute"
       attribute: "WiFiVersion"
       response:
           constraints:
               type: enum
+              minValue: 0
+              maxValue: 5
 
     - label: "Reads ChannelNumber attribute from DUT"
       disabled: true
