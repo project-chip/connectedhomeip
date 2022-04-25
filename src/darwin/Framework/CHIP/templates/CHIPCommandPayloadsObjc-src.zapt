@@ -6,22 +6,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{#zcl_clusters}}
 {{#zcl_commands}}
-{{#zcl_command_arguments}}
-{{#first}}
-@implementation CHIP{{asUpperCamelCase parent.parent.name}}Cluster{{asUpperCamelCase parent.name}}Params
+@implementation CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params
 - (instancetype)init
 {
   if (self = [super init]) {
-{{/first}}
+{{#zcl_command_arguments}}
+
     {{>init_struct_member label=label type=type cluster=parent.parent.name}}
-{{#last}}
+{{/zcl_command_arguments}}
+    _timedInvokeTimeoutMs = nil;
   }
   return self;
 }
 @end
-{{/last}}
-{{/zcl_command_arguments}}
-
 {{/zcl_commands}}
 {{/zcl_clusters}}
 

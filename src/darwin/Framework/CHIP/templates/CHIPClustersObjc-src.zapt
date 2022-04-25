@@ -29,10 +29,28 @@ using namespace chip::app::Clusters;
 
 {{#chip_cluster_commands}}
 {{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}{{else}}CommandSuccess{{/if}}{{/inline}}
-- (void){{asLowerCamelCase name}}With{{#if (hasArguments)}}Params:(CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler{{else}}CompletionHandler{{/if}}:({{>command_completion_type command=.}})completionHandler
+{{#unless (hasArguments)}}
+- (void){{asLowerCamelCase name}}WithCompletionHandler:({{>command_completion_type command=.}})completionHandler
 {
+  [self {{asLowerCamelCase name}}WithParams:nil completionHandler:completionHandler];
+}
+{{/unless}}
+- (void){{asLowerCamelCase name}}WithParams: (CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=.}})completionHandler
+{
+    chip::Optional<uint16_t> timedInvokeTimeoutMs;
     ListFreer listFreer;
     {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
+    // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
+    if (params!=nil) {
+      if (params.timedInvokeTimeoutMs!=nil) {
+        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+      }
+    }
+    {{#if mustUseTimedInvoke}}
+    if (!timedInvokeTimeoutMs.HasValue()) {
+      timedInvokeTimeoutMs.SetValue(10000);
+    }
+    {{/if}}
     {{#chip_cluster_command_arguments}}
       {{#first}}
         {{#unless (commandHasRequiredField parent)}}
@@ -63,13 +81,9 @@ using namespace chip::app::Clusters;
       ^(Cancelable * success, Cancelable * failure) {
         auto successFn = Callback<CHIP{{>callbackName}}CallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall
-        {{#if mustUseTimedInvoke}}
-          {{!TODO Fix Darwin API to pass in this information.  For now, 10 seconds.}}
-          , 10000
-          {{/if}}
-        );
+        return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
     });
+    // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 }
 {{/chip_cluster_commands}}
 
@@ -83,6 +97,7 @@ using namespace chip::app::Clusters;
 {{~/if_is_fabric_scoped_struct~}}
 (void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler
 {
+    // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
     new CHIP{{>attribute_data_callback_name}}CallbackBridge(self.callbackQueue,
       {{! This treats completionHandler as taking an id for the data.  This is
           not great from a type-safety perspective, of course. }}
@@ -97,12 +112,29 @@ using namespace chip::app::Clusters;
           {{~/if_is_fabric_scoped_struct~}}
           );
       });
+      // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 }
 
 {{#if isWritableAttribute}}
 {{#*inline "callbackName"}}DefaultSuccess{{/inline}}
-- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completionHandler:(StatusCompletion)completionHandler
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completionHandler:(StatusCompletion)completionHandler{
+  [self write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:nil completionHandler:completionHandler];
+}
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:(CHIPWriteParams * _Nullable)params completionHandler:(StatusCompletion)completionHandler
 {
+    chip::Optional<uint16_t> timedWriteTimeoutMsOptional;
+    // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
+    if (params!=nil) {
+      if (params.timedWriteTimeoutMs!=nil){
+        timedWriteTimeoutMsOptional.SetValue(params.timedWriteTimeoutMs.unsignedShortValue);
+      }
+    }
+    {{#if mustUseTimedInvoke}}
+    if (!timedWriteTimeoutMsOptional.HasValue()) {
+      timedWriteTimeoutMsOptional.SetValue(10000);
+    }
+    {{/if}}
+    
     new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue,
       {{! For now, don't change the bridge API; instead just use an adapter
           to invoke our completion handler. This is not great from a
@@ -117,13 +149,9 @@ using namespace chip::app::Clusters;
         {{>encode_value target="cppValue" source="value" cluster=parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
         auto successFn = Callback<CHIP{{>callbackName}}CallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall
-        {{#if mustUseTimedWrite}}
-          {{!TODO Fix Darwin API to pass in this information.  For now, 10 seconds.}}
-          , 10000
-          {{/if}}
-       );
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall, timedWriteTimeoutMsOptional);
     });
+    // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 }
 
 {{/if}}
@@ -132,6 +160,7 @@ using namespace chip::app::Clusters;
        params:(CHIPSubscribeParams * _Nullable)params
 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
 {
+    // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
     new CHIP{{>attribute_data_callback_name}}CallbackSubscriptionBridge(self.callbackQueue,
       {{! This treats reportHandler as taking an id for the data.  This is
           not great from a type-safety perspective, of course. }}
@@ -149,10 +178,12 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
               params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]
           );
       }, subscriptionEstablishedHandler);
+      // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 }
 
 + (void) read{{>attribute}}WithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint  queue:(dispatch_queue_t)queue completionHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler
 {
+    // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
     new CHIP{{>attribute_data_callback_name}}CallbackBridge(queue,
       completionHandler,
       ^(Cancelable * success, Cancelable * failure) {
@@ -173,6 +204,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
           }
           return CHIP_ERROR_NOT_FOUND;
       });
+      // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 }
 
 {{/if}}

@@ -34,6 +34,27 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * CHIPWriteParams
+ *    This is used to control the behavior of cluster writes.
+ *    If not provided (i.e. nil passed for the CHIPWriteParams argument), will be
+ *    treated as as if no arguments were passed in.
+ */
+@interface CHIPWriteParams : NSObject
+
+/**
+ * Whether a Timed Write Request is sent. Default is nil and is treated as if
+ * a write is sent.
+ *
+ * If the property contains a value, the command will request a timed command within the
+ * specified time.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedWriteTimeoutMs;
+
+- (instancetype)init;
+@end
+
+/**
  * CHIPReadParams
  *    This is used to control the behavior of attribute reads and subscribes.
  *    If not provided (i.e. nil passed for the CHIPReadParams argument), will be
