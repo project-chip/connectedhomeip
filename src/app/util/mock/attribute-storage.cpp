@@ -103,11 +103,13 @@ uint16_t emberAfEndpointCount(void)
 
 uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint)
 {
+    static_assert(ArraySize(endpoints) < UINT16_MAX);
+
     for (size_t i = 0; i < ArraySize(endpoints); i++)
     {
         if (endpoints[i] == endpoint)
         {
-            return i;
+            return static_cast<uint16_t>(i);
         }
     }
     return UINT16_MAX;
@@ -205,7 +207,9 @@ uint8_t emberAfClusterIndex(chip::EndpointId endpoint, chip::ClusterId cluster, 
     {
         if (clusters[i + clusterIndex[endpointIndex]] == cluster)
         {
-            return i;
+            VerifyOrDie(i <= UINT8_MAX);
+
+            return static_cast<uint8_t>(i);
         }
     }
     return UINT8_MAX;
