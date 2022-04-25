@@ -131,7 +131,9 @@ void AttributePathExpandIterator::PrepareAttributeIndexRange(const AttributePath
             {
                 if (GlobalAttributesNotInMetadata[idx] == aAttributePath.mAttributeId)
                 {
-                    mGlobalAttributeIndex = idx;
+                    // generally safe: we have a static cast check for GlobalAttributesNotInMetaData size
+                    VerifyOrDie(idx <= UINT8_MAX);
+                    mGlobalAttributeIndex = static_cast<uint8_t>(idx);
                     break;
                 }
             }
