@@ -214,10 +214,10 @@ LED3 for lift mode and LED3 for tilt mode.
 
 > **Note**:
 >
-> There are 25 steps needed to fully close the shutter from fully opened
+> There are 20 steps needed to fully close the shutter from fully opened
 > position, and vise versa (each step takes approximately 200 ms, which aims to
 > simulate the real shutter movement). This means that, for instance, **Button
-> 2** needs to be pressed 25 times to fully lift the shutter and to cover the
+> 2** needs to be pressed 20 times to fully lift the shutter and to cover the
 > whole range of **LED 2** brightness step by step. Note that the shutter
 > positions and brightness of **LED 2** and **LED 3** are stored in non-volatile
 > memory and are restored after every device reset. After the firmware update,

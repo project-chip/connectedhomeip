@@ -28,12 +28,12 @@
 
 LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 
-int PWMDevice::Init(const device * aPWMDevice, uint32_t aPWMChannel, uint8_t aMinLevel, uint8_t aMaxLevel)
+int PWMDevice::Init(const device * aPWMDevice, uint32_t aPWMChannel, uint8_t aMinLevel, uint8_t aMaxLevel, uint8_t aDefaultLevel)
 {
     mState      = kState_On;
     mMinLevel   = aMinLevel;
     mMaxLevel   = aMaxLevel;
-    mLevel      = aMaxLevel;
+    mLevel      = aDefaultLevel;
     mPwmDevice  = aPWMDevice;
     mPwmChannel = aPWMChannel;
 
