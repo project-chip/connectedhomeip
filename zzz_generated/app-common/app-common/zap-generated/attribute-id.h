@@ -312,6 +312,7 @@
 #define ZCL_REACHABLE_ATTRIBUTE_ID (0x0011)
 #define ZCL_UNIQUE_ID_ATTRIBUTE_ID (0x0012)
 #define ZCL_CAPABILITY_MINIMA_ATTRIBUTE_ID (0x0013)
+#define ZCL_SW_BUILD_ID_ATTRIBUTE_ID (0x4000)
 
 // Attribute ids for cluster: OTA Software Update Provider
 

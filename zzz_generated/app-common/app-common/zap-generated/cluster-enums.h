@@ -161,32 +161,6 @@ namespace OnOffSwitchConfiguration {
 
 namespace LevelControl {
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for MoveMode
-enum class MoveMode : uint8_t
-{
-    kUp   = 0x00,
-    kDown = 0x01,
-};
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MoveMode                        = EmberAfMoveMode;
-#endif
-
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for StepMode
-enum class StepMode : uint8_t
-{
-    kUp   = 0x00,
-    kDown = 0x01,
-};
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using StepMode                        = EmberAfStepMode;
-#endif
-
 // Bitmap for LevelControlFeature
 enum class LevelControlFeature : uint32_t
 {
@@ -1973,21 +1947,6 @@ enum class IasZoneType : uint16_t
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IasZoneType                     = EmberAfIasZoneType;
 #endif
-
-// Bitmap for IasZoneStatus
-enum class IasZoneStatus : uint16_t
-{
-    kAlarm1             = 0x1,
-    kAlarm2             = 0x2,
-    kTamper             = 0x4,
-    kBattery            = 0x8,
-    kSupervisionReports = 0x10,
-    kRestoreReports     = 0x20,
-    kTrouble            = 0x40,
-    kAc                 = 0x80,
-    kTest               = 0x100,
-    kBatteryDefect      = 0x200,
-};
 } // namespace IasZone
 
 namespace IasAce {
@@ -2085,40 +2044,9 @@ enum class IasZoneType : uint16_t
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IasZoneType                     = EmberAfIasZoneType;
 #endif
-
-// Bitmap for IasZoneStatus
-enum class IasZoneStatus : uint16_t
-{
-    kAlarm1             = 0x1,
-    kAlarm2             = 0x2,
-    kTamper             = 0x4,
-    kBattery            = 0x8,
-    kSupervisionReports = 0x10,
-    kRestoreReports     = 0x20,
-    kTrouble            = 0x40,
-    kAc                 = 0x80,
-    kTest               = 0x100,
-    kBatteryDefect      = 0x200,
-};
 } // namespace IasAce
 
 namespace IasWd {
-
-// Bitmap for SquawkInfo
-enum class SquawkInfo : uint8_t
-{
-    kMode   = 0xF0,
-    kStrobe = 0x8,
-    kLevel  = 0x3,
-};
-
-// Bitmap for WarningInfo
-enum class WarningInfo : uint8_t
-{
-    kMode       = 0xF0,
-    kStrobe     = 0xC,
-    kSirenLevel = 0x3,
-};
 } // namespace IasWd
 
 namespace WakeOnLan {
@@ -2126,18 +2054,18 @@ namespace WakeOnLan {
 
 namespace Channel {
 
-// Enum for LineupInfoTypeEnum
-enum class LineupInfoTypeEnum : uint8_t
-{
-    kMso = 0x00,
-};
-
-// Enum for StatusEnum
-enum class StatusEnum : uint8_t
+// Enum for ChannelStatusEnum
+enum class ChannelStatusEnum : uint8_t
 {
     kSuccess         = 0x00,
     kMultipleMatches = 0x01,
     kNoMatches       = 0x02,
+};
+
+// Enum for LineupInfoTypeEnum
+enum class LineupInfoTypeEnum : uint8_t
+{
+    kMso = 0x00,
 };
 
 // Bitmap for ChannelFeature
@@ -2150,8 +2078,8 @@ enum class ChannelFeature : uint32_t
 
 namespace TargetNavigator {
 
-// Enum for StatusEnum
-enum class StatusEnum : uint8_t
+// Enum for StatusEnumTargetNavigator
+enum class StatusEnumTargetNavigator : uint8_t
 {
     kSuccess        = 0x00,
     kTargetNotFound = 0x01,
@@ -2170,8 +2098,8 @@ enum class PlaybackStateEnum : uint8_t
     kBuffering  = 0x03,
 };
 
-// Enum for StatusEnum
-enum class StatusEnum : uint8_t
+// Enum for StatusEnumMediaPlayback
+enum class StatusEnumMediaPlayback : uint8_t
 {
     kSuccess                = 0x00,
     kInvalidStateForCommand = 0x01,
@@ -2304,8 +2232,8 @@ enum class CecKeyCode : uint8_t
     kData                      = 0x76,
 };
 
-// Enum for StatusEnum
-enum class StatusEnum : uint8_t
+// Enum for StatusEnumKeypadInput
+enum class StatusEnumKeypadInput : uint8_t
 {
     kSuccess                  = 0x00,
     kUnsupportedKey           = 0x01,
@@ -2348,8 +2276,8 @@ enum class ParameterEnum : uint8_t
     kType       = 0x0C,
 };
 
-// Enum for StatusEnum
-enum class StatusEnum : uint8_t
+// Enum for StatusEnumContentLauncher
+enum class StatusEnumContentLauncher : uint8_t
 {
     kSuccess         = 0x00,
     kUrlNotAvailable = 0x01,
@@ -2393,8 +2321,8 @@ enum class AudioOutputFeature : uint32_t
 
 namespace ApplicationLauncher {
 
-// Enum for StatusEnum
-enum class StatusEnum : uint8_t
+// Enum for StatusEnumApplicationLauncher
+enum class StatusEnumApplicationLauncher : uint8_t
 {
     kSuccess         = 0x00,
     kAppNotAvailable = 0x01,

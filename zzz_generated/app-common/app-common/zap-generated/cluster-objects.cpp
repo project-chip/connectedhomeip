@@ -5971,6 +5971,9 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::CapabilityMinima::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, capabilityMinima));
         break;
+    case Attributes::SwBuildId::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, swBuildId));
+        break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;

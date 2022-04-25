@@ -100,9 +100,9 @@ struct TypeInfo
 namespace MainsAlarmMask {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MainsAlarmMask::Id; }
@@ -185,9 +185,9 @@ struct TypeInfo
 namespace BatterySize {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::PowerConfiguration::enum8;
+    using DecodableType    = chip::app::Clusters::PowerConfiguration::enum8;
+    using DecodableArgType = chip::app::Clusters::PowerConfiguration::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatterySize::Id; }
@@ -233,9 +233,9 @@ struct TypeInfo
 namespace BatteryAlarmMask {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryAlarmMask::Id; }
@@ -341,9 +341,9 @@ struct TypeInfo
 namespace BatteryAlarmState {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryAlarmState::Id; }
@@ -390,9 +390,9 @@ struct TypeInfo
 namespace Battery2Size {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::PowerConfiguration::enum8;
+    using DecodableType    = chip::app::Clusters::PowerConfiguration::enum8;
+    using DecodableArgType = chip::app::Clusters::PowerConfiguration::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2Size::Id; }
@@ -438,9 +438,9 @@ struct TypeInfo
 namespace Battery2AlarmMask {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2AlarmMask::Id; }
@@ -546,9 +546,9 @@ struct TypeInfo
 namespace Battery2AlarmState {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2AlarmState::Id; }
@@ -595,9 +595,9 @@ struct TypeInfo
 namespace Battery3Size {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::PowerConfiguration::enum8;
+    using DecodableType    = chip::app::Clusters::PowerConfiguration::enum8;
+    using DecodableArgType = chip::app::Clusters::PowerConfiguration::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3Size::Id; }
@@ -643,9 +643,9 @@ struct TypeInfo
 namespace Battery3AlarmMask {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3AlarmMask::Id; }
@@ -751,9 +751,9 @@ struct TypeInfo
 namespace Battery3AlarmState {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3AlarmState::Id; }
@@ -799,9 +799,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -829,20 +829,23 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::MainsVoltage::TypeInfo::DecodableType mainsVoltage                             = static_cast<uint16_t>(0);
-        Attributes::MainsFrequency::TypeInfo::DecodableType mainsFrequency                         = static_cast<uint8_t>(0);
-        Attributes::MainsAlarmMask::TypeInfo::DecodableType mainsAlarmMask                         = static_cast<uint8_t>(0);
+        Attributes::MainsVoltage::TypeInfo::DecodableType mainsVoltage     = static_cast<uint16_t>(0);
+        Attributes::MainsFrequency::TypeInfo::DecodableType mainsFrequency = static_cast<uint8_t>(0);
+        Attributes::MainsAlarmMask::TypeInfo::DecodableType mainsAlarmMask =
+            static_cast<chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8>>(0);
         Attributes::MainsVoltageMinThreshold::TypeInfo::DecodableType mainsVoltageMinThreshold     = static_cast<uint16_t>(0);
         Attributes::MainsVoltageMaxThreshold::TypeInfo::DecodableType mainsVoltageMaxThreshold     = static_cast<uint16_t>(0);
         Attributes::MainsVoltageDwellTrip::TypeInfo::DecodableType mainsVoltageDwellTrip           = static_cast<uint16_t>(0);
         Attributes::BatteryVoltage::TypeInfo::DecodableType batteryVoltage                         = static_cast<uint8_t>(0);
         Attributes::BatteryPercentageRemaining::TypeInfo::DecodableType batteryPercentageRemaining = static_cast<uint8_t>(0);
         Attributes::BatteryManufacturer::TypeInfo::DecodableType batteryManufacturer;
-        Attributes::BatterySize::TypeInfo::DecodableType batterySize                                     = static_cast<uint8_t>(0);
-        Attributes::BatteryAhrRating::TypeInfo::DecodableType batteryAhrRating                           = static_cast<uint16_t>(0);
-        Attributes::BatteryQuantity::TypeInfo::DecodableType batteryQuantity                             = static_cast<uint8_t>(0);
-        Attributes::BatteryRatedVoltage::TypeInfo::DecodableType batteryRatedVoltage                     = static_cast<uint8_t>(0);
-        Attributes::BatteryAlarmMask::TypeInfo::DecodableType batteryAlarmMask                           = static_cast<uint8_t>(0);
+        Attributes::BatterySize::TypeInfo::DecodableType batterySize =
+            static_cast<chip::app::Clusters::PowerConfiguration::enum8>(0);
+        Attributes::BatteryAhrRating::TypeInfo::DecodableType batteryAhrRating       = static_cast<uint16_t>(0);
+        Attributes::BatteryQuantity::TypeInfo::DecodableType batteryQuantity         = static_cast<uint8_t>(0);
+        Attributes::BatteryRatedVoltage::TypeInfo::DecodableType batteryRatedVoltage = static_cast<uint8_t>(0);
+        Attributes::BatteryAlarmMask::TypeInfo::DecodableType batteryAlarmMask =
+            static_cast<chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8>>(0);
         Attributes::BatteryVoltageMinThreshold::TypeInfo::DecodableType batteryVoltageMinThreshold       = static_cast<uint8_t>(0);
         Attributes::BatteryVoltageThreshold1::TypeInfo::DecodableType batteryVoltageThreshold1           = static_cast<uint8_t>(0);
         Attributes::BatteryVoltageThreshold2::TypeInfo::DecodableType batteryVoltageThreshold2           = static_cast<uint8_t>(0);
@@ -851,15 +854,18 @@ struct TypeInfo
         Attributes::BatteryPercentageThreshold1::TypeInfo::DecodableType batteryPercentageThreshold1     = static_cast<uint8_t>(0);
         Attributes::BatteryPercentageThreshold2::TypeInfo::DecodableType batteryPercentageThreshold2     = static_cast<uint8_t>(0);
         Attributes::BatteryPercentageThreshold3::TypeInfo::DecodableType batteryPercentageThreshold3     = static_cast<uint8_t>(0);
-        Attributes::BatteryAlarmState::TypeInfo::DecodableType batteryAlarmState                         = static_cast<uint32_t>(0);
-        Attributes::Battery2Voltage::TypeInfo::DecodableType battery2Voltage                             = static_cast<uint8_t>(0);
-        Attributes::Battery2PercentageRemaining::TypeInfo::DecodableType battery2PercentageRemaining     = static_cast<uint8_t>(0);
+        Attributes::BatteryAlarmState::TypeInfo::DecodableType batteryAlarmState =
+            static_cast<chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap32>>(0);
+        Attributes::Battery2Voltage::TypeInfo::DecodableType battery2Voltage                         = static_cast<uint8_t>(0);
+        Attributes::Battery2PercentageRemaining::TypeInfo::DecodableType battery2PercentageRemaining = static_cast<uint8_t>(0);
         Attributes::Battery2Manufacturer::TypeInfo::DecodableType battery2Manufacturer;
-        Attributes::Battery2Size::TypeInfo::DecodableType battery2Size                               = static_cast<uint8_t>(0);
-        Attributes::Battery2AhrRating::TypeInfo::DecodableType battery2AhrRating                     = static_cast<uint16_t>(0);
-        Attributes::Battery2Quantity::TypeInfo::DecodableType battery2Quantity                       = static_cast<uint8_t>(0);
-        Attributes::Battery2RatedVoltage::TypeInfo::DecodableType battery2RatedVoltage               = static_cast<uint8_t>(0);
-        Attributes::Battery2AlarmMask::TypeInfo::DecodableType battery2AlarmMask                     = static_cast<uint8_t>(0);
+        Attributes::Battery2Size::TypeInfo::DecodableType battery2Size =
+            static_cast<chip::app::Clusters::PowerConfiguration::enum8>(0);
+        Attributes::Battery2AhrRating::TypeInfo::DecodableType battery2AhrRating       = static_cast<uint16_t>(0);
+        Attributes::Battery2Quantity::TypeInfo::DecodableType battery2Quantity         = static_cast<uint8_t>(0);
+        Attributes::Battery2RatedVoltage::TypeInfo::DecodableType battery2RatedVoltage = static_cast<uint8_t>(0);
+        Attributes::Battery2AlarmMask::TypeInfo::DecodableType battery2AlarmMask =
+            static_cast<chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8>>(0);
         Attributes::Battery2VoltageMinThreshold::TypeInfo::DecodableType battery2VoltageMinThreshold = static_cast<uint8_t>(0);
         Attributes::Battery2VoltageThreshold1::TypeInfo::DecodableType battery2VoltageThreshold1     = static_cast<uint8_t>(0);
         Attributes::Battery2VoltageThreshold2::TypeInfo::DecodableType battery2VoltageThreshold2     = static_cast<uint8_t>(0);
@@ -869,15 +875,18 @@ struct TypeInfo
         Attributes::Battery2PercentageThreshold1::TypeInfo::DecodableType battery2PercentageThreshold1 = static_cast<uint8_t>(0);
         Attributes::Battery2PercentageThreshold2::TypeInfo::DecodableType battery2PercentageThreshold2 = static_cast<uint8_t>(0);
         Attributes::Battery2PercentageThreshold3::TypeInfo::DecodableType battery2PercentageThreshold3 = static_cast<uint8_t>(0);
-        Attributes::Battery2AlarmState::TypeInfo::DecodableType battery2AlarmState                     = static_cast<uint32_t>(0);
-        Attributes::Battery3Voltage::TypeInfo::DecodableType battery3Voltage                           = static_cast<uint8_t>(0);
-        Attributes::Battery3PercentageRemaining::TypeInfo::DecodableType battery3PercentageRemaining   = static_cast<uint8_t>(0);
+        Attributes::Battery2AlarmState::TypeInfo::DecodableType battery2AlarmState =
+            static_cast<chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap32>>(0);
+        Attributes::Battery3Voltage::TypeInfo::DecodableType battery3Voltage                         = static_cast<uint8_t>(0);
+        Attributes::Battery3PercentageRemaining::TypeInfo::DecodableType battery3PercentageRemaining = static_cast<uint8_t>(0);
         Attributes::Battery3Manufacturer::TypeInfo::DecodableType battery3Manufacturer;
-        Attributes::Battery3Size::TypeInfo::DecodableType battery3Size                               = static_cast<uint8_t>(0);
-        Attributes::Battery3AhrRating::TypeInfo::DecodableType battery3AhrRating                     = static_cast<uint16_t>(0);
-        Attributes::Battery3Quantity::TypeInfo::DecodableType battery3Quantity                       = static_cast<uint8_t>(0);
-        Attributes::Battery3RatedVoltage::TypeInfo::DecodableType battery3RatedVoltage               = static_cast<uint8_t>(0);
-        Attributes::Battery3AlarmMask::TypeInfo::DecodableType battery3AlarmMask                     = static_cast<uint8_t>(0);
+        Attributes::Battery3Size::TypeInfo::DecodableType battery3Size =
+            static_cast<chip::app::Clusters::PowerConfiguration::enum8>(0);
+        Attributes::Battery3AhrRating::TypeInfo::DecodableType battery3AhrRating       = static_cast<uint16_t>(0);
+        Attributes::Battery3Quantity::TypeInfo::DecodableType battery3Quantity         = static_cast<uint8_t>(0);
+        Attributes::Battery3RatedVoltage::TypeInfo::DecodableType battery3RatedVoltage = static_cast<uint8_t>(0);
+        Attributes::Battery3AlarmMask::TypeInfo::DecodableType battery3AlarmMask =
+            static_cast<chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8>>(0);
         Attributes::Battery3VoltageMinThreshold::TypeInfo::DecodableType battery3VoltageMinThreshold = static_cast<uint8_t>(0);
         Attributes::Battery3VoltageThreshold1::TypeInfo::DecodableType battery3VoltageThreshold1     = static_cast<uint8_t>(0);
         Attributes::Battery3VoltageThreshold2::TypeInfo::DecodableType battery3VoltageThreshold2     = static_cast<uint8_t>(0);
@@ -887,11 +896,13 @@ struct TypeInfo
         Attributes::Battery3PercentageThreshold1::TypeInfo::DecodableType battery3PercentageThreshold1 = static_cast<uint8_t>(0);
         Attributes::Battery3PercentageThreshold2::TypeInfo::DecodableType battery3PercentageThreshold2 = static_cast<uint8_t>(0);
         Attributes::Battery3PercentageThreshold3::TypeInfo::DecodableType battery3PercentageThreshold3 = static_cast<uint8_t>(0);
-        Attributes::Battery3AlarmState::TypeInfo::DecodableType battery3AlarmState                     = static_cast<uint32_t>(0);
+        Attributes::Battery3AlarmState::TypeInfo::DecodableType battery3AlarmState =
+            static_cast<chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap32>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -952,9 +963,9 @@ struct TypeInfo
 namespace DeviceTempAlarmMask {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::DeviceTemperatureConfiguration::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::DeviceTemperatureConfiguration::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::DeviceTemperatureConfiguration::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DeviceTempAlarmMask::Id; }
@@ -1048,9 +1059,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::DeviceTemperatureConfiguration::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::DeviceTemperatureConfiguration::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::DeviceTemperatureConfiguration::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -1078,11 +1089,12 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::CurrentTemperature::TypeInfo::DecodableType currentTemperature         = static_cast<int16_t>(0);
-        Attributes::MinTempExperienced::TypeInfo::DecodableType minTempExperienced         = static_cast<int16_t>(0);
-        Attributes::MaxTempExperienced::TypeInfo::DecodableType maxTempExperienced         = static_cast<int16_t>(0);
-        Attributes::OverTempTotalDwell::TypeInfo::DecodableType overTempTotalDwell         = static_cast<uint16_t>(0);
-        Attributes::DeviceTempAlarmMask::TypeInfo::DecodableType deviceTempAlarmMask       = static_cast<uint8_t>(0);
+        Attributes::CurrentTemperature::TypeInfo::DecodableType currentTemperature = static_cast<int16_t>(0);
+        Attributes::MinTempExperienced::TypeInfo::DecodableType minTempExperienced = static_cast<int16_t>(0);
+        Attributes::MaxTempExperienced::TypeInfo::DecodableType maxTempExperienced = static_cast<int16_t>(0);
+        Attributes::OverTempTotalDwell::TypeInfo::DecodableType overTempTotalDwell = static_cast<uint16_t>(0);
+        Attributes::DeviceTempAlarmMask::TypeInfo::DecodableType deviceTempAlarmMask =
+            static_cast<chip::BitFlags<chip::app::Clusters::DeviceTemperatureConfiguration::bitmap8>>(0);
         Attributes::LowTempThreshold::TypeInfo::DecodableType lowTempThreshold             = static_cast<int16_t>(0);
         Attributes::HighTempThreshold::TypeInfo::DecodableType highTempThreshold           = static_cast<int16_t>(0);
         Attributes::LowTempDwellTripPoint::TypeInfo::DecodableType lowTempDwellTripPoint   = static_cast<uint32_t>(0);
@@ -1090,7 +1102,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::DeviceTemperatureConfiguration::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -1270,9 +1283,9 @@ struct TypeInfo
 namespace IdentifyType {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::Identify::enum8;
+    using DecodableType    = chip::app::Clusters::Identify::enum8;
+    using DecodableArgType = chip::app::Clusters::Identify::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IdentifyType::Id; }
@@ -1318,9 +1331,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Identify::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Identify::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Identify::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -1349,11 +1362,12 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::IdentifyTime::TypeInfo::DecodableType identifyTime = static_cast<uint16_t>(0);
-        Attributes::IdentifyType::TypeInfo::DecodableType identifyType = static_cast<uint8_t>(0);
+        Attributes::IdentifyType::TypeInfo::DecodableType identifyType = static_cast<chip::app::Clusters::Identify::enum8>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::Identify::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -1761,9 +1775,9 @@ namespace Attributes {
 namespace NameSupport {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Groups::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Groups::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Groups::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NameSupport::Id; }
@@ -1809,9 +1823,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Groups::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Groups::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Groups::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -1839,11 +1853,13 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::NameSupport::TypeInfo::DecodableType nameSupport = static_cast<uint8_t>(0);
+        Attributes::NameSupport::TypeInfo::DecodableType nameSupport =
+            static_cast<chip::BitFlags<chip::app::Clusters::Groups::bitmap8>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::Groups::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -2771,9 +2787,9 @@ struct TypeInfo
 namespace NameSupport {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Scenes::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Scenes::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Scenes::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NameSupport::Id; }
@@ -2831,9 +2847,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Scenes::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Scenes::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Scenes::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -2861,16 +2877,18 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::SceneCount::TypeInfo::DecodableType sceneCount             = static_cast<uint8_t>(0);
-        Attributes::CurrentScene::TypeInfo::DecodableType currentScene         = static_cast<uint8_t>(0);
-        Attributes::CurrentGroup::TypeInfo::DecodableType currentGroup         = static_cast<uint16_t>(0);
-        Attributes::SceneValid::TypeInfo::DecodableType sceneValid             = static_cast<bool>(0);
-        Attributes::NameSupport::TypeInfo::DecodableType nameSupport           = static_cast<uint8_t>(0);
+        Attributes::SceneCount::TypeInfo::DecodableType sceneCount     = static_cast<uint8_t>(0);
+        Attributes::CurrentScene::TypeInfo::DecodableType currentScene = static_cast<uint8_t>(0);
+        Attributes::CurrentGroup::TypeInfo::DecodableType currentGroup = static_cast<uint16_t>(0);
+        Attributes::SceneValid::TypeInfo::DecodableType sceneValid     = static_cast<bool>(0);
+        Attributes::NameSupport::TypeInfo::DecodableType nameSupport =
+            static_cast<chip::BitFlags<chip::app::Clusters::Scenes::bitmap8>>(0);
         Attributes::LastConfiguredBy::TypeInfo::DecodableType lastConfiguredBy = static_cast<chip::NodeId>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::Scenes::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -3202,9 +3220,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::OnOff::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::OnOff::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::OnOff::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -3240,7 +3258,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::OnOff::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -3253,9 +3272,9 @@ namespace Attributes {
 namespace SwitchType {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::OnOffSwitchConfiguration::enum8;
+    using DecodableType    = chip::app::Clusters::OnOffSwitchConfiguration::enum8;
+    using DecodableArgType = chip::app::Clusters::OnOffSwitchConfiguration::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SwitchType::Id; }
@@ -3265,9 +3284,9 @@ struct TypeInfo
 namespace SwitchActions {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::OnOffSwitchConfiguration::enum8;
+    using DecodableType    = chip::app::Clusters::OnOffSwitchConfiguration::enum8;
+    using DecodableArgType = chip::app::Clusters::OnOffSwitchConfiguration::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SwitchActions::Id; }
@@ -3313,9 +3332,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::OnOffSwitchConfiguration::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::OnOffSwitchConfiguration::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::OnOffSwitchConfiguration::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -3343,12 +3362,15 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::SwitchType::TypeInfo::DecodableType switchType       = static_cast<uint8_t>(0);
-        Attributes::SwitchActions::TypeInfo::DecodableType switchActions = static_cast<uint8_t>(0);
+        Attributes::SwitchType::TypeInfo::DecodableType switchType =
+            static_cast<chip::app::Clusters::OnOffSwitchConfiguration::enum8>(0);
+        Attributes::SwitchActions::TypeInfo::DecodableType switchActions =
+            static_cast<chip::app::Clusters::OnOffSwitchConfiguration::enum8>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::OnOffSwitchConfiguration::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -3790,9 +3812,9 @@ struct TypeInfo
 namespace Options {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::LevelControl::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::LevelControl::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::LevelControl::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Options::Id; }
@@ -3910,9 +3932,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::LevelControl::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::LevelControl::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::LevelControl::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -3940,14 +3962,15 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::CurrentLevel::TypeInfo::DecodableType currentLevel               = static_cast<uint8_t>(0);
-        Attributes::RemainingTime::TypeInfo::DecodableType remainingTime             = static_cast<uint16_t>(0);
-        Attributes::MinLevel::TypeInfo::DecodableType minLevel                       = static_cast<uint8_t>(0);
-        Attributes::MaxLevel::TypeInfo::DecodableType maxLevel                       = static_cast<uint8_t>(0);
-        Attributes::CurrentFrequency::TypeInfo::DecodableType currentFrequency       = static_cast<uint16_t>(0);
-        Attributes::MinFrequency::TypeInfo::DecodableType minFrequency               = static_cast<uint16_t>(0);
-        Attributes::MaxFrequency::TypeInfo::DecodableType maxFrequency               = static_cast<uint16_t>(0);
-        Attributes::Options::TypeInfo::DecodableType options                         = static_cast<uint8_t>(0);
+        Attributes::CurrentLevel::TypeInfo::DecodableType currentLevel         = static_cast<uint8_t>(0);
+        Attributes::RemainingTime::TypeInfo::DecodableType remainingTime       = static_cast<uint16_t>(0);
+        Attributes::MinLevel::TypeInfo::DecodableType minLevel                 = static_cast<uint8_t>(0);
+        Attributes::MaxLevel::TypeInfo::DecodableType maxLevel                 = static_cast<uint8_t>(0);
+        Attributes::CurrentFrequency::TypeInfo::DecodableType currentFrequency = static_cast<uint16_t>(0);
+        Attributes::MinFrequency::TypeInfo::DecodableType minFrequency         = static_cast<uint16_t>(0);
+        Attributes::MaxFrequency::TypeInfo::DecodableType maxFrequency         = static_cast<uint16_t>(0);
+        Attributes::Options::TypeInfo::DecodableType options =
+            static_cast<chip::BitFlags<chip::app::Clusters::LevelControl::bitmap8>>(0);
         Attributes::OnOffTransitionTime::TypeInfo::DecodableType onOffTransitionTime = static_cast<uint16_t>(0);
         Attributes::OnLevel::TypeInfo::DecodableType onLevel;
         Attributes::OnTransitionTime::TypeInfo::DecodableType onTransitionTime;
@@ -3957,7 +3980,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::LevelControl::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -4251,9 +4275,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Alarms::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Alarms::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Alarms::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -4285,7 +4309,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::Alarms::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -4310,9 +4335,9 @@ struct TypeInfo
 namespace TimeStatus {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Time::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Time::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Time::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TimeStatus::Id; }
@@ -4454,9 +4479,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Time::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Time::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Time::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -4484,8 +4509,9 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Time::TypeInfo::DecodableType time                     = static_cast<uint32_t>(0);
-        Attributes::TimeStatus::TypeInfo::DecodableType timeStatus         = static_cast<uint8_t>(0);
+        Attributes::Time::TypeInfo::DecodableType time = static_cast<uint32_t>(0);
+        Attributes::TimeStatus::TypeInfo::DecodableType timeStatus =
+            static_cast<chip::BitFlags<chip::app::Clusters::Time::bitmap8>>(0);
         Attributes::TimeZone::TypeInfo::DecodableType timeZone             = static_cast<int32_t>(0);
         Attributes::DstStart::TypeInfo::DecodableType dstStart             = static_cast<uint32_t>(0);
         Attributes::DstEnd::TypeInfo::DecodableType dstEnd                 = static_cast<uint32_t>(0);
@@ -4497,7 +4523,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::Time::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -4561,9 +4588,9 @@ struct TypeInfo
 namespace Polarity {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::BinaryInputBasic::enum8;
+    using DecodableType    = chip::app::Clusters::BinaryInputBasic::enum8;
+    using DecodableArgType = chip::app::Clusters::BinaryInputBasic::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Polarity::Id; }
@@ -4585,9 +4612,9 @@ struct TypeInfo
 namespace Reliability {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::BinaryInputBasic::enum8;
+    using DecodableType    = chip::app::Clusters::BinaryInputBasic::enum8;
+    using DecodableArgType = chip::app::Clusters::BinaryInputBasic::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Reliability::Id; }
@@ -4597,9 +4624,9 @@ struct TypeInfo
 namespace StatusFlags {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::BinaryInputBasic::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::BinaryInputBasic::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::BinaryInputBasic::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StatusFlags::Id; }
@@ -4657,9 +4684,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::BinaryInputBasic::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::BinaryInputBasic::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::BinaryInputBasic::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -4690,16 +4717,18 @@ struct TypeInfo
         Attributes::ActiveText::TypeInfo::DecodableType activeText;
         Attributes::Description::TypeInfo::DecodableType description;
         Attributes::InactiveText::TypeInfo::DecodableType inactiveText;
-        Attributes::OutOfService::TypeInfo::DecodableType outOfService       = static_cast<bool>(0);
-        Attributes::Polarity::TypeInfo::DecodableType polarity               = static_cast<uint8_t>(0);
-        Attributes::PresentValue::TypeInfo::DecodableType presentValue       = static_cast<bool>(0);
-        Attributes::Reliability::TypeInfo::DecodableType reliability         = static_cast<uint8_t>(0);
-        Attributes::StatusFlags::TypeInfo::DecodableType statusFlags         = static_cast<uint8_t>(0);
+        Attributes::OutOfService::TypeInfo::DecodableType outOfService = static_cast<bool>(0);
+        Attributes::Polarity::TypeInfo::DecodableType polarity = static_cast<chip::app::Clusters::BinaryInputBasic::enum8>(0);
+        Attributes::PresentValue::TypeInfo::DecodableType presentValue = static_cast<bool>(0);
+        Attributes::Reliability::TypeInfo::DecodableType reliability = static_cast<chip::app::Clusters::BinaryInputBasic::enum8>(0);
+        Attributes::StatusFlags::TypeInfo::DecodableType statusFlags =
+            static_cast<chip::BitFlags<chip::app::Clusters::BinaryInputBasic::bitmap8>>(0);
         Attributes::ApplicationType::TypeInfo::DecodableType applicationType = static_cast<uint32_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::BinaryInputBasic::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -4722,7 +4751,7 @@ public:
     uint8_t powerProfileId         = static_cast<uint8_t>(0);
     uint8_t energyPhaseId          = static_cast<uint8_t>(0);
     bool powerProfileRemoteControl = static_cast<bool>(0);
-    uint8_t powerProfileState      = static_cast<uint8_t>(0);
+    enum8 powerProfileState        = static_cast<enum8>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -5686,9 +5715,9 @@ struct TypeInfo
 namespace EnergyFormatting {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::PowerProfile::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::PowerProfile::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::PowerProfile::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnergyFormatting::Id; }
@@ -5710,9 +5739,9 @@ struct TypeInfo
 namespace ScheduleMode {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::PowerProfile::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::PowerProfile::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::PowerProfile::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ScheduleMode::Id; }
@@ -5758,9 +5787,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::PowerProfile::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::PowerProfile::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::PowerProfile::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -5790,13 +5819,16 @@ struct TypeInfo
 
         Attributes::TotalProfileNum::TypeInfo::DecodableType totalProfileNum       = static_cast<uint8_t>(0);
         Attributes::MultipleScheduling::TypeInfo::DecodableType multipleScheduling = static_cast<bool>(0);
-        Attributes::EnergyFormatting::TypeInfo::DecodableType energyFormatting     = static_cast<uint8_t>(0);
-        Attributes::EnergyRemote::TypeInfo::DecodableType energyRemote             = static_cast<bool>(0);
-        Attributes::ScheduleMode::TypeInfo::DecodableType scheduleMode             = static_cast<uint8_t>(0);
+        Attributes::EnergyFormatting::TypeInfo::DecodableType energyFormatting =
+            static_cast<chip::BitFlags<chip::app::Clusters::PowerProfile::bitmap8>>(0);
+        Attributes::EnergyRemote::TypeInfo::DecodableType energyRemote = static_cast<bool>(0);
+        Attributes::ScheduleMode::TypeInfo::DecodableType scheduleMode =
+            static_cast<chip::BitFlags<chip::app::Clusters::PowerProfile::bitmap8>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::PowerProfile::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -6195,9 +6227,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ApplianceControl::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ApplianceControl::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ApplianceControl::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -6231,7 +6263,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ApplianceControl::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -6280,9 +6313,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::PulseWidthModulation::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::PulseWidthModulation::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::PulseWidthModulation::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PulseWidthModulation::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -6313,7 +6346,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::PulseWidthModulation::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -6436,9 +6470,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Descriptor::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Descriptor::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Descriptor::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -6473,7 +6507,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::Descriptor::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -6574,9 +6609,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Binding::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Binding::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Binding::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -6608,7 +6643,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::Binding::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -6830,9 +6866,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::AccessControl::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::AccessControl::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::AccessControl::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -6868,7 +6904,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::AccessControl::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -7285,9 +7322,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::PollControl::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::PollControl::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::PollControl::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -7325,7 +7362,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::PollControl::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -7987,9 +8025,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::BridgedActions::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::BridgedActions::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::BridgedActions::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -8023,7 +8061,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::BridgedActions::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -8434,6 +8473,19 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CapabilityMinima
+namespace SwBuildId {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SwBuildId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 16; }
+};
+} // namespace SwBuildId
 namespace GeneratedCommandList {
 struct TypeInfo
 {
@@ -8473,9 +8525,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Basic::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Basic::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Basic::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -8523,10 +8575,12 @@ struct TypeInfo
         Attributes::Reachable::TypeInfo::DecodableType reachable                     = static_cast<bool>(0);
         Attributes::UniqueID::TypeInfo::DecodableType uniqueID;
         Attributes::CapabilityMinima::TypeInfo::DecodableType capabilityMinima;
+        Attributes::SwBuildId::TypeInfo::DecodableType swBuildId;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::Basic::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -8943,9 +8997,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::OtaSoftwareUpdateProvider::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::OtaSoftwareUpdateProvider::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::OtaSoftwareUpdateProvider::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -8976,7 +9030,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::OtaSoftwareUpdateProvider::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -9167,9 +9222,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::OtaSoftwareUpdateRequestor::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::OtaSoftwareUpdateRequestor::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::OtaSoftwareUpdateRequestor::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -9205,7 +9260,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::OtaSoftwareUpdateRequestor::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -9401,9 +9457,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::LocalizationConfiguration::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::LocalizationConfiguration::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::LocalizationConfiguration::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -9436,7 +9492,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::LocalizationConfiguration::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -9521,9 +9578,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::TimeFormatLocalization::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::TimeFormatLocalization::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::TimeFormatLocalization::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -9559,7 +9616,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::TimeFormatLocalization::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -9620,9 +9678,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::UnitLocalization::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::UnitLocalization::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::UnitLocalization::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::UnitLocalization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -9655,7 +9713,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::UnitLocalization::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -9716,9 +9775,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::PowerSourceConfiguration::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::PowerSourceConfiguration::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::PowerSourceConfiguration::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -9750,7 +9809,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::PowerSourceConfiguration::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -9855,9 +9915,9 @@ namespace Attributes {
 namespace Status {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::PowerSource::enum8;
+    using DecodableType    = chip::app::Clusters::PowerSource::enum8;
+    using DecodableArgType = chip::app::Clusters::PowerSource::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Status::Id; }
@@ -9916,9 +9976,9 @@ struct TypeInfo
 namespace WiredCurrentType {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::PowerSource::enum8;
+    using DecodableType    = chip::app::Clusters::PowerSource::enum8;
+    using DecodableArgType = chip::app::Clusters::PowerSource::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredCurrentType::Id; }
@@ -10024,9 +10084,9 @@ struct TypeInfo
 namespace BatteryChargeLevel {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::PowerSource::enum8;
+    using DecodableType    = chip::app::Clusters::PowerSource::enum8;
+    using DecodableArgType = chip::app::Clusters::PowerSource::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryChargeLevel::Id; }
@@ -10048,9 +10108,9 @@ struct TypeInfo
 namespace BatteryReplaceability {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::PowerSource::enum8;
+    using DecodableType    = chip::app::Clusters::PowerSource::enum8;
+    using DecodableArgType = chip::app::Clusters::PowerSource::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryReplaceability::Id; }
@@ -10171,9 +10231,9 @@ struct TypeInfo
 namespace BatteryChargeState {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::PowerSource::enum8;
+    using DecodableType    = chip::app::Clusters::PowerSource::enum8;
+    using DecodableArgType = chip::app::Clusters::PowerSource::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryChargeState::Id; }
@@ -10267,9 +10327,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::PowerSource::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::PowerSource::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::PowerSource::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -10297,24 +10357,27 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Status::TypeInfo::DecodableType status = static_cast<uint8_t>(0);
+        Attributes::Status::TypeInfo::DecodableType status = static_cast<chip::app::Clusters::PowerSource::enum8>(0);
         Attributes::Order::TypeInfo::DecodableType order   = static_cast<uint8_t>(0);
         Attributes::Description::TypeInfo::DecodableType description;
         Attributes::WiredAssessedInputVoltage::TypeInfo::DecodableType wiredAssessedInputVoltage     = static_cast<uint32_t>(0);
         Attributes::WiredAssessedInputFrequency::TypeInfo::DecodableType wiredAssessedInputFrequency = static_cast<uint16_t>(0);
-        Attributes::WiredCurrentType::TypeInfo::DecodableType wiredCurrentType                       = static_cast<uint8_t>(0);
-        Attributes::WiredAssessedCurrent::TypeInfo::DecodableType wiredAssessedCurrent               = static_cast<uint32_t>(0);
-        Attributes::WiredNominalVoltage::TypeInfo::DecodableType wiredNominalVoltage                 = static_cast<uint32_t>(0);
-        Attributes::WiredMaximumCurrent::TypeInfo::DecodableType wiredMaximumCurrent                 = static_cast<uint32_t>(0);
-        Attributes::WiredPresent::TypeInfo::DecodableType wiredPresent                               = static_cast<bool>(0);
+        Attributes::WiredCurrentType::TypeInfo::DecodableType wiredCurrentType =
+            static_cast<chip::app::Clusters::PowerSource::enum8>(0);
+        Attributes::WiredAssessedCurrent::TypeInfo::DecodableType wiredAssessedCurrent = static_cast<uint32_t>(0);
+        Attributes::WiredNominalVoltage::TypeInfo::DecodableType wiredNominalVoltage   = static_cast<uint32_t>(0);
+        Attributes::WiredMaximumCurrent::TypeInfo::DecodableType wiredMaximumCurrent   = static_cast<uint32_t>(0);
+        Attributes::WiredPresent::TypeInfo::DecodableType wiredPresent                 = static_cast<bool>(0);
         Attributes::ActiveWiredFaults::TypeInfo::DecodableType activeWiredFaults;
-        Attributes::BatteryVoltage::TypeInfo::DecodableType batteryVoltage                     = static_cast<uint32_t>(0);
-        Attributes::BatteryPercentRemaining::TypeInfo::DecodableType batteryPercentRemaining   = static_cast<uint8_t>(0);
-        Attributes::BatteryTimeRemaining::TypeInfo::DecodableType batteryTimeRemaining         = static_cast<uint32_t>(0);
-        Attributes::BatteryChargeLevel::TypeInfo::DecodableType batteryChargeLevel             = static_cast<uint8_t>(0);
+        Attributes::BatteryVoltage::TypeInfo::DecodableType batteryVoltage                   = static_cast<uint32_t>(0);
+        Attributes::BatteryPercentRemaining::TypeInfo::DecodableType batteryPercentRemaining = static_cast<uint8_t>(0);
+        Attributes::BatteryTimeRemaining::TypeInfo::DecodableType batteryTimeRemaining       = static_cast<uint32_t>(0);
+        Attributes::BatteryChargeLevel::TypeInfo::DecodableType batteryChargeLevel =
+            static_cast<chip::app::Clusters::PowerSource::enum8>(0);
         Attributes::BatteryReplacementNeeded::TypeInfo::DecodableType batteryReplacementNeeded = static_cast<bool>(0);
-        Attributes::BatteryReplaceability::TypeInfo::DecodableType batteryReplaceability       = static_cast<uint8_t>(0);
-        Attributes::BatteryPresent::TypeInfo::DecodableType batteryPresent                     = static_cast<bool>(0);
+        Attributes::BatteryReplaceability::TypeInfo::DecodableType batteryReplaceability =
+            static_cast<chip::app::Clusters::PowerSource::enum8>(0);
+        Attributes::BatteryPresent::TypeInfo::DecodableType batteryPresent = static_cast<bool>(0);
         Attributes::ActiveBatteryFaults::TypeInfo::DecodableType activeBatteryFaults;
         Attributes::BatteryReplacementDescription::TypeInfo::DecodableType batteryReplacementDescription;
         Attributes::BatteryCommonDesignation::TypeInfo::DecodableType batteryCommonDesignation = static_cast<uint32_t>(0);
@@ -10323,15 +10386,17 @@ struct TypeInfo
         Attributes::BatteryApprovedChemistry::TypeInfo::DecodableType batteryApprovedChemistry = static_cast<uint32_t>(0);
         Attributes::BatteryCapacity::TypeInfo::DecodableType batteryCapacity                   = static_cast<uint32_t>(0);
         Attributes::BatteryQuantity::TypeInfo::DecodableType batteryQuantity                   = static_cast<uint8_t>(0);
-        Attributes::BatteryChargeState::TypeInfo::DecodableType batteryChargeState             = static_cast<uint8_t>(0);
-        Attributes::BatteryTimeToFullCharge::TypeInfo::DecodableType batteryTimeToFullCharge   = static_cast<uint32_t>(0);
+        Attributes::BatteryChargeState::TypeInfo::DecodableType batteryChargeState =
+            static_cast<chip::app::Clusters::PowerSource::enum8>(0);
+        Attributes::BatteryTimeToFullCharge::TypeInfo::DecodableType batteryTimeToFullCharge = static_cast<uint32_t>(0);
         Attributes::BatteryFunctionalWhileCharging::TypeInfo::DecodableType batteryFunctionalWhileCharging = static_cast<bool>(0);
         Attributes::BatteryChargingCurrent::TypeInfo::DecodableType batteryChargingCurrent = static_cast<uint32_t>(0);
         Attributes::ActiveBatteryChargeFaults::TypeInfo::DecodableType activeBatteryChargeFaults;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::PowerSource::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -10707,9 +10772,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::GeneralCommissioning::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::GeneralCommissioning::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::GeneralCommissioning::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -10747,7 +10812,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::GeneralCommissioning::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -11373,9 +11439,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::NetworkCommissioning::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::NetworkCommissioning::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::NetworkCommissioning::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -11414,7 +11480,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::NetworkCommissioning::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -11560,9 +11627,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::DiagnosticLogs::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::DiagnosticLogs::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::DiagnosticLogs::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -11593,7 +11660,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::DiagnosticLogs::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -11706,9 +11774,9 @@ struct TypeInfo
 namespace BootReasons {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::GeneralDiagnostics::enum8;
+    using DecodableType    = chip::app::Clusters::GeneralDiagnostics::enum8;
+    using DecodableArgType = chip::app::Clusters::GeneralDiagnostics::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BootReasons::Id; }
@@ -11790,9 +11858,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::GeneralDiagnostics::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::GeneralDiagnostics::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::GeneralDiagnostics::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -11824,14 +11892,16 @@ struct TypeInfo
         Attributes::RebootCount::TypeInfo::DecodableType rebootCount                     = static_cast<uint16_t>(0);
         Attributes::UpTime::TypeInfo::DecodableType upTime                               = static_cast<uint64_t>(0);
         Attributes::TotalOperationalHours::TypeInfo::DecodableType totalOperationalHours = static_cast<uint32_t>(0);
-        Attributes::BootReasons::TypeInfo::DecodableType bootReasons                     = static_cast<uint8_t>(0);
+        Attributes::BootReasons::TypeInfo::DecodableType bootReasons =
+            static_cast<chip::app::Clusters::GeneralDiagnostics::enum8>(0);
         Attributes::ActiveHardwareFaults::TypeInfo::DecodableType activeHardwareFaults;
         Attributes::ActiveRadioFaults::TypeInfo::DecodableType activeRadioFaults;
         Attributes::ActiveNetworkFaults::TypeInfo::DecodableType activeNetworkFaults;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::GeneralDiagnostics::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -12170,9 +12240,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::SoftwareDiagnostics::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::SoftwareDiagnostics::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::SoftwareDiagnostics::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -12207,7 +12277,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::SoftwareDiagnostics::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -12389,8 +12460,8 @@ enum class Fields
 struct Type
 {
 public:
-    uint16_t rotationTime = static_cast<uint16_t>(0);
-    uint16_t flags        = static_cast<uint16_t>(0);
+    uint16_t rotationTime          = static_cast<uint16_t>(0);
+    chip::BitFlags<bitmap16> flags = static_cast<chip::BitFlags<bitmap16>>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -12462,9 +12533,9 @@ struct TypeInfo
 namespace RoutingRole {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::ThreadNetworkDiagnostics::enum8;
+    using DecodableType    = chip::app::Clusters::ThreadNetworkDiagnostics::enum8;
+    using DecodableArgType = chip::app::Clusters::ThreadNetworkDiagnostics::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RoutingRole::Id; }
@@ -13255,9 +13326,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ThreadNetworkDiagnostics::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ThreadNetworkDiagnostics::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ThreadNetworkDiagnostics::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -13285,8 +13356,9 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Channel::TypeInfo::DecodableType channel         = static_cast<uint16_t>(0);
-        Attributes::RoutingRole::TypeInfo::DecodableType routingRole = static_cast<uint8_t>(0);
+        Attributes::Channel::TypeInfo::DecodableType channel = static_cast<uint16_t>(0);
+        Attributes::RoutingRole::TypeInfo::DecodableType routingRole =
+            static_cast<chip::app::Clusters::ThreadNetworkDiagnostics::enum8>(0);
         Attributes::NetworkName::TypeInfo::DecodableType networkName;
         Attributes::PanId::TypeInfo::DecodableType panId                 = static_cast<uint16_t>(0);
         Attributes::ExtendedPanId::TypeInfo::DecodableType extendedPanId = static_cast<uint64_t>(0);
@@ -13352,7 +13424,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ThreadNetworkDiagnostics::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -13634,9 +13707,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::WiFiNetworkDiagnostics::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::WiFiNetworkDiagnostics::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::WiFiNetworkDiagnostics::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -13680,7 +13753,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::WiFiNetworkDiagnostics::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -13982,9 +14056,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::EthernetNetworkDiagnostics::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::EthernetNetworkDiagnostics::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::EthernetNetworkDiagnostics::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -14024,7 +14098,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::EthernetNetworkDiagnostics::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -14073,9 +14148,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::TimeSynchronization::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::TimeSynchronization::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::TimeSynchronization::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -14106,7 +14181,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::TimeSynchronization::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -14346,9 +14422,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::BridgedDeviceBasic::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::BridgedDeviceBasic::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::BridgedDeviceBasic::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -14394,7 +14470,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::BridgedDeviceBasic::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -14603,9 +14680,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Switch::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Switch::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Switch::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -14639,7 +14716,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::Switch::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -15090,9 +15168,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::AdministratorCommissioning::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::AdministratorCommissioning::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::AdministratorCommissioning::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -15126,7 +15204,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::AdministratorCommissioning::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -15841,9 +15920,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::OperationalCredentials::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::OperationalCredentials::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::OperationalCredentials::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -15880,7 +15959,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::OperationalCredentials::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -16329,9 +16409,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::GroupKeyManagement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::GroupKeyManagement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::GroupKeyManagement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -16366,7 +16446,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::GroupKeyManagement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -16431,9 +16512,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::FixedLabel::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::FixedLabel::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::FixedLabel::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -16465,7 +16546,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::FixedLabel::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -16530,9 +16612,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::UserLabel::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::UserLabel::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::UserLabel::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -16564,7 +16646,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::UserLabel::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -16613,9 +16696,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ProxyConfiguration::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ProxyConfiguration::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ProxyConfiguration::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -16646,7 +16729,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ProxyConfiguration::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -16695,9 +16779,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ProxyDiscovery::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ProxyDiscovery::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ProxyDiscovery::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyDiscovery::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -16728,7 +16812,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ProxyDiscovery::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -16777,9 +16862,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ProxyValid::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ProxyValid::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ProxyValid::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyValid::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -16810,7 +16895,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ProxyValid::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -16871,9 +16957,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::BooleanState::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::BooleanState::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::BooleanState::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -16905,7 +16991,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::BooleanState::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -16983,8 +17070,8 @@ enum class Fields
 struct Type
 {
 public:
-    uint16_t mfgCode = static_cast<uint16_t>(0);
-    uint16_t value   = static_cast<uint16_t>(0);
+    enum16 mfgCode = static_cast<enum16>(0);
+    enum16 value   = static_cast<enum16>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -17061,9 +17148,9 @@ struct TypeInfo
 namespace StandardNamespace {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::ModeSelect::enum16>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::ModeSelect::enum16>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::ModeSelect::enum16> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StandardNamespace::Id; }
@@ -17159,9 +17246,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ModeSelect::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ModeSelect::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ModeSelect::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -17198,7 +17285,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ModeSelect::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -17235,9 +17323,9 @@ struct TypeInfo
 namespace Status {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ShadeConfiguration::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ShadeConfiguration::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ShadeConfiguration::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Status::Id; }
@@ -17259,9 +17347,9 @@ struct TypeInfo
 namespace Mode {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::ShadeConfiguration::enum8;
+    using DecodableType    = chip::app::Clusters::ShadeConfiguration::enum8;
+    using DecodableArgType = chip::app::Clusters::ShadeConfiguration::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Mode::Id; }
@@ -17307,9 +17395,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ShadeConfiguration::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ShadeConfiguration::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ShadeConfiguration::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -17339,13 +17427,15 @@ struct TypeInfo
 
         Attributes::PhysicalClosedLimit::TypeInfo::DecodableType physicalClosedLimit = static_cast<uint16_t>(0);
         Attributes::MotorStepSize::TypeInfo::DecodableType motorStepSize             = static_cast<uint8_t>(0);
-        Attributes::Status::TypeInfo::DecodableType status                           = static_cast<uint8_t>(0);
-        Attributes::ClosedLimit::TypeInfo::DecodableType closedLimit                 = static_cast<uint16_t>(0);
-        Attributes::Mode::TypeInfo::DecodableType mode                               = static_cast<uint8_t>(0);
+        Attributes::Status::TypeInfo::DecodableType status =
+            static_cast<chip::BitFlags<chip::app::Clusters::ShadeConfiguration::bitmap8>>(0);
+        Attributes::ClosedLimit::TypeInfo::DecodableType closedLimit = static_cast<uint16_t>(0);
+        Attributes::Mode::TypeInfo::DecodableType mode = static_cast<chip::app::Clusters::ShadeConfiguration::enum8>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ShadeConfiguration::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -19858,9 +19948,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::DoorLock::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::DoorLock::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::DoorLock::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -19952,7 +20042,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -20564,9 +20655,9 @@ struct TypeInfo
 namespace OperationalStatus {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationalStatus::Id; }
@@ -20696,9 +20787,9 @@ struct TypeInfo
 namespace SafetyStatus {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap16>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap16>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap16>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SafetyStatus::Id; }
@@ -20744,9 +20835,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -20785,7 +20876,8 @@ struct TypeInfo
             static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus>>(0);
         Attributes::CurrentPositionLiftPercentage::TypeInfo::DecodableType currentPositionLiftPercentage;
         Attributes::CurrentPositionTiltPercentage::TypeInfo::DecodableType currentPositionTiltPercentage;
-        Attributes::OperationalStatus::TypeInfo::DecodableType operationalStatus = static_cast<uint8_t>(0);
+        Attributes::OperationalStatus::TypeInfo::DecodableType operationalStatus =
+            static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap8>>(0);
         Attributes::TargetPositionLiftPercent100ths::TypeInfo::DecodableType targetPositionLiftPercent100ths;
         Attributes::TargetPositionTiltPercent100ths::TypeInfo::DecodableType targetPositionTiltPercent100ths;
         Attributes::EndProductType::TypeInfo::DecodableType endProductType =
@@ -20797,11 +20889,13 @@ struct TypeInfo
         Attributes::InstalledOpenLimitTilt::TypeInfo::DecodableType installedOpenLimitTilt     = static_cast<uint16_t>(0);
         Attributes::InstalledClosedLimitTilt::TypeInfo::DecodableType installedClosedLimitTilt = static_cast<uint16_t>(0);
         Attributes::Mode::TypeInfo::DecodableType mode = static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>>(0);
-        Attributes::SafetyStatus::TypeInfo::DecodableType safetyStatus = static_cast<uint16_t>(0);
+        Attributes::SafetyStatus::TypeInfo::DecodableType safetyStatus =
+            static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap16>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -20892,9 +20986,9 @@ namespace Attributes {
 namespace BarrierMovingState {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::BarrierControl::enum8;
+    using DecodableType    = chip::app::Clusters::BarrierControl::enum8;
+    using DecodableArgType = chip::app::Clusters::BarrierControl::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierMovingState::Id; }
@@ -20904,9 +20998,9 @@ struct TypeInfo
 namespace BarrierSafetyStatus {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::BarrierControl::bitmap16>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::BarrierControl::bitmap16>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::BarrierControl::bitmap16>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierSafetyStatus::Id; }
@@ -20916,9 +21010,9 @@ struct TypeInfo
 namespace BarrierCapabilities {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::BarrierControl::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::BarrierControl::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::BarrierControl::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierCapabilities::Id; }
@@ -21048,9 +21142,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::BarrierControl::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::BarrierControl::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::BarrierControl::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -21078,9 +21172,12 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::BarrierMovingState::TypeInfo::DecodableType barrierMovingState               = static_cast<uint8_t>(0);
-        Attributes::BarrierSafetyStatus::TypeInfo::DecodableType barrierSafetyStatus             = static_cast<uint16_t>(0);
-        Attributes::BarrierCapabilities::TypeInfo::DecodableType barrierCapabilities             = static_cast<uint8_t>(0);
+        Attributes::BarrierMovingState::TypeInfo::DecodableType barrierMovingState =
+            static_cast<chip::app::Clusters::BarrierControl::enum8>(0);
+        Attributes::BarrierSafetyStatus::TypeInfo::DecodableType barrierSafetyStatus =
+            static_cast<chip::BitFlags<chip::app::Clusters::BarrierControl::bitmap16>>(0);
+        Attributes::BarrierCapabilities::TypeInfo::DecodableType barrierCapabilities =
+            static_cast<chip::BitFlags<chip::app::Clusters::BarrierControl::bitmap8>>(0);
         Attributes::BarrierOpenEvents::TypeInfo::DecodableType barrierOpenEvents                 = static_cast<uint16_t>(0);
         Attributes::BarrierCloseEvents::TypeInfo::DecodableType barrierCloseEvents               = static_cast<uint16_t>(0);
         Attributes::BarrierCommandOpenEvents::TypeInfo::DecodableType barrierCommandOpenEvents   = static_cast<uint16_t>(0);
@@ -21091,7 +21188,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::BarrierControl::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -21260,9 +21358,9 @@ struct TypeInfo
 namespace PumpStatus {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::bitmap16>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::bitmap16>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::bitmap16>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PumpStatus::Id; }
@@ -21380,9 +21478,9 @@ struct TypeInfo
 namespace AlarmMask {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::bitmap16>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::bitmap16>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::bitmap16>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AlarmMask::Id; }
@@ -21428,9 +21526,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -21471,7 +21569,8 @@ struct TypeInfo
         Attributes::MaxConstFlow::TypeInfo::DecodableType maxConstFlow;
         Attributes::MinConstTemp::TypeInfo::DecodableType minConstTemp;
         Attributes::MaxConstTemp::TypeInfo::DecodableType maxConstTemp;
-        Attributes::PumpStatus::TypeInfo::DecodableType pumpStatus = static_cast<uint16_t>(0);
+        Attributes::PumpStatus::TypeInfo::DecodableType pumpStatus =
+            static_cast<chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::bitmap16>>(0);
         Attributes::EffectiveOperationMode::TypeInfo::DecodableType effectiveOperationMode =
             static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode>(0);
         Attributes::EffectiveControlMode::TypeInfo::DecodableType effectiveControlMode =
@@ -21485,11 +21584,13 @@ struct TypeInfo
             static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode>(0);
         Attributes::ControlMode::TypeInfo::DecodableType controlMode =
             static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode>(0);
-        Attributes::AlarmMask::TypeInfo::DecodableType alarmMask = static_cast<uint16_t>(0);
+        Attributes::AlarmMask::TypeInfo::DecodableType alarmMask =
+            static_cast<chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::bitmap16>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -22302,9 +22403,9 @@ struct TypeInfo
 namespace Occupancy {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Occupancy::Id; }
@@ -22386,9 +22487,9 @@ struct TypeInfo
 namespace HvacSystemTypeConfiguration {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HvacSystemTypeConfiguration::Id; }
@@ -22518,9 +22619,9 @@ struct TypeInfo
 namespace RemoteSensing {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RemoteSensing::Id; }
@@ -22542,9 +22643,9 @@ struct TypeInfo
 namespace SystemMode {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::Thermostat::enum8;
+    using DecodableType    = chip::app::Clusters::Thermostat::enum8;
+    using DecodableArgType = chip::app::Clusters::Thermostat::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SystemMode::Id; }
@@ -22554,9 +22655,9 @@ struct TypeInfo
 namespace AlarmMask {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AlarmMask::Id; }
@@ -22566,9 +22667,9 @@ struct TypeInfo
 namespace ThermostatRunningMode {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::Thermostat::enum8;
+    using DecodableType    = chip::app::Clusters::Thermostat::enum8;
+    using DecodableArgType = chip::app::Clusters::Thermostat::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ThermostatRunningMode::Id; }
@@ -22578,9 +22679,9 @@ struct TypeInfo
 namespace StartOfWeek {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::Thermostat::enum8;
+    using DecodableType    = chip::app::Clusters::Thermostat::enum8;
+    using DecodableArgType = chip::app::Clusters::Thermostat::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartOfWeek::Id; }
@@ -22614,9 +22715,9 @@ struct TypeInfo
 namespace TemperatureSetpointHold {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::Thermostat::enum8;
+    using DecodableType    = chip::app::Clusters::Thermostat::enum8;
+    using DecodableArgType = chip::app::Clusters::Thermostat::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureSetpointHold::Id; }
@@ -22638,9 +22739,9 @@ struct TypeInfo
 namespace ThermostatProgrammingOperationMode {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ThermostatProgrammingOperationMode::Id; }
@@ -22650,9 +22751,9 @@ struct TypeInfo
 namespace ThermostatRunningState {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap16>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap16>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap16>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ThermostatRunningState::Id; }
@@ -22662,9 +22763,9 @@ struct TypeInfo
 namespace SetpointChangeSource {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::Thermostat::enum8;
+    using DecodableType    = chip::app::Clusters::Thermostat::enum8;
+    using DecodableArgType = chip::app::Clusters::Thermostat::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SetpointChangeSource::Id; }
@@ -22698,9 +22799,9 @@ struct TypeInfo
 namespace AcType {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::Thermostat::enum8;
+    using DecodableType    = chip::app::Clusters::Thermostat::enum8;
+    using DecodableArgType = chip::app::Clusters::Thermostat::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcType::Id; }
@@ -22722,9 +22823,9 @@ struct TypeInfo
 namespace AcRefrigerantType {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::Thermostat::enum8;
+    using DecodableType    = chip::app::Clusters::Thermostat::enum8;
+    using DecodableArgType = chip::app::Clusters::Thermostat::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcRefrigerantType::Id; }
@@ -22734,9 +22835,9 @@ struct TypeInfo
 namespace AcCompressorType {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::Thermostat::enum8;
+    using DecodableType    = chip::app::Clusters::Thermostat::enum8;
+    using DecodableArgType = chip::app::Clusters::Thermostat::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCompressorType::Id; }
@@ -22746,9 +22847,9 @@ struct TypeInfo
 namespace AcErrorCode {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcErrorCode::Id; }
@@ -22758,9 +22859,9 @@ struct TypeInfo
 namespace AcLouverPosition {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::Thermostat::enum8;
+    using DecodableType    = chip::app::Clusters::Thermostat::enum8;
+    using DecodableArgType = chip::app::Clusters::Thermostat::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcLouverPosition::Id; }
@@ -22782,9 +22883,9 @@ struct TypeInfo
 namespace AcCapacityFormat {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::Thermostat::enum8;
+    using DecodableType    = chip::app::Clusters::Thermostat::enum8;
+    using DecodableArgType = chip::app::Clusters::Thermostat::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCapacityFormat::Id; }
@@ -22830,9 +22931,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Thermostat::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -22860,16 +22961,18 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::LocalTemperature::TypeInfo::DecodableType localTemperature                       = static_cast<int16_t>(0);
-        Attributes::OutdoorTemperature::TypeInfo::DecodableType outdoorTemperature                   = static_cast<int16_t>(0);
-        Attributes::Occupancy::TypeInfo::DecodableType occupancy                                     = static_cast<uint8_t>(0);
-        Attributes::AbsMinHeatSetpointLimit::TypeInfo::DecodableType absMinHeatSetpointLimit         = static_cast<int16_t>(0);
-        Attributes::AbsMaxHeatSetpointLimit::TypeInfo::DecodableType absMaxHeatSetpointLimit         = static_cast<int16_t>(0);
-        Attributes::AbsMinCoolSetpointLimit::TypeInfo::DecodableType absMinCoolSetpointLimit         = static_cast<int16_t>(0);
-        Attributes::AbsMaxCoolSetpointLimit::TypeInfo::DecodableType absMaxCoolSetpointLimit         = static_cast<int16_t>(0);
-        Attributes::PiCoolingDemand::TypeInfo::DecodableType piCoolingDemand                         = static_cast<uint8_t>(0);
-        Attributes::PiHeatingDemand::TypeInfo::DecodableType piHeatingDemand                         = static_cast<uint8_t>(0);
-        Attributes::HvacSystemTypeConfiguration::TypeInfo::DecodableType hvacSystemTypeConfiguration = static_cast<uint8_t>(0);
+        Attributes::LocalTemperature::TypeInfo::DecodableType localTemperature     = static_cast<int16_t>(0);
+        Attributes::OutdoorTemperature::TypeInfo::DecodableType outdoorTemperature = static_cast<int16_t>(0);
+        Attributes::Occupancy::TypeInfo::DecodableType occupancy =
+            static_cast<chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8>>(0);
+        Attributes::AbsMinHeatSetpointLimit::TypeInfo::DecodableType absMinHeatSetpointLimit = static_cast<int16_t>(0);
+        Attributes::AbsMaxHeatSetpointLimit::TypeInfo::DecodableType absMaxHeatSetpointLimit = static_cast<int16_t>(0);
+        Attributes::AbsMinCoolSetpointLimit::TypeInfo::DecodableType absMinCoolSetpointLimit = static_cast<int16_t>(0);
+        Attributes::AbsMaxCoolSetpointLimit::TypeInfo::DecodableType absMaxCoolSetpointLimit = static_cast<int16_t>(0);
+        Attributes::PiCoolingDemand::TypeInfo::DecodableType piCoolingDemand                 = static_cast<uint8_t>(0);
+        Attributes::PiHeatingDemand::TypeInfo::DecodableType piHeatingDemand                 = static_cast<uint8_t>(0);
+        Attributes::HvacSystemTypeConfiguration::TypeInfo::DecodableType hvacSystemTypeConfiguration =
+            static_cast<chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8>>(0);
         Attributes::LocalTemperatureCalibration::TypeInfo::DecodableType localTemperatureCalibration = static_cast<int8_t>(0);
         Attributes::OccupiedCoolingSetpoint::TypeInfo::DecodableType occupiedCoolingSetpoint         = static_cast<int16_t>(0);
         Attributes::OccupiedHeatingSetpoint::TypeInfo::DecodableType occupiedHeatingSetpoint         = static_cast<int16_t>(0);
@@ -22880,36 +22983,48 @@ struct TypeInfo
         Attributes::MinCoolSetpointLimit::TypeInfo::DecodableType minCoolSetpointLimit               = static_cast<int16_t>(0);
         Attributes::MaxCoolSetpointLimit::TypeInfo::DecodableType maxCoolSetpointLimit               = static_cast<int16_t>(0);
         Attributes::MinSetpointDeadBand::TypeInfo::DecodableType minSetpointDeadBand                 = static_cast<int8_t>(0);
-        Attributes::RemoteSensing::TypeInfo::DecodableType remoteSensing                             = static_cast<uint8_t>(0);
+        Attributes::RemoteSensing::TypeInfo::DecodableType remoteSensing =
+            static_cast<chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8>>(0);
         Attributes::ControlSequenceOfOperation::TypeInfo::DecodableType controlSequenceOfOperation =
             static_cast<chip::app::Clusters::Thermostat::ThermostatControlSequence>(0);
-        Attributes::SystemMode::TypeInfo::DecodableType systemMode                               = static_cast<uint8_t>(0);
-        Attributes::AlarmMask::TypeInfo::DecodableType alarmMask                                 = static_cast<uint8_t>(0);
-        Attributes::ThermostatRunningMode::TypeInfo::DecodableType thermostatRunningMode         = static_cast<uint8_t>(0);
-        Attributes::StartOfWeek::TypeInfo::DecodableType startOfWeek                             = static_cast<uint8_t>(0);
+        Attributes::SystemMode::TypeInfo::DecodableType systemMode = static_cast<chip::app::Clusters::Thermostat::enum8>(0);
+        Attributes::AlarmMask::TypeInfo::DecodableType alarmMask =
+            static_cast<chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8>>(0);
+        Attributes::ThermostatRunningMode::TypeInfo::DecodableType thermostatRunningMode =
+            static_cast<chip::app::Clusters::Thermostat::enum8>(0);
+        Attributes::StartOfWeek::TypeInfo::DecodableType startOfWeek = static_cast<chip::app::Clusters::Thermostat::enum8>(0);
         Attributes::NumberOfWeeklyTransitions::TypeInfo::DecodableType numberOfWeeklyTransitions = static_cast<uint8_t>(0);
         Attributes::NumberOfDailyTransitions::TypeInfo::DecodableType numberOfDailyTransitions   = static_cast<uint8_t>(0);
-        Attributes::TemperatureSetpointHold::TypeInfo::DecodableType temperatureSetpointHold     = static_cast<uint8_t>(0);
+        Attributes::TemperatureSetpointHold::TypeInfo::DecodableType temperatureSetpointHold =
+            static_cast<chip::app::Clusters::Thermostat::enum8>(0);
         Attributes::TemperatureSetpointHoldDuration::TypeInfo::DecodableType temperatureSetpointHoldDuration =
             static_cast<uint16_t>(0);
         Attributes::ThermostatProgrammingOperationMode::TypeInfo::DecodableType thermostatProgrammingOperationMode =
-            static_cast<uint8_t>(0);
-        Attributes::ThermostatRunningState::TypeInfo::DecodableType thermostatRunningState               = static_cast<uint16_t>(0);
-        Attributes::SetpointChangeSource::TypeInfo::DecodableType setpointChangeSource                   = static_cast<uint8_t>(0);
+            static_cast<chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8>>(0);
+        Attributes::ThermostatRunningState::TypeInfo::DecodableType thermostatRunningState =
+            static_cast<chip::BitFlags<chip::app::Clusters::Thermostat::bitmap16>>(0);
+        Attributes::SetpointChangeSource::TypeInfo::DecodableType setpointChangeSource =
+            static_cast<chip::app::Clusters::Thermostat::enum8>(0);
         Attributes::SetpointChangeAmount::TypeInfo::DecodableType setpointChangeAmount                   = static_cast<int16_t>(0);
         Attributes::SetpointChangeSourceTimestamp::TypeInfo::DecodableType setpointChangeSourceTimestamp = static_cast<uint32_t>(0);
-        Attributes::AcType::TypeInfo::DecodableType acType                                               = static_cast<uint8_t>(0);
-        Attributes::AcCapacity::TypeInfo::DecodableType acCapacity                                       = static_cast<uint16_t>(0);
-        Attributes::AcRefrigerantType::TypeInfo::DecodableType acRefrigerantType                         = static_cast<uint8_t>(0);
-        Attributes::AcCompressorType::TypeInfo::DecodableType acCompressorType                           = static_cast<uint8_t>(0);
-        Attributes::AcErrorCode::TypeInfo::DecodableType acErrorCode                                     = static_cast<uint32_t>(0);
-        Attributes::AcLouverPosition::TypeInfo::DecodableType acLouverPosition                           = static_cast<uint8_t>(0);
-        Attributes::AcCoilTemperature::TypeInfo::DecodableType acCoilTemperature                         = static_cast<int16_t>(0);
-        Attributes::AcCapacityFormat::TypeInfo::DecodableType acCapacityFormat                           = static_cast<uint8_t>(0);
+        Attributes::AcType::TypeInfo::DecodableType acType         = static_cast<chip::app::Clusters::Thermostat::enum8>(0);
+        Attributes::AcCapacity::TypeInfo::DecodableType acCapacity = static_cast<uint16_t>(0);
+        Attributes::AcRefrigerantType::TypeInfo::DecodableType acRefrigerantType =
+            static_cast<chip::app::Clusters::Thermostat::enum8>(0);
+        Attributes::AcCompressorType::TypeInfo::DecodableType acCompressorType =
+            static_cast<chip::app::Clusters::Thermostat::enum8>(0);
+        Attributes::AcErrorCode::TypeInfo::DecodableType acErrorCode =
+            static_cast<chip::BitFlags<chip::app::Clusters::Thermostat::bitmap32>>(0);
+        Attributes::AcLouverPosition::TypeInfo::DecodableType acLouverPosition =
+            static_cast<chip::app::Clusters::Thermostat::enum8>(0);
+        Attributes::AcCoilTemperature::TypeInfo::DecodableType acCoilTemperature = static_cast<int16_t>(0);
+        Attributes::AcCapacityFormat::TypeInfo::DecodableType acCapacityFormat =
+            static_cast<chip::app::Clusters::Thermostat::enum8>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::Thermostat::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -23006,9 +23121,9 @@ struct TypeInfo
 namespace RockSupport {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::FanControl::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::FanControl::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::FanControl::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RockSupport::Id; }
@@ -23018,9 +23133,9 @@ struct TypeInfo
 namespace RockSetting {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::FanControl::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::FanControl::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::FanControl::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RockSetting::Id; }
@@ -23030,9 +23145,9 @@ struct TypeInfo
 namespace WindSupport {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::FanControl::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::FanControl::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::FanControl::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WindSupport::Id; }
@@ -23042,9 +23157,9 @@ struct TypeInfo
 namespace WindSetting {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::FanControl::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::FanControl::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::FanControl::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WindSetting::Id; }
@@ -23090,9 +23205,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::FanControl::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::FanControl::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::FanControl::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -23128,14 +23243,19 @@ struct TypeInfo
         Attributes::SpeedMax::TypeInfo::DecodableType speedMax             = static_cast<uint8_t>(0);
         Attributes::SpeedSetting::TypeInfo::DecodableType speedSetting     = static_cast<uint8_t>(0);
         Attributes::SpeedCurrent::TypeInfo::DecodableType speedCurrent     = static_cast<uint8_t>(0);
-        Attributes::RockSupport::TypeInfo::DecodableType rockSupport       = static_cast<uint8_t>(0);
-        Attributes::RockSetting::TypeInfo::DecodableType rockSetting       = static_cast<uint8_t>(0);
-        Attributes::WindSupport::TypeInfo::DecodableType windSupport       = static_cast<uint8_t>(0);
-        Attributes::WindSetting::TypeInfo::DecodableType windSetting       = static_cast<uint8_t>(0);
+        Attributes::RockSupport::TypeInfo::DecodableType rockSupport =
+            static_cast<chip::BitFlags<chip::app::Clusters::FanControl::bitmap8>>(0);
+        Attributes::RockSetting::TypeInfo::DecodableType rockSetting =
+            static_cast<chip::BitFlags<chip::app::Clusters::FanControl::bitmap8>>(0);
+        Attributes::WindSupport::TypeInfo::DecodableType windSupport =
+            static_cast<chip::BitFlags<chip::app::Clusters::FanControl::bitmap8>>(0);
+        Attributes::WindSetting::TypeInfo::DecodableType windSetting =
+            static_cast<chip::BitFlags<chip::app::Clusters::FanControl::bitmap8>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::FanControl::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -23184,9 +23304,9 @@ struct TypeInfo
 namespace RelativeHumidityMode {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::DehumidificationControl::enum8;
+    using DecodableType    = chip::app::Clusters::DehumidificationControl::enum8;
+    using DecodableArgType = chip::app::Clusters::DehumidificationControl::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RelativeHumidityMode::Id; }
@@ -23196,9 +23316,9 @@ struct TypeInfo
 namespace DehumidificationLockout {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::DehumidificationControl::enum8;
+    using DecodableType    = chip::app::Clusters::DehumidificationControl::enum8;
+    using DecodableArgType = chip::app::Clusters::DehumidificationControl::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DehumidificationLockout::Id; }
@@ -23232,9 +23352,9 @@ struct TypeInfo
 namespace RelativeHumidityDisplay {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::DehumidificationControl::enum8;
+    using DecodableType    = chip::app::Clusters::DehumidificationControl::enum8;
+    using DecodableArgType = chip::app::Clusters::DehumidificationControl::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RelativeHumidityDisplay::Id; }
@@ -23280,9 +23400,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::DehumidificationControl::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::DehumidificationControl::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::DehumidificationControl::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -23313,15 +23433,19 @@ struct TypeInfo
         Attributes::RelativeHumidity::TypeInfo::DecodableType relativeHumidity                     = static_cast<uint8_t>(0);
         Attributes::DehumidificationCooling::TypeInfo::DecodableType dehumidificationCooling       = static_cast<uint8_t>(0);
         Attributes::RhDehumidificationSetpoint::TypeInfo::DecodableType rhDehumidificationSetpoint = static_cast<uint8_t>(0);
-        Attributes::RelativeHumidityMode::TypeInfo::DecodableType relativeHumidityMode             = static_cast<uint8_t>(0);
-        Attributes::DehumidificationLockout::TypeInfo::DecodableType dehumidificationLockout       = static_cast<uint8_t>(0);
+        Attributes::RelativeHumidityMode::TypeInfo::DecodableType relativeHumidityMode =
+            static_cast<chip::app::Clusters::DehumidificationControl::enum8>(0);
+        Attributes::DehumidificationLockout::TypeInfo::DecodableType dehumidificationLockout =
+            static_cast<chip::app::Clusters::DehumidificationControl::enum8>(0);
         Attributes::DehumidificationHysteresis::TypeInfo::DecodableType dehumidificationHysteresis = static_cast<uint8_t>(0);
         Attributes::DehumidificationMaxCool::TypeInfo::DecodableType dehumidificationMaxCool       = static_cast<uint8_t>(0);
-        Attributes::RelativeHumidityDisplay::TypeInfo::DecodableType relativeHumidityDisplay       = static_cast<uint8_t>(0);
+        Attributes::RelativeHumidityDisplay::TypeInfo::DecodableType relativeHumidityDisplay =
+            static_cast<chip::app::Clusters::DehumidificationControl::enum8>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::DehumidificationControl::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -23334,9 +23458,9 @@ namespace Attributes {
 namespace TemperatureDisplayMode {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8;
+    using DecodableType    = chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8;
+    using DecodableArgType = chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureDisplayMode::Id; }
@@ -23346,9 +23470,9 @@ struct TypeInfo
 namespace KeypadLockout {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8;
+    using DecodableType    = chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8;
+    using DecodableArgType = chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::KeypadLockout::Id; }
@@ -23358,9 +23482,9 @@ struct TypeInfo
 namespace ScheduleProgrammingVisibility {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8;
+    using DecodableType    = chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8;
+    using DecodableArgType = chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ScheduleProgrammingVisibility::Id; }
@@ -23406,9 +23530,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ThermostatUserInterfaceConfiguration::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ThermostatUserInterfaceConfiguration::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ThermostatUserInterfaceConfiguration::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -23436,13 +23560,17 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::TemperatureDisplayMode::TypeInfo::DecodableType temperatureDisplayMode               = static_cast<uint8_t>(0);
-        Attributes::KeypadLockout::TypeInfo::DecodableType keypadLockout                                 = static_cast<uint8_t>(0);
-        Attributes::ScheduleProgrammingVisibility::TypeInfo::DecodableType scheduleProgrammingVisibility = static_cast<uint8_t>(0);
+        Attributes::TemperatureDisplayMode::TypeInfo::DecodableType temperatureDisplayMode =
+            static_cast<chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8>(0);
+        Attributes::KeypadLockout::TypeInfo::DecodableType keypadLockout =
+            static_cast<chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8>(0);
+        Attributes::ScheduleProgrammingVisibility::TypeInfo::DecodableType scheduleProgrammingVisibility =
+            static_cast<chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ThermostatUserInterfaceConfiguration::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -24442,9 +24570,9 @@ struct TypeInfo
 namespace DriftCompensation {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::ColorControl::enum8;
+    using DecodableType    = chip::app::Clusters::ColorControl::enum8;
+    using DecodableArgType = chip::app::Clusters::ColorControl::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DriftCompensation::Id; }
@@ -24479,9 +24607,9 @@ struct TypeInfo
 namespace ColorMode {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::ColorControl::enum8;
+    using DecodableType    = chip::app::Clusters::ColorControl::enum8;
+    using DecodableArgType = chip::app::Clusters::ColorControl::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorMode::Id; }
@@ -24491,9 +24619,9 @@ struct TypeInfo
 namespace ColorControlOptions {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ColorControl::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ColorControl::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ColorControl::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorControlOptions::Id; }
@@ -24875,9 +25003,9 @@ struct TypeInfo
 namespace EnhancedColorMode {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::ColorControl::enum8;
+    using DecodableType    = chip::app::Clusters::ColorControl::enum8;
+    using DecodableArgType = chip::app::Clusters::ColorControl::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnhancedColorMode::Id; }
@@ -24947,9 +25075,9 @@ struct TypeInfo
 namespace ColorCapabilities {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ColorControl::bitmap16>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ColorControl::bitmap16>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ColorControl::bitmap16>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorCapabilities::Id; }
@@ -25043,9 +25171,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ColorControl::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ColorControl::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ColorControl::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -25078,58 +25206,63 @@ struct TypeInfo
         Attributes::RemainingTime::TypeInfo::DecodableType remainingTime         = static_cast<uint16_t>(0);
         Attributes::CurrentX::TypeInfo::DecodableType currentX                   = static_cast<uint16_t>(0);
         Attributes::CurrentY::TypeInfo::DecodableType currentY                   = static_cast<uint16_t>(0);
-        Attributes::DriftCompensation::TypeInfo::DecodableType driftCompensation = static_cast<uint8_t>(0);
+        Attributes::DriftCompensation::TypeInfo::DecodableType driftCompensation =
+            static_cast<chip::app::Clusters::ColorControl::enum8>(0);
         Attributes::CompensationText::TypeInfo::DecodableType compensationText;
-        Attributes::ColorTemperature::TypeInfo::DecodableType colorTemperature                     = static_cast<uint16_t>(0);
-        Attributes::ColorMode::TypeInfo::DecodableType colorMode                                   = static_cast<uint8_t>(0);
-        Attributes::ColorControlOptions::TypeInfo::DecodableType colorControlOptions               = static_cast<uint8_t>(0);
-        Attributes::NumberOfPrimaries::TypeInfo::DecodableType numberOfPrimaries                   = static_cast<uint8_t>(0);
-        Attributes::Primary1X::TypeInfo::DecodableType primary1X                                   = static_cast<uint16_t>(0);
-        Attributes::Primary1Y::TypeInfo::DecodableType primary1Y                                   = static_cast<uint16_t>(0);
-        Attributes::Primary1Intensity::TypeInfo::DecodableType primary1Intensity                   = static_cast<uint8_t>(0);
-        Attributes::Primary2X::TypeInfo::DecodableType primary2X                                   = static_cast<uint16_t>(0);
-        Attributes::Primary2Y::TypeInfo::DecodableType primary2Y                                   = static_cast<uint16_t>(0);
-        Attributes::Primary2Intensity::TypeInfo::DecodableType primary2Intensity                   = static_cast<uint8_t>(0);
-        Attributes::Primary3X::TypeInfo::DecodableType primary3X                                   = static_cast<uint16_t>(0);
-        Attributes::Primary3Y::TypeInfo::DecodableType primary3Y                                   = static_cast<uint16_t>(0);
-        Attributes::Primary3Intensity::TypeInfo::DecodableType primary3Intensity                   = static_cast<uint8_t>(0);
-        Attributes::Primary4X::TypeInfo::DecodableType primary4X                                   = static_cast<uint16_t>(0);
-        Attributes::Primary4Y::TypeInfo::DecodableType primary4Y                                   = static_cast<uint16_t>(0);
-        Attributes::Primary4Intensity::TypeInfo::DecodableType primary4Intensity                   = static_cast<uint8_t>(0);
-        Attributes::Primary5X::TypeInfo::DecodableType primary5X                                   = static_cast<uint16_t>(0);
-        Attributes::Primary5Y::TypeInfo::DecodableType primary5Y                                   = static_cast<uint16_t>(0);
-        Attributes::Primary5Intensity::TypeInfo::DecodableType primary5Intensity                   = static_cast<uint8_t>(0);
-        Attributes::Primary6X::TypeInfo::DecodableType primary6X                                   = static_cast<uint16_t>(0);
-        Attributes::Primary6Y::TypeInfo::DecodableType primary6Y                                   = static_cast<uint16_t>(0);
-        Attributes::Primary6Intensity::TypeInfo::DecodableType primary6Intensity                   = static_cast<uint8_t>(0);
-        Attributes::WhitePointX::TypeInfo::DecodableType whitePointX                               = static_cast<uint16_t>(0);
-        Attributes::WhitePointY::TypeInfo::DecodableType whitePointY                               = static_cast<uint16_t>(0);
-        Attributes::ColorPointRX::TypeInfo::DecodableType colorPointRX                             = static_cast<uint16_t>(0);
-        Attributes::ColorPointRY::TypeInfo::DecodableType colorPointRY                             = static_cast<uint16_t>(0);
-        Attributes::ColorPointRIntensity::TypeInfo::DecodableType colorPointRIntensity             = static_cast<uint8_t>(0);
-        Attributes::ColorPointGX::TypeInfo::DecodableType colorPointGX                             = static_cast<uint16_t>(0);
-        Attributes::ColorPointGY::TypeInfo::DecodableType colorPointGY                             = static_cast<uint16_t>(0);
-        Attributes::ColorPointGIntensity::TypeInfo::DecodableType colorPointGIntensity             = static_cast<uint8_t>(0);
-        Attributes::ColorPointBX::TypeInfo::DecodableType colorPointBX                             = static_cast<uint16_t>(0);
-        Attributes::ColorPointBY::TypeInfo::DecodableType colorPointBY                             = static_cast<uint16_t>(0);
-        Attributes::ColorPointBIntensity::TypeInfo::DecodableType colorPointBIntensity             = static_cast<uint8_t>(0);
-        Attributes::EnhancedCurrentHue::TypeInfo::DecodableType enhancedCurrentHue                 = static_cast<uint16_t>(0);
-        Attributes::EnhancedColorMode::TypeInfo::DecodableType enhancedColorMode                   = static_cast<uint8_t>(0);
+        Attributes::ColorTemperature::TypeInfo::DecodableType colorTemperature = static_cast<uint16_t>(0);
+        Attributes::ColorMode::TypeInfo::DecodableType colorMode = static_cast<chip::app::Clusters::ColorControl::enum8>(0);
+        Attributes::ColorControlOptions::TypeInfo::DecodableType colorControlOptions =
+            static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::bitmap8>>(0);
+        Attributes::NumberOfPrimaries::TypeInfo::DecodableType numberOfPrimaries       = static_cast<uint8_t>(0);
+        Attributes::Primary1X::TypeInfo::DecodableType primary1X                       = static_cast<uint16_t>(0);
+        Attributes::Primary1Y::TypeInfo::DecodableType primary1Y                       = static_cast<uint16_t>(0);
+        Attributes::Primary1Intensity::TypeInfo::DecodableType primary1Intensity       = static_cast<uint8_t>(0);
+        Attributes::Primary2X::TypeInfo::DecodableType primary2X                       = static_cast<uint16_t>(0);
+        Attributes::Primary2Y::TypeInfo::DecodableType primary2Y                       = static_cast<uint16_t>(0);
+        Attributes::Primary2Intensity::TypeInfo::DecodableType primary2Intensity       = static_cast<uint8_t>(0);
+        Attributes::Primary3X::TypeInfo::DecodableType primary3X                       = static_cast<uint16_t>(0);
+        Attributes::Primary3Y::TypeInfo::DecodableType primary3Y                       = static_cast<uint16_t>(0);
+        Attributes::Primary3Intensity::TypeInfo::DecodableType primary3Intensity       = static_cast<uint8_t>(0);
+        Attributes::Primary4X::TypeInfo::DecodableType primary4X                       = static_cast<uint16_t>(0);
+        Attributes::Primary4Y::TypeInfo::DecodableType primary4Y                       = static_cast<uint16_t>(0);
+        Attributes::Primary4Intensity::TypeInfo::DecodableType primary4Intensity       = static_cast<uint8_t>(0);
+        Attributes::Primary5X::TypeInfo::DecodableType primary5X                       = static_cast<uint16_t>(0);
+        Attributes::Primary5Y::TypeInfo::DecodableType primary5Y                       = static_cast<uint16_t>(0);
+        Attributes::Primary5Intensity::TypeInfo::DecodableType primary5Intensity       = static_cast<uint8_t>(0);
+        Attributes::Primary6X::TypeInfo::DecodableType primary6X                       = static_cast<uint16_t>(0);
+        Attributes::Primary6Y::TypeInfo::DecodableType primary6Y                       = static_cast<uint16_t>(0);
+        Attributes::Primary6Intensity::TypeInfo::DecodableType primary6Intensity       = static_cast<uint8_t>(0);
+        Attributes::WhitePointX::TypeInfo::DecodableType whitePointX                   = static_cast<uint16_t>(0);
+        Attributes::WhitePointY::TypeInfo::DecodableType whitePointY                   = static_cast<uint16_t>(0);
+        Attributes::ColorPointRX::TypeInfo::DecodableType colorPointRX                 = static_cast<uint16_t>(0);
+        Attributes::ColorPointRY::TypeInfo::DecodableType colorPointRY                 = static_cast<uint16_t>(0);
+        Attributes::ColorPointRIntensity::TypeInfo::DecodableType colorPointRIntensity = static_cast<uint8_t>(0);
+        Attributes::ColorPointGX::TypeInfo::DecodableType colorPointGX                 = static_cast<uint16_t>(0);
+        Attributes::ColorPointGY::TypeInfo::DecodableType colorPointGY                 = static_cast<uint16_t>(0);
+        Attributes::ColorPointGIntensity::TypeInfo::DecodableType colorPointGIntensity = static_cast<uint8_t>(0);
+        Attributes::ColorPointBX::TypeInfo::DecodableType colorPointBX                 = static_cast<uint16_t>(0);
+        Attributes::ColorPointBY::TypeInfo::DecodableType colorPointBY                 = static_cast<uint16_t>(0);
+        Attributes::ColorPointBIntensity::TypeInfo::DecodableType colorPointBIntensity = static_cast<uint8_t>(0);
+        Attributes::EnhancedCurrentHue::TypeInfo::DecodableType enhancedCurrentHue     = static_cast<uint16_t>(0);
+        Attributes::EnhancedColorMode::TypeInfo::DecodableType enhancedColorMode =
+            static_cast<chip::app::Clusters::ColorControl::enum8>(0);
         Attributes::ColorLoopActive::TypeInfo::DecodableType colorLoopActive                       = static_cast<uint8_t>(0);
         Attributes::ColorLoopDirection::TypeInfo::DecodableType colorLoopDirection                 = static_cast<uint8_t>(0);
         Attributes::ColorLoopTime::TypeInfo::DecodableType colorLoopTime                           = static_cast<uint16_t>(0);
         Attributes::ColorLoopStartEnhancedHue::TypeInfo::DecodableType colorLoopStartEnhancedHue   = static_cast<uint16_t>(0);
         Attributes::ColorLoopStoredEnhancedHue::TypeInfo::DecodableType colorLoopStoredEnhancedHue = static_cast<uint16_t>(0);
-        Attributes::ColorCapabilities::TypeInfo::DecodableType colorCapabilities                   = static_cast<uint16_t>(0);
-        Attributes::ColorTempPhysicalMin::TypeInfo::DecodableType colorTempPhysicalMin             = static_cast<uint16_t>(0);
-        Attributes::ColorTempPhysicalMax::TypeInfo::DecodableType colorTempPhysicalMax             = static_cast<uint16_t>(0);
+        Attributes::ColorCapabilities::TypeInfo::DecodableType colorCapabilities =
+            static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::bitmap16>>(0);
+        Attributes::ColorTempPhysicalMin::TypeInfo::DecodableType colorTempPhysicalMin = static_cast<uint16_t>(0);
+        Attributes::ColorTempPhysicalMax::TypeInfo::DecodableType colorTempPhysicalMax = static_cast<uint16_t>(0);
         Attributes::CoupleColorTempToLevelMinMireds::TypeInfo::DecodableType coupleColorTempToLevelMinMireds =
             static_cast<uint16_t>(0);
         Attributes::StartUpColorTemperatureMireds::TypeInfo::DecodableType startUpColorTemperatureMireds = static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -25166,9 +25299,9 @@ struct TypeInfo
 namespace BallastStatus {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::BallastConfiguration::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::BallastConfiguration::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::BallastConfiguration::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BallastStatus::Id; }
@@ -25312,9 +25445,9 @@ struct TypeInfo
 namespace LampAlarmMode {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::BallastConfiguration::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::BallastConfiguration::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::BallastConfiguration::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampAlarmMode::Id; }
@@ -25372,9 +25505,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::BallastConfiguration::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::BallastConfiguration::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::BallastConfiguration::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -25402,9 +25535,10 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::PhysicalMinLevel::TypeInfo::DecodableType physicalMinLevel               = static_cast<uint8_t>(0);
-        Attributes::PhysicalMaxLevel::TypeInfo::DecodableType physicalMaxLevel               = static_cast<uint8_t>(0);
-        Attributes::BallastStatus::TypeInfo::DecodableType ballastStatus                     = static_cast<uint8_t>(0);
+        Attributes::PhysicalMinLevel::TypeInfo::DecodableType physicalMinLevel = static_cast<uint8_t>(0);
+        Attributes::PhysicalMaxLevel::TypeInfo::DecodableType physicalMaxLevel = static_cast<uint8_t>(0);
+        Attributes::BallastStatus::TypeInfo::DecodableType ballastStatus =
+            static_cast<chip::BitFlags<chip::app::Clusters::BallastConfiguration::bitmap8>>(0);
         Attributes::MinLevel::TypeInfo::DecodableType minLevel                               = static_cast<uint8_t>(0);
         Attributes::MaxLevel::TypeInfo::DecodableType maxLevel                               = static_cast<uint8_t>(0);
         Attributes::PowerOnLevel::TypeInfo::DecodableType powerOnLevel                       = static_cast<uint8_t>(0);
@@ -25414,14 +25548,16 @@ struct TypeInfo
         Attributes::LampQuality::TypeInfo::DecodableType lampQuality                         = static_cast<uint8_t>(0);
         Attributes::LampType::TypeInfo::DecodableType lampType;
         Attributes::LampManufacturer::TypeInfo::DecodableType lampManufacturer;
-        Attributes::LampRatedHours::TypeInfo::DecodableType lampRatedHours                 = static_cast<uint32_t>(0);
-        Attributes::LampBurnHours::TypeInfo::DecodableType lampBurnHours                   = static_cast<uint32_t>(0);
-        Attributes::LampAlarmMode::TypeInfo::DecodableType lampAlarmMode                   = static_cast<uint8_t>(0);
+        Attributes::LampRatedHours::TypeInfo::DecodableType lampRatedHours = static_cast<uint32_t>(0);
+        Attributes::LampBurnHours::TypeInfo::DecodableType lampBurnHours   = static_cast<uint32_t>(0);
+        Attributes::LampAlarmMode::TypeInfo::DecodableType lampAlarmMode =
+            static_cast<chip::BitFlags<chip::app::Clusters::BallastConfiguration::bitmap8>>(0);
         Attributes::LampBurnHoursTripPoint::TypeInfo::DecodableType lampBurnHoursTripPoint = static_cast<uint32_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::BallastConfiguration::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -25482,9 +25618,9 @@ struct TypeInfo
 namespace LightSensorType {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::enum8>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::enum8>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::enum8> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LightSensorType::Id; }
@@ -25530,9 +25666,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::IlluminanceMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::IlluminanceMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::IlluminanceMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -25568,7 +25704,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::IlluminanceMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -25665,9 +25802,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::TemperatureMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::TemperatureMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::TemperatureMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -25702,7 +25839,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::TemperatureMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -25859,9 +25997,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::PressureMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::PressureMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::PressureMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -25901,7 +26039,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::PressureMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -25998,9 +26137,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::FlowMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::FlowMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::FlowMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -26035,7 +26174,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::FlowMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -26132,9 +26272,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::RelativeHumidityMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::RelativeHumidityMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::RelativeHumidityMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -26169,7 +26309,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::RelativeHumidityMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -26182,9 +26323,9 @@ namespace Attributes {
 namespace Occupancy {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::OccupancySensing::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::OccupancySensing::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::OccupancySensing::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Occupancy::Id; }
@@ -26194,9 +26335,9 @@ struct TypeInfo
 namespace OccupancySensorType {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::OccupancySensing::enum8;
+    using DecodableType    = chip::app::Clusters::OccupancySensing::enum8;
+    using DecodableArgType = chip::app::Clusters::OccupancySensing::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupancySensorType::Id; }
@@ -26206,9 +26347,9 @@ struct TypeInfo
 namespace OccupancySensorTypeBitmap {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::OccupancySensing::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::OccupancySensing::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::OccupancySensing::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupancySensorTypeBitmap::Id; }
@@ -26362,9 +26503,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::OccupancySensing::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::OccupancySensing::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::OccupancySensing::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -26392,9 +26533,12 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Occupancy::TypeInfo::DecodableType occupancy                                       = static_cast<uint8_t>(0);
-        Attributes::OccupancySensorType::TypeInfo::DecodableType occupancySensorType                   = static_cast<uint8_t>(0);
-        Attributes::OccupancySensorTypeBitmap::TypeInfo::DecodableType occupancySensorTypeBitmap       = static_cast<uint8_t>(0);
+        Attributes::Occupancy::TypeInfo::DecodableType occupancy =
+            static_cast<chip::BitFlags<chip::app::Clusters::OccupancySensing::bitmap8>>(0);
+        Attributes::OccupancySensorType::TypeInfo::DecodableType occupancySensorType =
+            static_cast<chip::app::Clusters::OccupancySensing::enum8>(0);
+        Attributes::OccupancySensorTypeBitmap::TypeInfo::DecodableType occupancySensorTypeBitmap =
+            static_cast<chip::BitFlags<chip::app::Clusters::OccupancySensing::bitmap8>>(0);
         Attributes::PirOccupiedToUnoccupiedDelay::TypeInfo::DecodableType pirOccupiedToUnoccupiedDelay = static_cast<uint16_t>(0);
         Attributes::PirUnoccupiedToOccupiedDelay::TypeInfo::DecodableType pirUnoccupiedToOccupiedDelay = static_cast<uint16_t>(0);
         Attributes::PirUnoccupiedToOccupiedThreshold::TypeInfo::DecodableType pirUnoccupiedToOccupiedThreshold =
@@ -26414,7 +26558,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::OccupancySensing::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -26511,9 +26656,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -26548,7 +26693,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -26645,9 +26791,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -26682,7 +26828,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -26779,9 +26926,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::EthyleneConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::EthyleneConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::EthyleneConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -26816,7 +26963,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::EthyleneConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -26913,9 +27061,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::EthyleneOxideConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::EthyleneOxideConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::EthyleneOxideConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -26950,7 +27098,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::EthyleneOxideConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -27047,9 +27196,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::HydrogenConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::HydrogenConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::HydrogenConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -27084,7 +27233,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::HydrogenConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -27181,9 +27331,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::HydrogenSulphideConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::HydrogenSulphideConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::HydrogenSulphideConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -27218,7 +27368,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::HydrogenSulphideConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -27315,9 +27466,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::NitricOxideConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::NitricOxideConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::NitricOxideConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -27352,7 +27503,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::NitricOxideConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -27449,9 +27601,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -27486,7 +27638,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -27583,9 +27736,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::OxygenConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::OxygenConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::OxygenConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -27620,7 +27773,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::OxygenConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -27717,9 +27871,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::OzoneConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::OzoneConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::OzoneConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -27754,7 +27908,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::OzoneConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -27851,9 +28006,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::SulfurDioxideConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::SulfurDioxideConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::SulfurDioxideConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -27888,7 +28043,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::SulfurDioxideConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -27985,9 +28141,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -28022,7 +28178,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -28119,9 +28276,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::BromateConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::BromateConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::BromateConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -28156,7 +28313,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::BromateConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -28253,9 +28411,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ChloraminesConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ChloraminesConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ChloraminesConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -28290,7 +28448,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ChloraminesConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -28387,9 +28546,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ChlorineConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ChlorineConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ChlorineConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -28424,7 +28583,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ChlorineConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -28521,9 +28681,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::FecalColiformAndEColiConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::FecalColiformAndEColiConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::FecalColiformAndEColiConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -28558,7 +28718,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::FecalColiformAndEColiConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -28655,9 +28816,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::FluorideConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::FluorideConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::FluorideConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -28692,7 +28853,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::FluorideConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -28789,9 +28951,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -28826,7 +28988,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -28923,9 +29086,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -28960,7 +29123,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -29057,9 +29221,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -29094,7 +29258,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -29191,9 +29356,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::TurbidityConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::TurbidityConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::TurbidityConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -29228,7 +29393,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::TurbidityConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -29325,9 +29491,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::CopperConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::CopperConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::CopperConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -29362,7 +29528,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::CopperConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -29459,9 +29626,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::LeadConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::LeadConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::LeadConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -29496,7 +29663,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::LeadConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -29593,9 +29761,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ManganeseConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ManganeseConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ManganeseConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -29630,7 +29798,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ManganeseConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -29727,9 +29896,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::SulfateConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::SulfateConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::SulfateConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -29764,7 +29933,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::SulfateConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -29861,9 +30031,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -29898,7 +30068,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -29995,9 +30166,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::BromoformConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::BromoformConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::BromoformConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -30032,7 +30203,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::BromoformConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -30129,9 +30301,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -30166,7 +30338,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -30263,9 +30436,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ChloroformConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ChloroformConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ChloroformConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -30300,7 +30473,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ChloroformConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -30397,9 +30571,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::SodiumConcentrationMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::SodiumConcentrationMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::SodiumConcentrationMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -30434,7 +30608,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::SodiumConcentrationMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -30720,9 +30895,9 @@ namespace Attributes {
 namespace ZoneState {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::IasZone::enum8;
+    using DecodableType    = chip::app::Clusters::IasZone::enum8;
+    using DecodableArgType = chip::app::Clusters::IasZone::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ZoneState::Id; }
@@ -30732,9 +30907,9 @@ struct TypeInfo
 namespace ZoneType {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::app::Clusters::IasZone::enum16;
+    using DecodableType    = chip::app::Clusters::IasZone::enum16;
+    using DecodableArgType = chip::app::Clusters::IasZone::enum16;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ZoneType::Id; }
@@ -30744,9 +30919,9 @@ struct TypeInfo
 namespace ZoneStatus {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::IasZone::bitmap16>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::IasZone::bitmap16>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::IasZone::bitmap16>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ZoneStatus::Id; }
@@ -30840,9 +31015,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::IasZone::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::IasZone::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::IasZone::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -30870,9 +31045,10 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::ZoneState::TypeInfo::DecodableType zoneState         = static_cast<uint8_t>(0);
-        Attributes::ZoneType::TypeInfo::DecodableType zoneType           = static_cast<uint16_t>(0);
-        Attributes::ZoneStatus::TypeInfo::DecodableType zoneStatus       = static_cast<uint16_t>(0);
+        Attributes::ZoneState::TypeInfo::DecodableType zoneState = static_cast<chip::app::Clusters::IasZone::enum8>(0);
+        Attributes::ZoneType::TypeInfo::DecodableType zoneType   = static_cast<chip::app::Clusters::IasZone::enum16>(0);
+        Attributes::ZoneStatus::TypeInfo::DecodableType zoneStatus =
+            static_cast<chip::BitFlags<chip::app::Clusters::IasZone::bitmap16>>(0);
         Attributes::IasCieAddress::TypeInfo::DecodableType iasCieAddress = static_cast<chip::NodeId>(0);
         Attributes::ZoneId::TypeInfo::DecodableType zoneId               = static_cast<uint8_t>(0);
         Attributes::NumberOfZoneSensitivityLevelsSupported::TypeInfo::DecodableType numberOfZoneSensitivityLevelsSupported =
@@ -30881,7 +31057,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::IasZone::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -31756,9 +31933,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::IasAce::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::IasAce::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::IasAce::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -31789,7 +31966,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::IasAce::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -31941,9 +32119,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::IasWd::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::IasWd::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::IasWd::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -31975,7 +32153,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::IasWd::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -32037,9 +32216,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::WakeOnLan::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::WakeOnLan::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::WakeOnLan::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -32071,7 +32250,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::WakeOnLan::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -32209,7 +32389,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    ChannelStatusEnum status = static_cast<ChannelStatusEnum>(0);
     Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -32225,7 +32405,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    ChannelStatusEnum status = static_cast<ChannelStatusEnum>(0);
     Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -32379,9 +32559,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Channel::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Channel::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Channel::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -32415,7 +32595,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::Channel::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -32513,7 +32694,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::NavigateTargetResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    StatusEnumTargetNavigator status = static_cast<StatusEnumTargetNavigator>(0);
     Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -32529,7 +32710,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::NavigateTargetResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    StatusEnumTargetNavigator status = static_cast<StatusEnumTargetNavigator>(0);
     Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -32603,9 +32784,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::TargetNavigator::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::TargetNavigator::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::TargetNavigator::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -32638,7 +32819,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::TargetNavigator::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -33039,7 +33221,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::PlaybackResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    StatusEnumMediaPlayback status = static_cast<StatusEnumMediaPlayback>(0);
     Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -33055,7 +33237,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::PlaybackResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    StatusEnumMediaPlayback status = static_cast<StatusEnumMediaPlayback>(0);
     Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -33221,9 +33403,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::MediaPlayback::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::MediaPlayback::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::MediaPlayback::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -33262,7 +33444,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::MediaPlayback::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -33516,9 +33699,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::MediaInput::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::MediaInput::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::MediaInput::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -33551,7 +33734,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::MediaInput::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -33641,9 +33825,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::LowPower::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::LowPower::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::LowPower::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -33674,7 +33858,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::LowPower::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -33743,7 +33928,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SendKeyResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    StatusEnumKeypadInput status = static_cast<StatusEnumKeypadInput>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -33758,7 +33943,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SendKeyResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    StatusEnumKeypadInput status = static_cast<StatusEnumKeypadInput>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SendKeyResponse
@@ -33805,9 +33990,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::KeypadInput::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::KeypadInput::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::KeypadInput::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -33838,7 +34023,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::KeypadInput::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -34123,7 +34309,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    StatusEnumContentLauncher status = static_cast<StatusEnumContentLauncher>(0);
     Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -34139,7 +34325,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    StatusEnumContentLauncher status = static_cast<StatusEnumContentLauncher>(0);
     Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -34163,9 +34349,9 @@ struct TypeInfo
 namespace SupportedStreamingProtocols {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ContentLauncher::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ContentLauncher::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ContentLauncher::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedStreamingProtocols::Id; }
@@ -34211,9 +34397,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ContentLauncher::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ContentLauncher::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ContentLauncher::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -34242,11 +34428,13 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::AcceptHeader::TypeInfo::DecodableType acceptHeader;
-        Attributes::SupportedStreamingProtocols::TypeInfo::DecodableType supportedStreamingProtocols = static_cast<uint32_t>(0);
+        Attributes::SupportedStreamingProtocols::TypeInfo::DecodableType supportedStreamingProtocols =
+            static_cast<chip::BitFlags<chip::app::Clusters::ContentLauncher::bitmap32>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ContentLauncher::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -34432,9 +34620,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::AudioOutput::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::AudioOutput::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::AudioOutput::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -34467,7 +34655,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::AudioOutput::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -34662,7 +34851,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LauncherResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    StatusEnumApplicationLauncher status = static_cast<StatusEnumApplicationLauncher>(0);
     chip::ByteSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -34678,7 +34867,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LauncherResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    StatusEnumApplicationLauncher status = static_cast<StatusEnumApplicationLauncher>(0);
     chip::ByteSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -34752,9 +34941,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ApplicationLauncher::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ApplicationLauncher::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ApplicationLauncher::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -34787,7 +34976,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ApplicationLauncher::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -34960,9 +35150,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ApplicationBasic::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ApplicationBasic::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ApplicationBasic::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -35002,7 +35192,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ApplicationBasic::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -35206,9 +35397,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::AccountLogin::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::AccountLogin::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::AccountLogin::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -35239,7 +35430,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::AccountLogin::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -37195,9 +37387,9 @@ struct TypeInfo
 namespace Enum8 {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::TestCluster::enum8;
+    using DecodableType    = chip::app::Clusters::TestCluster::enum8;
+    using DecodableArgType = chip::app::Clusters::TestCluster::enum8;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Enum8::Id; }
@@ -37207,9 +37399,9 @@ struct TypeInfo
 namespace Enum16 {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::app::Clusters::TestCluster::enum16;
+    using DecodableType    = chip::app::Clusters::TestCluster::enum16;
+    using DecodableArgType = chip::app::Clusters::TestCluster::enum16;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Enum16::Id; }
@@ -37785,9 +37977,9 @@ struct TypeInfo
 namespace NullableEnum8 {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::enum8>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::enum8>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::enum8> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableEnum8::Id; }
@@ -37797,9 +37989,9 @@ struct TypeInfo
 namespace NullableEnum16 {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::enum16>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::enum16>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::enum16> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableEnum16::Id; }
@@ -37968,9 +38160,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::TestCluster::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::TestCluster::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::TestCluster::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -38023,8 +38215,8 @@ struct TypeInfo
         Attributes::Int48s::TypeInfo::DecodableType int48s           = static_cast<int64_t>(0);
         Attributes::Int56s::TypeInfo::DecodableType int56s           = static_cast<int64_t>(0);
         Attributes::Int64s::TypeInfo::DecodableType int64s           = static_cast<int64_t>(0);
-        Attributes::Enum8::TypeInfo::DecodableType enum8             = static_cast<uint8_t>(0);
-        Attributes::Enum16::TypeInfo::DecodableType enum16           = static_cast<uint16_t>(0);
+        Attributes::Enum8::TypeInfo::DecodableType enum8             = static_cast<chip::app::Clusters::TestCluster::enum8>(0);
+        Attributes::Enum16::TypeInfo::DecodableType enum16           = static_cast<chip::app::Clusters::TestCluster::enum16>(0);
         Attributes::FloatSingle::TypeInfo::DecodableType floatSingle = static_cast<float>(0);
         Attributes::FloatDouble::TypeInfo::DecodableType floatDouble = static_cast<double>(0);
         Attributes::OctetString::TypeInfo::DecodableType octetString;
@@ -38086,7 +38278,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -38529,9 +38722,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::Messaging::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::Messaging::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::Messaging::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -38562,7 +38755,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::Messaging::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -38762,9 +38956,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ApplianceIdentification::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ApplianceIdentification::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ApplianceIdentification::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -38807,7 +39001,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ApplianceIdentification::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -39008,9 +39203,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::MeterIdentification::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::MeterIdentification::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::MeterIdentification::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -39053,7 +39248,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::MeterIdentification::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -39263,9 +39459,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ApplianceEventsAndAlert::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ApplianceEventsAndAlert::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ApplianceEventsAndAlert::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -39296,7 +39492,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ApplianceEventsAndAlert::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -39619,9 +39816,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ApplianceStatistics::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ApplianceStatistics::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ApplianceStatistics::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -39654,7 +39851,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ApplianceStatistics::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
@@ -39849,9 +40047,9 @@ namespace Attributes {
 namespace MeasurementType {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementType::Id; }
@@ -40689,9 +40887,9 @@ struct TypeInfo
 namespace OverloadAlarmsMask {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap8>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap8>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap8>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OverloadAlarmsMask::Id; }
@@ -40725,9 +40923,9 @@ struct TypeInfo
 namespace AcOverloadAlarmsMask {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap16>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap16>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap16>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcOverloadAlarmsMask::Id; }
@@ -41421,9 +41619,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap32>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap32>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap32>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -41451,7 +41649,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::MeasurementType::TypeInfo::DecodableType measurementType                         = static_cast<uint32_t>(0);
+        Attributes::MeasurementType::TypeInfo::DecodableType measurementType =
+            static_cast<chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap32>>(0);
         Attributes::DcVoltage::TypeInfo::DecodableType dcVoltage                                     = static_cast<int16_t>(0);
         Attributes::DcVoltageMin::TypeInfo::DecodableType dcVoltageMin                               = static_cast<int16_t>(0);
         Attributes::DcVoltageMax::TypeInfo::DecodableType dcVoltageMax                               = static_cast<int16_t>(0);
@@ -41528,35 +41727,37 @@ struct TypeInfo
         Attributes::AcCurrentDivisor::TypeInfo::DecodableType acCurrentDivisor                           = static_cast<uint16_t>(0);
         Attributes::AcPowerMultiplier::TypeInfo::DecodableType acPowerMultiplier                         = static_cast<uint16_t>(0);
         Attributes::AcPowerDivisor::TypeInfo::DecodableType acPowerDivisor                               = static_cast<uint16_t>(0);
-        Attributes::OverloadAlarmsMask::TypeInfo::DecodableType overloadAlarmsMask                       = static_cast<uint8_t>(0);
-        Attributes::VoltageOverload::TypeInfo::DecodableType voltageOverload                             = static_cast<int16_t>(0);
-        Attributes::CurrentOverload::TypeInfo::DecodableType currentOverload                             = static_cast<int16_t>(0);
-        Attributes::AcOverloadAlarmsMask::TypeInfo::DecodableType acOverloadAlarmsMask                   = static_cast<uint16_t>(0);
-        Attributes::AcVoltageOverload::TypeInfo::DecodableType acVoltageOverload                         = static_cast<int16_t>(0);
-        Attributes::AcCurrentOverload::TypeInfo::DecodableType acCurrentOverload                         = static_cast<int16_t>(0);
-        Attributes::AcActivePowerOverload::TypeInfo::DecodableType acActivePowerOverload                 = static_cast<int16_t>(0);
-        Attributes::AcReactivePowerOverload::TypeInfo::DecodableType acReactivePowerOverload             = static_cast<int16_t>(0);
-        Attributes::AverageRmsOverVoltage::TypeInfo::DecodableType averageRmsOverVoltage                 = static_cast<int16_t>(0);
-        Attributes::AverageRmsUnderVoltage::TypeInfo::DecodableType averageRmsUnderVoltage               = static_cast<int16_t>(0);
-        Attributes::RmsExtremeOverVoltage::TypeInfo::DecodableType rmsExtremeOverVoltage                 = static_cast<int16_t>(0);
-        Attributes::RmsExtremeUnderVoltage::TypeInfo::DecodableType rmsExtremeUnderVoltage               = static_cast<int16_t>(0);
-        Attributes::RmsVoltageSag::TypeInfo::DecodableType rmsVoltageSag                                 = static_cast<int16_t>(0);
-        Attributes::RmsVoltageSwell::TypeInfo::DecodableType rmsVoltageSwell                             = static_cast<int16_t>(0);
-        Attributes::LineCurrentPhaseB::TypeInfo::DecodableType lineCurrentPhaseB                         = static_cast<uint16_t>(0);
-        Attributes::ActiveCurrentPhaseB::TypeInfo::DecodableType activeCurrentPhaseB                     = static_cast<int16_t>(0);
-        Attributes::ReactiveCurrentPhaseB::TypeInfo::DecodableType reactiveCurrentPhaseB                 = static_cast<int16_t>(0);
-        Attributes::RmsVoltagePhaseB::TypeInfo::DecodableType rmsVoltagePhaseB                           = static_cast<uint16_t>(0);
-        Attributes::RmsVoltageMinPhaseB::TypeInfo::DecodableType rmsVoltageMinPhaseB                     = static_cast<uint16_t>(0);
-        Attributes::RmsVoltageMaxPhaseB::TypeInfo::DecodableType rmsVoltageMaxPhaseB                     = static_cast<uint16_t>(0);
-        Attributes::RmsCurrentPhaseB::TypeInfo::DecodableType rmsCurrentPhaseB                           = static_cast<uint16_t>(0);
-        Attributes::RmsCurrentMinPhaseB::TypeInfo::DecodableType rmsCurrentMinPhaseB                     = static_cast<uint16_t>(0);
-        Attributes::RmsCurrentMaxPhaseB::TypeInfo::DecodableType rmsCurrentMaxPhaseB                     = static_cast<uint16_t>(0);
-        Attributes::ActivePowerPhaseB::TypeInfo::DecodableType activePowerPhaseB                         = static_cast<int16_t>(0);
-        Attributes::ActivePowerMinPhaseB::TypeInfo::DecodableType activePowerMinPhaseB                   = static_cast<int16_t>(0);
-        Attributes::ActivePowerMaxPhaseB::TypeInfo::DecodableType activePowerMaxPhaseB                   = static_cast<int16_t>(0);
-        Attributes::ReactivePowerPhaseB::TypeInfo::DecodableType reactivePowerPhaseB                     = static_cast<int16_t>(0);
-        Attributes::ApparentPowerPhaseB::TypeInfo::DecodableType apparentPowerPhaseB                     = static_cast<uint16_t>(0);
-        Attributes::PowerFactorPhaseB::TypeInfo::DecodableType powerFactorPhaseB                         = static_cast<int8_t>(0);
+        Attributes::OverloadAlarmsMask::TypeInfo::DecodableType overloadAlarmsMask =
+            static_cast<chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap8>>(0);
+        Attributes::VoltageOverload::TypeInfo::DecodableType voltageOverload = static_cast<int16_t>(0);
+        Attributes::CurrentOverload::TypeInfo::DecodableType currentOverload = static_cast<int16_t>(0);
+        Attributes::AcOverloadAlarmsMask::TypeInfo::DecodableType acOverloadAlarmsMask =
+            static_cast<chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap16>>(0);
+        Attributes::AcVoltageOverload::TypeInfo::DecodableType acVoltageOverload             = static_cast<int16_t>(0);
+        Attributes::AcCurrentOverload::TypeInfo::DecodableType acCurrentOverload             = static_cast<int16_t>(0);
+        Attributes::AcActivePowerOverload::TypeInfo::DecodableType acActivePowerOverload     = static_cast<int16_t>(0);
+        Attributes::AcReactivePowerOverload::TypeInfo::DecodableType acReactivePowerOverload = static_cast<int16_t>(0);
+        Attributes::AverageRmsOverVoltage::TypeInfo::DecodableType averageRmsOverVoltage     = static_cast<int16_t>(0);
+        Attributes::AverageRmsUnderVoltage::TypeInfo::DecodableType averageRmsUnderVoltage   = static_cast<int16_t>(0);
+        Attributes::RmsExtremeOverVoltage::TypeInfo::DecodableType rmsExtremeOverVoltage     = static_cast<int16_t>(0);
+        Attributes::RmsExtremeUnderVoltage::TypeInfo::DecodableType rmsExtremeUnderVoltage   = static_cast<int16_t>(0);
+        Attributes::RmsVoltageSag::TypeInfo::DecodableType rmsVoltageSag                     = static_cast<int16_t>(0);
+        Attributes::RmsVoltageSwell::TypeInfo::DecodableType rmsVoltageSwell                 = static_cast<int16_t>(0);
+        Attributes::LineCurrentPhaseB::TypeInfo::DecodableType lineCurrentPhaseB             = static_cast<uint16_t>(0);
+        Attributes::ActiveCurrentPhaseB::TypeInfo::DecodableType activeCurrentPhaseB         = static_cast<int16_t>(0);
+        Attributes::ReactiveCurrentPhaseB::TypeInfo::DecodableType reactiveCurrentPhaseB     = static_cast<int16_t>(0);
+        Attributes::RmsVoltagePhaseB::TypeInfo::DecodableType rmsVoltagePhaseB               = static_cast<uint16_t>(0);
+        Attributes::RmsVoltageMinPhaseB::TypeInfo::DecodableType rmsVoltageMinPhaseB         = static_cast<uint16_t>(0);
+        Attributes::RmsVoltageMaxPhaseB::TypeInfo::DecodableType rmsVoltageMaxPhaseB         = static_cast<uint16_t>(0);
+        Attributes::RmsCurrentPhaseB::TypeInfo::DecodableType rmsCurrentPhaseB               = static_cast<uint16_t>(0);
+        Attributes::RmsCurrentMinPhaseB::TypeInfo::DecodableType rmsCurrentMinPhaseB         = static_cast<uint16_t>(0);
+        Attributes::RmsCurrentMaxPhaseB::TypeInfo::DecodableType rmsCurrentMaxPhaseB         = static_cast<uint16_t>(0);
+        Attributes::ActivePowerPhaseB::TypeInfo::DecodableType activePowerPhaseB             = static_cast<int16_t>(0);
+        Attributes::ActivePowerMinPhaseB::TypeInfo::DecodableType activePowerMinPhaseB       = static_cast<int16_t>(0);
+        Attributes::ActivePowerMaxPhaseB::TypeInfo::DecodableType activePowerMaxPhaseB       = static_cast<int16_t>(0);
+        Attributes::ReactivePowerPhaseB::TypeInfo::DecodableType reactivePowerPhaseB         = static_cast<int16_t>(0);
+        Attributes::ApparentPowerPhaseB::TypeInfo::DecodableType apparentPowerPhaseB         = static_cast<uint16_t>(0);
+        Attributes::PowerFactorPhaseB::TypeInfo::DecodableType powerFactorPhaseB             = static_cast<int8_t>(0);
         Attributes::AverageRmsVoltageMeasurementPeriodPhaseB::TypeInfo::DecodableType averageRmsVoltageMeasurementPeriodPhaseB =
             static_cast<uint16_t>(0);
         Attributes::AverageRmsOverVoltageCounterPhaseB::TypeInfo::DecodableType averageRmsOverVoltageCounterPhaseB =
@@ -41599,7 +41800,8 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap =
+            static_cast<chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap32>>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };

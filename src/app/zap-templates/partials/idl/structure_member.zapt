@@ -1,29 +1,13 @@
 {{~#if isOptional~}} optional {{/if~}}
 {{~#if isNullable~}} nullable {{/if~}}
 
-{{~#if dataTypeReference}}
-  {{~#if_is_number dataTypeReference~}}
-    {{#unless (is_string_underscored dataTypeReferenceName)}}
-      {{~as_uppercase dataTypeReferenceName~}}
-    {{else}}
-      {{~dataTypeReferenceName~}}
-    {{/unless}}
-  {{else}}
-    {{~#if_is_string dataTypeReference~}}
-      {{~as_uppercase dataTypeReferenceName~}}
-    {{else}}
-      {{~dataTypeReferenceName~}}
-    {{/if_is_string}}
-  {{/if_is_number~}}
-{{else}}
-  {{~type~}}
-{{/if~}}
+{{type}}
   {{~#unless isArray~}} 
-    {{~#if_is_string type~}}
+    {{~#if (isString type)~}}
       {{~#if maxLength~}} 
         <{{maxLength}}> 
       {{~/if~}}
-    {{~/if_is_string}} 
+    {{~/if}} 
   {{~/unless}} {{asLowerCamelCase label~}}
 
 {{~#if isArray~}}
