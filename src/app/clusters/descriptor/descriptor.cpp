@@ -124,9 +124,14 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
 CHIP_ERROR DescriptorAttrAccess::ReadClientServerAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder, bool server)
 {
     CHIP_ERROR err = aEncoder.EncodeList([&endpoint, server](const auto & encoder) -> CHIP_ERROR {
-        uint16_t clusterCount = emberAfClusterCount(endpoint, server);
+        // TODO: emberAfClusterCount returns uint16_t yet emberAfGetNthCluster uses uint8_t
+        //       We do not expect too many clusters so this seems ok, however numeric types
+        //       should generally match.
+        VerifyOrReturnError(emberAfClusterCount(endpoint, server) <= UINT8_MAX, CHIP_ERROR_INCORRECT_STATE);
 
-        for (uint16_t clusterIndex = 0; clusterIndex < clusterCount; clusterIndex++)
+        uint8_t clusterCount = static_cast<uint8_t>(emberAfClusterCount(endpoint, server));
+
+        for (uint8_t clusterIndex = 0; clusterIndex < clusterCount; clusterIndex++)
         {
             const EmberAfCluster * cluster = emberAfGetNthCluster(endpoint, clusterIndex, server);
             ReturnErrorOnFailure(encoder.Encode(cluster->clusterId));
