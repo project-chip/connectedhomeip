@@ -535,6 +535,7 @@ CHIP_ERROR AdvertiserMinMdns::GetCommissionableInstanceName(char * instanceName,
 CHIP_ERROR AdvertiserMinMdns::UpdateCommissionableInstanceName()
 {
     uint64_t random_instance_name = chip::Crypto::GetRandU64();
+    static_assert(sizeof(mCommissionableInstanceName) == sizeof(random_instance_name), "Not copying the right amount of data");
     memcpy(&mCommissionableInstanceName[0], &random_instance_name, sizeof(mCommissionableInstanceName));
     return CHIP_NO_ERROR;
 }
