@@ -94,7 +94,6 @@ template("ti_simplelink_executable") {
       public_deps = [ ":${simplelink_target_name}.out.image" ]
 
       script = "${ti_simplelink_sdk_root}//tools/common/oad/oad_image_tool.py"
-      environment = [ "PYTHONDONTWRITEBYTECODE=1" ]
       sources = [ "${root_out_dir}/${objcopy_image_name}" ]
       outputs = [ "${root_out_dir}/${output_base_name}.bin" ]
 
