@@ -65,6 +65,7 @@ static_library("Darwin") {
     "PosixConfig.cpp",
     "PosixConfig.h",
     "SystemPlatformConfig.h",
+    "SystemTimeSupport.cpp",
   ]
 
   deps = [
