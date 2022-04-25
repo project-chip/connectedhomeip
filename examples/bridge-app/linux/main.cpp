@@ -667,8 +667,8 @@ int main(int argc, char * argv[])
     SuccessOrExit(err);
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
 
-    err = err = chip::examples::InitConfigurationManager(reinterpret_cast<ConfigurationManagerImpl &>(ConfigurationMgr()),
-                                                         LinuxDeviceOptions::GetInstance());
+    err = chip::examples::InitConfigurationManager(reinterpret_cast<ConfigurationManagerImpl &>(ConfigurationMgr()),
+                                                   LinuxDeviceOptions::GetInstance());
     SuccessOrExit(err);
 
     err = PrintQRCodeContent();
