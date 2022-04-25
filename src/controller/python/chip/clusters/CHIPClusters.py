@@ -162,10 +162,10 @@ class ChipClusters:
                     "commandName": "OpenCommissioningWindow",
                     "args": {
                         "commissioningTimeout": "int",
-                        "PAKEVerifier": "",
+                        "PAKEVerifier": "bytes",
                         "discriminator": "int",
                         "iterations": "int",
-                        "salt": "",
+                        "salt": "bytes",
                     },
                 },
             0x00000002: {
@@ -318,7 +318,7 @@ class ChipClusters:
                     "args": {
                         "catalogVendorId": "int",
                         "applicationId": "str",
-                        "data": "",
+                        "data": "bytes",
                     },
                 },
             0x00000001: {
@@ -1824,7 +1824,7 @@ class ChipClusters:
                     "args": {
                         "intent": "int",
                         "requestedProtocol": "int",
-                        "transferFileDesignator": "",
+                        "transferFileDesignator": "bytes",
                     },
                 },
             },
@@ -1933,7 +1933,7 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "LockDoor",
                     "args": {
-                        "pinCode": "",
+                        "pinCode": "bytes",
                     },
                 },
             0x00000022: {
@@ -1943,7 +1943,7 @@ class ChipClusters:
                         "operationType": "int",
                         "credentialType": "int",
                         "credentialIndex": "int",
-                        "credentialData": "",
+                        "credentialData": "bytes",
                         "userIndex": "int",
                         "userStatus": "int",
                         "userType": "int",
@@ -1999,7 +1999,7 @@ class ChipClusters:
                     "commandId": 0x00000001,
                     "commandName": "UnlockDoor",
                     "args": {
-                        "pinCode": "",
+                        "pinCode": "bytes",
                     },
                 },
             0x00000003: {
@@ -2007,7 +2007,7 @@ class ChipClusters:
                     "commandName": "UnlockWithTimeout",
                     "args": {
                         "timeout": "int",
-                        "pinCode": "",
+                        "pinCode": "bytes",
                     },
                 },
             },
@@ -3677,7 +3677,7 @@ class ChipClusters:
                     "commandId": 0x00000003,
                     "commandName": "AddOrUpdateThreadNetwork",
                     "args": {
-                        "operationalDataset": "",
+                        "operationalDataset": "bytes",
                         "breadcrumb": "int",
                     },
                 },
@@ -3685,8 +3685,8 @@ class ChipClusters:
                     "commandId": 0x00000002,
                     "commandName": "AddOrUpdateWiFiNetwork",
                     "args": {
-                        "ssid": "",
-                        "credentials": "",
+                        "ssid": "bytes",
+                        "credentials": "bytes",
                         "breadcrumb": "int",
                     },
                 },
@@ -3694,7 +3694,7 @@ class ChipClusters:
                     "commandId": 0x00000006,
                     "commandName": "ConnectNetwork",
                     "args": {
-                        "networkID": "",
+                        "networkID": "bytes",
                         "breadcrumb": "int",
                     },
                 },
@@ -3702,7 +3702,7 @@ class ChipClusters:
                     "commandId": 0x00000004,
                     "commandName": "RemoveNetwork",
                     "args": {
-                        "networkID": "",
+                        "networkID": "bytes",
                         "breadcrumb": "int",
                     },
                 },
@@ -3710,7 +3710,7 @@ class ChipClusters:
                     "commandId": 0x00000008,
                     "commandName": "ReorderNetwork",
                     "args": {
-                        "networkID": "",
+                        "networkID": "bytes",
                         "networkIndex": "int",
                         "breadcrumb": "int",
                     },
@@ -3719,7 +3719,7 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "ScanNetworks",
                     "args": {
-                        "ssid": "",
+                        "ssid": "bytes",
                         "breadcrumb": "int",
                     },
                 },
@@ -3808,7 +3808,7 @@ class ChipClusters:
                     "commandId": 0x00000002,
                     "commandName": "ApplyUpdateRequest",
                     "args": {
-                        "updateToken": "",
+                        "updateToken": "bytes",
                         "newVersion": "int",
                     },
                 },
@@ -3816,7 +3816,7 @@ class ChipClusters:
                     "commandId": 0x00000004,
                     "commandName": "NotifyUpdateApplied",
                     "args": {
-                        "updateToken": "",
+                        "updateToken": "bytes",
                         "softwareVersion": "int",
                     },
                 },
@@ -3831,7 +3831,7 @@ class ChipClusters:
                         "hardwareVersion": "int",
                         "location": "str",
                         "requestorCanConsent": "bool",
-                        "metadataForProvider": "",
+                        "metadataForProvider": "bytes",
                     },
                 },
             },
@@ -3861,7 +3861,7 @@ class ChipClusters:
                         "providerNodeId": "int",
                         "vendorId": "int",
                         "announcementReason": "int",
-                        "metadataForNode": "",
+                        "metadataForNode": "bytes",
                         "endpoint": "int",
                     },
                 },
@@ -4121,9 +4121,9 @@ class ChipClusters:
                     "commandId": 0x00000006,
                     "commandName": "AddNOC",
                     "args": {
-                        "NOCValue": "",
-                        "ICACValue": "",
-                        "IPKValue": "",
+                        "NOCValue": "bytes",
+                        "ICACValue": "bytes",
+                        "IPKValue": "bytes",
                         "caseAdminNode": "int",
                         "adminVendorId": "int",
                     },
@@ -4132,21 +4132,21 @@ class ChipClusters:
                     "commandId": 0x0000000B,
                     "commandName": "AddTrustedRootCertificate",
                     "args": {
-                        "rootCertificate": "",
+                        "rootCertificate": "bytes",
                     },
                 },
             0x00000000: {
                     "commandId": 0x00000000,
                     "commandName": "AttestationRequest",
                     "args": {
-                        "attestationNonce": "",
+                        "attestationNonce": "bytes",
                     },
                 },
             0x00000004: {
                     "commandId": 0x00000004,
                     "commandName": "CSRRequest",
                     "args": {
-                        "CSRNonce": "",
+                        "CSRNonce": "bytes",
                     },
                 },
             0x00000002: {
@@ -4167,7 +4167,7 @@ class ChipClusters:
                     "commandId": 0x0000000C,
                     "commandName": "RemoveTrustedRootCertificate",
                     "args": {
-                        "trustedRootIdentifier": "",
+                        "trustedRootIdentifier": "bytes",
                     },
                 },
             0x00000009: {
@@ -4181,8 +4181,8 @@ class ChipClusters:
                     "commandId": 0x00000007,
                     "commandName": "UpdateNOC",
                     "args": {
-                        "NOCValue": "",
-                        "ICACValue": "",
+                        "NOCValue": "bytes",
+                        "ICACValue": "bytes",
                     },
                 },
             },
@@ -4214,7 +4214,7 @@ class ChipClusters:
                 0x00000004: {
                     "attributeName": "TrustedRootCertificates",
                     "attributeId": 0x00000004,
-                    "type": "",
+                    "type": "bytes",
                     "reportable": True,
                 },
                 0x00000005: {
@@ -5359,7 +5359,7 @@ class ChipClusters:
                 0x0000001B: {
                     "attributeName": "ListOctetString",
                     "attributeId": 0x0000001B,
-                    "type": "",
+                    "type": "bytes",
                     "reportable": True,
                     "writable": True,
                 },
@@ -5464,7 +5464,7 @@ class ChipClusters:
                 0x0000002A: {
                     "attributeName": "ListLongOctetString",
                     "attributeId": 0x0000002A,
-                    "type": "",
+                    "type": "bytes",
                     "reportable": True,
                     "writable": True,
                 },

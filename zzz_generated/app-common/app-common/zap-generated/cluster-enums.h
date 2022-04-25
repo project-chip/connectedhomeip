@@ -161,6 +161,32 @@ namespace OnOffSwitchConfiguration {
 
 namespace LevelControl {
 
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for MoveMode
+enum class MoveMode : uint8_t
+{
+    kUp   = 0x00,
+    kDown = 0x01,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using MoveMode                        = EmberAfMoveMode;
+#endif
+
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for StepMode
+enum class StepMode : uint8_t
+{
+    kUp   = 0x00,
+    kDown = 0x01,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using StepMode                        = EmberAfStepMode;
+#endif
+
 // Bitmap for LevelControlFeature
 enum class LevelControlFeature : uint32_t
 {
@@ -1947,6 +1973,21 @@ enum class IasZoneType : uint16_t
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IasZoneType                     = EmberAfIasZoneType;
 #endif
+
+// Bitmap for IasZoneStatus
+enum class IasZoneStatus : uint16_t
+{
+    kAlarm1             = 0x1,
+    kAlarm2             = 0x2,
+    kTamper             = 0x4,
+    kBattery            = 0x8,
+    kSupervisionReports = 0x10,
+    kRestoreReports     = 0x20,
+    kTrouble            = 0x40,
+    kAc                 = 0x80,
+    kTest               = 0x100,
+    kBatteryDefect      = 0x200,
+};
 } // namespace IasZone
 
 namespace IasAce {
@@ -2044,9 +2085,40 @@ enum class IasZoneType : uint16_t
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IasZoneType                     = EmberAfIasZoneType;
 #endif
+
+// Bitmap for IasZoneStatus
+enum class IasZoneStatus : uint16_t
+{
+    kAlarm1             = 0x1,
+    kAlarm2             = 0x2,
+    kTamper             = 0x4,
+    kBattery            = 0x8,
+    kSupervisionReports = 0x10,
+    kRestoreReports     = 0x20,
+    kTrouble            = 0x40,
+    kAc                 = 0x80,
+    kTest               = 0x100,
+    kBatteryDefect      = 0x200,
+};
 } // namespace IasAce
 
 namespace IasWd {
+
+// Bitmap for SquawkInfo
+enum class SquawkInfo : uint8_t
+{
+    kMode   = 0xF0,
+    kStrobe = 0x8,
+    kLevel  = 0x3,
+};
+
+// Bitmap for WarningInfo
+enum class WarningInfo : uint8_t
+{
+    kMode       = 0xF0,
+    kStrobe     = 0xC,
+    kSirenLevel = 0x3,
+};
 } // namespace IasWd
 
 namespace WakeOnLan {

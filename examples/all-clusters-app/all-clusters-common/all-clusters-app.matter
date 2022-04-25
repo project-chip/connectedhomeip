@@ -1721,6 +1721,19 @@ server cluster IasZone = 1280 {
     kInvalidZoneType = 65535;
   }
 
+  bitmap IasZoneStatus : BITMAP16 {
+    kAlarm1 = 0x1;
+    kAlarm2 = 0x2;
+    kTamper = 0x4;
+    kBattery = 0x8;
+    kSupervisionReports = 0x10;
+    kRestoreReports = 0x20;
+    kTrouble = 0x40;
+    kAc = 0x80;
+    kTest = 0x100;
+    kBatteryDefect = 0x200;
+  }
+
   readonly attribute enum8 zoneState = 0;
   readonly attribute enum16 zoneType = 1;
   readonly attribute bitmap16 zoneStatus = 2;
@@ -1913,6 +1926,16 @@ server cluster KeypadInput = 1289 {
 }
 
 server cluster LevelControl = 8 {
+  enum MoveMode : ENUM8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  enum StepMode : ENUM8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
   bitmap LevelControlFeature : BITMAP32 {
     kOnOff = 0x1;
     kLighting = 0x2;

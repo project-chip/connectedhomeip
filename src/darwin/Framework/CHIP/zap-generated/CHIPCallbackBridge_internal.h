@@ -153,6 +153,12 @@ typedef void (*NullableOnOffClusterOnOffEffectIdentifierAttributeCallback)(
 typedef void (*OnOffClusterOnOffStartUpOnOffAttributeCallback)(void *, chip::app::Clusters::OnOff::OnOffStartUpOnOff);
 typedef void (*NullableOnOffClusterOnOffStartUpOnOffAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> &);
+typedef void (*LevelControlClusterMoveModeAttributeCallback)(void *, chip::app::Clusters::LevelControl::MoveMode);
+typedef void (*NullableLevelControlClusterMoveModeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::LevelControl::MoveMode> &);
+typedef void (*LevelControlClusterStepModeAttributeCallback)(void *, chip::app::Clusters::LevelControl::StepMode);
+typedef void (*NullableLevelControlClusterStepModeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::LevelControl::StepMode> &);
 typedef void (*ApplianceControlClusterApplianceStatusAttributeCallback)(void *,
                                                                         chip::app::Clusters::ApplianceControl::ApplianceStatus);
 typedef void (*NullableApplianceControlClusterApplianceStatusAttributeCallback)(
@@ -10260,6 +10266,120 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPLevelControlClusterMoveModeAttributeCallbackBridge
+    : public CHIPCallbackBridge<LevelControlClusterMoveModeAttributeCallback>
+{
+public:
+    CHIPLevelControlClusterMoveModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                           bool keepAlive = false) :
+        CHIPCallbackBridge<LevelControlClusterMoveModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::LevelControl::MoveMode value);
+};
+
+class CHIPLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge
+    : public CHIPLevelControlClusterMoveModeAttributeCallbackBridge
+{
+public:
+    CHIPLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action,
+                                                                       SubscriptionEstablishedHandler establishedHandler) :
+        CHIPLevelControlClusterMoveModeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullableLevelControlClusterMoveModeAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableLevelControlClusterMoveModeAttributeCallback>
+{
+public:
+    CHIPNullableLevelControlClusterMoveModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullableLevelControlClusterMoveModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::LevelControl::MoveMode> & value);
+};
+
+class CHIPNullableLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge
+    : public CHIPNullableLevelControlClusterMoveModeAttributeCallbackBridge
+{
+public:
+    CHIPNullableLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullableLevelControlClusterMoveModeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPLevelControlClusterStepModeAttributeCallbackBridge
+    : public CHIPCallbackBridge<LevelControlClusterStepModeAttributeCallback>
+{
+public:
+    CHIPLevelControlClusterStepModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                           bool keepAlive = false) :
+        CHIPCallbackBridge<LevelControlClusterStepModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::LevelControl::StepMode value);
+};
+
+class CHIPLevelControlClusterStepModeAttributeCallbackSubscriptionBridge
+    : public CHIPLevelControlClusterStepModeAttributeCallbackBridge
+{
+public:
+    CHIPLevelControlClusterStepModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action,
+                                                                       SubscriptionEstablishedHandler establishedHandler) :
+        CHIPLevelControlClusterStepModeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullableLevelControlClusterStepModeAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableLevelControlClusterStepModeAttributeCallback>
+{
+public:
+    CHIPNullableLevelControlClusterStepModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullableLevelControlClusterStepModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::LevelControl::StepMode> & value);
+};
+
+class CHIPNullableLevelControlClusterStepModeAttributeCallbackSubscriptionBridge
+    : public CHIPNullableLevelControlClusterStepModeAttributeCallbackBridge
+{
+public:
+    CHIPNullableLevelControlClusterStepModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullableLevelControlClusterStepModeAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

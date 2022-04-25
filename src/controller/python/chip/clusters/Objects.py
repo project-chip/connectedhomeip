@@ -3046,6 +3046,15 @@ class LevelControl(Cluster):
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
 
+    class Enums:
+        class MoveMode(IntEnum):
+            kUp = 0x00
+            kDown = 0x01
+
+        class StepMode(IntEnum):
+            kUp = 0x00
+            kDown = 0x01
+
 
 
     class Commands:
