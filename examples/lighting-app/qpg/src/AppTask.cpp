@@ -54,9 +54,9 @@ namespace {
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
-bool sIsThreadProvisioned     = false;
-bool sIsThreadEnabled         = false;
-bool sHaveBLEConnections      = false;
+bool sIsThreadProvisioned = false;
+bool sIsThreadEnabled     = false;
+bool sHaveBLEConnections  = false;
 
 uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
 
