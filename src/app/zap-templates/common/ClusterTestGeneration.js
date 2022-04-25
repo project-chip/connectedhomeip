@@ -251,12 +251,9 @@ function setDefaultResponse(test)
 
   // Ensure only valid keywords are used for response values.
   const values = test[kResponseName][kValuesName];
-  for (let i = 0; i < values.length; i++)
-  {
-    for (let key in values[i])
-    {
-      if (key == "name" || key == "value" || key == kConstraintsName || key == kSaveAsName)
-      {
+  for (let i = 0; i < values.length; i++) {
+    for (let key in values[i]) {
+      if (key == "name" || key == "value" || key == kConstraintsName || key == kSaveAsName) {
         continue;
       }
 
