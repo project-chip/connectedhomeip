@@ -285,48 +285,54 @@ combination with JLinkRTTClient as follows:
     [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
 
     Here is some CHIPTool examples:
-    
+
     Pairing with chip-tool:
+
     ```
     chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
     ```
-    
+
     Set a user:
+
     ```
-    ./out/chip-tool doorlock set-user OperationType UserIndex UserName UserUniqueId UserStatus UserType CredentialRule node-id/group-id 
+    ./out/chip-tool doorlock set-user OperationType UserIndex UserName UserUniqueId UserStatus UserType CredentialRule node-id/group-id
     ./out/chip-tool doorlock set-user 0 1 "mike" 5 1 0 0 1 1 --timedInteractionTimeoutMs 1000
     ```
 
     Set a credential:
+
     ```
     ./out/chip-tool doorlock set-credential OperationType Credential CredentialData UserIndex UserStatus UserType node-id/group-id
     ./out/chip-tool doorlock set-credential 0 '{ "credentialType": 1, "credentialIndex": 1 }' "123456" 1 null null 1 1 --timedInteractionTimeoutMs 1000
     ```
-    
+
     Changing a credential:
+
     ```
     ./out/chip-tool doorlock set-credential OperationType Credential CredentialData UserIndex UserStatus UserType node-id/group-id
     ./out/chip-tool doorlock set-credential 2 '{ "credentialType": 1, "credentialIndex": 1 }' "123457" 1 null null 1 1 --timedInteractionTimeoutMs 1000
     ```
 
     Get a user:
+
     ```
     ./out/chip-tool doorlock get-user UserIndex node-id/group-id
     ./out/chip-tool doorlock get-user 1 1 1
     ```
-    
+
     Unlock door:
+
     ```
     ./out/chip-tool doorlock unlock-door node-id/group-id
     ./out/chip-tool doorlock unlock-door 1 1
     ```
-    
+
     Lock door:
+
     ```
     ./out/chip-tool doorlock lock-door node-id/group-id
     ./out/chip-tool doorlock lock-door 1 1
     ```
-    
 
 ### Notes
 
