@@ -178,7 +178,8 @@ public:
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
     CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override;
     CHIP_ERROR FinalizeServiceUpdate() override { return CHIP_NO_ERROR; }
-    CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) override;
+    CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) const override;
+    CHIP_ERROR UpdateCommissionableInstanceName() override;
 
     // MdnsPacketDelegate
     void OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
@@ -275,6 +276,8 @@ private:
     ResponseSender mResponseSender;
     uint8_t mCommissionableInstanceName[sizeof(uint64_t)];
 
+    bool mIsInitialized = false;
+
     // current request handling
     const chip::Inet::IPPacketInfo * mCurrentSource = nullptr;
     uint32_t mMessageId                             = 0;
@@ -319,10 +322,16 @@ void AdvertiserMinMdns::OnQuery(const QueryData & data)
 
 CHIP_ERROR AdvertiserMinMdns::Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager)
 {
+    // TODO: Per API documentation, Init() should be a no-op if mIsInitialized
+    // is true.  But we don't handle updates to our set of interfaces right now,
+    // so rely on the logic in this function to shut down and restart the
+    // GlobalMinimalMdnsServer to handle that.
     GlobalMinimalMdnsServer::Server().Shutdown();
 
-    uint64_t random_instance_name = chip::Crypto::GetRandU64();
-    memcpy(&mCommissionableInstanceName[0], &random_instance_name, sizeof(mCommissionableInstanceName));
+    if (!mIsInitialized)
+    {
+        UpdateCommissionableInstanceName();
+    }
 
     // Re-set the server in the response sender in case this has been swapped in the
     // GlobalMinimalMdnsServer (used for testing).
@@ -334,12 +343,15 @@ CHIP_ERROR AdvertiserMinMdns::Init(chip::Inet::EndPointManager<chip::Inet::UDPEn
 
     AdvertiseRecords();
 
+    mIsInitialized = true;
+
     return CHIP_NO_ERROR;
 }
 
 void AdvertiserMinMdns::Shutdown()
 {
     GlobalMinimalMdnsServer::Server().Shutdown();
+    mIsInitialized = false;
 }
 
 CHIP_ERROR AdvertiserMinMdns::RemoveServices()
@@ -509,7 +521,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AdvertiserMinMdns::GetCommissionableInstanceName(char * instanceName, size_t maxLength)
+CHIP_ERROR AdvertiserMinMdns::GetCommissionableInstanceName(char * instanceName, size_t maxLength) const
 {
     if (maxLength < (Commission::kInstanceNameMaxLength + 1))
     {
@@ -518,6 +530,14 @@ CHIP_ERROR AdvertiserMinMdns::GetCommissionableInstanceName(char * instanceName,
 
     return chip::Encoding::BytesToUppercaseHexString(&mCommissionableInstanceName[0], sizeof(mCommissionableInstanceName),
                                                      instanceName, maxLength);
+}
+
+CHIP_ERROR AdvertiserMinMdns::UpdateCommissionableInstanceName()
+{
+    uint64_t random_instance_name = chip::Crypto::GetRandU64();
+    static_assert(sizeof(mCommissionableInstanceName) == sizeof(random_instance_name), "Not copying the right amount of data");
+    memcpy(&mCommissionableInstanceName[0], &random_instance_name, sizeof(mCommissionableInstanceName));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & params)
