@@ -103,7 +103,7 @@ uint16_t emberAfEndpointCount(void)
 
 uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint)
 {
-    for (uint16_t i = 0; i < ArraySize(endpoints); i++)
+    for (size_t i = 0; i < ArraySize(endpoints); i++)
     {
         if (endpoints[i] == endpoint)
         {
@@ -115,7 +115,7 @@ uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint)
 
 uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
 {
-    for (uint16_t i = 0; i < ArraySize(endpoints); i++)
+    for (size_t i = 0; i < ArraySize(endpoints); i++)
     {
         if (endpoints[i] == endpoint)
         {
@@ -201,7 +201,7 @@ uint8_t emberAfClusterIndex(chip::EndpointId endpoint, chip::ClusterId cluster, 
 {
     uint16_t endpointIndex          = emberAfIndexFromEndpoint(endpoint);
     uint16_t clusterCountOnEndpoint = emberAfClusterCount(endpoint, true);
-    for (uint8_t i = 0; i < clusterCountOnEndpoint; i++)
+    for (uint16_t i = 0; i < clusterCountOnEndpoint; i++)
     {
         if (clusters[i + clusterIndex[endpointIndex]] == cluster)
         {
