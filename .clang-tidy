@@ -23,10 +23,8 @@ Checks: >
   -bugprone-signed-char-misuse,
   -bugprone-copy-constructor-init,
   -clang-analyzer-core.CallAndMessage,
-  -clang-analyzer-core.UndefinedBinaryOperatorResult,
   -clang-analyzer-core.NullDereference,
   -clang-analyzer-optin.cplusplus.UninitializedObject,
-  -clang-analyzer-core.uninitialized.Branch,
   -clang-analyzer-optin.performance,
   -clang-analyzer-optin.osx.cocoa.localizability.EmptyLocalizationContextChecker,
   -clang-analyzer-deadcode.DeadStores,
@@ -35,14 +33,11 @@ Checks: >
   -clang-analyzer-security.insecureAPI.strcpy,
   -clang-analyzer-nullability.NullablePassedToNonnull,
   -clang-analyzer-optin.performance.Padding,
-  -clang-analyzer-security.insecureAPI.bzero,
   -clang-analyzer-unix.cstring.NullArg,
   -clang-analyzer-security.insecureAPI.rand,
   -clang-analyzer-core.NonNullParamChecker,
   -clang-analyzer-nullability.NullPassedToNonnull,
   -clang-analyzer-unix.Malloc,
-  -clang-analyzer-valist.Unterminated,
-  -clang-analyzer-cplusplus.NewDeleteLeaks,
   -clang-diagnostic-implicit-int-conversion
 WarningsAsErrors: '*'
 HeaderFilterRegex: '(src|examples|zzz_generated|credentials).*(?<!third_party.*repo)'

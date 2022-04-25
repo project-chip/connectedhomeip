@@ -28,6 +28,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>
 
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 using namespace chip;
 using namespace chip::ArgParser;
 
@@ -413,5 +415,9 @@ CHIP_ERROR ParseArguments(int argc, char * argv[], OptionSet * customOptions)
 
 LinuxDeviceOptions & LinuxDeviceOptions::GetInstance()
 {
+    if (gDeviceOptions.dacProvider == nullptr)
+    {
+        gDeviceOptions.dacProvider = chip::Credentials::Examples::GetExampleDACProvider();
+    }
     return gDeviceOptions;
 }

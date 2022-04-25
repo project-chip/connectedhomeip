@@ -40,11 +40,6 @@
 	url = https://github.com/openthread/ot-br-posix.git
 	branch  = main
 	platforms = linux
-[submodule "bluez"]
-	path = third_party/bluez/repo
-	url = https://github.com/bluez/bluez.git
-	branch  = master
-	platforms = linux
 [submodule "cirque"]
 	path = third_party/cirque/repo
 	url = https://github.com/openweave/cirque.git

@@ -611,7 +611,10 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
         std::unique_ptr<GVariantIter, GVariantIterDeleter> iter;
         g_variant_get(scan_result.get(), "a(tstayqqyyyybb)", &MakeUniquePointerReceiver(iter).Get());
         if (!iter)
+        {
+            delete scanResult;
             return;
+        }
 
         guint64 ext_address;
         const gchar * network_name;

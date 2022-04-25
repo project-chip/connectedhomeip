@@ -186,8 +186,8 @@ public:
 
         /*
          * Get highest received event number.
-         * If application don't have this one, it clear outparam and return CHIP_NO_ERROR.
-         * if any returning error, it will fail the entire read client.
+         * If the application does not want to filter events by event number, it should call ClearValue() on aEventNumber
+         * and return CHIP_NO_ERROR.  An error return from this function will fail the entire read client interaction.
          */
         virtual CHIP_ERROR GetHighestReceivedEventNumber(Optional<EventNumber> & aEventNumber)
         {

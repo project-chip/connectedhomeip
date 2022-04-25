@@ -147,12 +147,18 @@ CHIP_ERROR ASN1Reader::GetInteger(int64_t & val)
     ReturnErrorCodeIf(ValueLen > sizeof(int64_t), ASN1_ERROR_VALUE_OVERFLOW);
     ReturnErrorCodeIf(mElemStart + mHeadLen + ValueLen > mContainerEnd, ASN1_ERROR_UNDERRUN);
 
+    // NOLINTBEGIN(clang-analyzer-core.UndefinedBinaryOperatorResult)
+    //
+    // TODO: clang-tidy says that if val is -1, then (val << 8) is not defined.
+    //       added above supression to keep clang-tidy validating the rest of the files, however
+    //       this complain likely needs fixing.
     const uint8_t * p = Value;
     val               = ((*p & 0x80) == 0) ? 0 : -1;
     for (uint32_t i = ValueLen; i > 0; i--, p++)
     {
         val = (val << 8) | *p;
     }
+    // NOLINTEND(clang-analyzer-core.UndefinedBinaryOperatorResult)
 
     return CHIP_NO_ERROR;
 }

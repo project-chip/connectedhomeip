@@ -31,6 +31,8 @@
 
 #include <ti/drivers/apps/Button.h>
 
+struct Identify;
+
 class AppTask
 {
 public:
@@ -42,6 +44,10 @@ public:
     void UpdateClusterState();
     void InitOnOffClusterState();
     void InitPCCClusterState();
+
+    static void IdentifyStartHandler(::Identify *);
+    static void IdentifyStopHandler(::Identify *);
+    static void TriggerIdentifyEffectHandler(::Identify * identify);
 
 private:
     friend AppTask & GetAppTask(void);

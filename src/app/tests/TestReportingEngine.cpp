@@ -82,7 +82,7 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     ReadRequestMessage::Builder readRequestBuilder;
     DummyDelegate dummy;
 
-    err = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager());
+    err = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     TestExchangeDelegate delegate;
     Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(&delegate);
@@ -118,7 +118,7 @@ void TestReportingEngine::TestMergeOverlappedAttributePath(nlTestSuite * apSuite
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
-    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager());
+    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     AttributePathParams * clusterInfo = InteractionModelEngine::GetInstance()->GetReportingEngine().mGlobalDirtySet.CreateObject();
