@@ -354,8 +354,10 @@ true''')
                 queueCommand("idf.py fullclean")
             queueCommand("idf.py build")
             queueCommand("idf.py build flashing_script")
-            queueCommand(f"(cd build/ && tar cJvf $(git rev-parse HEAD)-{options.sampleDeviceTypeName}.tar.xz --files-from=chip-shell.flashbundle.txt)")
-            queueCommand(f"cp build/$(git rev-parse HEAD)-{options.sampleDeviceTypeName}.tar.xz {paths['scriptFolder']}")
+            queueCommand(
+                f"(cd build/ && tar cJvf $(git rev-parse HEAD)-{options.sampleDeviceTypeName}.tar.xz --files-from=chip-shell.flashbundle.txt)")
+            queueCommand(
+                f"cp build/$(git rev-parse HEAD)-{options.sampleDeviceTypeName}.tar.xz {paths['scriptFolder']}")
         elif options.buildTarget == "nrfconnect":
             queueCommand(f"cd {paths['rootSampleFolder']}/nrfconnect")
             if options.doClean:
@@ -383,7 +385,8 @@ true''')
             if options.doClean:
                 queueCommand(f"rm -rf out")
             if options.doRPC:
-                queueCommand("gn gen out --args='import(\"//with_pw_rpc.gni\")'")
+                queueCommand(
+                    "gn gen out --args='import(\"//with_pw_rpc.gni\")'")
             else:
                 queueCommand("gn gen out --args=''")
             queueCommand("ninja -C out")
