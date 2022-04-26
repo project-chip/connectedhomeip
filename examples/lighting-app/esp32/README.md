@@ -128,6 +128,25 @@ is "nvs".
 `scripts/tools/generate_esp32_chip_factory_bin.py` script generates the
 chip-factory NVS image `partition.bin`.
 
+Script has dependency on
+[spake2p](https://github.com/project-chip/connectedhomeip/tree/master/src/tools/spake2p)
+for generating spake2p parameters.
+
+Build spake2p as follows
+
+```
+cd path/to/connectedhomeip
+gn gen out/host
+ninja -C out/host
+cd -
+```
+
+Add spake2p to \$PATH environment variable
+
+```
+export PATH=$PATH:path/to/connectedhomeip/out/host
+```
+
 Below mentioned command generates the nvs image with test DAC with VID:0xFFF2
 and PID:8001
 
