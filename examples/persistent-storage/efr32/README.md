@@ -1,4 +1,4 @@
-#CHIP EFR32 Persistent Storage Example
+# CHIP EFR32 Persistent Storage Example
 
 An example testing and demonstrating the key value storage API.
 

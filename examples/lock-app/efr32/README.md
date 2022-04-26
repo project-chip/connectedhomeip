@@ -1,4 +1,4 @@
-#CHIP EFR32 Lock Example
+# CHIP EFR32 Lock Example
 
 An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
 

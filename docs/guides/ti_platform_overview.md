@@ -91,7 +91,7 @@ handled by the platform implementation files.
 
 <hr>
 
-# Matter example applications
+## Matter example applications
 
 Sample Matter applications are provided for the TI platform. These can be used
 as reference for your own application.
@@ -102,7 +102,7 @@ as reference for your own application.
 
 <hr>
 
-## Build system
+### Build system
 
 The TI platform uses GN to generate ninja build scripts. Build files have
 already been written to build and link the TI specific code within the
@@ -110,7 +110,7 @@ SimpleLink SDK.
 
 <hr>
 
-## TI Support
+### TI Support
 
 For technical support, please consider creating a post on TI's [E2E forum][e2e].
 Additionally, we welcome any feedback.

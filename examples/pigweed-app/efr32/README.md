@@ -1,4 +1,4 @@
-#CHIP EFR32 Pigweed Example Application
+# CHIP EFR32 Pigweed Example Application
 
 The EFR32 example demonstrates the usage of Pigweed module functionalities in an
 application.
