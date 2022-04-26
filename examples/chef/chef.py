@@ -17,20 +17,20 @@
 import sys
 import optparse
 import os
-import subprocess
 from pathlib import Path
-from sys import platform
+import sys
 import yaml
+
+import constants
+import stateful_shell
+
 
 global commandQueue
 commandQueue = ""
 
+TermColors = constants.TermColors
 
-class TermColors:
-    STRBOLD = '\033[1m'
-    STRRESET = '\033[0m'
-    STRCYAN = '\033[1;36m'
-    STRYELLOW = '\033[1;33m'
+shell = stateful_shell.StatefulShell()
 
 
 def splash():
@@ -111,9 +111,8 @@ def queueCommand(command):
 
 
 def execQueue():
-    global commandQueue
-    subprocess.run(commandQueue, shell=True, executable=shellApp)
-    commandQueue = ""
+    for command in commandQueue.split("; "):
+        shell.run_cmd(command)
 
 
 def hexInputToInt(valIn):
@@ -143,12 +142,7 @@ def main(argv):
     # Build environment switches
     #
 
-    global shellApp
-    if platform == "linux" or platform == "linux2":
-        shellApp = '/bin/bash'
-    elif platform == "darwin":
-        shellApp = '/bin/zsh'
-    elif platform == "win32":
+    if sys.platform == "win32":
         print('Windows is currently not supported. Use Linux or MacOS platforms')
         exit(1)
 
@@ -266,12 +260,12 @@ Notes:
     #
 
     if options.doBootstrapZap:
-        if platform == "linux" or platform == "linux2":
+        if sys.platform == "linux" or sys.platform == "linux2":
             queuePrint("Installing ZAP OS package dependencies")
             queueCommand(f"sudo apt-get install sudo apt-get install node node-yargs npm libpixman-1-dev libcairo2-dev libpango1.0-dev node-pre-gyp libjpeg9-dev libgif-dev node-typescript")
-        if platform == "darwin":
+        if sys.platform == "darwin":
             queuePrint("Installation of ZAP OS packages not supported on MacOS")
-        if platform == "win32":
+        if sys.platform == "win32":
             queuePrint(
                 "Installation of ZAP OS packages not supported on Windows")
 
