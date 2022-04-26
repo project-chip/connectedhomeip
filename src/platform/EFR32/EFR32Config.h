@@ -101,11 +101,9 @@ public:
     static constexpr Key kConfigKey_Spake2pSalt           = EFR32ConfigKey(kMatterFactory_KeyBase, 0x09);
     static constexpr Key kConfigKey_Spake2pVerifier       = EFR32ConfigKey(kMatterFactory_KeyBase, 0x0A);
     // Matter Config Keys
-    static constexpr Key kConfigKey_FabricId           = EFR32ConfigKey(kMatterConfig_KeyBase, 0x00);
     static constexpr Key kConfigKey_ServiceConfig      = EFR32ConfigKey(kMatterConfig_KeyBase, 0x01);
     static constexpr Key kConfigKey_PairedAccountId    = EFR32ConfigKey(kMatterConfig_KeyBase, 0x02);
     static constexpr Key kConfigKey_ServiceId          = EFR32ConfigKey(kMatterConfig_KeyBase, 0x03);
-    static constexpr Key kConfigKey_FabricSecret       = EFR32ConfigKey(kMatterConfig_KeyBase, 0x04);
     static constexpr Key kConfigKey_LastUsedEpochKeyId = EFR32ConfigKey(kMatterConfig_KeyBase, 0x05);
     static constexpr Key kConfigKey_FailSafeArmed      = EFR32ConfigKey(kMatterConfig_KeyBase, 0x06);
     static constexpr Key kConfigKey_GroupKey           = EFR32ConfigKey(kMatterConfig_KeyBase, 0x07);

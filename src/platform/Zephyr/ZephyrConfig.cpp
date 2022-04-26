@@ -63,12 +63,9 @@ const ZephyrConfig::Key ZephyrConfig::kConfigKey_Spake2pSalt           = CONFIG_
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_Spake2pVerifier       = CONFIG_KEY(NAMESPACE_FACTORY "verifier");
 // Keys stored in the chip config namespace
 // NOTE: update sAllResettableConfigKeys definition when adding a new entry below
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_FabricId           = CONFIG_KEY(NAMESPACE_CONFIG "fabric-id");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_ServiceConfig      = CONFIG_KEY(NAMESPACE_CONFIG "service-config");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_PairedAccountId    = CONFIG_KEY(NAMESPACE_CONFIG "account-id");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_ServiceId          = CONFIG_KEY(NAMESPACE_CONFIG "service-id");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_FabricSecret       = CONFIG_KEY(NAMESPACE_CONFIG "fabric-secret");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_GroupKeyIndex      = CONFIG_KEY(NAMESPACE_CONFIG "group-key-index");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_LastUsedEpochKeyId = CONFIG_KEY(NAMESPACE_CONFIG "last-ek-id");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_FailSafeArmed      = CONFIG_KEY(NAMESPACE_CONFIG "fail-safe-armed");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_RegulatoryLocation = CONFIG_KEY(NAMESPACE_CONFIG "regulatory-location");
@@ -84,9 +81,8 @@ const ZephyrConfig::Key ZephyrConfig::kCounterKey_TotalOperationalHours = CONFIG
 namespace {
 
 constexpr const char * sAllResettableConfigKeys[] = {
-    ZephyrConfig::kConfigKey_FabricId,           ZephyrConfig::kConfigKey_ServiceConfig,
+    ZephyrConfig::kConfigKey_ServiceConfig,
     ZephyrConfig::kConfigKey_PairedAccountId,    ZephyrConfig::kConfigKey_ServiceId,
-    ZephyrConfig::kConfigKey_FabricSecret,       ZephyrConfig::kConfigKey_GroupKeyIndex,
     ZephyrConfig::kConfigKey_LastUsedEpochKeyId, ZephyrConfig::kConfigKey_FailSafeArmed,
     ZephyrConfig::kConfigKey_RegulatoryLocation, ZephyrConfig::kConfigKey_CountryCode,
     ZephyrConfig::kConfigKey_Breadcrumb,

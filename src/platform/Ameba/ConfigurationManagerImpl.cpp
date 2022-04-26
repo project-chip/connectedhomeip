@@ -67,8 +67,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     SuccessOrExit(err);
     err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipACL);
     SuccessOrExit(err);
-    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipGroupMsgCounters);
-    SuccessOrExit(err);
     err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipAttributes);
     SuccessOrExit(err);
     err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipBindingTable);

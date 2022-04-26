@@ -51,7 +51,6 @@ const char AmebaConfig::kConfigNamespace_ChipFabric3[]          = "chip-fabric-3
 const char AmebaConfig::kConfigNamespace_ChipFabric4[]          = "chip-fabric-4";
 const char AmebaConfig::kConfigNamespace_ChipFabric5[]          = "chip-fabric-5";
 const char AmebaConfig::kConfigNamespace_ChipACL[]              = "chip-acl";
-const char AmebaConfig::kConfigNamespace_ChipGroupMsgCounters[] = "chip-groupmsgcounters";
 const char AmebaConfig::kConfigNamespace_ChipAttributes[]       = "chip-attributes";
 const char AmebaConfig::kConfigNamespace_ChipBindingTable[]     = "chip-bindingtable";
 const char AmebaConfig::kConfigNamespace_ChipOTA[]              = "chip-ota";
@@ -74,11 +73,9 @@ const AmebaConfig::Key AmebaConfig::kConfigKey_Spake2pVerifier       = { kConfig
 const AmebaConfig::Key AmebaConfig::kConfigKey_UniqueId              = { kConfigNamespace_ChipFactory, "uniqueId" };
 
 // Keys stored in the chip-config namespace
-const AmebaConfig::Key AmebaConfig::kConfigKey_FabricId                    = { kConfigNamespace_ChipConfig, "fabric-id" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_ServiceConfig               = { kConfigNamespace_ChipConfig, "service-config" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_PairedAccountId             = { kConfigNamespace_ChipConfig, "account-id" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_ServiceId                   = { kConfigNamespace_ChipConfig, "service-id" };
-const AmebaConfig::Key AmebaConfig::kConfigKey_GroupKeyIndex               = { kConfigNamespace_ChipConfig, "group-key-index" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_LastUsedEpochKeyId          = { kConfigNamespace_ChipConfig, "last-ek-id" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_FailSafeArmed               = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_WiFiStationSecType          = { kConfigNamespace_ChipConfig, "sta-sec-type" };
