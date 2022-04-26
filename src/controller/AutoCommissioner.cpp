@@ -377,7 +377,9 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                                  "Failed device attestation. Device vendor and/or product ID do not match the IDs expected. "
                                  "Verify DAC certificate chain and certification declaration to ensure spec rules followed.");
                 }
-            } else if (report.Is<CommissionErrorInfo>()) {
+            }
+            else if (report.Is<CommissionErrorInfo>())
+            {
                 completionStatus.commissioningError = MakeOptional(report.Get<CommissionErrorInfo>().commissioningError);
             }
         }
