@@ -17,7 +17,6 @@
 import sys
 import optparse
 import os
-from pathlib import Path
 import sys
 import textwrap
 import yaml
@@ -29,6 +28,13 @@ import stateful_shell
 TermColors = constants.TermColors
 
 shell = stateful_shell.StatefulShell()
+
+_CHEF_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
+_REPO_BASE_PATH = os.path.join(_CHEF_SCRIPT_PATH, "../../")
+_DEVICE_FOLDER = os.path.join(_CHEF_SCRIPT_PATH, "devices")
+_DEVICE_LIST = [file[:-4] for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap")]
+
+gen_dir = ""  # Filled in after sample app type is read from args.
 
 
 def splash():
@@ -50,12 +56,12 @@ def printc(strInput):
     print(color + strInput + TermColors.STRRESET)
 
 
-def loadConfig(paths):
+def loadConfig():
     config = dict()
     config["nrfconnect"] = dict()
     config["esp32"] = dict()
 
-    configFile = paths["scriptFolder"] + "/config.yaml"
+    configFile = f"{_CHEF_SCRIPT_PATH}/config.yaml"
     if (os.path.exists(configFile)):
         configStream = open(configFile, 'r')
         config = yaml.load(configStream, Loader=yaml.SafeLoader)
@@ -74,19 +80,6 @@ def loadConfig(paths):
         configStream.close()
 
     return config
-
-
-def definePaths():
-    paths = dict()
-    paths["scriptFolder"] = os.path.abspath(os.path.dirname(__file__))
-    paths["matterFolder"] = paths["scriptFolder"] + "/../../"
-    paths["rootSampleFolder"] = paths["scriptFolder"]
-    paths["devices"] = []
-
-    for filepath in Path(f"{paths['rootSampleFolder']}/devices").rglob('*.zap'):
-        paths["devices"].append(
-            str(os.path.splitext(os.path.basename(filepath))[0]))
-    return paths
 
 
 def checkPythonVersion():
@@ -113,8 +106,7 @@ def hexInputToInt(valIn):
 
 def main(argv):
     checkPythonVersion()
-    paths = definePaths()
-    config = loadConfig(paths)
+    config = loadConfig()
 
     global myEnv
     myEnv = os.environ.copy()
@@ -131,7 +123,7 @@ def main(argv):
     # Arguments parser
     #
 
-    deviceTypes = "\n    ".join(paths["devices"])
+    deviceTypes = "\n  ".join(_DEVICE_LIST)
 
     usage = textwrap.dedent(f"""\
         usage: chef.py [options]
@@ -198,22 +190,22 @@ def main(argv):
     #
 
     print(f"Target is set to {options.sampleDeviceTypeName}")
-    paths["genFolder"] = paths["rootSampleFolder"] + f"/out/{options.sampleDeviceTypeName}/zap-generated/"
+    global gen_dir
+    gen_dir = (
+        f"{_CHEF_SCRIPT_PATH}/out/{options.sampleDeviceTypeName}/zap-generated/")
 
     print("Setting up environment...")
     if options.buildTarget == "esp32":
         if config['esp32']['IDF_PATH'] is None:
             print('Path for esp32 SDK was not found. Make sure esp32.IDF_PATH is set on your config.yaml file')
             exit(1)
-        paths["platFolder"] = os.path.normpath(
-            paths["rootSampleFolder"] + "/esp32")
+        plat_folder = os.path.normpath(f"{_CHEF_SCRIPT_PATH}/esp32")
         shell.run_cmd(f'source {config["esp32"]["IDF_PATH"]}/export.sh')
     elif options.buildTarget == "nrfconnect":
         if config['nrfconnect']['ZEPHYR_BASE'] is None:
             print('Path for nrfconnect SDK was not found. Make sure nrfconnect.ZEPHYR_BASE is set on your config.yaml file')
             exit(1)
-        paths["platFolder"] = os.path.normpath(
-            paths["rootSampleFolder"] + "/nrfconnect")
+        plat_folder = os.path.normpath(f"{_CHEF_SCRIPT_PATH}/nrfconnect")
         shell.run_cmd(f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/zephyr-env.sh')
         shell.run_cmd("export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb")
     elif options.buildTarget == "linux":
@@ -221,7 +213,7 @@ def main(argv):
     else:
         print(f"Target {options.buildTarget} not supported")
 
-    shell.run_cmd(f"source {paths['matterFolder']}/scripts/activate.sh")
+    shell.run_cmd(f"source {_REPO_BASE_PATH}/scripts/activate.sh")
 
     #
     # Toolchain update
@@ -233,7 +225,7 @@ def main(argv):
         elif options.buildTarget == "nrfconnect":
             print("Updating toolchain")
             shell.run_cmd(
-                f"cd {paths['matterFolder']} && python3 scripts/setup/nrfconnect/update_ncs.py --update")
+                f"cd {_REPO_BASE_PATH} && python3 scripts/setup/nrfconnect/update_ncs.py --update")
         elif options.buildTarget == "linux":
             print("Linux toolchain update not supported. Skipping")
 
@@ -254,7 +246,7 @@ def main(argv):
 
         print("Running NPM to install ZAP Node.JS dependencies")
         shell.run_cmd(
-            f"cd {paths['matterFolder']}/third_party/zap/repo/ && npm install")
+            f"cd {_REPO_BASE_PATH}/third_party/zap/repo/ && npm install")
 
     #
     # Cluster customization
@@ -262,18 +254,18 @@ def main(argv):
 
     if options.doRunGui:
         print("Starting ZAP GUI editor")
-        shell.run_cmd(f"cd {paths['rootSampleFolder']}/devices")
+        shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/devices")
         shell.run_cmd(
-            f"{paths['matterFolder']}/scripts/tools/zap/run_zaptool.sh {options.sampleDeviceTypeName}.zap")
+            f"{_REPO_BASE_PATH}/scripts/tools/zap/run_zaptool.sh {options.sampleDeviceTypeName}.zap")
 
     if options.doRunZap:
         print("Running ZAP script to generate artifacts")
-        shell.run_cmd(f"mkdir -p {paths['genFolder']}/")
-        shell.run_cmd(f"rm {paths['genFolder']}/*")
+        shell.run_cmd(f"mkdir -p {gen_dir}/")
+        shell.run_cmd(f"rm {gen_dir}/*")
         shell.run_cmd(
-            f"{paths['matterFolder']}/scripts/tools/zap/generate.py {paths['rootSampleFolder']}/devices/{options.sampleDeviceTypeName}.zap -o {paths['genFolder']}")
+            f"{_REPO_BASE_PATH}/scripts/tools/zap/generate.py {_CHEF_SCRIPT_PATH}/devices/{options.sampleDeviceTypeName}.zap -o {gen_dir}")
         # af-gen-event.h is not generated
-        shell.run_cmd(f"touch {paths['genFolder']}/af-gen-event.h")
+        shell.run_cmd(f"touch {gen_dir}/af-gen-event.h")
 
     #
     # Menuconfig
@@ -281,10 +273,10 @@ def main(argv):
 
     if options.doMenuconfig:
         if options.buildTarget == "esp32":
-            shell.run_cmd(f"cd {paths['rootSampleFolder']}/esp32")
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
             shell.run_cmd("idf.py menuconfig")
         elif options.buildTarget == "nrfconnect":
-            shell.run_cmd(f"cd {paths['rootSampleFolder']}/nrfconnect")
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/nrfconnect")
             shell.run_cmd("west build -t menuconfig")
         elif options.buildTarget == "linux":
             print("Menuconfig not available on Linux target. Skipping")
@@ -298,16 +290,16 @@ def main(argv):
         if options.doRPC:
             print("RPC PW enabled")
             shell.run_cmd(
-                f"export SDKCONFIG_DEFAULTS={paths['rootSampleFolder']}/esp32/sdkconfig_rpc.defaults")
+                f"export SDKCONFIG_DEFAULTS={_CHEF_SCRIPT_PATH}/esp32/sdkconfig_rpc.defaults")
         else:
             print("RPC PW disabled")
             shell.run_cmd(
-                f"export SDKCONFIG_DEFAULTS={paths['rootSampleFolder']}/esp32/sdkconfig.defaults")
+                f"export SDKCONFIG_DEFAULTS={_CHEF_SCRIPT_PATH}/esp32/sdkconfig.defaults")
         options.vid = hexInputToInt(options.vid)
         options.pid = hexInputToInt(options.pid)
         print(
             f"Product ID 0x{options.pid:02X} / Vendor ID 0x{options.vid:02X}")
-        shell.run_cmd(f"cd {paths['rootSampleFolder']}")
+        shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
 
         if (options.buildTarget == "esp32") or (options.buildTarget == "nrfconnect"):
             with open("project_include.cmake", "w") as f:
@@ -318,30 +310,30 @@ def main(argv):
                         set(SAMPLE_NAME {options.sampleDeviceTypeName})"""))
 
         if options.buildTarget == "esp32":
-            shell.run_cmd(f"cd {paths['rootSampleFolder']}/esp32")
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
             if options.doClean:
-                shell.run_cmd(f"rm {paths['rootSampleFolder']}/esp32/sdkconfig")
-                shell.run_cmd(f"cd {paths['rootSampleFolder']}/esp32")
-                shell.run_cmd(f"rm -rf {paths['rootSampleFolder']}/esp32/build")
+                shell.run_cmd(f"rm {_CHEF_SCRIPT_PATH}/esp32/sdkconfig")
+                shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
+                shell.run_cmd(f"rm -rf {_CHEF_SCRIPT_PATH}/esp32/build")
                 shell.run_cmd("idf.py fullclean")
             shell.run_cmd("idf.py build")
         elif options.buildTarget == "nrfconnect":
-            shell.run_cmd(f"cd {paths['rootSampleFolder']}/nrfconnect")
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/nrfconnect")
             if options.doClean:
                 # shell.run_cmd(f"rm -rf {paths['rootSampleFolder']}/nrfconnect/build")
                 shell.run_cmd("west build -b nrf52840dk_nrf52840")
             else:
                 shell.run_cmd("west build -b nrf52840dk_nrf52840")
         elif options.buildTarget == "linux":
-            shell.run_cmd(f"cd {paths['rootSampleFolder']}/linux")
-            with open(f"{paths['rootSampleFolder']}/linux/args.gni", "w") as f:
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/linux")
+            with open(f"{_CHEF_SCRIPT_PATH}/linux/args.gni", "w") as f:
                 f.write(textwrap.dedent(f"""\
                         import("//build_overrides/chip.gni")
                         import("\\${{chip_root}}/config/standalone/args.gni")
                         chip_shell_cmd_server = false
                         target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={'1' if options.doRPC else '0'}"]
                         """))
-            with open(f"{paths['rootSampleFolder']}/linux/sample.gni", "w") as f:
+            with open(f"{_CHEF_SCRIPT_PATH}/linux/sample.gni", "w") as f:
                 f.write(textwrap.dedent(f"""\
                         sample_zap_file = "{options.sampleDeviceTypeName}.zap"
                         sample_name = "{options.sampleDeviceTypeName}"
@@ -365,13 +357,13 @@ def main(argv):
             if config['esp32']['TTY'] is None:
                 print('The path for the serial enumeration for esp32 is not set. Make sure esp32.TTY is set on your config.yaml file')
                 exit(1)
-            shell.run_cmd(f"cd {paths['rootSampleFolder']}/esp32")
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
             if options.doErase:
                 shell.run_cmd(
                     f"idf.py -p {config['esp32']['TTY']} erase-flash")
             shell.run_cmd(f"idf.py -p {config['esp32']['TTY']} flash")
         elif options.buildTarget == "nrfconnect":
-            shell.run_cmd(f"cd {paths['rootSampleFolder']}/nrfconnect")
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/nrfconnect")
             if options.doErase:
                 shell.run_cmd("rm -rf build")
             else:
@@ -387,7 +379,7 @@ def main(argv):
             if config['esp32']['TTY'] is None:
                 print('The path for the serial enumeration for esp32 is not set. Make sure esp32.TTY is set on your config.yaml file')
                 exit(1)
-            shell.run_cmd(f"cd {paths['rootSampleFolder']}/esp32")
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
             shell.run_cmd(f"idf.py -p {config['esp32']['TTY']} monitor")
         elif options.buildTarget == "nrfconnect":
             if config['nrfconnect']['TTY'] is None:
@@ -397,9 +389,9 @@ def main(argv):
             shell.run_cmd(f"screen {config['nrfconnect']['TTY']} 115200")
         elif options.buildTarget == "linux":
             print(
-                f"{paths['rootSampleFolder']}/linux/out/{options.sampleDeviceTypeName}")
+                f"{_CHEF_SCRIPT_PATH}/linux/out/{options.sampleDeviceTypeName}")
             shell.run_cmd(
-                f"{paths['rootSampleFolder']}/linux/out/{options.sampleDeviceTypeName}")
+                f"{_CHEF_SCRIPT_PATH}/linux/out/{options.sampleDeviceTypeName}")
 
     #
     # RPC Console
