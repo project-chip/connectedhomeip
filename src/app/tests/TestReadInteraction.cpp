@@ -40,6 +40,7 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
+#include <protocols/interaction_model/Constants.h>
 
 #include <nlunit-test.h>
 
@@ -597,7 +598,7 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         err = readHandler.OnInitialRequest(std::move(readRequestbuf));
-        NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+        NL_TEST_ASSERT(apSuite, err == CHIP_IM_GLOBAL_STATUS(InvalidAction));
 
         //
         // In the call above to OnInitialRequest, the handler will not actually close out the EC since
