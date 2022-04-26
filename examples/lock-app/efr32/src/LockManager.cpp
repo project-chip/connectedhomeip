@@ -245,12 +245,12 @@ void LockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
 
 bool LockManager::Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err)
 {
-    return setLockState(DlLockState::kLocked, pin, err);
+    return setLockState(endpointId, DlLockState::kLocked, pin, err);
 }
 
 bool LockManager::Unlock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err)
 {
-    return setLockState(DlLockState::kUnlocked, pin, err);
+    return setLockState(endpointId, DlLockState::kUnlocked, pin, err);
 }
 
 bool LockManager::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const
@@ -418,7 +418,7 @@ const char * LockManager::lockStateToString(DlLockState lockState) const
     return "Unknown";
 }
 
-bool LockManager::setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, DlOperationError & err)
+bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockState, const Optional<chip::ByteSpan> & pin, DlOperationError & err)
 {
     DlLockState curState = DlLockState::kLocked;
     if (mState == kState_UnlockCompleted)
