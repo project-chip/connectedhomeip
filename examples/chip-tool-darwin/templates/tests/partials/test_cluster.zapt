@@ -2,6 +2,7 @@
 class {{filename}}: public TestCommandBridge
 {
   public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     {{#if ../credsIssuerConfigArg}}
     {{filename}}(CredentialIssuerCommands * credsIssuerConfig): TestCommand("{{filename}}", credsIssuerConfig), mTestIndex(0)
     {{else}}
@@ -16,6 +17,7 @@ class {{filename}}: public TestCommandBridge
           {{/if}}
         {{/chip_tests_config}}
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~{{filename}}()
     {

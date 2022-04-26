@@ -3,7 +3,6 @@ class {{filename}}Suite: public TestCommand
 {
   public:
 
-    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     {{#if ../credsIssuerConfigArg}}
     {{filename}}Suite(CredentialIssuerCommands * credsIssuerConfig): TestCommand("{{filename}}", credsIssuerConfig), mTestIndex(0)
     {{else}}
@@ -18,7 +17,6 @@ class {{filename}}Suite: public TestCommand
           {{/if}}
         {{/chip_tests_config}}
     }
-    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~{{filename}}Suite()
     {
