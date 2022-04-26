@@ -388,12 +388,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimaryWiFiMACAddres
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StorePrimaryWiFiMACAddress(const uint8_t * buf)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimaryMACAddress(MutableByteSpan buf)
 {
     if (buf.size() != ConfigurationManager::kPrimaryMACAddressLength)
@@ -426,12 +420,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimary802154MACAddr
 #else
     return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StorePrimary802154MACAddress(const uint8_t * buf)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ConfigClass>
