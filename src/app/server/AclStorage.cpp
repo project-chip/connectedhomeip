@@ -187,14 +187,14 @@ CHIP_ERROR Convert(StagingSubject from, NodeId & to)
     switch (from.authMode)
     {
     case StagingAuthMode::kPase:
-        ReturnErrorCodeIf(from.nodeId & ~kMaskPAKEKeyId, CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorCodeIf((from.nodeId & ~kMaskPAKEKeyId) != 0, CHIP_ERROR_INVALID_ARGUMENT);
         to = NodeIdFromPAKEKeyId(static_cast<PasscodeId>(from.nodeId));
         break;
     case StagingAuthMode::kCase:
         to = from.nodeId;
         break;
     case StagingAuthMode::kGroup:
-        ReturnErrorCodeIf(from.nodeId & ~kMaskGroupId, CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorCodeIf((from.nodeId & ~kMaskGroupId) != 0, CHIP_ERROR_INVALID_ARGUMENT);
         to = NodeIdFromGroupId(static_cast<GroupId>(from.nodeId));
         break;
     default:
@@ -205,7 +205,7 @@ CHIP_ERROR Convert(StagingSubject from, NodeId & to)
 
 CHIP_ERROR Convert(const Target & from, StagingTarget & to)
 {
-    if (from.flags & Target::kCluster)
+    if ((from.flags & Target::kCluster) != 0)
     {
         to.cluster.SetNonNull(from.cluster);
     }
@@ -213,7 +213,7 @@ CHIP_ERROR Convert(const Target & from, StagingTarget & to)
     {
         to.cluster.SetNull();
     }
-    if (from.flags & Target::kEndpoint)
+    if ((from.flags & Target::kEndpoint) != 0)
     {
         to.endpoint.SetNonNull(from.endpoint);
     }
@@ -221,7 +221,7 @@ CHIP_ERROR Convert(const Target & from, StagingTarget & to)
     {
         to.endpoint.SetNull();
     }
-    if (from.flags & Target::kDeviceType)
+    if ((from.flags & Target::kDeviceType) != 0)
     {
         to.deviceType.SetNonNull(from.deviceType);
     }

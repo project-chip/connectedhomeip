@@ -725,6 +725,8 @@ public:
 
     EntryStorage * GetStorage() { return mStorage; }
 
+    // A storage is about to be deleted. If this delegate was
+    // using it, make a best effort to copy it to the pool.
     void FixBeforeDelete(EntryStorage & storage)
     {
         if (mStorage == &storage)
@@ -734,6 +736,9 @@ public:
         }
     }
 
+    // A storage was deleted, and others shuffled into its place.
+    // Fix this delegate (if necessary) to ensure it's using the
+    // correct storage.
     void FixAfterDelete(EntryStorage & storage)
     {
         constexpr auto & acl = EntryStorage::acl;
@@ -855,6 +860,9 @@ public:
 
     bool InUse() const { return mInUse; }
 
+    // A storage was deleted, and others shuffled into its place.
+    // Fix this delegate (if necessary) to ensure it's using the
+    // correct storage.
     void FixAfterDelete(EntryStorage & storage)
     {
         constexpr auto & acl = EntryStorage::acl;
