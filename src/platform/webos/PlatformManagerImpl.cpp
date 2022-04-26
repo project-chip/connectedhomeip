@@ -98,7 +98,7 @@ void GDBus_Thread()
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-2332423
+
 void PlatformManagerImpl::WiFIIPChangeListener()
 {
     int sock;
