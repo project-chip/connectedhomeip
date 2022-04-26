@@ -93,37 +93,6 @@ static Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolu
     return ConvertValue(limits.open, limits.closed, WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, absolute);
 }
 
-static OperationalState ValueToOperationalState(uint8_t value)
-{
-    switch (value)
-    {
-    case 0x00:
-        return OperationalState::Stall;
-    case 0x01:
-        return OperationalState::MovingUpOrOpen;
-    case 0x02:
-        return OperationalState::MovingDownOrClose;
-    case 0x03:
-    default:
-        return OperationalState::Reserved;
-    }
-}
-static uint8_t OperationalStateToValue(const OperationalState & state)
-{
-    switch (state)
-    {
-    case OperationalState::Stall:
-        return 0x00;
-    case OperationalState::MovingUpOrOpen:
-        return 0x01;
-    case OperationalState::MovingDownOrClose:
-        return 0x02;
-    case OperationalState::Reserved:
-    default:
-        return 0x03;
-    }
-}
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -296,42 +265,17 @@ chip::BitFlags<Mode> ModeGet(chip::EndpointId endpoint)
     return mode;
 }
 
-void SafetyStatusSet(chip::EndpointId endpoint, SafetyStatus & status)
+void SafetyStatusSet(chip::EndpointId endpoint, chip::BitFlags<SafetyStatus> & newSafetyStatus)
 {
-    /* clang-format off */
-    uint16_t value = (status.remoteLockout ? 0x0001 : 0)
-                     | (status.tamperDetection ? 0x0002 : 0)
-                     | (status.failedCommunication ? 0x0004 : 0)
-                     | (status.positionFailure ? 0x0008 : 0)
-                     | (status.thermalProtection ? 0x0010 : 0)
-                     | (status.obstacleDetected ? 0x0020 : 0)
-                     | (status.powerIssue ? 0x0040 : 0)
-                     | (status.stopInput ? 0x0080 : 0);
-    value |= (uint16_t) (status.motorJammed ? 0x0100 : 0)
-             | (uint16_t) (status.hardwareFailure ? 0x0200 : 0)
-             | (uint16_t) (status.manualOperation ? 0x0400 : 0);
-    /* clang-format on */
-    Attributes::SafetyStatus::Set(endpoint, value);
+    Attributes::SafetyStatus::Set(endpoint, newSafetyStatus);
 }
 
-const SafetyStatus SafetyStatusGet(chip::EndpointId endpoint)
+chip::BitFlags<SafetyStatus> SafetyStatusGet(chip::EndpointId endpoint)
 {
-    uint16_t value = 0;
-    SafetyStatus status;
+    chip::BitFlags<SafetyStatus> safetyStatus;
 
-    Attributes::SafetyStatus::Get(endpoint, &value);
-    status.remoteLockout       = (value & 0x0001) ? 1 : 0;
-    status.tamperDetection     = (value & 0x0002) ? 1 : 0;
-    status.failedCommunication = (value & 0x0004) ? 1 : 0;
-    status.positionFailure     = (value & 0x0008) ? 1 : 0;
-    status.thermalProtection   = (value & 0x0010) ? 1 : 0;
-    status.obstacleDetected    = (value & 0x0020) ? 1 : 0;
-    status.powerIssue          = (value & 0x0040) ? 1 : 0;
-    status.stopInput           = (value & 0x0080) ? 1 : 0;
-    status.motorJammed         = (value & 0x0100) ? 1 : 0;
-    status.hardwareFailure     = (value & 0x0200) ? 1 : 0;
-    status.manualOperation     = (value & 0x0400) ? 1 : 0;
-    return status;
+    Attributes::SafetyStatus::Get(endpoint, &safetyStatus);
+    return safetyStatus;
 }
 
 LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits)
