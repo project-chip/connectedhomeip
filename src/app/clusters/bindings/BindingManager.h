@@ -26,26 +26,6 @@
 
 namespace chip {
 
-class BindingManagerContext
-{
-public:
-    BindingManagerContext(void * context) : mContext(context) {}
-    void * GetContext() { return mContext; };
-    uint8_t GetConsumersNumber() { return mConsumersNumber; }
-    void IncrementConsumersNumber() { mConsumersNumber++; }
-    void DecrementConsumersNumber()
-    {
-        if (mConsumersNumber > 0)
-        {
-            mConsumersNumber--;
-        }
-    }
-
-private:
-    void * mContext;
-    uint8_t mConsumersNumber = 0;
-};
-
 /**
  * Application callback function when a cluster associated with a binding changes.
  *
@@ -64,7 +44,7 @@ using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry & bindin
  * Application callback function when a context used in NotifyBoundClusterChanged will not be needed and should be
  * released.
  */
-using BoundDeviceContextReleaseHandler = void (*)(void * context);
+using BoundDeviceContextReleaseHandler = PendingNotificationContextReleaseHandler;
 
 struct BindingManagerInitParams
 {
@@ -103,7 +83,7 @@ public:
      */
     void RegisterBoundDeviceContextReleaseHandler(BoundDeviceContextReleaseHandler handler)
     {
-        mBoundDeviceContextReleaseHandler = handler;
+        mPendingNotificationMap.RegisterPendingNotificationContextReleaseHandler(handler);
     }
 
     CHIP_ERROR Init(const BindingManagerInitParams & params);
@@ -153,7 +133,6 @@ private:
 
     PendingNotificationMap mPendingNotificationMap;
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;
-    BoundDeviceContextReleaseHandler mBoundDeviceContextReleaseHandler;
     BindingManagerInitParams mInitParams;
 
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;

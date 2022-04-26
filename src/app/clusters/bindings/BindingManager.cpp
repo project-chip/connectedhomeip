@@ -161,16 +161,7 @@ void BindingManager::HandleDeviceConnected(OperationalDeviceProxy * device)
         {
             fabricToRemove = entry.fabricIndex;
             nodeToRemove   = entry.nodeId;
-
-            BindingManagerContext * context = static_cast<BindingManagerContext *>(pendingNotification.mContext);
-            mBoundDeviceChangedHandler(entry, device, context->GetContext());
-
-            context->DecrementConsumersNumber();
-            if (context->GetConsumersNumber() == 0)
-            {
-                mBoundDeviceContextReleaseHandler(context->GetContext());
-                Platform::Delete(context);
-            }
+            mBoundDeviceChangedHandler(entry, device, pendingNotification.mContext->GetContext());
         }
     }
     mPendingNotificationMap.RemoveAllEntriesForNode(fabricToRemove, nodeToRemove);
@@ -199,10 +190,10 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
 {
     VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mBoundDeviceChangedHandler, CHIP_NO_ERROR);
-    VerifyOrReturnError(mBoundDeviceContextReleaseHandler, CHIP_NO_ERROR);
 
-    CHIP_ERROR error                       = CHIP_NO_ERROR;
-    BindingManagerContext * bindingContext = Platform::New<BindingManagerContext>(static_cast<void *>(context));
+    CHIP_ERROR error      = CHIP_NO_ERROR;
+    auto * bindingContext = mPendingNotificationMap.NewPendingNotificationContext(context);
+    VerifyOrReturnError(bindingContext != nullptr, CHIP_ERROR_NO_MEMORY);
 
     bindingContext->IncrementConsumersNumber();
 
@@ -223,8 +214,7 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
                 }
                 else
                 {
-                    mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), static_cast<void *>(bindingContext));
-                    bindingContext->IncrementConsumersNumber();
+                    mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), bindingContext);
                     error = EstablishConnection(iter->fabricIndex, iter->nodeId);
                     SuccessOrExit(error == CHIP_NO_ERROR);
                 }
@@ -238,13 +228,6 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
 
 exit:
     bindingContext->DecrementConsumersNumber();
-
-    // Call release bindingContext handler only if any pending notification is not going to use it.
-    if (bindingContext->GetConsumersNumber() == 0)
-    {
-        mBoundDeviceContextReleaseHandler(bindingContext->GetContext());
-        Platform::Delete(bindingContext);
-    }
 
     return error;
 }
