@@ -86,7 +86,7 @@ public:
 
     void Exit(std::string message, CHIP_ERROR err) override
     {
-        LogEnd(err);
+        LogEnd(message, err);
         SetCommandExitStatus(err);
     }
 
