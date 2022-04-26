@@ -1,4 +1,4 @@
-struct: "struct"i id "{" struct_field* "}"
+struct: "struct"i id "{" (struct_field ";")* "}"
 enum: "enum"i id ":" type "{" constant_entry* "}"
 bitmap: "bitmap"i id ":" type "{" constant_entry* "}"
 
@@ -14,7 +14,7 @@ event_access: "access" "(" ("read" ":" access_privilege)? ")"
 
 event_with_access: "event" event_access? id
 
-event: event_priority event_with_access "=" number "{" struct_field* "}"
+event: event_priority event_with_access "=" number "{" (struct_field ";")* "}"
 
 ?event_priority: "critical"i -> critical_priority
                | "info"i     -> info_priority
@@ -24,7 +24,7 @@ attribute_access_entry: attribute_access_type ":" access_privilege
 
 attribute_access: "access" "(" (attribute_access_entry ("," attribute_access_entry)* )? ")"
 
-attribute_with_access: attribute_access? struct_field
+attribute_with_access: attribute_access? struct_field ";"
 
 attribute: attribute_tag* "attribute"i attribute_with_access
 attribute_tag: "readonly"i -> attr_readonly
@@ -33,7 +33,7 @@ attribute_tag: "readonly"i -> attr_readonly
 request_struct: "request"i struct
 
 // Response structures must have a response id
-response_struct: "response"i "struct"i id "=" number "{" struct_field * "}"
+response_struct: "response"i "struct"i id "=" number "{" (struct_field ";") * "}"
 
 command_attribute: "timed"i -> timed_command
 command_attributes: command_attribute*
@@ -63,7 +63,7 @@ struct_field: member_attribute* field
 member_attribute: "optional"i -> optional
                 | "nullable"i -> nullable
 
-field: data_type id list_marker? "=" number ";"
+field: data_type id list_marker? "=" number
 list_marker: "[" "]"
 
 data_type: type ("<" number ">")?
