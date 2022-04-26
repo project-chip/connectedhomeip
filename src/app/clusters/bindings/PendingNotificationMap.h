@@ -38,11 +38,8 @@ public:
     void IncrementConsumersNumber() { mConsumersNumber++; }
     void DecrementConsumersNumber()
     {
-        if (mConsumersNumber > 0)
-        {
-            mConsumersNumber--;
-        }
-        else
+        VerifyOrDie(mConsumersNumber > 0);
+        if (--mConsumersNumber == 0)
         {
             // Release the context only if there is no pending notification pointing to it context.
             if (mPendingNotificationContextReleaseHandler != nullptr)
