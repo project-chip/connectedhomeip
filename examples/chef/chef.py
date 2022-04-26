@@ -155,20 +155,21 @@ def main(argv):
 
     deviceTypes = "\n    ".join(paths["devices"])
 
-    usage = f'''usage: chef.py [options]
+    usage = textwrap.dedent(f"""\
+        usage: chef.py [options]
 
-Platforms:
-    nrfconnect
-    esp32
-    linux
+        Platforms:
+            nrfconnect
+            esp32
+            linux
 
-Device Types:
-    {deviceTypes}
+        Device Types:
+            {deviceTypes}
 
-Notes:
-- Whenever you change a device type, make sure to also use options -zbe
-- Be careful if you have more than one device connected. The script assumes you have only one device connected and might flash the wrong one\
-'''
+        Notes:
+        - Whenever you change a device type, make sure to also use options -zbe
+        - Be careful if you have more than one device connected. The script assumes you have only one device connected and might flash the wrong one\
+        """)
     parser = optparse.OptionParser(usage=usage)
 
     parser.add_option("-u", "--update_toolchain", help="updates toolchain & installs zap",
@@ -330,14 +331,14 @@ Notes:
         queueCommand(f"cd {paths['rootSampleFolder']}")
 
         if (options.buildTarget == "esp32") or (options.buildTarget == "nrfconnect"):
-            queueCommand(f'''
-cat > project_include.cmake <<EOF
-set(CONFIG_DEVICE_VENDOR_ID {options.vid})
-set(CONFIG_DEVICE_PRODUCT_ID {options.pid})
-set(CONFIG_ENABLE_PW_RPC {"1" if options.doRPC else "0"})
-set(SAMPLE_NAME {options.sampleDeviceTypeName})
-EOF
-true''')
+            queueCommand(textwrap.dedent(f"""\
+                    cat > project_include.cmake <<EOF
+                    set(CONFIG_DEVICE_VENDOR_ID {options.vid})
+                    set(CONFIG_DEVICE_PRODUCT_ID {options.pid})
+                    set(CONFIG_ENABLE_PW_RPC {"1" if options.doRPC else "0"})
+                    set(SAMPLE_NAME {options.sampleDeviceTypeName})
+                    EOF
+                    true"""))
 
         if options.buildTarget == "esp32":
             queueCommand(f"cd {paths['rootSampleFolder']}/esp32")
@@ -356,19 +357,19 @@ true''')
                 queueCommand(f"west build -b nrf52840dk_nrf52840")
         elif options.buildTarget == "linux":
             queueCommand(f"cd {paths['rootSampleFolder']}/linux")
-            queueCommand(f'''
-cat > args.gni <<EOF
-import("//build_overrides/chip.gni")
-import("\\${{chip_root}}/config/standalone/args.gni")
-chip_shell_cmd_server = false
-target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={'1' if options.doRPC else '0'}"]
-EOF
+            queueCommand(textwrap.dedent(f"""\
+                    cat > args.gni <<EOF
+                    import("//build_overrides/chip.gni")
+                    import("\\${{chip_root}}/config/standalone/args.gni")
+                    chip_shell_cmd_server = false
+                    target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={'1' if options.doRPC else '0'}"]
+                    EOF
 
-cat > sample.gni <<EOF
-sample_zap_file = "{options.sampleDeviceTypeName}.zap"
-sample_name = "{options.sampleDeviceTypeName}"
-EOF
-true''')
+                    cat > sample.gni <<EOF
+                    sample_zap_file = "{options.sampleDeviceTypeName}.zap"
+                    sample_name = "{options.sampleDeviceTypeName}"
+                    EOF
+                    true"""))
             if options.doClean:
                 queueCommand(f"rm -rf out")
             queueCommand("gn gen out")
