@@ -60,8 +60,14 @@ for define in "${defines[@]}"; do
 done
 target_defines=[${target_defines:1}]
 
+read -r -a archs <<<"$ARCHS"
+
+# We need to pick some arg for our target_cflags and target_cpu bits.
+# Just take the first one.
+declare first_arch="${archs[0]}"
+
 declare target_cpu=
-case $PLATFORM_PREFERRED_ARCH in
+case $first_arch in
     i386)
         target_cpu=x86
         ;;
@@ -79,9 +85,7 @@ case $PLATFORM_PREFERRED_ARCH in
         ;;
 esac
 
-declare target_cflags='"-target","'"$PLATFORM_PREFERRED_ARCH"'-'"$LLVM_TARGET_TRIPLE_VENDOR"'-'"$LLVM_TARGET_TRIPLE_OS_VERSION"'"'
-
-read -r -a archs <<<"$ARCHS"
+declare target_cflags='"-target","'"$first_arch"'-'"$LLVM_TARGET_TRIPLE_VENDOR"'-'"$LLVM_TARGET_TRIPLE_OS_VERSION"'"'
 
 for arch in "${archs[@]}"; do
     target_cflags+=',"-arch","'"$arch"'"'
@@ -155,7 +159,7 @@ find_in_ancestors() {
     # put build intermediates in TEMP_DIR
     cd "$TEMP_DIR"
 
-    # gnerate and build
+    # generate and build
     gn --root="$CHIP_ROOT" gen --check out --args="${args[*]}"
     ninja -v -C out
 )
