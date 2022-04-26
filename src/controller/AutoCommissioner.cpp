@@ -363,9 +363,9 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     {
         completionStatus.failedStage = MakeOptional(report.stageCompleted);
         ChipLogError(Controller, "Failed to perform commissioning step %d", static_cast<int>(report.stageCompleted));
-        if (report.stageCompleted == CommissioningStage::kAttestationVerification)
+        if (report.Is<AdditionalErrorInfo>())
         {
-            if (report.Is<AdditionalErrorInfo>())
+            if (report.stageCompleted == CommissioningStage::kAttestationVerification)
             {
                 completionStatus.attestationResult = MakeOptional(report.Get<AdditionalErrorInfo>().attestationResult);
                 if ((report.Get<AdditionalErrorInfo>().attestationResult ==
@@ -378,10 +378,10 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                                  "Verify DAC certificate chain and certification declaration to ensure spec rules followed.");
                 }
             }
-            else if (report.Is<CommissionErrorInfo>())
-            {
-                completionStatus.commissioningError = MakeOptional(report.Get<CommissionErrorInfo>().commissioningError);
-            }
+        }
+        else if (report.Is<CommissionErrorInfo>())
+        {
+            completionStatus.commissioningError = MakeOptional(report.Get<CommissionErrorInfo>().commissioningError);
         }
     }
     else
