@@ -791,7 +791,14 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 {
     ble_sts_t status = BLE_SUCCESS;
 
-    status = blc_gatt_pushHandleValueIndicate(conId, Matter_TX_DP_H, pBuf->Start(), pBuf->DataLength());
+    do
+    {
+        if (status != BLE_SUCCESS)
+        {
+            k_msleep(1);
+        }
+        status = blc_gatt_pushHandleValueIndicate(conId, Matter_TX_DP_H, pBuf->Start(), pBuf->DataLength());
+    } while (status == GATT_ERR_DATA_PENDING_DUE_TO_SERVICE_DISCOVERY_BUSY);
     if (status != BLE_SUCCESS)
     {
         ChipLogError(DeviceLayer, "Fail to send indication. Error %d", status);
