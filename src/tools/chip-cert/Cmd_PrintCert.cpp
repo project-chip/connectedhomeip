@@ -133,7 +133,7 @@ void PrintHexField(FILE * file, const char * name, int indent, size_t count, con
     Indent(file, indent);
     indent += fprintf(file, "%s: ", name);
 
-    for (uint16_t i = 0; i < count; i++)
+    for (size_t i = 0; i < count; i++)
     {
         if (i != 0 && i != count && i % countPerRow == 0)
         {

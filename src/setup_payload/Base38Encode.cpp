@@ -55,7 +55,7 @@ CHIP_ERROR base38Encode(ByteSpan in_buf, MutableCharSpan & out_buf)
 
         size_t bytesInChunk = (in_buf_len >= kMaxBytesSingleChunkLen) ? kMaxBytesSingleChunkLen : in_buf_len;
 
-        for (uint8_t byte_idx = 0; byte_idx < bytesInChunk; byte_idx++)
+        for (size_t byte_idx = 0; byte_idx < bytesInChunk; byte_idx++)
         {
             value += static_cast<uint32_t>(in_buf_ptr[byte_idx] << (8 * byte_idx));
         }
