@@ -1671,9 +1671,9 @@ server cluster OperationalCredentials = 62 {
 }
 
 server cluster RelativeHumidityMeasurement = 1029 {
-  readonly attribute int16u measuredValue = 0;
-  readonly attribute int16u minMeasuredValue = 1;
-  readonly attribute int16u maxMeasuredValue = 2;
+  readonly attribute nullable int16u measuredValue = 0;
+  readonly attribute nullable int16u minMeasuredValue = 1;
+  readonly attribute nullable int16u maxMeasuredValue = 2;
   readonly attribute int16u clusterRevision = 65533;
 }
 
