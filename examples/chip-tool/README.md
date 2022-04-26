@@ -582,22 +582,26 @@ features, read the following guide:
 
 ## Using the Client via PASE
 
-For testing chip-tool can stop after setting up a PASE session. Model commands
-can be issued via PASE as well.
+For testing, chip-tool can stop after setting up a PASE session and model
+commands can be issued via PASE.
+
+Note: You cannot rely on PASE forever: on PASE establishment, a fail-safe timer
+will be set, which will cause eventual reset of state. Also, the commissioning
+window can only be open for 15 minutes at a time.
 
 ```bash
 # Start chip-tool interactively
 ./out/debug/chip-tool interactive start
 
 # Pair PASE only
-pairing qrcode-paseonly 7676777 MT:6FCJ142C00X50648G00
+pairing qrcode-paseonly ${NODE_ID} ${QR_CODE}
 
 # Issue a command via PASE
-onoff toggle 7676777 1 --via-pase 1
+onoff toggle ${NODE_ID} 1 --via-pase 1
 
 # Also uses PASE
-onoff toggle 7676777 1
+onoff toggle ${NODE_ID} 1
 
 # Switch back to CASE (fails if paseonly)
-onoff toggle 7676777 1 --via-pase 1
+onoff toggle ${NODE_ID} 1 --via-pase 0
 ```
