@@ -1423,7 +1423,7 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, DlCr
             continue;
         }
 
-        for (uint16_t j = 0; j < user.credentials.size(); ++j)
+        for (size_t j = 0; j < user.credentials.size(); ++j)
         {
             if (user.credentials.data()[j].CredentialIndex == credentialIndex &&
                 user.credentials.data()[j].CredentialType == to_underlying(credentialType))
