@@ -365,7 +365,8 @@ void SessionManager::ExpireAllPairingsForPeerExceptPending(const ScopedNodeId & 
     mSecureSessions.ForEachSession([&](auto session) {
         if ((session->GetPeer() == node) && (session->GetSecureSessionType() != SecureSession::Type::kPending))
         {
-            ChipLogDetail(Inet, "Expired/released previous local session ID %u for peer " ChipLogFormatScopedNodeId, static_cast<unsigned>(session->GetLocalSessionId()), ChipLogValueScopedNodeId(session->GetPeer()));
+            ChipLogDetail(Inet, "Expired/released previous local session ID %u for peer " ChipLogFormatScopedNodeId,
+                          static_cast<unsigned>(session->GetLocalSessionId()), ChipLogValueScopedNodeId(session->GetPeer()));
             mSecureSessions.ReleaseSession(session);
         }
         return Loop::Continue;
