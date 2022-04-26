@@ -302,7 +302,6 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
     mFlags.Set(Flags::kFlagInitiator, Initiator);
     mDelegate = delegate;
 
-    SetDropAckDebug(false);
     SetAckPending(false);
 
     // Do not request Ack for multicast

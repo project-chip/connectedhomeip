@@ -52,7 +52,7 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionManager * sessionManager,
     payloadHeader.SetExchangeID(exchangeId).SetMessageType(protocol, type).SetInitiator(isInitiator);
 
     // If there is a pending acknowledgment piggyback it on this message.
-    if (reliableMessageContext->HasPiggybackAckPending())
+    if (reliableMessageContext->HasAckCounter())
     {
         payloadHeader.SetAckMessageCounter(reliableMessageContext->TakePendingPeerAckMessageCounter());
 
