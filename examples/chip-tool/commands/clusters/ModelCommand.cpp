@@ -45,11 +45,9 @@ CHIP_ERROR ModelCommand::RunCommand()
 
         return this->SendCommand(commissioneeDevice, this->mEndPointId);
     }
-    else
-    {
-        ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
-        return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
-    }
+
+    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
+    return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
 void ModelCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
