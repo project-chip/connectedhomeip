@@ -89,21 +89,6 @@ def checkPythonVersion():
         exit(1)
 
 
-def hexInputToInt(valIn):
-    '''Parses inputs as hexadecimal numbers, takes into account optional 0x
-       prefix
-    '''
-    if (type(valIn) is str):
-        if (valIn[0:2].lower() == "0x"):
-            valOut = valIn[2:]
-        else:
-            valOut = valIn
-        valOut = int(valOut, 16)
-    else:
-        valOut = valIn
-    return valOut
-
-
 def main(argv):
     checkPythonVersion()
     config = loadConfig()
@@ -172,9 +157,9 @@ def main(argv):
                       metavar="TARGET",
                       default="esp32")
     parser.add_option("-r", "--rpc", help="enables Pigweed RPC interface. Enabling RPC disables the shell interface. Your sdkconfig configurations will be reverted to default. Default is PW RPC off. When enabling or disabling this flag, on the first build force a clean build with -c", action="store_true", dest="doRPC")
-    parser.add_option("-v", "--vid", dest="vid",
+    parser.add_option("-v", "--vid", dest="vid", type=int,
                       help="specifies the Vendor ID. Default is 0xFFF1", metavar="VID", default=0xFFF1)
-    parser.add_option("-p", "--pid", dest="pid",
+    parser.add_option("-p", "--pid", dest="pid", type=int,
                       help="specifies the Product ID. Default is 0x8000", metavar="PID", default=0x8000)
     parser.add_option("", "--rpc_console", help="Opens PW RPC Console",
                       action="store_true", dest="doRPC_CONSOLE")
@@ -295,8 +280,6 @@ def main(argv):
             print("RPC PW disabled")
             shell.run_cmd(
                 f"export SDKCONFIG_DEFAULTS={_CHEF_SCRIPT_PATH}/esp32/sdkconfig.defaults")
-        options.vid = hexInputToInt(options.vid)
-        options.pid = hexInputToInt(options.pid)
         print(
             f"Product ID 0x{options.pid:02X} / Vendor ID 0x{options.vid:02X}")
         shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
