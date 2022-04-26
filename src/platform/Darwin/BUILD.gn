@@ -55,8 +55,6 @@ static_library("Darwin") {
     "DnssdImpl.cpp",
     "DnssdImpl.h",
     "InetPlatformConfig.h",
-    "KeyValueStoreManagerImpl.h",
-    "KeyValueStoreManagerImpl.mm",
     "Logging.cpp",
     "MdnsError.cpp",
     "MdnsError.h",
@@ -67,6 +65,13 @@ static_library("Darwin") {
     "SystemPlatformConfig.h",
     "SystemTimeSupport.cpp",
   ]
+
+  if (chip_disable_platform_kvs == false) {
+    sources += [
+      "KeyValueStoreManagerImpl.h",
+      "KeyValueStoreManagerImpl.mm",
+    ]
+  }
 
   deps = [
     "${chip_root}/src/lib/dnssd:platform_header",

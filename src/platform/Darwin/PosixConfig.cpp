@@ -83,6 +83,7 @@ const PosixConfig::Key PosixConfig::kCounterKey_TotalOperationalHours = { kConfi
                                                                           "total-operational-hours" };
 const PosixConfig::Key PosixConfig::kConfigKey_UniqueId               = { kConfigNamespace_ChipConfig, "unique-id" };
 
+#if !CHIP_DISABLE_PLATFORM_KVS
 // Prefix used for NVS keys that contain Chip group encryption keys.
 const char PosixConfig::kGroupKeyNamePrefix[] = "gk-";
 
@@ -210,6 +211,8 @@ exit:
 }
 
 void PosixConfig::RunConfigUnitTest() {}
+
+#endif // CHIP_DISABLE_PLATFORM_KVS
 
 } // namespace Internal
 } // namespace DeviceLayer
