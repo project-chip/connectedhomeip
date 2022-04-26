@@ -81,11 +81,10 @@ const ZephyrConfig::Key ZephyrConfig::kCounterKey_TotalOperationalHours = CONFIG
 namespace {
 
 constexpr const char * sAllResettableConfigKeys[] = {
-    ZephyrConfig::kConfigKey_ServiceConfig,
-    ZephyrConfig::kConfigKey_PairedAccountId,    ZephyrConfig::kConfigKey_ServiceId,
-    ZephyrConfig::kConfigKey_LastUsedEpochKeyId, ZephyrConfig::kConfigKey_FailSafeArmed,
-    ZephyrConfig::kConfigKey_RegulatoryLocation, ZephyrConfig::kConfigKey_CountryCode,
-    ZephyrConfig::kConfigKey_Breadcrumb,
+    ZephyrConfig::kConfigKey_ServiceConfig, ZephyrConfig::kConfigKey_PairedAccountId,
+    ZephyrConfig::kConfigKey_ServiceId,     ZephyrConfig::kConfigKey_LastUsedEpochKeyId,
+    ZephyrConfig::kConfigKey_FailSafeArmed, ZephyrConfig::kConfigKey_RegulatoryLocation,
+    ZephyrConfig::kConfigKey_CountryCode,   ZephyrConfig::kConfigKey_Breadcrumb,
 };
 
 // Data structure to be passed as a parameter of Zephyr's settings_load_subtree_direct() function

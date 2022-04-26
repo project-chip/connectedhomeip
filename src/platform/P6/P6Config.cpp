@@ -214,11 +214,10 @@ bool P6Config::ConfigValueExists(Key key)
 CHIP_ERROR P6Config::FactoryResetConfig(void)
 {
     CHIP_ERROR err            = CHIP_NO_ERROR;
-    const Key * config_keys[] = { &kConfigKey_FabricId,       &kConfigKey_ServiceConfig,      &kConfigKey_PairedAccountId,
-                                  &kConfigKey_ServiceId,      &kConfigKey_LastUsedEpochKeyId,
-                                  &kConfigKey_FailSafeArmed,  &kConfigKey_WiFiStationSecType, &kConfigKey_WiFiSSID,
-                                  &kConfigKey_WiFiPassword,   &kConfigKey_WiFiSecurity,       &kConfigKey_WiFiMode,
-                                  &kConfigKey_SoftwareVersion };
+    const Key * config_keys[] = { &kConfigKey_FabricId,           &kConfigKey_ServiceConfig,      &kConfigKey_PairedAccountId,
+                                  &kConfigKey_ServiceId,          &kConfigKey_LastUsedEpochKeyId, &kConfigKey_FailSafeArmed,
+                                  &kConfigKey_WiFiStationSecType, &kConfigKey_WiFiSSID,           &kConfigKey_WiFiPassword,
+                                  &kConfigKey_WiFiSecurity,       &kConfigKey_WiFiMode,           &kConfigKey_SoftwareVersion };
 
     for (uint32_t i = 0; i < (sizeof(config_keys) / sizeof(config_keys[0])); i++)
     {
