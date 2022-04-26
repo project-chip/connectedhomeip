@@ -284,7 +284,7 @@ combination with JLinkRTTClient as follows:
 
     [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
 
-   Here is some CHIPTool examples:
+Here is some CHIPTool examples:
 
     Pairing with chip-tool:
     ```
@@ -293,7 +293,7 @@ combination with JLinkRTTClient as follows:
 
     Set a user:
     ```
-    ./out/chip-tool doorlock set-user OperationType UserIndex UserName UserUniqueId UserStatus UserType CredentialRule node-id/group-id 
+    ./out/chip-tool doorlock set-user OperationType UserIndex UserName UserUniqueId UserStatus UserType CredentialRule node-id/group-id
     ./out/chip-tool doorlock set-user 0 1 "mike" 5 1 0 0 1 1 --timedInteractionTimeoutMs 1000
     ```
 
