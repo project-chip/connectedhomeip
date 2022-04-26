@@ -50,7 +50,7 @@ constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
 // NOTE: For now, the LinuxWiFiDriver only supports one network, this can be fixed by using the wpa_supplicant API directly (then
 // wpa_supplicant will manage the networks for us.)
 
-CHIP_ERROR LinuxWiFiDriver::Init()
+CHIP_ERROR LinuxWiFiDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     CHIP_ERROR err;
     size_t ssidLen        = 0;
@@ -73,6 +73,14 @@ CHIP_ERROR LinuxWiFiDriver::Init()
     mSavedNetwork.ssidLen        = ssidLen;
 
     mStagingNetwork = mSavedNetwork;
+
+    ConnectivityMgrImpl().SetNetworkStatusChangeCallback(networkStatusChangeCallback);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LinuxWiFiDriver::Shutdown()
+{
+    ConnectivityMgrImpl().SetNetworkStatusChangeCallback(nullptr);
     return CHIP_NO_ERROR;
 }
 
@@ -97,8 +105,11 @@ bool LinuxWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan network
     return networkId.size() == network.ssidLen && memcmp(networkId.data(), network.ssid, network.ssidLen) == 0;
 }
 
-Status LinuxWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials)
+Status LinuxWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
+                                           uint8_t & outNetworkIndex)
 {
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
     VerifyOrReturnError(mStagingNetwork.ssidLen == 0 || NetworkMatch(mStagingNetwork, ssid), Status::kBoundsExceeded);
 
     static_assert(sizeof(WiFiNetwork::ssid) <= std::numeric_limits<decltype(WiFiNetwork::ssidLen)>::max(),
@@ -119,8 +130,10 @@ Status LinuxWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials)
     return Status::kSuccess;
 }
 
-Status LinuxWiFiDriver::RemoveNetwork(ByteSpan networkId)
+Status LinuxWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
 
     // Use empty ssid for representing invalid network
@@ -128,8 +141,9 @@ Status LinuxWiFiDriver::RemoveNetwork(ByteSpan networkId)
     return Status::kSuccess;
 }
 
-Status LinuxWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index)
+Status LinuxWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
+    outDebugText.reduce_size(0);
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
     // We only support one network, so reorder is actually no-op.
 
@@ -166,7 +180,13 @@ void LinuxWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * cal
     CHIP_ERROR err = DeviceLayer::ConnectivityMgrImpl().StartWiFiScan(ssid, callback);
     if (err != CHIP_NO_ERROR)
     {
+        mScanStatus.SetValue(Status::kUnknownError);
         callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
+    }
+    else
+    {
+        // On linux platform, once "scan" is started, we can say the result will always be success.
+        mScanStatus.SetValue(Status::kSuccess);
     }
 }
 
@@ -186,12 +206,12 @@ bool LinuxWiFiDriver::WiFiNetworkIterator::Next(Network & item)
     item.connected    = false;
     exhausted         = true;
 
-    Network connectedNetwork;
-    CHIP_ERROR err = DeviceLayer::ConnectivityMgrImpl().GetConnectedNetwork(connectedNetwork);
+    Network configuredNetwork;
+    CHIP_ERROR err = DeviceLayer::ConnectivityMgrImpl().GetConfiguredNetwork(configuredNetwork);
     if (err == CHIP_NO_ERROR)
     {
-        if (connectedNetwork.networkIDLen == item.networkIDLen &&
-            memcmp(connectedNetwork.networkID, item.networkID, item.networkIDLen) == 0)
+        if (DeviceLayer::ConnectivityMgrImpl().IsWiFiStationConnected() && configuredNetwork.networkIDLen == item.networkIDLen &&
+            memcmp(configuredNetwork.networkID, item.networkID, item.networkIDLen) == 0)
         {
             item.connected = true;
         }

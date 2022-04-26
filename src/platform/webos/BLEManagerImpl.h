@@ -237,7 +237,7 @@ inline BLEManager & BLEMgr()
  * Returns the platform-specific implementation of the BLEManager singleton object.
  *
  * Internal components can use this to gain access to features of the BLEManager
- * that are specific to the Linux platforms.
+ * that are specific to the webOS platforms.
  */
 inline BLEManagerImpl & BLEMgrImpl()
 {

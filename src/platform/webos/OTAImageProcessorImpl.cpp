@@ -17,15 +17,17 @@
  */
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
-#include <platform/OTARequestorInterface.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
 #include "OTAImageProcessorImpl.h"
+
+#include <sys/stat.h>
 
 namespace chip {
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
-    if (mParams.imageFile.empty())
+    if (mImageFile == nullptr)
     {
         ChipLogError(SoftwareUpdate, "Invalid output image file supplied");
         return CHIP_ERROR_INTERNAL;
@@ -49,7 +51,7 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    if (mParams.imageFile.empty())
+    if (mImageFile == nullptr)
     {
         ChipLogError(SoftwareUpdate, "Invalid output image file supplied");
         return CHIP_ERROR_INTERNAL;
@@ -82,6 +84,38 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
+bool OTAImageProcessorImpl::IsFirstImageRun()
+{
+    OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return false;
+    }
+
+    return requestor->GetCurrentUpdateState() == OTARequestorInterface::OTAUpdateStateEnum::kApplying;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
+{
+    OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    uint32_t currentVersion;
+    uint32_t targetVersion = requestor->GetTargetVersion();
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
+    if (currentVersion != targetVersion)
+    {
+        ChipLogError(SoftwareUpdate, "Current software version = %" PRIu32 ", expected software version = %" PRIu32, currentVersion,
+                     targetVersion);
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
@@ -96,16 +130,15 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         return;
     }
 
+    unlink(imageProcessor->mImageFile);
+
     imageProcessor->mHeaderParser.Init();
-    imageProcessor->mOfs.open(imageProcessor->mParams.imageFile.data(),
-                              std::ofstream::out | std::ofstream::ate | std::ofstream::app);
+    imageProcessor->mOfs.open(imageProcessor->mImageFile, std::ofstream::out | std::ofstream::ate | std::ofstream::app);
     if (!imageProcessor->mOfs.good())
     {
         imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_OPEN_FAILED);
         return;
     }
-
-    // TODO: if file already exists and is not empty, erase previous contents
 
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
@@ -121,23 +154,25 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     imageProcessor->mOfs.close();
     imageProcessor->ReleaseBlock();
 
-    ChipLogProgress(SoftwareUpdate, "OTA image downloaded to %s", imageProcessor->mParams.imageFile.data());
+    ChipLogProgress(SoftwareUpdate, "OTA image downloaded to %s", imageProcessor->mImageFile);
 }
 
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
-    if (imageProcessor == nullptr)
-    {
-        return;
-    }
+    VerifyOrReturn(imageProcessor != nullptr);
 
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
-    if (requestor != nullptr)
-    {
-        // TODO: Use software version from Configuration Manager
-        requestor->NotifyUpdateApplied(imageProcessor->mSoftwareVersion);
-    }
+    VerifyOrReturn(requestor != nullptr);
+
+    // Move the downloaded image to the location where the new image is to be executed from
+    unlink(kImageExecPath);
+    rename(imageProcessor->mImageFile, kImageExecPath);
+    chmod(kImageExecPath, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+
+    // Shutdown the stack and expect to boot into the new image once the event loop is stopped
+    DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { DeviceLayer::PlatformMgr().HandleServerShuttingDown(); });
+    DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { DeviceLayer::PlatformMgr().StopEventLoopTask(); });
 }
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)
@@ -149,7 +184,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
     }
 
     imageProcessor->mOfs.close();
-    remove(imageProcessor->mParams.imageFile.data());
+    unlink(imageProcessor->mImageFile);
     imageProcessor->ReleaseBlock();
 }
 
@@ -197,11 +232,6 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
         ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
         ReturnErrorOnFailure(error);
 
-        // We save the software version to be used in the next NotifyUpdateApplied, but it's a non-standard
-        // behavior of the Linux implementation and the pattern should not be blindly followed by real-life
-        // products. In general, it's up to the implementation to decide which header fields will be
-        // validated or presented to the user.
-        mSoftwareVersion       = header.mSoftwareVersion;
         mParams.totalFileBytes = header.mPayloadSize;
         mHeaderParser.Clear();
     }

@@ -19,7 +19,7 @@
 /**
  *    @file
  *          Provides an implementation of the Configuration key-value store object
- *          using IniPP on Linux platform.
+ *          using IniPP on webOS platform.
  *
  */
 
@@ -31,7 +31,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/Linux/CHIPLinuxStorageIni.h>
+#include <platform/webos/CHIPWebOSStorageIni.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
@@ -117,6 +117,33 @@ CHIP_ERROR ChipLinuxStorageIni::CommitConfig(const std::string & configFile)
     {
         ChipLogError(DeviceLayer, "failed to open file (%s) for writing", tmpPath.c_str());
         retval = CHIP_ERROR_OPEN_FAILED;
+    }
+
+    return retval;
+}
+
+CHIP_ERROR ChipLinuxStorageIni::GetUInt16Value(const char * key, uint16_t & val)
+{
+    CHIP_ERROR retval = CHIP_NO_ERROR;
+    std::map<std::string, std::string> section;
+
+    retval = GetDefaultSection(section);
+
+    if (retval == CHIP_NO_ERROR)
+    {
+        auto it = section.find(key);
+
+        if (it != section.end())
+        {
+            if (!inipp::extract(section[key], val))
+            {
+                retval = CHIP_ERROR_INVALID_ARGUMENT;
+            }
+        }
+        else
+        {
+            retval = CHIP_ERROR_KEY_NOT_FOUND;
+        }
     }
 
     return retval;

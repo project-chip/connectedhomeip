@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Provides an implementation of the ConfigurationManager object
- *          for Linux platforms.
+ *          for webOS platforms.
  */
 
 #pragma once
@@ -26,17 +26,22 @@
 #include "platform/internal/DeviceNetworkInfo.h"
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
-#include <platform/Linux/PosixConfig.h>
+#include <platform/webos/PosixConfig.h>
 
 namespace chip {
 namespace DeviceLayer {
 
 /**
- * Concrete implementation of the ConfigurationManager singleton object for the Linux platform.
+ * Concrete implementation of the ConfigurationManager singleton object for the webOS platform.
  */
 class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::PosixConfig>
 {
 public:
+    CHIP_ERROR StoreVendorId(uint16_t vendorId);
+    CHIP_ERROR StoreProductId(uint16_t productId);
+
+    CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
+    CHIP_ERROR GetProductId(uint16_t & productId) override;
     CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
     CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
@@ -63,6 +68,8 @@ private:
 #endif
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
+    CHIP_ERROR WriteConfigValue(Key key, uint16_t val);
+    CHIP_ERROR ReadConfigValue(Key key, uint16_t & val);
 
     // ===== Members that implement the GenericConfigurationManagerImpl protected interface.
     CHIP_ERROR ReadConfigValue(Key key, bool & val) override;

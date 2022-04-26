@@ -29,8 +29,8 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
-#include <platform/Linux/CHIPLinuxStorage.h>
-#include <platform/Linux/PosixConfig.h>
+#include <platform/webos/CHIPWebOSStorage.h>
+#include <platform/webos/PosixConfig.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -60,6 +60,8 @@ const PosixConfig::Key PosixConfig::kConfigKey_SetupDiscriminator    = { kConfig
 const PosixConfig::Key PosixConfig::kConfigKey_Spake2pIterationCount = { kConfigNamespace_ChipFactory, "iteration-count" };
 const PosixConfig::Key PosixConfig::kConfigKey_Spake2pSalt           = { kConfigNamespace_ChipFactory, "salt" };
 const PosixConfig::Key PosixConfig::kConfigKey_Spake2pVerifier       = { kConfigNamespace_ChipFactory, "verifier" };
+const PosixConfig::Key PosixConfig::kConfigKey_VendorId              = { kConfigNamespace_ChipFactory, "vendor-id" };
+const PosixConfig::Key PosixConfig::kConfigKey_ProductId             = { kConfigNamespace_ChipFactory, "product-id" };
 
 // Keys stored in the Chip-config namespace
 const PosixConfig::Key PosixConfig::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };
@@ -75,6 +77,7 @@ const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation = { kConfigNam
 const PosixConfig::Key PosixConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
 const PosixConfig::Key PosixConfig::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
 const PosixConfig::Key PosixConfig::kConfigKey_LocationCapability = { kConfigNamespace_ChipConfig, "location-capability" };
+const PosixConfig::Key PosixConfig::kConfigKey_UniqueId           = { kConfigNamespace_ChipFactory, "unique-id" };
 
 // Keys stored in the Chip-counters namespace
 const PosixConfig::Key PosixConfig::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
@@ -102,8 +105,7 @@ ChipLinuxStorage * PosixConfig::GetStorageForNamespace(Key key)
 
 CHIP_ERROR PosixConfig::Init()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    return err;
+    return PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, bool & val)
@@ -123,6 +125,25 @@ CHIP_ERROR PosixConfig::ReadConfigValue(Key key, bool & val)
     SuccessOrExit(err);
 
     val = (intVal != 0);
+
+exit:
+    return err;
+}
+
+CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint16_t & val)
+{
+    CHIP_ERROR err;
+    ChipLinuxStorage * storage;
+
+    storage = GetStorageForNamespace(key);
+    VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+
+    err = storage->ReadValue(key.Name, val);
+    if (err == CHIP_ERROR_KEY_NOT_FOUND)
+    {
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    SuccessOrExit(err);
 
 exit:
     return err;
@@ -246,6 +267,27 @@ CHIP_ERROR PosixConfig::WriteConfigValue(Key key, bool val)
     SuccessOrExit(err);
 
     ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %s", key.Namespace, key.Name, val ? "true" : "false");
+
+exit:
+    return err;
+}
+
+CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint16_t val)
+{
+    CHIP_ERROR err;
+    ChipLinuxStorage * storage;
+
+    storage = GetStorageForNamespace(key);
+    VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+
+    err = storage->WriteValue(key.Name, val);
+    SuccessOrExit(err);
+
+    // Commit the value to the persistent store.
+    err = storage->Commit();
+    SuccessOrExit(err);
+
+    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu16 " (0x%" PRIX16 ")", key.Namespace, key.Name, val, val);
 
 exit:
     return err;

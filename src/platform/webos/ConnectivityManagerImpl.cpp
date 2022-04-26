@@ -21,10 +21,10 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/Linux/ConnectivityUtils.h>
-#include <platform/Linux/DiagnosticDataProviderImpl.h>
+#include <platform/webos/ConnectivityUtils.h>
+#include <platform/webos/DiagnosticDataProviderImpl.h>
 #include <platform/webos/NetworkCommissioningDriver.h>
-#include <platform/Linux/WirelessDefs.h>
+#include <platform/webos/WirelessDefs.h>
 #include <platform/internal/BLEManager.h>
 
 #include <cstdlib>
@@ -925,8 +925,12 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
     GVariant * args = nullptr;
     GVariantBuilder builder;
     gboolean result;
-    char ssidStr[kMaxWiFiSSIDLength] = { 0 };
-    char keyStr[kMaxWiFiKeyLength]   = { 0 };
+    char ssidStr[kMaxWiFiSSIDLength + 1u] = { 0 };
+    char keyStr[kMaxWiFiKeyLength + 1u]   = { 0 };
+
+    VerifyOrReturnError(ssid.size() <= kMaxWiFiSSIDLength, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(credentials.size() <= kMaxWiFiKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
+
     // There is another ongoing connect request, reject the new one.
     VerifyOrReturnError(mpConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -1345,14 +1349,12 @@ CHIP_ERROR ConnectivityManagerImpl::GetConfiguredNetwork(NetworkCommissioning::N
     GVariant * ssid       = g_variant_lookup_value(properties, "ssid", nullptr);
     gsize length;
     const gchar * ssidStr = g_variant_get_string(ssid, &length);
-    if (length > sizeof(network.networkID))
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
     // TODO: wpa_supplicant will return ssid with quotes! We should have a better way to get the actual ssid in bytes.
+    gsize length_actual = length - 2;
+    VerifyOrReturnError(length_actual <= sizeof(network.networkID), CHIP_ERROR_INTERNAL);
     ChipLogDetail(DeviceLayer, "Current connected network: %s", ssidStr);
-    memcpy(network.networkID, ssidStr + 1, length - 2);
-    network.networkIDLen = length - 2;
+    memcpy(network.networkID, ssidStr + 1, length_actual);
+    network.networkIDLen = length_actual;
     return CHIP_NO_ERROR;
 }
 
@@ -1641,7 +1643,7 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
     auto bandInfo   = GetBandAndChannelFromFrequency(frequency);
     result.wiFiBand = bandInfo.first;
     result.channel  = bandInfo.second;
-    result.security = GetNetworkSecurityType(bssProxy);
+    result.security.SetRaw(GetNetworkSecurityType(bssProxy));
 
     return true;
 }

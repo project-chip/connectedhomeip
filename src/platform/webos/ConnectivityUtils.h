@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Utilities for accessing parameters of the network interface and the wireless
- *          statistics(extracted from /proc/net/wireless) on Linux platforms.
+ *          statistics(extracted from /proc/net/wireless) on webOS platforms.
  */
 
 #pragma once

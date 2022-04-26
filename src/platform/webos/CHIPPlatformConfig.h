@@ -37,6 +37,8 @@ using CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE = const char *;
 
 #define CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE 1
 
+#define CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT 1
+
 // ==================== Security Adaptations ====================
 
 // ==================== General Configuration Overrides ====================
@@ -58,10 +60,6 @@ using CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE = const char *;
 #endif // CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS
 
 // ==================== Security Configuration Overrides ====================
-
-#ifndef CHIP_CONFIG_DEBUG_CERT_VALIDATION
-#define CHIP_CONFIG_DEBUG_CERT_VALIDATION 0
-#endif // CHIP_CONFIG_DEBUG_CERT_VALIDATION
 
 #ifndef CHIP_CONFIG_KVS_PATH
 #define CHIP_CONFIG_KVS_PATH "/tmp/chip_kvs"

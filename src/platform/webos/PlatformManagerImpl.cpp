@@ -19,7 +19,7 @@
 /**
  *    @file
  *          Provides an implementation of the PlatformManager object
- *          for Linux platforms.
+ *          for webOS platforms.
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -29,9 +29,10 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DeviceControlServer.h>
-#include <platform/Linux/DiagnosticDataProviderImpl.h>
+#include <platform/webos/DeviceInfoProviderImpl.h>
+#include <platform/webos/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
 
 #include <thread>
 
@@ -74,7 +75,7 @@ void SignalHandler(int signum)
     case SIGHUP:
         PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::RadioFaultChange::Id);
         break;
-    case SIGTERM:
+    case SIGTTIN:
         PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::NetworkFaultChange::Id);
         break;
     case SIGTSTP:
@@ -85,9 +86,19 @@ void SignalHandler(int signum)
     }
 }
 
+#if CHIP_WITH_GIO
+void GDBus_Thread()
+{
+    GMainLoop * loop = g_main_loop_new(nullptr, false);
+
+    g_main_loop_run(loop);
+    g_main_loop_unref(loop);
+}
+#endif
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+2332423
 void PlatformManagerImpl::WiFIIPChangeListener()
 {
     int sock;
@@ -127,7 +138,7 @@ void PlatformManagerImpl::WiFIIPChangeListener()
                     if (routeInfo->rta_type == IFA_LOCAL)
                     {
                         char name[IFNAMSIZ];
-                        if (if_indextoname(addressMessage->ifa_index, name) == NULL)
+                        if (if_indextoname(addressMessage->ifa_index, name) == nullptr)
                         {
                             ChipLogError(DeviceLayer, "Error %d when getting the interface name at index: %d", errno,
                                          addressMessage->ifa_index);
@@ -164,24 +175,23 @@ void PlatformManagerImpl::WiFIIPChangeListener()
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
-    CHIP_ERROR err;
     struct sigaction action;
 
     memset(&action, 0, sizeof(action));
     action.sa_handler = SignalHandler;
-    sigaction(SIGHUP, &action, NULL);
-    sigaction(SIGTERM, &action, NULL);
-    sigaction(SIGUSR1, &action, NULL);
-    sigaction(SIGUSR2, &action, NULL);
-    sigaction(SIGTSTP, &action, NULL);
+    sigaction(SIGHUP, &action, nullptr);
+    sigaction(SIGTTIN, &action, nullptr);
+    sigaction(SIGUSR1, &action, nullptr);
+    sigaction(SIGUSR2, &action, nullptr);
+    sigaction(SIGTSTP, &action, nullptr);
 
 #if CHIP_WITH_GIO
-    // GError * error = nullptr;
+    GError * error = nullptr;
 
-    // this->mpGDBusConnection = UniqueGDBusConnection(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error));
+    this->mpGDBusConnection = UniqueGDBusConnection(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error));
 
-    // std::thread gdbusThread(GDBus_Thread);
-    // gdbusThread.detach();
+    std::thread gdbusThread(GDBus_Thread);
+    gdbusThread.detach();
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -190,20 +200,18 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 #endif
 
     // Initialize the configuration system.
-    err = Internal::PosixConfig::Init();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(Internal::PosixConfig::Init());
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
+    SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack());
 
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PlatformManagerImpl::_Shutdown()
@@ -229,110 +237,6 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     }
 
     return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetFixedLabelList(
-    EndpointId endpoint, AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
-{
-    // In Linux simulation, return following hardcoded labelList on all endpoints.
-    FixedLabel::Structs::LabelStruct::Type room;
-    FixedLabel::Structs::LabelStruct::Type orientation;
-    FixedLabel::Structs::LabelStruct::Type floor;
-    FixedLabel::Structs::LabelStruct::Type direction;
-
-    room.label = CharSpan::fromCharString("room");
-    room.value = CharSpan::fromCharString("bedroom 2");
-
-    orientation.label = CharSpan::fromCharString("orientation");
-    orientation.value = CharSpan::fromCharString("North");
-
-    floor.label = CharSpan::fromCharString("floor");
-    floor.value = CharSpan::fromCharString("2");
-
-    direction.label = CharSpan::fromCharString("direction");
-    direction.value = CharSpan::fromCharString("up");
-
-    labelList.add(room);
-    labelList.add(orientation);
-    labelList.add(floor);
-    labelList.add(direction);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-PlatformManagerImpl::_SetUserLabelList(
-    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
-{
-    // TODO:: store the user labelList, and read back stored user labelList if it has been set. Add yaml test to verify this.
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-PlatformManagerImpl::_GetUserLabelList(
-    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
-{
-    // In Linux simulation, return following hardcoded labelList on all endpoints.
-    UserLabel::Structs::LabelStruct::Type room;
-    UserLabel::Structs::LabelStruct::Type orientation;
-    UserLabel::Structs::LabelStruct::Type floor;
-    UserLabel::Structs::LabelStruct::Type direction;
-
-    room.label = CharSpan::fromCharString("room");
-    room.value = CharSpan::fromCharString("bedroom 2");
-
-    orientation.label = CharSpan::fromCharString("orientation");
-    orientation.value = CharSpan::fromCharString("North");
-
-    floor.label = CharSpan::fromCharString("floor");
-    floor.value = CharSpan::fromCharString("2");
-
-    direction.label = CharSpan::fromCharString("direction");
-    direction.value = CharSpan::fromCharString("up");
-
-    labelList.add(room);
-    labelList.add(orientation);
-    labelList.add(floor);
-    labelList.add(direction);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-PlatformManagerImpl::_GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
-{
-    // In Linux simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
-    supportedLocales.add(CharSpan::fromCharString("en-US"));
-    supportedLocales.add(CharSpan::fromCharString("de-DE"));
-    supportedLocales.add(CharSpan::fromCharString("fr-FR"));
-    supportedLocales.add(CharSpan::fromCharString("en-GB"));
-    supportedLocales.add(CharSpan::fromCharString("es-ES"));
-    supportedLocales.add(CharSpan::fromCharString("zh-CN"));
-    supportedLocales.add(CharSpan::fromCharString("it-IT"));
-    supportedLocales.add(CharSpan::fromCharString("ja-JP"));
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-PlatformManagerImpl::_GetSupportedCalendarTypes(
-    AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes)
-{
-    // In Linux simulation, return following supported Calendar Types
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kBuddhist);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kChinese);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kCoptic);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kEthiopian);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kGregorian);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kHebrew);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kIndian);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kIslamic);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kJapanese);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kKorean);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kPersian);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kTaiwanese);
-
-    return CHIP_NO_ERROR;
 }
 
 void PlatformManagerImpl::HandleGeneralFault(uint32_t EventId)

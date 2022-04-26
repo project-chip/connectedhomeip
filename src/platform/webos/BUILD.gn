@@ -59,24 +59,24 @@ static_library("webos") {
   sources = [
     "../DeviceSafeQueue.cpp",
     "../DeviceSafeQueue.h",
-    "../Linux/CHIPLinuxStorage.cpp",
-    "../Linux/CHIPLinuxStorage.h",
-    "../Linux/CHIPLinuxStorageIni.cpp",
-    "../Linux/CHIPLinuxStorageIni.h",
-    "../Linux/ConfigurationManagerImpl.cpp",
-    "../Linux/ConfigurationManagerImpl.h",
-    "../Linux/ConnectivityUtils.cpp",
-    "../Linux/ConnectivityUtils.h",
-    "../Linux/DiagnosticDataProviderImpl.cpp",
-    "../Linux/DiagnosticDataProviderImpl.h",
-    "../Linux/InetPlatformConfig.h",
-    "../Linux/KeyValueStoreManagerImpl.cpp",
-    "../Linux/KeyValueStoreManagerImpl.h",
-    "../Linux/PlatformManagerImpl.cpp",
-    "../Linux/PlatformManagerImpl.h",
-    "../Linux/PosixConfig.cpp",
-    "../Linux/PosixConfig.h",
-    "../Linux/SystemTimeSupport.cpp",
+    "CHIPWebOSStorage.cpp",
+    "CHIPWebOSStorage.h",
+    "CHIPWebOSStorageIni.cpp",
+    "CHIPWebOSStorageIni.h",
+    "ConfigurationManagerImpl.cpp",
+    "ConfigurationManagerImpl.h",
+    "ConnectivityUtils.cpp",
+    "ConnectivityUtils.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
+    "InetPlatformConfig.h",
+    "KeyValueStoreManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.h",
+    "PlatformManagerImpl.cpp",
+    "PlatformManagerImpl.h",
+    "PosixConfig.cpp",
+    "PosixConfig.h",
+    "SystemTimeSupport.cpp",
     "../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
@@ -97,6 +97,8 @@ static_library("webos") {
     "MainLoop.h",
     "ChipDeviceScanner.cpp",
     "ChipDeviceScanner.h",
+    "DeviceInfoProviderImpl.cpp",
+    "DeviceInfoProviderImpl.h",
   ]
 
   deps = [ "${chip_root}/src/setup_payload" ]
@@ -111,8 +113,8 @@ static_library("webos") {
 
   if (chip_mdns != "none") {
     sources += [
-      "../Linux/DnssdImpl.cpp",
-      "../Linux/DnssdImpl.h",
+      "DnssdImpl.cpp",
+      "DnssdImpl.h",
     ]
 
     deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]

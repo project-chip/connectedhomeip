@@ -18,11 +18,11 @@
 /**
  *    @file
  *          Utilities for accessing parameters of the network interface and the wireless
- *          statistics(extracted from /proc/net/wireless) on Linux platforms.
+ *          statistics(extracted from /proc/net/wireless) on webOS platforms.
  */
 
 #include <app-common/zap-generated/enums.h>
-#include <platform/Linux/ConnectivityUtils.h>
+#include <platform/webos/ConnectivityUtils.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <arpa/inet.h>
@@ -632,7 +632,7 @@ CHIP_ERROR ConnectivityUtils::GetEthFullDuplex(const char * ifname, bool & fullD
     }
     else
     {
-        fullDuplex = (ecmd.duplex == DUPLEX_FULL) ? true : false;
+        fullDuplex = ecmd.duplex == DUPLEX_FULL;
         err        = CHIP_NO_ERROR;
     }
 
