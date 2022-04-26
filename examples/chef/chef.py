@@ -357,7 +357,7 @@ true''')
             queueCommand(f"cd {paths['rootSampleFolder']}/nrfconnect")
             if options.doClean:
                 # queueCommand(f"rm -rf {paths['rootSampleFolder']}/nrfconnect/build")
-                queueCommand(f"west build -b nrf52840dk_nrf52840 -c")
+                queueCommand(f"west build -b nrf52840dk_nrf52840 -p always")
             else:
                 queueCommand(f"west build -b nrf52840dk_nrf52840")
         elif options.buildTarget == "linux":
