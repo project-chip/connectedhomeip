@@ -237,18 +237,18 @@ class AndroidBuilder(Builder):
                     '%s/examples/%s/android/App/gradlew' % (self.root,
                                                             self.app.ExampleName()), '-p',
                     '%s/examples/%s/android/App/' % (self.root,
-                                                    self.app.ExampleName()),
+                                                     self.app.ExampleName()),
                     '-PmatterBuildSrcDir=%s' % self.output_dir,
                     '-PmatterSdkSourceBuild=false',
-                    '-PbuildDir=%s/%s' % (self.output_dir,module), ':%s:assembleDebug' % module
+                    '-PbuildDir=%s/%s' % (self.output_dir, module), ':%s:assembleDebug' % module
                 ],
-                    title='Building Example %s, module %s' %(self.identifier, module))
+                    title='Building Example %s, module %s' % (self.identifier, module))
         else:
             self._Execute([
                 '%s/examples/%s/android/App/gradlew' % (self.root,
                                                         self.app.ExampleName()), '-p',
                 '%s/examples/%s/android/App/' % (self.root,
-                                                self.app.ExampleName()),
+                                                 self.app.ExampleName()),
                 '-PmatterBuildSrcDir=%s' % self.output_dir,
                 '-PmatterSdkSourceBuild=false',
                 '-PbuildDir=%s' % self.output_dir, 'assembleDebug'
