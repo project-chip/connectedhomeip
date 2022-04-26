@@ -54,9 +54,9 @@ CHIP_ERROR main()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    #ifdef CONFIG_ENABLE_PW_RPC
-        rpc::Init();
-    #endif
+#ifdef CONFIG_ENABLE_PW_RPC
+    rpc::Init();
+#endif
 
     err = chip::Platform::MemoryInit();
     if (err != CHIP_NO_ERROR)
