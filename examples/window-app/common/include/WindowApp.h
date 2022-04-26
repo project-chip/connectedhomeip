@@ -128,11 +128,6 @@ public:
 
         chip::EndpointId mEndpoint = 0;
 
-        // Attribute: Id 10 OperationalStatus
-        OperationalStatus mOperationalStatus = { .global = OperationalState::Stall,
-                                                 .lift   = OperationalState::Stall,
-                                                 .tilt   = OperationalState::Stall };
-
         Timer * mLiftTimer            = nullptr;
         Timer * mTiltTimer            = nullptr;
         OperationalState mLiftOpState = OperationalState::Stall;

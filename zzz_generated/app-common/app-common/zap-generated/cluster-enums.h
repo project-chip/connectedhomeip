@@ -1437,6 +1437,16 @@ enum class ConfigStatus : uint8_t
     kTiltEncoderControlled = 0x40,
 };
 
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kLift              = 0x1,
+    kTilt              = 0x2,
+    kPositionAwareLift = 0x4,
+    kAbsolutePosition  = 0x8,
+    kPositionAwareTilt = 0x10,
+};
+
 // Bitmap for Mode
 enum class Mode : uint8_t
 {
@@ -1444,16 +1454,6 @@ enum class Mode : uint8_t
     kCalibrationMode        = 0x2,
     kMaintenanceMode        = 0x4,
     kLedFeedback            = 0x8,
-};
-
-// Bitmap for WcFeature
-enum class WcFeature : uint32_t
-{
-    kLift              = 0x1,
-    kTilt              = 0x2,
-    kPositionAwareLift = 0x4,
-    kAbsolutePosition  = 0x8,
-    kPositionAwareTilt = 0x10,
 };
 
 // Bitmap for WcOperationalStatus
