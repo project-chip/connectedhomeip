@@ -111,7 +111,7 @@ bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userInde
                              totalCredentials);
 }
 
-// TODO: These functions will be supported by door-lock-server in the future. These are set to return failure until implemented. 
+// TODO: These functions will be supported by door-lock-server in the future. These are set to return failure until implemented.
 DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
                                           EmberAfPluginDoorLockWeekDaySchedule & schedule)
 {
