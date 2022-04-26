@@ -68,7 +68,6 @@
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
-#define EXAMPLE_VENDOR_ID 0xcafe
 
 #define SYSTEM_STATE_LED &sl_led_led0
 #define LOCK_STATE_LED &sl_led_led1

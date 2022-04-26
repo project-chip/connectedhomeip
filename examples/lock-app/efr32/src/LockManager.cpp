@@ -71,9 +71,6 @@ bool LockManager::ReadConfigValues()
 
     EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_CredentialData, mCredentialData, sizeof(mCredentialData), outLen);
 
-    // EFR32Config::ReadConfigValueStr(EFR32Config::kConfigKey_CredentialData, reinterpret_cast< char *>(&mCredentialData),
-    // sizeof(mCredentialData), outLen);
-
     EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(&mCredentials),
                                     sizeof(DlCredential), outLen);
 
@@ -448,7 +445,6 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
             continue;
         }
 
-        // chip::ByteSpan credentialData(mLockCredentials.credentialData, mLockCredentials.credentialDataSize);
         if (mLockCredentials.credentialData.data_equal(pin.Value()))
         {
             ChipLogDetail(Zcl,
