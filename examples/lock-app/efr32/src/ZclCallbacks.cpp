@@ -111,28 +111,28 @@ bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userInde
                              totalCredentials);
 }
 
-// TODO: These functions will be supported by door-lock-server in the future. These need to be 
+// TODO: These functions will be supported by door-lock-server in the future. These are set to return failure until implemented. 
 DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
                                           EmberAfPluginDoorLockWeekDaySchedule & schedule)
 {
-    return DlStatus::kSuccess;
+    return DlStatus::kFailure;
 }
 
 DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
                                           EmberAfPluginDoorLockYearDaySchedule & schedule)
 {
-    return DlStatus::kSuccess;
+    return DlStatus::kFailure;
 }
 
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
                                           DlScheduleStatus status, DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
                                           uint8_t endHour, uint8_t endMinute)
 {
-    return DlStatus::kSuccess;
+    return DlStatus::kFailure;
 }
 
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
                                           DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime)
 {
-    return DlStatus::kSuccess;
+    return DlStatus::kFailure;
 }
