@@ -1103,8 +1103,11 @@ cp {out}/android-arm-chip-tvserver/lib/third_party/connectedhomeip/src/app/serve
 
 cp {out}/android-arm-chip-tvserver/lib/TvApp.jar {root}/examples/tv-app/android/App/app/libs/TvApp.jar
 
-# Building Example android-arm-chip-tvserver
-{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-arm-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm-chip-tvserver assembleDebug
+# Building Example android-arm-chip-tvserver, module platform-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-arm-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm-chip-tvserver/platform-app :platform-app:assembleDebug
+
+# Building Example android-arm-chip-tvserver, module content-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-arm-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm-chip-tvserver/content-app :content-app:assembleDebug
 
 # Building JNI android-arm64-chip-test
 ninja -C {out}/android-arm64-chip-test
@@ -1191,8 +1194,11 @@ cp {out}/android-arm64-chip-tvserver/lib/third_party/connectedhomeip/src/app/ser
 
 cp {out}/android-arm64-chip-tvserver/lib/TvApp.jar {root}/examples/tv-app/android/App/app/libs/TvApp.jar
 
-# Building Example android-arm64-chip-tvserver
-{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-arm64-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-tvserver assembleDebug
+# Building Example android-arm64-chip-tvserver, module platform-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-arm64-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-tvserver/platform-app :platform-app:assembleDebug
+
+# Building Example android-arm64-chip-tvserver, module content-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-arm64-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-tvserver/content-app :content-app:assembleDebug
 
 # Building JNI android-x64-chip-tool
 ninja -C {out}/android-x64-chip-tool
@@ -1235,8 +1241,11 @@ cp {out}/android-x64-chip-tvserver/lib/third_party/connectedhomeip/src/app/serve
 
 cp {out}/android-x64-chip-tvserver/lib/TvApp.jar {root}/examples/tv-app/android/App/app/libs/TvApp.jar
 
-# Building Example android-x64-chip-tvserver
-{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x64-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x64-chip-tvserver assembleDebug
+# Building Example android-x64-chip-tvserver, module platform-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x64-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x64-chip-tvserver/platform-app :platform-app:assembleDebug
+
+# Building Example android-x64-chip-tvserver, module content-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x64-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x64-chip-tvserver/content-app :content-app:assembleDebug
 
 # Building JNI android-x86-chip-tool
 ninja -C {out}/android-x86-chip-tool
@@ -1279,8 +1288,11 @@ cp {out}/android-x86-chip-tvserver/lib/third_party/connectedhomeip/src/app/serve
 
 cp {out}/android-x86-chip-tvserver/lib/TvApp.jar {root}/examples/tv-app/android/App/app/libs/TvApp.jar
 
-# Building Example android-x86-chip-tvserver
-{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x86-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tvserver assembleDebug
+# Building Example android-x86-chip-tvserver, module platform-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x86-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tvserver/platform-app :platform-app:assembleDebug
+
+# Building Example android-x86-chip-tvserver, module content-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x86-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tvserver/content-app :content-app:assembleDebug
 
 # Building bl602-light
 ninja -C {out}/bl602-light
