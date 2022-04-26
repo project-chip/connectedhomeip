@@ -369,6 +369,7 @@ if __name__ == '__main__':
     # The ability to run is for debug and to print out the parsed AST.
     import click
     import coloredlogs
+    import pprint
 
     # Supported log levels, mapping string values required for argument
     # parsing into logging constants
@@ -395,6 +396,6 @@ if __name__ == '__main__':
         logging.info("Parse completed")
 
         logging.info("Data:")
-        print(data)
+        pprint.pp(data)
 
     main()
