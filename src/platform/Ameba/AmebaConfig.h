@@ -46,7 +46,6 @@ public:
     static const char kConfigNamespace_ChipFabric4[];
     static const char kConfigNamespace_ChipFabric5[];
     static const char kConfigNamespace_ChipACL[];
-    static const char kConfigNamespace_ChipGroupMsgCounters[];
     static const char kConfigNamespace_ChipAttributes[];
     static const char kConfigNamespace_ChipBindingTable[];
     static const char kConfigNamespace_ChipOTA[];
@@ -62,12 +61,9 @@ public:
     static const Key kConfigKey_HardwareVersion;
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
-    static const Key kConfigKey_FabricId;
     static const Key kConfigKey_ServiceConfig;
     static const Key kConfigKey_PairedAccountId;
     static const Key kConfigKey_ServiceId;
-    static const Key kConfigKey_FabricSecret;
-    static const Key kConfigKey_GroupKeyIndex;
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
     static const Key kConfigKey_WiFiStationSecType;
@@ -89,8 +85,6 @@ public:
     static const Key kCounterKey_UpTime;
     static const Key kCounterKey_TotalOperationalHours;
     static const Key kCounterKey_BootReason;
-
-    static const char kGroupKeyNamePrefix[];
 
     // Config value accessors.
     static CHIP_ERROR ReadConfigValue(Key key, bool & val);

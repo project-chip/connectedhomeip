@@ -61,12 +61,9 @@ public:
     static const Key kConfigKey_HardwareVersion;
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
-    static const Key kConfigKey_FabricId;
     static const Key kConfigKey_ServiceConfig;
     static const Key kConfigKey_PairedAccountId;
     static const Key kConfigKey_ServiceId;
-    static const Key kConfigKey_FabricSecret;
-    static const Key kConfigKey_GroupKeyIndex;
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
     static const Key kConfigKey_WiFiStationSecType;
@@ -79,8 +76,6 @@ public:
     static const Key kConfigKey_Spake2pVerifier;
     static const Key kConfigKey_VendorId;
     static const Key kConfigKey_ProductId;
-
-    static const char kGroupKeyNamePrefix[];
 
     static CHIP_ERROR Init(void);
 

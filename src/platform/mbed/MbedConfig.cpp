@@ -75,11 +75,9 @@ const MbedConfig::Key MbedConfig::kConfigKey_Spake2pSalt           = { FACTORY_K
 const MbedConfig::Key MbedConfig::kConfigKey_Spake2pVerifier       = { FACTORY_KEY("verifier") };
 
 // Keys stored in the chip-config namespace
-const MbedConfig::Key MbedConfig::kConfigKey_FabricId           = { CONFIG_KEY("fabric-id") };
 const MbedConfig::Key MbedConfig::kConfigKey_ServiceConfig      = { CONFIG_KEY("service-config") };
 const MbedConfig::Key MbedConfig::kConfigKey_PairedAccountId    = { CONFIG_KEY("account-id") };
 const MbedConfig::Key MbedConfig::kConfigKey_ServiceId          = { CONFIG_KEY("service-id") };
-const MbedConfig::Key MbedConfig::kConfigKey_GroupKeyIndex      = { CONFIG_KEY("group-key-index") };
 const MbedConfig::Key MbedConfig::kConfigKey_LastUsedEpochKeyId = { CONFIG_KEY("last-ek-id") };
 const MbedConfig::Key MbedConfig::kConfigKey_FailSafeArmed      = { CONFIG_KEY("fail-safe-armed") };
 const MbedConfig::Key MbedConfig::kConfigKey_WiFiStationSecType = { CONFIG_KEY("sta-sec-type") };
