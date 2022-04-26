@@ -26,9 +26,6 @@ import constants
 import stateful_shell
 
 
-global commandQueue
-commandQueue = ""
-
 TermColors = constants.TermColors
 
 shell = stateful_shell.StatefulShell()
@@ -97,25 +94,6 @@ def checkPythonVersion():
         print('Must use Python 3. Current version is ' +
               str(sys.version_info[0]))
         exit(1)
-
-
-def queuePrint(str):
-    global commandQueue
-    if (len(commandQueue) > 0):
-        commandQueue = commandQueue + "; "
-    commandQueue = commandQueue + "echo -e " + str
-
-
-def queueCommand(command):
-    global commandQueue
-    if (len(commandQueue) > 0):
-        commandQueue = commandQueue + "; "
-    commandQueue = commandQueue + command
-
-
-def execQueue():
-    for command in commandQueue.split("; "):
-        shell.run_cmd(command)
 
 
 def hexInputToInt(valIn):
@@ -219,31 +197,31 @@ def main(argv):
     # Platform Folder
     #
 
-    queuePrint(f"Target is set to {options.sampleDeviceTypeName}")
+    print(f"Target is set to {options.sampleDeviceTypeName}")
     paths["genFolder"] = paths["rootSampleFolder"] + f"/out/{options.sampleDeviceTypeName}/zap-generated/"
 
-    queuePrint("Setting up environment...")
+    print("Setting up environment...")
     if options.buildTarget == "esp32":
         if config['esp32']['IDF_PATH'] is None:
             print('Path for esp32 SDK was not found. Make sure esp32.IDF_PATH is set on your config.yaml file')
             exit(1)
         paths["platFolder"] = os.path.normpath(
             paths["rootSampleFolder"] + "/esp32")
-        queueCommand(f'source {config["esp32"]["IDF_PATH"]}/export.sh')
+        shell.run_cmd(f'source {config["esp32"]["IDF_PATH"]}/export.sh')
     elif options.buildTarget == "nrfconnect":
         if config['nrfconnect']['ZEPHYR_BASE'] is None:
             print('Path for nrfconnect SDK was not found. Make sure nrfconnect.ZEPHYR_BASE is set on your config.yaml file')
             exit(1)
         paths["platFolder"] = os.path.normpath(
             paths["rootSampleFolder"] + "/nrfconnect")
-        queueCommand(f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/zephyr-env.sh')
-        queueCommand("export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb")
+        shell.run_cmd(f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/zephyr-env.sh')
+        shell.run_cmd("export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb")
     elif options.buildTarget == "linux":
         pass
     else:
         print(f"Target {options.buildTarget} not supported")
 
-    queueCommand(f"source {paths['matterFolder']}/scripts/activate.sh")
+    shell.run_cmd(f"source {paths['matterFolder']}/scripts/activate.sh")
 
     #
     # Toolchain update
@@ -251,13 +229,13 @@ def main(argv):
 
     if options.doUpdateToolchain:
         if options.buildTarget == "esp32":
-            queuePrint("ESP32 toolchain update not supported. Skipping")
+            print("ESP32 toolchain update not supported. Skipping")
         elif options.buildTarget == "nrfconnect":
-            queuePrint("Updating toolchain")
-            queueCommand(
+            print("Updating toolchain")
+            shell.run_cmd(
                 f"cd {paths['matterFolder']} && python3 scripts/setup/nrfconnect/update_ncs.py --update")
         elif options.buildTarget == "linux":
-            queuePrint("Linux toolchain update not supported. Skipping")
+            print("Linux toolchain update not supported. Skipping")
 
     #
     # ZAP bootstrapping
@@ -265,16 +243,17 @@ def main(argv):
 
     if options.doBootstrapZap:
         if sys.platform == "linux" or sys.platform == "linux2":
-            queuePrint("Installing ZAP OS package dependencies")
-            queueCommand(f"sudo apt-get install sudo apt-get install node node-yargs npm libpixman-1-dev libcairo2-dev libpango1.0-dev node-pre-gyp libjpeg9-dev libgif-dev node-typescript")
+            print("Installing ZAP OS package dependencies")
+            shell.run_cmd(
+                f"sudo apt-get install sudo apt-get install node node-yargs npm libpixman-1-dev libcairo2-dev libpango1.0-dev node-pre-gyp libjpeg9-dev libgif-dev node-typescript")
         if sys.platform == "darwin":
-            queuePrint("Installation of ZAP OS packages not supported on MacOS")
+            print("Installation of ZAP OS packages not supported on MacOS")
         if sys.platform == "win32":
-            queuePrint(
+            print(
                 "Installation of ZAP OS packages not supported on Windows")
 
-        queuePrint("Running NPM to install ZAP Node.JS dependencies")
-        queueCommand(
+        print("Running NPM to install ZAP Node.JS dependencies")
+        shell.run_cmd(
             f"cd {paths['matterFolder']}/third_party/zap/repo/ && npm install")
 
     #
@@ -282,19 +261,19 @@ def main(argv):
     #
 
     if options.doRunGui:
-        queuePrint("Starting ZAP GUI editor")
-        queueCommand(f"cd {paths['rootSampleFolder']}/devices")
-        queueCommand(
+        print("Starting ZAP GUI editor")
+        shell.run_cmd(f"cd {paths['rootSampleFolder']}/devices")
+        shell.run_cmd(
             f"{paths['matterFolder']}/scripts/tools/zap/run_zaptool.sh {options.sampleDeviceTypeName}.zap")
 
     if options.doRunZap:
-        queuePrint("Running ZAP script to generate artifacts")
-        queueCommand(f"mkdir -p {paths['genFolder']}/")
-        queueCommand(f"rm {paths['genFolder']}/*")
-        queueCommand(
+        print("Running ZAP script to generate artifacts")
+        shell.run_cmd(f"mkdir -p {paths['genFolder']}/")
+        shell.run_cmd(f"rm {paths['genFolder']}/*")
+        shell.run_cmd(
             f"{paths['matterFolder']}/scripts/tools/zap/generate.py {paths['rootSampleFolder']}/devices/{options.sampleDeviceTypeName}.zap -o {paths['genFolder']}")
         # af-gen-event.h is not generated
-        queueCommand(f"touch {paths['genFolder']}/af-gen-event.h")
+        shell.run_cmd(f"touch {paths['genFolder']}/af-gen-event.h")
 
     #
     # Menuconfig
@@ -302,36 +281,36 @@ def main(argv):
 
     if options.doMenuconfig:
         if options.buildTarget == "esp32":
-            queueCommand(f"cd {paths['rootSampleFolder']}/esp32")
-            queueCommand("idf.py menuconfig")
+            shell.run_cmd(f"cd {paths['rootSampleFolder']}/esp32")
+            shell.run_cmd("idf.py menuconfig")
         elif options.buildTarget == "nrfconnect":
-            queueCommand(f"cd {paths['rootSampleFolder']}/nrfconnect")
-            queueCommand("west build -t menuconfig")
+            shell.run_cmd(f"cd {paths['rootSampleFolder']}/nrfconnect")
+            shell.run_cmd("west build -t menuconfig")
         elif options.buildTarget == "linux":
-            queuePrint("Menuconfig not available on Linux target. Skipping")
+            print("Menuconfig not available on Linux target. Skipping")
 
     #
     # Build
     #
 
     if options.doBuild:
-        queuePrint("Building...")
+        print("Building...")
         if options.doRPC:
-            queuePrint("RPC PW enabled")
-            queueCommand(
+            print("RPC PW enabled")
+            shell.run_cmd(
                 f"export SDKCONFIG_DEFAULTS={paths['rootSampleFolder']}/esp32/sdkconfig_rpc.defaults")
         else:
-            queuePrint("RPC PW disabled")
-            queueCommand(
+            print("RPC PW disabled")
+            shell.run_cmd(
                 f"export SDKCONFIG_DEFAULTS={paths['rootSampleFolder']}/esp32/sdkconfig.defaults")
         options.vid = hexInputToInt(options.vid)
         options.pid = hexInputToInt(options.pid)
-        queuePrint(
+        print(
             f"Product ID 0x{options.pid:02X} / Vendor ID 0x{options.vid:02X}")
-        queueCommand(f"cd {paths['rootSampleFolder']}")
+        shell.run_cmd(f"cd {paths['rootSampleFolder']}")
 
         if (options.buildTarget == "esp32") or (options.buildTarget == "nrfconnect"):
-            queueCommand(textwrap.dedent(f"""\
+            shell.run_cmd(textwrap.dedent(f"""\
                     cat > project_include.cmake <<EOF
                     set(CONFIG_DEVICE_VENDOR_ID {options.vid})
                     set(CONFIG_DEVICE_PRODUCT_ID {options.pid})
@@ -341,23 +320,23 @@ def main(argv):
                     true"""))
 
         if options.buildTarget == "esp32":
-            queueCommand(f"cd {paths['rootSampleFolder']}/esp32")
+            shell.run_cmd(f"cd {paths['rootSampleFolder']}/esp32")
             if options.doClean:
-                queueCommand(f"rm {paths['rootSampleFolder']}/esp32/sdkconfig")
-                queueCommand(f"cd {paths['rootSampleFolder']}/esp32")
-                queueCommand(f"rm -rf {paths['rootSampleFolder']}/esp32/build")
-                queueCommand("idf.py fullclean")
-            queueCommand("idf.py build")
+                shell.run_cmd(f"rm {paths['rootSampleFolder']}/esp32/sdkconfig")
+                shell.run_cmd(f"cd {paths['rootSampleFolder']}/esp32")
+                shell.run_cmd(f"rm -rf {paths['rootSampleFolder']}/esp32/build")
+                shell.run_cmd("idf.py fullclean")
+            shell.run_cmd("idf.py build")
         elif options.buildTarget == "nrfconnect":
-            queueCommand(f"cd {paths['rootSampleFolder']}/nrfconnect")
+            shell.run_cmd(f"cd {paths['rootSampleFolder']}/nrfconnect")
             if options.doClean:
-                # queueCommand(f"rm -rf {paths['rootSampleFolder']}/nrfconnect/build")
-                queueCommand(f"west build -b nrf52840dk_nrf52840")
+                # shell.run_cmd(f"rm -rf {paths['rootSampleFolder']}/nrfconnect/build")
+                shell.run_cmd("west build -b nrf52840dk_nrf52840")
             else:
-                queueCommand(f"west build -b nrf52840dk_nrf52840")
+                shell.run_cmd("west build -b nrf52840dk_nrf52840")
         elif options.buildTarget == "linux":
-            queueCommand(f"cd {paths['rootSampleFolder']}/linux")
-            queueCommand(textwrap.dedent(f"""\
+            shell.run_cmd(f"cd {paths['rootSampleFolder']}/linux")
+            shell.run_cmd(textwrap.dedent(f"""\
                     cat > args.gni <<EOF
                     import("//build_overrides/chip.gni")
                     import("\\${{chip_root}}/config/standalone/args.gni")
@@ -371,9 +350,9 @@ def main(argv):
                     EOF
                     true"""))
             if options.doClean:
-                queueCommand(f"rm -rf out")
-            queueCommand("gn gen out")
-            queueCommand("ninja -C out")
+                shell.run_cmd(f"rm -rf out")
+            shell.run_cmd("gn gen out")
+            shell.run_cmd("ninja -C out")
 
     #
     # Compilation DB TODO
@@ -384,57 +363,55 @@ def main(argv):
     #
 
     if options.doFlash:
-        queuePrint("Flashing target")
+        print("Flashing target")
         if options.buildTarget == "esp32":
             if config['esp32']['TTY'] is None:
                 print('The path for the serial enumeration for esp32 is not set. Make sure esp32.TTY is set on your config.yaml file')
                 exit(1)
-            queueCommand(f"cd {paths['rootSampleFolder']}/esp32")
+            shell.run_cmd(f"cd {paths['rootSampleFolder']}/esp32")
             if options.doErase:
-                queueCommand(
+                shell.run_cmd(
                     f"idf.py -p {config['esp32']['TTY']} erase-flash")
-            queueCommand(f"idf.py -p {config['esp32']['TTY']} flash")
+            shell.run_cmd(f"idf.py -p {config['esp32']['TTY']} flash")
         elif options.buildTarget == "nrfconnect":
-            queueCommand(f"cd {paths['rootSampleFolder']}/nrfconnect")
+            shell.run_cmd(f"cd {paths['rootSampleFolder']}/nrfconnect")
             if options.doErase:
-                queueCommand("rm -rf build")
+                shell.run_cmd("rm -rf build")
             else:
-                queueCommand("west flash")
+                shell.run_cmd("west flash")
 
     #
     # Terminal interaction
     #
 
     if options.doInteract:
-        queuePrint("Starting terminal...")
+        print("Starting terminal...")
         if options.buildTarget == "esp32":
             if config['esp32']['TTY'] is None:
                 print('The path for the serial enumeration for esp32 is not set. Make sure esp32.TTY is set on your config.yaml file')
                 exit(1)
-            queueCommand(f"cd {paths['rootSampleFolder']}/esp32")
-            queueCommand(f"idf.py -p {config['esp32']['TTY']} monitor")
+            shell.run_cmd(f"cd {paths['rootSampleFolder']}/esp32")
+            shell.run_cmd(f"idf.py -p {config['esp32']['TTY']} monitor")
         elif options.buildTarget == "nrfconnect":
             if config['nrfconnect']['TTY'] is None:
                 print('The path for the serial enumeration for nordic is not set. Make sure nrfconnect.TTY is set on your config.yaml file')
                 exit(1)
-            queueCommand("killall screen")
-            queueCommand(f"screen {config['nrfconnect']['TTY']} 115200")
+            shell.run_cmd("killall screen")
+            shell.run_cmd(f"screen {config['nrfconnect']['TTY']} 115200")
         elif options.buildTarget == "linux":
-            queuePrint(
+            print(
                 f"{paths['rootSampleFolder']}/linux/out/{options.sampleDeviceTypeName}")
-            queueCommand(
+            shell.run_cmd(
                 f"{paths['rootSampleFolder']}/linux/out/{options.sampleDeviceTypeName}")
 
     #
     # RPC Console
     #
     if options.doRPC_CONSOLE:
-        queueCommand(
+        shell.run_cmd(
             f"python3 -m chip_rpc.console --device {config['esp32']['TTY']}")
 
-    queuePrint("Done")
-
-    execQueue()
+    print("Done")
 
 
 if __name__ == '__main__':
