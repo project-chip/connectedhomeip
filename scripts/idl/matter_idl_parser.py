@@ -14,12 +14,14 @@ except:
 
     from matter_idl_types import *
 
+
 class AttributeTransformDefaultValue:
     def __init__(self, value):
         self.value = value
 
     def __call__(self, attr):
         attr.default = self.value
+
 
 class AttributeTransformSetCallback:
     def __init__(self):

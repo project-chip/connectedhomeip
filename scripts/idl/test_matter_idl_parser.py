@@ -205,7 +205,7 @@ class TestParser(unittest.TestCase):
                         Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE, AttributeTag.CALLBACK]), definition=Field(
                             data_type=DataType(name="int32u"), code=4, name="intWithCallback")),
                         Attribute(tags=set([AttributeTag.READABLE]), definition=Field(
-                            data_type=DataType(name="int32u"), code=5, name="readonlyDefault"), default = 321),
+                            data_type=DataType(name="int32u"), code=5, name="readonlyDefault"), default=321),
                     ]
                     )])
         self.assertEqual(actual, expected)
