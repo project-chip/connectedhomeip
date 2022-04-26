@@ -81,9 +81,10 @@ void ConfigStatusSet(chip::EndpointId endpoint, const chip::BitMask<ConfigStatus
 chip::BitMask<ConfigStatus> ConfigStatusGet(chip::EndpointId endpoint);
 void ConfigStatusUpdateFeatures(chip::EndpointId endpoint);
 
-void OperationalStatusSet(chip::EndpointId endpoint, const OperationalStatus & status);
-void OperationalStatusSetWithGlobalUpdated(chip::EndpointId endpoint, OperationalStatus & status);
-const OperationalStatus OperationalStatusGet(chip::EndpointId endpoint);
+void OperationalStatusPrint(const chip::BitFlags<OperationalStatus> & opStatus);
+chip::BitFlags<OperationalStatus> OperationalStatusGet(chip::EndpointId endpoint);
+void OperationalStateSet(chip::EndpointId endpoint, const chip::BitFlags<OperationalStatus> field, OperationalState state);
+OperationalState OperationalStateGet(chip::EndpointId endpoint, const chip::BitFlags<OperationalStatus> field);
 
 OperationalState ComputeOperationalState(uint16_t target, uint16_t current);
 OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths current);

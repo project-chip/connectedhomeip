@@ -175,40 +175,54 @@ void ConfigStatusUpdateFeatures(chip::EndpointId endpoint)
     ConfigStatusSet(endpoint, configStatus);
 }
 
-void OperationalStatusSetWithGlobalUpdated(chip::EndpointId endpoint, OperationalStatus & status)
+void OperationalStatusPrint(const chip::BitFlags<OperationalStatus> & opStatus)
 {
-    /* Global Always follow Lift by priority and then fallback to Tilt */
-    if (OperationalState::Stall != status.lift)
-    {
-        status.global = status.lift;
-    }
-    else
-    {
-        status.global = status.tilt;
-    }
-
-    OperationalStatusSet(endpoint, status);
+    emberAfWindowCoveringClusterPrint("OperationalStatus raw=0x%02X global=%u lift=%u tilt=%u",
+                                      opStatus.Raw(),
+                                      opStatus.GetField(OperationalStatus::kGlobal),
+                                      opStatus.GetField(OperationalStatus::kLift),
+                                      opStatus.GetField(OperationalStatus::kTilt));
 }
 
-void OperationalStatusSet(chip::EndpointId endpoint, const OperationalStatus & status)
+chip::BitFlags<OperationalStatus> OperationalStatusGet(chip::EndpointId endpoint)
 {
-    uint8_t global = OperationalStateToValue(status.global);
-    uint8_t lift   = OperationalStateToValue(status.lift);
-    uint8_t tilt   = OperationalStateToValue(status.tilt);
-    uint8_t value  = (global & 0x03) | static_cast<uint8_t>((lift & 0x03) << 2) | static_cast<uint8_t>((tilt & 0x03) << 4);
-    Attributes::OperationalStatus::Set(endpoint, value);
-}
+    chip::BitFlags<OperationalStatus> status;
 
-const OperationalStatus OperationalStatusGet(chip::EndpointId endpoint)
-{
-    uint8_t value = 0;
-    OperationalStatus status;
+    Attributes::OperationalStatus::Get(endpoint, &status);
 
-    Attributes::OperationalStatus::Get(endpoint, &value);
-    status.global = ValueToOperationalState(value & 0x03);
-    status.lift   = ValueToOperationalState((value >> 2) & 0x03);
-    status.tilt   = ValueToOperationalState((value >> 4) & 0x03);
     return status;
+}
+
+void OperationalStateSet(chip::EndpointId endpoint, const chip::BitFlags<OperationalStatus> field, OperationalState state)
+{
+    chip::BitFlags<OperationalStatus> status, prevStatus;
+    Attributes::OperationalStatus::Get(endpoint, &status);
+    prevStatus = status;
+
+    /* Filter only Lift or Tilt action since we cannot allow global reflecting a state alone */
+    if ((OperationalStatus::kLift == field) || (OperationalStatus::kTilt == field))
+    {
+        status.SetField(field, static_cast<uint8_t>(state));
+        status.SetField(OperationalStatus::kGlobal, static_cast<uint8_t>(state));
+
+        /* Global Always follow Lift by priority and then fallback to Tilt */
+        if (static_cast<uint8_t>(OperationalState::Stall) != status.GetField(OperationalStatus::kLift))
+        {
+            status.SetField(OperationalStatus::kGlobal, status.GetField(OperationalStatus::kLift));
+        }
+
+        if (status != prevStatus)
+            Attributes::OperationalStatus::Set(endpoint, status);
+    }
+}
+
+OperationalState OperationalStateGet(chip::EndpointId endpoint, const chip::BitFlags<OperationalStatus> field)
+{
+    chip::BitFlags<OperationalStatus> status;
+
+    Attributes::OperationalStatus::Get(endpoint, &status);
+
+    return static_cast<OperationalState>(status.GetField(field));
 }
 
 void EndProductTypeSet(chip::EndpointId endpoint, EndProductType type)
@@ -472,11 +486,14 @@ Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths
 void emberAfPluginWindowCoveringFinalizeFakeMotionEventHandler(EndpointId endpoint)
 {
     NPercent100ths position;
-    OperationalStatus opStatus = OperationalStatusGet(endpoint);
-    emberAfWindowCoveringClusterPrint("WC DELAYED CALLBACK 100ms w/ OpStatus=0x%02X", (unsigned char) opStatus.global);
+
+    OperationalState opLift = OperationalStateGet(endpoint, OperationalStatus::kLift);
+    OperationalState opTilt = OperationalStateGet(endpoint, OperationalStatus::kTilt);
+
+    emberAfWindowCoveringClusterPrint("WC DELAYED CALLBACK 100ms w/ OpLift=0x%02X OpTilt=0x%02X", (unsigned char) opLift, (unsigned char) opTilt);
 
     /* Update position to simulate movement to pass the CI */
-    if (OperationalState::Stall != opStatus.lift)
+    if (OperationalState::Stall != opLift)
     {
         Attributes::TargetPositionLiftPercent100ths::Get(endpoint, position);
         if (!position.IsNull())
@@ -486,7 +503,7 @@ void emberAfPluginWindowCoveringFinalizeFakeMotionEventHandler(EndpointId endpoi
     }
 
     /* Update position to simulate movement to pass the CI */
-    if (OperationalState::Stall != opStatus.tilt)
+    if (OperationalState::Stall != opTilt)
     {
         Attributes::TargetPositionTiltPercent100ths::Get(endpoint, position);
         if (!position.IsNull())
@@ -538,18 +555,17 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
     BitMask<Mode> mode;
     BitMask<ConfigStatus> configStatus;
     NPercent100ths current, target;
-    OperationalStatus prevOpStatus = OperationalStatusGet(endpoint);
-    OperationalStatus opStatus     = prevOpStatus;
 
-    emberAfWindowCoveringClusterPrint("WC POST ATTRIBUTE=%u OpStatus global=0x%02X lift=0x%02X tilt=0x%02X",
-                                      (unsigned int) attributeId, (unsigned int) opStatus.global, (unsigned int) opStatus.lift,
-                                      (unsigned int) opStatus.tilt);
+    emberAfWindowCoveringClusterPrint("WC POST ATTRIBUTE=%u", (unsigned int) attributeId);
+
+    OperationalState opLift = OperationalStateGet(endpoint, OperationalStatus::kLift);
+    OperationalState opTilt = OperationalStateGet(endpoint, OperationalStatus::kTilt);
 
     switch (attributeId)
     {
     /* RO OperationalStatus */
     case Attributes::OperationalStatus::Id:
-        if (OperationalState::Stall != opStatus.global)
+        if (OperationalState::Stall != OperationalStateGet(endpoint, OperationalStatus::kGlobal))
         {
             // Finish the fake motion attribute update:
             emberEventControlSetDelayMS(ConfigureFakeMotionEventControl(endpoint), FAKE_MOTION_DELAY_MS);
@@ -557,16 +573,16 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
         break;
     /* ============= Positions for Position Aware ============= */
     case Attributes::CurrentPositionLiftPercent100ths::Id:
-        if (OperationalState::Stall != opStatus.lift)
+        if (OperationalState::Stall != opLift)
         {
-            opStatus.lift = OperationalState::Stall;
+            opLift = OperationalState::Stall;
             emberAfWindowCoveringClusterPrint("Lift stop");
         }
         break;
     case Attributes::CurrentPositionTiltPercent100ths::Id:
-        if (OperationalState::Stall != opStatus.tilt)
+        if (OperationalState::Stall != opTilt)
         {
-            opStatus.tilt = OperationalState::Stall;
+            opTilt = OperationalState::Stall;
             emberAfWindowCoveringClusterPrint("Tilt stop");
         }
         break;
@@ -574,13 +590,13 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
     case Attributes::TargetPositionLiftPercent100ths::Id:
         Attributes::TargetPositionLiftPercent100ths::Get(endpoint, target);
         Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, current);
-        opStatus.lift = ComputeOperationalState(target, current);
+        opLift = ComputeOperationalState(target, current);
         break;
     /* For a device supporting Position Awareness : Changing the Target triggers motions on the real or simulated device */
     case Attributes::TargetPositionTiltPercent100ths::Id:
         Attributes::TargetPositionTiltPercent100ths::Get(endpoint, target);
         Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, current);
-        opStatus.tilt = ComputeOperationalState(target, current);
+        opTilt = ComputeOperationalState(target, current);
         break;
     /* Mode change is either internal from the application or external from a write request */
     case Attributes::Mode::Id:
@@ -597,8 +613,8 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
     }
 
     /* This decides and triggers fake motion for the selected endpoint */
-    if ((opStatus.lift != prevOpStatus.lift) || (opStatus.tilt != prevOpStatus.tilt))
-        OperationalStatusSetWithGlobalUpdated(endpoint, opStatus);
+    OperationalStateSet(endpoint, OperationalStatus::kLift, opLift);
+    OperationalStateSet(endpoint, OperationalStatus::kTilt, opTilt);
 }
 
 EmberAfStatus GetMotionLockStatus(chip::EndpointId endpoint)
