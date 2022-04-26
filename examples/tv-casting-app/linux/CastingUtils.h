@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,18 +16,26 @@
  *    limitations under the License.
  */
 
+/**
+ * @brief CastingUtils carries several utility functions that can be used
+ * with Linux implementations of the TV Casting app.
+ */
 #pragma once
 
-#include <app/server/Dnssd.h>
-#include <app/server/Server.h>
-#include <lib/core/CHIPError.h>
-#include <lib/core/NodeId.h>
+#include "CastingServer.h"
+#include "TargetEndpointInfo.h"
+#include "TargetVideoPlayerInfo.h"
 
-CHIP_ERROR TargetVideoPlayerInfoInit(chip::NodeId nodeId, chip::FabricIndex fabricIndex);
+constexpr uint32_t kCommissionerDiscoveryTimeoutInMs = 5 * 1000;
+
 CHIP_ERROR DiscoverCommissioners();
+
 CHIP_ERROR RequestCommissioning(int index);
-void ReadServerClustersForNode(chip::NodeId nodeId);
-CHIP_ERROR ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr);
+
+void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissioner = nullptr);
+
+void InitCommissioningFlow(intptr_t commandArg);
+
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-CHIP_ERROR SendUDC(chip::Transport::PeerAddress commissioner);
+    void HandleUDCSendExpiration(System::Layer * aSystemLayer, void * context);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
