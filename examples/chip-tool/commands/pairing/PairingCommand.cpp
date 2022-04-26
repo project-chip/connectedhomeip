@@ -96,7 +96,7 @@ CHIP_ERROR PairingCommand::PaseWithCode(NodeId remoteId)
     mDiscriminator = payload.discriminator;
 
     RendezvousParameters rendezvousParams =
-        RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(PeerAddress::BLE());
+        RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator);
     return CurrentCommissioner().EstablishPASEConnection(remoteId, rendezvousParams);
 }
 
