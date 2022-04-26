@@ -22367,19 +22367,19 @@ typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringConfigStatus) {
     CHIPWindowCoveringConfigStatusTiltEncoderControlled = 0x40,
 };
 
+typedef NS_OPTIONS(uint32_t, CHIPWindowCoveringFeature) {
+    CHIPWindowCoveringFeatureLift = 0x1,
+    CHIPWindowCoveringFeatureTilt = 0x2,
+    CHIPWindowCoveringFeaturePositionAwareLift = 0x4,
+    CHIPWindowCoveringFeatureAbsolutePosition = 0x8,
+    CHIPWindowCoveringFeaturePositionAwareTilt = 0x10,
+};
+
 typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringMode) {
     CHIPWindowCoveringModeMotorDirectionReversed = 0x1,
     CHIPWindowCoveringModeCalibrationMode = 0x2,
     CHIPWindowCoveringModeMaintenanceMode = 0x4,
     CHIPWindowCoveringModeLedFeedback = 0x8,
-};
-
-typedef NS_OPTIONS(uint32_t, CHIPWindowCoveringWcFeature) {
-    CHIPWindowCoveringWcFeatureLift = 0x1,
-    CHIPWindowCoveringWcFeatureTilt = 0x2,
-    CHIPWindowCoveringWcFeaturePositionAwareLift = 0x4,
-    CHIPWindowCoveringWcFeatureAbsolutePosition = 0x8,
-    CHIPWindowCoveringWcFeaturePositionAwareTilt = 0x10,
 };
 
 typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringWcOperationalStatus) {
