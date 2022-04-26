@@ -71,7 +71,6 @@ const P6Config::Key P6Config::kConfigKey_FailSafeArmed      = { kConfigNamespace
 const P6Config::Key P6Config::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const P6Config::Key P6Config::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
 const P6Config::Key P6Config::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
-const P6Config::Key P6Config::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
 const P6Config::Key P6Config::kConfigKey_WiFiSSID           = { kConfigNamespace_ChipConfig, "wifi-ssid" };
 const P6Config::Key P6Config::kConfigKey_WiFiPassword       = { kConfigNamespace_ChipConfig, "wifi-password" };
 const P6Config::Key P6Config::kConfigKey_WiFiSecurity       = { kConfigNamespace_ChipConfig, "wifi-security" };

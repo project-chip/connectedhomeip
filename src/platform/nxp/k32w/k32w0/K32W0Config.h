@@ -87,7 +87,6 @@ public:
     static constexpr Key kConfigKey_FailSafeArmed      = K32WConfigKey(kPDMId_ChipConfig, 0x06);
     static constexpr Key kConfigKey_RegulatoryLocation = K32WConfigKey(kPDMId_ChipConfig, 0x07);
     static constexpr Key kConfigKey_CountryCode        = K32WConfigKey(kPDMId_ChipConfig, 0x08);
-    static constexpr Key kConfigKey_Breadcrumb         = K32WConfigKey(kPDMId_ChipConfig, 0x09);
     static constexpr Key kConfigKey_UniqueId           = K32WConfigKey(kPDMId_ChipConfig, 0x0A);
     static constexpr Key kConfigKey_SoftwareVersion    = K32WConfigKey(kPDMId_ChipConfig, 0x0B);
     static constexpr Key kConfigKey_FirstRunOfOTAImage = K32WConfigKey(kPDMId_ChipConfig, 0x0C);

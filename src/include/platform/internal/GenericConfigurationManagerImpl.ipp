@@ -542,18 +542,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreCountryCode(const 
     return WriteConfigValueStr(ConfigClass::kConfigKey_CountryCode, code, codeLen);
 }
 
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetBreadcrumb(uint64_t & breadcrumb)
-{
-    return ReadConfigValue(ConfigClass::kConfigKey_Breadcrumb, breadcrumb);
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreBreadcrumb(uint64_t breadcrumb)
-{
-    return WriteConfigValue(ConfigClass::kConfigKey_Breadcrumb, breadcrumb);
-}
-
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetRebootCount(uint32_t & rebootCount)
 {

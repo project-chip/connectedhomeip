@@ -73,7 +73,6 @@ public:
     static const Key kConfigKey_SetupDiscriminator;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
-    static const Key kConfigKey_Breadcrumb;
     static const Key kConfigKey_WiFiSSID;
     static const Key kConfigKey_WiFiPassword;
     static const Key kConfigKey_WiFiSecurity;

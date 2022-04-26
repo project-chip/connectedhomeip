@@ -83,7 +83,6 @@ const MbedConfig::Key MbedConfig::kConfigKey_FailSafeArmed      = { CONFIG_KEY("
 const MbedConfig::Key MbedConfig::kConfigKey_WiFiStationSecType = { CONFIG_KEY("sta-sec-type") };
 const MbedConfig::Key MbedConfig::kConfigKey_RegulatoryLocation = { CONFIG_KEY("regulatory-location") };
 const MbedConfig::Key MbedConfig::kConfigKey_CountryCode        = { CONFIG_KEY("country-code") };
-const MbedConfig::Key MbedConfig::kConfigKey_Breadcrumb         = { CONFIG_KEY("breadcrumb") };
 const MbedConfig::Key MbedConfig::kConfigKey_UniqueId           = { CONFIG_KEY("unique-id") };
 
 CHIP_ERROR MbedConfig::ReadConfigValue(Key key, bool & val)
