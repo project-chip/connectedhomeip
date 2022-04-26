@@ -84,7 +84,6 @@ public:
     static const Key kConfigKey_ProductURL;
     static const Key kConfigKey_ProductLabel;
     static const Key kConfigKey_LocalConfigDisabled;
-    static const Key kConfigKey_Reachable;
     static const Key kConfigKey_UniqueId;
     static const Key kConfigKey_Spake2pIterationCount;
     static const Key kConfigKey_Spake2pSalt;
