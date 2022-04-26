@@ -40216,7 +40216,7 @@ class TestBasicInformationSuite : public TestCommand
 {
 public:
     TestBasicInformationSuite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("TestBasicInformation", 6, credsIssuerConfig)
+        TestCommand("TestBasicInformation", 18, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -40334,6 +40334,74 @@ private:
                 }
             }
             break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::CharSpan value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueAsString("nodeLabel", value, chip::CharSpan("", 0)));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::CharSpan value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueAsString("nodeLabel", value, chip::CharSpan("My node", 7)));
+            }
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("localConfigDisabled", value, false));
+            }
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("localConfigDisabled", value, true));
+            }
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::CharSpan value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueAsString("nodeLabel", value, chip::CharSpan("My node", 7)));
+            }
+            break;
+        case 15:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 16:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("localConfigDisabled", value, true));
+            }
+            break;
+        case 17:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -40377,6 +40445,64 @@ private:
         case 5: {
             LogStep(5, "Read AttributeList value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::AttributeList::Id);
+        }
+        case 6: {
+            LogStep(6, "Read NodeLabel");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id);
+        }
+        case 7: {
+            LogStep(7, "Write NodeLabel");
+            chip::CharSpan value;
+            value = chip::Span<const char>("My nodegarbage: not in length on purpose", 7);
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id, value);
+        }
+        case 8: {
+            LogStep(8, "Read back NodeLabel");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id);
+        }
+        case 9: {
+            LogStep(9, "Read LocalConfigDisabled");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::LocalConfigDisabled::Id);
+        }
+        case 10: {
+            LogStep(10, "Write LocalConfigDisabled");
+            bool value;
+            value = true;
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::LocalConfigDisabled::Id, value);
+        }
+        case 11: {
+            LogStep(11, "Read back LocalConfigDisabled");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::LocalConfigDisabled::Id);
+        }
+        case 12: {
+            LogStep(12, "Reboot the device");
+            SetIdentity(kIdentityAlpha);
+            return Reboot();
+        }
+        case 13: {
+            LogStep(13, "Connect to the device again");
+            SetIdentity(kIdentityAlpha);
+            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        }
+        case 14: {
+            LogStep(14, "Read back NodeLabel after reboot");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id);
+        }
+        case 15: {
+            LogStep(15, "Restore initial NodeLabel value");
+            chip::CharSpan value;
+            value = chip::Span<const char>("garbage: not in length on purpose", 0);
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id, value);
+        }
+        case 16: {
+            LogStep(16, "Read back LocalConfigDisabled after reboot");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::LocalConfigDisabled::Id);
+        }
+        case 17: {
+            LogStep(17, "Restore initial LocalConfigDisabled value");
+            bool value;
+            value = false;
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::LocalConfigDisabled::Id, value);
         }
         }
         return CHIP_NO_ERROR;

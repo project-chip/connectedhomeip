@@ -104,12 +104,9 @@ public:
     CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
     CHIP_ERROR GetBootReason(uint32_t & bootReason) override;
     CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
-    CHIP_ERROR GetNodeLabel(char * buf, size_t bufSize) override;
-    CHIP_ERROR StoreNodeLabel(const char * buf, size_t bufSize) override;
     CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override;
     CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override;
     CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetLocalConfigDisabled(bool & disabled) override;
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override;
     CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen) override;
     CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize) override;

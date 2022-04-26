@@ -63,7 +63,6 @@ public:
     {
         kMaxVendorNameLength            = 32,
         kMaxProductNameLength           = 32,
-        kMaxNodeLabelLength             = 32,
         kMaxLocationLength              = 2,
         kMaxHardwareVersionStringLength = 64,
         kMaxSoftwareVersionStringLength = 64,
@@ -123,12 +122,9 @@ public:
     virtual CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours)      = 0;
     virtual CHIP_ERROR GetBootReason(uint32_t & bootReason)                            = 0;
     virtual CHIP_ERROR StoreBootReason(uint32_t bootReason)                            = 0;
-    virtual CHIP_ERROR GetNodeLabel(char * buf, size_t bufSize)                        = 0;
-    virtual CHIP_ERROR StoreNodeLabel(const char * buf, size_t bufSize)                = 0;
     virtual CHIP_ERROR GetPartNumber(char * buf, size_t bufSize)                       = 0;
     virtual CHIP_ERROR GetProductURL(char * buf, size_t bufSize)                       = 0;
     virtual CHIP_ERROR GetProductLabel(char * buf, size_t bufSize)                     = 0;
-    virtual CHIP_ERROR GetLocalConfigDisabled(bool & disabled)                         = 0;
     virtual CHIP_ERROR GetUniqueId(char * buf, size_t bufSize)                         = 0;
     virtual CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen)        = 0;
     virtual CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize)                    = 0;

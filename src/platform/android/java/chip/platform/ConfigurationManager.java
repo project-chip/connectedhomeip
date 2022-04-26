@@ -39,11 +39,9 @@ public interface ConfigurationManager {
   String kConfigKey_ProductName = "product-name";
   String kConfigKey_SoftwareVersion = "software-version";
   String kConfigKey_SoftwareVersionString = "software-version-str";
-  String kConfigKey_NodeLabel = "node-label";
   String kConfigKey_PartNumber = "part-number";
   String kConfigKey_ProductURL = "product-url";
   String kConfigKey_ProductLabel = "product-label";
-  String kConfigKey_LocalConfigDisabled = "local-config-disabled";
   String kConfigKey_UniqueId = "uniqueId";
   String kConfigKey_Spake2pIterationCount = "iteration-count";
   String kConfigKey_Spake2pSalt = "salt";

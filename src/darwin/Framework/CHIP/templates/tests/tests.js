@@ -271,7 +271,8 @@ function getTests()
     'TestConstraints',
     'TestDelayCommands',
     'TestDescriptorCluster',
-    'TestBasicInformation',
+    // TestBasicInformation needs support for Reboot with no discriminator
+    //'TestBasicInformation',
     'TestGeneralCommissioning',
     'TestGroupsCluster',
     'TestGroupKeyManagementCluster',
