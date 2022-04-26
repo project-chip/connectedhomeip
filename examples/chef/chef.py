@@ -51,11 +51,6 @@ def splash():
     print(splashText)
 
 
-def printc(strInput):
-    color = TermColors.STRCYAN
-    print(color + strInput + TermColors.STRRESET)
-
-
 def loadConfig():
     config = dict()
     config["nrfconnect"] = dict()
@@ -92,9 +87,6 @@ def checkPythonVersion():
 def main(argv):
     checkPythonVersion()
     config = loadConfig()
-
-    global myEnv
-    myEnv = os.environ.copy()
 
     #
     # Build environment switches
