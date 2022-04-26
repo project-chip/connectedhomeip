@@ -358,9 +358,9 @@ true''')
             nrf_build_cmd = "west build -b nrf52840dk_nrf52840"
             nrf_build_options = []
             if options.doClean:
-              nrf_build_options.append("-p always")
+                nrf_build_options.append("-p always")
             if options.doRPC:
-              nrf_build_options.append("-- -DOVERLAY_CONFIG=rpc.overlay")
+                nrf_build_options.append("-- -DOVERLAY_CONFIG=rpc.overlay")
             queueCommand(nrf_build_cmd + " ".join(nrf_build_options))
         elif options.buildTarget == "linux":
             queueCommand(f"cd {paths['rootSampleFolder']}/linux")
