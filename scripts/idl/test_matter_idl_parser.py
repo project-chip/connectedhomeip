@@ -180,6 +180,36 @@ class TestParser(unittest.TestCase):
                     )])
         self.assertEqual(actual, expected)
 
+    def test_attribute_storage_info(self):
+        actual = parseText("""
+            server cluster MyCluster = 1 {
+                attribute char_string<11> attr1 = 1 [callback];
+                attribute octet_string<33> attr2[] = 2 [default="abc"];
+                attribute int32u withDefault = 3 [default=11];
+                attribute int32u intWithCallback = 4 [callback];
+                readonly attribute int32u readonlyDefault = 5 [default=321];
+            }
+        """)
+
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.SERVER,
+                    name="MyCluster",
+                    code=1,
+                    attributes=[
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="char_string", max_length=11), code=1, name="attr1")),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="octet_string", max_length=33), code=2, name="attr2", is_list=True)),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="int32u"), code=3, name="withDefault")),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="int32u"), code=4, name="initWithCallback")),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="int32u"), code=5, name="readonlyDefault")),
+                    ]
+                    )])
+        self.assertEqual(actual, expected)
+
     def test_cluster_commands(self):
         actual = parseText("""
             server cluster WithCommands = 1 {
