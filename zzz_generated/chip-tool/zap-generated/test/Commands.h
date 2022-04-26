@@ -26456,6 +26456,8 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
+    static void OnSuccessCallback_40(void * context, uint16_t safetyStatus)
+    static void OnSuccessCallback_42(void * context, uint16_t safetyStatus)
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
@@ -32676,7 +32678,7 @@ private:
                                   WindowCovering::Attributes::TargetPositionTiltPercent100ths::Id, value);
         }
         case 21: {
-            LogStep(21, "3b: reads back the RO optional attribute: TargetPositionTiltPercent100ths");
+    void OnSuccessResponse_40(uint16_t safetyStatus)
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
                                  WindowCovering::Attributes::TargetPositionTiltPercent100ths::Id);
         }
@@ -32684,6 +32686,8 @@ private:
             LogStep(22, "2: read the RO optional attribute default: CurrentPositionLiftPercent100ths");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
                                  WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Id);
+        uint16_t safetyStatusArgument;
+        safetyStatusArgument = 4096U;
         }
         case 23: {
             LogStep(23, "3a: write a value into the RO optional attribute: CurrentPositionLiftPercent100ths");
@@ -32704,7 +32708,7 @@ private:
                                  WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id);
         }
         case 26: {
-            LogStep(26, "3a: write a value into the RO optional attribute: CurrentPositionTiltPercent100ths");
+    void OnSuccessResponse_42(uint16_t safetyStatus)
             chip::app::DataModel::Nullable<chip::Percent100ths> value;
             value.SetNonNull();
             value.Value() = 20000U;
