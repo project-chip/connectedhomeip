@@ -1174,6 +1174,8 @@ typedef void (*WiFiNetworkDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*WindowCoveringConfigStatusAttributeCallback)(void *,
                                                             chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus>);
+typedef void (*WindowCoveringOperationalStatusAttributeCallback)(
+    void *, chip::BitFlags<chip::app::Clusters::WindowCovering::OperationalStatus>);
 typedef void (*WindowCoveringModeAttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>);
 typedef void (*WindowCoveringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
@@ -9551,6 +9553,34 @@ public:
                                                                       CHIPActionBlock action,
                                                                       SubscriptionEstablishedHandler establishedHandler) :
         CHIPWindowCoveringConfigStatusAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPWindowCoveringOperationalStatusAttributeCallbackBridge
+    : public CHIPCallbackBridge<WindowCoveringOperationalStatusAttributeCallback>
+{
+public:
+    CHIPWindowCoveringOperationalStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<WindowCoveringOperationalStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::OperationalStatus> value);
+};
+
+class CHIPWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge
+    : public CHIPWindowCoveringOperationalStatusAttributeCallbackBridge
+{
+public:
+    CHIPWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action,
+                                                                           SubscriptionEstablishedHandler establishedHandler) :
+        CHIPWindowCoveringOperationalStatusAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

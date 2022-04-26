@@ -3762,12 +3762,6 @@ server cluster WindowCovering = 258 {
     kTiltEncoderControlled = 0x40;
   }
 
-  bitmap Mode : BITMAP8 {
-    kMotorDirectionReversed = 0x1;
-    kCalibrationMode = 0x2;
-    kMaintenanceMode = 0x4;
-    kLedFeedback = 0x8;
-  }
   bitmap Feature : BITMAP32 {
     kLift = 0x1;
     kTilt = 0x2;
@@ -3776,7 +3770,14 @@ server cluster WindowCovering = 258 {
     kPositionAwareTilt = 0x10;
   }
 
-  bitmap WcOperationalStatus : BITMAP8 {
+  bitmap Mode : BITMAP8 {
+    kMotorDirectionReversed = 0x1;
+    kCalibrationMode = 0x2;
+    kMaintenanceMode = 0x4;
+    kLedFeedback = 0x8;
+  }
+
+  bitmap OperationalStatus : BITMAP8 {
     kGlobal = 0x3;
     kLift = 0xC;
     kTilt = 0x30;

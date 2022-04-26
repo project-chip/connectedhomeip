@@ -1464,8 +1464,8 @@ enum class Mode : uint8_t
     kLedFeedback            = 0x8,
 };
 
-// Bitmap for WcOperationalStatus
-enum class WcOperationalStatus : uint8_t
+// Bitmap for OperationalStatus
+enum class OperationalStatus : uint8_t
 {
     kGlobal = 0x3,
     kLift   = 0xC,
