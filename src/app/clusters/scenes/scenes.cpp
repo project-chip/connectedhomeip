@@ -594,9 +594,8 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(chip::FabricIndex fa
 #endif
 #ifdef ZCL_USING_MODE_SELECT_CLUSTER_SERVER
     entry.hasCurrentModeValue =
-        readServerAttribute(endpoint, ZCL_MODE_SELECT_CLUSTER_ID, ZCL_CURRENT_MODE_ATTRIBUTE_ID,
-                            "currentMode", (uint8_t *) &entry.currentModeValue,
-                            sizeof(entry.currentModeValue));
+        readServerAttribute(endpoint, ZCL_MODE_SELECT_CLUSTER_ID, ZCL_CURRENT_MODE_ATTRIBUTE_ID, "currentMode",
+                            (uint8_t *) &entry.currentModeValue, sizeof(entry.currentModeValue));
 #endif
 
     // When creating a new entry, the name is set to the null string (i.e., the
@@ -752,8 +751,7 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::FabricIndex fab
 #ifdef ZCL_USING_MODE_SELECT_CLUSTER_SERVER
             if (entry.hasCurrentModeValue)
             {
-                writeServerAttribute(endpoint, ZCL_MODE_SELECT_CLUSTER_ID,
-                                     ZCL_MODE_SELECT_CLUSTER_ID, "CurrentMode",
+                writeServerAttribute(endpoint, ZCL_MODE_SELECT_CLUSTER_ID, ZCL_MODE_SELECT_CLUSTER_ID, "CurrentMode",
                                      (uint8_t *) &entry.currentModeValue, ZCL_INT8U_ATTRIBUTE_TYPE);
             }
 #endif
@@ -1058,7 +1056,6 @@ bool emberAfPluginScenesServerParseAddScene(
             // extensions are added in this cluster, more logic will be needed here.
             entry.hasCurrentModeValue = true;
             entry.currentModeValue = emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
-
 
 #endif
 #endif // if 0 disabling all the code.
