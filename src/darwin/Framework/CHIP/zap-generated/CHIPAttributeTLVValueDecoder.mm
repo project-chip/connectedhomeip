@@ -17042,7 +17042,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
             return value;
         }
         case Attributes::TargetPositionLiftPercent100ths::Id: {

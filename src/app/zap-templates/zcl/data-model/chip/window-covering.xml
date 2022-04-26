@@ -55,7 +55,7 @@ limitations under the License.
     <!-- Conformance feature [TL & PA_TL] - for now optional -->
     <attribute side="server" writable="false" code="0x0009" define="WC_CURRENT_POSITION_TILT_PERCENTAGE"          type="Percent"  min="0"      max="100"    isNullable="true" optional="true" reportable="true" >CurrentPositionTiltPercentage</attribute>
     <!-- Conformance feature M -->
-    <attribute side="server" writable="false" code="0x000A" define="WC_OPERATIONAL_STATUS"                        type="BITMAP8"  min="0x00"   max="0x7F"   default="0x00"   optional="false" reportable="true" >OperationalStatus</attribute>
+    <attribute side="server" writable="false" code="0x000A" define="WC_OPERATIONAL_STATUS"                        type="OperationalStatus" min="0x00"   max="0x7F"   default="0x00"   optional="false" reportable="true" >OperationalStatus</attribute>
     <!-- Conformance feature LF & PA_LF - for now optional -->
     <attribute side="server" writable="false" code="0x000B" define="WC_TARGET_POSITION_LIFT_PERCENT100THS"        type="Percent100ths" min="0" max="10000"  isNullable="true" optional="true" reportable="true" >TargetPositionLiftPercent100ths</attribute>
     <!-- Conformance feature TL & PA_TL - for now optional -->
@@ -177,7 +177,7 @@ limitations under the License.
     <field mask="0x08" name="LedFeedback"/>
   </bitmap>
 
-  <bitmap name="WcOperationalStatus" type="BITMAP8">
+  <bitmap name="OperationalStatus" type="BITMAP8">
     <cluster code="0x0102"/>
     <field mask="0x03" name="Global"/>
     <field mask="0x0C" name="Lift"/>
@@ -219,5 +219,4 @@ limitations under the License.
     <field mask="0x08" name="AbsolutePosition"/>
     <field mask="0x10" name="PositionAwareTilt"/>
   </bitmap>
-
 </configurator>
