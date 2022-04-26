@@ -17209,7 +17209,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {

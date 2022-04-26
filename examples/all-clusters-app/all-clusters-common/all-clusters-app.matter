@@ -3782,7 +3782,7 @@ server cluster WindowCovering = 258 {
     kTilt = 0x30;
   }
 
-  bitmap WcSafetyStatus : BITMAP16 {
+  bitmap SafetyStatus : BITMAP16 {
     kRemoteLockout = 0x1;
     kTamperDetection = 0x2;
     kFailedCommunication = 0x4;

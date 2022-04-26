@@ -10062,7 +10062,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Mode", 1, value);
         }
         case WindowCovering::Attributes::SafetyStatus::Id: {
-            uint16_t value;
+            chip::BitFlags<chip::app::Clusters::WindowCovering::SafetyStatus> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SafetyStatus", 1, value);
         }
