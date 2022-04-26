@@ -98,6 +98,10 @@ class Attribute:
     def is_subscribable(self):
         return AttributeTag.NOSUBSCRIBE not in self.tags
 
+    @property
+    def is_callback(self):
+        return AttributeTag.CALLBACK in self.tags
+
 
 @dataclass
 class Struct:
