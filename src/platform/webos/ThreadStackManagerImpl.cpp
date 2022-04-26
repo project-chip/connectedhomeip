@@ -21,9 +21,9 @@
 #include <app/AttributeAccessInterface.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/webos/NetworkCommissioningDriver.h>
 #include <platform/PlatformManager.h>
 #include <platform/ThreadStackManager.h>
+#include <platform/webos/NetworkCommissioningDriver.h>
 
 #include <nlbyteorder.hpp>
 #include <nlio-byteorder.hpp>

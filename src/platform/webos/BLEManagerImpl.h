@@ -138,7 +138,7 @@ private:
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
     void OnScanComplete() override;
-    void OnChipDeviceScanned(char* address) override;
+    void OnChipDeviceScanned(char * address) override;
     void OnChipScanComplete() override;
 
     // ===== Members for internal use by the following friends.
@@ -170,18 +170,19 @@ private:
         kMaxAdvertismentDataSetSize = 31  // TODO: verify this
     };
 
-struct BLEConnection
-{
-    char * peerAddr;
-    uint16_t mtu;
-    bool subscribed;
-    void * gattCharC1Handle;
-    void * gattCharC2Handle;
-    bool isChipDevice;
-};
+    struct BLEConnection
+    {
+        char * peerAddr;
+        uint16_t mtu;
+        bool subscribed;
+        void * gattCharC1Handle;
+        void * gattCharC2Handle;
+        bool isChipDevice;
+    };
 
-    bool SendWriteRequestToWebOS(void *bleConnObj, const uint8_t *svcId, const uint8_t *charId, const uint8_t *pBuf, uint32_t pBufDataLen);
-    bool SubscribeCharacteristicToWebOS(void *bleConnObj, const uint8_t *svcId, const uint8_t *charId);
+    bool SendWriteRequestToWebOS(void * bleConnObj, const uint8_t * svcId, const uint8_t * charId, const uint8_t * pBuf,
+                                 uint32_t pBufDataLen);
+    bool SubscribeCharacteristicToWebOS(void * bleConnObj, const uint8_t * svcId, const uint8_t * charId);
 
     void InitConnectionData(void);
     void AddConnectionData(const char * remoteAddr);
@@ -189,11 +190,11 @@ struct BLEConnection
     void HandleConnectionEvent(bool connected, const char * remoteAddress);
 
     static gboolean _BleInitialize(void * userData);
-    static bool gattMonitorCharateristicsCb(LSHandle *sh, LSMessage *message, void *userData);
-    static bool gattWriteDescriptorValueCb(LSHandle *sh, LSMessage *message, void *userData);
-    static bool gattWriteValueCb(LSHandle *sh, LSMessage *message, void *ctx);
-    static bool gattGetServiceCb(LSHandle *sh, LSMessage *message, void *ctx);
-    static bool gattConnectCb(LSHandle *sh, LSMessage *message, void *ctx);
+    static bool gattMonitorCharateristicsCb(LSHandle * sh, LSMessage * message, void * userData);
+    static bool gattWriteDescriptorValueCb(LSHandle * sh, LSMessage * message, void * userData);
+    static bool gattWriteValueCb(LSHandle * sh, LSMessage * message, void * ctx);
+    static bool gattGetServiceCb(LSHandle * sh, LSMessage * message, void * ctx);
+    static bool gattConnectCb(LSHandle * sh, LSMessage * message, void * ctx);
     static gboolean ConnectChipThing(gpointer userData);
     void ConnectHandler(const char * address);
 
@@ -211,13 +212,13 @@ struct BLEConnection
     BLEScanConfig mBLEScanConfig;
     BitFlags<Flags> mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
-    bool mIsCentral            = false;
+    bool mIsCentral = false;
     std::unique_ptr<ChipDeviceScanner> mDeviceScanner;
 
-    GMainContext * mMainContext  = nullptr;
-    LSHandle *mLSHandle = nullptr;
-    char* mRemoteAddress = nullptr;
-    char* mClientId = nullptr;
+    GMainContext * mMainContext = nullptr;
+    LSHandle * mLSHandle        = nullptr;
+    char * mRemoteAddress       = nullptr;
+    char * mClientId            = nullptr;
 
     GHashTable * mConnectionMap = nullptr;
 };
