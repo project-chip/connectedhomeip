@@ -111,8 +111,6 @@ public:
     virtual CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)    = 0;
     virtual CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb)                            = 0;
     virtual CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen)  = 0;
-    virtual CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf)                 = 0;
-    virtual CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf)               = 0;
     virtual CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) = 0;
     virtual CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer)                      = 0;
     virtual CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer)                      = 0;
@@ -131,7 +129,6 @@ public:
     virtual CHIP_ERROR GetProductURL(char * buf, size_t bufSize)                       = 0;
     virtual CHIP_ERROR GetProductLabel(char * buf, size_t bufSize)                     = 0;
     virtual CHIP_ERROR GetLocalConfigDisabled(bool & disabled)                         = 0;
-    virtual CHIP_ERROR GetReachable(bool & reachable)                                  = 0;
     virtual CHIP_ERROR GetUniqueId(char * buf, size_t bufSize)                         = 0;
     virtual CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen)        = 0;
     virtual CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize)                    = 0;

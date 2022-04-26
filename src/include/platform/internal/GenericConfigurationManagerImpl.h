@@ -73,9 +73,7 @@ public:
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override;
     CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override;
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
-    CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf) override;
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf) override;
-    CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf) override;
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) override;
     CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) override;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
@@ -112,7 +110,6 @@ public:
     CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override;
     CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override;
     CHIP_ERROR GetLocalConfigDisabled(bool & disabled) override;
-    CHIP_ERROR GetReachable(bool & reachable) override;
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override;
     CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen) override;
     CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize) override;

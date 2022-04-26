@@ -44,7 +44,6 @@ public interface ConfigurationManager {
   String kConfigKey_ProductURL = "product-url";
   String kConfigKey_ProductLabel = "product-label";
   String kConfigKey_LocalConfigDisabled = "local-config-disabled";
-  String kConfigKey_Reachable = "reachable";
   String kConfigKey_UniqueId = "uniqueId";
   String kConfigKey_Spake2pIterationCount = "iteration-count";
   String kConfigKey_Spake2pSalt = "salt";
