@@ -310,14 +310,12 @@ def main(argv):
         shell.run_cmd(f"cd {paths['rootSampleFolder']}")
 
         if (options.buildTarget == "esp32") or (options.buildTarget == "nrfconnect"):
-            shell.run_cmd(textwrap.dedent(f"""\
-                    cat > project_include.cmake <<EOF
-                    set(CONFIG_DEVICE_VENDOR_ID {options.vid})
-                    set(CONFIG_DEVICE_PRODUCT_ID {options.pid})
-                    set(CONFIG_ENABLE_PW_RPC {"1" if options.doRPC else "0"})
-                    set(SAMPLE_NAME {options.sampleDeviceTypeName})
-                    EOF
-                    true"""))
+            with open("project_include.cmake", "w") as f:
+                f.write(textwrap.dedent(f"""\
+                        set(CONFIG_DEVICE_VENDOR_ID {options.vid})
+                        set(CONFIG_DEVICE_PRODUCT_ID {options.pid})
+                        set(CONFIG_ENABLE_PW_RPC {"1" if options.doRPC else "0"})
+                        set(SAMPLE_NAME {options.sampleDeviceTypeName})"""))
 
         if options.buildTarget == "esp32":
             shell.run_cmd(f"cd {paths['rootSampleFolder']}/esp32")
@@ -336,19 +334,18 @@ def main(argv):
                 shell.run_cmd("west build -b nrf52840dk_nrf52840")
         elif options.buildTarget == "linux":
             shell.run_cmd(f"cd {paths['rootSampleFolder']}/linux")
-            shell.run_cmd(textwrap.dedent(f"""\
-                    cat > args.gni <<EOF
-                    import("//build_overrides/chip.gni")
-                    import("\\${{chip_root}}/config/standalone/args.gni")
-                    chip_shell_cmd_server = false
-                    target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={'1' if options.doRPC else '0'}"]
-                    EOF
-
-                    cat > sample.gni <<EOF
-                    sample_zap_file = "{options.sampleDeviceTypeName}.zap"
-                    sample_name = "{options.sampleDeviceTypeName}"
-                    EOF
-                    true"""))
+            with open(f"{paths['rootSampleFolder']}/linux/args.gni", "w") as f:
+                f.write(textwrap.dedent(f"""\
+                        import("//build_overrides/chip.gni")
+                        import("\\${{chip_root}}/config/standalone/args.gni")
+                        chip_shell_cmd_server = false
+                        target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={'1' if options.doRPC else '0'}"]
+                        """))
+            with open(f"{paths['rootSampleFolder']}/linux/sample.gni", "w") as f:
+                f.write(textwrap.dedent(f"""\
+                        sample_zap_file = "{options.sampleDeviceTypeName}.zap"
+                        sample_name = "{options.sampleDeviceTypeName}
+                        """))
             if options.doClean:
                 shell.run_cmd(f"rm -rf out")
             shell.run_cmd("gn gen out")
