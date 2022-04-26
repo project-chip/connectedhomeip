@@ -38,8 +38,12 @@ CHIP_ERROR ModelCommand::RunCommand()
     if (mViaPase.ValueOr(0) == 1)
     {
         ChipLogProgress(chipTool, "Sending command via PASE to node 0x%" PRIx64, mNodeId);
-        CommissioneeDeviceProxy * device = CurrentCommissioner().FindCommissioneeDevice(mNodeId);
-        return this->SendCommand(device, this->mEndPointId);
+        CommissioneeDeviceProxy * commissioneeDevice = nullptr;
+        CHIP_ERROR err = CurrentCommissioner().GetDeviceBeingCommissioned(mNodeId, &commissioneeDevice);
+        VerifyOrReturnError(CHIP_NO_ERROR == err, err);
+        VerifyOrReturnError(commissioneeDevice != nullptr, CHIP_ERROR_NOT_CONNECTED);
+
+        return this->SendCommand(commissioneeDevice, this->mEndPointId);
     }
     else
     {

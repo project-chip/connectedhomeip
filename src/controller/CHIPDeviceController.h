@@ -712,7 +712,6 @@ private:
 
     void HandleAttestationResult(CHIP_ERROR err);
 
-public:
     CommissioneeDeviceProxy * FindCommissioneeDevice(const SessionHandle & session);
     CommissioneeDeviceProxy * FindCommissioneeDevice(NodeId id);
     CommissioneeDeviceProxy * FindCommissioneeDevice(const Transport::PeerAddress & peerAddress);
