@@ -74,6 +74,8 @@ struct CompletionStatus
     CHIP_ERROR err;
     Optional<CommissioningStage> failedStage;
     Optional<Credentials::AttestationVerificationResult> attestationResult;
+    Optional<app::Clusters::GeneralCommissioning::CommissioningError> commissioningError;
+    Optional<app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> networkCommissioningStatus;
 };
 
 constexpr uint16_t kDefaultFailsafeTimeout = 60;
@@ -453,13 +455,19 @@ struct AdditionalErrorInfo
     Credentials::AttestationVerificationResult attestationResult;
 };
 
+struct CommissionErrorInfo
+{
+    CommissionErrorInfo(app::Clusters::GeneralCommissioning::CommissioningError result) : commissioningError(result) {}
+    app::Clusters::GeneralCommissioning::CommissioningError commissioningError;
+};
+
 class CommissioningDelegate
 {
 public:
     virtual ~CommissioningDelegate(){};
     /* CommissioningReport is returned after each commissioning step is completed. The reports for each step are:
      * kReadCommissioningInfo - ReadCommissioningInfo
-     * kArmFailsafe: none
+     * kArmFailsafe: CommissionErrorInfo if there is an error
      * kConfigRegulatory: none
      * kSendPAICertificateRequest: RequestedCertificate
      * kSendDACCertificateRequest: RequestedCertificate
@@ -478,7 +486,7 @@ public:
      * kCleanup: none
      */
     struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData,
-                                         ReadCommissioningInfo, AdditionalErrorInfo>
+                                         ReadCommissioningInfo, AdditionalErrorInfo, CommissionErrorInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

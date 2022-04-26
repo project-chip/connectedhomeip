@@ -1487,6 +1487,8 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
 
     if (mPairingDelegate != nullptr)
     {
+        // TODO github issue mentions that the intent it to plumb result to PairingDelegate, but over
+        // chat it was mentioned to plumb event to AutoCommisioner. Need to double check which.
         mPairingDelegate->OnCommissioningStatusUpdate(PeerId(GetCompressedFabricId(), nodeId), mCommissioningStage, err);
     }
     if (mCommissioningDelegate == nullptr)
@@ -1724,13 +1726,47 @@ void DeviceCommissioner::OnDone()
     CommissioningStageComplete(return_err, report);
 }
 
+// TODO if we want to branch out the Commissioning Error to a specific chip error this will be
+// moved to the top and likely is better as a map lookup (which I would look for suggestions).
+CHIP_ERROR ConvertCommissioningErrorToChipError(GeneralCommissioning::CommissioningError commissioningError) {
+    switch (commissioningError)
+    {
+    case GeneralCommissioning::CommissioningError::kOk:
+        return CHIP_NO_ERROR;
+        break;
+    case GeneralCommissioning::CommissioningError::kValueOutsideRange:
+        return CHIP_ERROR_INVALID_ARGUMENT;  //  TODO figure out more appropriate error.
+        break;
+    case GeneralCommissioning::CommissioningError::kInvalidAuthentication:
+        return CHIP_ERROR_INVALID_ARGUMENT;  //  TODO figure out more appropriate error.
+        break;
+    case GeneralCommissioning::CommissioningError::kNoFailSafe:
+        return CHIP_ERROR_INVALID_ARGUMENT;  //  TODO figure out more appropriate error.
+        break;
+    case GeneralCommissioning::CommissioningError::kBusyWithOtherAdmin:
+        return CHIP_ERROR_INVALID_ARGUMENT;  //  TODO figure out more appropriate error.
+        break;
+    default:
+        break;
+    }
+    return CHIP_ERROR_INVALID_ARGUMENT;  //  TODO figure out more appropriate error.
+}
+
 void DeviceCommissioner::OnArmFailSafe(void * context,
                                        const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
 {
-    // TODO: Use errorCode
-    ChipLogProgress(Controller, "Received ArmFailSafe response");
+    // TODO: Figure out if ther is a better way other than static_cast.
+    ChipLogProgress(Controller, "Received ArmFailSafe response errorCode=%u", static_cast<uint8_t>(data.errorCode));
+
+    CommissioningDelegate::CommissioningReport report;
+    if (data.errorCode != GeneralCommissioning::CommissioningError::kOk) {
+      report.Set<CommissionErrorInfo>(data.errorCode);
+    }
+
+    // TODO: do we actually want to look this up or is it okay to just use CHIP_ERROR_INTERNAL instead of this mapping
+    CHIP_ERROR retVal = ConvertCommissioningErrorToChipError(data.errorCode);
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+    commissioner->CommissioningStageComplete(retVal, report);
 }
 
 void DeviceCommissioner::OnSetRegulatoryConfigResponse(
