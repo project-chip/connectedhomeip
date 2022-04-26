@@ -22115,10 +22115,10 @@ typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringMode) {
     CHIPWindowCoveringModeLedFeedback = 0x8,
 };
 
-typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringWcOperationalStatus) {
-    CHIPWindowCoveringWcOperationalStatusGlobal = 0x3,
-    CHIPWindowCoveringWcOperationalStatusLift = 0xC,
-    CHIPWindowCoveringWcOperationalStatusTilt = 0x30,
+typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringOperationalStatus) {
+    CHIPWindowCoveringOperationalStatusGlobal = 0x3,
+    CHIPWindowCoveringOperationalStatusLift = 0xC,
+    CHIPWindowCoveringOperationalStatusTilt = 0x30,
 };
 
 typedef NS_OPTIONS(uint16_t, CHIPWindowCoveringSafetyStatus) {
