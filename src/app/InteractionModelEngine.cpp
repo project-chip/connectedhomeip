@@ -852,6 +852,64 @@ CHIP_ERROR InteractionModelEngine::PushFrontAttributePathList(ObjectList<Attribu
     return err;
 }
 
+void InteractionModelEngine::RemoveDuplicateConcreteAttribute(ObjectList<AttributePathParams> *& aAttributePaths)
+{
+    ObjectList<AttributePathParams> * prev = nullptr;
+    bool duplicate                         = false;
+    auto * path1                           = aAttributePaths;
+
+    while (path1 != nullptr)
+    {
+        // skip all wildcard paths
+        if (path1->mValue.HasAttributeWildcard())
+        {
+            prev  = path1;
+            path1 = path1->mpNext;
+            continue;
+        }
+
+        // Look up the duplicate concrete path that is referenced by one of all wildcard paths
+        for (auto * path2 = aAttributePaths; path2 != nullptr; path2 = path2->mpNext)
+        {
+            if (path2 == path1)
+            {
+                continue;
+            }
+
+            if (path2->mValue.HasAttributeWildcard() && path2->mValue.IsAttributePathSupersetOf(path1->mValue))
+            {
+                duplicate = true;
+                break;
+            }
+        }
+
+        // if duplicate is found, discard that path, and update prev and path1.
+        if (duplicate)
+        {
+            if (path1 == aAttributePaths)
+            {
+                aAttributePaths = path1->mpNext;
+                mAttributePathPool.ReleaseObject(path1);
+                prev  = nullptr;
+                path1 = aAttributePaths;
+            }
+            else
+            {
+                prev->mpNext = path1->mpNext;
+                mAttributePathPool.ReleaseObject(path1);
+                path1 = path1->mpNext;
+            }
+
+            duplicate = false;
+        }
+        else
+        {
+            prev  = path1;
+            path1 = path1->mpNext;
+        }
+    }
+}
+
 void InteractionModelEngine::ReleaseEventPathList(ObjectList<EventPathParams> *& aEventPathList)
 {
     ReleasePool(aEventPathList, mEventPathPool);
