@@ -280,11 +280,11 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "ERROR initializing server: %s", ErrorStr(err));
+        ChipLogError(AppServer, "ERROR setting up transport: %s", ErrorStr(err));
     }
     else
     {
-        ChipLogProgress(AppServer, "Server initialized");
+        ChipLogProgress(AppServer, "Server Listening...");
     }
     return err;
 }
