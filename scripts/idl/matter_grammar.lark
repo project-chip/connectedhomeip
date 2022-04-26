@@ -29,7 +29,7 @@ attribute_is_callback: "callback"i
 
 attribute_traits: "[" single_attribute_trait ("," single_attribute_trait)* "]"
 
-attribute_access: "access" "(" (attribute_access_entry ("," attribute_access_entry)* )? ")"
+attribute_access: "access"i "(" (attribute_access_entry ("," attribute_access_entry)* )? ")"
 
 attribute_with_access: attribute_access? struct_field
 
@@ -46,9 +46,9 @@ command_attribute: "timed"i -> timed_command
 command_attributes: command_attribute*
 
 
-command_access: "access" "(" ("invoke" ":" access_privilege)? ")"
+command_access: "access"i "(" ("invoke"i ":" access_privilege)? ")"
 
-command_with_access: "command" command_access? id
+command_with_access: "command"i command_access? id
 
 command: command_attributes command_with_access "(" id? ")" ":" id "=" number ";"
 
