@@ -415,7 +415,8 @@ const char * LockManager::lockStateToString(DlLockState lockState) const
     return "Unknown";
 }
 
-bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockState, const Optional<chip::ByteSpan> & pin, DlOperationError & err)
+bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockState, const Optional<chip::ByteSpan> & pin,
+                               DlOperationError & err)
 {
     DlLockState curState = DlLockState::kLocked;
     if (mState == kState_UnlockCompleted)
