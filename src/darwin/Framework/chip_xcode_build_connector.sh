@@ -64,7 +64,7 @@ read -r -a archs <<<"$ARCHS"
 
 # We need to pick some arg for our target_cflags and target_cpu bits.
 # Just take the first one.
-declare first_arch=${archs[0]}
+declare first_arch="${archs[0]}"
 
 declare target_cpu=
 case $first_arch in
