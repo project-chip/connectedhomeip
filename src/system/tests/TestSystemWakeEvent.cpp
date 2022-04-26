@@ -75,9 +75,14 @@ struct TestContext
 
     int SelectWakeEvent(timeval timeout = {})
     {
+        // NOLINTBEGIN(clang-analyzer-security.insecureAPI.bzero)
+        //
+        // NOTE: darwin uses bzero to clear out FD sets. This is not a security concern.
         FD_ZERO(&mReadSet);
         FD_ZERO(&mWriteSet);
         FD_ZERO(&mErrorSet);
+        // NOLINTEND(clang-analyzer-security.insecureAPI.bzero)
+
         FD_SET(WakeEventTest::GetReadFD(mWakeEvent), &mReadSet);
         return select(WakeEventTest::GetReadFD(mWakeEvent) + 1, &mReadSet, &mWriteSet, &mErrorSet, &timeout);
     }

@@ -83,6 +83,11 @@ OnReadDoneCallback gOnReadDoneCallback                               = nullptr;
 OnReportBeginCallback gOnReportBeginCallback                         = nullptr;
 OnReportBeginCallback gOnReportEndCallback                           = nullptr;
 
+void PythonResubscribePolicy(uint32_t aNumCumulativeRetries, uint32_t & aNextSubscriptionIntervalMsec, bool & aShouldResubscribe)
+{
+    aShouldResubscribe = false;
+}
+
 class ReadClientCallback : public ReadClient::Callback
 {
 public:
@@ -223,6 +228,7 @@ struct __attribute__((packed)) PyReadAttributeParams
     uint32_t maxInterval; // MaxInterval in subscription request
     bool isSubscription;
     bool isFabricFiltered;
+    bool keepSubscriptions;
 };
 
 // Encodes n attribute write requests, follows 3 * n arguments, in the (AttributeWritePath*=void *, uint8_t*, size_t) order.
@@ -441,6 +447,8 @@ chip::ChipError::StorageType pychip_ReadClient_Read(void * appContext, ReadClien
         {
             params.mMinIntervalFloorSeconds   = pyParams.minInterval;
             params.mMaxIntervalCeilingSeconds = pyParams.maxInterval;
+            params.mKeepSubscriptions         = pyParams.keepSubscriptions;
+            params.mResubscribePolicy         = PythonResubscribePolicy;
             attributePaths.release();
             eventPaths.release();
             err = readClient->SendAutoResubscribeRequest(std::move(params));

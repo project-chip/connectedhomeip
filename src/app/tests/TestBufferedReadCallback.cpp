@@ -609,7 +609,7 @@ nlTestSuite theSuite =
 {
     "TestBufferedReadCallback",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 

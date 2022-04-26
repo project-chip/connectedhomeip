@@ -51,6 +51,7 @@ static_library("Darwin") {
     "DeviceInfoProviderImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
+    "DnssdContexts.cpp",
     "DnssdImpl.cpp",
     "DnssdImpl.h",
     "InetPlatformConfig.h",
@@ -64,6 +65,7 @@ static_library("Darwin") {
     "PosixConfig.cpp",
     "PosixConfig.h",
     "SystemPlatformConfig.h",
+    "SystemTimeSupport.cpp",
   ]
 
   deps = [

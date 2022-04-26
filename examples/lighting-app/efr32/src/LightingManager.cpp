@@ -23,6 +23,11 @@
 #include "AppTask.h"
 #include <FreeRTOS.h>
 
+#include <app/clusters/on-off-server/on-off-server.h>
+
+using namespace chip;
+using namespace ::chip::DeviceLayer;
+
 LightingManager LightingManager::sLight;
 
 TimerHandle_t sLightTimer;
@@ -43,7 +48,13 @@ CHIP_ERROR LightingManager::Init()
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
-    mState                 = kState_OffCompleted;
+    bool currentLedState;
+    // read current on/off value on endpoint one.
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    OnOffServer::Instance().getOnOffValue(1, &currentLedState);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    mState                 = currentLedState ? kState_OnCompleted : kState_OffCompleted;
     mAutoTurnOffTimerArmed = false;
     mAutoTurnOff           = false;
     mAutoTurnOffDuration   = 0;

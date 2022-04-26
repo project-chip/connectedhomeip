@@ -28,11 +28,13 @@ public:
 
     virtual CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) = 0;
 
-    CHIP_ERROR Start(uint16_t discriminator);
+    CHIP_ERROR Start(uint16_t discriminator = 0xFFFF, uint16_t port = CHIP_PORT, const char * kvs = nullptr);
     CHIP_ERROR Stop();
-    CHIP_ERROR Reboot(uint16_t discriminator);
+    CHIP_ERROR Reboot(uint16_t discriminator = 0xFFFF, uint16_t port = CHIP_PORT, const char * kvs = nullptr);
     CHIP_ERROR FactoryReset();
 
 private:
     CHIP_ERROR RunInternal(const char * command);
+    CHIP_ERROR CreateCommonCommandArgs(char * commandBuffer, size_t commandBufferSize, const char * scriptDir,
+                                       const char * scriptName, uint16_t discriminator, uint16_t port, const char * kvs);
 };

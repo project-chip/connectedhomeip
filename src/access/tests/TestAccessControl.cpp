@@ -1984,11 +1984,11 @@ void TestSubjectsTargets(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(&index, entry) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, int(index) == 2);
 
-    FabricIndex fabricIndex;
-    Privilege privilege;
-    AuthMode authMode;
-    size_t count;
-    NodeId subject;
+    FabricIndex fabricIndex = 0;
+    Privilege privilege     = Privilege::kView;
+    AuthMode authMode       = AuthMode::kNone;
+    size_t count            = 0;
+    NodeId subject          = kUndefinedNodeId;
     Target target;
 
     NL_TEST_ASSERT(inSuite, accessControl.ReadEntry(0, entry) == CHIP_NO_ERROR);

@@ -454,14 +454,6 @@ JNI_METHOD(void, disconnectDevice)(JNIEnv * env, jobject self, jlong handle, jlo
     wrapper->Controller()->ReleaseOperationalDevice(deviceId);
 }
 
-JNI_METHOD(jboolean, isActive)(JNIEnv * env, jobject self, jlong handle)
-{
-    chip::DeviceLayer::StackLock lock;
-
-    DeviceProxy * chipDevice = reinterpret_cast<DeviceProxy *>(handle);
-    return chipDevice->IsActive();
-}
-
 JNI_METHOD(void, shutdownSubscriptions)(JNIEnv * env, jobject self, jlong handle, jlong devicePtr)
 {
     chip::DeviceLayer::StackLock lock;

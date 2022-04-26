@@ -576,7 +576,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
             (attributeCluster != nullptr) ? &reader : GetAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
         if (attributeOverride)
         {
-            bool triedEncode;
+            bool triedEncode = false;
             ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aIsFabricFiltered, aPath, aAttributeReports,
                                                         apEncoderState, attributeOverride, &triedEncode));
             ReturnErrorCodeIf(triedEncode, CHIP_NO_ERROR);

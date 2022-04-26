@@ -191,7 +191,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mMessageCounterManager.Init(&mExchangeMgr);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable());
     SuccessOrExit(err);
 
     chip::Dnssd::Resolver::Instance().Init(DeviceLayer::UDPEndPointManager());

@@ -23,6 +23,9 @@ declare_args() {
   optimize_debug =
       current_os == "freertos" || current_os == "zephyr" || current_os == "mbed"
 
+  # Optimization level for debug. Only has an effect if optimize_debug is true.
+  optimize_debug_level = "g"
+
   # Symbol level for debugging.
   symbol_level = 2
 

@@ -86,6 +86,20 @@ bool OnOffServer::HasFeature(chip::EndpointId endpoint, OnOffFeature feature)
     return success ? ((featureMap & to_underlying(feature)) != 0) : false;
 }
 
+EmberAfStatus OnOffServer::getOnOffValue(chip::EndpointId endpoint, bool * currentOnOffValue)
+{
+    // read current on/off value
+    EmberAfStatus status = Attributes::OnOff::Get(endpoint, currentOnOffValue);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        emberAfOnOffClusterPrintln("ERR: reading on/off %x", status);
+    }
+
+    emberAfOnOffClusterPrintln("On/Off ep%d value: %d", endpoint, *currentOnOffValue);
+
+    return status;
+}
+
 /** @brief On/off Cluster Set Value
  *
  * This function is called when the on/off value needs to be set, either through
