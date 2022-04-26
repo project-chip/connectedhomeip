@@ -129,7 +129,7 @@ namespace app {
 namespace Clusters {
 namespace WindowCovering {
 
-bool HasFeature(chip::EndpointId endpoint, WcFeature feature)
+bool HasFeature(chip::EndpointId endpoint, Feature feature)
 {
     bool hasFeature     = false;
     uint32_t featureMap = 0;
@@ -145,12 +145,12 @@ bool HasFeature(chip::EndpointId endpoint, WcFeature feature)
 
 bool HasFeaturePaLift(chip::EndpointId endpoint)
 {
-    return (HasFeature(endpoint, WcFeature::kLift) && HasFeature(endpoint, WcFeature::kPositionAwareLift));
+    return (HasFeature(endpoint, Feature::kLift) && HasFeature(endpoint, Feature::kPositionAwareLift));
 }
 
 bool HasFeaturePaTilt(chip::EndpointId endpoint)
 {
-    return (HasFeature(endpoint, WcFeature::kTilt) && HasFeature(endpoint, WcFeature::kPositionAwareTilt));
+    return (HasFeature(endpoint, Feature::kTilt) && HasFeature(endpoint, Feature::kPositionAwareTilt));
 }
 
 void TypeSet(chip::EndpointId endpoint, Type type)
@@ -721,11 +721,11 @@ bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandO
         return true;
     }
 
-    if (HasFeature(endpoint, WcFeature::kLift))
+    if (HasFeature(endpoint, Feature::kLift))
     {
         Attributes::TargetPositionLiftPercent100ths::Set(endpoint, WC_PERCENT100THS_MIN_OPEN);
     }
-    if (HasFeature(endpoint, WcFeature::kTilt))
+    if (HasFeature(endpoint, Feature::kTilt))
     {
         Attributes::TargetPositionTiltPercent100ths::Set(endpoint, WC_PERCENT100THS_MIN_OPEN);
     }
@@ -751,11 +751,11 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
         return true;
     }
 
-    if (HasFeature(endpoint, WcFeature::kLift))
+    if (HasFeature(endpoint, Feature::kLift))
     {
         Attributes::TargetPositionLiftPercent100ths::Set(endpoint, WC_PERCENT100THS_MAX_CLOSED);
     }
-    if (HasFeature(endpoint, WcFeature::kTilt))
+    if (HasFeature(endpoint, Feature::kTilt))
     {
         Attributes::TargetPositionTiltPercent100ths::Set(endpoint, WC_PERCENT100THS_MAX_CLOSED);
     }
@@ -818,7 +818,7 @@ bool emberAfWindowCoveringClusterGoToLiftValueCallback(app::CommandHandler * com
         return true;
     }
 
-    if (HasFeature(endpoint, WcFeature::kAbsolutePosition) && HasFeaturePaLift(endpoint))
+    if (HasFeature(endpoint, Feature::kAbsolutePosition) && HasFeaturePaLift(endpoint))
     {
         Attributes::TargetPositionLiftPercent100ths::Set(endpoint, LiftToPercent100ths(endpoint, liftValue));
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
@@ -892,7 +892,7 @@ bool emberAfWindowCoveringClusterGoToTiltValueCallback(app::CommandHandler * com
         return true;
     }
 
-    if (HasFeature(endpoint, WcFeature::kAbsolutePosition) && HasFeaturePaTilt(endpoint))
+    if (HasFeature(endpoint, Feature::kAbsolutePosition) && HasFeaturePaTilt(endpoint))
     {
         Attributes::TargetPositionTiltPercent100ths::Set(endpoint, TiltToPercent100ths(endpoint, tiltValue));
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);

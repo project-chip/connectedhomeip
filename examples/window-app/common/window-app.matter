@@ -1470,7 +1470,7 @@ server cluster WindowCovering = 258 {
     kLedFeedback = 0x8;
   }
 
-  bitmap WcFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kLift = 0x1;
     kTilt = 0x2;
     kPositionAwareLift = 0x4;
