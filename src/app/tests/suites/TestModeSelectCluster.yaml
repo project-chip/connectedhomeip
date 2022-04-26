@@ -96,7 +96,7 @@ tests:
               - name: "NewMode"
                 value: 2
       response:
-          error: CONSTRAINT_ERROR
+          error: INVALID_COMMAND
 
     - label: "Toggle OnOff"
       cluster: "On/Off"
