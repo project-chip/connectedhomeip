@@ -6829,7 +6829,6 @@ class Basic(Cluster):
                 ClusterObjectFieldDescriptor(Label="reachable", Tag=0x00000011, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="uniqueID", Tag=0x00000012, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="capabilityMinima", Tag=0x00000013, Type=Basic.Structs.CapabilityMinimaStruct),
-                ClusterObjectFieldDescriptor(Label="swBuildId", Tag=0x00004000, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -6857,7 +6856,6 @@ class Basic(Cluster):
     reachable: 'typing.Optional[bool]' = None
     uniqueID: 'typing.Optional[str]' = None
     capabilityMinima: 'Basic.Structs.CapabilityMinimaStruct' = None
-    swBuildId: 'typing.Optional[str]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -7216,22 +7214,6 @@ class Basic(Cluster):
                 return ClusterObjectFieldDescriptor(Type=Basic.Structs.CapabilityMinimaStruct)
 
             value: 'Basic.Structs.CapabilityMinimaStruct' = field(default_factory=lambda: Basic.Structs.CapabilityMinimaStruct())
-
-        @dataclass
-        class SwBuildId(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0028
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00004000
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[str])
-
-            value: 'typing.Optional[str]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

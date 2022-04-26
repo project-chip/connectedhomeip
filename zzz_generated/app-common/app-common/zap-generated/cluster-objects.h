@@ -8473,19 +8473,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CapabilityMinima
-namespace SwBuildId {
-struct TypeInfo
-{
-    using Type             = chip::CharSpan;
-    using DecodableType    = chip::CharSpan;
-    using DecodableArgType = chip::CharSpan;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SwBuildId::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 16; }
-};
-} // namespace SwBuildId
 namespace GeneratedCommandList {
 struct TypeInfo
 {
@@ -8575,7 +8562,6 @@ struct TypeInfo
         Attributes::Reachable::TypeInfo::DecodableType reachable                     = static_cast<bool>(0);
         Attributes::UniqueID::TypeInfo::DecodableType uniqueID;
         Attributes::CapabilityMinima::TypeInfo::DecodableType capabilityMinima;
-        Attributes::SwBuildId::TypeInfo::DecodableType swBuildId;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

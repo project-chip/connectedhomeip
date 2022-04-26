@@ -5021,7 +5021,6 @@ private:
 | * Reachable                                                         | 0x0011 |
 | * UniqueID                                                          | 0x0012 |
 | * CapabilityMinima                                                  | 0x0013 |
-| * SwBuildId                                                         | 0x4000 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -20392,7 +20391,6 @@ void registerClusterBasic(Commands & commands, CredentialIssuerCommands * credsI
         make_unique<ReadAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                                //
         make_unique<ReadAttribute>(Id, "unique-id", Attributes::UniqueID::Id, credsIssuerConfig),                                 //
         make_unique<ReadAttribute>(Id, "capability-minima", Attributes::CapabilityMinima::Id, credsIssuerConfig),                 //
-        make_unique<ReadAttribute>(Id, "sw-build-id", Attributes::SwBuildId::Id, credsIssuerConfig),                              //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                       //
@@ -20423,7 +20421,6 @@ void registerClusterBasic(Commands & commands, CredentialIssuerCommands * credsI
         make_unique<SubscribeAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                           //
         make_unique<SubscribeAttribute>(Id, "unique-id", Attributes::UniqueID::Id, credsIssuerConfig),                            //
         make_unique<SubscribeAttribute>(Id, "capability-minima", Attributes::CapabilityMinima::Id, credsIssuerConfig),            //
-        make_unique<SubscribeAttribute>(Id, "sw-build-id", Attributes::SwBuildId::Id, credsIssuerConfig),                         //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //

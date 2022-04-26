@@ -6240,36 +6240,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 
 } // namespace UniqueID
 
-namespace SwBuildId {
-
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
-{
-    uint8_t zclString[16 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    size_t length = emberAfStringLength(zclString);
-    if (length == NumericAttributeTraits<uint8_t>::kNullValue)
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-
-    VerifyOrReturnError(value.size() == 16, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
-    memcpy(value.data(), &zclString[1], 16);
-    value.reduce_size(length);
-    return status;
-}
-EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
-{
-    static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 16, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
-    uint8_t zclString[16 + 1];
-    emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
-    memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
-}
-
-} // namespace SwBuildId
-
 namespace FeatureMap {
 
 EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::Basic::bitmap32> * value)

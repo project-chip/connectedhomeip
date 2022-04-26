@@ -1128,11 +1128,6 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // ch
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace UniqueID
 
-namespace SwBuildId {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
-EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
-} // namespace SwBuildId
-
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::Basic::bitmap32> * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::Basic::bitmap32> value);
