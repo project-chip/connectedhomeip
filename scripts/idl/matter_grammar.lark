@@ -22,9 +22,13 @@ event: event_priority event_with_access "=" number "{" (struct_field ";")* "}"
 
 attribute_access_entry: attribute_access_type ":" access_privilege
 
+default_value: "default"i "=" (number | ESCAPED_STRING)
+single_attribute_trait: "callback"i | default_value
+attribute_traits: "[" single_attribute_trait ("," single_attribute_trait)* "]"
+
 attribute_access: "access" "(" (attribute_access_entry ("," attribute_access_entry)* )? ")"
 
-attribute_with_access: attribute_access? struct_field ";"
+attribute_with_access: attribute_access? struct_field attribute_traits? ";"
 
 attribute: attribute_tag* "attribute"i attribute_with_access
 attribute_tag: "readonly"i -> attr_readonly
@@ -80,6 +84,7 @@ ID: /[a-zA-Z_][a-zA-Z0-9_]*/
 
 idl: (struct|enum|cluster|endpoint)*
 
+%import common.ESCAPED_STRING
 %import common.WS
 %import common.C_COMMENT
 %import common.CPP_COMMENT
