@@ -24,6 +24,7 @@
 class Test_TC_DM_1_3_SimulatedSuite : public TestCommand
 {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DM_1_3_SimulatedSuite() : TestCommand("Test_TC_DM_1_3_Simulated"), mTestIndex(0)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
@@ -31,6 +32,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DM_1_3_SimulatedSuite() {}
 
@@ -418,6 +420,7 @@ private:
 class Test_TC_DM_3_3_SimulatedSuite : public TestCommand
 {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DM_3_3_SimulatedSuite() : TestCommand("Test_TC_DM_3_3_Simulated"), mTestIndex(0)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
@@ -425,6 +428,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DM_3_3_SimulatedSuite() {}
 
@@ -613,6 +617,7 @@ private:
 class Test_TC_DM_2_3_SimulatedSuite : public TestCommand
 {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DM_2_3_SimulatedSuite() : TestCommand("Test_TC_DM_2_3_Simulated"), mTestIndex(0)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
@@ -620,6 +625,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DM_2_3_SimulatedSuite() {}
 
