@@ -1466,8 +1466,8 @@ enum class WcOperationalStatus : uint8_t
     kTilt   = 0x30,
 };
 
-// Bitmap for WcSafetyStatus
-enum class WcSafetyStatus : uint16_t
+// Bitmap for SafetyStatus
+enum class SafetyStatus : uint16_t
 {
     kRemoteLockout       = 0x1,
     kTamperDetection     = 0x2,

@@ -448,8 +448,7 @@ void WindowApp::Cover::Init(chip::EndpointId endpoint)
     ModeSet(endpoint, mode);
 
     // Attribute: Id 27 SafetyStatus (Optional)
-    SafetyStatus safetyStatus = { 0x00 }; // 0 is no issues;
-    SafetyStatusSet(endpoint, safetyStatus);
+    chip::BitFlags<SafetyStatus> safetyStatus(0x00); // 0 is no issues;
 }
 
 void WindowApp::Cover::Finish()

@@ -58,21 +58,6 @@ struct OperationalStatus
     OperationalState tilt;   // bit 4-5 TL
 };
 
-struct SafetyStatus
-{
-    uint8_t remoteLockout : 1;       // bit 0
-    uint8_t tamperDetection : 1;     // bit 1
-    uint8_t failedCommunication : 1; // bit 2
-    uint8_t positionFailure : 1;     // bit 3
-    uint8_t thermalProtection : 1;   // bit 4
-    uint8_t obstacleDetected : 1;    // bit 5
-    uint8_t powerIssue : 1;          // bit 6
-    uint8_t stopInput : 1;           // bit 7
-    uint8_t motorJammed : 1;         // bit 8
-    uint8_t hardwareFailure : 1;     // bit 9
-    uint8_t manualOperation : 1;     // bit 10
-};
-static_assert(sizeof(SafetyStatus) == sizeof(uint16_t), "SafetyStatus Size is not correct");
 
 // Declare Position Limit Status
 enum class LimitStatus : uint8_t
@@ -119,8 +104,8 @@ void ModePrint(const chip::BitMask<Mode> & mode);
 void ModeSet(chip::EndpointId endpoint, chip::BitMask<Mode> & mode);
 chip::BitMask<Mode> ModeGet(chip::EndpointId endpoint);
 
-void SafetyStatusSet(chip::EndpointId endpoint, SafetyStatus & status);
-const SafetyStatus SafetyStatusGet(chip::EndpointId endpoint);
+void SafetyStatusSet(chip::EndpointId endpoint, const chip::BitFlags<SafetyStatus> & status);
+chip::BitFlags<SafetyStatus> SafetyStatusGet(chip::EndpointId endpoint);
 
 LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits);
 
