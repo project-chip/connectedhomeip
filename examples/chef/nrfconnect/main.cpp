@@ -87,9 +87,7 @@ CHIP_ERROR main()
     chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(kExtDiscoveryTimeoutSecs);
 
     // Start IM server
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+    ReturnErrorOnFailure(chip::Server::GetInstance().Init());
 
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
 
