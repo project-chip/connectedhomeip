@@ -271,11 +271,6 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocalConfigDisabled(bool & disabled)
     return ReadConfigValue(AndroidConfig::kConfigKey_LocalConfigDisabled, disabled);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetReachable(bool & reachable)
-{
-    return ReadConfigValue(AndroidConfig::kConfigKey_Reachable, reachable);
-}
-
 CHIP_ERROR ConfigurationManagerImpl::GetUniqueId(char * buf, size_t bufSize)
 {
     size_t dateLen;

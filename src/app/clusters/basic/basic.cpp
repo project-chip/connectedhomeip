@@ -406,13 +406,6 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
         status = Attributes::LocalConfigDisabled::Set(endpoint, localConfigDisabled);
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Local Config Disabled: 0x%02x", status));
     }
-
-    bool reachable;
-    if (ConfigurationMgr().GetReachable(reachable) == CHIP_NO_ERROR)
-    {
-        status = Attributes::Reachable::Set(endpoint, reachable);
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Reachable: 0x%02x", status));
-    }
 }
 
 void MatterBasicPluginServerInitCallback()

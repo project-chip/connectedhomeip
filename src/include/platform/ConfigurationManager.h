@@ -131,7 +131,6 @@ public:
     virtual CHIP_ERROR GetProductURL(char * buf, size_t bufSize)                       = 0;
     virtual CHIP_ERROR GetProductLabel(char * buf, size_t bufSize)                     = 0;
     virtual CHIP_ERROR GetLocalConfigDisabled(bool & disabled)                         = 0;
-    virtual CHIP_ERROR GetReachable(bool & reachable)                                  = 0;
     virtual CHIP_ERROR GetUniqueId(char * buf, size_t bufSize)                         = 0;
     virtual CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen)        = 0;
     virtual CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize)                    = 0;

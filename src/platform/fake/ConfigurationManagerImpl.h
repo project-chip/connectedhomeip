@@ -94,7 +94,6 @@ private:
     CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetLocalConfigDisabled(bool & disabled) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR GetReachable(bool & reachable) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
