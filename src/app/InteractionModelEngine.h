@@ -137,6 +137,7 @@ public:
 
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type) const;
+    uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type, FabricIndex fabricIndex) const;
 
     uint32_t GetNumActiveWriteHandlers() const;
 

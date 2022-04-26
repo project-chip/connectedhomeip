@@ -126,6 +126,10 @@ public:
 
     void ScheduleUrgentEventDeliverySync();
 
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    size_t GetGlobalDirtySetSize() { return mGlobalDirtySet.Allocated(); }
+#endif
+
 private:
     friend class TestReportingEngine;
 

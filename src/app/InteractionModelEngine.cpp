@@ -141,6 +141,22 @@ uint32_t InteractionModelEngine::GetNumActiveReadHandlers(ReadHandler::Interacti
     return count;
 }
 
+uint32_t InteractionModelEngine::GetNumActiveReadHandlers(ReadHandler::InteractionType aType, FabricIndex aFabricIndex) const
+{
+    uint32_t count = 0;
+
+    mReadHandlers.ForEachActiveObject([aType, aFabricIndex, &count](const ReadHandler * handler) {
+        if (handler->IsType(aType) && handler->GetAccessingFabricIndex() == aFabricIndex)
+        {
+            count++;
+        }
+
+        return Loop::Continue;
+    });
+
+    return count;
+}
+
 ReadHandler * InteractionModelEngine::ActiveHandlerAt(unsigned int aIndex)
 {
     if (aIndex >= mReadHandlers.Allocated())
