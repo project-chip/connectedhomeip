@@ -30,7 +30,7 @@ public:
     virtual ~ValueChecker(){};
 
 protected:
-    virtual void Exit(std::string message) = 0;
+    virtual void Exit(std::string message, CHIP_ERROR err = CHIP_ERROR_INTERNAL) = 0;
 
     bool CheckDecodeValue(CHIP_ERROR error)
     {

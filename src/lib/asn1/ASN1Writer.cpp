@@ -75,7 +75,7 @@ size_t ASN1Writer::GetLengthWritten() const
 
 CHIP_ERROR ASN1Writer::PutInteger(int64_t val)
 {
-    uint8_t encodedVal[8];
+    uint8_t encodedVal[sizeof(int64_t)];
     uint8_t valStart, valLen;
 
     BigEndian::Put64(encodedVal, static_cast<uint64_t>(val));

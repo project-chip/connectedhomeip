@@ -38,6 +38,7 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include "CommissionableInit.h"
 #include "Device.h"
 #include "Options.h"
 #include <app/server/Server.h>
@@ -51,16 +52,21 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 
-static const int kNodeLabelSize = 32;
-// Current ZCL implementation of Struct uses a max-size array of 254 bytes
-static const int kDescriptorAttributeArraySize = 254;
-static const int kFixedLabelAttributeArraySize = 254;
-// Four attributes in descriptor cluster: DeviceTypeList, ServerList, ClientList, PartsList
-static const int kFixedLabelElementsOctetStringSize = 16;
+namespace {
 
-static EndpointId gCurrentEndpointId;
-static EndpointId gFirstDynamicEndpointId;
-static Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+const int kNodeLabelSize = 32;
+// Current ZCL implementation of Struct uses a max-size array of 254 bytes
+const int kDescriptorAttributeArraySize = 254;
+const int kFixedLabelAttributeArraySize = 254;
+// Four attributes in descriptor cluster: DeviceTypeList, ServerList, ClientList, PartsList
+const int kFixedLabelElementsOctetStringSize = 16;
+
+EndpointId gCurrentEndpointId;
+EndpointId gFirstDynamicEndpointId;
+Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+
+// To hold SPAKE2+ verifier, discriminator, passcode
+LinuxCommissionableDataProvider gCommissionableDataProvider;
 
 // ENDPOINT DEFINITIONS:
 // =================================================================================
@@ -193,6 +199,8 @@ DECLARE_DYNAMIC_CLUSTER(ZCL_SWITCH_CLUSTER_ID, switchAttrs, nullptr, nullptr),
 DECLARE_DYNAMIC_ENDPOINT(bridgedSwitchEndpoint, bridgedSwitchClusters);
 DataVersion gSwitch1DataVersions[ArraySize(bridgedSwitchClusters)];
 DataVersion gSwitch2DataVersions[ArraySize(bridgedSwitchClusters)];
+
+} // namespace
 
 // REVISION DEFINITIONS:
 // =================================================================================
@@ -653,22 +661,37 @@ int main(int argc, char * argv[])
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
+    // Init the commissionable data provider based on command line options
+    // to handle custom verifiers, discriminators, etc.
+    err = chip::examples::InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
+    SuccessOrExit(err);
+    DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
+
+    err = chip::examples::InitConfigurationManager(reinterpret_cast<ConfigurationManagerImpl &>(ConfigurationMgr()),
+                                                   LinuxDeviceOptions::GetInstance());
+    SuccessOrExit(err);
+
     err = PrintQRCodeContent();
     SuccessOrExit(err);
 
     chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)
-
 #if CONFIG_NETWORK_LAYER_BLE
+    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)
     chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(LinuxDeviceOptions::GetInstance().mBleDevice, false);
+    chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 #endif
 
-    chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-
-    // Init ZCL Data Model and CHIP App Server
+    // Init Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
+#if CHIP_DEVICE_ENABLE_PORT_PARAMS
+    // use a different service port to make testing possible with other sample devices running on same host
+    initParams.operationalServicePort = LinuxDeviceOptions::GetInstance().securedDevicePort;
+#endif
+
+    initParams.interfaceId = LinuxDeviceOptions::GetInstance().interfaceId;
     chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config

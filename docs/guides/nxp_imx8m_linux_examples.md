@@ -7,6 +7,8 @@ Linux Yocto SDK and then run the output executable files on the **NXP i.MX 8M**
 -   [CHIP Linux All-clusters Example](../../examples/all-clusters-app/linux)
 -   [CHIP Linux Lighting Example](../../examples/lighting-app/linux)
 -   [CHIP Linux Thermostat Example](../../examples/thermostat/linux)
+-   [CHIP Linux CHIP-tool Example](../../examples/chip-tool)
+-   [CHIP Linux OTA-provider Example](../../examples/ota-provider-app/linux)
 
 This document has been tested on:
 
@@ -120,48 +122,64 @@ to be generated.
           sudo tmp/deploy/sdk/fsl-imx-xwayland-glibc-x86_64-imx-image-full-cortexa53-crypto-imx8mmevk-toolchain-5.10-hardknott.sh
           ```
 
-    After the Yocto SDK is installed on the host machine, an environment setup
-    script is also generated, and there are prompt lines telling the user to
-    source the script each time when using the SDK in a new shell, for example:
+    After the Yocto SDK is installed on the host machine, to use the SDK when
+    building the CHIP Linux Examples, export a shell environment variable named
+    `IMX_SDK_ROOT` to specify the path of the SDK, for example:
 
           ```
-          . /opt/fsl-imx-xwayland/5.10-hardknott/environment-setup-cortexa53-crypto-poky-linux
+          export IMX_SDK_ROOT=/opt/fsl-imx-xwayland/5.10-hardknott
           ```
 
 -   Build the example application:
 
-    Assuming that the working directory has been changed the CHIP Linux Examples
-    code, all the other steps are the same.
+    Building those examples with the Yocto SDK specified by the `IMX_SDK_ROOT`
+    has been integrated into the tool `build_examples.py` and the tool
+    `imxlinux_example.sh`. Choose one of them to build the examples.
+
+    Assuming that the working directory is changed to the top level directory of
+    this project.
 
           ```
+          git submodule update --init
+          source scripts/activate.sh
+
           # If the all-clusters example is to be built
-          cd ~/connectedhomeip/examples/all-clusters-app/linux
+          ./scripts/build/build_examples.py --target imx-all-clusters-app build
+          # or
+          ./scripts/examples/imxlinux_example.sh examples/all-clusters-app/linux examples/all-clusters-app/linux/out/aarch64
 
           # If the lighting example is to be built
-          cd ~/connectedhomeip/examples/lighting-app/linux
+          ./scripts/build/build_examples.py --target imx-lighting-app  build
+          # or
+          ./scripts/examples/imxlinux_example.sh examples/lighting-app/linux examples/lighting-app/linux/out/aarch64
 
           # If the thermostat example is to be built
-          cd ~/connectedhomeip/examples/thermostat/linux
+          ./scripts/build/build_examples.py  --target imx-thermostat build
+          # or
+          ./scripts/examples/imxlinux_example.sh examples/thermostat/linux examples/thermostat/linux/out/aarch64
 
-          git submodule update --init
-          source third_party/connectedhomeip/scripts/activate.sh
-          PLATFORM_CFLAGS='-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"'
-          PKG_CONFIG_SYSROOT_DIR=${PKG_CONFIG_SYSROOT_DIR} \
-          PKG_CONFIG_LIBDIR=${PKG_CONFIG_PATH} \
-          gn gen out/aarch64 --args="target_os=\"linux\" target_cpu=\"arm64\" arm_arch=\"armv8-a\"
-              import(\"//build_overrides/build.gni\")
-              target_cflags=[ \"--sysroot=${SDKTARGETSYSROOT}\", \"${PLATFORM_CFLAGS}\" ]
-              target_ldflags = [ \"--sysroot=${SDKTARGETSYSROOT}\" ]
-              custom_toolchain=\"\${build_root}/toolchain/custom\"
-              target_cc=\"${OECORE_NATIVE_SYSROOT}/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc\"
-              target_cxx=\"${OECORE_NATIVE_SYSROOT}/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++\"
-              target_ar=\"${OECORE_NATIVE_SYSROOT}/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar\""
-          ninja -C out/aarch64
+          # If the chip-tool example is to be built
+          ./scripts/build/build_examples.py  --target imx-chip-tool build
+          # or
+          ./scripts/examples/imxlinux_example.sh examples/chip-tool examples/chip-tool/out/aarch64
+
+          # If the ota-provider example is to be built
+          ./scripts/build/build_examples.py  --target imx-ota-provider-app build
+          # or
+          ./scripts/examples/imxlinux_example.sh examples/ota-provider-app/linux examples/ota-provider-app/linux/out/aarch64
+
           ```
 
-    The executable file is built under out/aarch64, it can be executed on the
-    **i.MX 8M Mini EVK** which running the Yocto image previously generated as
-    described in the sections above.
+    If the `build_examples.py` is used, the executable files are built in the
+    subdirectories under out/, the subdirectory name is the same as the argument
+    specified after the option `--target` when build the examples.
+
+    If the `imxlinux_example.sh` is used, the executable files are built in the
+    directory specified by the second parameter when build the examples.
+
+    The executable files can be executed on the **i.MX 8M Mini EVK** which
+    running the Yocto image previously generated as described in the sections
+    above.
 
 <a name="command-line-args"></a>
 

@@ -19,6 +19,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 {{/zcl_structs}}
+
+{{#zcl_events}}
+@interface CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event : NSObject
+{{#zcl_event_fields}}
+@property (strong, nonatomic{{#unless (isStrEqual (asGetterName name) (asStructPropertyName name))}}, getter={{asGetterName name}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName name}};
+{{/zcl_event_fields}}
+@end
+
+{{/zcl_events}}
+
+
 {{/zcl_clusters}}
 
 NS_ASSUME_NONNULL_END

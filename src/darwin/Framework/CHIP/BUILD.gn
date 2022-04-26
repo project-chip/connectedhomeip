@@ -72,6 +72,7 @@ static_library("framework") {
     "zap-generated/CHIPClustersObjc.mm",
     "zap-generated/CHIPCommandPayloadsObjc.h",
     "zap-generated/CHIPCommandPayloadsObjc.mm",
+    "zap-generated/CHIPEventTLVValueDecoder.mm",
     "zap-generated/CHIPStructsObjc.h",
     "zap-generated/CHIPStructsObjc.mm",
   ]
