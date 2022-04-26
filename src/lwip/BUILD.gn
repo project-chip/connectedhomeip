@@ -65,7 +65,7 @@ buildconfig_header("lwip_buildconfig") {
 
   defines = [ "HAVE_LWIP_UDP_BIND_NETIF=1" ]
   if (lwip_platform != "external") {
-    if (is_debug) {
+    if (lwip_debug) {
       # Automatically enable LWIP_DEBUG for internal is_debug builds.
       defines += [ "LWIP_DEBUG=1" ]
     }
