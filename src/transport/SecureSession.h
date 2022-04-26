@@ -89,8 +89,7 @@ public:
     SecureSession(SecureSessionTable & table, Type secureSessionType, uint16_t localSessionId) :
         mTable(table), mState(State::kPairing), mSecureSessionType(secureSessionType), mLocalSessionId(localSessionId)
     {
-        ChipLogDetail(Inet, "SecureSession Allocated %p Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
-                      mLocalSessionId);
+        ChipLogDetail(Inet, "SecureSession Allocated %p Type:%d LSID:%d", this, to_underlying(mSecureSessionType), mLocalSessionId);
     }
 
     /**
@@ -114,8 +113,7 @@ public:
     }
     ~SecureSession() override
     {
-        ChipLogDetail(Inet, "SecureSession Released %p Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
-                      mLocalSessionId);
+        ChipLogDetail(Inet, "SecureSession Released %p Type:%d LSID:%d", this, to_underlying(mSecureSessionType), mLocalSessionId);
     }
 
     SecureSession(SecureSession &&)      = delete;
