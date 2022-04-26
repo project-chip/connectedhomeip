@@ -19,6 +19,7 @@ import optparse
 import os
 from pathlib import Path
 import sys
+import textwrap
 import yaml
 
 import constants
@@ -34,15 +35,17 @@ shell = stateful_shell.StatefulShell()
 
 
 def splash():
-    splashText = TermColors.STRBOLD + TermColors.STRYELLOW + '''\
-  ______  __    __   _______  _______
- /      ||  |  |  | |   ____||   ____|
-|  ,----'|  |__|  | |  |__   |  |__
-|  |     |   __   | |   __|  |   __|
-|  `----.|  |  |  | |  |____ |  |
- \\______||__|  |__| |_______||__|\
-''' + TermColors.STRRESET
-    return splash
+    splashText = textwrap.dedent(
+        f"""\
+        {TermColors.STRBOLD}{TermColors.STRYELLOW}
+          ______  __    __   _______  _______
+         /      ||  |  |  | |   ____||   ____|
+        |  ,----'|  |__|  | |  |__   |  |__
+        |  |     |   __   | |   __|  |   __|
+        |  `----.|  |  |  | |  |____ |  |
+         \\______||__|  |__| |_______||__|{TermColors.STRRESET}
+        """)
+    print(splashText)
 
 
 def printc(strInput):
