@@ -42,7 +42,7 @@ jobs:
 
         steps:
             - name: Checkout submodules
-               run: scripts/checkout_submodules.py --shallow --platform darwin
+              run: scripts/checkout_submodules.py --shallow --platform darwin
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install openssl pkg-config coreutils
