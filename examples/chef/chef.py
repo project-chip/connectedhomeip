@@ -19,6 +19,7 @@ import optparse
 import os
 import sys
 import textwrap
+from typing import Sequence
 import yaml
 
 import constants
@@ -37,7 +38,7 @@ _DEVICE_LIST = [file[:-4] for file in os.listdir(_DEVICE_FOLDER) if file.endswit
 gen_dir = ""  # Filled in after sample app type is read from args.
 
 
-def splash():
+def splash() -> None:
     splashText = textwrap.dedent(
         f"""\
         {TermColors.STRBOLD}{TermColors.STRYELLOW}
@@ -51,7 +52,7 @@ def splash():
     print(splashText)
 
 
-def load_config():
+def load_config() -> None:
     config = dict()
     config["nrfconnect"] = dict()
     config["esp32"] = dict()
@@ -77,14 +78,14 @@ def load_config():
     return config
 
 
-def check_python_version():
+def check_python_version() -> None:
     if sys.version_info[0] < 3:
         print('Must use Python 3. Current version is ' +
               str(sys.version_info[0]))
         exit(1)
 
 
-def main(argv):
+def main(argv: Sequence[str]) -> None:
     check_python_version()
     config = load_config()
 
