@@ -29,6 +29,7 @@
 
 #include <type_traits>
 #include <utility>
+#include <limits>
 
 namespace chip {
 
@@ -85,6 +86,41 @@ public:
     {
         mValue |= static_cast<IntegerType>(flag);
         return *this;
+    }
+
+
+    /**
+     * SetField to value via a mask shifting.
+     *
+     * @param mask      Typed flag(s) to used as mask, flag(s) must be contiguous. Any flags not in @a v are unaffected.
+     * @param value     New value to apply at the field/mask location.
+     */
+    constexpr BitFlags & SetField(FlagsEnum mask, IntegerType value)
+    {
+        IntegerType bitMask = static_cast<IntegerType>(mask);
+        IntegerType shift = GetShift(bitMask);
+
+        // Clear bits overlayed by the mask
+        mValue = static_cast<IntegerType>(mValue & ~bitMask);
+        // Set the right bits
+        mValue |= static_cast<IntegerType>(((value & bitMask) << shift));
+
+        return *this;
+    }
+
+    /**
+     * GetField to value via a mask shifting.
+     *
+     * @param mask      Typed flag(s) to used as mask, flag(s) must be contiguous. Any flags not in @a v are unaffected.
+     * @returns         Value from the underlying field/mask
+     */
+    IntegerType GetField(FlagsEnum mask) const
+    {
+        IntegerType bitMask = static_cast<IntegerType>(mask);
+        IntegerType shift = GetShift(bitMask);
+
+        // Forward the right bits
+        return static_cast<IntegerType>(((mValue & bitMask) >> shift));
     }
 
     /**
@@ -244,6 +280,18 @@ private:
     }
     static constexpr IntegerType Or(FlagsEnum value) { return static_cast<IntegerType>(value); }
     static constexpr IntegerType Or(const BitFlags<FlagsEnum> & flags) { return flags.Raw(); }
+
+    static constexpr IntegerType GetShift(IntegerType bitMask)
+    {
+        IntegerType count = 0;
+        while (!(bitMask & 0x1) && (count < std::numeric_limits<IntegerType>::max()))
+        {
+            bitMask = static_cast<IntegerType>(bitMask >> 1);
+            count++;
+        }
+        return count;
+    }
+
 
     StorageType mValue = 0;
 };
