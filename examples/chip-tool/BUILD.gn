@@ -84,6 +84,7 @@ static_library("chip-tool-utils") {
     "${chip_root}/src/app/tests/suites/commands/commissioner",
     "${chip_root}/src/app/tests/suites/commands/delay",
     "${chip_root}/src/app/tests/suites/commands/discovery",
+    "${chip_root}/src/app/tests/suites/commands/interaction_model",
     "${chip_root}/src/app/tests/suites/commands/log",
     "${chip_root}/src/app/tests/suites/commands/system",
     "${chip_root}/src/app/tests/suites/pics",

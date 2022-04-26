@@ -88,30 +88,36 @@ function setDefaultTypeForWaitCommand(test)
   const type = test[kWaitCommandName];
   switch (type) {
   case 'readEvent':
+    test.commandName = 'WaitEvent';
     test.isEvent     = true;
     test.isReadEvent = true;
     break;
   case 'subscribeEvent':
+    test.commandName      = 'WaitEvent';
     test.isEvent          = true;
     test.isSubscribe      = true;
     test.isSubscribeEvent = true;
     break;
   case 'readAttribute':
+    test.commandName     = 'WaitAttribute';
     test.isAttribute     = true;
     test.isReadAttribute = true;
     break;
   case 'writeAttribute':
+    test.commandName      = 'WaitAttribute';
     test.isAttribute      = true;
     test.isWriteAttribute = true;
     break;
   case 'subscribeAttribute':
+    test.commandName          = 'WaitAttribute';
     test.isAttribute          = true;
     test.isSubscribe          = true;
     test.isSubscribeAttribute = true;
     break;
   default:
-    test.isCommand = true;
-    test.command   = test.wait
+    test.commandName = 'WaitCommand';
+    test.isCommand   = true;
+    test.command     = test.wait
     break;
   }
 
@@ -123,20 +129,20 @@ function setDefaultTypeForCommand(test)
   const type = test[kCommandName];
   switch (type) {
   case 'readEvent':
-    test.commandName = 'Read';
+    test.commandName = 'ReadEvent';
     test.isEvent     = true;
     test.isReadEvent = true;
     break;
 
   case 'subscribeEvent':
-    test.commandName      = 'Subscribe';
+    test.commandName      = 'SubscribeEvent';
     test.isEvent          = true;
     test.isSubscribe      = true;
     test.isSubscribeEvent = true;
     break;
 
   case 'readAttribute':
-    test.commandName     = 'Read';
+    test.commandName     = 'ReadAttribute';
     test.isAttribute     = true;
     test.isReadAttribute = true;
     if (!(kFabricFiltered in test)) {
@@ -145,17 +151,19 @@ function setDefaultTypeForCommand(test)
     break;
 
   case 'writeAttribute':
-    test.commandName      = 'Write';
+    test.commandName      = 'WriteAttribute';
     test.isAttribute      = true;
     test.isWriteAttribute = true;
     if ((kGroupId in test)) {
-      test.isGroupCommand = true;
-      test.groupId        = parseInt(test[kGroupId], 10);
+      test.isGroupCommand        = true;
+      test.isWriteGroupAttribute = true;
+      test.commandName           = 'WriteGroupAttribute';
+      test.groupId               = parseInt(test[kGroupId], 10);
     }
     break;
 
   case 'subscribeAttribute':
-    test.commandName          = 'Subscribe';
+    test.commandName          = 'SubscribeAttribute';
     test.isAttribute          = true;
     test.isSubscribe          = true;
     test.isSubscribeAttribute = true;
@@ -165,16 +173,17 @@ function setDefaultTypeForCommand(test)
     break;
 
   case 'waitForReport':
-    test.commandName     = 'Report';
+    test.commandName     = 'WaitForReport';
     test.isAttribute     = true;
     test.isWaitForReport = true;
     break;
 
   default:
-    test.commandName = test.command;
+    test.commandName = isTestOnlyCluster(test.cluster) ? test.command : 'SendCommand';
     test.isCommand   = true;
     if ((kGroupId in test)) {
       test.isGroupCommand = true;
+      test.commandName    = 'SendGroupCommand';
       test.groupId        = parseInt(test[kGroupId], 10);
     }
     break;
@@ -236,7 +245,7 @@ function ensureValidError(response, errorName)
   }
 }
 
-function setDefaultResponse(test)
+function setDefaultResponse(test, useSynthesizeWaitForReport)
 {
   const defaultResponse = {};
   setDefault(test, kResponseName, defaultResponse);
@@ -296,7 +305,7 @@ function setDefaultResponse(test)
     return;
   }
 
-  if (test.isWriteAttribute || test.isSubscribe) {
+  if (test.isWriteAttribute || (useSynthesizeWaitForReport && test.isSubscribe)) {
     if (hasResponseValueOrConstraints) {
       const errorStr = 'Test has a "value" or a "constraints" defined.';
       throwError(test, errorStr);
@@ -324,24 +333,24 @@ function setDefaultResponse(test)
   delete test[kResponseName].value;
 }
 
-function setDefaults(test, defaultConfig)
+function setDefaults(test, defaultConfig, useSynthesizeWaitForReport)
 {
   const defaultIdentityName = kIdentityName in defaultConfig ? defaultConfig[kIdentityName] : "alpha";
   const defaultClusterName  = defaultConfig[kClusterName] || null;
   const defaultEndpointId   = kEndpointName in defaultConfig ? defaultConfig[kEndpointName] : null;
   const defaultDisabled     = false;
 
-  setDefaultType(test);
   setDefault(test, kIdentityName, defaultIdentityName);
   setDefault(test, kClusterName, defaultClusterName);
   setDefault(test, kEndpointName, defaultEndpointId);
   setDefault(test, kDisabledName, defaultDisabled);
+  setDefaultType(test);
   setDefaultPICS(test);
   setDefaultArguments(test);
-  setDefaultResponse(test);
+  setDefaultResponse(test, useSynthesizeWaitForReport);
 }
 
-function parse(filename)
+function parse(filename, useSynthesizeWaitForReport)
 {
   let filepath;
   const isCertificationTest = filename.startsWith('Test_TC_');
@@ -354,41 +363,43 @@ function parse(filename)
   const data = fs.readFileSync(filepath, { encoding : 'utf8', flag : 'r' });
   const yaml = YAML.parse(data);
 
-  // "subscribeAttribute" command expects a report to be acked before
-  // it got a success response.
-  // In order to validate that the report has been received with the proper value
-  // a "subscribeAttribute" command can have a response configured into the test step
-  // definition. In this case, a new async "waitForReport" test step will be synthesized
-  // and added to the list of tests.
-  yaml.tests.forEach((test, index) => {
-    if (test.command == "subscribeAttribute" && test.response) {
-      // Create a new report test where the expected response is the response argument
-      // for the "subscribeAttributeTest"
-      const reportTest = {
-        label : "Report: " + test.label,
-        command : "waitForReport",
-        attribute : test.attribute,
-        response : test.response,
-        async : true,
-        allocateSubscribeDataCallback : true,
-      };
-      delete test.response;
+  if (useSynthesizeWaitForReport) {
+    // "subscribeAttribute" command expects a report to be acked before
+    // it got a success response.
+    // In order to validate that the report has been received with the proper value
+    // a "subscribeAttribute" command can have a response configured into the test step
+    // definition. In this case, a new async "waitForReport" test step will be synthesized
+    // and added to the list of tests.
+    yaml.tests.forEach((test, index) => {
+      if (test.command == "subscribeAttribute" && test.response) {
+        // Create a new report test where the expected response is the response argument
+        // for the "subscribeAttributeTest"
+        const reportTest = {
+          label : "Report: " + test.label,
+          command : "waitForReport",
+          attribute : test.attribute,
+          response : test.response,
+          async : true,
+          allocateSubscribeDataCallback : true,
+        };
+        delete test.response;
 
-      // insert the new report test into the tests list
-      yaml.tests.splice(index, 0, reportTest);
+        // insert the new report test into the tests list
+        yaml.tests.splice(index, 0, reportTest);
 
-      // Associate the "subscribeAttribute" test with the synthesized report test
-      test.hasWaitForReport              = true;
-      test.waitForReport                 = reportTest;
-      test.allocateSubscribeDataCallback = !test.hasWaitForReport;
-    }
-  });
+        // Associate the "subscribeAttribute" test with the synthesized report test
+        test.hasWaitForReport              = true;
+        test.waitForReport                 = reportTest;
+        test.allocateSubscribeDataCallback = !test.hasWaitForReport;
+      }
+    });
+  }
 
   const defaultConfig = yaml.config || [];
   yaml.tests.forEach(test => {
     test.filename = filename;
     test.testName = yaml.name;
-    setDefaults(test, defaultConfig);
+    setDefaults(test, defaultConfig, useSynthesizeWaitForReport);
   });
 
   // Filter disabled tests
@@ -491,7 +502,7 @@ async function chip_tests(list, options)
   let global  = this.global;
   const items = Array.isArray(list) ? list : list.split(',');
   const names = items.map(name => name.trim());
-  let tests   = names.map(item => parse(item));
+  let tests   = names.map(item => parse(item, options.hash.useSynthesizeWaitForReport));
 
   const context = this;
   tests         = await Promise.all(tests.map(async function(test) {
@@ -656,6 +667,10 @@ function checkNumberSanity(value, errorContext)
 
 function chip_tests_item_parameters(options)
 {
+  if (this.isWait) {
+    return asBlocks.call(this, Promise.resolve([]), options);
+  }
+
   const commandValues = this.arguments.values;
 
   const promise = assertCommandOrAttributeOrEvent(this).then(item => {

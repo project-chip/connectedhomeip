@@ -57,10 +57,10 @@ public:
 
     virtual void NextTest() = 0;
 
-    void Exit(std::string message) override
+    void Exit(std::string message, CHIP_ERROR err = CHIP_ERROR_INTERNAL) override
     {
         ChipLogError(chipTool, " ***** Test Failure: %s\n", message.c_str());
-        SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+        SetCommandExitStatus(err);
     }
 
     /////////// GlobalCommands Interface /////////
