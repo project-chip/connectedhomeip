@@ -3804,7 +3804,7 @@ server cluster WindowCovering = 258 {
   readonly attribute ConfigStatus configStatus = 7;
   readonly attribute nullable Percent currentPositionLiftPercentage = 8;
   readonly attribute nullable Percent currentPositionTiltPercentage = 9;
-  readonly attribute bitmap8 operationalStatus = 10;
+  readonly attribute OperationalStatus operationalStatus = 10;
   readonly attribute nullable Percent100ths targetPositionLiftPercent100ths = 11;
   readonly attribute nullable Percent100ths targetPositionTiltPercent100ths = 12;
   readonly attribute EndProductType endProductType = 13;
@@ -3815,7 +3815,7 @@ server cluster WindowCovering = 258 {
   readonly attribute int16u installedOpenLimitTilt = 18;
   readonly attribute int16u installedClosedLimitTilt = 19;
   attribute access(write: manage) Mode mode = 23;
-  readonly attribute bitmap16 safetyStatus = 26;
+  readonly attribute SafetyStatus safetyStatus = 26;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
