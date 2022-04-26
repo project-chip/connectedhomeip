@@ -30,7 +30,7 @@ public:
         const chip::ByteSpan & skid, chip::MutableByteSpan & outPaaDerBuffer) const override;
 
 private:
-    nullable NSArray<NSData *> * mPaaCerts;
+    NSArray<NSData *> * _Nullable mPaaCerts;
 };
 
 NS_ASSUME_NONNULL_END
