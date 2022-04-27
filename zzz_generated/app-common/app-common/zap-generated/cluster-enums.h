@@ -2323,8 +2323,8 @@ enum class KeypadInputFeature : uint32_t
 
 namespace ContentLauncher {
 
-// Enum for ContentLauncherStatusEnum
-enum class ContentLauncherStatusEnum : uint8_t
+// Enum for ContentLaunchStatusEnum
+enum class ContentLaunchStatusEnum : uint8_t
 {
     kSuccess         = 0x00,
     kUrlNotAvailable = 0x01,

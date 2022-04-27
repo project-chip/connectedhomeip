@@ -33181,7 +33181,7 @@ class ContentLauncher(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class ContentLauncherStatusEnum(IntEnum):
+        class ContentLaunchStatusEnum(IntEnum):
             kSuccess = 0x00
             kUrlNotAvailable = 0x01
             kAuthFailed = 0x02
@@ -33348,11 +33348,11 @@ class ContentLauncher(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ContentLauncher.Enums.ContentLauncherStatusEnum),
+                            ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ContentLauncher.Enums.ContentLaunchStatusEnum),
                             ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            status: 'ContentLauncher.Enums.ContentLauncherStatusEnum' = 0
+            status: 'ContentLauncher.Enums.ContentLaunchStatusEnum' = 0
             data: 'typing.Optional[str]' = None
 
 

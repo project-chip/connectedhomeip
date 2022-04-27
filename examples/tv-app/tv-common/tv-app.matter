@@ -368,7 +368,7 @@ server cluster Channel = 1284 {
 }
 
 server cluster ContentLauncher = 1290 {
-  enum ContentLauncherStatusEnum : ENUM8 {
+  enum ContentLaunchStatusEnum : ENUM8 {
     kSuccess = 0;
     kUrlNotAvailable = 1;
     kAuthFailed = 2;
@@ -459,7 +459,7 @@ server cluster ContentLauncher = 1290 {
   }
 
   response struct LaunchResponse = 2 {
-    ContentLauncherStatusEnum status = 0;
+    ContentLaunchStatusEnum status = 0;
     optional CHAR_STRING data = 1;
   }
 

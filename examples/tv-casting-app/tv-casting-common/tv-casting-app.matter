@@ -346,7 +346,7 @@ client cluster Channel = 1284 {
 }
 
 client cluster ContentLauncher = 1290 {
-  enum ContentLauncherStatusEnum : ENUM8 {
+  enum ContentLaunchStatusEnum : ENUM8 {
     kSuccess = 0;
     kUrlNotAvailable = 1;
     kAuthFailed = 2;

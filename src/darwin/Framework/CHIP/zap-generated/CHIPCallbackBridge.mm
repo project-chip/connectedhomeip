@@ -17921,18 +17921,17 @@ void CHIPNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscri
     }
 }
 
-void CHIPContentLauncherClusterContentLauncherStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ContentLauncher::ContentLauncherStatusEnum value)
+void CHIPContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPContentLauncherClusterContentLauncherStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void CHIPContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPContentLauncherClusterContentLauncherStatusEnumAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -17946,8 +17945,8 @@ void CHIPContentLauncherClusterContentLauncherStatusEnumAttributeCallbackSubscri
     }
 }
 
-void CHIPNullableContentLauncherClusterContentLauncherStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLauncherStatusEnum> & value)
+void CHIPNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17958,11 +17957,11 @@ void CHIPNullableContentLauncherClusterContentLauncherStatusEnumAttributeCallbac
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableContentLauncherClusterContentLauncherStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void CHIPNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
     auto * self
-        = static_cast<CHIPNullableContentLauncherClusterContentLauncherStatusEnumAttributeCallbackSubscriptionBridge *>(context);
+        = static_cast<CHIPNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }

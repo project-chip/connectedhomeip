@@ -16660,10 +16660,10 @@ typedef NS_OPTIONS(uint32_t, CHIPKeypadInputFeature) {
     CHIPKeypadInputFeatureNumberKeys = 0x4,
 };
 
-typedef NS_ENUM(uint8_t, CHIPContentLauncherStatus) {
-    CHIPContentLauncherStatusSuccess = 0x00,
-    CHIPContentLauncherStatusUrlNotAvailable = 0x01,
-    CHIPContentLauncherStatusAuthFailed = 0x02,
+typedef NS_ENUM(uint8_t, CHIPContentLauncherContentLaunchStatus) {
+    CHIPContentLauncherContentLaunchStatusSuccess = 0x00,
+    CHIPContentLauncherContentLaunchStatusUrlNotAvailable = 0x01,
+    CHIPContentLauncherContentLaunchStatusAuthFailed = 0x02,
 };
 
 typedef NS_ENUM(uint8_t, CHIPContentLauncherMetricType) {

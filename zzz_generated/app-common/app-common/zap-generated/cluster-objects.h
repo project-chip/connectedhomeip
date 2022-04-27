@@ -34123,7 +34123,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    ContentLauncherStatusEnum status = static_cast<ContentLauncherStatusEnum>(0);
+    ContentLaunchStatusEnum status = static_cast<ContentLaunchStatusEnum>(0);
     Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -34139,7 +34139,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    ContentLauncherStatusEnum status = static_cast<ContentLauncherStatusEnum>(0);
+    ContentLaunchStatusEnum status = static_cast<ContentLaunchStatusEnum>(0);
     Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
