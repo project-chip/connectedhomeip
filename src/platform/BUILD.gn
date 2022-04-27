@@ -343,7 +343,8 @@ if (chip_device_platform != "none") {
     ]
 
     # Linux has its own NetworkCommissioningThreadDriver
-    if (chip_enable_openthread && chip_device_platform != "linux" && chip_device_platform != "webos") {
+    if (chip_enable_openthread && chip_device_platform != "linux" &&
+        chip_device_platform != "webos") {
       sources += [
         "OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
         "OpenThread/GenericNetworkCommissioningThreadDriver.h",
