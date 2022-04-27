@@ -28,8 +28,8 @@ public:
 
     virtual CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) = 0;
 
-    CHIP_ERROR Start(uint16_t discriminator = 0xFFFF, uint16_t port = CHIP_PORT,
-                     const char * kvs = nullptr, const char * registerKey = "default");
+    CHIP_ERROR Start(uint16_t discriminator = 0xFFFF, uint16_t port = CHIP_PORT, const char * kvs = nullptr,
+                     const char * registerKey = "default");
     CHIP_ERROR Stop(const char * registerKey = "default");
     CHIP_ERROR Reboot(const char * registerKey = "default");
     CHIP_ERROR FactoryReset(const char * registerKey = "default");
