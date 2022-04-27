@@ -91,8 +91,8 @@ with other Thread devices in the network.
 
 ### Device Firmware Upgrade
 
-The example supports over-the-air (OTA) device firmware upgrade (DFU) using
-the Matter OTA update, which is mandatory for Matter-compliant devices and enabled
+The example supports over-the-air (OTA) device firmware upgrade (DFU) using the
+Matter OTA update, which is mandatory for Matter-compliant devices and enabled
 by default.
 
 For this method, the
@@ -175,16 +175,16 @@ following states are possible:
 -   _Solid On_ &mdash; The device is fully provisioned and has full Thread
     network and service connectivity.
 
-**LED 2** indicates the lift position of the shutter, which is represented by the
-brightness of the LED. The brightness level ranges from 0 to 255, where the
-switched off LED with brightness level 0 indicates a fully opened shutter (lifted)
-and 255 indicates a fully closed shutter (lowered).
+**LED 2** indicates the lift position of the shutter, which is represented by
+the brightness of the LED. The brightness level ranges from 0 to 255, where the
+switched off LED with brightness level 0 indicates a fully opened shutter
+(lifted) and 255 indicates a fully closed shutter (lowered).
 
-**LED 3** indicates the tilt position of the shutter, which is represented by the
-brightness of the LED. The brightness level ranges from 0 to 255, where the
-switched off LED with brightness level 0 indicates a fully opened shutter (tilted
-to a horizontal position) and 255 indicates a fully closed shutter (tilted
-to a vertical position).
+**LED 3** indicates the tilt position of the shutter, which is represented by
+the brightness of the LED. The brightness level ranges from 0 to 255, where the
+switched off LED with brightness level 0 indicates a fully opened shutter
+(tilted to a horizontal position) and 255 indicates a fully closed shutter
+(tilted to a vertical position).
 
 **Button 1** can be used for the following purposes:
 
@@ -200,25 +200,27 @@ to a vertical position).
     instruction.
 
 **Button 2** &mdash; Pressing the button once moves the shutter towards the open
-position by one step. Depending on the current movement mode, the button decreases
-the brightness of **LED2** for the lift mode and **LED3** for the tilt mode.
+position by one step. Depending on the current movement mode, the button
+decreases the brightness of **LED2** for the lift mode and **LED3** for the tilt
+mode.
 
-**Button 3** &mdash; Pressing the button once moves the shutter towards the closed
-position by one step. Depending on the current movement mode, the button increases
-the brightness of **LED2** for the lift mode and **LED3** for the tilt mode.
+**Button 3** &mdash; Pressing the button once moves the shutter towards the
+closed position by one step. Depending on the current movement mode, the button
+increases the brightness of **LED2** for the lift mode and **LED3** for the tilt
+mode.
 
-**Button 2** and **Button 3** &mdash; Pressing both buttons at the same time toggles
-the shutter movement mode between lift and tilt. After each device reset,
-the mode is set to lift by default.
+**Button 2** and **Button 3** &mdash; Pressing both buttons at the same time
+toggles the shutter movement mode between lift and tilt. After each device
+reset, the mode is set to lift by default.
 
 > **Note**:
 >
 > Completely opening and closing the shutter requires 20 button presses (steps).
 > Each step takes approximately 200 ms to simulate the real shutter movement.
 > The shutter position and LED brightness values are stored in non-volatile
-> memory and are restored after every device reset. After the firmware update
-> or factory reset both LEDs are switched off by default, which corresponds
-> to the shutter being fully open, both lift-wise and tilt-wise.
+> memory and are restored after every device reset. After the firmware update or
+> factory reset both LEDs are switched off by default, which corresponds to the
+> shutter being fully open, both lift-wise and tilt-wise.
 
 **Button 4** &mdash; Pressing the button once starts the NFC tag emulation and
 enables Bluetooth LE advertising for the predefined period of time (15 minutes
@@ -467,14 +469,14 @@ Before you start testing the application, you can select one of the build types
 supported by the sample. This sample supports the following build types,
 depending on the selected board:
 
--   debug &mdash; Debug version of the application - can be used to enable additional
-    features for verifying the application behavior, such as logs or
+-   debug &mdash; Debug version of the application - can be used to enable
+    additional features for verifying the application behavior, such as logs or
     command-line shell.
--   release &mdash; Release version of the application - can be used to enable only
-    the necessary application functionalities to optimize its performance.
--   no_dfu &mdash; Debug version of the application without Device Firmware Upgrade
-    feature support - can be used only for the nRF52840 DK and nRF5340 DK, as
-    those platforms have DFU enabled by default.
+-   release &mdash; Release version of the application - can be used to enable
+    only the necessary application functionalities to optimize its performance.
+-   no_dfu &mdash; Debug version of the application without Device Firmware
+    Upgrade feature support - can be used only for the nRF52840 DK and nRF5340
+    DK, as those platforms have DFU enabled by default.
 
 For more information, see the
 [Configuring nRF Connect SDK examples](../../../docs/guides/nrfconnect_examples_configuration.md)
