@@ -124,24 +124,7 @@ function getTests()
   ];
 
   const MediaControl = [
-    'Test_TC_MC_1_1',
-    'Test_TC_MC_1_2',
-    'Test_TC_MC_1_3',
-    'Test_TC_MC_1_4',
-    'Test_TC_MC_1_5',
-    'Test_TC_MC_1_6',
-    'Test_TC_MC_1_7',
-    'Test_TC_MC_1_8',
-    'Test_TC_MC_1_9',
-    'Test_TC_MC_1_10',
-    'Test_TC_MC_1_11',
-    'Test_TC_MC_1_12',
     'Test_TC_MC_2_1',
-    'Test_TC_MC_3_1',
-    'Test_TC_MC_3_2',
-    'Test_TC_MC_3_3',
-    'Test_TC_MC_3_4',
-    'Test_TC_MC_3_5',
     'Test_TC_MC_3_6',
     'Test_TC_MC_3_7',
     'Test_TC_MC_3_8',
@@ -167,7 +150,7 @@ function getTests()
   ];
 
   const OnOff = [
-    'Test_TC_OO_1_1', 'Test_TC_OO_2_1', 'Test_TC_OO_2_2', 'Test_TC_OO_2_3',
+    'Test_TC_OO_2_1', 'Test_TC_OO_2_2', 'Test_TC_OO_2_3',
     // 'Test_TC_OO_2_4', Disable this Test for now as Darwin does not support reboot commands currently
   ];
 
@@ -192,8 +175,6 @@ function getTests()
   ];
 
   const RelativeHumidityMeasurement = [
-    'Test_TC_RH_1_1',
-    'Test_TC_RH_2_1',
     'Test_TC_RH_2_2',
   ];
 
@@ -203,7 +184,6 @@ function getTests()
   ];
 
   const TemperatureMeasurement = [
-    'Test_TC_TM_1_1',
     'Test_TC_TM_2_1',
     'Test_TC_TM_2_2',
   ];
@@ -215,7 +195,6 @@ function getTests()
   ];
 
   const ThermostatUserConfiguration = [
-    'Test_TC_TSUIC_1_1',
     'Test_TC_TSUIC_2_1',
     'Test_TC_TSUIC_2_2',
   ];

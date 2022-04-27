@@ -28,7 +28,6 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Issue 1078
     - label: "Read CatalogList attribute."
       command: "readAttribute"
       attribute: "CatalogList"
