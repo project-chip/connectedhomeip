@@ -2511,10 +2511,6 @@ public:
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
-            if (ShouldSkip("PICS_SKIP_SAMPLE_APP")) {
-                NextTest();
-                return;
-            }
             err = TestReadTheGlobalAttributeAttributeList_3();
             break;
         case 4:
@@ -2626,8 +2622,12 @@ private:
 
             {
                 id actualValue = value;
-                VerifyOrReturn(CheckValue("AttributeList", [actualValue count], static_cast<uint32_t>(1)));
+                VerifyOrReturn(CheckValue("AttributeList", [actualValue count], static_cast<uint32_t>(5)));
                 VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
+                VerifyOrReturn(CheckValue("", actualValue[1], 65528UL));
+                VerifyOrReturn(CheckValue("", actualValue[2], 65529UL));
+                VerifyOrReturn(CheckValue("", actualValue[3], 65531UL));
+                VerifyOrReturn(CheckValue("", actualValue[4], 65533UL));
             }
 
             VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
@@ -17734,10 +17734,6 @@ public:
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
-            if (ShouldSkip("PICS_SKIP_SAMPLE_APP")) {
-                NextTest();
-                return;
-            }
             err = TestReadTheGlobalAttributeAttributeList_3();
             break;
         case 4:
@@ -17855,12 +17851,16 @@ private:
 
             {
                 id actualValue = value;
-                VerifyOrReturn(CheckValue("AttributeList", [actualValue count], static_cast<uint32_t>(5)));
+                VerifyOrReturn(CheckValue("AttributeList", [actualValue count], static_cast<uint32_t>(9)));
                 VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
                 VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
                 VerifyOrReturn(CheckValue("", actualValue[2], 2UL));
                 VerifyOrReturn(CheckValue("", actualValue[3], 3UL));
                 VerifyOrReturn(CheckValue("", actualValue[4], 4UL));
+                VerifyOrReturn(CheckValue("", actualValue[5], 65528UL));
+                VerifyOrReturn(CheckValue("", actualValue[6], 65529UL));
+                VerifyOrReturn(CheckValue("", actualValue[7], 65531UL));
+                VerifyOrReturn(CheckValue("", actualValue[8], 65533UL));
             }
 
             VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
@@ -18173,10 +18173,6 @@ public:
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
-            if (ShouldSkip("PICS_SKIP_SAMPLE_APP")) {
-                NextTest();
-                return;
-            }
             err = TestReadTheGlobalAttributeAttributeList_3();
             break;
         case 4:
@@ -18288,9 +18284,13 @@ private:
 
             {
                 id actualValue = value;
-                VerifyOrReturn(CheckValue("AttributeList", [actualValue count], static_cast<uint32_t>(2)));
+                VerifyOrReturn(CheckValue("AttributeList", [actualValue count], static_cast<uint32_t>(6)));
                 VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
                 VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
+                VerifyOrReturn(CheckValue("", actualValue[2], 65528UL));
+                VerifyOrReturn(CheckValue("", actualValue[3], 65529UL));
+                VerifyOrReturn(CheckValue("", actualValue[4], 65531UL));
+                VerifyOrReturn(CheckValue("", actualValue[5], 65533UL));
             }
 
             VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));

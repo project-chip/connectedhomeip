@@ -41,13 +41,11 @@ tests:
           constraints:
               type: uint16
 
-    #issue #17482
     - label: "Read the global attribute: AttributeList"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 1, 2, 3, 4]
+          value: [0,1,2,3,4,65528,65529,65531,65533]
           constraints:
               type: list
 
