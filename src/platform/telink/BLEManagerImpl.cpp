@@ -220,28 +220,22 @@ void BLEManagerImpl::ConnectCallback(uint8_t bleEvent, uint8_t * data, int len)
     ChipDeviceEvent event;
     ble_sts_t status = BLE_SUCCESS;
 
-    PlatformMgr().LockChipStack();
-
     event.Type                             = DeviceEventType::kPlatformTelinkBleConnected;
     event.Platform.BleConnEvent.connHandle = BLS_CONN_HANDLE;
     event.Platform.BleConnEvent.HciResult  = BLE_SUCCESS;
 
     PlatformMgr().PostEventOrDie(&event);
-    PlatformMgr().UnlockChipStack();
 }
 
 void BLEManagerImpl::DisconnectCallback(uint8_t bleEvent, uint8_t * data, int len)
 {
     ChipDeviceEvent event;
 
-    PlatformMgr().LockChipStack();
-
     event.Type                             = DeviceEventType::kPlatformTelinkBleDisconnected;
     event.Platform.BleConnEvent.connHandle = BLS_CONN_HANDLE;
     event.Platform.BleConnEvent.HciResult  = *data; // Reason of disconnection stored in first data byte
 
     PlatformMgr().PostEventOrDie(&event);
-    PlatformMgr().UnlockChipStack();
 }
 
 int BLEManagerImpl::TxCccWriteCallback(uint16_t connHandle, void * p)
