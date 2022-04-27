@@ -164,12 +164,14 @@ public:
 private:
     enum class State : uint8_t
     {
-        kInitialized      = 0,
-        kSentSigma1       = 1,
-        kSentSigma2       = 2,
-        kSentSigma3       = 3,
-        kSentSigma1Resume = 4,
-        kSentSigma2Resume = 5,
+        kInitialized       = 0,
+        kSentSigma1        = 1,
+        kSentSigma2        = 2,
+        kSentSigma3        = 3,
+        kSentSigma1Resume  = 4,
+        kSentSigma2Resume  = 5,
+        kFinished          = 6,
+        kFinishedViaResume = 7,
     };
 
     CHIP_ERROR Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate);
@@ -192,7 +194,7 @@ private:
     CHIP_ERROR SendSigma3();
     CHIP_ERROR HandleSigma3(System::PacketBufferHandle && msg);
 
-    CHIP_ERROR SendSigma2Resume(const ByteSpan & initiatorRandom);
+    CHIP_ERROR SendSigma2Resume();
 
     CHIP_ERROR ConstructSaltSigma2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                    MutableByteSpan & salt);
@@ -255,15 +257,12 @@ private:
     NodeId mPeerNodeId             = kUndefinedNodeId;
     CATValues mPeerCATs;
 
-    // This field is only used for CASE responder, when during sending sigma2 and waiting for sigma3
-    SessionResumptionStorage::ResumptionIdStorage mResumptionId;
+    SessionResumptionStorage::ResumptionIdStorage mResumeResumptionId; // ResumptionId which is used to resume this session
+    SessionResumptionStorage::ResumptionIdStorage mNewResumptionId;    // ResumptionId which is stored to resume future session
     // Sigma1 initiator random, maintained to be reused post-Sigma1, such as when generating Sigma2 S2RK key
     uint8_t mInitiatorRandom[kSigmaParamRandomNumberSize];
 
     State mState;
-
-protected:
-    bool mCASESessionEstablished = false;
 };
 
 } // namespace chip
