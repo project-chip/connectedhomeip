@@ -48,11 +48,11 @@ public:
      *
      * @param secureSessionType secure session type
      * @param localSessionId unique identifier for the local node's secure unicast session context
+     * @param localNodeId represents the local Node ID for this node
      * @param peerNodeId represents peer Node's ID
-     * @param localNodeId represents local Node's ID
      * @param peerCATs represents peer CASE Authenticated Tags
      * @param peerSessionId represents the encryption key ID assigned by peer node
-     * @param fabric represents fabric ID for the session
+     * @param fabricIndex represents fabric index for the session
      * @param config represents the reliable message protocol configuration
      *
      * @note the newly created state will have an 'active' time set based on the current time source.
@@ -62,7 +62,7 @@ public:
      */
     CHECK_RETURN_VALUE
     Optional<SessionHandle> CreateNewSecureSessionForTest(SecureSession::Type secureSessionType, uint16_t localSessionId,
-                                                          NodeId peerNodeId, NodeId localNodeId, CATValues peerCATs,
+                                                          NodeId localNodeId, NodeId peerNodeId, CATValues peerCATs,
                                                           uint16_t peerSessionId, FabricIndex fabricIndex,
                                                           const ReliableMessageProtocolConfig & config)
     {
@@ -89,7 +89,7 @@ public:
             }
         }
 
-        SecureSession * result = mEntries.CreateObject(secureSessionType, localSessionId, peerNodeId, localNodeId, peerCATs,
+        SecureSession * result = mEntries.CreateObject(secureSessionType, localSessionId, localNodeId, peerNodeId, peerCATs,
                                                        peerSessionId, fabricIndex, config);
         return result != nullptr ? MakeOptional<SessionHandle>(*result) : Optional<SessionHandle>::Missing();
     }

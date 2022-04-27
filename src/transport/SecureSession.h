@@ -99,7 +99,7 @@ public:
      *   PASE, setting internal state according to the parameters used and
      *   discovered during session establishment.
      */
-    void Activate(Type secureSessionType, const ScopedNodeId & peerNode, const ScopedNodeId & localNode, CATValues peerCATs,
+    void Activate(Type secureSessionType, const ScopedNodeId & localNode, const ScopedNodeId & peerNode, CATValues peerCATs,
                   uint16_t peerSessionId, const ReliableMessageProtocolConfig & config)
     {
         VerifyOrDie(peerNode.GetFabricIndex() == localNode.GetFabricIndex());
