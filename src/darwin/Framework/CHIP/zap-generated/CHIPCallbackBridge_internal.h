@@ -533,6 +533,9 @@ typedef void (*ChannelClusterLineupInfoTypeEnumAttributeCallback)(void *, chip::
 typedef void (*NullableChannelClusterLineupInfoTypeEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::LineupInfoTypeEnum> &);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Renaming StatusEnums with cluster name prefix
 typedef void (*TargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallback)(
     void *, chip::app::Clusters::TargetNavigator::TargetNavigatorStatusEnum);
 typedef void (*NullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallback)(
@@ -541,16 +544,20 @@ typedef void (*MediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallback)(
     void *, chip::app::Clusters::MediaPlayback::MediaPlaybackStatusEnum);
 typedef void (*NullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::MediaPlaybackStatusEnum> &);
+<<<<<<< HEAD
 =======
 typedef void (*TargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallback)(
     void *, chip::app::Clusters::TargetNavigator::StatusEnumTargetNavigator);
 typedef void (*NullableTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TargetNavigator::StatusEnumTargetNavigator> &);
 >>>>>>> Changes for cleaner regen
+=======
+>>>>>>> Renaming StatusEnums with cluster name prefix
 typedef void (*MediaPlaybackClusterPlaybackStateEnumAttributeCallback)(void *,
                                                                        chip::app::Clusters::MediaPlayback::PlaybackStateEnum);
 typedef void (*NullableMediaPlaybackClusterPlaybackStateEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::PlaybackStateEnum> &);
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 typedef void (*MediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallback)(
@@ -558,6 +565,8 @@ typedef void (*MediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallback)(
 typedef void (*NullableMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::StatusEnumMediaPlayback> &);
 >>>>>>> Changes for cleaner regen
+=======
+>>>>>>> Renaming StatusEnums with cluster name prefix
 typedef void (*MediaInputClusterInputTypeEnumAttributeCallback)(void *, chip::app::Clusters::MediaInput::InputTypeEnum);
 typedef void (*NullableMediaInputClusterInputTypeEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaInput::InputTypeEnum> &);
@@ -565,6 +574,9 @@ typedef void (*KeypadInputClusterCecKeyCodeAttributeCallback)(void *, chip::app:
 typedef void (*NullableKeypadInputClusterCecKeyCodeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::CecKeyCode> &);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Renaming StatusEnums with cluster name prefix
 typedef void (*KeypadInputClusterKeypadInputStatusEnumAttributeCallback)(void *,
                                                                          chip::app::Clusters::KeypadInput::KeypadInputStatusEnum);
 typedef void (*NullableKeypadInputClusterKeypadInputStatusEnumAttributeCallback)(
@@ -573,18 +585,22 @@ typedef void (*ContentLauncherClusterContentLaunchStatusEnumAttributeCallback)(
     void *, chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum);
 typedef void (*NullableContentLauncherClusterContentLaunchStatusEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum> &);
+<<<<<<< HEAD
 =======
 typedef void (*KeypadInputClusterStatusEnumKeypadInputAttributeCallback)(void *,
                                                                          chip::app::Clusters::KeypadInput::StatusEnumKeypadInput);
 typedef void (*NullableKeypadInputClusterStatusEnumKeypadInputAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::StatusEnumKeypadInput> &);
 >>>>>>> Changes for cleaner regen
+=======
+>>>>>>> Renaming StatusEnums with cluster name prefix
 typedef void (*ContentLauncherClusterMetricTypeEnumAttributeCallback)(void *, chip::app::Clusters::ContentLauncher::MetricTypeEnum);
 typedef void (*NullableContentLauncherClusterMetricTypeEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::MetricTypeEnum> &);
 typedef void (*ContentLauncherClusterParameterEnumAttributeCallback)(void *, chip::app::Clusters::ContentLauncher::ParameterEnum);
 typedef void (*NullableContentLauncherClusterParameterEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ParameterEnum> &);
+<<<<<<< HEAD
 <<<<<<< HEAD
 typedef void (*AudioOutputClusterOutputTypeEnumAttributeCallback)(void *, chip::app::Clusters::AudioOutput::OutputTypeEnum);
 typedef void (*NullableAudioOutputClusterOutputTypeEnumAttributeCallback)(
@@ -606,6 +622,15 @@ typedef void (*ApplicationLauncherClusterStatusEnumApplicationLauncherAttributeC
 typedef void (*NullableApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::StatusEnumApplicationLauncher> &);
 >>>>>>> Changes for cleaner regen
+=======
+typedef void (*AudioOutputClusterOutputTypeEnumAttributeCallback)(void *, chip::app::Clusters::AudioOutput::OutputTypeEnum);
+typedef void (*NullableAudioOutputClusterOutputTypeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AudioOutput::OutputTypeEnum> &);
+typedef void (*ApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback)(
+    void *, chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum);
+typedef void (*NullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum> &);
+>>>>>>> Renaming StatusEnums with cluster name prefix
 typedef void (*ApplicationBasicClusterApplicationStatusEnumAttributeCallback)(
     void *, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum);
 typedef void (*NullableApplicationBasicClusterApplicationStatusEnumAttributeCallback)(
@@ -18061,6 +18086,7 @@ private:
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 class CHIPMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge
     : public CHIPCallbackBridge<MediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallback>
 {
@@ -18084,25 +18110,33 @@ public:
 =======
 class CHIPTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallbackBridge
     : public CHIPCallbackBridge<TargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallback>
+=======
+class CHIPTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge
+    : public CHIPCallbackBridge<TargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallback>
+>>>>>>> Renaming StatusEnums with cluster name prefix
 {
 public:
-    CHIPTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<TargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallback>(queue, handler, action, OnSuccessFn,
+        CHIPCallbackBridge<TargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                              keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::TargetNavigator::StatusEnumTargetNavigator value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::TargetNavigator::TargetNavigatorStatusEnum value);
 };
 
-class CHIPTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallbackSubscriptionBridge
-    : public CHIPTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallbackBridge
+class CHIPTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge
+    : public CHIPTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge
 {
 public:
-    CHIPTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallbackSubscriptionBridge(
+    CHIPTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
+<<<<<<< HEAD
         CHIPTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallbackBridge(queue, handler, action, true),
 >>>>>>> Changes for cleaner regen
+=======
+        CHIPTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge(queue, handler, action, true),
+>>>>>>> Renaming StatusEnums with cluster name prefix
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -18112,6 +18146,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 class CHIPNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge
     : public CHIPCallbackBridge<NullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallback>
@@ -18138,29 +18173,37 @@ public:
 =======
 class CHIPNullableTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallbackBridge
     : public CHIPCallbackBridge<NullableTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallback>
+=======
+class CHIPNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallback>
+>>>>>>> Renaming StatusEnums with cluster name prefix
 {
 public:
-    CHIPNullableTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallbackBridge(dispatch_queue_t queue,
+    CHIPNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
                                                                                        ResponseHandler handler,
                                                                                        CHIPActionBlock action,
                                                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<NullableTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallback>(queue, handler, action,
+        CHIPCallbackBridge<NullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallback>(queue, handler, action,
                                                                                                      OnSuccessFn, keepAlive){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::TargetNavigator::StatusEnumTargetNavigator> & value);
+                const chip::app::DataModel::Nullable<chip::app::Clusters::TargetNavigator::TargetNavigatorStatusEnum> & value);
 };
 
-class CHIPNullableTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallbackSubscriptionBridge
-    : public CHIPNullableTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallbackBridge
+class CHIPNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge
+    : public CHIPNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge
 {
 public:
-    CHIPNullableTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallbackSubscriptionBridge(
+    CHIPNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
+<<<<<<< HEAD
         CHIPNullableTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallbackBridge(queue, handler, action, true),
 >>>>>>> Changes for cleaner regen
+=======
+        CHIPNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge(queue, handler, action, true),
+>>>>>>> Renaming StatusEnums with cluster name prefix
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -18170,8 +18213,75 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class CHIPMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge
+    : public CHIPCallbackBridge<MediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallback>
+{
+public:
+    CHIPMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<MediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                         keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::MediaPlayback::MediaPlaybackStatusEnum value);
+};
+
+class CHIPMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge
+    : public CHIPMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge
+{
+public:
+    CHIPMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallback>
+{
+public:
+    CHIPNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn, keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::MediaPlaybackStatusEnum> & value);
+};
+
+class CHIPNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge
+    : public CHIPNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge
+{
+public:
+    CHIPNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+class CHIPMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallbackBridge
+    : public CHIPCallbackBridge<MediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallback>
+=======
 class CHIPMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge
     : public CHIPCallbackBridge<MediaPlaybackClusterPlaybackStateEnumAttributeCallback>
+>>>>>>> Renaming StatusEnums with cluster name prefix
 {
 public:
     CHIPMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -18220,68 +18330,6 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-<<<<<<< HEAD
-=======
-class CHIPMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallbackBridge
-    : public CHIPCallbackBridge<MediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallback>
-{
-public:
-    CHIPMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<MediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::MediaPlayback::StatusEnumMediaPlayback value);
-};
-
-class CHIPMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallbackSubscriptionBridge
-    : public CHIPMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallbackBridge
-{
-public:
-    CHIPMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPNullableMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallbackBridge
-    : public CHIPCallbackBridge<NullableMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallback>
-{
-public:
-    CHIPNullableMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                   CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NullableMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallback>(queue, handler, action,
-                                                                                                 OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::StatusEnumMediaPlayback> & value);
-};
-
-class CHIPNullableMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallbackSubscriptionBridge
-    : public CHIPNullableMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallbackBridge
-{
-public:
-    CHIPNullableMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPNullableMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -18408,6 +18456,7 @@ private:
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 class CHIPKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge
     : public CHIPCallbackBridge<KeypadInputClusterKeypadInputStatusEnumAttributeCallback>
 {
@@ -18431,25 +18480,33 @@ public:
 =======
 class CHIPKeypadInputClusterStatusEnumKeypadInputAttributeCallbackBridge
     : public CHIPCallbackBridge<KeypadInputClusterStatusEnumKeypadInputAttributeCallback>
+=======
+class CHIPKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge
+    : public CHIPCallbackBridge<KeypadInputClusterKeypadInputStatusEnumAttributeCallback>
+>>>>>>> Renaming StatusEnums with cluster name prefix
 {
 public:
-    CHIPKeypadInputClusterStatusEnumKeypadInputAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<KeypadInputClusterStatusEnumKeypadInputAttributeCallback>(queue, handler, action, OnSuccessFn,
+        CHIPCallbackBridge<KeypadInputClusterKeypadInputStatusEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::KeypadInput::StatusEnumKeypadInput value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::KeypadInput::KeypadInputStatusEnum value);
 };
 
-class CHIPKeypadInputClusterStatusEnumKeypadInputAttributeCallbackSubscriptionBridge
-    : public CHIPKeypadInputClusterStatusEnumKeypadInputAttributeCallbackBridge
+class CHIPKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge
+    : public CHIPKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge
 {
 public:
-    CHIPKeypadInputClusterStatusEnumKeypadInputAttributeCallbackSubscriptionBridge(
+    CHIPKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
+<<<<<<< HEAD
         CHIPKeypadInputClusterStatusEnumKeypadInputAttributeCallbackBridge(queue, handler, action, true),
 >>>>>>> Changes for cleaner regen
+=======
+        CHIPKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge(queue, handler, action, true),
+>>>>>>> Renaming StatusEnums with cluster name prefix
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -18459,6 +18516,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 class CHIPNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge
     : public CHIPCallbackBridge<NullableKeypadInputClusterKeypadInputStatusEnumAttributeCallback>
@@ -18546,26 +18604,96 @@ public:
 =======
 class CHIPNullableKeypadInputClusterStatusEnumKeypadInputAttributeCallbackBridge
     : public CHIPCallbackBridge<NullableKeypadInputClusterStatusEnumKeypadInputAttributeCallback>
+=======
+class CHIPNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableKeypadInputClusterKeypadInputStatusEnumAttributeCallback>
+>>>>>>> Renaming StatusEnums with cluster name prefix
 {
 public:
-    CHIPNullableKeypadInputClusterStatusEnumKeypadInputAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NullableKeypadInputClusterStatusEnumKeypadInputAttributeCallback>(queue, handler, action, OnSuccessFn,
+        CHIPCallbackBridge<NullableKeypadInputClusterKeypadInputStatusEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                              keepAlive){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::StatusEnumKeypadInput> & value);
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::KeypadInputStatusEnum> & value);
 };
 
-class CHIPNullableKeypadInputClusterStatusEnumKeypadInputAttributeCallbackSubscriptionBridge
-    : public CHIPNullableKeypadInputClusterStatusEnumKeypadInputAttributeCallbackBridge
+class CHIPNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge
+    : public CHIPNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge
 {
 public:
-    CHIPNullableKeypadInputClusterStatusEnumKeypadInputAttributeCallbackSubscriptionBridge(
+    CHIPNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge
+    : public CHIPCallbackBridge<ContentLauncherClusterContentLaunchStatusEnumAttributeCallback>
+{
+public:
+    CHIPContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ContentLauncherClusterContentLaunchStatusEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum value);
+};
+
+class CHIPContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge
+    : public CHIPContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge
+{
+public:
+    CHIPContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+<<<<<<< HEAD
         CHIPNullableKeypadInputClusterStatusEnumKeypadInputAttributeCallbackBridge(queue, handler, action, true),
 >>>>>>> Changes for cleaner regen
+=======
+        CHIPContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableContentLauncherClusterContentLaunchStatusEnumAttributeCallback>
+{
+public:
+    CHIPNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler,
+                                                                                     CHIPActionBlock action,
+                                                                                     bool keepAlive = false) :
+        CHIPCallbackBridge<NullableContentLauncherClusterContentLaunchStatusEnumAttributeCallback>(queue, handler, action,
+                                                                                                   OnSuccessFn, keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum> & value);
+};
+
+class CHIPNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge
+    : public CHIPNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge
+{
+public:
+    CHIPNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge(queue, handler, action, true),
+>>>>>>> Renaming StatusEnums with cluster name prefix
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -18692,6 +18820,7 @@ private:
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 class CHIPContentLauncherClusterStatusEnumContentLauncherAttributeCallbackBridge
     : public CHIPCallbackBridge<ContentLauncherClusterStatusEnumContentLauncherAttributeCallback>
@@ -18756,6 +18885,8 @@ private:
 };
 
 >>>>>>> Changes for cleaner regen
+=======
+>>>>>>> Renaming StatusEnums with cluster name prefix
 class CHIPAudioOutputClusterOutputTypeEnumAttributeCallbackBridge
     : public CHIPCallbackBridge<AudioOutputClusterOutputTypeEnumAttributeCallback>
 {
@@ -18815,6 +18946,7 @@ private:
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 class CHIPApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge
     : public CHIPCallbackBridge<ApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback>
 {
@@ -18840,27 +18972,35 @@ public:
 =======
 class CHIPApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallbackBridge
     : public CHIPCallbackBridge<ApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallback>
+=======
+class CHIPApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge
+    : public CHIPCallbackBridge<ApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback>
+>>>>>>> Renaming StatusEnums with cluster name prefix
 {
 public:
-    CHIPApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallbackBridge(dispatch_queue_t queue,
+    CHIPApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
                                                                                        ResponseHandler handler,
                                                                                        CHIPActionBlock action,
                                                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<ApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallback>(queue, handler, action,
+        CHIPCallbackBridge<ApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback>(queue, handler, action,
                                                                                                      OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ApplicationLauncher::StatusEnumApplicationLauncher value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum value);
 };
 
-class CHIPApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallbackSubscriptionBridge
-    : public CHIPApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallbackBridge
+class CHIPApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge
+    : public CHIPApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge
 {
 public:
-    CHIPApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallbackSubscriptionBridge(
+    CHIPApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
+<<<<<<< HEAD
         CHIPApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallbackBridge(queue, handler, action, true),
 >>>>>>> Changes for cleaner regen
+=======
+        CHIPApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge(queue, handler, action, true),
+>>>>>>> Renaming StatusEnums with cluster name prefix
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -18870,6 +19010,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 class CHIPNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge
     : public CHIPCallbackBridge<NullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback>
@@ -18883,18 +19024,27 @@ public:
 =======
 class CHIPNullableApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallbackBridge
     : public CHIPCallbackBridge<NullableApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallback>
+=======
+class CHIPNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback>
+>>>>>>> Renaming StatusEnums with cluster name prefix
 {
 public:
-    CHIPNullableApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallbackBridge(dispatch_queue_t queue,
+    CHIPNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
                                                                                                ResponseHandler handler,
                                                                                                CHIPActionBlock action,
                                                                                                bool keepAlive = false) :
+<<<<<<< HEAD
         CHIPCallbackBridge<NullableApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallback>(
 >>>>>>> Changes for cleaner regen
+=======
+        CHIPCallbackBridge<NullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback>(
+>>>>>>> Renaming StatusEnums with cluster name prefix
             queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(
         void * context,
+<<<<<<< HEAD
 <<<<<<< HEAD
         const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum> & value);
 };
@@ -18909,17 +19059,24 @@ public:
         CHIPNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge(queue, handler, action, true),
 =======
         const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::StatusEnumApplicationLauncher> & value);
+=======
+        const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum> & value);
+>>>>>>> Renaming StatusEnums with cluster name prefix
 };
 
-class CHIPNullableApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallbackSubscriptionBridge
-    : public CHIPNullableApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallbackBridge
+class CHIPNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge
+    : public CHIPNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge
 {
 public:
-    CHIPNullableApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallbackSubscriptionBridge(
+    CHIPNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
+<<<<<<< HEAD
         CHIPNullableApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallbackBridge(queue, handler, action, true),
 >>>>>>> Changes for cleaner regen
+=======
+        CHIPNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge(queue, handler, action, true),
+>>>>>>> Renaming StatusEnums with cluster name prefix
         mEstablishedHandler(establishedHandler)
     {}
 

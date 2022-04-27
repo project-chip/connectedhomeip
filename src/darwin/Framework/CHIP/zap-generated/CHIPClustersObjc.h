@@ -22621,10 +22621,19 @@ typedef NS_OPTIONS(uint32_t, CHIPChannelFeature) {
     CHIPChannelFeatureLineupInfo = 0x2,
 };
 
-typedef NS_ENUM(uint8_t, CHIPTargetNavigatorStatusEnumTargetNavigator) {
-    CHIPTargetNavigatorStatusEnumTargetNavigatorSuccess = 0x00,
-    CHIPTargetNavigatorStatusEnumTargetNavigatorTargetNotFound = 0x01,
-    CHIPTargetNavigatorStatusEnumTargetNavigatorNotAllowed = 0x02,
+typedef NS_ENUM(uint8_t, CHIPTargetNavigatorStatus) {
+    CHIPTargetNavigatorStatusSuccess = 0x00,
+    CHIPTargetNavigatorStatusTargetNotFound = 0x01,
+    CHIPTargetNavigatorStatusNotAllowed = 0x02,
+};
+
+typedef NS_ENUM(uint8_t, CHIPMediaPlaybackStatus) {
+    CHIPMediaPlaybackStatusSuccess = 0x00,
+    CHIPMediaPlaybackStatusInvalidStateForCommand = 0x01,
+    CHIPMediaPlaybackStatusNotAllowed = 0x02,
+    CHIPMediaPlaybackStatusNotActive = 0x03,
+    CHIPMediaPlaybackStatusSpeedOutOfRange = 0x04,
+    CHIPMediaPlaybackStatusSeekOutOfRange = 0x05,
 };
 
 <<<<<<< HEAD
@@ -22643,6 +22652,7 @@ typedef NS_ENUM(uint8_t, CHIPMediaPlaybackPlaybackState) {
     CHIPMediaPlaybackPlaybackStateBuffering = 0x03,
 };
 
+<<<<<<< HEAD
 typedef NS_ENUM(uint8_t, CHIPMediaPlaybackStatusEnumMediaPlayback) {
     CHIPMediaPlaybackStatusEnumMediaPlaybackSuccess = 0x00,
     CHIPMediaPlaybackStatusEnumMediaPlaybackInvalidStateForCommand = 0x01,
@@ -22660,6 +22670,8 @@ typedef NS_ENUM(uint8_t, CHIPMediaPlaybackPlaybackState) {
     CHIPMediaPlaybackPlaybackStateBuffering = 0x03,
 };
 
+=======
+>>>>>>> Renaming StatusEnums with cluster name prefix
 typedef NS_ENUM(uint8_t, CHIPMediaInputInputType) {
     CHIPMediaInputInputTypeInternal = 0x00,
     CHIPMediaInputInputTypeAux = 0x01,
@@ -22768,10 +22780,10 @@ typedef NS_ENUM(uint8_t, CHIPKeypadInputCecKeyCode) {
     CHIPKeypadInputCecKeyCodeData = 0x76,
 };
 
-typedef NS_ENUM(uint8_t, CHIPKeypadInputStatusEnumKeypadInput) {
-    CHIPKeypadInputStatusEnumKeypadInputSuccess = 0x00,
-    CHIPKeypadInputStatusEnumKeypadInputUnsupportedKey = 0x01,
-    CHIPKeypadInputStatusEnumKeypadInputInvalidKeyInCurrentState = 0x02,
+typedef NS_ENUM(uint8_t, CHIPKeypadInputStatus) {
+    CHIPKeypadInputStatusSuccess = 0x00,
+    CHIPKeypadInputStatusUnsupportedKey = 0x01,
+    CHIPKeypadInputStatusInvalidKeyInCurrentState = 0x02,
 };
 
 typedef NS_OPTIONS(uint32_t, CHIPKeypadInputFeature) {
@@ -22808,6 +22820,7 @@ typedef NS_ENUM(uint8_t, CHIPContentLauncherParameter) {
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 typedef NS_ENUM(uint8_t, CHIPContentLauncherStatusEnumContentLauncher) {
     CHIPContentLauncherStatusEnumContentLauncherSuccess = 0x00,
@@ -22816,6 +22829,8 @@ typedef NS_ENUM(uint8_t, CHIPContentLauncherStatusEnumContentLauncher) {
 };
 
 >>>>>>> Changes for cleaner regen
+=======
+>>>>>>> Renaming StatusEnums with cluster name prefix
 typedef NS_OPTIONS(uint32_t, CHIPContentLauncherFeature) {
     CHIPContentLauncherFeatureContentSearch = 0x1,
     CHIPContentLauncherFeatureURLPlayback = 0x2,
@@ -22839,10 +22854,10 @@ typedef NS_OPTIONS(uint32_t, CHIPAudioOutputFeature) {
     CHIPAudioOutputFeatureNameUpdates = 0x1,
 };
 
-typedef NS_ENUM(uint8_t, CHIPApplicationLauncherStatusEnumApplicationLauncher) {
-    CHIPApplicationLauncherStatusEnumApplicationLauncherSuccess = 0x00,
-    CHIPApplicationLauncherStatusEnumApplicationLauncherAppNotAvailable = 0x01,
-    CHIPApplicationLauncherStatusEnumApplicationLauncherSystemBusy = 0x02,
+typedef NS_ENUM(uint8_t, CHIPApplicationLauncherStatus) {
+    CHIPApplicationLauncherStatusSuccess = 0x00,
+    CHIPApplicationLauncherStatusAppNotAvailable = 0x01,
+    CHIPApplicationLauncherStatusSystemBusy = 0x02,
 };
 
 typedef NS_OPTIONS(uint32_t, CHIPApplicationLauncherFeature) {

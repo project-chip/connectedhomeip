@@ -2151,12 +2151,17 @@ enum class ChannelFeature : uint32_t
 namespace TargetNavigator {
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 // Enum for TargetNavigatorStatusEnum
 enum class TargetNavigatorStatusEnum : uint8_t
 =======
 // Enum for StatusEnumTargetNavigator
 enum class StatusEnumTargetNavigator : uint8_t
 >>>>>>> Reverting the changes to the zapt template files
+=======
+// Enum for TargetNavigatorStatusEnum
+enum class TargetNavigatorStatusEnum : uint8_t
+>>>>>>> Renaming StatusEnums with cluster name prefix
 {
     kSuccess        = 0x00,
     kTargetNotFound = 0x01,
@@ -2166,6 +2171,7 @@ enum class StatusEnumTargetNavigator : uint8_t
 
 namespace MediaPlayback {
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 // Enum for MediaPlaybackStatusEnum
 enum class MediaPlaybackStatusEnum : uint8_t
@@ -2182,6 +2188,10 @@ enum class PlaybackStateEnum : uint8_t
 // Enum for StatusEnumMediaPlayback
 enum class StatusEnumMediaPlayback : uint8_t
 >>>>>>> Reverting the changes to the zapt template files
+=======
+// Enum for MediaPlaybackStatusEnum
+enum class MediaPlaybackStatusEnum : uint8_t
+>>>>>>> Renaming StatusEnums with cluster name prefix
 {
     kSuccess                = 0x00,
     kInvalidStateForCommand = 0x01,
@@ -2324,12 +2334,17 @@ enum class CecKeyCode : uint8_t
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 // Enum for KeypadInputStatusEnum
 enum class KeypadInputStatusEnum : uint8_t
 =======
 // Enum for StatusEnumKeypadInput
 enum class StatusEnumKeypadInput : uint8_t
 >>>>>>> Reverting the changes to the zapt template files
+=======
+// Enum for KeypadInputStatusEnum
+enum class KeypadInputStatusEnum : uint8_t
+>>>>>>> Renaming StatusEnums with cluster name prefix
 {
     kSuccess                  = 0x00,
     kUnsupportedKey           = 0x01,
@@ -2381,6 +2396,7 @@ enum class ParameterEnum : uint8_t
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 // Enum for StatusEnumContentLauncher
 enum class StatusEnumContentLauncher : uint8_t
@@ -2391,6 +2407,8 @@ enum class StatusEnumContentLauncher : uint8_t
 };
 
 >>>>>>> Reverting the changes to the zapt template files
+=======
+>>>>>>> Renaming StatusEnums with cluster name prefix
 // Bitmap for ContentLauncherFeature
 enum class ContentLauncherFeature : uint32_t
 {
@@ -2429,12 +2447,17 @@ enum class AudioOutputFeature : uint32_t
 namespace ApplicationLauncher {
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 // Enum for ApplicationLauncherStatusEnum
 enum class ApplicationLauncherStatusEnum : uint8_t
 =======
 // Enum for StatusEnumApplicationLauncher
 enum class StatusEnumApplicationLauncher : uint8_t
 >>>>>>> Reverting the changes to the zapt template files
+=======
+// Enum for ApplicationLauncherStatusEnum
+enum class ApplicationLauncherStatusEnum : uint8_t
+>>>>>>> Renaming StatusEnums with cluster name prefix
 {
     kSuccess         = 0x00,
     kAppNotAvailable = 0x01,

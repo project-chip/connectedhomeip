@@ -32681,10 +32681,14 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     TargetNavigatorStatusEnum status = static_cast<TargetNavigatorStatusEnum>(0);
 =======
     StatusEnumTargetNavigator status = static_cast<StatusEnumTargetNavigator>(0);
 >>>>>>> Reverting the changes to the zapt template files
+=======
+    TargetNavigatorStatusEnum status = static_cast<TargetNavigatorStatusEnum>(0);
+>>>>>>> Renaming StatusEnums with cluster name prefix
     Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -32701,10 +32705,14 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     TargetNavigatorStatusEnum status = static_cast<TargetNavigatorStatusEnum>(0);
 =======
     StatusEnumTargetNavigator status = static_cast<StatusEnumTargetNavigator>(0);
 >>>>>>> Reverting the changes to the zapt template files
+=======
+    TargetNavigatorStatusEnum status = static_cast<TargetNavigatorStatusEnum>(0);
+>>>>>>> Renaming StatusEnums with cluster name prefix
     Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -33216,10 +33224,14 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     MediaPlaybackStatusEnum status = static_cast<MediaPlaybackStatusEnum>(0);
 =======
     StatusEnumMediaPlayback status = static_cast<StatusEnumMediaPlayback>(0);
 >>>>>>> Reverting the changes to the zapt template files
+=======
+    MediaPlaybackStatusEnum status = static_cast<MediaPlaybackStatusEnum>(0);
+>>>>>>> Renaming StatusEnums with cluster name prefix
     Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -33236,10 +33248,14 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     MediaPlaybackStatusEnum status = static_cast<MediaPlaybackStatusEnum>(0);
 =======
     StatusEnumMediaPlayback status = static_cast<StatusEnumMediaPlayback>(0);
 >>>>>>> Reverting the changes to the zapt template files
+=======
+    MediaPlaybackStatusEnum status = static_cast<MediaPlaybackStatusEnum>(0);
+>>>>>>> Renaming StatusEnums with cluster name prefix
     Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -33931,10 +33947,14 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     KeypadInputStatusEnum status = static_cast<KeypadInputStatusEnum>(0);
 =======
     StatusEnumKeypadInput status = static_cast<StatusEnumKeypadInput>(0);
 >>>>>>> Reverting the changes to the zapt template files
+=======
+    KeypadInputStatusEnum status = static_cast<KeypadInputStatusEnum>(0);
+>>>>>>> Renaming StatusEnums with cluster name prefix
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -33950,10 +33970,14 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     KeypadInputStatusEnum status = static_cast<KeypadInputStatusEnum>(0);
 =======
     StatusEnumKeypadInput status = static_cast<StatusEnumKeypadInput>(0);
 >>>>>>> Reverting the changes to the zapt template files
+=======
+    KeypadInputStatusEnum status = static_cast<KeypadInputStatusEnum>(0);
+>>>>>>> Renaming StatusEnums with cluster name prefix
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SendKeyResponse
@@ -34320,10 +34344,14 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     ContentLaunchStatusEnum status = static_cast<ContentLaunchStatusEnum>(0);
 =======
     StatusEnumContentLauncher status = static_cast<StatusEnumContentLauncher>(0);
 >>>>>>> Reverting the changes to the zapt template files
+=======
+    ContentLaunchStatusEnum status = static_cast<ContentLaunchStatusEnum>(0);
+>>>>>>> Renaming StatusEnums with cluster name prefix
     Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -34340,10 +34368,14 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     ContentLaunchStatusEnum status = static_cast<ContentLaunchStatusEnum>(0);
 =======
     StatusEnumContentLauncher status = static_cast<StatusEnumContentLauncher>(0);
 >>>>>>> Reverting the changes to the zapt template files
+=======
+    ContentLaunchStatusEnum status = static_cast<ContentLaunchStatusEnum>(0);
+>>>>>>> Renaming StatusEnums with cluster name prefix
     Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -34870,10 +34902,14 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     ApplicationLauncherStatusEnum status = static_cast<ApplicationLauncherStatusEnum>(0);
 =======
     StatusEnumApplicationLauncher status = static_cast<StatusEnumApplicationLauncher>(0);
 >>>>>>> Reverting the changes to the zapt template files
+=======
+    ApplicationLauncherStatusEnum status = static_cast<ApplicationLauncherStatusEnum>(0);
+>>>>>>> Renaming StatusEnums with cluster name prefix
     chip::ByteSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -34890,10 +34926,14 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     ApplicationLauncherStatusEnum status = static_cast<ApplicationLauncherStatusEnum>(0);
 =======
     StatusEnumApplicationLauncher status = static_cast<StatusEnumApplicationLauncher>(0);
 >>>>>>> Reverting the changes to the zapt template files
+=======
+    ApplicationLauncherStatusEnum status = static_cast<ApplicationLauncherStatusEnum>(0);
+>>>>>>> Renaming StatusEnums with cluster name prefix
     chip::ByteSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

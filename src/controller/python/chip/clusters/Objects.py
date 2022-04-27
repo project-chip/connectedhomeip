@@ -31964,10 +31964,14 @@ class TargetNavigator(Cluster):
 
     class Enums:
 <<<<<<< HEAD
+<<<<<<< HEAD
         class TargetNavigatorStatusEnum(IntEnum):
 =======
         class StatusEnumTargetNavigator(IntEnum):
 >>>>>>> Changes for cleaner regen
+=======
+        class TargetNavigatorStatusEnum(IntEnum):
+>>>>>>> Renaming StatusEnums with cluster name prefix
             kSuccess = 0x00
             kTargetNotFound = 0x01
             kNotAllowed = 0x02
@@ -32018,6 +32022,7 @@ class TargetNavigator(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
 <<<<<<< HEAD
+<<<<<<< HEAD
                             ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=TargetNavigator.Enums.TargetNavigatorStatusEnum),
                             ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=typing.Optional[str]),
                     ])
@@ -32030,6 +32035,13 @@ class TargetNavigator(Cluster):
 
             status: 'TargetNavigator.Enums.StatusEnumTargetNavigator' = 0
 >>>>>>> Changes for cleaner regen
+=======
+                            ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=TargetNavigator.Enums.TargetNavigatorStatusEnum),
+                            ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=typing.Optional[str]),
+                    ])
+
+            status: 'TargetNavigator.Enums.TargetNavigatorStatusEnum' = 0
+>>>>>>> Renaming StatusEnums with cluster name prefix
             data: 'typing.Optional[str]' = None
 
 
@@ -32185,6 +32197,7 @@ class MediaPlayback(Cluster):
 
     class Enums:
 <<<<<<< HEAD
+<<<<<<< HEAD
         class MediaPlaybackStatusEnum(IntEnum):
 =======
         class PlaybackStateEnum(IntEnum):
@@ -32195,6 +32208,9 @@ class MediaPlayback(Cluster):
 
         class StatusEnumMediaPlayback(IntEnum):
 >>>>>>> Changes for cleaner regen
+=======
+        class MediaPlaybackStatusEnum(IntEnum):
+>>>>>>> Renaming StatusEnums with cluster name prefix
             kSuccess = 0x00
             kInvalidStateForCommand = 0x01
             kNotAllowed = 0x02
@@ -32371,6 +32387,7 @@ class MediaPlayback(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
 <<<<<<< HEAD
+<<<<<<< HEAD
                             ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatusEnum),
                             ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=typing.Optional[str]),
                     ])
@@ -32383,6 +32400,13 @@ class MediaPlayback(Cluster):
 
             status: 'MediaPlayback.Enums.StatusEnumMediaPlayback' = 0
 >>>>>>> Changes for cleaner regen
+=======
+                            ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatusEnum),
+                            ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=typing.Optional[str]),
+                    ])
+
+            status: 'MediaPlayback.Enums.MediaPlaybackStatusEnum' = 0
+>>>>>>> Renaming StatusEnums with cluster name prefix
             data: 'typing.Optional[str]' = None
 
         @dataclass
@@ -33064,10 +33088,14 @@ class KeypadInput(Cluster):
             kData = 0x76
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         class KeypadInputStatusEnum(IntEnum):
 =======
         class StatusEnumKeypadInput(IntEnum):
 >>>>>>> Changes for cleaner regen
+=======
+        class KeypadInputStatusEnum(IntEnum):
+>>>>>>> Renaming StatusEnums with cluster name prefix
             kSuccess = 0x00
             kUnsupportedKey = 0x01
             kInvalidKeyInCurrentState = 0x02
@@ -33101,6 +33129,7 @@ class KeypadInput(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
 <<<<<<< HEAD
+<<<<<<< HEAD
                             ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=KeypadInput.Enums.KeypadInputStatusEnum),
                     ])
 
@@ -33111,6 +33140,12 @@ class KeypadInput(Cluster):
 
             status: 'KeypadInput.Enums.StatusEnumKeypadInput' = 0
 >>>>>>> Changes for cleaner regen
+=======
+                            ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=KeypadInput.Enums.KeypadInputStatusEnum),
+                    ])
+
+            status: 'KeypadInput.Enums.KeypadInputStatusEnum' = 0
+>>>>>>> Renaming StatusEnums with cluster name prefix
 
 
     class Attributes:
@@ -33247,6 +33282,7 @@ class ContentLauncher(Cluster):
             kType = 0x0C
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         class StatusEnumContentLauncher(IntEnum):
             kSuccess = 0x00
@@ -33254,6 +33290,8 @@ class ContentLauncher(Cluster):
             kAuthFailed = 0x02
 
 >>>>>>> Changes for cleaner regen
+=======
+>>>>>>> Renaming StatusEnums with cluster name prefix
 
     class Structs:
         @dataclass
@@ -33398,6 +33436,7 @@ class ContentLauncher(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
 <<<<<<< HEAD
+<<<<<<< HEAD
                             ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ContentLauncher.Enums.ContentLaunchStatusEnum),
                             ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=typing.Optional[str]),
                     ])
@@ -33410,6 +33449,13 @@ class ContentLauncher(Cluster):
 
             status: 'ContentLauncher.Enums.StatusEnumContentLauncher' = 0
 >>>>>>> Changes for cleaner regen
+=======
+                            ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ContentLauncher.Enums.ContentLaunchStatusEnum),
+                            ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=typing.Optional[str]),
+                    ])
+
+            status: 'ContentLauncher.Enums.ContentLaunchStatusEnum' = 0
+>>>>>>> Renaming StatusEnums with cluster name prefix
             data: 'typing.Optional[str]' = None
 
 
@@ -33757,10 +33803,14 @@ class ApplicationLauncher(Cluster):
 
     class Enums:
 <<<<<<< HEAD
+<<<<<<< HEAD
         class ApplicationLauncherStatusEnum(IntEnum):
 =======
         class StatusEnumApplicationLauncher(IntEnum):
 >>>>>>> Changes for cleaner regen
+=======
+        class ApplicationLauncherStatusEnum(IntEnum):
+>>>>>>> Renaming StatusEnums with cluster name prefix
             kSuccess = 0x00
             kAppNotAvailable = 0x01
             kSystemBusy = 0x02
@@ -33854,6 +33904,7 @@ class ApplicationLauncher(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
 <<<<<<< HEAD
+<<<<<<< HEAD
                             ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ApplicationLauncher.Enums.ApplicationLauncherStatusEnum),
                             ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=bytes),
                     ])
@@ -33866,6 +33917,13 @@ class ApplicationLauncher(Cluster):
 
             status: 'ApplicationLauncher.Enums.StatusEnumApplicationLauncher' = 0
 >>>>>>> Changes for cleaner regen
+=======
+                            ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ApplicationLauncher.Enums.ApplicationLauncherStatusEnum),
+                            ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=bytes),
+                    ])
+
+            status: 'ApplicationLauncher.Enums.ApplicationLauncherStatusEnum' = 0
+>>>>>>> Renaming StatusEnums with cluster name prefix
             data: 'bytes' = b""
 
 
