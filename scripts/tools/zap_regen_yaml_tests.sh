@@ -23,4 +23,3 @@
 #
 
 ./scripts/tools/zap_regen_all.py --type tests
-
