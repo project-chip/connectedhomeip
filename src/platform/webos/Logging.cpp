@@ -35,7 +35,6 @@ namespace Platform {
  */
 void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
-    //  initialize_service_ls2_calls();
     struct timeval tv;
 
     // Should not fail per man page of gettimeofday(), but failed to get time is not a fatal error in log. The bad time value will
