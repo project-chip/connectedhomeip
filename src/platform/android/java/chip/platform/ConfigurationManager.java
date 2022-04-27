@@ -48,21 +48,15 @@ public interface ConfigurationManager {
   String kConfigKey_Spake2pVerifier = "verifier";
 
   // Keys stored in the Chip-config namespace
-  String kConfigKey_FabricId = "fabric-id";
   String kConfigKey_ServiceConfig = "service-config";
   String kConfigKey_PairedAccountId = "account-id";
   String kConfigKey_ServiceId = "service-id";
-  String kConfigKey_FabricSecret = "fabric-secret";
-  String kConfigKey_GroupKeyIndex = "group-key-index";
   String kConfigKey_LastUsedEpochKeyId = "last-ek-id";
   String kConfigKey_FailSafeArmed = "fail-safe-armed";
   String kConfigKey_WiFiStationSecType = "sta-sec-type";
   String kConfigKey_RegulatoryLocation = "regulatory-location";
   String kConfigKey_CountryCode = "country-code";
   String kConfigKey_Breadcrumb = "breadcrumb";
-
-  // Prefix used for NVS keys that contain Chip group encryption keys.
-  String kGroupKeyNamePrefix = "gk-";
 
   long readConfigValueLong(String namespace, String name) throws AndroidChipPlatformException;
 

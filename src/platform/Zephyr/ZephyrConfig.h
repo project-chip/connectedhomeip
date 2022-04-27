@@ -53,12 +53,9 @@ public:
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
     static const Key kConfigKey_SetupDiscriminator;
-    static const Key kConfigKey_FabricId;
     static const Key kConfigKey_ServiceConfig;
     static const Key kConfigKey_PairedAccountId;
     static const Key kConfigKey_ServiceId;
-    static const Key kConfigKey_FabricSecret;
-    static const Key kConfigKey_GroupKeyIndex;
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
     static const Key kConfigKey_RegulatoryLocation;
