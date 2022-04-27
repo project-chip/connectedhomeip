@@ -88,6 +88,7 @@ public:
 
     static const char kGroupKeyNamePrefix[];
 
+#if !CHIP_DISABLE_PLATFORM_KVS
     static CHIP_ERROR Init(void);
 
     // Config value accessors.
@@ -114,11 +115,7 @@ protected:
     // NVS Namespace helper functions.
     static CHIP_ERROR EnsureNamespace(const char * ns);
     static CHIP_ERROR ClearNamespace(const char * ns);
-
-private:
-    // TODO: This is temporary until Darwin implements a proper ReadConfigValue
-    static uint16_t mPosixSetupDiscriminator;
-    static char mPosixCountryCode[2 + 1];
+#endif // CHIP_DISABLE_PLATFORM_KVS
 };
 
 struct PosixConfig::Key

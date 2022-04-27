@@ -41,7 +41,6 @@ static NSString * const kErrorPersistentStorageInit = @"Init failure while creat
 static NSString * const kErrorAttestationTrustStoreInit = @"Init failure while creating the attestation trust store";
 static NSString * const kInfoFactoryShutdown = @"Shutting down the Matter controller factory";
 static NSString * const kErrorGroupProviderInit = @"Init failure while initializing group data provider";
-static NSString * const kErrorKVSInit = @"Init Key Value Store failure";
 static NSString * const kErrorControllersInit = @"Init controllers array failure";
 static NSString * const kErrorControllerFactoryInit = @"Init failure while initializing controller factory";
 
@@ -178,15 +177,6 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
         }
 
         [CHIPControllerAccessControl init];
-
-        if (startupParams.kvsPath != nil) {
-            // TODO: We should stop needing a KeyValueStoreManager on the client side, then remove this code.
-            CHIP_ERROR errorCode = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init([startupParams.kvsPath UTF8String]);
-            if (errorCode != CHIP_NO_ERROR) {
-                CHIP_LOG_ERROR("Error: %@", kErrorKVSInit);
-                return;
-            }
-        }
 
         _persistentStorageDelegateBridge = new CHIPPersistentStorageDelegateBridge(startupParams.storageDelegate);
         if (_persistentStorageDelegateBridge == nil) {
@@ -468,7 +458,6 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
     _paaCerts = nil;
     _port = nil;
     _startServer = NO;
-    _kvsPath = nil;
 
     return self;
 }
