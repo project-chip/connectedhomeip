@@ -38,8 +38,8 @@ chip_data_model("tv-casting-common") {
     "${chip_root}/third_party/inipp",
   ]
 
-  include_dirs = 
-    [ "${chip_root}/examples/tv-casting-app/tv-casting-common/include" ]
+  include_dirs =
+      [ "${chip_root}/examples/tv-casting-app/tv-casting-common/include" ]
 
   is_server = true
 }

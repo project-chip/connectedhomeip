@@ -38,8 +38,8 @@ executable("chip-tv-casting-app") {
     "${chip_root}/third_party/inipp",
   ]
 
-  include_dirs = 
-    [ "${chip_root}/examples/tv-casting-app/tv-casting-common/include" ]
+  include_dirs =
+      [ "${chip_root}/examples/tv-casting-app/tv-casting-common/include" ]
 
   cflags = [ "-Wconversion" ]
 
