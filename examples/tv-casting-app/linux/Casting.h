@@ -23,6 +23,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 
+chip::FabricIndex CurrentFabricIndex();
+CHIP_ERROR ProcessClusterCommand(int argc, char ** argv);
 CHIP_ERROR TargetVideoPlayerInfoInit(chip::NodeId nodeId, chip::FabricIndex fabricIndex);
 CHIP_ERROR DiscoverCommissioners();
 CHIP_ERROR RequestCommissioning(int index);

@@ -49,6 +49,9 @@ static CHIP_ERROR PrintAllCommands()
         sout,
         "  access <node>        Read and display clusters on each endpoint for <node>. Usage: cast access 0xFFFFFFEFFFFFFFFF\r\n");
     streamer_printf(sout, "  sendudc <address> <port> Send UDC message to address. Usage: cast sendudc ::1 5543\r\n");
+    streamer_printf(
+        sout,
+        "  cluster [clustercommand] Send cluster command. Usage: cast cluster keypadinput send-key 1 18446744004990074879 1\r\n");
     streamer_printf(sout, "\r\n");
 
     return CHIP_NO_ERROR;
@@ -119,6 +122,10 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         return SendUDC(chip::Transport::PeerAddress::UDP(commissioner, port));
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    if (strcmp(argv[0], "cluster") == 0)
+    {
+        return ProcessClusterCommand(argc, argv);
+    }
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
 

@@ -40,6 +40,11 @@
 #include <transport/raw/PeerAddress.h>
 #include <zap-generated/CHIPClusters.h>
 
+#include "commands/clusters/SubscriptionsCommands.h"
+#include "commands/common/Commands.h"
+#include "commands/example/ExampleCredentialIssuerCommands.h"
+#include <zap-generated/cluster/Commands.h>
+
 #if defined(ENABLE_CHIP_SHELL)
 #include "CastingShellCommands.h"
 #include <lib/shell/Engine.h>
@@ -157,7 +162,6 @@ void InitServer()
     {
         return;
     }
-    // DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init("/tmp/chip_tv_casting_kvs");
     DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 
     // Enter commissioning mode, open commissioning window
@@ -180,7 +184,7 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
 {
     InitServer();
 
-    Server::GetInstance().GetFabricTable().DeleteAllFabrics();
+    // Server::GetInstance().GetFabricTable().DeleteAllFabrics();
     ReturnOnFailure(
         Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(kCommissioningWindowTimeout));
 
@@ -369,14 +373,6 @@ public:
             return CHIP_ERROR_INVALID_FABRIC_ID;
         }
 
-        chip::DeviceProxyInitParams initParams = {
-            .sessionManager           = &(server->GetSecureSessionManager()),
-            .sessionResumptionStorage = server->GetSessionResumptionStorage(),
-            .exchangeMgr              = &(server->GetExchangeManager()),
-            .fabricTable              = &(server->GetFabricTable()),
-            .clientPool               = &gCASEClientPool,
-        };
-
         PeerId peerID = fabric->GetPeerIdForNode(nodeId);
 
         //
@@ -387,7 +383,6 @@ public:
         //       with that peer. If that is the case, our `OnConnected` callback will not get invoked syncronously and
         //       mOperationalDeviceProxy will still have a value of null, triggering the check below to fail.
         //
-        mOperationalDeviceProxy = nullptr;
         CHIP_ERROR err =
             server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnConnectedCallback, &mOnConnectionFailureCallback);
         if (err != CHIP_NO_ERROR)
@@ -505,6 +500,48 @@ private:
     bool mInitialized = false;
 };
 TargetVideoPlayerInfo gTargetVideoPlayerInfo;
+
+FabricIndex CurrentFabricIndex()
+{
+    return gTargetVideoPlayerInfo.GetFabricIndex();
+}
+
+void SetDefaultFabricIndex()
+{
+    InitServer();
+
+    // set fabric to be the first in the list
+    for (const auto & fb : chip::Server::GetInstance().GetFabricTable())
+    {
+        FabricIndex fabricIndex = fb.GetFabricIndex();
+        ChipLogError(AppServer, "Next Fabric index=%d", fabricIndex);
+        if (!fb.IsInitialized())
+        {
+            ChipLogError(AppServer, " -- Not initialized");
+            continue;
+        }
+        ChipLogProgress(NotSpecified,
+                        "---- Current Fabric nodeId=0x" ChipLogFormatX64 " fabricId=0x" ChipLogFormatX64 " fabricIndex=%d",
+                        ChipLogValueX64(fb.GetNodeId()), ChipLogValueX64(fb.GetFabricId()), fabricIndex);
+        gTargetVideoPlayerInfo.Initialize(fb.GetNodeId(), fabricIndex);
+        return;
+    }
+    ChipLogError(AppServer, " -- No initialized fabrics");
+}
+
+// For shell and command line processing of commands
+ExampleCredentialIssuerCommands credIssuerCommands;
+Commands commands;
+
+CHIP_ERROR ProcessClusterCommand(int argc, char ** argv)
+{
+    if (!gTargetVideoPlayerInfo.IsInitialized())
+    {
+        SetDefaultFabricIndex();
+    }
+    commands.Run(argc, argv);
+    return CHIP_NO_ERROR;
+}
 
 void OnDescriptorReadSuccessResponse(void * context, const app::DataModel::DecodableList<ClusterId> & responseList)
 {
@@ -704,11 +741,6 @@ int main(int argc, char * argv[])
         SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
     }
 
-    if (!chip::ArgParser::ParseArgs(argv[0], argc, argv, allOptions))
-    {
-        return 1;
-    }
-
     // Send discover commissioners request
     SuccessOrExit(err = gCommissionableNodeController.DiscoverCommissioners(gDiscoveryFilter));
 
@@ -719,6 +751,15 @@ int main(int argc, char * argv[])
 
     // Add callback to send Content casting commands after commissioning completes
     chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0);
+
+    registerClusters(commands, &credIssuerCommands);
+    registerClusterSubscriptions(commands, &credIssuerCommands);
+
+    if (argc > 1)
+    {
+        // if there are command-line arguments, then automatically start server
+        ProcessClusterCommand(argc, argv);
+    }
 
     DeviceLayer::PlatformMgr().RunEventLoop();
 exit:
