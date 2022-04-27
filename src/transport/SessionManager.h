@@ -158,8 +158,8 @@ public:
 
     // Test-only: create a session on the fly.
     CHIP_ERROR InjectPaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, NodeId peerNodeId,
-                                            uint16_t peerSessionId, FabricIndex fabric, const Transport::PeerAddress & peerAddress,
-                                            CryptoContext::SessionRole role);
+                                            uint16_t peerSessionId, FabricIndex fabricIndex,
+                                            const Transport::PeerAddress & peerAddress, CryptoContext::SessionRole role);
 
     /**
      * @brief

@@ -22,5 +22,4 @@
 #      rather than all of zap like `./scripts/tools/zap_regen_all.py
 #
 
-./scripts/tools/zap/generate.py src/controller/data_model/controller-clusters.zap \
-    -o zzz_generated/chip-tool/zap-generated -t examples/chip-tool/templates/templates.json
+./scripts/tools/zap_regen_all.py --type tests

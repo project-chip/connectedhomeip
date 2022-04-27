@@ -546,6 +546,7 @@ function getTests()
     'TestIdentifyCluster',
     'TestOperationalCredentialsCluster',
     'TestModeSelectCluster',
+    'TestSelfFabricRemoval',
     'TestSystemCommands',
     'TestBinding',
     'TestUserLabelCluster',

@@ -161,6 +161,10 @@ void CASESession::Clear()
     Crypto::ClearSecretData(mIPK);
 
     AbortExchange();
+
+    mLocalNodeId = kUndefinedNodeId;
+    mPeerNodeId  = kUndefinedNodeId;
+    mFabricInfo  = nullptr;
 }
 
 void CASESession::AbortExchange()
@@ -256,7 +260,11 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     mLocalMRPConfig = mrpConfig;
 
     mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
-    mPeerNodeId = peerNodeId;
+    mPeerNodeId  = peerNodeId;
+    mLocalNodeId = fabric->GetNodeId();
+
+    ChipLogProgress(SecureChannel, "Initiating session on local FabricIndex %u from 0x" ChipLogFormatX64 " -> 0x" ChipLogFormatX64,
+                    static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(mLocalNodeId), ChipLogValueX64(mPeerNodeId));
 
     err = SendSigma1();
     SuccessOrExit(err);
@@ -336,9 +344,13 @@ CHIP_ERROR CASESession::RecoverInitiatorIpk()
     size_t ipkIndex = (ipkKeySet.num_keys_used > 1) ? ((ipkKeySet.num_keys_used - 1) - 1) : 0;
     memcpy(&mIPK[0], ipkKeySet.epoch_keys[ipkIndex].key, sizeof(mIPK));
 
+    // Leaving this logging code for debug, but this cannot be enabled at runtime
+    // since it leaks private security material.
+#if 0
     ChipLogProgress(SecureChannel, "RecoverInitiatorIpk: GroupDataProvider %p, Got IPK for FabricIndex %u", mGroupDataProvider,
                     static_cast<unsigned>(mFabricInfo->GetFabricIndex()));
     ChipLogByteSpan(SecureChannel, ByteSpan(mIPK));
+#endif
 
     return CHIP_NO_ERROR;
 }
@@ -491,7 +503,8 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestionationId(const ByteSpan & destina
                 found = true;
                 MutableByteSpan ipkSpan(mIPK);
                 CopySpanToMutableSpan(candidateIpkSpan, ipkSpan);
-                mFabricInfo = &fabricInfo;
+                mFabricInfo  = &fabricInfo;
+                mLocalNodeId = nodeId;
                 break;
             }
         }
@@ -523,7 +536,8 @@ CHIP_ERROR CASESession::TryResumeSession(SessionResumptionStorage::ConstResumpti
     if (mFabricInfo == nullptr)
         return CHIP_ERROR_INTERNAL;
 
-    mPeerNodeId = node.GetNodeId();
+    mPeerNodeId  = node.GetNodeId();
+    mLocalNodeId = mFabricInfo->GetNodeId();
 
     return CHIP_NO_ERROR;
 }
@@ -569,11 +583,15 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
         return CHIP_NO_ERROR;
     }
 
+    // Attempt to match the initiator's desired destination based on local fabric table.
     err = FindLocalNodeFromDestionationId(destinationIdentifier, initiatorRandom);
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(SecureChannel, "CASE matched destination ID: fabricIndex %u, NodeID 0x" ChipLogFormatX64,
-                        static_cast<unsigned>(mFabricInfo->GetFabricIndex()), ChipLogValueX64(mFabricInfo->GetNodeId()));
+                        static_cast<unsigned>(mFabricInfo->GetFabricIndex()), ChipLogValueX64(mLocalNodeId));
+
+        // Side-effect of FindLocalNodeFromDestionationId success was that mFabricInfo/mLocalNodeId are now
+        // set to the local fabric and associated NodeId that was targeted by the initiator.
     }
     else
     {
