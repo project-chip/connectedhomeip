@@ -24,6 +24,8 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
+#include <app/util/mock/Constants.h>
+#include <app/util/mock/Functions.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVDebug.hpp>
@@ -109,17 +111,17 @@ void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuit
     AttributePathParams attributePathParams3;
 
     // Three concrete paths, no duplicates
-    attributePathParams1.mEndpointId  = 1;
-    attributePathParams1.mClusterId   = 1;
-    attributePathParams1.mAttributeId = 1;
+    attributePathParams1.mEndpointId  = Test::kMockEndpoint3;
+    attributePathParams1.mClusterId   = Test::MockClusterId(2);
+    attributePathParams1.mAttributeId = Test::MockAttributeId(1);
 
-    attributePathParams2.mEndpointId  = 2;
-    attributePathParams2.mClusterId   = 1;
-    attributePathParams2.mAttributeId = 1;
+    attributePathParams2.mEndpointId  = Test::kMockEndpoint3;
+    attributePathParams2.mClusterId   = Test::MockClusterId(2);
+    attributePathParams2.mAttributeId = Test::MockAttributeId(2);
 
-    attributePathParams3.mEndpointId  = 3;
-    attributePathParams3.mClusterId   = 1;
-    attributePathParams3.mAttributeId = 1;
+    attributePathParams3.mEndpointId  = Test::kMockEndpoint3;
+    attributePathParams3.mClusterId   = Test::MockClusterId(2);
+    attributePathParams3.mAttributeId = Test::MockAttributeId(3);
 
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
@@ -129,16 +131,16 @@ void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuit
     InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
 
     attributePathParams1.mEndpointId  = kInvalidEndpointId;
-    attributePathParams1.mClusterId   = 1;
-    attributePathParams1.mAttributeId = 1;
+    attributePathParams1.mClusterId   = kInvalidClusterId;
+    attributePathParams1.mAttributeId = kInvalidAttributeId;
 
-    attributePathParams2.mEndpointId  = 2;
-    attributePathParams2.mClusterId   = 1;
-    attributePathParams2.mAttributeId = 1;
+    attributePathParams2.mEndpointId  = Test::kMockEndpoint3;
+    attributePathParams2.mClusterId   = Test::MockClusterId(2);
+    attributePathParams2.mAttributeId = Test::MockAttributeId(2);
 
-    attributePathParams3.mEndpointId  = 3;
-    attributePathParams3.mClusterId   = 1;
-    attributePathParams3.mAttributeId = 1;
+    attributePathParams3.mEndpointId  = Test::kMockEndpoint3;
+    attributePathParams3.mClusterId   = Test::MockClusterId(2);
+    attributePathParams3.mAttributeId = Test::MockAttributeId(3);
 
     // 1st path is wildcard endpoint, 2nd, 3rd paths are concrete paths, the concrete ones would be removed.
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
@@ -164,17 +166,17 @@ void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuit
     NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 1);
     InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
 
-    attributePathParams1.mEndpointId  = 1;
-    attributePathParams1.mClusterId   = 1;
+    attributePathParams1.mEndpointId  = Test::kMockEndpoint3;
+    attributePathParams1.mClusterId   = Test::MockClusterId(2);
     attributePathParams1.mAttributeId = kInvalidAttributeId;
 
-    attributePathParams2.mEndpointId  = 1;
-    attributePathParams2.mClusterId   = 2;
-    attributePathParams2.mAttributeId = 1;
+    attributePathParams2.mEndpointId  = Test::kMockEndpoint2;
+    attributePathParams2.mClusterId   = Test::MockClusterId(2);
+    attributePathParams2.mAttributeId = Test::MockAttributeId(2);
 
-    attributePathParams3.mEndpointId  = 1;
-    attributePathParams3.mClusterId   = 2;
-    attributePathParams3.mAttributeId = 2;
+    attributePathParams3.mEndpointId  = Test::kMockEndpoint2;
+    attributePathParams3.mClusterId   = Test::MockClusterId(2);
+    attributePathParams3.mAttributeId = Test::MockAttributeId(3);
 
     // 1st is wildcard one, but not intersect with the latter two concrete paths, so the paths in total are 3 finally
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
@@ -188,13 +190,13 @@ void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuit
     attributePathParams1.mClusterId   = kInvalidClusterId;
     attributePathParams1.mAttributeId = kInvalidAttributeId;
 
-    attributePathParams2.mEndpointId  = 1;
+    attributePathParams2.mEndpointId  = Test::kMockEndpoint3;
     attributePathParams2.mClusterId   = kInvalidClusterId;
     attributePathParams2.mAttributeId = kInvalidAttributeId;
 
     attributePathParams3.mEndpointId  = kInvalidEndpointId;
     attributePathParams3.mClusterId   = kInvalidClusterId;
-    attributePathParams3.mAttributeId = 1;
+    attributePathParams3.mAttributeId = Test::MockAttributeId(3);
 
     // Wildcards cannot be deduplicated.
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
@@ -202,6 +204,21 @@ void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuit
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
     InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
     NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 3);
+    InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
+
+    attributePathParams1.mEndpointId  = kInvalidEndpointId;
+    attributePathParams1.mClusterId   = Test::MockClusterId(2);
+    attributePathParams1.mAttributeId = Test::MockAttributeId(10);
+
+    attributePathParams2.mEndpointId  = Test::kMockEndpoint3;
+    attributePathParams2.mClusterId   = Test::MockClusterId(2);
+    attributePathParams2.mAttributeId = Test::MockAttributeId(10);
+
+    // 1st path is wildcard endpoint, 2nd path is invalid attribute
+    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
+    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
+    InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
+    NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 2);
     InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
 }
 
