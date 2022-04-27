@@ -72,10 +72,10 @@ public:
 
     // TODO: This constructor should be private.  Tests should allocate a
     // kPending session and then call Activate(), just like non-test code does.
-    SecureSession(Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId, NodeId localNodeId, CATValues peerCATs,
+    SecureSession(Type secureSessionType, uint16_t localSessionId, NodeId localNodeId, NodeId peerNodeId, CATValues peerCATs,
                   uint16_t peerSessionId, FabricIndex fabric, const ReliableMessageProtocolConfig & config) :
         mSecureSessionType(secureSessionType),
-        mPeerNodeId(peerNodeId), mLocalNodeId(localNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId),
+        mLocalSessionId(localSessionId), mLocalNodeId(localNodeId), mPeerNodeId(peerNodeId), mPeerCATs(peerCATs),
         mPeerSessionId(peerSessionId), mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()),
         mLastPeerActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
     {
@@ -208,10 +208,10 @@ public:
 
 private:
     Type mSecureSessionType;
-    NodeId mPeerNodeId;
-    NodeId mLocalNodeId;
-    CATValues mPeerCATs;
     const uint16_t mLocalSessionId;
+    NodeId mLocalNodeId;
+    NodeId mPeerNodeId;
+    CATValues mPeerCATs;
     uint16_t mPeerSessionId;
 
     PeerAddress mPeerAddress;
