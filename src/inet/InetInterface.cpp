@@ -30,6 +30,7 @@
 #include <inet/InetInterface.h>
 
 #include <inet/IPPrefix.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
@@ -506,11 +507,11 @@ static void backport_if_freenameindex(struct if_nameindex * inArray)
     {
         if (inArray[i].if_name != NULL)
         {
-            free(inArray[i].if_name);
+            MemoryFree(inArray[i].if_name);
         }
     }
 
-    free(inArray);
+    MemoryFree(inArray);
 }
 
 static struct if_nameindex * backport_if_nameindex(void)
@@ -542,7 +543,7 @@ static struct if_nameindex * backport_if_nameindex(void)
         lastIntfName = addrIter->ifa_name;
     }
 
-    tmpval = (struct if_nameindex *) malloc((numIntf + 1) * sizeof(struct if_nameindex));
+    tmpval = (struct if_nameindex *) MemoryAlloc((numIntf + 1) * sizeof(struct if_nameindex));
     VerifyOrExit(tmpval != NULL, );
     memset(tmpval, 0, (numIntf + 1) * sizeof(struct if_nameindex));
 
@@ -574,7 +575,7 @@ static struct if_nameindex * backport_if_nameindex(void)
         }
     }
 
-    retval = (struct if_nameindex *) malloc((maxIntfNum + 1) * sizeof(struct if_nameindex));
+    retval = (struct if_nameindex *) MemoryAlloc((maxIntfNum + 1) * sizeof(struct if_nameindex));
     VerifyOrExit(retval != NULL, );
     memset(retval, 0, (maxIntfNum + 1) * sizeof(struct if_nameindex));
 
@@ -614,7 +615,7 @@ static struct if_nameindex * backport_if_nameindex(void)
 exit:
     if (tmpval != NULL)
     {
-        free(tmpval);
+        MemoryFree(tmpval);
     }
 
     if (addrList != NULL)

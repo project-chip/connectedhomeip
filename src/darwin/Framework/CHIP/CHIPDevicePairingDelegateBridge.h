@@ -40,8 +40,8 @@ public:
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
 
 private:
-    id<CHIPDevicePairingDelegate> mDelegate;
-    dispatch_queue_t mQueue;
+    _Nullable id<CHIPDevicePairingDelegate> mDelegate;
+    _Nullable dispatch_queue_t mQueue;
 
     CHIPPairingStatus MapStatus(chip::Controller::DevicePairingDelegate::Status status);
 };

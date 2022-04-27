@@ -41,7 +41,6 @@ static NSString * const kErrorPersistentStorageInit = @"Init failure while creat
 static NSString * const kErrorAttestationTrustStoreInit = @"Init failure while creating the attestation trust store";
 static NSString * const kInfoFactoryShutdown = @"Shutting down the Matter controller factory";
 static NSString * const kErrorGroupProviderInit = @"Init failure while initializing group data provider";
-static NSString * const kErrorKVSInit = @"Init Key Value Store failure";
 static NSString * const kErrorControllersInit = @"Init controllers array failure";
 static NSString * const kErrorControllerFactoryInit = @"Init failure while initializing controller factory";
 
@@ -87,11 +86,6 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
         return nil;
     }
 
-    _attestationTrustStoreBridge = new CHIPAttestationTrustStoreBridge();
-    if ([self checkForInitError:(_attestationTrustStoreBridge != nullptr) logMsg:kErrorAttestationTrustStoreInit]) {
-        return nil;
-    }
-
     _groupStorageDelegate = new chip::TestPersistentStorageDelegate();
     if ([self checkForInitError:(_groupStorageDelegate != nullptr) logMsg:kErrorGroupProviderInit]) {
         return nil;
@@ -119,7 +113,8 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
 
 - (void)dealloc
 {
-    [self cleanupOwnedObjects];
+    [self shutdown];
+    [self cleanupInitObjects];
 }
 
 - (BOOL)checkForInitError:(BOOL)condition logMsg:(NSString *)logMsg
@@ -130,12 +125,12 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
 
     CHIP_LOG_ERROR("Error: %@", logMsg);
 
-    [self cleanupOwnedObjects];
+    [self cleanupInitObjects];
 
     return YES;
 }
 
-- (void)cleanupOwnedObjects
+- (void)cleanupInitObjects
 {
     _controllers = nil;
 
@@ -150,6 +145,11 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
         _groupStorageDelegate = nullptr;
     }
 
+    Platform::MemoryShutdown();
+}
+
+- (void)cleanupStartupObjects
+{
     if (_attestationTrustStoreBridge) {
         delete _attestationTrustStoreBridge;
         _attestationTrustStoreBridge = nullptr;
@@ -159,8 +159,6 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
         delete _persistentStorageDelegateBridge;
         _persistentStorageDelegateBridge = nullptr;
     }
-
-    Platform::MemoryShutdown();
 }
 
 - (BOOL)startup:(MatterControllerFactoryParams *)startupParams
@@ -179,15 +177,6 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
 
         [CHIPControllerAccessControl init];
 
-        if (startupParams.kvsPath != nil) {
-            // TODO: We should stop needing a KeyValueStoreManager on the client side, then remove this code.
-            CHIP_ERROR errorCode = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init([startupParams.kvsPath UTF8String]);
-            if (errorCode != CHIP_NO_ERROR) {
-                CHIP_LOG_ERROR("Error: %@", kErrorKVSInit);
-                return;
-            }
-        }
-
         _persistentStorageDelegateBridge = new CHIPPersistentStorageDelegateBridge(startupParams.storageDelegate);
         if (_persistentStorageDelegateBridge == nil) {
             CHIP_LOG_ERROR("Error: %@", kErrorPersistentStorageInit);
@@ -196,7 +185,11 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
 
         // Initialize device attestation verifier
         if (startupParams.paaCerts) {
-            _attestationTrustStoreBridge->Init(startupParams.paaCerts);
+            _attestationTrustStoreBridge = new CHIPAttestationTrustStoreBridge(startupParams.paaCerts);
+            if (_attestationTrustStoreBridge == nullptr) {
+                CHIP_LOG_ERROR("Error: %@", kErrorAttestationTrustStoreInit);
+                return;
+            }
             chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(_attestationTrustStoreBridge));
         } else {
             // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
@@ -226,6 +219,10 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
     // Make sure to stop the event loop again before returning, so we are not running it while we don't have any controllers.
     DeviceLayer::PlatformMgrImpl().StopEventLoopTask();
 
+    if (![self isRunning]) {
+        [self cleanupStartupObjects];
+    }
+
     return [self isRunning];
 }
 
@@ -242,13 +239,10 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
     CHIP_LOG_DEBUG("%@", kInfoFactoryShutdown);
     _controllerFactory->Shutdown();
 
-    if (_persistentStorageDelegateBridge) {
-        delete _persistentStorageDelegateBridge;
-        _persistentStorageDelegateBridge = nullptr;
-    }
+    [self cleanupStartupObjects];
 
-    // NOTE: we do not call cleanupOwnedObjects because we can be restarted, and
-    // that does not re-create the owned objects that we create inside init.
+    // NOTE: we do not call cleanupInitObjects because we can be restarted, and
+    // that does not re-create the objects that we create inside init.
     // Maybe we should be creating them in startup?
 
     _isRunning = NO;
@@ -468,7 +462,6 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
     _paaCerts = nil;
     _port = nil;
     _startServer = NO;
-    _kvsPath = nil;
 
     return self;
 }

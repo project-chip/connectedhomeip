@@ -106,7 +106,6 @@ bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandle
         return false;
     }
     ModeSelect::Attributes::CurrentMode::Set(endpointId, newMode);
-    // TODO: Implement application logic
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: ChangeToMode successful");
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);

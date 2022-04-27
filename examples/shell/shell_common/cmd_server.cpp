@@ -172,8 +172,9 @@ static CHIP_ERROR CmdAppServerClusters(int argc, char ** argv)
 
     for (int i = 0; i < emberAfEndpointCount(); i++)
     {
-        EndpointId endpoint   = emberAfEndpointFromIndex(i);
-        uint16_t clusterCount = emberAfClusterCount(endpoint, server);
+        EndpointId endpoint = emberAfEndpointFromIndex(i);
+
+        uint8_t clusterCount = emberAfClusterCount(endpoint, server);
 
         streamer_printf(streamer_get(), "Endpoint %d:\r\n", endpoint);
 

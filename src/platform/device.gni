@@ -143,6 +143,15 @@ if (chip_device_platform != "external") {
   }
 }
 
+declare_args() {
+  # If true, disables KVS implementation for the platform.  May not be
+  # supported on all platforms.
+  chip_disable_platform_kvs = false
+}
+
+assert(chip_disable_platform_kvs == false || chip_device_platform == "darwin",
+       "Can only disable KVS on some platforms")
+
 if (_chip_device_layer != "none" && chip_device_platform != "external") {
   chip_ble_platform_config_include =
       "<platform/" + _chip_device_layer + "/BlePlatformConfig.h>"

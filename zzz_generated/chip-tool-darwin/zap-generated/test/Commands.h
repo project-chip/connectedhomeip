@@ -179,8 +179,6 @@ public:
         printf("TestConstraints\n");
         printf("TestDelayCommands\n");
         printf("TestDescriptorCluster\n");
-        printf("TestBasicInformation\n");
-        printf("TestGeneralCommissioning\n");
         printf("TestGroupsCluster\n");
         printf("TestGroupKeyManagementCluster\n");
         printf("TestIdentifyCluster\n");
@@ -205,6 +203,7 @@ public:
 
 class TestAccessControlCluster : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestAccessControlCluster()
         : TestCommandBridge("TestAccessControlCluster")
         , mTestIndex(0)
@@ -214,6 +213,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestAccessControlCluster() {}
 
@@ -1914,6 +1914,7 @@ private:
 
 class Test_TC_BI_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_BI_1_1()
         : TestCommandBridge("Test_TC_BI_1_1")
         , mTestIndex(0)
@@ -1923,6 +1924,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_BI_1_1() {}
 
@@ -2163,6 +2165,7 @@ private:
 
 class Test_TC_BI_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_BI_2_1()
         : TestCommandBridge("Test_TC_BI_2_1")
         , mTestIndex(0)
@@ -2172,6 +2175,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_BI_2_1() {}
 
@@ -2534,6 +2538,7 @@ private:
 
 class Test_TC_BI_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_BI_2_2()
         : TestCommandBridge("Test_TC_BI_2_2")
         , mTestIndex(0)
@@ -2543,6 +2548,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_BI_2_2() {}
 
@@ -2859,6 +2865,7 @@ private:
 
 class Test_TC_BOOL_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_BOOL_1_1()
         : TestCommandBridge("Test_TC_BOOL_1_1")
         , mTestIndex(0)
@@ -2868,6 +2875,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_BOOL_1_1() {}
 
@@ -3042,6 +3050,7 @@ private:
 
 class Test_TC_BOOL_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_BOOL_2_1()
         : TestCommandBridge("Test_TC_BOOL_2_1")
         , mTestIndex(0)
@@ -3051,6 +3060,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_BOOL_2_1() {}
 
@@ -3159,6 +3169,7 @@ private:
 
 class Test_TC_BRAC_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_BRAC_1_1()
         : TestCommandBridge("Test_TC_BRAC_1_1")
         , mTestIndex(0)
@@ -3168,6 +3179,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_BRAC_1_1() {}
 
@@ -3342,6 +3354,7 @@ private:
 
 class Test_TC_CC_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_1_1()
         : TestCommandBridge("Test_TC_CC_1_1")
         , mTestIndex(0)
@@ -3351,6 +3364,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_1_1() {}
 
@@ -3481,6 +3495,7 @@ private:
 
 class Test_TC_CC_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_2_1()
         : TestCommandBridge("Test_TC_CC_2_1")
         , mTestIndex(0)
@@ -3490,6 +3505,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_2_1() {}
 
@@ -7343,6 +7359,7 @@ private:
 
 class Test_TC_CC_3_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_3_1()
         : TestCommandBridge("Test_TC_CC_3_1")
         , mTestIndex(0)
@@ -7352,6 +7369,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_3_1() {}
 
@@ -7647,6 +7665,7 @@ private:
 
 class Test_TC_CC_3_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_3_2()
         : TestCommandBridge("Test_TC_CC_3_2")
         , mTestIndex(0)
@@ -7656,6 +7675,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_3_2() {}
 
@@ -7918,6 +7938,7 @@ private:
 
 class Test_TC_CC_3_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_3_3()
         : TestCommandBridge("Test_TC_CC_3_3")
         , mTestIndex(0)
@@ -7927,6 +7948,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_3_3() {}
 
@@ -8137,6 +8159,7 @@ private:
 
 class Test_TC_CC_4_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_4_1()
         : TestCommandBridge("Test_TC_CC_4_1")
         , mTestIndex(0)
@@ -8146,6 +8169,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_4_1() {}
 
@@ -8327,6 +8351,7 @@ private:
 
 class Test_TC_CC_4_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_4_2()
         : TestCommandBridge("Test_TC_CC_4_2")
         , mTestIndex(0)
@@ -8336,6 +8361,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_4_2() {}
 
@@ -8652,6 +8678,7 @@ private:
 
 class Test_TC_CC_4_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_4_3()
         : TestCommandBridge("Test_TC_CC_4_3")
         , mTestIndex(0)
@@ -8661,6 +8688,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_4_3() {}
 
@@ -8871,6 +8899,7 @@ private:
 
 class Test_TC_CC_4_4 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_4_4()
         : TestCommandBridge("Test_TC_CC_4_4")
         , mTestIndex(0)
@@ -8880,6 +8909,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_4_4() {}
 
@@ -9062,6 +9092,7 @@ private:
 
 class Test_TC_CC_5_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_5_1()
         : TestCommandBridge("Test_TC_CC_5_1")
         , mTestIndex(0)
@@ -9071,6 +9102,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_5_1() {}
 
@@ -9253,6 +9285,7 @@ private:
 
 class Test_TC_CC_5_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_5_2()
         : TestCommandBridge("Test_TC_CC_5_2")
         , mTestIndex(0)
@@ -9262,6 +9295,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_5_2() {}
 
@@ -9468,6 +9502,7 @@ private:
 
 class Test_TC_CC_5_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_5_3()
         : TestCommandBridge("Test_TC_CC_5_3")
         , mTestIndex(0)
@@ -9477,6 +9512,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_5_3() {}
 
@@ -9659,6 +9695,7 @@ private:
 
 class Test_TC_CC_6_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_6_1()
         : TestCommandBridge("Test_TC_CC_6_1")
         , mTestIndex(0)
@@ -9668,6 +9705,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_6_1() {}
 
@@ -9849,6 +9887,7 @@ private:
 
 class Test_TC_CC_6_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_6_2()
         : TestCommandBridge("Test_TC_CC_6_2")
         , mTestIndex(0)
@@ -9858,6 +9897,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_6_2() {}
 
@@ -10215,6 +10255,7 @@ private:
 
 class Test_TC_CC_6_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_6_3()
         : TestCommandBridge("Test_TC_CC_6_3")
         , mTestIndex(0)
@@ -10224,6 +10265,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_6_3() {}
 
@@ -10438,6 +10480,7 @@ private:
 
 class Test_TC_CC_7_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_7_1()
         : TestCommandBridge("Test_TC_CC_7_1")
         , mTestIndex(0)
@@ -10447,6 +10490,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_7_1() {}
 
@@ -10741,6 +10785,7 @@ private:
 
 class Test_TC_CC_7_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_7_2()
         : TestCommandBridge("Test_TC_CC_7_2")
         , mTestIndex(0)
@@ -10750,6 +10795,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_7_2() {}
 
@@ -11041,6 +11087,7 @@ private:
 
 class Test_TC_CC_7_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_7_3()
         : TestCommandBridge("Test_TC_CC_7_3")
         , mTestIndex(0)
@@ -11050,6 +11097,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_7_3() {}
 
@@ -11260,6 +11308,7 @@ private:
 
 class Test_TC_CC_7_4 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_7_4()
         : TestCommandBridge("Test_TC_CC_7_4")
         , mTestIndex(0)
@@ -11269,6 +11318,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_7_4() {}
 
@@ -11451,6 +11501,7 @@ private:
 
 class Test_TC_CC_8_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_8_1()
         : TestCommandBridge("Test_TC_CC_8_1")
         , mTestIndex(0)
@@ -11460,6 +11511,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_8_1() {}
 
@@ -11943,6 +11995,7 @@ private:
 
 class Test_TC_CC_9_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_9_1()
         : TestCommandBridge("Test_TC_CC_9_1")
         , mTestIndex(0)
@@ -11952,6 +12005,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_9_1() {}
 
@@ -13635,6 +13689,7 @@ private:
 
 class Test_TC_CC_9_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_9_2()
         : TestCommandBridge("Test_TC_CC_9_2")
         , mTestIndex(0)
@@ -13644,6 +13699,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_9_2() {}
 
@@ -14269,6 +14325,7 @@ private:
 
 class Test_TC_CC_9_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_9_3()
         : TestCommandBridge("Test_TC_CC_9_3")
         , mTestIndex(0)
@@ -14278,6 +14335,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_9_3() {}
 
@@ -14903,6 +14961,7 @@ private:
 
 class Test_TC_DD_1_5 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DD_1_5()
         : TestCommandBridge("Test_TC_DD_1_5")
         , mTestIndex(0)
@@ -14912,6 +14971,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DD_1_5() {}
 
@@ -14973,6 +15033,7 @@ private:
 
 class Test_TC_DD_1_6 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DD_1_6()
         : TestCommandBridge("Test_TC_DD_1_6")
         , mTestIndex(0)
@@ -14982,6 +15043,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DD_1_6() {}
 
@@ -15063,6 +15125,7 @@ private:
 
 class Test_TC_DD_1_7 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DD_1_7()
         : TestCommandBridge("Test_TC_DD_1_7")
         , mTestIndex(0)
@@ -15072,6 +15135,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DD_1_7() {}
 
@@ -15143,6 +15207,7 @@ private:
 
 class Test_TC_DD_1_8 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DD_1_8()
         : TestCommandBridge("Test_TC_DD_1_8")
         , mTestIndex(0)
@@ -15152,6 +15217,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DD_1_8() {}
 
@@ -15222,6 +15288,7 @@ private:
 
 class Test_TC_DD_1_9 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DD_1_9()
         : TestCommandBridge("Test_TC_DD_1_9")
         , mTestIndex(0)
@@ -15231,6 +15298,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DD_1_9() {}
 
@@ -15311,6 +15379,7 @@ private:
 
 class Test_TC_DM_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DM_1_1()
         : TestCommandBridge("Test_TC_DM_1_1")
         , mTestIndex(0)
@@ -15320,6 +15389,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DM_1_1() {}
 
@@ -15865,6 +15935,7 @@ private:
 
 class Test_TC_DM_3_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DM_3_1()
         : TestCommandBridge("Test_TC_DM_3_1")
         , mTestIndex(0)
@@ -15874,6 +15945,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DM_3_1() {}
 
@@ -15992,6 +16064,7 @@ private:
 
 class Test_TC_DL_1_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DL_1_3()
         : TestCommandBridge("Test_TC_DL_1_3")
         , mTestIndex(0)
@@ -16001,6 +16074,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DL_1_3() {}
 
@@ -16273,6 +16347,7 @@ private:
 
 class Test_TC_EMR_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_EMR_1_1()
         : TestCommandBridge("Test_TC_EMR_1_1")
         , mTestIndex(0)
@@ -16282,6 +16357,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_EMR_1_1() {}
 
@@ -16474,6 +16550,7 @@ private:
 
 class Test_TC_ETHDIAG_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_ETHDIAG_1_1()
         : TestCommandBridge("Test_TC_ETHDIAG_1_1")
         , mTestIndex(0)
@@ -16483,6 +16560,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_ETHDIAG_1_1() {}
 
@@ -16766,6 +16844,7 @@ private:
 
 class Test_TC_ETHDIAG_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_ETHDIAG_2_1()
         : TestCommandBridge("Test_TC_ETHDIAG_2_1")
         , mTestIndex(0)
@@ -16775,6 +16854,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_ETHDIAG_2_1() {}
 
@@ -16835,6 +16915,7 @@ private:
 
 class Test_TC_FLW_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_FLW_1_1()
         : TestCommandBridge("Test_TC_FLW_1_1")
         , mTestIndex(0)
@@ -16844,6 +16925,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_FLW_1_1() {}
 
@@ -16974,6 +17056,7 @@ private:
 
 class Test_TC_FLW_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_FLW_2_1()
         : TestCommandBridge("Test_TC_FLW_2_1")
         , mTestIndex(0)
@@ -16983,6 +17066,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_FLW_2_1() {}
 
@@ -17368,6 +17452,7 @@ private:
 
 class Test_TC_FLW_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_FLW_2_2()
         : TestCommandBridge("Test_TC_FLW_2_2")
         , mTestIndex(0)
@@ -17377,6 +17462,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_FLW_2_2() {}
 
@@ -17481,6 +17567,7 @@ private:
 
 class Test_TC_GC_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_GC_1_1()
         : TestCommandBridge("Test_TC_GC_1_1")
         , mTestIndex(0)
@@ -17490,6 +17577,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_GC_1_1() {}
 
@@ -17692,6 +17780,7 @@ private:
 
 class Test_TC_ILL_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_ILL_1_1()
         : TestCommandBridge("Test_TC_ILL_1_1")
         , mTestIndex(0)
@@ -17701,6 +17790,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_ILL_1_1() {}
 
@@ -17857,6 +17947,7 @@ private:
 
 class Test_TC_ILL_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_ILL_2_1()
         : TestCommandBridge("Test_TC_ILL_2_1")
         , mTestIndex(0)
@@ -17866,6 +17957,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_ILL_2_1() {}
 
@@ -18043,6 +18135,7 @@ private:
 
 class Test_TC_I_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_I_1_1()
         : TestCommandBridge("Test_TC_I_1_1")
         , mTestIndex(0)
@@ -18052,6 +18145,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_I_1_1() {}
 
@@ -18200,6 +18294,7 @@ private:
 
 class Test_TC_I_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_I_2_1()
         : TestCommandBridge("Test_TC_I_2_1")
         , mTestIndex(0)
@@ -18209,6 +18304,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_I_2_1() {}
 
@@ -18320,6 +18416,7 @@ private:
 
 class Test_TC_I_2_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_I_2_3()
         : TestCommandBridge("Test_TC_I_2_3")
         , mTestIndex(0)
@@ -18329,6 +18426,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_I_2_3() {}
 
@@ -18791,6 +18889,7 @@ private:
 
 class Test_TC_LVL_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_LVL_1_1()
         : TestCommandBridge("Test_TC_LVL_1_1")
         , mTestIndex(0)
@@ -18800,6 +18899,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_LVL_1_1() {}
 
@@ -19119,6 +19219,7 @@ private:
 
 class Test_TC_LVL_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_LVL_2_1()
         : TestCommandBridge("Test_TC_LVL_2_1")
         , mTestIndex(0)
@@ -19128,6 +19229,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_LVL_2_1() {}
 
@@ -19551,6 +19653,7 @@ private:
 
 class Test_TC_LVL_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_LVL_2_2()
         : TestCommandBridge("Test_TC_LVL_2_2")
         , mTestIndex(0)
@@ -19560,6 +19663,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_LVL_2_2() {}
 
@@ -20010,6 +20114,7 @@ private:
 
 class Test_TC_LVL_3_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_LVL_3_1()
         : TestCommandBridge("Test_TC_LVL_3_1")
         , mTestIndex(0)
@@ -20019,6 +20124,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_LVL_3_1() {}
 
@@ -20393,6 +20499,7 @@ private:
 
 class Test_TC_LVL_4_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_LVL_4_1()
         : TestCommandBridge("Test_TC_LVL_4_1")
         , mTestIndex(0)
@@ -20402,6 +20509,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_LVL_4_1() {}
 
@@ -20808,6 +20916,7 @@ private:
 
 class Test_TC_LVL_5_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_LVL_5_1()
         : TestCommandBridge("Test_TC_LVL_5_1")
         , mTestIndex(0)
@@ -20817,6 +20926,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_LVL_5_1() {}
 
@@ -21148,6 +21258,7 @@ private:
 
 class Test_TC_LVL_6_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_LVL_6_1()
         : TestCommandBridge("Test_TC_LVL_6_1")
         , mTestIndex(0)
@@ -21157,6 +21268,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_LVL_6_1() {}
 
@@ -21452,6 +21564,7 @@ private:
 
 class Test_TC_MC_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_1()
         : TestCommandBridge("Test_TC_MC_1_1")
         , mTestIndex(0)
@@ -21461,6 +21574,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_1() {}
 
@@ -21591,6 +21705,7 @@ private:
 
 class Test_TC_MC_1_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_2()
         : TestCommandBridge("Test_TC_MC_1_2")
         , mTestIndex(0)
@@ -21600,6 +21715,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_2() {}
 
@@ -21730,6 +21846,7 @@ private:
 
 class Test_TC_MC_1_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_3()
         : TestCommandBridge("Test_TC_MC_1_3")
         , mTestIndex(0)
@@ -21739,6 +21856,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_3() {}
 
@@ -21875,6 +21993,7 @@ private:
 
 class Test_TC_MC_1_4 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_4()
         : TestCommandBridge("Test_TC_MC_1_4")
         , mTestIndex(0)
@@ -21884,6 +22003,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_4() {}
 
@@ -22014,6 +22134,7 @@ private:
 
 class Test_TC_MC_1_5 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_5()
         : TestCommandBridge("Test_TC_MC_1_5")
         , mTestIndex(0)
@@ -22023,6 +22144,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_5() {}
 
@@ -22153,6 +22275,7 @@ private:
 
 class Test_TC_MC_1_6 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_6()
         : TestCommandBridge("Test_TC_MC_1_6")
         , mTestIndex(0)
@@ -22162,6 +22285,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_6() {}
 
@@ -22292,6 +22416,7 @@ private:
 
 class Test_TC_MC_1_7 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_7()
         : TestCommandBridge("Test_TC_MC_1_7")
         , mTestIndex(0)
@@ -22301,6 +22426,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_7() {}
 
@@ -22431,6 +22557,7 @@ private:
 
 class Test_TC_MC_1_8 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_8()
         : TestCommandBridge("Test_TC_MC_1_8")
         , mTestIndex(0)
@@ -22440,6 +22567,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_8() {}
 
@@ -22570,6 +22698,7 @@ private:
 
 class Test_TC_MC_1_9 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_9()
         : TestCommandBridge("Test_TC_MC_1_9")
         , mTestIndex(0)
@@ -22579,6 +22708,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_9() {}
 
@@ -22709,6 +22839,7 @@ private:
 
 class Test_TC_MC_1_10 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_10()
         : TestCommandBridge("Test_TC_MC_1_10")
         , mTestIndex(0)
@@ -22718,6 +22849,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_10() {}
 
@@ -22854,6 +22986,7 @@ private:
 
 class Test_TC_MC_1_11 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_11()
         : TestCommandBridge("Test_TC_MC_1_11")
         , mTestIndex(0)
@@ -22863,6 +22996,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_11() {}
 
@@ -22993,6 +23127,7 @@ private:
 
 class Test_TC_MC_1_12 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_12()
         : TestCommandBridge("Test_TC_MC_1_12")
         , mTestIndex(0)
@@ -23002,6 +23137,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_12() {}
 
@@ -23132,6 +23268,7 @@ private:
 
 class Test_TC_MC_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_2_1()
         : TestCommandBridge("Test_TC_MC_2_1")
         , mTestIndex(0)
@@ -23141,6 +23278,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_2_1() {}
 
@@ -23222,6 +23360,7 @@ private:
 
 class Test_TC_MC_3_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_1()
         : TestCommandBridge("Test_TC_MC_3_1")
         , mTestIndex(0)
@@ -23231,6 +23370,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_1() {}
 
@@ -23291,6 +23431,7 @@ private:
 
 class Test_TC_MC_3_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_2()
         : TestCommandBridge("Test_TC_MC_3_2")
         , mTestIndex(0)
@@ -23300,6 +23441,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_2() {}
 
@@ -23360,6 +23502,7 @@ private:
 
 class Test_TC_MC_3_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_3()
         : TestCommandBridge("Test_TC_MC_3_3")
         , mTestIndex(0)
@@ -23369,6 +23512,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_3() {}
 
@@ -23429,6 +23573,7 @@ private:
 
 class Test_TC_MC_3_4 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_4()
         : TestCommandBridge("Test_TC_MC_3_4")
         , mTestIndex(0)
@@ -23438,6 +23583,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_4() {}
 
@@ -23498,6 +23644,7 @@ private:
 
 class Test_TC_MC_3_5 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_5()
         : TestCommandBridge("Test_TC_MC_3_5")
         , mTestIndex(0)
@@ -23507,6 +23654,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_5() {}
 
@@ -23567,6 +23715,7 @@ private:
 
 class Test_TC_MC_3_6 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_6()
         : TestCommandBridge("Test_TC_MC_3_6")
         , mTestIndex(0)
@@ -23576,6 +23725,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_6() {}
 
@@ -23636,6 +23786,7 @@ private:
 
 class Test_TC_MC_3_7 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_7()
         : TestCommandBridge("Test_TC_MC_3_7")
         , mTestIndex(0)
@@ -23645,6 +23796,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_7() {}
 
@@ -23705,6 +23857,7 @@ private:
 
 class Test_TC_MC_3_8 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_8()
         : TestCommandBridge("Test_TC_MC_3_8")
         , mTestIndex(0)
@@ -23714,6 +23867,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_8() {}
 
@@ -23774,6 +23928,7 @@ private:
 
 class Test_TC_MC_3_9 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_9()
         : TestCommandBridge("Test_TC_MC_3_9")
         , mTestIndex(0)
@@ -23783,6 +23938,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_9() {}
 
@@ -23843,6 +23999,7 @@ private:
 
 class Test_TC_MC_3_10 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_10()
         : TestCommandBridge("Test_TC_MC_3_10")
         , mTestIndex(0)
@@ -23852,6 +24009,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_10() {}
 
@@ -23912,6 +24070,7 @@ private:
 
 class Test_TC_MC_3_11 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_11()
         : TestCommandBridge("Test_TC_MC_3_11")
         , mTestIndex(0)
@@ -23921,6 +24080,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_11() {}
 
@@ -23981,6 +24141,7 @@ private:
 
 class Test_TC_MC_5_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_5_1()
         : TestCommandBridge("Test_TC_MC_5_1")
         , mTestIndex(0)
@@ -23990,6 +24151,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_5_1() {}
 
@@ -24072,6 +24234,7 @@ private:
 
 class Test_TC_MC_5_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_5_2()
         : TestCommandBridge("Test_TC_MC_5_2")
         , mTestIndex(0)
@@ -24081,6 +24244,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_5_2() {}
 
@@ -24151,6 +24315,7 @@ private:
 
 class Test_TC_MC_5_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_5_3()
         : TestCommandBridge("Test_TC_MC_5_3")
         , mTestIndex(0)
@@ -24160,6 +24325,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_5_3() {}
 
@@ -24230,6 +24396,7 @@ private:
 
 class Test_TC_MC_6_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_6_1()
         : TestCommandBridge("Test_TC_MC_6_1")
         , mTestIndex(0)
@@ -24239,6 +24406,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_6_1() {}
 
@@ -24365,6 +24533,7 @@ private:
 
 class Test_TC_MC_6_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_6_2()
         : TestCommandBridge("Test_TC_MC_6_2")
         , mTestIndex(0)
@@ -24374,6 +24543,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_6_2() {}
 
@@ -24530,6 +24700,7 @@ private:
 
 class Test_TC_MC_6_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_6_3()
         : TestCommandBridge("Test_TC_MC_6_3")
         , mTestIndex(0)
@@ -24539,6 +24710,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_6_3() {}
 
@@ -24629,6 +24801,7 @@ private:
 
 class Test_TC_MC_6_4 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_6_4()
         : TestCommandBridge("Test_TC_MC_6_4")
         , mTestIndex(0)
@@ -24638,6 +24811,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_6_4() {}
 
@@ -24836,6 +25010,7 @@ private:
 
 class Test_TC_MC_7_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_7_1()
         : TestCommandBridge("Test_TC_MC_7_1")
         , mTestIndex(0)
@@ -24845,6 +25020,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_7_1() {}
 
@@ -24905,6 +25081,7 @@ private:
 
 class Test_TC_MC_7_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_7_2()
         : TestCommandBridge("Test_TC_MC_7_2")
         , mTestIndex(0)
@@ -24914,6 +25091,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_7_2() {}
 
@@ -24974,6 +25152,7 @@ private:
 
 class Test_TC_MC_8_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_8_1()
         : TestCommandBridge("Test_TC_MC_8_1")
         , mTestIndex(0)
@@ -24983,6 +25162,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_8_1() {}
 
@@ -25087,6 +25267,7 @@ private:
 
 class Test_TC_MC_9_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_9_1()
         : TestCommandBridge("Test_TC_MC_9_1")
         , mTestIndex(0)
@@ -25096,6 +25277,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_9_1() {}
 
@@ -25317,6 +25499,7 @@ private:
 
 class Test_TC_MC_10_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_10_1()
         : TestCommandBridge("Test_TC_MC_10_1")
         , mTestIndex(0)
@@ -25326,6 +25509,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_10_1() {}
 
@@ -25431,6 +25615,7 @@ private:
 
 class Test_TC_MOD_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MOD_1_1()
         : TestCommandBridge("Test_TC_MOD_1_1")
         , mTestIndex(0)
@@ -25440,6 +25625,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MOD_1_1() {}
 
@@ -25593,6 +25779,7 @@ private:
 
 class Test_TC_OCC_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_OCC_1_1()
         : TestCommandBridge("Test_TC_OCC_1_1")
         , mTestIndex(0)
@@ -25602,6 +25789,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_OCC_1_1() {}
 
@@ -25738,6 +25926,7 @@ private:
 
 class Test_TC_OCC_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_OCC_2_1()
         : TestCommandBridge("Test_TC_OCC_2_1")
         , mTestIndex(0)
@@ -25747,6 +25936,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_OCC_2_1() {}
 
@@ -26068,6 +26258,7 @@ private:
 
 class Test_TC_OCC_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_OCC_2_2()
         : TestCommandBridge("Test_TC_OCC_2_2")
         , mTestIndex(0)
@@ -26077,6 +26268,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_OCC_2_2() {}
 
@@ -26200,6 +26392,7 @@ private:
 
 class Test_TC_OO_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_OO_1_1()
         : TestCommandBridge("Test_TC_OO_1_1")
         , mTestIndex(0)
@@ -26209,6 +26402,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_OO_1_1() {}
 
@@ -26488,6 +26682,7 @@ private:
 
 class Test_TC_OO_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_OO_2_1()
         : TestCommandBridge("Test_TC_OO_2_1")
         , mTestIndex(0)
@@ -26497,6 +26692,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_OO_2_1() {}
 
@@ -26687,6 +26883,7 @@ private:
 
 class Test_TC_OO_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_OO_2_2()
         : TestCommandBridge("Test_TC_OO_2_2")
         , mTestIndex(0)
@@ -26696,6 +26893,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_OO_2_2() {}
 
@@ -27172,6 +27370,7 @@ private:
 
 class Test_TC_OO_2_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_OO_2_3()
         : TestCommandBridge("Test_TC_OO_2_3")
         , mTestIndex(0)
@@ -27181,6 +27380,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_OO_2_3() {}
 
@@ -28511,6 +28711,7 @@ private:
 
 class Test_TC_PS_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_PS_1_1()
         : TestCommandBridge("Test_TC_PS_1_1")
         , mTestIndex(0)
@@ -28520,6 +28721,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_PS_1_1() {}
 
@@ -28672,6 +28874,7 @@ private:
 
 class Test_TC_PS_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_PS_2_1()
         : TestCommandBridge("Test_TC_PS_2_1")
         , mTestIndex(0)
@@ -28681,6 +28884,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_PS_2_1() {}
 
@@ -28967,6 +29171,7 @@ private:
 
 class Test_TC_PRS_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_PRS_1_1()
         : TestCommandBridge("Test_TC_PRS_1_1")
         , mTestIndex(0)
@@ -28976,6 +29181,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_PRS_1_1() {}
 
@@ -29112,6 +29318,7 @@ private:
 
 class Test_TC_PRS_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_PRS_2_1()
         : TestCommandBridge("Test_TC_PRS_2_1")
         , mTestIndex(0)
@@ -29121,6 +29328,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_PRS_2_1() {}
 
@@ -29417,6 +29625,7 @@ private:
 
 class Test_TC_PCC_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_PCC_1_1()
         : TestCommandBridge("Test_TC_PCC_1_1")
         , mTestIndex(0)
@@ -29426,6 +29635,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_PCC_1_1() {}
 
@@ -29716,6 +29926,7 @@ private:
 
 class Test_TC_PCC_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_PCC_2_1()
         : TestCommandBridge("Test_TC_PCC_2_1")
         , mTestIndex(0)
@@ -29725,6 +29936,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_PCC_2_1() {}
 
@@ -31193,6 +31405,7 @@ private:
 
 class Test_TC_PCC_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_PCC_2_2()
         : TestCommandBridge("Test_TC_PCC_2_2")
         , mTestIndex(0)
@@ -31202,6 +31415,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_PCC_2_2() {}
 
@@ -31448,6 +31662,7 @@ private:
 
 class Test_TC_PCC_2_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_PCC_2_3()
         : TestCommandBridge("Test_TC_PCC_2_3")
         , mTestIndex(0)
@@ -31457,6 +31672,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_PCC_2_3() {}
 
@@ -31951,6 +32167,7 @@ private:
 
 class Test_TC_PCC_2_4 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_PCC_2_4()
         : TestCommandBridge("Test_TC_PCC_2_4")
         , mTestIndex(0)
@@ -31960,6 +32177,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_PCC_2_4() {}
 
@@ -32350,6 +32568,7 @@ private:
 
 class Test_TC_PSCFG_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_PSCFG_1_1()
         : TestCommandBridge("Test_TC_PSCFG_1_1")
         , mTestIndex(0)
@@ -32359,6 +32578,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_PSCFG_1_1() {}
 
@@ -32519,6 +32739,7 @@ private:
 
 class Test_TC_RH_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_RH_1_1()
         : TestCommandBridge("Test_TC_RH_1_1")
         , mTestIndex(0)
@@ -32528,6 +32749,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_RH_1_1() {}
 
@@ -32684,6 +32906,7 @@ private:
 
 class Test_TC_RH_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_RH_2_1()
         : TestCommandBridge("Test_TC_RH_2_1")
         , mTestIndex(0)
@@ -32693,6 +32916,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_RH_2_1() {}
 
@@ -32851,6 +33075,7 @@ private:
 
 class Test_TC_RH_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_RH_2_2()
         : TestCommandBridge("Test_TC_RH_2_2")
         , mTestIndex(0)
@@ -32860,6 +33085,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_RH_2_2() {}
 
@@ -33014,6 +33240,7 @@ private:
 
 class Test_TC_SWTCH_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_SWTCH_2_1()
         : TestCommandBridge("Test_TC_SWTCH_2_1")
         , mTestIndex(0)
@@ -33023,6 +33250,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_SWTCH_2_1() {}
 
@@ -33239,6 +33467,7 @@ private:
 
 class Test_TC_SWTCH_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_SWTCH_2_2()
         : TestCommandBridge("Test_TC_SWTCH_2_2")
         , mTestIndex(0)
@@ -33248,6 +33477,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_SWTCH_2_2() {}
 
@@ -33710,6 +33940,7 @@ private:
 
 class Test_TC_TM_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_TM_1_1()
         : TestCommandBridge("Test_TC_TM_1_1")
         , mTestIndex(0)
@@ -33719,6 +33950,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_TM_1_1() {}
 
@@ -33827,6 +34059,7 @@ private:
 
 class Test_TC_TM_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_TM_2_1()
         : TestCommandBridge("Test_TC_TM_2_1")
         , mTestIndex(0)
@@ -33836,6 +34069,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_TM_2_1() {}
 
@@ -34018,6 +34252,7 @@ private:
 
 class Test_TC_TM_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_TM_2_2()
         : TestCommandBridge("Test_TC_TM_2_2")
         , mTestIndex(0)
@@ -34027,6 +34262,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_TM_2_2() {}
 
@@ -34205,6 +34441,7 @@ private:
 
 class Test_TC_TSTAT_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_TSTAT_1_1()
         : TestCommandBridge("Test_TC_TSTAT_1_1")
         , mTestIndex(0)
@@ -34214,6 +34451,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_TSTAT_1_1() {}
 
@@ -34340,6 +34578,7 @@ private:
 
 class Test_TC_TSTAT_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_TSTAT_2_1()
         : TestCommandBridge("Test_TC_TSTAT_2_1")
         , mTestIndex(0)
@@ -34349,6 +34588,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_TSTAT_2_1() {}
 
@@ -34943,6 +35183,7 @@ private:
 
 class Test_TC_TSTAT_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_TSTAT_2_2()
         : TestCommandBridge("Test_TC_TSTAT_2_2")
         , mTestIndex(0)
@@ -34952,6 +35193,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_TSTAT_2_2() {}
 
@@ -36691,6 +36933,7 @@ private:
 
 class Test_TC_TSUIC_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_TSUIC_1_1()
         : TestCommandBridge("Test_TC_TSUIC_1_1")
         , mTestIndex(0)
@@ -36700,6 +36943,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_TSUIC_1_1() {}
 
@@ -36852,6 +37096,7 @@ private:
 
 class Test_TC_TSUIC_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_TSUIC_2_1()
         : TestCommandBridge("Test_TC_TSUIC_2_1")
         , mTestIndex(0)
@@ -36861,6 +37106,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_TSUIC_2_1() {}
 
@@ -37094,6 +37340,7 @@ private:
 
 class Test_TC_TSUIC_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_TSUIC_2_2()
         : TestCommandBridge("Test_TC_TSUIC_2_2")
         , mTestIndex(0)
@@ -37103,6 +37350,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_TSUIC_2_2() {}
 
@@ -37552,6 +37800,7 @@ private:
 
 class Test_TC_DIAG_TH_NW_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DIAG_TH_NW_1_1()
         : TestCommandBridge("Test_TC_DIAG_TH_NW_1_1")
         , mTestIndex(0)
@@ -37561,6 +37810,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DIAG_TH_NW_1_1() {}
 
@@ -37672,6 +37922,7 @@ private:
 
 class Test_TC_DIAG_TH_NW_1_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DIAG_TH_NW_1_2()
         : TestCommandBridge("Test_TC_DIAG_TH_NW_1_2")
         , mTestIndex(0)
@@ -37681,6 +37932,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DIAG_TH_NW_1_2() {}
 
@@ -40367,6 +40619,7 @@ private:
 
 class Test_TC_LC_1_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_LC_1_2()
         : TestCommandBridge("Test_TC_LC_1_2")
         , mTestIndex(0)
@@ -40376,6 +40629,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_LC_1_2() {}
 
@@ -40457,6 +40711,7 @@ private:
 
 class Test_TC_WIFIDIAG_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WIFIDIAG_1_1()
         : TestCommandBridge("Test_TC_WIFIDIAG_1_1")
         , mTestIndex(0)
@@ -40466,6 +40721,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WIFIDIAG_1_1() {}
 
@@ -40688,6 +40944,7 @@ private:
 
 class Test_TC_WIFIDIAG_3_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WIFIDIAG_3_1()
         : TestCommandBridge("Test_TC_WIFIDIAG_3_1")
         , mTestIndex(0)
@@ -40697,6 +40954,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WIFIDIAG_3_1() {}
 
@@ -40757,6 +41015,7 @@ private:
 
 class Test_TC_WNCV_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WNCV_1_1()
         : TestCommandBridge("Test_TC_WNCV_1_1")
         , mTestIndex(0)
@@ -40766,6 +41025,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WNCV_1_1() {}
 
@@ -41008,6 +41268,7 @@ private:
 
 class Test_TC_WNCV_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WNCV_2_1()
         : TestCommandBridge("Test_TC_WNCV_2_1")
         , mTestIndex(0)
@@ -41017,6 +41278,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WNCV_2_1() {}
 
@@ -42582,6 +42844,7 @@ private:
 
 class Test_TC_WNCV_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WNCV_2_2()
         : TestCommandBridge("Test_TC_WNCV_2_2")
         , mTestIndex(0)
@@ -42591,6 +42854,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WNCV_2_2() {}
 
@@ -42651,6 +42915,7 @@ private:
 
 class Test_TC_WNCV_2_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WNCV_2_3()
         : TestCommandBridge("Test_TC_WNCV_2_3")
         , mTestIndex(0)
@@ -42660,6 +42925,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WNCV_2_3() {}
 
@@ -43251,6 +43517,7 @@ private:
 
 class Test_TC_WNCV_2_4 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WNCV_2_4()
         : TestCommandBridge("Test_TC_WNCV_2_4")
         , mTestIndex(0)
@@ -43260,6 +43527,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WNCV_2_4() {}
 
@@ -43383,6 +43651,7 @@ private:
 
 class Test_TC_WNCV_2_5 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WNCV_2_5()
         : TestCommandBridge("Test_TC_WNCV_2_5")
         , mTestIndex(0)
@@ -43392,6 +43661,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WNCV_2_5() {}
 
@@ -43515,6 +43785,7 @@ private:
 
 class Test_TC_WNCV_3_4 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WNCV_3_4()
         : TestCommandBridge("Test_TC_WNCV_3_4")
         , mTestIndex(0)
@@ -43526,6 +43797,7 @@ public:
         AddArgument("fullMotionDuration", 0, UINT16_MAX, &mFullMotionDuration);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WNCV_3_4() {}
 
@@ -43785,6 +44057,7 @@ private:
 
 class Test_TC_WNCV_3_5 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WNCV_3_5()
         : TestCommandBridge("Test_TC_WNCV_3_5")
         , mTestIndex(0)
@@ -43796,6 +44069,7 @@ public:
         AddArgument("fullMotionDuration", 0, UINT16_MAX, &mFullMotionDuration);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WNCV_3_5() {}
 
@@ -44055,6 +44329,7 @@ private:
 
 class Test_TC_WNCV_4_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WNCV_4_3()
         : TestCommandBridge("Test_TC_WNCV_4_3")
         , mTestIndex(0)
@@ -44064,6 +44339,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WNCV_4_3() {}
 
@@ -44287,6 +44563,7 @@ private:
 
 class Test_TC_WNCV_4_4 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WNCV_4_4()
         : TestCommandBridge("Test_TC_WNCV_4_4")
         , mTestIndex(0)
@@ -44296,6 +44573,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WNCV_4_4() {}
 
@@ -44519,6 +44797,7 @@ private:
 
 class TestCluster : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestCluster()
         : TestCommandBridge("TestCluster")
         , mTestIndex(0)
@@ -44528,6 +44807,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestCluster() {}
 
@@ -57797,6 +58077,7 @@ private:
 
 class TestSaveAs : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestSaveAs()
         : TestCommandBridge("TestSaveAs")
         , mTestIndex(0)
@@ -57806,6 +58087,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestSaveAs() {}
 
@@ -60729,6 +61011,7 @@ private:
 
 class TestConstraints : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestConstraints()
         : TestCommandBridge("TestConstraints")
         , mTestIndex(0)
@@ -60738,6 +61021,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestConstraints() {}
 
@@ -61293,6 +61577,7 @@ private:
 
 class TestDelayCommands : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestDelayCommands()
         : TestCommandBridge("TestDelayCommands")
         , mTestIndex(0)
@@ -61302,6 +61587,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestDelayCommands() {}
 
@@ -61372,6 +61658,7 @@ private:
 
 class TestDescriptorCluster : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestDescriptorCluster()
         : TestCommandBridge("TestDescriptorCluster")
         , mTestIndex(0)
@@ -61381,6 +61668,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestDescriptorCluster() {}
 
@@ -61573,429 +61861,9 @@ private:
     }
 };
 
-class TestBasicInformation : public TestCommandBridge {
-public:
-    TestBasicInformation()
-        : TestCommandBridge("TestBasicInformation")
-        , mTestIndex(0)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~TestBasicInformation() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex) {
-            ChipLogProgress(chipTool, " **** Test Start: TestBasicInformation\n");
-        }
-
-        if (mTestCount == mTestIndex) {
-            ChipLogProgress(chipTool, " **** Test Complete: TestBasicInformation\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++) {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Read location\n");
-            err = TestReadLocation_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Write location\n");
-            err = TestWriteLocation_2();
-            break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read back location\n");
-            err = TestReadBackLocation_3();
-            break;
-        case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Restore initial location value\n");
-            err = TestRestoreInitialLocationValue_4();
-            break;
-        case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Read AttributeList value\n");
-            err = TestReadAttributeListValue_5();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err) {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 6;
-
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
-    {
-        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadLocation_1()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestBasic * cluster = [[CHIPTestBasic alloc] initWithDevice:device endpoint:0 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeLocationWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read location Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValueAsString("Location", actualValue, @"XX"));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestWriteLocation_2()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestBasic * cluster = [[CHIPTestBasic alloc] initWithDevice:device endpoint:0 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id locationArgument;
-        locationArgument = @"US";
-        [cluster writeAttributeLocationWithValue:locationArgument
-                               completionHandler:^(NSError * _Nullable err) {
-                                   NSLog(@"Write location Error: %@", err);
-
-                                   VerifyOrReturn(CheckValue("status", err, 0));
-
-                                   NextTest();
-                               }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadBackLocation_3()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestBasic * cluster = [[CHIPTestBasic alloc] initWithDevice:device endpoint:0 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeLocationWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read back location Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValueAsString("Location", actualValue, @"US"));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestRestoreInitialLocationValue_4()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestBasic * cluster = [[CHIPTestBasic alloc] initWithDevice:device endpoint:0 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id locationArgument;
-        locationArgument = @"XX";
-        [cluster writeAttributeLocationWithValue:locationArgument
-                               completionHandler:^(NSError * _Nullable err) {
-                                   NSLog(@"Restore initial location value Error: %@", err);
-
-                                   VerifyOrReturn(CheckValue("status", err, 0));
-
-                                   NextTest();
-                               }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadAttributeListValue_5()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestBasic * cluster = [[CHIPTestBasic alloc] initWithDevice:device endpoint:0 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read AttributeList value Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("AttributeList", [actualValue count], static_cast<uint32_t>(24)));
-                VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
-                VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
-                VerifyOrReturn(CheckValue("", actualValue[2], 2UL));
-                VerifyOrReturn(CheckValue("", actualValue[3], 3UL));
-                VerifyOrReturn(CheckValue("", actualValue[4], 4UL));
-                VerifyOrReturn(CheckValue("", actualValue[5], 5UL));
-                VerifyOrReturn(CheckValue("", actualValue[6], 6UL));
-                VerifyOrReturn(CheckValue("", actualValue[7], 7UL));
-                VerifyOrReturn(CheckValue("", actualValue[8], 8UL));
-                VerifyOrReturn(CheckValue("", actualValue[9], 9UL));
-                VerifyOrReturn(CheckValue("", actualValue[10], 10UL));
-                VerifyOrReturn(CheckValue("", actualValue[11], 11UL));
-                VerifyOrReturn(CheckValue("", actualValue[12], 12UL));
-                VerifyOrReturn(CheckValue("", actualValue[13], 13UL));
-                VerifyOrReturn(CheckValue("", actualValue[14], 14UL));
-                VerifyOrReturn(CheckValue("", actualValue[15], 15UL));
-                VerifyOrReturn(CheckValue("", actualValue[16], 16UL));
-                VerifyOrReturn(CheckValue("", actualValue[17], 17UL));
-                VerifyOrReturn(CheckValue("", actualValue[18], 18UL));
-                VerifyOrReturn(CheckValue("", actualValue[19], 19UL));
-                VerifyOrReturn(CheckValue("", actualValue[20], 65528UL));
-                VerifyOrReturn(CheckValue("", actualValue[21], 65529UL));
-                VerifyOrReturn(CheckValue("", actualValue[22], 65531UL));
-                VerifyOrReturn(CheckValue("", actualValue[23], 65533UL));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-};
-
-class TestGeneralCommissioning : public TestCommandBridge {
-public:
-    TestGeneralCommissioning()
-        : TestCommandBridge("TestGeneralCommissioning")
-        , mTestIndex(0)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~TestGeneralCommissioning() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex) {
-            ChipLogProgress(chipTool, " **** Test Start: TestGeneralCommissioning\n");
-        }
-
-        if (mTestCount == mTestIndex) {
-            ChipLogProgress(chipTool, " **** Test Complete: TestGeneralCommissioning\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++) {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Write Breadcrumb (1/2)\n");
-            err = TestWriteBreadcrumb12_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read back Breadcrumb (1/2)\n");
-            err = TestReadBackBreadcrumb12_2();
-            break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Write Breadcrumb (2/2)\n");
-            err = TestWriteBreadcrumb22_3();
-            break;
-        case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read back Breadcrumb (2/2)\n");
-            err = TestReadBackBreadcrumb22_4();
-            break;
-        case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Validate presence of SupportsConcurrentConnection\n");
-            err = TestValidatePresenceOfSupportsConcurrentConnection_5();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err) {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 6;
-
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
-    {
-        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestWriteBreadcrumb12_1()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestGeneralCommissioning * cluster = [[CHIPTestGeneralCommissioning alloc] initWithDevice:device
-                                                                                             endpoint:0
-                                                                                                queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id breadcrumbArgument;
-        breadcrumbArgument = [NSNumber numberWithUnsignedLongLong:137438953472ULL];
-        [cluster writeAttributeBreadcrumbWithValue:breadcrumbArgument
-                                 completionHandler:^(NSError * _Nullable err) {
-                                     NSLog(@"Write Breadcrumb (1/2) Error: %@", err);
-
-                                     VerifyOrReturn(CheckValue("status", err, 0));
-
-                                     NextTest();
-                                 }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadBackBreadcrumb12_2()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestGeneralCommissioning * cluster = [[CHIPTestGeneralCommissioning alloc] initWithDevice:device
-                                                                                             endpoint:0
-                                                                                                queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeBreadcrumbWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read back Breadcrumb (1/2) Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("Breadcrumb", actualValue, 137438953472ULL));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestWriteBreadcrumb22_3()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestGeneralCommissioning * cluster = [[CHIPTestGeneralCommissioning alloc] initWithDevice:device
-                                                                                             endpoint:0
-                                                                                                queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id breadcrumbArgument;
-        breadcrumbArgument = [NSNumber numberWithUnsignedLongLong:81ULL];
-        [cluster writeAttributeBreadcrumbWithValue:breadcrumbArgument
-                                 completionHandler:^(NSError * _Nullable err) {
-                                     NSLog(@"Write Breadcrumb (2/2) Error: %@", err);
-
-                                     VerifyOrReturn(CheckValue("status", err, 0));
-
-                                     NextTest();
-                                 }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadBackBreadcrumb22_4()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestGeneralCommissioning * cluster = [[CHIPTestGeneralCommissioning alloc] initWithDevice:device
-                                                                                             endpoint:0
-                                                                                                queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeBreadcrumbWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read back Breadcrumb (2/2) Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("Breadcrumb", actualValue, 81ULL));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestValidatePresenceOfSupportsConcurrentConnection_5()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestGeneralCommissioning * cluster = [[CHIPTestGeneralCommissioning alloc] initWithDevice:device
-                                                                                             endpoint:0
-                                                                                                queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster
-            readAttributeSupportsConcurrentConnectionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-                NSLog(@"Validate presence of SupportsConcurrentConnection Error: %@", err);
-
-                VerifyOrReturn(CheckValue("status", err, 0));
-
-                VerifyOrReturn(CheckConstraintType("supportsConcurrentConnection", "", "bool"));
-                NextTest();
-            }];
-
-        return CHIP_NO_ERROR;
-    }
-};
-
 class TestGroupsCluster : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestGroupsCluster()
         : TestCommandBridge("TestGroupsCluster")
         , mTestIndex(0)
@@ -62005,6 +61873,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestGroupsCluster() {}
 
@@ -62703,6 +62572,7 @@ private:
 
 class TestGroupKeyManagementCluster : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestGroupKeyManagementCluster()
         : TestCommandBridge("TestGroupKeyManagementCluster")
         , mTestIndex(0)
@@ -62712,6 +62582,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestGroupKeyManagementCluster() {}
 
@@ -63377,6 +63248,7 @@ private:
 
 class TestIdentifyCluster : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestIdentifyCluster()
         : TestCommandBridge("TestIdentifyCluster")
         , mTestIndex(0)
@@ -63386,6 +63258,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestIdentifyCluster() {}
 
@@ -63470,6 +63343,7 @@ private:
 
 class TestLogCommands : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestLogCommands()
         : TestCommandBridge("TestLogCommands")
         , mTestIndex(0)
@@ -63479,6 +63353,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestLogCommands() {}
 
@@ -63559,6 +63434,7 @@ private:
 
 class TestOperationalCredentialsCluster : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestOperationalCredentialsCluster()
         : TestCommandBridge("TestOperationalCredentialsCluster")
         , mTestIndex(0)
@@ -63568,6 +63444,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestOperationalCredentialsCluster() {}
 
@@ -63858,6 +63735,7 @@ private:
 
 class TestBinding : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestBinding()
         : TestCommandBridge("TestBinding")
         , mTestIndex(0)
@@ -63867,6 +63745,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestBinding() {}
 
@@ -64218,6 +64097,7 @@ private:
 
 class Test_TC_SWDIAG_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_SWDIAG_1_1()
         : TestCommandBridge("Test_TC_SWDIAG_1_1")
         , mTestIndex(0)
@@ -64227,6 +64107,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_SWDIAG_1_1() {}
 
@@ -64410,6 +64291,7 @@ private:
 
 class Test_TC_SWDIAG_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_SWDIAG_2_1()
         : TestCommandBridge("Test_TC_SWDIAG_2_1")
         , mTestIndex(0)
@@ -64419,6 +64301,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_SWDIAG_2_1() {}
 
@@ -64469,6 +64352,7 @@ private:
 
 class Test_TC_SWDIAG_3_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_SWDIAG_3_1()
         : TestCommandBridge("Test_TC_SWDIAG_3_1")
         , mTestIndex(0)
@@ -64478,6 +64362,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_SWDIAG_3_1() {}
 
@@ -64631,6 +64516,7 @@ private:
 
 class TestSubscribe_OnOff : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestSubscribe_OnOff()
         : TestCommandBridge("TestSubscribe_OnOff")
         , mTestIndex(0)
@@ -64640,6 +64526,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestSubscribe_OnOff() {}
 
@@ -65032,8 +64919,6 @@ void registerCommandsTests(Commands & commands)
         make_unique<TestConstraints>(),
         make_unique<TestDelayCommands>(),
         make_unique<TestDescriptorCluster>(),
-        make_unique<TestBasicInformation>(),
-        make_unique<TestGeneralCommissioning>(),
         make_unique<TestGroupsCluster>(),
         make_unique<TestGroupKeyManagementCluster>(),
         make_unique<TestIdentifyCluster>(),

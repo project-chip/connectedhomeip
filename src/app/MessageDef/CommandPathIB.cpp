@@ -45,7 +45,10 @@ CHIP_ERROR CommandPathIB::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrExit(chip::TLV::IsContextTag(reader.GetTag()), err = CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (chip::TLV::TagNumFromTag(reader.GetTag()))
         {
         case kCsTag_EndpointId:

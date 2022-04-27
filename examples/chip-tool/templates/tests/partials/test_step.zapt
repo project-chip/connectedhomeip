@@ -1,0 +1,118 @@
+{{~#*inline "clusterName"}}{{asUpperCamelCase cluster}}{{/inline~}}
+
+{{~#*inline "maybePICS"}}
+{{#if PICS}}
+    VerifyOrdo(!ShouldSkip("{{PICS}}"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+{{/if}}
+{{/inline~}}
+
+{{~#*inline "maybeSetupSubStepCount"}}
+{{#if expectMultipleResponses}}
+    mTestSubStepCount = {{response.length}};
+{{/if}}
+{{/inline~}}
+
+{{~#*inline "maybePrepareArguments"}}
+{{#unless isWait}}
+{{#if (isTestOnlyCluster cluster)}}
+    SetIdentity({{>kIdentity}});
+{{else if hasSpecificArguments}}
+    {{#if (chip_tests_item_has_list)}}ListFreer listFreer;{{/if~}}
+    {{asEncodableType}} value;
+    {{#chip_tests_item_parameters}}
+        {{>commandValue ns=parent.cluster container=(asPropertyValue dontUnwrapValue=true) definedValue=definedValue depth=0}}
+    {{/chip_tests_item_parameters}}
+{{/if}}
+{{/unless}}
+{{/inline~}}
+
+{{~#*inline "testOnlyClusterArguments"}}
+{{#chip_tests_item_parameters}}{{#not_first}},{{/not_first}}
+    {{#*inline "defaultValue"}}{{asTypedLiteral (chip_tests_config_get_default_value definedValue) (chip_tests_config_get_type definedValue)}}{{/inline}}
+    {{~#if (chip_tests_config_has definedValue)~}}
+        m{{asUpperCamelCase definedValue}}.HasValue() ? m{{asUpperCamelCase definedValue}}.Value() : {{~#if (isString type)}}chip::CharSpan::fromCharString("{{>defaultValue}}"){{else}}{{>defaultValue}}{{/if~}}
+    {{~else if (isString type)}}
+        "{{definedValue}}"
+    {{else}}
+        {{definedValue}}
+    {{~/if~}}
+{{/chip_tests_item_parameters}}
+{{/inline~}}
+
+
+{{~#*inline "maybeFabricFiltered"}}
+{{#unless isWait}}
+{{#unless fabricFiltered}}
+    , false
+{{/unless}}
+{{/unless}}
+{{/inline~}}
+
+{{~#*inline "maybeTimedInteractionTimeout"}}
+{{#if timedInteractionTimeoutMs}}
+    , chip::Optional<uint16_t>({{timedInteractionTimeoutMs}})
+{{else if commandObject.mustUseTimedInvoke}}
+    , chip::NullOptional
+{{else if attributeObject.mustUseTimedWrite}}
+    , chip::NullOptional
+{{/if}}
+{{/inline~}}
+
+{{~#*inline "kIdentity"}}kIdentity{{asUpperCamelCase identity}}{{/inline~}}
+{{~#*inline "groupId"}}{{groupId}}{{/inline~}}
+{{~#*inline "endpointId"}}GetEndpoint({{endpoint}}){{/inline~}}
+{{~#*inline "clusterId"}}{{>clusterName}}::Id{{/inline~}}
+{{~#*inline "attributeId"}}{{>clusterName}}::Attributes::{{asUpperCamelCase attribute}}::Id{{/inline~}}
+{{~#*inline "eventId"}}{{>clusterName}}::Events::{{asUpperCamelCase event}}::Id{{/inline~}}
+{{~#*inline "commandId"}}{{>clusterName}}::Commands::{{asUpperCamelCase command}}::Id{{/inline~}}
+
+{{~#*inline "attributeArguments"}}{{>kIdentity}}, {{>endpointId}}, {{>clusterId}}, {{>attributeId}}{{/inline~}}
+{{~#*inline "eventArguments"}}{{>kIdentity}}, {{>endpointId}}, {{>clusterId}}, {{>eventId}}{{/inline~}}
+{{~#*inline "commandArguments"}}{{>kIdentity}}, {{>endpointId}}, {{>clusterId}}, {{>commandId}}{{/inline~}}
+{{~#*inline "waitAttributeArguments"}}{{>endpointId}}, {{>clusterId}}, {{>attributeId}}{{/inline~}}
+{{~#*inline "waitEventArguments"}}{{>endpointId}}, {{>clusterId}}, {{>eventId}}{{/inline~}}
+{{~#*inline "waitCommandArguments"}}{{>endpointId}}, {{>clusterId}}, {{>commandId}}{{/inline~}}
+{{~#*inline "groupAttributeArguments"}}{{>kIdentity}}, {{>groupId}}, {{>clusterId}}, {{>attributeId}}{{/inline~}}
+{{~#*inline "groupCommandArguments"}}{{>kIdentity}}, {{>groupId}}, {{>clusterId}}, {{>commandId}}{{/inline~}}
+
+{{~#*inline "waitArguments"}}
+{{#if isAttribute}}
+  {{>waitAttributeArguments}}
+{{else if isEvent}}
+  {{>endpointId}}, {{>clusterId}}, {{>eventId}}
+{{else}}
+  {{>waitCommandArguments}}
+{{/if}}
+{{/inline~}}
+
+{{~#*inline "arguments"}}
+{{#if (isTestOnlyCluster cluster)}}{{>testOnlyClusterArguments}}
+{{else if isWait}}                 {{>waitArguments}}
+{{else if isReadAttribute}}        {{>attributeArguments}}{{>maybeFabricFiltered~}}
+{{else if isSubscribeAttribute}}   {{>attributeArguments}}, {{minInterval}}, {{maxInterval}}{{>maybeFabricFiltered~}}
+{{else if isWriteGroupAttribute}}  {{>groupAttributeArguments}}, value{{>maybeTimedInteractionTimeout~}}
+{{else if isWriteAttribute}}       {{>attributeArguments}}, value{{>maybeTimedInteractionTimeout~}}
+{{else if isReadEvent}}            {{>eventArguments}}{{>maybeFabricFiltered}}
+{{else if isSubscribeEvent}}       {{>eventArguments}}, {{minInterval}}, {{maxInterval}}{{>maybeFabricFiltered~}}
+{{else if isGroupCommand}}         {{>groupCommandArguments}}, value{{>maybeTimedInteractionTimeout~}}
+{{else if isCommand}}              {{>commandArguments}}, value{{>maybeTimedInteractionTimeout~}}
+{{/if}}
+{{/inline~}}
+
+{{~#*inline "maybeBusyWait"}}
+{{#if busyWaitMs}}
+    ReturnErrorOnFailure({{commandName}}({{>arguments}}));
+
+    using namespace chip::System::Clock::Literals;
+    return BusyWaitFor({{busyWaitMs}}_ms);
+{{else}}
+    return {{commandName}}({{>arguments}});
+{{/if}}
+{{/inline~}}
+
+{{! --- Test Step Content --}}
+LogStep({{index}}, "{{label}}");
+{{>maybePICS}}
+{{>maybeSetupSubStepCount}}
+{{>maybePrepareArguments}}
+{{>maybeBusyWait}}
