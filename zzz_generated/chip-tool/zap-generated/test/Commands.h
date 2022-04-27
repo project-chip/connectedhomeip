@@ -41492,50 +41492,50 @@ private:
             return Start("default", 1111, 5560, "/tmp/chip_kvs_default");
         }
         case 9: {
-            LogStep(9, "Start a second accessory with all command line options");
+            LogStep(9, "Stop the second accessory");
+            SetIdentity(kIdentityAlpha);
+            return Stop("chip-lock-app");
+        }
+        case 10: {
+            LogStep(10, "Start a second accessory with all command line options");
             SetIdentity(kIdentityAlpha);
             return Start("chip-lock-app", 50, 5561, "/tmp/chip_kvs_lock");
         }
-        case 10: {
-            LogStep(10, "Commission second accessory from alpha");
+        case 11: {
+            LogStep(11, "Commission second accessory from alpha");
             SetIdentity(kIdentityAlpha);
             return PairWithQRCode(
                 3735928559, mPayload.HasValue() ? mPayload.Value() : chip::CharSpan::fromCharString("MT:-24J0IX4122-.548G00"));
         }
-        case 11: {
-            LogStep(11, "Wait for the second commissioned device to be retrieved for alpha");
+        case 12: {
+            LogStep(12, "Wait for the second commissioned device to be retrieved for alpha");
             SetIdentity(kIdentityAlpha);
             return WaitForCommissionee(3735928559);
         }
-        case 12: {
-            LogStep(12, "Reboot the second accessory with all command line options");
-            SetIdentity(kIdentityAlpha);
-            return Reboot("chip-lock-app", 50, 5561, "/tmp/chip_kvs_lock");
-        }
         case 13: {
-            LogStep(13, "Stop the second accessory");
-            SetIdentity(kIdentityAlpha);
-            return Stop("chip-lock-app");
-        }
-        case 14: {
-            LogStep(14, "Reboot the default accessory with no command line options");
+            LogStep(13, "Reboot the default accessory with no command line options");
             SetIdentity(kIdentityAlpha);
             return Reboot("default");
         }
-        case 15: {
-            LogStep(15, "Reboot the default accessory with discriminator command line option");
+        case 14: {
+            LogStep(14, "Reboot the default accessory with discriminator command line option");
             SetIdentity(kIdentityAlpha);
             return Reboot("default", 2222);
         }
-        case 16: {
-            LogStep(16, "Reboot the default accessory with discriminator and port command line options");
+        case 15: {
+            LogStep(15, "Reboot the default accessory with discriminator and port command line options");
             SetIdentity(kIdentityAlpha);
             return Reboot("default", 2222, 5565);
         }
-        case 17: {
-            LogStep(17, "Reboot the default accessory with all command line options");
+        case 16: {
+            LogStep(16, "Reboot the default accessory with all command line options");
             SetIdentity(kIdentityAlpha);
             return Reboot("default", 2222, 5565, "/tmp/chip_kvs_default");
+        }
+        case 17: {
+            LogStep(17, "Reboot the second accessory with all command line options");
+            SetIdentity(kIdentityAlpha);
+            return Reboot("chip-lock-app", 50, 5561, "/tmp/chip_kvs_lock");
         }
         case 18: {
             LogStep(18, "Factory Reset the default accessory");

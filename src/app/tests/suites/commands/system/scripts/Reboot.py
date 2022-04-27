@@ -23,7 +23,7 @@ PORT = 9000
 if sys.platform == 'linux':
     IP = '10.10.10.5'
 
-# Passing in sys.argv[2:] gets rid of the script name and key to the app registers. The remaining
+# Passing in sys.argv[2:] gets rid of the script name and key to the apps register. The remaining
 # values in the list as key-value pairs, e.g. [option1, value1, option2, value2, ...]
 with xmlrpc.client.ServerProxy('http://' + IP + ':' + str(PORT) + '/', allow_none=True) as proxy:
     proxy.reboot(sys.argv[1], sys.argv[2:])

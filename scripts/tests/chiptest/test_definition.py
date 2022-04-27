@@ -221,6 +221,10 @@ class TestDefinition:
             for field in paths.__dataclass_fields__:
                 path = getattr(paths, field)
 
+                # Do not add chip-tool to the register
+                if path == paths.chip_tool:
+                    continue
+
                 # For the app indicated by self.target, give it the 'default' key to add to the register
                 if path == target_app:
                     key = 'default'
@@ -234,6 +238,7 @@ class TestDefinition:
                 # Remove server application storage (factory reset),
                 # so it will be commissionable again.
                 app.factoryReset()
+                app.start({'--KVS': '/tmp/chip_kvs_' + key})
 
             tool_cmd = paths.chip_tool
 
@@ -248,9 +253,8 @@ class TestDefinition:
                 if os.path.exists(f):
                     os.unlink(f)
 
-            # Only start and pair the default app
+            # Only pair the default app
             app = apps_register.get('default')
-            app.start({'--KVS': '/tmp/chip_kvs_default'})
             pairing_cmd = tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode]
             if sys.platform != 'darwin':
                 pairing_cmd.append('--paa-trust-store-path')

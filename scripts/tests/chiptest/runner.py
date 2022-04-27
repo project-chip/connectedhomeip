@@ -132,9 +132,7 @@ class Runner:
 
         for dependency in dependencies:
             for accessory in dependency.accessories:
-                # Only wait on processes that have been started
-                if accessory.stopped == False:
-                    wait.add_process(accessory, dependency)
+                wait.add_process(accessory, dependency)
 
         for process, userdata in iter(wait.queue.get, None):
             if process == s:

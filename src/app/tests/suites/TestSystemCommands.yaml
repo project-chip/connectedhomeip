@@ -102,6 +102,13 @@ tests:
               - name: "kvs"
                 value: "/tmp/chip_kvs_default"
 
+    - label: "Stop the second accessory"
+      command: "Stop"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "chip-lock-app"
+
     - label: "Start a second accessory with all command line options"
       command: "Start"
       arguments:
@@ -134,26 +141,6 @@ tests:
           values:
               - name: "nodeId"
                 value: 0xDEADBEEF
-
-    - label: "Reboot the second accessory with all command line options"
-      command: "Reboot"
-      arguments:
-          values:
-              - name: "registerKey"
-                value: "chip-lock-app"
-              - name: "discriminator"
-                value: 50
-              - name: "port"
-                value: 5561
-              - name: "kvs"
-                value: "/tmp/chip_kvs_lock"
-
-    - label: "Stop the second accessory"
-      command: "Stop"
-      arguments:
-          values:
-              - name: "registerKey"
-                value: "chip-lock-app"
 
     - label: "Reboot the default accessory with no command line options"
       command: "Reboot"
@@ -197,6 +184,19 @@ tests:
                 value: 5565
               - name: "kvs"
                 value: "/tmp/chip_kvs_default"
+
+    - label: "Reboot the second accessory with all command line options"
+      command: "Reboot"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "chip-lock-app"
+              - name: "discriminator"
+                value: 50
+              - name: "port"
+                value: 5561
+              - name: "kvs"
+                value: "/tmp/chip_kvs_lock"
 
     - label: "Factory Reset the default accessory"
       command: "FactoryReset"
