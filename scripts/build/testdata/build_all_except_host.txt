@@ -10,9 +10,6 @@ bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {ro
 # Generating ameba-amebad-pigweed
 bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh -r {root} ninja {out}/ameba-amebad-pigweed pigweed-app'
 
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
-
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
@@ -21,9 +18,6 @@ gn gen --check --fail-on-unused-args {out}/android-androidstudio-arm-chip-tool '
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
-
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
 
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
@@ -34,9 +28,6 @@ gn gen --check --fail-on-unused-args {out}/android-androidstudio-arm64-chip-tool
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
-
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
@@ -45,9 +36,6 @@ gn gen --check --fail-on-unused-args {out}/android-androidstudio-x64-chip-tool '
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
-
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
 
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
@@ -58,9 +46,6 @@ gn gen --check --fail-on-unused-args {out}/android-androidstudio-x86-chip-tool '
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
-
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
@@ -69,9 +54,6 @@ gn gen --check --fail-on-unused-args {out}/android-arm-chip-tool '--args=target_
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
-
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
 
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
@@ -82,9 +64,6 @@ gn gen --check --fail-on-unused-args {out}/android-arm-chip-tv-casting-app '--ar
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
-
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
@@ -93,9 +72,6 @@ gn gen --check --fail-on-unused-args {out}/android-arm-chip-tvserver '--args=tar
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
-
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
 
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
@@ -106,9 +82,6 @@ gn gen --check --fail-on-unused-args {out}/android-arm64-chip-test '--args=targe
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
-
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
@@ -117,9 +90,6 @@ gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tool '--args=targe
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
-
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
 
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
@@ -130,9 +100,6 @@ gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tv-casting-app '--
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
-
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
@@ -141,9 +108,6 @@ gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tvserver '--args=t
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
-
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
 
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
@@ -154,9 +118,6 @@ gn gen --check --fail-on-unused-args {out}/android-x64-chip-tool '--args=target_
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
-
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
@@ -166,9 +127,6 @@ gn gen --check --fail-on-unused-args {out}/android-x64-chip-tvserver '--args=tar
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
-
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
@@ -177,9 +135,6 @@ gn gen --check --fail-on-unused-args {out}/android-x86-chip-tool '--args=target_
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
-
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
 
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py

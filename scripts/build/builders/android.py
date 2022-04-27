@@ -257,10 +257,6 @@ class AndroidBuilder(Builder):
 
     def generate(self):
         self._Execute([
-            'python3', 'build/chip/java/tests/generate_jars_for_test.py'
-        ], title='Generating JARs for Java build rules test')
-
-        self._Execute([
             'python3', 'third_party/android_deps/set_up_android_deps.py'
         ], title='Setting up Android deps through Gradle')
 
