@@ -308,24 +308,32 @@ public:
             err = TestVerify_16();
             break;
         case 17:
-            ChipLogProgress(chipTool, " ***** Test Step 17 : Restore ACL\n");
-            err = TestRestoreAcl_17();
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Write too many entries\n");
+            err = TestWriteTooManyEntries_17();
             break;
         case 18:
             ChipLogProgress(chipTool, " ***** Test Step 18 : Verify\n");
             err = TestVerify_18();
             break;
         case 19:
-            ChipLogProgress(chipTool, " ***** Test Step 19 : Validate resource minima (SubjectsPerAccessControlEntry)\n");
-            err = TestValidateResourceMinimaSubjectsPerAccessControlEntry_19();
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Restore ACL\n");
+            err = TestRestoreAcl_19();
             break;
         case 20:
-            ChipLogProgress(chipTool, " ***** Test Step 20 : Validate resource minima (TargetsPerAccessControlEntry)\n");
-            err = TestValidateResourceMinimaTargetsPerAccessControlEntry_20();
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Verify\n");
+            err = TestVerify_20();
             break;
         case 21:
-            ChipLogProgress(chipTool, " ***** Test Step 21 : Validate resource minima (AccessControlEntriesPerFabric)\n");
-            err = TestValidateResourceMinimaAccessControlEntriesPerFabric_21();
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Validate resource minima (SubjectsPerAccessControlEntry)\n");
+            err = TestValidateResourceMinimaSubjectsPerAccessControlEntry_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : Validate resource minima (TargetsPerAccessControlEntry)\n");
+            err = TestValidateResourceMinimaTargetsPerAccessControlEntry_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool, " ***** Test Step 23 : Validate resource minima (AccessControlEntriesPerFabric)\n");
+            err = TestValidateResourceMinimaAccessControlEntriesPerFabric_23();
             break;
         }
 
@@ -342,7 +350,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 22;
+    const uint16_t mTestCount = 24;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -1374,7 +1382,405 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestRestoreAcl_17()
+    CHIP_ERROR TestWriteTooManyEntries_17()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id aclArgument;
+        {
+            NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+            temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
+            {
+                NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
+                temp_3[0] = [[CHIPAccessControlClusterTarget alloc] init];
+                ((CHIPAccessControlClusterTarget *) temp_3[0]).cluster = nil;
+                ((CHIPAccessControlClusterTarget *) temp_3[0]).endpoint = [NSNumber numberWithUnsignedShort:0U];
+                ((CHIPAccessControlClusterTarget *) temp_3[0]).deviceType = nil;
+
+                temp_3[1] = [[CHIPAccessControlClusterTarget alloc] init];
+                ((CHIPAccessControlClusterTarget *) temp_3[1]).cluster = [NSNumber numberWithUnsignedInt:1UL];
+                ((CHIPAccessControlClusterTarget *) temp_3[1]).endpoint = nil;
+                ((CHIPAccessControlClusterTarget *) temp_3[1]).deviceType = nil;
+
+                temp_3[2] = [[CHIPAccessControlClusterTarget alloc] init];
+                ((CHIPAccessControlClusterTarget *) temp_3[2]).cluster = [NSNumber numberWithUnsignedInt:2UL];
+                ((CHIPAccessControlClusterTarget *) temp_3[2]).endpoint = [NSNumber numberWithUnsignedShort:3U];
+                ((CHIPAccessControlClusterTarget *) temp_3[2]).deviceType = nil;
+
+                ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = temp_3;
+            }
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
+
+            temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
+            {
+                NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
+                temp_3[0] = [NSNumber numberWithUnsignedLongLong:4ULL];
+                temp_3[1] = [NSNumber numberWithUnsignedLongLong:5ULL];
+                temp_3[2] = [NSNumber numberWithUnsignedLongLong:6ULL];
+                temp_3[3] = [NSNumber numberWithUnsignedLongLong:7ULL];
+                ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = temp_3;
+            }
+            {
+                NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
+                temp_3[0] = [[CHIPAccessControlClusterTarget alloc] init];
+                ((CHIPAccessControlClusterTarget *) temp_3[0]).cluster = nil;
+                ((CHIPAccessControlClusterTarget *) temp_3[0]).endpoint = [NSNumber numberWithUnsignedShort:8U];
+                ((CHIPAccessControlClusterTarget *) temp_3[0]).deviceType = nil;
+
+                temp_3[1] = [[CHIPAccessControlClusterTarget alloc] init];
+                ((CHIPAccessControlClusterTarget *) temp_3[1]).cluster = [NSNumber numberWithUnsignedInt:9UL];
+                ((CHIPAccessControlClusterTarget *) temp_3[1]).endpoint = nil;
+                ((CHIPAccessControlClusterTarget *) temp_3[1]).deviceType = nil;
+
+                temp_3[2] = [[CHIPAccessControlClusterTarget alloc] init];
+                ((CHIPAccessControlClusterTarget *) temp_3[2]).cluster = [NSNumber numberWithUnsignedInt:10UL];
+                ((CHIPAccessControlClusterTarget *) temp_3[2]).endpoint = [NSNumber numberWithUnsignedShort:11U];
+                ((CHIPAccessControlClusterTarget *) temp_3[2]).deviceType = nil;
+
+                ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = temp_3;
+            }
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
+
+            temp_0[2] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).privilege = [NSNumber numberWithUnsignedChar:3];
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).authMode = [NSNumber numberWithUnsignedChar:3];
+            {
+                NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
+                temp_3[0] = [NSNumber numberWithUnsignedLongLong:12ULL];
+                temp_3[1] = [NSNumber numberWithUnsignedLongLong:13ULL];
+                temp_3[2] = [NSNumber numberWithUnsignedLongLong:14ULL];
+                temp_3[3] = [NSNumber numberWithUnsignedLongLong:15ULL];
+                ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).subjects = temp_3;
+            }
+            {
+                NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
+                temp_3[0] = [[CHIPAccessControlClusterTarget alloc] init];
+                ((CHIPAccessControlClusterTarget *) temp_3[0]).cluster = nil;
+                ((CHIPAccessControlClusterTarget *) temp_3[0]).endpoint = [NSNumber numberWithUnsignedShort:16U];
+                ((CHIPAccessControlClusterTarget *) temp_3[0]).deviceType = nil;
+
+                temp_3[1] = [[CHIPAccessControlClusterTarget alloc] init];
+                ((CHIPAccessControlClusterTarget *) temp_3[1]).cluster = [NSNumber numberWithUnsignedInt:17UL];
+                ((CHIPAccessControlClusterTarget *) temp_3[1]).endpoint = nil;
+                ((CHIPAccessControlClusterTarget *) temp_3[1]).deviceType = nil;
+
+                temp_3[2] = [[CHIPAccessControlClusterTarget alloc] init];
+                ((CHIPAccessControlClusterTarget *) temp_3[2]).cluster = [NSNumber numberWithUnsignedInt:18UL];
+                ((CHIPAccessControlClusterTarget *) temp_3[2]).endpoint = [NSNumber numberWithUnsignedShort:19U];
+                ((CHIPAccessControlClusterTarget *) temp_3[2]).deviceType = nil;
+
+                ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).targets = temp_3;
+            }
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
+
+            temp_0[3] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[3]).privilege = [NSNumber numberWithUnsignedChar:1];
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[3]).authMode = [NSNumber numberWithUnsignedChar:2];
+            {
+                NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
+                temp_3[0] = [NSNumber numberWithUnsignedLongLong:20ULL];
+                temp_3[1] = [NSNumber numberWithUnsignedLongLong:21ULL];
+                temp_3[2] = [NSNumber numberWithUnsignedLongLong:22ULL];
+                temp_3[3] = [NSNumber numberWithUnsignedLongLong:23ULL];
+                ((CHIPAccessControlClusterAccessControlEntry *) temp_0[3]).subjects = temp_3;
+            }
+            {
+                NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
+                temp_3[0] = [[CHIPAccessControlClusterTarget alloc] init];
+                ((CHIPAccessControlClusterTarget *) temp_3[0]).cluster = nil;
+                ((CHIPAccessControlClusterTarget *) temp_3[0]).endpoint = [NSNumber numberWithUnsignedShort:24U];
+                ((CHIPAccessControlClusterTarget *) temp_3[0]).deviceType = nil;
+
+                temp_3[1] = [[CHIPAccessControlClusterTarget alloc] init];
+                ((CHIPAccessControlClusterTarget *) temp_3[1]).cluster = [NSNumber numberWithUnsignedInt:25UL];
+                ((CHIPAccessControlClusterTarget *) temp_3[1]).endpoint = nil;
+                ((CHIPAccessControlClusterTarget *) temp_3[1]).deviceType = nil;
+
+                temp_3[2] = [[CHIPAccessControlClusterTarget alloc] init];
+                ((CHIPAccessControlClusterTarget *) temp_3[2]).cluster = [NSNumber numberWithUnsignedInt:26UL];
+                ((CHIPAccessControlClusterTarget *) temp_3[2]).endpoint = [NSNumber numberWithUnsignedShort:27U];
+                ((CHIPAccessControlClusterTarget *) temp_3[2]).deviceType = nil;
+
+                ((CHIPAccessControlClusterAccessControlEntry *) temp_0[3]).targets = temp_3;
+            }
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[3]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
+
+            aclArgument = temp_0;
+        }
+        [cluster writeAttributeAclWithValue:aclArgument
+                          completionHandler:^(NSError * _Nullable err) {
+                              NSLog(@"Write too many entries Error: %@", err);
+
+                              VerifyOrReturn(CheckValue("status", err, 135));
+                              NextTest();
+                          }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestVerify_18()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        CHIPReadParams * params = [[CHIPReadParams alloc] init];
+        params.fabricFiltered = [NSNumber numberWithBool:true];
+        [cluster
+            readAttributeAclWithParams:params
+                     completionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+                         NSLog(@"Verify Error: %@", err);
+
+                         VerifyOrReturn(CheckValue("status", err, 0));
+
+                         {
+                             id actualValue = value;
+                             VerifyOrReturn(CheckValue("ACL", [actualValue count], static_cast<uint32_t>(3)));
+                             VerifyOrReturn(CheckValue(
+                                 "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege, 5));
+                             VerifyOrReturn(CheckValue(
+                                 "AuthMode", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).authMode, 2));
+                             VerifyOrReturn(CheckValueNull(
+                                 "Subjects", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects));
+                             VerifyOrReturn(CheckValueNonNull(
+                                 "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets));
+                             VerifyOrReturn(CheckValue("Targets",
+                                 [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets count],
+                                 static_cast<uint32_t>(3)));
+                             VerifyOrReturn(CheckValueNull("Cluster",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
+                                         .targets[0])
+                                     .cluster));
+                             VerifyOrReturn(CheckValueNonNull("Endpoint",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
+                                         .targets[0])
+                                     .endpoint));
+                             VerifyOrReturn(CheckValue("Endpoint",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
+                                         .targets[0])
+                                     .endpoint,
+                                 0U));
+                             VerifyOrReturn(CheckValueNull("DeviceType",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
+                                         .targets[0])
+                                     .deviceType));
+                             VerifyOrReturn(CheckValueNonNull("Cluster",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
+                                         .targets[1])
+                                     .cluster));
+                             VerifyOrReturn(CheckValue("Cluster",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
+                                         .targets[1])
+                                     .cluster,
+                                 1UL));
+                             VerifyOrReturn(CheckValueNull("Endpoint",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
+                                         .targets[1])
+                                     .endpoint));
+                             VerifyOrReturn(CheckValueNull("DeviceType",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
+                                         .targets[1])
+                                     .deviceType));
+                             VerifyOrReturn(CheckValueNonNull("Cluster",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
+                                         .targets[2])
+                                     .cluster));
+                             VerifyOrReturn(CheckValue("Cluster",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
+                                         .targets[2])
+                                     .cluster,
+                                 2UL));
+                             VerifyOrReturn(CheckValueNonNull("Endpoint",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
+                                         .targets[2])
+                                     .endpoint));
+                             VerifyOrReturn(CheckValue("Endpoint",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
+                                         .targets[2])
+                                     .endpoint,
+                                 3U));
+                             VerifyOrReturn(CheckValueNull("DeviceType",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
+                                         .targets[2])
+                                     .deviceType));
+                             VerifyOrReturn(CheckValue(
+                                 "FabricIndex", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex, 1));
+                             VerifyOrReturn(CheckValue(
+                                 "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).privilege, 1));
+                             VerifyOrReturn(CheckValue(
+                                 "AuthMode", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).authMode, 2));
+                             VerifyOrReturn(CheckValueNonNull(
+                                 "Subjects", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).subjects));
+                             VerifyOrReturn(CheckValue("Subjects",
+                                 [((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).subjects count],
+                                 static_cast<uint32_t>(4)));
+                             VerifyOrReturn(
+                                 CheckValue("", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).subjects[0], 4ULL));
+                             VerifyOrReturn(
+                                 CheckValue("", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).subjects[1], 5ULL));
+                             VerifyOrReturn(
+                                 CheckValue("", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).subjects[2], 6ULL));
+                             VerifyOrReturn(
+                                 CheckValue("", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).subjects[3], 7ULL));
+                             VerifyOrReturn(CheckValueNonNull(
+                                 "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).targets));
+                             VerifyOrReturn(CheckValue("Targets",
+                                 [((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).targets count],
+                                 static_cast<uint32_t>(3)));
+                             VerifyOrReturn(CheckValueNull("Cluster",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
+                                         .targets[0])
+                                     .cluster));
+                             VerifyOrReturn(CheckValueNonNull("Endpoint",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
+                                         .targets[0])
+                                     .endpoint));
+                             VerifyOrReturn(CheckValue("Endpoint",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
+                                         .targets[0])
+                                     .endpoint,
+                                 8U));
+                             VerifyOrReturn(CheckValueNull("DeviceType",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
+                                         .targets[0])
+                                     .deviceType));
+                             VerifyOrReturn(CheckValueNonNull("Cluster",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
+                                         .targets[1])
+                                     .cluster));
+                             VerifyOrReturn(CheckValue("Cluster",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
+                                         .targets[1])
+                                     .cluster,
+                                 9UL));
+                             VerifyOrReturn(CheckValueNull("Endpoint",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
+                                         .targets[1])
+                                     .endpoint));
+                             VerifyOrReturn(CheckValueNull("DeviceType",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
+                                         .targets[1])
+                                     .deviceType));
+                             VerifyOrReturn(CheckValueNonNull("Cluster",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
+                                         .targets[2])
+                                     .cluster));
+                             VerifyOrReturn(CheckValue("Cluster",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
+                                         .targets[2])
+                                     .cluster,
+                                 10UL));
+                             VerifyOrReturn(CheckValueNonNull("Endpoint",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
+                                         .targets[2])
+                                     .endpoint));
+                             VerifyOrReturn(CheckValue("Endpoint",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
+                                         .targets[2])
+                                     .endpoint,
+                                 11U));
+                             VerifyOrReturn(CheckValueNull("DeviceType",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
+                                         .targets[2])
+                                     .deviceType));
+                             VerifyOrReturn(CheckValue(
+                                 "FabricIndex", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).fabricIndex, 1));
+                             VerifyOrReturn(CheckValue(
+                                 "Privilege", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).privilege, 3));
+                             VerifyOrReturn(CheckValue(
+                                 "AuthMode", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).authMode, 3));
+                             VerifyOrReturn(CheckValueNonNull(
+                                 "Subjects", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).subjects));
+                             VerifyOrReturn(CheckValue("Subjects",
+                                 [((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).subjects count],
+                                 static_cast<uint32_t>(4)));
+                             VerifyOrReturn(CheckValue(
+                                 "", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).subjects[0], 12ULL));
+                             VerifyOrReturn(CheckValue(
+                                 "", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).subjects[1], 13ULL));
+                             VerifyOrReturn(CheckValue(
+                                 "", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).subjects[2], 14ULL));
+                             VerifyOrReturn(CheckValue(
+                                 "", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).subjects[3], 15ULL));
+                             VerifyOrReturn(CheckValueNonNull(
+                                 "Targets", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).targets));
+                             VerifyOrReturn(CheckValue("Targets",
+                                 [((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).targets count],
+                                 static_cast<uint32_t>(3)));
+                             VerifyOrReturn(CheckValueNull("Cluster",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
+                                         .targets[0])
+                                     .cluster));
+                             VerifyOrReturn(CheckValueNonNull("Endpoint",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
+                                         .targets[0])
+                                     .endpoint));
+                             VerifyOrReturn(CheckValue("Endpoint",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
+                                         .targets[0])
+                                     .endpoint,
+                                 16U));
+                             VerifyOrReturn(CheckValueNull("DeviceType",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
+                                         .targets[0])
+                                     .deviceType));
+                             VerifyOrReturn(CheckValueNonNull("Cluster",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
+                                         .targets[1])
+                                     .cluster));
+                             VerifyOrReturn(CheckValue("Cluster",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
+                                         .targets[1])
+                                     .cluster,
+                                 17UL));
+                             VerifyOrReturn(CheckValueNull("Endpoint",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
+                                         .targets[1])
+                                     .endpoint));
+                             VerifyOrReturn(CheckValueNull("DeviceType",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
+                                         .targets[1])
+                                     .deviceType));
+                             VerifyOrReturn(CheckValueNonNull("Cluster",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
+                                         .targets[2])
+                                     .cluster));
+                             VerifyOrReturn(CheckValue("Cluster",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
+                                         .targets[2])
+                                     .cluster,
+                                 18UL));
+                             VerifyOrReturn(CheckValueNonNull("Endpoint",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
+                                         .targets[2])
+                                     .endpoint));
+                             VerifyOrReturn(CheckValue("Endpoint",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
+                                         .targets[2])
+                                     .endpoint,
+                                 19U));
+                             VerifyOrReturn(CheckValueNull("DeviceType",
+                                 ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
+                                         .targets[2])
+                                     .deviceType));
+                             VerifyOrReturn(CheckValue(
+                                 "FabricIndex", ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).fabricIndex, 1));
+                         }
+
+                         NextTest();
+                     }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestRestoreAcl_19()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:mCallbackQueue];
@@ -1404,7 +1810,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestVerify_18()
+    CHIP_ERROR TestVerify_20()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:mCallbackQueue];
@@ -1439,7 +1845,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestValidateResourceMinimaSubjectsPerAccessControlEntry_19()
+    CHIP_ERROR TestValidateResourceMinimaSubjectsPerAccessControlEntry_21()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:mCallbackQueue];
@@ -1461,7 +1867,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestValidateResourceMinimaTargetsPerAccessControlEntry_20()
+    CHIP_ERROR TestValidateResourceMinimaTargetsPerAccessControlEntry_22()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:mCallbackQueue];
@@ -1483,7 +1889,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestValidateResourceMinimaAccessControlEntriesPerFabric_21()
+    CHIP_ERROR TestValidateResourceMinimaAccessControlEntriesPerFabric_23()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:mCallbackQueue];

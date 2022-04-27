@@ -198,8 +198,8 @@ CHIP_ERROR AccessControl::CreateEntry(const SubjectDescriptor * subjectDescripto
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    size_t count;
-    size_t maxCount;
+    size_t count    = 0;
+    size_t maxCount = 0;
     ReturnErrorOnFailure(mDelegate->GetEntryCount(fabric, count));
     ReturnErrorOnFailure(mDelegate->GetMaxEntriesPerFabric(maxCount));
 
@@ -207,7 +207,7 @@ CHIP_ERROR AccessControl::CreateEntry(const SubjectDescriptor * subjectDescripto
 
     ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
 
-    size_t i;
+    size_t i = 0;
     ReturnErrorOnFailure(mDelegate->CreateEntry(&i, entry, &fabric));
 
     if (index)
