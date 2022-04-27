@@ -232,7 +232,7 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
                 LauncherResponseType response;
                 const char * buf = "data";
                 response.data    = ByteSpan(from_const_char(buf), strlen(buf));
-                response.status  = StatusEnum::kAppNotAvailable;
+                response.status  = ApplicationLauncherStatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
             }
@@ -313,7 +313,7 @@ bool emberAfApplicationLauncherClusterStopAppCallback(app::CommandHandler * comm
                 LauncherResponseType response;
                 const char * buf = "data";
                 response.data    = ByteSpan(from_const_char(buf), strlen(buf));
-                response.status  = StatusEnum::kAppNotAvailable;
+                response.status  = ApplicationLauncherStatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
             }
@@ -396,7 +396,7 @@ bool emberAfApplicationLauncherClusterHideAppCallback(app::CommandHandler * comm
                 LauncherResponseType response;
                 const char * buf = "data";
                 response.data    = ByteSpan(from_const_char(buf), strlen(buf));
-                response.status  = StatusEnum::kAppNotAvailable;
+                response.status  = ApplicationLauncherStatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
             }

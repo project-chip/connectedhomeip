@@ -59,11 +59,11 @@ void KeypadInputManager::HandleSendKey(CommandResponseHelper<SendKeyResponseType
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kInvalidKeyInCurrentState;
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kInvalidKeyInCurrentState;
     }
     else
     {
-        response.status = static_cast<chip::app::Clusters::KeypadInput::StatusEnum>(ret);
+        response.status = static_cast<chip::app::Clusters::KeypadInput::KeypadInputStatusEnum>(ret);
     }
     helper.Success(response);
 }

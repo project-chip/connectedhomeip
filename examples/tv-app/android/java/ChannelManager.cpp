@@ -284,7 +284,7 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
 
         jfieldID getStatusField = env->GetFieldID(channelClass, "status", "I");
         jint jstatus            = env->GetIntField(channelObject, getStatusField);
-        response.status         = static_cast<app::Clusters::Channel::StatusEnum>(jstatus);
+        response.status         = static_cast<app::Clusters::Channel::ChannelStatusEnum>(jstatus);
 
         jfieldID getNameField = env->GetFieldID(channelClass, "name", "Ljava/lang/String;");
         jstring jname         = static_cast<jstring>(env->GetObjectField(channelObject, getNameField));
