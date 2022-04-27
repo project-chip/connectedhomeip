@@ -128,7 +128,7 @@ server cluster ApplicationBasic = 1293 {
 }
 
 server cluster ApplicationLauncher = 1292 {
-  enum StatusEnum : ENUM8 {
+  enum ApplicationLauncherStatusEnum : ENUM8 {
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
@@ -339,14 +339,14 @@ server cluster BridgedActions = 37 {
 }
 
 server cluster Channel = 1284 {
-  enum LineupInfoTypeEnum : ENUM8 {
-    kMso = 0;
-  }
-
-  enum StatusEnum : ENUM8 {
+  enum ChannelStatusEnum : ENUM8 {
     kSuccess = 0;
     kMultipleMatches = 1;
     kNoMatches = 2;
+  }
+
+  enum LineupInfoTypeEnum : ENUM8 {
+    kMso = 0;
   }
 
   bitmap ChannelFeature : BITMAP32 {
@@ -661,6 +661,12 @@ server cluster ColorControl = 768 {
 }
 
 server cluster ContentLauncher = 1290 {
+  enum ContentLauncherStatusEnum : ENUM8 {
+    kSuccess = 0;
+    kUrlNotAvailable = 1;
+    kAuthFailed = 2;
+  }
+
   enum MetricTypeEnum : ENUM8 {
     kPixels = 0;
     kPercentage = 1;
@@ -680,12 +686,6 @@ server cluster ContentLauncher = 1290 {
     kSport = 10;
     kSportsTeam = 11;
     kType = 12;
-  }
-
-  enum StatusEnum : ENUM8 {
-    kSuccess = 0;
-    kUrlNotAvailable = 1;
-    kAuthFailed = 2;
   }
 
   bitmap ContentLauncherFeature : BITMAP32 {
@@ -1910,7 +1910,7 @@ server cluster KeypadInput = 1289 {
     kData = 118;
   }
 
-  enum StatusEnum : ENUM8 {
+  enum KeypadInputStatusEnum : ENUM8 {
     kSuccess = 0;
     kUnsupportedKey = 1;
     kInvalidKeyInCurrentState = 2;
@@ -2057,20 +2057,20 @@ server cluster MediaInput = 1287 {
 }
 
 server cluster MediaPlayback = 1286 {
-  enum PlaybackStateEnum : ENUM8 {
-    kPlaying = 0;
-    kPaused = 1;
-    kNotPlaying = 2;
-    kBuffering = 3;
-  }
-
-  enum StatusEnum : ENUM8 {
+  enum MediaPlaybackStatusEnum : ENUM8 {
     kSuccess = 0;
     kInvalidStateForCommand = 1;
     kNotAllowed = 2;
     kNotActive = 3;
     kSpeedOutOfRange = 4;
     kSeekOutOfRange = 5;
+  }
+
+  enum PlaybackStateEnum : ENUM8 {
+    kPlaying = 0;
+    kPaused = 1;
+    kNotPlaying = 2;
+    kBuffering = 3;
   }
 
   readonly attribute PlaybackStateEnum currentState = 0;
@@ -2925,7 +2925,7 @@ server cluster Switch = 59 {
 }
 
 server cluster TargetNavigator = 1285 {
-  enum StatusEnum : ENUM8 {
+  enum TargetNavigatorStatusEnum : ENUM8 {
     kSuccess = 0;
     kTargetNotFound = 1;
     kNotAllowed = 2;

@@ -2126,18 +2126,18 @@ namespace WakeOnLan {
 
 namespace Channel {
 
-// Enum for LineupInfoTypeEnum
-enum class LineupInfoTypeEnum : uint8_t
-{
-    kMso = 0x00,
-};
-
-// Enum for StatusEnum
-enum class StatusEnum : uint8_t
+// Enum for ChannelStatusEnum
+enum class ChannelStatusEnum : uint8_t
 {
     kSuccess         = 0x00,
     kMultipleMatches = 0x01,
     kNoMatches       = 0x02,
+};
+
+// Enum for LineupInfoTypeEnum
+enum class LineupInfoTypeEnum : uint8_t
+{
+    kMso = 0x00,
 };
 
 // Bitmap for ChannelFeature
@@ -2150,8 +2150,8 @@ enum class ChannelFeature : uint32_t
 
 namespace TargetNavigator {
 
-// Enum for StatusEnum
-enum class StatusEnum : uint8_t
+// Enum for TargetNavigatorStatusEnum
+enum class TargetNavigatorStatusEnum : uint8_t
 {
     kSuccess        = 0x00,
     kTargetNotFound = 0x01,
@@ -2161,17 +2161,8 @@ enum class StatusEnum : uint8_t
 
 namespace MediaPlayback {
 
-// Enum for PlaybackStateEnum
-enum class PlaybackStateEnum : uint8_t
-{
-    kPlaying    = 0x00,
-    kPaused     = 0x01,
-    kNotPlaying = 0x02,
-    kBuffering  = 0x03,
-};
-
-// Enum for StatusEnum
-enum class StatusEnum : uint8_t
+// Enum for MediaPlaybackStatusEnum
+enum class MediaPlaybackStatusEnum : uint8_t
 {
     kSuccess                = 0x00,
     kInvalidStateForCommand = 0x01,
@@ -2179,6 +2170,15 @@ enum class StatusEnum : uint8_t
     kNotActive              = 0x03,
     kSpeedOutOfRange        = 0x04,
     kSeekOutOfRange         = 0x05,
+};
+
+// Enum for PlaybackStateEnum
+enum class PlaybackStateEnum : uint8_t
+{
+    kPlaying    = 0x00,
+    kPaused     = 0x01,
+    kNotPlaying = 0x02,
+    kBuffering  = 0x03,
 };
 } // namespace MediaPlayback
 
@@ -2304,8 +2304,8 @@ enum class CecKeyCode : uint8_t
     kData                      = 0x76,
 };
 
-// Enum for StatusEnum
-enum class StatusEnum : uint8_t
+// Enum for KeypadInputStatusEnum
+enum class KeypadInputStatusEnum : uint8_t
 {
     kSuccess                  = 0x00,
     kUnsupportedKey           = 0x01,
@@ -2322,6 +2322,14 @@ enum class KeypadInputFeature : uint32_t
 } // namespace KeypadInput
 
 namespace ContentLauncher {
+
+// Enum for ContentLauncherStatusEnum
+enum class ContentLauncherStatusEnum : uint8_t
+{
+    kSuccess         = 0x00,
+    kUrlNotAvailable = 0x01,
+    kAuthFailed      = 0x02,
+};
 
 // Enum for MetricTypeEnum
 enum class MetricTypeEnum : uint8_t
@@ -2346,14 +2354,6 @@ enum class ParameterEnum : uint8_t
     kSport      = 0x0A,
     kSportsTeam = 0x0B,
     kType       = 0x0C,
-};
-
-// Enum for StatusEnum
-enum class StatusEnum : uint8_t
-{
-    kSuccess         = 0x00,
-    kUrlNotAvailable = 0x01,
-    kAuthFailed      = 0x02,
 };
 
 // Bitmap for ContentLauncherFeature
@@ -2393,8 +2393,8 @@ enum class AudioOutputFeature : uint32_t
 
 namespace ApplicationLauncher {
 
-// Enum for StatusEnum
-enum class StatusEnum : uint8_t
+// Enum for ApplicationLauncherStatusEnum
+enum class ApplicationLauncherStatusEnum : uint8_t
 {
     kSuccess         = 0x00,
     kAppNotAvailable = 0x01,

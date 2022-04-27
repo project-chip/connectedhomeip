@@ -32209,7 +32209,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    ChannelStatusEnum status = static_cast<ChannelStatusEnum>(0);
     Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -32225,7 +32225,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    ChannelStatusEnum status = static_cast<ChannelStatusEnum>(0);
     Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -32513,7 +32513,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::NavigateTargetResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    TargetNavigatorStatusEnum status = static_cast<TargetNavigatorStatusEnum>(0);
     Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -32529,7 +32529,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::NavigateTargetResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    TargetNavigatorStatusEnum status = static_cast<TargetNavigatorStatusEnum>(0);
     Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -33039,7 +33039,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::PlaybackResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    MediaPlaybackStatusEnum status = static_cast<MediaPlaybackStatusEnum>(0);
     Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -33055,7 +33055,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::PlaybackResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    MediaPlaybackStatusEnum status = static_cast<MediaPlaybackStatusEnum>(0);
     Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -33743,7 +33743,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SendKeyResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    KeypadInputStatusEnum status = static_cast<KeypadInputStatusEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -33758,7 +33758,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SendKeyResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    KeypadInputStatusEnum status = static_cast<KeypadInputStatusEnum>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SendKeyResponse
@@ -34123,7 +34123,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    ContentLauncherStatusEnum status = static_cast<ContentLauncherStatusEnum>(0);
     Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -34139,7 +34139,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    ContentLauncherStatusEnum status = static_cast<ContentLauncherStatusEnum>(0);
     Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -34662,7 +34662,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LauncherResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    ApplicationLauncherStatusEnum status = static_cast<ApplicationLauncherStatusEnum>(0);
     chip::ByteSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -34678,7 +34678,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LauncherResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    StatusEnum status = static_cast<StatusEnum>(0);
+    ApplicationLauncherStatusEnum status = static_cast<ApplicationLauncherStatusEnum>(0);
     chip::ByteSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

@@ -327,6 +327,12 @@ server cluster ColorControl = 768 {
 }
 
 client cluster ContentLauncher = 1290 {
+  enum ContentLauncherStatusEnum : ENUM8 {
+    kSuccess = 0;
+    kUrlNotAvailable = 1;
+    kAuthFailed = 2;
+  }
+
   enum MetricTypeEnum : ENUM8 {
     kPixels = 0;
     kPercentage = 1;
@@ -346,12 +352,6 @@ client cluster ContentLauncher = 1290 {
     kSport = 10;
     kSportsTeam = 11;
     kType = 12;
-  }
-
-  enum StatusEnum : ENUM8 {
-    kSuccess = 0;
-    kUrlNotAvailable = 1;
-    kAuthFailed = 2;
   }
 
   bitmap ContentLauncherFeature : BITMAP32 {
@@ -420,7 +420,7 @@ client cluster ContentLauncher = 1290 {
   }
 
   response struct LaunchResponse = 2 {
-    StatusEnum status = 0;
+    ContentLauncherStatusEnum status = 0;
     optional CHAR_STRING data = 1;
   }
 
@@ -429,6 +429,12 @@ client cluster ContentLauncher = 1290 {
 }
 
 server cluster ContentLauncher = 1290 {
+  enum ContentLauncherStatusEnum : ENUM8 {
+    kSuccess = 0;
+    kUrlNotAvailable = 1;
+    kAuthFailed = 2;
+  }
+
   enum MetricTypeEnum : ENUM8 {
     kPixels = 0;
     kPercentage = 1;
@@ -448,12 +454,6 @@ server cluster ContentLauncher = 1290 {
     kSport = 10;
     kSportsTeam = 11;
     kType = 12;
-  }
-
-  enum StatusEnum : ENUM8 {
-    kSuccess = 0;
-    kUrlNotAvailable = 1;
-    kAuthFailed = 2;
   }
 
   bitmap ContentLauncherFeature : BITMAP32 {
@@ -522,7 +522,7 @@ server cluster ContentLauncher = 1290 {
   }
 
   response struct LaunchResponse = 2 {
-    StatusEnum status = 0;
+    ContentLauncherStatusEnum status = 0;
     optional CHAR_STRING data = 1;
   }
 
@@ -976,7 +976,7 @@ client cluster KeypadInput = 1289 {
     kData = 118;
   }
 
-  enum StatusEnum : ENUM8 {
+  enum KeypadInputStatusEnum : ENUM8 {
     kSuccess = 0;
     kUnsupportedKey = 1;
     kInvalidKeyInCurrentState = 2;
@@ -998,7 +998,7 @@ client cluster KeypadInput = 1289 {
   }
 
   response struct SendKeyResponse = 1 {
-    StatusEnum status = 0;
+    KeypadInputStatusEnum status = 0;
   }
 
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
@@ -1094,7 +1094,7 @@ server cluster KeypadInput = 1289 {
     kData = 118;
   }
 
-  enum StatusEnum : ENUM8 {
+  enum KeypadInputStatusEnum : ENUM8 {
     kSuccess = 0;
     kUnsupportedKey = 1;
     kInvalidKeyInCurrentState = 2;
@@ -1116,7 +1116,7 @@ server cluster KeypadInput = 1289 {
   }
 
   response struct SendKeyResponse = 1 {
-    StatusEnum status = 0;
+    KeypadInputStatusEnum status = 0;
   }
 
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
@@ -2148,7 +2148,7 @@ server cluster Switch = 59 {
 }
 
 client cluster TargetNavigator = 1285 {
-  enum StatusEnum : ENUM8 {
+  enum TargetNavigatorStatusEnum : ENUM8 {
     kSuccess = 0;
     kTargetNotFound = 1;
     kNotAllowed = 2;
@@ -2172,7 +2172,7 @@ client cluster TargetNavigator = 1285 {
   }
 
   response struct NavigateTargetResponse = 1 {
-    StatusEnum status = 0;
+    TargetNavigatorStatusEnum status = 0;
     optional CHAR_STRING data = 1;
   }
 
@@ -2180,7 +2180,7 @@ client cluster TargetNavigator = 1285 {
 }
 
 server cluster TargetNavigator = 1285 {
-  enum StatusEnum : ENUM8 {
+  enum TargetNavigatorStatusEnum : ENUM8 {
     kSuccess = 0;
     kTargetNotFound = 1;
     kNotAllowed = 2;
@@ -2204,7 +2204,7 @@ server cluster TargetNavigator = 1285 {
   }
 
   response struct NavigateTargetResponse = 1 {
-    StatusEnum status = 0;
+    TargetNavigatorStatusEnum status = 0;
     optional CHAR_STRING data = 1;
   }
 
