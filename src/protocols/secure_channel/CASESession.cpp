@@ -163,8 +163,8 @@ void CASESession::Clear()
     AbortExchange();
 
     mLocalNodeId = kUndefinedNodeId;
-    mPeerNodeId = kUndefinedNodeId;
-    mFabricInfo = nullptr;
+    mPeerNodeId  = kUndefinedNodeId;
+    mFabricInfo  = nullptr;
 }
 
 void CASESession::AbortExchange()
@@ -260,11 +260,11 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     mLocalMRPConfig = mrpConfig;
 
     mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
-    mPeerNodeId = peerNodeId;
+    mPeerNodeId  = peerNodeId;
     mLocalNodeId = fabric->GetNodeId();
 
     ChipLogProgress(SecureChannel, "Initiating session on local FabricIndex %u from 0x" ChipLogFormatX64 " -> 0x" ChipLogFormatX64,
-        static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(mLocalNodeId), ChipLogValueX64(mPeerNodeId));
+                    static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(mLocalNodeId), ChipLogValueX64(mPeerNodeId));
 
     err = SendSigma1();
     SuccessOrExit(err);
@@ -503,7 +503,7 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestionationId(const ByteSpan & destina
                 found = true;
                 MutableByteSpan ipkSpan(mIPK);
                 CopySpanToMutableSpan(candidateIpkSpan, ipkSpan);
-                mFabricInfo = &fabricInfo;
+                mFabricInfo  = &fabricInfo;
                 mLocalNodeId = nodeId;
                 break;
             }
@@ -536,7 +536,7 @@ CHIP_ERROR CASESession::TryResumeSession(SessionResumptionStorage::ConstResumpti
     if (mFabricInfo == nullptr)
         return CHIP_ERROR_INTERNAL;
 
-    mPeerNodeId = node.GetNodeId();
+    mPeerNodeId  = node.GetNodeId();
     mLocalNodeId = mFabricInfo->GetNodeId();
 
     return CHIP_NO_ERROR;
