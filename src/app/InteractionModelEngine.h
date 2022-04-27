@@ -157,9 +157,9 @@ public:
     CHIP_ERROR PushFrontAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList,
                                           AttributePathParams & aAttributePath);
 
-    // If the path indicates an attribute that is also referenced by one of all wildcard paths in the request,
-    // the path SHALL be removed.
-    void RemoveDuplicateConcreteAttribute(ObjectList<AttributePathParams> *& aAttributePaths);
+    // If a concrete path indicates an attribute that is also referenced by a wildcard path in the request,
+    // the path SHALL be removed from the list.
+    void RemoveDuplicateConcreteAttributePath(ObjectList<AttributePathParams> *& aAttributePaths);
 
     void ReleaseEventPathList(ObjectList<EventPathParams> *& aEventPathList);
 
