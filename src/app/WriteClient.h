@@ -197,7 +197,7 @@ public:
                 value);
         }
 
-        return EncodeAttribute(attributePath, value.Value());
+        return EncodeAttribute(attributePath, value.Value(), aDataVersion);
     }
 
     /**
