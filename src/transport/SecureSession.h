@@ -72,11 +72,11 @@ public:
 
     // TODO: This constructor should be private.  Tests should allocate a
     // kPending session and then call Activate(), just like non-test code does.
-    SecureSession(Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId, NodeId localNodeId, CATValues peerCATs, uint16_t peerSessionId,
-                  FabricIndex fabric, const ReliableMessageProtocolConfig & config) :
+    SecureSession(Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId, NodeId localNodeId, CATValues peerCATs,
+                  uint16_t peerSessionId, FabricIndex fabric, const ReliableMessageProtocolConfig & config) :
         mSecureSessionType(secureSessionType),
-        mPeerNodeId(peerNodeId), mLocalNodeId(localNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId),
-        mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()),
+        mPeerNodeId(peerNodeId), mLocalNodeId(localNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId),
+        mPeerSessionId(peerSessionId), mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()),
         mLastPeerActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
     {
         SetFabricIndex(fabric);
@@ -89,7 +89,8 @@ public:
      *   receives a local session ID, but no other state.
      */
     SecureSession(uint16_t localSessionId) :
-        SecureSession(Type::kPending, localSessionId, kUndefinedNodeId, kUndefinedNodeId, CATValues{}, 0, kUndefinedFabricIndex, GetLocalMRPConfig())
+        SecureSession(Type::kPending, localSessionId, kUndefinedNodeId, kUndefinedNodeId, CATValues{}, 0, kUndefinedFabricIndex,
+                      GetLocalMRPConfig())
     {}
 
     /**
@@ -108,7 +109,8 @@ public:
         // CASE sessions must always start "associated" a given Fabric!
         VerifyOrDie(!((secureSessionType == Type::kCASE) && (peerNode.GetFabricIndex() == kUndefinedFabricIndex)));
         // CASE sessions can only be activated against operational node IDs!
-        VerifyOrDie(!((secureSessionType == Type::kCASE) && (!IsOperationalNodeId(peerNode.GetNodeId()) || !IsOperationalNodeId(localNode.GetNodeId()))));
+        VerifyOrDie(!((secureSessionType == Type::kCASE) &&
+                      (!IsOperationalNodeId(peerNode.GetNodeId()) || !IsOperationalNodeId(localNode.GetNodeId()))));
 
         mSecureSessionType = secureSessionType;
         mPeerNodeId        = peerNode.GetNodeId();
@@ -130,15 +132,9 @@ public:
     const char * GetSessionTypeString() const override { return "secure"; };
 #endif
 
-    ScopedNodeId GetPeer() const override
-    {
-        return ScopedNodeId(mPeerNodeId, GetFabricIndex());
-    }
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(mPeerNodeId, GetFabricIndex()); }
 
-    ScopedNodeId GetLocalScopedNodeId() const override
-    {
-        return ScopedNodeId(mLocalNodeId, GetFabricIndex());
-    }
+    ScopedNodeId GetLocalScopedNodeId() const override { return ScopedNodeId(mLocalNodeId, GetFabricIndex()); }
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override;
 

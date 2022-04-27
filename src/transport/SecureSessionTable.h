@@ -62,8 +62,9 @@ public:
      */
     CHECK_RETURN_VALUE
     Optional<SessionHandle> CreateNewSecureSessionForTest(SecureSession::Type secureSessionType, uint16_t localSessionId,
-                                                          NodeId peerNodeId, NodeId localNodeId, CATValues peerCATs, uint16_t peerSessionId,
-                                                          FabricIndex fabricIndex, const ReliableMessageProtocolConfig & config)
+                                                          NodeId peerNodeId, NodeId localNodeId, CATValues peerCATs,
+                                                          uint16_t peerSessionId, FabricIndex fabricIndex,
+                                                          const ReliableMessageProtocolConfig & config)
     {
         if (secureSessionType == SecureSession::Type::kCASE)
         {
@@ -83,13 +84,13 @@ public:
                 }
                 else
                 {
-                    (void)fabricIndex;
+                    (void) fabricIndex;
                 }
             }
         }
 
-        SecureSession * result =
-            mEntries.CreateObject(secureSessionType, localSessionId, peerNodeId, localNodeId, peerCATs, peerSessionId, fabricIndex, config);
+        SecureSession * result = mEntries.CreateObject(secureSessionType, localSessionId, peerNodeId, localNodeId, peerCATs,
+                                                       peerSessionId, fabricIndex, config);
         return result != nullptr ? MakeOptional<SessionHandle>(*result) : Optional<SessionHandle>::Missing();
     }
 
