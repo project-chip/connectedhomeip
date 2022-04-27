@@ -521,9 +521,9 @@ tests:
                               { Cluster: 18, Endpoint: 19, DeviceType: null },
                           ],
                   },
-                  # note missing last entry
               ]
 
+    # note missing last entry
     - label: "Restore ACL"
       command: "writeAttribute"
       attribute: "ACL"
