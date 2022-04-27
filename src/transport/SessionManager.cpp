@@ -400,8 +400,8 @@ CHIP_ERROR SessionManager::InjectPaseSessionWithTestKey(SessionHolder & sessionH
 {
     NodeId localNodeId = kUndefinedNodeId;
     Optional<SessionHandle> session =
-        mSecureSessions.CreateNewSecureSessionForTest(chip::Transport::SecureSession::Type::kPASE, localSessionId, localNodeId, peerNodeId,
-                                                      CATValues{}, peerSessionId, fabric, GetLocalMRPConfig());
+        mSecureSessions.CreateNewSecureSessionForTest(chip::Transport::SecureSession::Type::kPASE, localSessionId, localNodeId,
+                                                      peerNodeId, CATValues{}, peerSessionId, fabric, GetLocalMRPConfig());
     VerifyOrReturnError(session.HasValue(), CHIP_ERROR_NO_MEMORY);
     SecureSession * secureSession = session.Value()->AsSecureSession();
     secureSession->SetPeerAddress(peerAddress);
