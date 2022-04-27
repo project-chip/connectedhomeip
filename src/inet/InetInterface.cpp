@@ -507,11 +507,11 @@ static void backport_if_freenameindex(struct if_nameindex * inArray)
     {
         if (inArray[i].if_name != NULL)
         {
-            free(inArray[i].if_name);
+            MemoryFree(inArray[i].if_name);
         }
     }
 
-    free(inArray);
+    MemoryFree(inArray);
 }
 
 static struct if_nameindex * backport_if_nameindex(void)
