@@ -20,6 +20,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -32,7 +33,7 @@ public:
      *  Maximum length of a key required by implementations. Any implementer of PersistentStorageDelegate
      *  must support keys AT LEAST this long.
      */
-    static constexpr size_t kKeyLengthMax = 32;
+    static constexpr size_t kKeyLengthMax = DefaultStorageKeyAllocator::kKeyLengthMax;
 
     virtual ~PersistentStorageDelegate() {}
 
@@ -59,7 +60,7 @@ public:
      *   if the key exists and CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if the
      *   key is not found.
      *
-     * @param[in]      key Key to lookup
+     * @param[in]      key Key allocator that can provide the string key to get via KeyName().
      * @param[out]     buffer Pointer to a buffer where the place the read value.
      * @param[in, out] size Input is maximum buffer size, output updated to length of value.
      *
@@ -71,32 +72,63 @@ public:
      *                                     combined with setting "size" to 0 means the actual size was
      *                                     too large to fit in uint16_t.
      */
-    virtual CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) = 0;
+    CHIP_ERROR SyncGetKeyValue(const DefaultStorageKeyAllocator & key, void * buffer, uint16_t & size)
+    {
+        return SyncGetKeyValue(key.KeyName(), buffer, size);
+    }
 
     /**
      * @brief
      *   Set the value for the key to a byte buffer. Empty values can be stored
      *   with size == 0, in which case `value` may be nullptr.
      *
-     * @param[in] key Key to set
+     * @param[in] key Key allocator that can provide the string key to set via KeyName().
      * @param[in] value Pointer to bytes of value to be set. `value` can only be `nullptr` if size == 0.
      * @param[in] size Size of the `value` to store.
      *
      * @return CHIP_NO_ERROR on success, CHIP_INVALID_ARGUMENT on `value` being `nullptr` with size > 0,
      *         or another CHIP_ERROR value from implementation on failure.
      */
-    virtual CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) = 0;
+    CHIP_ERROR SyncSetKeyValue(const DefaultStorageKeyAllocator & key, const void * value, uint16_t size)
+    {
+        return SyncSetKeyValue(key.KeyName(), value, size);
+    }
 
     /**
      * @brief
      *   Deletes the value for the key
      *
-     * @param[in] key Key to be deleted
+     * @param[in] key Key allocator that can provide the string key to delete via KeyName().
      *
      * @return CHIP_NO_ERROR on success, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND the key is not found in storage,
      *         or another CHIP_ERROR value from implementation on failure.
      */
-    virtual CHIP_ERROR SyncDeleteKeyValue(const char * key) = 0;
+    CHIP_ERROR SyncDeleteKeyValue(const DefaultStorageKeyAllocator & key) { return SyncDeleteKeyValue(key.KeyName()); }
+
+    // APIs, for now, for things that have not been converted to
+    // DefaultStorageKeyAllocator yet.  DO NOT ADD NEW CALLERS of these APIs.
+    CHIP_ERROR SyncGetKeyValueDeprecated(const char * key, void * buffer, uint16_t & size)
+    {
+        return SyncGetKeyValue(key, buffer, size);
+    }
+    CHIP_ERROR SyncSetKeyValueDeprecated(const char * key, const void * value, uint16_t size)
+    {
+        return SyncSetKeyValue(key, value, size);
+    }
+    CHIP_ERROR SyncDeleteKeyValueDeprecated(const char * key) { return SyncDeleteKeyValue(key); }
+
+protected:
+    /**
+     * Implementations override these APIs, which take a string key.  The public
+     * APIs take a DefaultStorageKeyAllocator to ensure that all key allocation is
+     * centralized and we do not have key collisions.
+     *
+     * All the API documentation above applies to these override-able APIs.
+     */
+
+    virtual CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size)    = 0;
+    virtual CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) = 0;
+    virtual CHIP_ERROR SyncDeleteKeyValue(const char * key)                                 = 0;
 };
 
 } // namespace chip

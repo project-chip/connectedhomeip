@@ -55,14 +55,15 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::Initialize(PersistentStorageDele
     Crypto::P256SerializedKeypair serializedKey;
     uint16_t keySize = static_cast<uint16_t>(sizeof(serializedKey));
 
-    if (storage.SyncGetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize) != CHIP_NO_ERROR)
+    if (storage.SyncGetKeyValueDeprecated(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize) != CHIP_NO_ERROR)
     {
         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
         ReturnErrorOnFailure(mIssuer.Initialize());
         ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
 
         keySize = static_cast<uint16_t>(sizeof(serializedKey));
-        ReturnErrorOnFailure(storage.SyncSetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize));
+        ReturnErrorOnFailure(
+            storage.SyncSetKeyValueDeprecated(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize));
     }
     else
     {
@@ -87,7 +88,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
     CHIP_ERROR err      = CHIP_NO_ERROR;
     PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
-                      err = mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen));
+                      err = mStorage->SyncGetKeyValueDeprecated(key, rcac.data(), rcacBufLen));
     if (err == CHIP_NO_ERROR)
     {
         uint64_t rcacId;
@@ -107,8 +108,9 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
         ReturnErrorOnFailure(NewRootX509Cert(rcac_request, mIssuer, rcac));
 
         VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
-        PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
-                          ReturnErrorOnFailure(mStorage->SyncSetKeyValue(key, rcac.data(), static_cast<uint16_t>(rcac.size()))));
+        PERSISTENT_KEY_OP(
+            fabricId, kOperationalCredentialsRootCertificateStorage, key,
+            ReturnErrorOnFailure(mStorage->SyncSetKeyValueDeprecated(key, rcac.data(), static_cast<uint16_t>(rcac.size()))));
     }
 
     icac.reduce_size(0);

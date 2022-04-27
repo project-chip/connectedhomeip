@@ -150,13 +150,13 @@ void TestPersistentStorage(nlTestSuite * aSuite, void * aContext)
     VerifyRestored(aSuite, testStorage, expected);
 
     // Verify storage untouched if add fails
-    testStorage.AddPoisonKey(key.BindingTableEntry(4));
+    testStorage.AddPoisonKey(key.BindingTableEntry(4).KeyName());
     NL_TEST_ASSERT(aSuite, table.Add(EmberBindingTableEntry::ForNode(4, 4, 0, 0, NullOptional)) != CHIP_NO_ERROR);
     VerifyRestored(aSuite, testStorage, expected);
     testStorage.ClearPoisonKeys();
 
     // Verify storage untouched if removing head fails
-    testStorage.AddPoisonKey(key.BindingTable());
+    testStorage.AddPoisonKey(key.BindingTable().KeyName());
     auto iter = table.begin();
     NL_TEST_ASSERT(aSuite, table.RemoveAt(iter) != CHIP_NO_ERROR);
     VerifyTableSame(aSuite, table, expected);
@@ -164,7 +164,7 @@ void TestPersistentStorage(nlTestSuite * aSuite, void * aContext)
     VerifyRestored(aSuite, testStorage, expected);
 
     // Verify storage untouched if removing other nodes fails
-    testStorage.AddPoisonKey(key.BindingTableEntry(0));
+    testStorage.AddPoisonKey(key.BindingTableEntry(0).KeyName());
     iter = table.begin();
     ++iter;
     NL_TEST_ASSERT(aSuite, table.RemoveAt(iter) != CHIP_NO_ERROR);

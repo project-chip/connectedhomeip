@@ -295,7 +295,7 @@ CHIP_ERROR FabricInfo::DeleteFromStorage(PersistentStorageDelegate * storage, Fa
     DefaultStorageKeyAllocator keyAlloc;
 
     // Try to delete all the state even if one of the deletes fails.
-    typedef const char * (DefaultStorageKeyAllocator::*KeyGetter)(FabricIndex);
+    typedef const DefaultStorageKeyAllocator & (DefaultStorageKeyAllocator::*KeyGetter)(FabricIndex);
     constexpr KeyGetter keyGetters[] = { &DefaultStorageKeyAllocator::FabricNOC, &DefaultStorageKeyAllocator::FabricICAC,
                                          &DefaultStorageKeyAllocator::FabricRCAC, &DefaultStorageKeyAllocator::FabricMetadata,
                                          &DefaultStorageKeyAllocator::FabricOpKey };

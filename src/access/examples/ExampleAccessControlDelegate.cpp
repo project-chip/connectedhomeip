@@ -509,7 +509,7 @@ public:
     static constexpr uint8_t kTagSubjects    = 5;
     static constexpr uint8_t kTagTargets     = 6;
 
-    CHIP_ERROR Serialize(chip::PersistentStorageDelegate * storage, const char * key)
+    CHIP_ERROR Serialize(chip::PersistentStorageDelegate * storage, const chip::DefaultStorageKeyAllocator & key)
     {
         uint8_t buffer[kStorageBufferSize] = { 0 };
         chip::TLV::TLVWriter writer;
@@ -545,7 +545,7 @@ public:
         return storage->SyncSetKeyValue(key, buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
     }
 
-    CHIP_ERROR Deserialize(chip::PersistentStorageDelegate * storage, const char * key)
+    CHIP_ERROR Deserialize(chip::PersistentStorageDelegate * storage, const chip::DefaultStorageKeyAllocator & key)
     {
         uint8_t buffer[kStorageBufferSize] = { 0 };
         uint16_t bufferSize                = static_cast<uint16_t>(sizeof(buffer));

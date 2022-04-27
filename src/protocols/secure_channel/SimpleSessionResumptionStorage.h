@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/secure_channel/SessionResumptionStorage.h>
@@ -57,8 +58,8 @@ public:
     CHIP_ERROR DeleteState(const ScopedNodeId & node) override;
 
 private:
-    static const char * StorageKey(DefaultStorageKeyAllocator & keyAlloc, const ScopedNodeId & node);
-    static const char * StorageKey(DefaultStorageKeyAllocator & keyAlloc, ConstResumptionIdView resumptionId);
+    static const DefaultStorageKeyAllocator & StorageKey(DefaultStorageKeyAllocator & keyAlloc, const ScopedNodeId & node);
+    static const DefaultStorageKeyAllocator & StorageKey(DefaultStorageKeyAllocator & keyAlloc, ConstResumptionIdView resumptionId);
 
     static constexpr size_t MaxScopedNodeIdSize() { return TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex)); }
 

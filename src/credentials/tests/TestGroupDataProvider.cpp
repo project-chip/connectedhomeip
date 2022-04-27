@@ -41,7 +41,6 @@ namespace chip {
 namespace app {
 namespace TestGroups {
 
-static const char * kKey1   = "abc/def";
 static const char * kValue1 = "abc/def";
 static const char * kValue2 = "abc/ghi/xyz";
 static const size_t kSize1  = strlen(kValue1) + 1;
@@ -183,6 +182,9 @@ void TestStorageDelegate(nlTestSuite * apSuite, void * apContext)
     char out[128];
     uint16_t size = static_cast<uint16_t>(sizeof(out));
 
+    DefaultStorageKeyAllocator kKey1;
+    // Just pick a random key to use here.
+    kKey1.GroupFabricList();
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == delegate.SyncGetKeyValue(kKey1, out, size));
 
     size = static_cast<uint16_t>(kSize1);

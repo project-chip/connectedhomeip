@@ -147,7 +147,7 @@ CHIP_ERROR FailSafeContext::CommitToStorage()
     const auto failSafeContextTLVLength = writer.GetLengthWritten();
     VerifyOrReturnError(CanCastTo<uint16_t>(failSafeContextTLVLength), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    return PersistedStorage::KeyValueStoreMgr().Put(keyAlloc.FailSafeContextKey(), buf,
+    return PersistedStorage::KeyValueStoreMgr().Put(keyAlloc.FailSafeContextKey().KeyName(), buf,
                                                     static_cast<uint16_t>(failSafeContextTLVLength));
 }
 
@@ -155,7 +155,7 @@ CHIP_ERROR FailSafeContext::LoadFromStorage(FabricIndex & fabricIndex, bool & ad
 {
     DefaultStorageKeyAllocator keyAlloc;
     uint8_t buf[FailSafeContextTLVMaxSize()];
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get(keyAlloc.FailSafeContextKey(), buf, sizeof(buf)));
+    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get(keyAlloc.FailSafeContextKey().KeyName(), buf, sizeof(buf)));
 
     TLV::ContiguousBufferTLVReader reader;
     reader.Init(buf, sizeof(buf));
@@ -183,7 +183,7 @@ CHIP_ERROR FailSafeContext::DeleteFromStorage()
 {
     DefaultStorageKeyAllocator keyAlloc;
 
-    return PersistedStorage::KeyValueStoreMgr().Delete(keyAlloc.FailSafeContextKey());
+    return PersistedStorage::KeyValueStoreMgr().Delete(keyAlloc.FailSafeContextKey().KeyName());
 }
 
 void FailSafeContext::ForceFailSafeTimerExpiry()

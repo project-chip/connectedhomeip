@@ -60,7 +60,7 @@ public:
     PersistedCounter();
     ~PersistedCounter() override;
 
-    typedef const char * (DefaultStorageKeyAllocator::*KeyType)();
+    typedef const DefaultStorageKeyAllocator & (DefaultStorageKeyAllocator::*KeyType)();
 
     /**
      *  @brief

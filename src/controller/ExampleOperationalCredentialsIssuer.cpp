@@ -58,7 +58,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         uint16_t keySize = static_cast<uint16_t>(serializedKey.Capacity());
 
         PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIssuerKeypairStorage, key,
-                          err = storage.SyncGetKeyValue(key, serializedKey.Bytes(), keySize));
+                          err = storage.SyncGetKeyValueDeprecated(key, serializedKey.Bytes(), keySize));
         serializedKey.SetLength(keySize);
     }
 
@@ -70,8 +70,8 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
 
         PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIssuerKeypairStorage, key,
-                          ReturnErrorOnFailure(
-                              storage.SyncSetKeyValue(key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
+                          ReturnErrorOnFailure(storage.SyncSetKeyValueDeprecated(key, serializedKey.Bytes(),
+                                                                                 static_cast<uint16_t>(serializedKey.Length()))));
     }
     else
     {
@@ -84,7 +84,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         uint16_t keySize = static_cast<uint16_t>(serializedKey.Capacity());
 
         PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateIssuerKeypairStorage, key,
-                          err = storage.SyncGetKeyValue(key, serializedKey.Bytes(), keySize));
+                          err = storage.SyncGetKeyValueDeprecated(key, serializedKey.Bytes(), keySize));
         serializedKey.SetLength(keySize);
     }
 
@@ -97,8 +97,8 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         ReturnErrorOnFailure(mIntermediateIssuer.Serialize(serializedKey));
 
         PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateIssuerKeypairStorage, key,
-                          ReturnErrorOnFailure(
-                              storage.SyncSetKeyValue(key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
+                          ReturnErrorOnFailure(storage.SyncSetKeyValueDeprecated(key, serializedKey.Bytes(),
+                                                                                 static_cast<uint16_t>(serializedKey.Length()))));
     }
     else
     {
@@ -121,7 +121,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
     PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsRootCertificateStorage, key,
-                      err = mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen));
+                      err = mStorage->SyncGetKeyValueDeprecated(key, rcac.data(), rcacBufLen));
     if (err == CHIP_NO_ERROR)
     {
         uint64_t rcacId;
@@ -141,14 +141,15 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
         ReturnErrorOnFailure(NewRootX509Cert(rcac_request, mIssuer, rcac));
 
         VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
-        PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsRootCertificateStorage, key,
-                          ReturnErrorOnFailure(mStorage->SyncSetKeyValue(key, rcac.data(), static_cast<uint16_t>(rcac.size()))));
+        PERSISTENT_KEY_OP(
+            mIndex, kOperationalCredentialsRootCertificateStorage, key,
+            ReturnErrorOnFailure(mStorage->SyncSetKeyValueDeprecated(key, rcac.data(), static_cast<uint16_t>(rcac.size()))));
     }
 
     ChipDN icac_dn;
     uint16_t icacBufLen = static_cast<uint16_t>(std::min(icac.size(), static_cast<size_t>(UINT16_MAX)));
     PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateCertificateStorage, key,
-                      err = mStorage->SyncGetKeyValue(key, icac.data(), icacBufLen));
+                      err = mStorage->SyncGetKeyValueDeprecated(key, icac.data(), icacBufLen));
     if (err == CHIP_NO_ERROR)
     {
         uint64_t icacId;
@@ -168,8 +169,9 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
         ReturnErrorOnFailure(NewICAX509Cert(icac_request, mIntermediateIssuer.Pubkey(), mIssuer, icac));
 
         VerifyOrReturnError(CanCastTo<uint16_t>(icac.size()), CHIP_ERROR_INTERNAL);
-        PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateCertificateStorage, key,
-                          ReturnErrorOnFailure(mStorage->SyncSetKeyValue(key, icac.data(), static_cast<uint16_t>(icac.size()))));
+        PERSISTENT_KEY_OP(
+            mIndex, kOperationalCredentialsIntermediateCertificateStorage, key,
+            ReturnErrorOnFailure(mStorage->SyncSetKeyValueDeprecated(key, icac.data(), static_cast<uint16_t>(icac.size()))));
     }
 
     ChipDN noc_dn;

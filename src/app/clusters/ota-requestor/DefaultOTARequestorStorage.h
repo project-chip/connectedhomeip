@@ -20,6 +20,8 @@
 
 #include "OTARequestorStorage.h"
 
+#include <lib/support/DefaultStorageKeyAllocator.h>
+
 namespace chip {
 
 class PersistentStorageDelegate;
@@ -49,7 +51,7 @@ public:
     CHIP_ERROR ClearTargetVersion() override;
 
 private:
-    CHIP_ERROR Load(const char * key, MutableByteSpan & buffer);
+    CHIP_ERROR Load(const DefaultStorageKeyAllocator & key, MutableByteSpan & buffer);
     PersistentStorageDelegate * mPersistentStorage = nullptr;
 };
 

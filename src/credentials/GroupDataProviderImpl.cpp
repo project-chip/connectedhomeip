@@ -60,7 +60,7 @@ struct PersistentData
         ReturnErrorOnFailure(Serialize(writer));
 
         // Save serialized data
-        return storage->SyncSetKeyValue(key.KeyName(), buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
+        return storage->SyncSetKeyValue(key, buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
     }
 
     CHIP_ERROR Load(PersistentStorageDelegate * storage)
@@ -78,7 +78,7 @@ struct PersistentData
 
         // Load the serialized data
         uint16_t size  = static_cast<uint16_t>(sizeof(buffer));
-        CHIP_ERROR err = storage->SyncGetKeyValue(key.KeyName(), buffer, size);
+        CHIP_ERROR err = storage->SyncGetKeyValue(key, buffer, size);
         VerifyOrReturnError(CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND != err, CHIP_ERROR_NOT_FOUND);
         ReturnErrorOnFailure(err);
 
@@ -96,7 +96,7 @@ struct PersistentData
         // Update storage key
         ReturnErrorOnFailure(UpdateKey(key));
         // Delete stored data
-        return storage->SyncDeleteKeyValue(key.KeyName());
+        return storage->SyncDeleteKeyValue(key);
     }
 };
 

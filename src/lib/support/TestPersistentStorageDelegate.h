@@ -46,6 +46,10 @@ class TestPersistentStorageDelegate : public PersistentStorageDelegate
 public:
     TestPersistentStorageDelegate() {}
 
+    using PersistentStorageDelegate::SyncDeleteKeyValue;
+    using PersistentStorageDelegate::SyncGetKeyValue;
+    using PersistentStorageDelegate::SyncSetKeyValue;
+
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
         if ((buffer == nullptr) && (size != 0))

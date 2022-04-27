@@ -346,11 +346,11 @@ CHIP_ERROR GroupOutgoingCounters::IncrementCounter(bool isControl)
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
 
-    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(key.KeyName(), &temp, size));
+    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(key, &temp, size));
     if (temp == value)
     {
         temp = value + GROUP_MSG_COUNTER_MIN_INCREMENT;
-        return mStorage->SyncSetKeyValue(key.KeyName(), &temp, sizeof(uint32_t));
+        return mStorage->SyncSetKeyValue(key, &temp, sizeof(uint32_t));
     }
     return CHIP_NO_ERROR;
 }

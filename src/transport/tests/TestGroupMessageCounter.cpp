@@ -65,7 +65,7 @@ public:
 
         // Always Update storage for Test purposes
         temp = value + GROUP_MSG_COUNTER_MIN_INCREMENT;
-        mStorage->SyncSetKeyValue(key.KeyName(), &temp, sizeof(uint32_t));
+        mStorage->SyncSetKeyValue(key, &temp, sizeof(uint32_t));
     }
 };
 
