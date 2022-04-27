@@ -18,9 +18,9 @@
 
 #pragma once
 
+#include <app/server/Server.h>
 #include <controller/CHIPCommissionableNodeController.h>
 #include <zap-generated/CHIPClusters.h>
-#include <app/server/Server.h>
 
 #include "TargetEndpointInfo.h"
 #include "TargetVideoPlayerInfo.h"
@@ -50,9 +50,9 @@ public:
     CHIP_ERROR DiscoverCommissioners();
     const Dnssd::DiscoveredNodeData * GetDiscoveredCommissioner(int index);
     CHIP_ERROR OpenBasicCommissioningWindow();
-    #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-        CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner);
-    #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     CHIP_ERROR InitBindingHandlers();
     TargetVideoPlayerInfo * GetTargetVideoPlayerInfo() { return &mTargetVideoPlayerInfo; }

@@ -118,7 +118,8 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         chip::Inet::IPAddress::FromString(argv[1], commissioner);
         uint16_t port = (uint16_t) strtol(argv[2], &eptr, 10);
         PrepareForCommissioning();
-        return CastingServer::GetInstance()->SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(commissioner, port));
+        return CastingServer::GetInstance()->SendUserDirectedCommissioningRequest(
+            chip::Transport::PeerAddress::UDP(commissioner, port));
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     return CHIP_ERROR_INVALID_ARGUMENT;

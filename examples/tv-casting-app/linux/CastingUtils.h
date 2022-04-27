@@ -37,5 +37,5 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
 void InitCommissioningFlow(intptr_t commandArg);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    void HandleUDCSendExpiration(System::Layer * aSystemLayer, void * context);
+void HandleUDCSendExpiration(System::Layer * aSystemLayer, void * context);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
