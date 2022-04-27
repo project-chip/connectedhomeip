@@ -35,8 +35,8 @@ public:
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
 
 private:
-    _Nullable id<CHIPPersistentStorageDelegate> mDelegate;
-    _Nullable dispatch_queue_t mWorkQueue;
+    id<CHIPPersistentStorageDelegate> mDelegate;
+    dispatch_queue_t mWorkQueue;
 };
 
 NS_ASSUME_NONNULL_END

@@ -53,8 +53,8 @@ std::string Base64ToString(const std::string & b64Value)
 
 CHIPPersistentStorageDelegateBridge::CHIPPersistentStorageDelegateBridge(id<CHIPPersistentStorageDelegate> delegate)
     : mDelegate(delegate)
+    , mWorkQueue(dispatch_queue_create("com.zigbee.chip.framework.storage.workqueue", DISPATCH_QUEUE_SERIAL))
 {
-    mWorkQueue = dispatch_queue_create("com.zigbee.chip.framework.storage.workqueue", DISPATCH_QUEUE_SERIAL);
 }
 
 CHIPPersistentStorageDelegateBridge::~CHIPPersistentStorageDelegateBridge(void) {}
