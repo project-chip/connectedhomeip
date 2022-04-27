@@ -20,8 +20,8 @@
  */
 
 #include "CastingShellCommands.h"
-#include "CastingUtils.h"
 #include "CastingServer.h"
+#include "CastingUtils.h"
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>

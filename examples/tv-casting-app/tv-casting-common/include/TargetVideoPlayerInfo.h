@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include <platform/CHIPDeviceLayer.h>
-#include "app/clusters/bindings/BindingManager.h"
 #include "TargetEndpointInfo.h"
+#include "app/clusters/bindings/BindingManager.h"
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
 

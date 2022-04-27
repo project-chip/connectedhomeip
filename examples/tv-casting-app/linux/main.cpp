@@ -16,8 +16,12 @@
  *    limitations under the License.
  */
 
+#include "CastingServer.h"
+#include "CastingUtils.h"
 #include "LinuxCommissionableDataProvider.h"
 #include "Options.h"
+#include "TargetEndpointInfo.h"
+#include "TargetVideoPlayerInfo.h"
 #include "app/clusters/bindings/BindingManager.h"
 #include <app/OperationalDeviceProxy.h>
 #include <app/server/Dnssd.h>
@@ -39,10 +43,6 @@
 #include <system/SystemLayer.h>
 #include <transport/raw/PeerAddress.h>
 #include <zap-generated/CHIPClusters.h>
-#include "TargetEndpointInfo.h"
-#include "TargetVideoPlayerInfo.h"
-#include "CastingServer.h"
-#include "CastingUtils.h"
 
 #if defined(ENABLE_CHIP_SHELL)
 #include "CastingShellCommands.h"
@@ -70,18 +70,18 @@ struct TVExampleDeviceType
     uint16_t id;
 };
 
-Dnssd::DiscoveryFilter gDiscoveryFilter = Dnssd::DiscoveryFilter();
-constexpr TVExampleDeviceType kKnownDeviceTypes[]              = { { "video-player", 35 }, { "dimmable-light", 257 } };
-constexpr int kKnownDeviceTypesCount                           = sizeof kKnownDeviceTypes / sizeof *kKnownDeviceTypes;
-constexpr uint16_t kOptionDeviceType                           = 't';
+Dnssd::DiscoveryFilter gDiscoveryFilter           = Dnssd::DiscoveryFilter();
+constexpr TVExampleDeviceType kKnownDeviceTypes[] = { { "video-player", 35 }, { "dimmable-light", 257 } };
+constexpr int kKnownDeviceTypesCount              = sizeof kKnownDeviceTypes / sizeof *kKnownDeviceTypes;
+constexpr uint16_t kOptionDeviceType              = 't';
 
 // TODO: Accept these values over CLI
-const char * kContentUrl         = "https://www.test.com/videoid";
-const char * kContentDisplayStr  = "Test video";
+const char * kContentUrl        = "https://www.test.com/videoid";
+const char * kContentDisplayStr = "Test video";
 
 CommissionableNodeController gCommissionableNodeController;
 chip::System::SocketWatchToken gToken;
-bool gInited                            = false;
+bool gInited = false;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
@@ -129,20 +129,20 @@ HelpOptions helpOptions("tv-casting-app", "Usage: tv-casting-app [options]", "1.
 
 OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 
-
 void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     if (event->Type == DeviceLayer::DeviceEventType::kBindingsChangedViaCluster)
     {
         if (CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->IsInitialized())
         {
-            CastingServer::GetInstance()->ReadServerClustersForNode(CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->GetNodeId());
+            CastingServer::GetInstance()->ReadServerClustersForNode(
+                CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->GetNodeId());
         }
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
-        ReturnOnFailure(CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->Initialize(event->CommissioningComplete.PeerNodeId,
-                                                          event->CommissioningComplete.PeerFabricIndex));
+        ReturnOnFailure(CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->Initialize(
+            event->CommissioningComplete.PeerNodeId, event->CommissioningComplete.PeerFabricIndex));
 
         CastingServer::GetInstance()->ContentLauncherLaunchURL(kContentUrl, kContentDisplayStr);
     }

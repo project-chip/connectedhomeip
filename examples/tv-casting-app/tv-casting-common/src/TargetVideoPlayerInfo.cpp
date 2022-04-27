@@ -30,115 +30,115 @@ CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIn
         endpointInfo.Reset();
     }
 
-        Server * server           = &(chip::Server::GetInstance());
-        chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(fabricIndex);
-        if (fabric == nullptr)
-        {
-            ChipLogError(AppServer, "Did not find fabric for index %d", fabricIndex);
-            return CHIP_ERROR_INVALID_FABRIC_ID;
-        }
-
-        chip::DeviceProxyInitParams initParams = {
-            .sessionManager           = &(server->GetSecureSessionManager()),
-            .sessionResumptionStorage = server->GetSessionResumptionStorage(),
-            .exchangeMgr              = &(server->GetExchangeManager()),
-            .fabricTable              = &(server->GetFabricTable()),
-            .clientPool               = &gCASEClientPool,
-        };
-
-        PeerId peerID = fabric->GetPeerIdForNode(nodeId);
-
-        //
-        // TODO: The code here is assuming that we can create an OperationalDeviceProxy instance and attach it immediately
-        //       to a CASE session that just got established to us by the tv-app. While this will work most of the time,
-        //       this is a dangerous assumption to make since it is entirely possible for that secure session to have been
-        //       evicted in the time since that session was established to the point here when we desire to interact back
-        //       with that peer. If that is the case, our `OnConnected` callback will not get invoked syncronously and
-        //       mOperationalDeviceProxy will still have a value of null, triggering the check below to fail.
-        //
-        mOperationalDeviceProxy = nullptr;
-        CHIP_ERROR err =
-            server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnConnectedCallback, &mOnConnectionFailureCallback);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "Could not establish a session to the peer");
-            return err;
-        }
-
-        if (mOperationalDeviceProxy == nullptr)
-        {
-            ChipLogError(AppServer, "Failed to find an existing instance of OperationalDeviceProxy to the peer");
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        ChipLogProgress(AppServer, "Created an instance of OperationalDeviceProxy");
-
-        mInitialized = true;
-        return CHIP_NO_ERROR;
+    Server * server           = &(chip::Server::GetInstance());
+    chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(fabricIndex);
+    if (fabric == nullptr)
+    {
+        ChipLogError(AppServer, "Did not find fabric for index %d", fabricIndex);
+        return CHIP_ERROR_INVALID_FABRIC_ID;
     }
 
-    TargetEndpointInfo * TargetVideoPlayerInfo::GetOrAddEndpoint(EndpointId endpointId)
+    chip::DeviceProxyInitParams initParams = {
+        .sessionManager           = &(server->GetSecureSessionManager()),
+        .sessionResumptionStorage = server->GetSessionResumptionStorage(),
+        .exchangeMgr              = &(server->GetExchangeManager()),
+        .fabricTable              = &(server->GetFabricTable()),
+        .clientPool               = &gCASEClientPool,
+    };
+
+    PeerId peerID = fabric->GetPeerIdForNode(nodeId);
+
+    //
+    // TODO: The code here is assuming that we can create an OperationalDeviceProxy instance and attach it immediately
+    //       to a CASE session that just got established to us by the tv-app. While this will work most of the time,
+    //       this is a dangerous assumption to make since it is entirely possible for that secure session to have been
+    //       evicted in the time since that session was established to the point here when we desire to interact back
+    //       with that peer. If that is the case, our `OnConnected` callback will not get invoked syncronously and
+    //       mOperationalDeviceProxy will still have a value of null, triggering the check below to fail.
+    //
+    mOperationalDeviceProxy = nullptr;
+    CHIP_ERROR err =
+        server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    if (err != CHIP_NO_ERROR)
     {
-        if (!mInitialized)
-        {
-            return nullptr;
-        }
-        TargetEndpointInfo * endpoint = GetEndpoint(endpointId);
-        if (endpoint != nullptr)
-        {
-            return endpoint;
-        }
-        for (auto & endpointInfo : mEndpoints)
-        {
-            if (!endpointInfo.IsInitialized())
-            {
-                endpointInfo.Initialize(endpointId);
-                return &endpointInfo;
-            }
-        }
+        ChipLogError(AppServer, "Could not establish a session to the peer");
+        return err;
+    }
+
+    if (mOperationalDeviceProxy == nullptr)
+    {
+        ChipLogError(AppServer, "Failed to find an existing instance of OperationalDeviceProxy to the peer");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    ChipLogProgress(AppServer, "Created an instance of OperationalDeviceProxy");
+
+    mInitialized = true;
+    return CHIP_NO_ERROR;
+}
+
+TargetEndpointInfo * TargetVideoPlayerInfo::GetOrAddEndpoint(EndpointId endpointId)
+{
+    if (!mInitialized)
+    {
         return nullptr;
     }
-
-    TargetEndpointInfo * TargetVideoPlayerInfo::GetEndpoint(EndpointId endpointId)
+    TargetEndpointInfo * endpoint = GetEndpoint(endpointId);
+    if (endpoint != nullptr)
     {
-        if (!mInitialized)
+        return endpoint;
+    }
+    for (auto & endpointInfo : mEndpoints)
+    {
+        if (!endpointInfo.IsInitialized())
         {
-            return nullptr;
+            endpointInfo.Initialize(endpointId);
+            return &endpointInfo;
         }
-        for (auto & endpointInfo : mEndpoints)
-        {
-            if (endpointInfo.IsInitialized() && endpointInfo.GetEndpointId() == endpointId)
-            {
-                return &endpointInfo;
-            }
-        }
+    }
+    return nullptr;
+}
+
+TargetEndpointInfo * TargetVideoPlayerInfo::GetEndpoint(EndpointId endpointId)
+{
+    if (!mInitialized)
+    {
         return nullptr;
     }
-
-    bool TargetVideoPlayerInfo::HasEndpoint(EndpointId endpointId)
+    for (auto & endpointInfo : mEndpoints)
     {
-        if (!mInitialized)
+        if (endpointInfo.IsInitialized() && endpointInfo.GetEndpointId() == endpointId)
         {
-            return false;
+            return &endpointInfo;
         }
-        for (auto & endpointInfo : mEndpoints)
-        {
-            if (endpointInfo.IsInitialized() && endpointInfo.GetEndpointId() == endpointId)
-            {
-                return true;
-            }
-        }
+    }
+    return nullptr;
+}
+
+bool TargetVideoPlayerInfo::HasEndpoint(EndpointId endpointId)
+{
+    if (!mInitialized)
+    {
         return false;
     }
-
-    void TargetVideoPlayerInfo::PrintInfo()
+    for (auto & endpointInfo : mEndpoints)
     {
-        ChipLogProgress(NotSpecified, " TargetVideoPlayerInfo nodeId=0x" ChipLogFormatX64 " fabric index=%d",
-                        ChipLogValueX64(mNodeId), mFabricIndex);
-        for (auto & endpointInfo : mEndpoints)
+        if (endpointInfo.IsInitialized() && endpointInfo.GetEndpointId() == endpointId)
         {
-            if (endpointInfo.IsInitialized())
-            {
-                endpointInfo.PrintInfo();
-            }
+            return true;
         }
     }
+    return false;
+}
+
+void TargetVideoPlayerInfo::PrintInfo()
+{
+    ChipLogProgress(NotSpecified, " TargetVideoPlayerInfo nodeId=0x" ChipLogFormatX64 " fabric index=%d", ChipLogValueX64(mNodeId),
+                    mFabricIndex);
+    for (auto & endpointInfo : mEndpoints)
+    {
+        if (endpointInfo.IsInitialized())
+        {
+            endpointInfo.PrintInfo();
+        }
+    }
+}

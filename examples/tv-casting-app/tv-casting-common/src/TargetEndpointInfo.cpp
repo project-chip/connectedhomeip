@@ -17,54 +17,54 @@
  */
 #include "TargetEndpointInfo.h"
 
-    void TargetEndpointInfo::Initialize(EndpointId endpointId)
+void TargetEndpointInfo::Initialize(EndpointId endpointId)
+{
+    mEndpointId = endpointId;
+    for (size_t i = 0; i < kMaxNumberOfClustersPerEndpoint; i++)
     {
-        mEndpointId = endpointId;
-        for (size_t i = 0; i < kMaxNumberOfClustersPerEndpoint; i++)
-        {
-            mClusters[i] = kInvalidClusterId;
-        }
-        mInitialized = true;
+        mClusters[i] = kInvalidClusterId;
     }
+    mInitialized = true;
+}
 
-    bool TargetEndpointInfo::HasCluster(ClusterId clusterId)
+bool TargetEndpointInfo::HasCluster(ClusterId clusterId)
+{
+    for (size_t i = 0; i < kMaxNumberOfClustersPerEndpoint; i++)
     {
-        for (size_t i = 0; i < kMaxNumberOfClustersPerEndpoint; i++)
+        if (mClusters[i] == clusterId)
         {
-            if (mClusters[i] == clusterId)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    bool TargetEndpointInfo::AddCluster(ClusterId clusterId)
-    {
-        for (size_t i = 0; i < kMaxNumberOfClustersPerEndpoint; i++)
-        {
-            if (mClusters[i] == clusterId)
-            {
-                return true;
-            }
-            if (mClusters[i] == kInvalidClusterId)
-            {
-                mClusters[i] = clusterId;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    void TargetEndpointInfo::PrintInfo()
-    {
-        ChipLogProgress(NotSpecified, "   endpoint=%d", mEndpointId);
-        for (size_t i = 0; i < kMaxNumberOfClustersPerEndpoint; i++)
-        {
-            if (mClusters[i] != kInvalidClusterId)
-            {
-
-                ChipLogProgress(NotSpecified, "      cluster=" ChipLogFormatMEI, ChipLogValueMEI(mClusters[i]));
-            }
+            return true;
         }
     }
+    return false;
+}
+
+bool TargetEndpointInfo::AddCluster(ClusterId clusterId)
+{
+    for (size_t i = 0; i < kMaxNumberOfClustersPerEndpoint; i++)
+    {
+        if (mClusters[i] == clusterId)
+        {
+            return true;
+        }
+        if (mClusters[i] == kInvalidClusterId)
+        {
+            mClusters[i] = clusterId;
+            return true;
+        }
+    }
+    return false;
+}
+
+void TargetEndpointInfo::PrintInfo()
+{
+    ChipLogProgress(NotSpecified, "   endpoint=%d", mEndpointId);
+    for (size_t i = 0; i < kMaxNumberOfClustersPerEndpoint; i++)
+    {
+        if (mClusters[i] != kInvalidClusterId)
+        {
+
+            ChipLogProgress(NotSpecified, "      cluster=" ChipLogFormatMEI, ChipLogValueMEI(mClusters[i]));
+        }
+    }
+}

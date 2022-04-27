@@ -18,11 +18,13 @@
 
 #include "CastingServer.h"
 
-CastingServer* CastingServer::castingServer_= nullptr;;
+CastingServer * CastingServer::castingServer_ = nullptr;
+;
 
-CastingServer *CastingServer::GetInstance()
+CastingServer * CastingServer::GetInstance()
 {
-    if(castingServer_ == nullptr){
+    if (castingServer_ == nullptr)
+    {
         castingServer_ = new CastingServer();
     }
     return castingServer_;
@@ -56,7 +58,6 @@ CHIP_ERROR CastingServer::InitBindingHandlers()
     return CHIP_NO_ERROR;
 }
 
-
 CHIP_ERROR CastingServer::TargetVideoPlayerInfoInit(NodeId nodeId, FabricIndex fabricIndex)
 {
     InitServer();
@@ -75,7 +76,8 @@ CHIP_ERROR CastingServer::OpenBasicCommissioningWindow()
     return Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(kCommissioningWindowTimeout);
 }
 
-const Dnssd::DiscoveredNodeData * CastingServer::GetDiscoveredCommissioner(int index) {
+const Dnssd::DiscoveredNodeData * CastingServer::GetDiscoveredCommissioner(int index)
+{
     return mCommissionableNodeController.GetDiscoveredCommissioner(index);
 }
 
@@ -127,7 +129,8 @@ void CastingServer::ReadServerClusters(EndpointId endpointId)
     TargetEndpointInfo * endpointInfo = mTargetVideoPlayerInfo.GetOrAddEndpoint(endpointId);
 
     if (cluster.ReadAttribute<app::Clusters::Descriptor::Attributes::ServerList::TypeInfo>(
-            endpointInfo, CastingServer::OnDescriptorReadSuccessResponse, CastingServer::OnDescriptorReadFailureResponse) != CHIP_NO_ERROR)
+            endpointInfo, CastingServer::OnDescriptorReadSuccessResponse, CastingServer::OnDescriptorReadFailureResponse) !=
+        CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Could not read Descriptor cluster ServerList");
     }
@@ -177,7 +180,8 @@ CHIP_ERROR CastingServer::ContentLauncherLaunchURL(const char * contentUrl, cons
     request.contentURL          = chip::CharSpan::fromCharString(contentUrl);
     request.displayString       = Optional<CharSpan>(chip::CharSpan::fromCharString(contentDisplayStr));
     request.brandingInformation = MakeOptional(chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type());
-    cluster.InvokeCommand(request, nullptr, CastingServer::OnContentLauncherSuccessResponse, CastingServer::OnContentLauncherFailureResponse);
+    cluster.InvokeCommand(request, nullptr, CastingServer::OnContentLauncherSuccessResponse,
+                          CastingServer::OnContentLauncherFailureResponse);
     return CHIP_NO_ERROR;
 }
 

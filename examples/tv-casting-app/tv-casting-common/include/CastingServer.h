@@ -30,7 +30,7 @@ using namespace chip::Credentials;
 using namespace chip::app::Clusters::ContentLauncher::Commands;
 
 constexpr System::Clock::Seconds16 kCommissioningWindowTimeout = System::Clock::Seconds16(3 * 60);
-constexpr EndpointId kTvEndpoint = 1;
+constexpr EndpointId kTvEndpoint                               = 1;
 
 /**
  * @brief Represents a TV Casting server that can get the casting app commissioned
@@ -40,13 +40,13 @@ constexpr EndpointId kTvEndpoint = 1;
 class CastingServer
 {
 public:
-    CastingServer(CastingServer &other) = delete;
+    CastingServer(CastingServer & other) = delete;
     void operator=(const CastingServer &) = delete;
-    static CastingServer* GetInstance();
+    static CastingServer * GetInstance();
 
     void InitServer();
     CHIP_ERROR InitBindingHandlers();
-    TargetVideoPlayerInfo* GetTargetVideoPlayerInfo() { return &mTargetVideoPlayerInfo; }
+    TargetVideoPlayerInfo * GetTargetVideoPlayerInfo() { return &mTargetVideoPlayerInfo; }
     CHIP_ERROR TargetVideoPlayerInfoInit(chip::NodeId nodeId, chip::FabricIndex fabricIndex);
     CHIP_ERROR DiscoverCommissioners();
     const Dnssd::DiscoveredNodeData * GetDiscoveredCommissioner(int index);
@@ -62,7 +62,7 @@ public:
     static void OnContentLauncherFailureResponse(void * context, CHIP_ERROR error);
 
 private:
-    static CastingServer* castingServer_;
+    static CastingServer * castingServer_;
     CastingServer() {}
 
     bool mInited = false;

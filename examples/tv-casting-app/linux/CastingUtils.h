@@ -22,11 +22,11 @@
  */
 #pragma once
 
+#include "CastingServer.h"
 #include "TargetEndpointInfo.h"
 #include "TargetVideoPlayerInfo.h"
-#include "CastingServer.h"
 
-constexpr uint32_t kCommissionerDiscoveryTimeoutInMs           = 5 * 1000;
+constexpr uint32_t kCommissionerDiscoveryTimeoutInMs = 5 * 1000;
 
 CHIP_ERROR DiscoverCommissioners();
 
@@ -37,7 +37,7 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
 void InitCommissioningFlow(intptr_t commandArg);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    CHIP_ERROR SendUDC(chip::Transport::PeerAddress commissioner);
+CHIP_ERROR SendUDC(chip::Transport::PeerAddress commissioner);
 
-    void HandleUDCSendExpiration(System::Layer * aSystemLayer, void * context);
+void HandleUDCSendExpiration(System::Layer * aSystemLayer, void * context);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
