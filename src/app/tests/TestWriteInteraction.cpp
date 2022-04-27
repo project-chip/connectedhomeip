@@ -439,15 +439,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMatch(nlTe
     attributePathParams.mClusterId   = 3;
     attributePathParams.mAttributeId = 4;
 
-    const uint8_t byteSpanData[] = { 0xde, 0xad, 0xbe, 0xef };
-    const char charSpanData[]    = "a simple test string";
-
-    app::Clusters::TestCluster::Structs::SimpleStruct::Type dataTx;
-    dataTx.a = 12;
-    dataTx.b = true;
-    dataTx.d = chip::ByteSpan(byteSpanData);
-    // Spec A.11.2 strings SHALL NOT include a terminating null character to mark the end of a string.
-    dataTx.e = chip::Span<const char>(charSpanData, strlen(charSpanData));
+    DataModel::Nullable<app::Clusters::TestCluster::Structs::SimpleStruct::Type> dataTx;
 
     Optional<DataVersion> version(kAcceptedDataVersion);
 
@@ -460,21 +452,6 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMatch(nlTe
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     ctx.DrainAndServiceIO();
-
-    NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 1);
-
-    {
-        app::Clusters::TestCluster::Structs::SimpleStruct::Type dataRx;
-        TLV::TLVReader reader;
-        reader.Init(attributeDataTLV, attributeDataTLVLen);
-        reader.Next();
-        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == DataModel::Decode(reader, dataRx));
-        NL_TEST_ASSERT(apSuite, dataRx.a == dataTx.a);
-        NL_TEST_ASSERT(apSuite, dataRx.b == dataTx.b);
-        NL_TEST_ASSERT(apSuite, dataRx.d.data_equal(dataTx.d));
-        // Equals to dataRx.e.size() == dataTx.e.size() && memncmp(dataRx.e.data(), dataTx.e.data(), dataTx.e.size()) == 0
-        NL_TEST_ASSERT(apSuite, dataRx.e.data_equal(dataTx.e));
-    }
 
     NL_TEST_ASSERT(apSuite,
                    callback.mOnSuccessCalled == 1 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 1 &&
