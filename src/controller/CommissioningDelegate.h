@@ -455,10 +455,18 @@ struct AdditionalErrorInfo
     Credentials::AttestationVerificationResult attestationResult;
 };
 
-struct CommissionErrorInfo
+struct CommissioningErrorInfo
 {
-    CommissionErrorInfo(app::Clusters::GeneralCommissioning::CommissioningError result) : commissioningError(result) {}
+    CommissioningErrorInfo(app::Clusters::GeneralCommissioning::CommissioningError result) : commissioningError(result) {}
     app::Clusters::GeneralCommissioning::CommissioningError commissioningError;
+};
+
+struct NetworkCommissioningStatusInfo
+{
+    NetworkCommissioningStatusInfo(app::Clusters::NetworkCommissioning::NetworkCommissioningStatus result) :
+        networkCommissioningStatus(result)
+    {}
+    app::Clusters::NetworkCommissioning::NetworkCommissioningStatus networkCommissioningStatus;
 };
 
 class CommissioningDelegate
@@ -467,8 +475,8 @@ public:
     virtual ~CommissioningDelegate(){};
     /* CommissioningReport is returned after each commissioning step is completed. The reports for each step are:
      * kReadCommissioningInfo - ReadCommissioningInfo
-     * kArmFailsafe: CommissionErrorInfo if there is an error
-     * kConfigRegulatory: none
+     * kArmFailsafe: CommissioningErrorInfo if there is an error
+     * kConfigRegulatory: CommissioningErrorInfo if there is an error
      * kSendPAICertificateRequest: RequestedCertificate
      * kSendDACCertificateRequest: RequestedCertificate
      * kSendAttestationRequest: AttestationResponse
@@ -477,16 +485,17 @@ public:
      * kGenerateNOCChain: NocChain
      * kSendTrustedRootCert: None
      * kSendNOC: none
-     * kWiFiNetworkSetup: none
+     * kWiFiNetworkSetup: NetworkCommissioningStatusInfo if there is an error
      * kThreadNetworkSetup: none
-     * kWiFiNetworkEnable: none
+     * kWiFiNetworkEnable: NetworkCommissioningStatusInfo if there is an error
      * kThreadNetworkEnable: none
      * kFindOperational: OperationalNodeFoundData
-     * kSendComplete: none
+     * kSendComplete: CommissioningErrorInfo if there is an error
      * kCleanup: none
      */
-    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData,
-                                         ReadCommissioningInfo, AdditionalErrorInfo, CommissionErrorInfo>
+    struct CommissioningReport
+        : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
+                  AdditionalErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

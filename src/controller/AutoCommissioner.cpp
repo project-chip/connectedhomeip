@@ -379,9 +379,14 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 }
             }
         }
-        else if (report.Is<CommissionErrorInfo>())
+        else if (report.Is<CommissioningErrorInfo>())
         {
-            completionStatus.commissioningError = MakeOptional(report.Get<CommissionErrorInfo>().commissioningError);
+            completionStatus.commissioningError = MakeOptional(report.Get<CommissioningErrorInfo>().commissioningError);
+        }
+        else if (report.Is<NetworkCommissioningStatusInfo>())
+        {
+            completionStatus.networkCommissioningStatus =
+                MakeOptional(report.Get<NetworkCommissioningStatusInfo>().networkCommissioningStatus);
         }
     }
     else
