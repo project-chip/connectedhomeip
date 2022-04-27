@@ -29,10 +29,10 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DeviceControlServer.h>
-#include <platform/webos/DeviceInfoProviderImpl.h>
-#include <platform/webos/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
+#include <platform/webos/DeviceInfoProviderImpl.h>
+#include <platform/webos/DiagnosticDataProviderImpl.h>
 
 #include <thread>
 

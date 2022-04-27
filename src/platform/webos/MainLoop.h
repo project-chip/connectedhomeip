@@ -22,7 +22,6 @@
 #include <glib.h>
 #include <luna-service2/lunaservice.h>
 
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -55,7 +54,7 @@ public:
 
     static MainLoop & Instance(void);
 
-    LSHandle *mLSHandle;
+    LSHandle * mLSHandle;
 
 private:
     MainLoop() {}
