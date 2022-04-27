@@ -55,7 +55,7 @@ tests:
           values:
               - name: "value"
                 saveAs: eventNumber
- 
+
     - label: "Read the event back"
       command: "readEvent"
       event: "TestEvent"
