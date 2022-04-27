@@ -23,8 +23,6 @@ chip_with_lwip = true
 
 lwip_debug = false
 
-declare_args() {
-  # Disable lock tracking, since our FreeRTOS configuration does not set
-  # INCLUDE_xSemaphoreGetMutexHolder
-  chip_stack_lock_tracking = "none"
-}
+# Disable lock tracking, since our FreeRTOS configuration does not set
+# INCLUDE_xSemaphoreGetMutexHolder
+chip_stack_lock_tracking = "none"
