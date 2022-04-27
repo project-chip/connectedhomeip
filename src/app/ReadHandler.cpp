@@ -473,7 +473,7 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAtt
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttribute(mpAttributePathList);
+        InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttributePath(mpAttributePathList);
         mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributePathList);
         err                          = CHIP_NO_ERROR;
     }

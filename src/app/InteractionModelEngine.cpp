@@ -852,14 +852,14 @@ CHIP_ERROR InteractionModelEngine::PushFrontAttributePathList(ObjectList<Attribu
     return err;
 }
 
-void InteractionModelEngine::RemoveDuplicateConcreteAttribute(ObjectList<AttributePathParams> *& aAttributePaths)
+void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(ObjectList<AttributePathParams> *& aAttributePaths)
 {
     ObjectList<AttributePathParams> * prev = nullptr;
-    bool duplicate                         = false;
     auto * path1                           = aAttributePaths;
 
     while (path1 != nullptr)
     {
+        bool duplicate = false;
         // skip all wildcard paths
         if (path1->mValue.HasAttributeWildcard())
         {
@@ -868,7 +868,7 @@ void InteractionModelEngine::RemoveDuplicateConcreteAttribute(ObjectList<Attribu
             continue;
         }
 
-        // Look up the duplicate concrete path that is referenced by one of all wildcard paths
+        // Check whether a wildcard path expands to something that includes this concrete path.
         for (auto * path2 = aAttributePaths; path2 != nullptr; path2 = path2->mpNext)
         {
             if (path2 == path1)
@@ -883,28 +883,24 @@ void InteractionModelEngine::RemoveDuplicateConcreteAttribute(ObjectList<Attribu
             }
         }
 
-        // if duplicate is found, discard that path, and update prev and path1.
-        if (duplicate)
+        // if path1 duplicates something from wildcard expansion, discard path1
+        if (!duplicate)
         {
-            if (path1 == aAttributePaths)
-            {
-                aAttributePaths = path1->mpNext;
-                mAttributePathPool.ReleaseObject(path1);
-                prev  = nullptr;
-                path1 = aAttributePaths;
-            }
-            else
-            {
-                prev->mpNext = path1->mpNext;
-                mAttributePathPool.ReleaseObject(path1);
-                path1 = path1->mpNext;
-            }
+            prev  = path1;
+            path1 = path1->mpNext;
+            continue;
+        }
 
-            duplicate = false;
+        if (path1 == aAttributePaths)
+        {
+            aAttributePaths = path1->mpNext;
+            mAttributePathPool.ReleaseObject(path1);
+            path1 = aAttributePaths;
         }
         else
         {
-            prev  = path1;
+            prev->mpNext = path1->mpNext;
+            mAttributePathPool.ReleaseObject(path1);
             path1 = path1->mpNext;
         }
     }

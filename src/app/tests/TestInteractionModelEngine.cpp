@@ -124,7 +124,7 @@ void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuit
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
-    InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttribute(attributePathParamsList);
+    InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
     NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 3);
     InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
 
@@ -144,7 +144,7 @@ void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuit
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
-    InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttribute(attributePathParamsList);
+    InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
     NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 1);
     InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
 
@@ -152,7 +152,7 @@ void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuit
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
-    InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttribute(attributePathParamsList);
+    InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
     NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 1);
     InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
 
@@ -160,7 +160,7 @@ void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuit
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
-    InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttribute(attributePathParamsList);
+    InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
     NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 1);
     InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
 
@@ -180,7 +180,7 @@ void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuit
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
-    InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttribute(attributePathParamsList);
+    InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
     NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 3);
     InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
 
@@ -192,15 +192,15 @@ void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuit
     attributePathParams2.mClusterId   = kInvalidClusterId;
     attributePathParams2.mAttributeId = kInvalidAttributeId;
 
-    attributePathParams3.mEndpointId  = 1;
-    attributePathParams3.mClusterId   = 2;
-    attributePathParams3.mAttributeId = kInvalidAttributeId;
+    attributePathParams3.mEndpointId  = kInvalidEndpointId;
+    attributePathParams3.mClusterId   = kInvalidClusterId;
+    attributePathParams3.mAttributeId = 1;
 
     // Wildcards cannot be deduplicated.
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
     InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
-    InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttribute(attributePathParamsList);
+    InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
     NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 3);
     InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
 }
