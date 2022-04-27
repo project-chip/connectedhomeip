@@ -193,6 +193,62 @@ CHIP_ERROR AccessControl::Finish()
     return retval;
 }
 
+CHIP_ERROR AccessControl::CreateEntry(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t * index,
+                                      const Entry & entry)
+{
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
+    size_t count;
+    size_t maxCount;
+    ReturnErrorOnFailure(mDelegate->GetEntryCount(fabric, count));
+    ReturnErrorOnFailure(mDelegate->GetMaxEntriesPerFabric(maxCount));
+
+    VerifyOrReturnError((count + 1) <= maxCount, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
+
+    size_t i;
+    ReturnErrorOnFailure(mDelegate->CreateEntry(&i, entry, &fabric));
+
+    if (index)
+    {
+        *index = i;
+    }
+
+    NotifyEntryChanged(subjectDescriptor, fabric, i, &entry, EntryListener::ChangeType::kAdded);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AccessControl::UpdateEntry(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index,
+                                      const Entry & entry)
+{
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(mDelegate->UpdateEntry(index, entry, &fabric));
+    NotifyEntryChanged(subjectDescriptor, fabric, index, &entry, EntryListener::ChangeType::kUpdated);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AccessControl::DeleteEntry(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index)
+{
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    Entry entry;
+    Entry * p = nullptr;
+    if (mEntryListener != nullptr && ReadEntry(fabric, index, entry) == CHIP_NO_ERROR)
+    {
+        p = &entry;
+    }
+    ReturnErrorOnFailure(mDelegate->DeleteEntry(index, &fabric));
+    if (p && p->HasDefaultDelegate())
+    {
+        // Best effort to preserve read entry upon deletion failed, regretable but OK.
+        p = nullptr;
+    }
+    NotifyEntryChanged(subjectDescriptor, fabric, index, p, EntryListener::ChangeType::kRemoved);
+    return CHIP_NO_ERROR;
+}
+
 void AccessControl::AddEntryListener(EntryListener & listener)
 {
     if (mEntryListener == nullptr)

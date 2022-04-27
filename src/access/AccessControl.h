@@ -341,13 +341,29 @@ public:
         virtual CHIP_ERROR Finish() { return CHIP_NO_ERROR; }
 
         // Capabilities
-        virtual CHIP_ERROR GetMaxEntryCount(size_t & value) const
+        virtual CHIP_ERROR GetMaxEntriesPerFabric(size_t & value) const
         {
             value = 0;
             return CHIP_NO_ERROR;
         }
 
-        // TODO: add more capabilities
+        virtual CHIP_ERROR GetMaxSubjectsPerEntry(size_t & value) const
+        {
+            value = 0;
+            return CHIP_NO_ERROR;
+        }
+
+        virtual CHIP_ERROR GetMaxTargetsPerEntry(size_t & value) const
+        {
+            value = 0;
+            return CHIP_NO_ERROR;
+        }
+
+        virtual CHIP_ERROR GetMaxEntryCount(size_t & value) const
+        {
+            value = 0;
+            return CHIP_NO_ERROR;
+        }
 
         // Actualities
         virtual CHIP_ERROR GetEntryCount(FabricIndex fabric, size_t & value) const
@@ -413,6 +429,24 @@ public:
     CHIP_ERROR Finish();
 
     // Capabilities
+    CHIP_ERROR GetMaxEntriesPerFabric(size_t & value) const
+    {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        return mDelegate->GetMaxEntriesPerFabric(value);
+    }
+
+    CHIP_ERROR GetMaxSubjectsPerEntry(size_t & value) const
+    {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        return mDelegate->GetMaxSubjectsPerEntry(value);
+    }
+
+    CHIP_ERROR GetMaxTargetsPerEntry(size_t & value) const
+    {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        return mDelegate->GetMaxTargetsPerEntry(value);
+    }
+
     CHIP_ERROR GetMaxEntryCount(size_t & value) const
     {
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
@@ -453,19 +487,7 @@ public:
      * @param [out] index             (If not nullptr) index of created entry (relative to fabric).
      * @param [in]  entry             Entry from which created entry is copied.
      */
-    CHIP_ERROR CreateEntry(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t * index, const Entry & entry)
-    {
-        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
-        size_t i;
-        ReturnErrorOnFailure(mDelegate->CreateEntry(&i, entry, &fabric));
-        if (index)
-        {
-            *index = i;
-        }
-        NotifyEntryChanged(subjectDescriptor, fabric, i, &entry, EntryListener::ChangeType::kAdded);
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR CreateEntry(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t * index, const Entry & entry);
 
     /**
      * Creates an entry in the access control list.
@@ -515,14 +537,7 @@ public:
      * @param [in] index             Index of entry to update (relative to fabric).
      * @param [in] entry             Entry from which updated entry is copied.
      */
-    CHIP_ERROR UpdateEntry(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry & entry)
-    {
-        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
-        ReturnErrorOnFailure(mDelegate->UpdateEntry(index, entry, &fabric));
-        NotifyEntryChanged(subjectDescriptor, fabric, index, &entry, EntryListener::ChangeType::kUpdated);
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR UpdateEntry(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry & entry);
 
     /**
      * Updates an entry in the access control list.
@@ -545,24 +560,7 @@ public:
      * @param [in] fabric            Index of fabric in which to delete entry.
      * @param [in] index             Index of entry to delete (relative to fabric).
      */
-    CHIP_ERROR DeleteEntry(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index)
-    {
-        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-        Entry entry;
-        Entry * p = nullptr;
-        if (mEntryListener != nullptr && ReadEntry(fabric, index, entry) == CHIP_NO_ERROR)
-        {
-            p = &entry;
-        }
-        ReturnErrorOnFailure(mDelegate->DeleteEntry(index, &fabric));
-        if (p && p->HasDefaultDelegate())
-        {
-            // Best effort to preserve read entry upon deletion failed, regretable but OK.
-            p = nullptr;
-        }
-        NotifyEntryChanged(subjectDescriptor, fabric, index, p, EntryListener::ChangeType::kRemoved);
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR DeleteEntry(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index);
 
     /**
      * Deletes an entry from the access control list.
