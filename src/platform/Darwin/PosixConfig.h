@@ -54,19 +54,10 @@ public:
     // Key definitions for well-known keys.
     static const Key kConfigKey_SerialNum;
     static const Key kConfigKey_UniqueId;
-    static const Key kConfigKey_MfrDeviceId;
-    static const Key kConfigKey_MfrDeviceCert;
-    static const Key kConfigKey_MfrDeviceICACerts;
-    static const Key kConfigKey_MfrDevicePrivateKey;
     static const Key kConfigKey_HardwareVersion;
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
-    static const Key kConfigKey_ServiceConfig;
-    static const Key kConfigKey_PairedAccountId;
-    static const Key kConfigKey_ServiceId;
-    static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
-    static const Key kConfigKey_WiFiStationSecType;
     static const Key kConfigKey_SetupDiscriminator;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
@@ -81,7 +72,6 @@ public:
     static const Key kCounterKey_TotalOperationalHours;
     static const Key kCounterKey_RebootCount;
     static const Key kCounterKey_BootReason;
-    static const Key kCounterKey_UpTime;
 
 #if !CHIP_DISABLE_PLATFORM_KVS
     static CHIP_ERROR Init(void);
