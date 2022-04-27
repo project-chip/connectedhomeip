@@ -1730,7 +1730,6 @@ void DeviceCommissioner::OnArmFailSafe(void * context,
     CommissioningDelegate::CommissioningReport report;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO: Figure out if ther is a better way other than static_cast.
     ChipLogProgress(Controller, "Received ArmFailSafe response errorCode=%u", static_cast<uint8_t>(data.errorCode));
     if (data.errorCode != GeneralCommissioning::CommissioningError::kOk)
     {
@@ -1748,7 +1747,6 @@ void DeviceCommissioner::OnSetRegulatoryConfigResponse(
     CommissioningDelegate::CommissioningReport report;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO: Figure out if ther is a better way other than static_cast.
     ChipLogProgress(Controller, "Received SetRegulatoryConfig response errorCode=%u", static_cast<uint8_t>(data.errorCode));
     if (data.errorCode != GeneralCommissioning::CommissioningError::kOk)
     {
@@ -1765,7 +1763,6 @@ void DeviceCommissioner::OnNetworkConfigResponse(void * context,
     CommissioningDelegate::CommissioningReport report;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO: Figure out if ther is a better way other than static_cast.
     ChipLogProgress(Controller, "Received NetworkConfig response, networkingStatus=%u",
                     static_cast<uint8_t>(data.networkingStatus));
     if (data.networkingStatus != NetworkCommissioning::NetworkCommissioningStatus::kSuccess)
@@ -1783,7 +1780,6 @@ void DeviceCommissioner::OnConnectNetworkResponse(
     CommissioningDelegate::CommissioningReport report;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO: Figure out if ther is a better way other than static_cast.
     ChipLogProgress(Controller, "Received ConnectNetwork response, networkingStatus=%u",
                     static_cast<uint8_t>(data.networkingStatus));
     if (data.networkingStatus != NetworkCommissioning::NetworkCommissioningStatus::kSuccess)
@@ -1801,7 +1797,6 @@ void DeviceCommissioner::OnCommissioningCompleteResponse(
     CommissioningDelegate::CommissioningReport report;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO: Figure out if ther is a better way other than static_cast.
     ChipLogProgress(Controller, "Received CommissioningComplete response, errorCode=%u", static_cast<uint8_t>(data.errorCode));
     if (data.errorCode != GeneralCommissioning::CommissioningError::kOk)
     {
