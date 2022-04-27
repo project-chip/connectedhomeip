@@ -360,6 +360,19 @@ void SessionManager::ExpireAllPairings(const ScopedNodeId & node)
     });
 }
 
+void SessionManager::ExpireAllPairingsForPeerExceptPending(const ScopedNodeId & node)
+{
+    mSecureSessions.ForEachSession([&](auto session) {
+        if ((session->GetPeer() == node) && (session->GetSecureSessionType() == SecureSession::Type::kCASE))
+        {
+            ChipLogDetail(Inet, "Expired/released previous local session ID %u for peer " ChipLogFormatScopedNodeId,
+                          static_cast<unsigned>(session->GetLocalSessionId()), ChipLogValueScopedNodeId(session->GetPeer()));
+            mSecureSessions.ReleaseSession(session);
+        }
+        return Loop::Continue;
+    });
+}
+
 void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
 {
     ChipLogDetail(Inet, "Expiring all connections for fabric %d!!", fabric);
