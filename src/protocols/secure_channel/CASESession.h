@@ -64,6 +64,7 @@ public:
 
     Transport::SecureSession::Type GetSecureSessionType() const override { return Transport::SecureSession::Type::kCASE; }
     ScopedNodeId GetPeer() const override { return ScopedNodeId(mPeerNodeId, GetFabricIndex()); }
+    ScopedNodeId GetLocalScopedNodeId() const override { return ScopedNodeId(mLocalNodeId, GetFabricIndex()); }
     CATValues GetPeerCATs() const override { return mPeerCATs; };
 
     /**
@@ -253,6 +254,7 @@ private:
     FabricTable * mFabricsTable    = nullptr;
     const FabricInfo * mFabricInfo = nullptr;
     NodeId mPeerNodeId             = kUndefinedNodeId;
+    NodeId mLocalNodeId            = kUndefinedNodeId;
     CATValues mPeerCATs;
 
     // This field is only used for CASE responder, when during sending sigma2 and waiting for sigma3
