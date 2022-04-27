@@ -6,6 +6,12 @@
 {{/if}}
 {{/inline~}}
 
+{{~#*inline "maybeSetupSubStepCount"}}
+{{#if expectMultipleResponses}}
+    mTestSubStepCount = {{response.length}};
+{{/if}}
+{{/inline~}}
+
 {{~#*inline "maybePrepareArguments"}}
 {{#unless isWait}}
 {{#if (isTestOnlyCluster cluster)}}
@@ -107,5 +113,6 @@
 {{! --- Test Step Content --}}
 LogStep({{index}}, "{{label}}");
 {{>maybePICS}}
+{{>maybeSetupSubStepCount}}
 {{>maybePrepareArguments}}
 {{>maybeBusyWait}}

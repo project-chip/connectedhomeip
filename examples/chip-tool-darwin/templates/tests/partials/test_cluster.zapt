@@ -84,11 +84,13 @@ class {{filename}}: public TestCommandBridge
     {{#if async}}
     bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase command}}_Fulfilled = false;
     {{/if}}
+    {{#chip_tests_item_responses}}
     {{#chip_tests_item_response_parameters}}
     {{#if saveAs}}
     {{asObjectiveCType type ../cluster}} {{saveAs}};
     {{/if}}
     {{/chip_tests_item_response_parameters}}
+    {{/chip_tests_item_responses}}
 
     {{~#*inline "subscribeDataCallback"}}
     test_{{parent.filename}}_{{attribute}}_Reported
@@ -172,11 +174,9 @@ class {{filename}}: public TestCommandBridge
             }
             {{/if}}
 
-            {{#if response.error}}
-              VerifyOrReturn(CheckValue("status", err, {{response.error}}));
-              NextTest();
-            {{else if response.errorWrongValue}}
-              VerifyOrReturn(CheckConstraintNotValue("status", err, 0));
+            {{#chip_tests_item_responses}}
+            {{#if error}}
+              VerifyOrReturn(CheckValue("status", err, {{error}}));
               NextTest();
             {{else}}
               VerifyOrReturn(CheckValue("status", err, 0));
@@ -235,7 +235,7 @@ class {{filename}}: public TestCommandBridge
         {{#unless async}}
         NextTest();
         {{else}}
-        testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase command}}_Fulfilled = true;
+        testSendCluster{{parent.filename}}_{{asTestIndex ../index}}_{{asUpperCamelCase command}}_Fulfilled = true;
         {{/unless}}
         {{else}}
           {{! We're a subscription }}
@@ -246,6 +246,7 @@ class {{filename}}: public TestCommandBridge
           }
         {{/unless}}
         {{/if}}
+        {{/chip_tests_item_responses}}
     }{{#unless isWaitForReport}}]{{/unless}};
 
     {{/if}}
