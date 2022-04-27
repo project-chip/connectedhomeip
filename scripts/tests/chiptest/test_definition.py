@@ -38,14 +38,18 @@ class App:
         self.cv_stopped = threading.Condition()
         self.stopped = True
         self.lastLogIndex = 0
-        self.kvs = '/tmp/chip_kvs'
+        self.kvsList = ['/tmp/chip_kvs']
+        self.options = None
 
     def start(self, options=None):
         if not self.process:
+            # Cache command line options to be used for reboots
+            if options:
+                self.options = options
             # Make sure to assign self.process before we do any operations that
             # might fail, so attempts to kill us on failure actually work.
             self.process, self.outpipe, errpipe = self.__startServer(
-                self.runner, self.command, options)
+                self.runner, self.command)
             self.waitForAnyAdvertisement()
             self.__updateSetUpCode()
             with self.cv_stopped:
@@ -67,8 +71,9 @@ class App:
         return False
 
     def factoryReset(self):
-        if os.path.exists(self.kvs):
-            os.unlink(self.kvs)
+        for kvs in self.kvsList:
+            if os.path.exists(kvs):
+                os.unlink(kvs)
         return True
 
     def waitForAnyAdvertisement(self):
@@ -90,6 +95,10 @@ class App:
 
     def wait(self, timeout=None):
         while True:
+            # If the App was never started, wait cannot be called on the process
+            if self.process == None:
+                time.sleep(0.1)
+                continue
             code = self.process.wait(timeout)
             with self.cv_stopped:
                 if not self.stopped:
@@ -100,18 +109,19 @@ class App:
                 while self.stopped:
                     self.cv_stopped.wait()
 
-    def __startServer(self, runner, command, options):
+    def __startServer(self, runner, command):
         app_cmd = command + ['--interface-id', str(-1)]
 
-        if not options:
+        if not self.options:
             logging.debug('Executing application under test with default args')
         else:
             logging.debug('Executing application under test with the following args:')
-            for key, value in options.items():
+            for key, value in self.options.items():
                 logging.debug('   %s: %s' % (key, value))
                 app_cmd = app_cmd + [key, value]
                 if key == '--KVS':
-                    self.kvs = value
+                    if value not in self.kvsList:
+                        self.kvsList.append(value)
         return runner.RunSubprocess(app_cmd, name='APP ', wait=False)
 
     def __waitFor(self, waitForString, server_process, outpipe):
@@ -238,7 +248,6 @@ class TestDefinition:
                 # Remove server application storage (factory reset),
                 # so it will be commissionable again.
                 app.factoryReset()
-                app.start({'--KVS': '/tmp/chip_kvs_' + key})
 
             tool_cmd = paths.chip_tool
 
@@ -253,8 +262,9 @@ class TestDefinition:
                 if os.path.exists(f):
                     os.unlink(f)
 
-            # Only pair the default app
+            # Only start and pair the default app
             app = apps_register.get('default')
+            app.start()
             pairing_cmd = tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode]
             if sys.platform != 'darwin':
                 pairing_cmd.append('--paa-trust-store-path')

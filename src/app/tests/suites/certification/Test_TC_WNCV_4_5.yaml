@@ -20,9 +20,6 @@ config:
     nodeId: 0x12344321
     cluster: "Window Covering"
     endpoint: 1
-    discriminator:
-        type: INT16U
-        defaultValue: 3840
 
 tests:
     ################ Init Phase #############
@@ -131,16 +128,6 @@ tests:
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
-      arguments:
-          values:
-              - name: "registerKey"
-                value: "default"
-              - name: "discriminator"
-                value: discriminator
-              - name: "port"
-                value: 5540
-              - name: "kvs"
-                value: "/tmp/chip_kvs_default"
 
     ### DUT GoesOff
     - label: "3d: Wait for the commissioned device to be retrieved"

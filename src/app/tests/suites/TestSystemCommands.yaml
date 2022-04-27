@@ -33,19 +33,11 @@ tests:
 
     - label: "Stop the default accessory"
       command: "Stop"
-      arguments:
-          values:
-              - name: "registerKey"
-                value: "default"
 
     - label: "Start the default accessory with no command line options"
       command: "Start"
-      arguments:
-          values:
-              - name: "registerKey"
-                value: "default"
 
-    - label: "Stop the default accessory"
+    - label: "Stop the default accessory by key"
       command: "Stop"
       arguments:
           values:
@@ -57,17 +49,11 @@ tests:
       command: "Start"
       arguments:
           values:
-              - name: "registerKey"
-                value: "default"
               - name: "discriminator"
                 value: 1111
 
     - label: "Stop the default accessory"
       command: "Stop"
-      arguments:
-          values:
-              - name: "registerKey"
-                value: "default"
 
     - label:
           "Start the default accessory with discriminator and port command line
@@ -75,8 +61,6 @@ tests:
       command: "Start"
       arguments:
           values:
-              - name: "registerKey"
-                value: "default"
               - name: "discriminator"
                 value: 1111
               - name: "port"
@@ -84,17 +68,11 @@ tests:
 
     - label: "Stop the default accessory"
       command: "Stop"
-      arguments:
-          values:
-              - name: "registerKey"
-                value: "default"
 
     - label: "Start the default accessory with all command line options"
       command: "Start"
       arguments:
           values:
-              - name: "registerKey"
-                value: "default"
               - name: "discriminator"
                 value: 1111
               - name: "port"
@@ -102,25 +80,34 @@ tests:
               - name: "kvs"
                 value: "/tmp/chip_kvs_default"
 
-    - label: "Stop the second accessory"
+    - label: "Stop the default accessory"
       command: "Stop"
+
+    - label: "Start the default accessory by key with all command line options"
+      command: "Start"
       arguments:
           values:
+              - name: "discriminator"
+                value: 1111
+              - name: "port"
+                value: 5560
+              - name: "kvs"
+                value: "/tmp/chip_kvs_default"
               - name: "registerKey"
-                value: "chip-lock-app"
+                value: "default"
 
     - label: "Start a second accessory with all command line options"
       command: "Start"
       arguments:
           values:
-              - name: "registerKey"
-                value: "chip-lock-app"
               - name: "discriminator"
                 value: 50
               - name: "port"
                 value: 5561
               - name: "kvs"
                 value: "/tmp/chip_kvs_lock"
+              - name: "registerKey"
+                value: "chip-lock-app"
 
     - label: "Commission second accessory from alpha"
       identity: "alpha"
@@ -142,63 +129,47 @@ tests:
               - name: "nodeId"
                 value: 0xDEADBEEF
 
-    - label: "Reboot the default accessory with no command line options"
-      command: "Reboot"
-      arguments:
-          values:
-              - name: "registerKey"
-                value: "default"
-
-    - label:
-          "Reboot the default accessory with discriminator command line option"
-      command: "Reboot"
-      arguments:
-          values:
-              - name: "registerKey"
-                value: "default"
-              - name: "discriminator"
-                value: 2222
-
-    - label:
-          "Reboot the default accessory with discriminator and port command line
-          options"
-      command: "Reboot"
-      arguments:
-          values:
-              - name: "registerKey"
-                value: "default"
-              - name: "discriminator"
-                value: 2222
-              - name: "port"
-                value: 5565
-
-    - label: "Reboot the default accessory with all command line options"
-      command: "Reboot"
-      arguments:
-          values:
-              - name: "registerKey"
-                value: "default"
-              - name: "discriminator"
-                value: 2222
-              - name: "port"
-                value: 5565
-              - name: "kvs"
-                value: "/tmp/chip_kvs_default"
-
-    - label: "Reboot the second accessory with all command line options"
-      command: "Reboot"
+    - label: "Stop the second accessory"
+      command: "Stop"
       arguments:
           values:
               - name: "registerKey"
                 value: "chip-lock-app"
+
+    - label: "Start a second accessory with diff KVS"
+      command: "Start"
+      arguments:
+          values:
               - name: "discriminator"
                 value: 50
               - name: "port"
                 value: 5561
               - name: "kvs"
-                value: "/tmp/chip_kvs_lock"
+                value: "/tmp/chip_kvs_lock2"
+              - name: "registerKey"
+                value: "chip-lock-app"
+
+    - label: "Reboot the default accessory"
+      command: "Reboot"
+
+    - label: "Reboot the default accessory by key"
+      command: "Reboot"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+
+    - label: "Reboot the second accessory"
+      command: "Reboot"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "chip-lock-app"
 
     - label: "Factory Reset the default accessory"
+      command: "FactoryReset"
+
+    - label: "Factory Reset the default accessory by key"
       command: "FactoryReset"
       arguments:
           values:

@@ -20,9 +20,6 @@ config:
         type: NODE_ID
         defaultValue: 0xCAFE
     endpoint: 0
-    discriminator:
-        type: INT16U
-        defaultValue: 3840
     payload:
         type: CHAR_STRING
         defaultValue: "MT:0000000000I31506010" # This value needs to be generated automatically
@@ -31,16 +28,6 @@ tests:
     - label: "Reboot target device"
       cluster: "SystemCommands"
       command: "Reboot"
-      arguments:
-          values:
-              - name: "registerKey"
-                value: "default"
-              - name: "discriminator"
-                value: discriminator
-              - name: "port"
-                value: 5540
-              - name: "kvs"
-                value: "/tmp/chip_kvs_default"
 
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
       cluster: "DelayCommands"

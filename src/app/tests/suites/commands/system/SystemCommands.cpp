@@ -30,7 +30,7 @@ const char * getScriptsFolder()
 
 constexpr size_t kCommandMaxLen = 256;
 
-CHIP_ERROR SystemCommands::Start(const char * registerKey, uint16_t discriminator, uint16_t port, const char * kvs)
+CHIP_ERROR SystemCommands::Start(uint16_t discriminator, uint16_t port, const char * kvs, const char * registerKey)
 {
     const char * scriptDir            = getScriptsFolder();
     constexpr const char * scriptName = "Start.py";
@@ -52,14 +52,14 @@ CHIP_ERROR SystemCommands::Stop(const char * registerKey)
     return RunInternal(command);
 }
 
-CHIP_ERROR SystemCommands::Reboot(const char * registerKey, uint16_t discriminator, uint16_t port, const char * kvs)
+CHIP_ERROR SystemCommands::Reboot(const char * registerKey)
 {
     const char * scriptDir            = getScriptsFolder();
     constexpr const char * scriptName = "Reboot.py";
 
-    char command[kCommandMaxLen];
-    ReturnErrorOnFailure(
-        CreateCommonCommandArgs(command, sizeof(command), scriptDir, scriptName, registerKey, discriminator, port, kvs));
+    char command[128];
+    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s %s", scriptDir, scriptName, registerKey) >= 0,
+                        CHIP_ERROR_INTERNAL);
     return RunInternal(command);
 }
 

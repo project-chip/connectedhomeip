@@ -26,9 +26,6 @@ config:
         type: NODE_ID
         defaultValue: 0xC00FEE
     endpoint: 0
-    discriminator:
-        type: INT16U
-        defaultValue: 3840
     payload:
         type: CHAR_STRING
         defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
@@ -37,16 +34,6 @@ tests:
     - label: "Reboot target device"
       cluster: "SystemCommands"
       command: "Reboot"
-      arguments:
-          values:
-              - name: "registerKey"
-                value: "default"
-              - name: "discriminator"
-                value: discriminator
-              - name: "port"
-                value: 5540
-              - name: "kvs"
-                value: "/tmp/chip_kvs_default"
 
     - label: "Wait for the commissioned device to be retrieved for alpha"
       cluster: "DelayCommands"
