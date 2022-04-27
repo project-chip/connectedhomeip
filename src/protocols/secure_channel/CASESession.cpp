@@ -282,41 +282,33 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session) const
     switch (mState)
     {
     case State::kFinished: {
-        // Generate Salt for Encryption keys
-        size_t saltlen = sizeof(mIPK) + kSHA256_Hash_Length;
+        std::array<uint8_t, sizeof(mIPK) + kSHA256_Hash_Length> msg_salt;
 
-        chip::Platform::ScopedMemoryBuffer<uint8_t> msg_salt;
-        ReturnErrorCodeIf(!msg_salt.Alloc(saltlen), CHIP_ERROR_NO_MEMORY);
         {
-            Encoding::LittleEndian::BufferWriter bbuf(msg_salt.Get(), saltlen);
+            Encoding::LittleEndian::BufferWriter bbuf(msg_salt);
             bbuf.Put(mIPK, sizeof(mIPK));
             bbuf.Put(mMessageDigest, sizeof(mMessageDigest));
 
             VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
         }
 
-        ReturnErrorOnFailure(session.InitFromSecret(ByteSpan(mSharedSecret, mSharedSecret.Length()),
-                                                    ByteSpan(msg_salt.Get(), saltlen),
+        ReturnErrorOnFailure(session.InitFromSecret(ByteSpan(mSharedSecret, mSharedSecret.Length()), ByteSpan(msg_salt),
                                                     CryptoContext::SessionInfoType::kSessionEstablishment, mRole));
 
         return CHIP_NO_ERROR;
     }
-    case State::kFinishedResumed: {
-        // Generate Salt for Encryption keys
-        size_t saltlen = sizeof(mInitiatorRandom) + mResumeResumptionId.size();
+    case State::kFinishedViaResume: {
+        std::array<uint8_t, sizeof(mInitiatorRandom) + decltype(mResumeResumptionId)().size()> msg_salt;
 
-        chip::Platform::ScopedMemoryBuffer<uint8_t> msg_salt;
-        ReturnErrorCodeIf(!msg_salt.Alloc(saltlen), CHIP_ERROR_NO_MEMORY);
         {
-            Encoding::LittleEndian::BufferWriter bbuf(msg_salt.Get(), saltlen);
+            Encoding::LittleEndian::BufferWriter bbuf(msg_salt);
             bbuf.Put(mInitiatorRandom, sizeof(mInitiatorRandom));
             bbuf.Put(mResumeResumptionId.data(), mResumeResumptionId.size());
 
             VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
         }
 
-        ReturnErrorOnFailure(session.InitFromSecret(ByteSpan(mSharedSecret, mSharedSecret.Length()),
-                                                    ByteSpan(msg_salt.Get(), saltlen),
+        ReturnErrorOnFailure(session.InitFromSecret(ByteSpan(mSharedSecret, mSharedSecret.Length()), ByteSpan(msg_salt),
                                                     CryptoContext::SessionInfoType::kSessionResumption, mRole));
 
         return CHIP_NO_ERROR;
@@ -859,7 +851,7 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
 
     SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess);
 
-    mState = State::kFinishedResumed;
+    mState = State::kFinishedViaResume;
     Finish();
 
 exit:
@@ -1522,10 +1514,10 @@ void CASESession::OnSuccessStatusReport()
         mState = State::kFinished;
         break;
     case State::kSentSigma2Resume:
-        mState = State::kFinishedResumed;
+        mState = State::kFinishedViaResume;
         break;
     default:
-        VerifyOrDie(false);
+        VerifyOrDie(false && "Reached invalid internal state keeping in CASE session");
         break;
     }
 

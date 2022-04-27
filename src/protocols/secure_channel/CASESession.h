@@ -164,14 +164,14 @@ public:
 private:
     enum class State : uint8_t
     {
-        kInitialized      = 0,
-        kSentSigma1       = 1,
-        kSentSigma2       = 2,
-        kSentSigma3       = 3,
-        kSentSigma1Resume = 4,
-        kSentSigma2Resume = 5,
-        kFinished         = 6,
-        kFinishedResumed  = 7,
+        kInitialized       = 0,
+        kSentSigma1        = 1,
+        kSentSigma2        = 2,
+        kSentSigma3        = 3,
+        kSentSigma1Resume  = 4,
+        kSentSigma2Resume  = 5,
+        kFinished          = 6,
+        kFinishedViaResume = 7,
     };
 
     CHIP_ERROR Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate);
