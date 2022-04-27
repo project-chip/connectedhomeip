@@ -196,6 +196,7 @@ public:
         printf("TestClusterComplexTypes\n");
         printf("TestConstraints\n");
         printf("TestDelayCommands\n");
+        printf("TestEvents\n");
         printf("TestDiscovery\n");
         printf("TestLogCommands\n");
         printf("TestSaveAs\n");
@@ -38022,6 +38023,187 @@ private:
     }
 };
 
+class TestEventsSuite : public TestCommand
+{
+public:
+    TestEventsSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestEvents", 7, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~TestEventsSuite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    uint64_t eventNumber;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 1:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 2:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+
+                eventNumber = value.value;
+            }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 1));
+                VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 2));
+                VerifyOrReturn(CheckValue("testEvent.arg3", value.arg3, true));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("value", value.value, eventNumber + 1));
+            }
+            break;
+        case 6:
+            switch (mTestSubStepIndex)
+            {
+            case 0:
+                VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+                {
+                    chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value;
+                    VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                    VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 1));
+                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 2));
+                    VerifyOrReturn(CheckValue("testEvent.arg3", value.arg3, true));
+                }
+                mTestSubStepIndex++;
+                break;
+            case 1:
+                VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+                {
+                    chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value;
+                    VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                    VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 3));
+                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 4));
+                    VerifyOrReturn(CheckValue("testEvent.arg3", value.arg3, false));
+                }
+                mTestSubStepIndex++;
+                break;
+            default:
+                LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+                break;
+            }
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the commissioned device to be retrieved");
+            SetIdentity(kIdentityAlpha);
+            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        }
+        case 1: {
+            LogStep(1, "Check there is no event on the target endpoint");
+            return ReadEvent(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Events::TestEvent::Id, false
+
+            );
+        }
+        case 2: {
+            LogStep(2, "Check reading events from an invalid endpoint");
+            return ReadEvent(kIdentityAlpha, GetEndpoint(0), TestCluster::Id, TestCluster::Events::TestEvent::Id, false
+
+            );
+        }
+        case 3: {
+            LogStep(3, "Generate an event on the accessory");
+            chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::Type value;
+            value.arg1 = 1;
+            value.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
+            value.arg3 = true;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestEmitTestEventRequest::Id,
+                               value);
+        }
+        case 4: {
+            LogStep(4, "Read the event back");
+            return ReadEvent(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Events::TestEvent::Id, false
+
+            );
+        }
+        case 5: {
+            LogStep(5, "Generate a second event on the accessory");
+            chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::Type value;
+            value.arg1 = 3;
+            value.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(4);
+            value.arg3 = false;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestEmitTestEventRequest::Id,
+                               value);
+        }
+        case 6: {
+            LogStep(6, "Read the event back");
+            mTestSubStepCount = 2;
+            return ReadEvent(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Events::TestEvent::Id, false
+
+            );
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 class TestDiscoverySuite : public TestCommand
 {
 public:
@@ -56923,6 +57105,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<TestClusterComplexTypesSuite>(credsIssuerConfig),
         make_unique<TestConstraintsSuite>(credsIssuerConfig),
         make_unique<TestDelayCommandsSuite>(credsIssuerConfig),
+        make_unique<TestEventsSuite>(credsIssuerConfig),
         make_unique<TestDiscoverySuite>(credsIssuerConfig),
         make_unique<TestLogCommandsSuite>(credsIssuerConfig),
         make_unique<TestSaveAsSuite>(credsIssuerConfig),
