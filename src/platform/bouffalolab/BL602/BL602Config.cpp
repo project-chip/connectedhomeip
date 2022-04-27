@@ -69,7 +69,6 @@ const BL602Config::Key BL602Config::kConfigKey_OperationalDeviceICACerts   = { "
 const BL602Config::Key BL602Config::kConfigKey_OperationalDevicePrivateKey = { "op-device-key" };
 const BL602Config::Key BL602Config::kConfigKey_RegulatoryLocation          = { "regulatory-location" };
 const BL602Config::Key BL602Config::kConfigKey_CountryCode                 = { "country-code" };
-const BL602Config::Key BL602Config::kConfigKey_Breadcrumb                  = { "breadcrumb" };
 const BL602Config::Key BL602Config::kConfigKey_UniqueId                    = { "unique-id" };
 
 CHIP_ERROR BL602Config::Init()

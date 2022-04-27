@@ -273,7 +273,9 @@ function getTests()
     'TestDescriptorCluster',
     // TestBasicInformation needs support for Reboot with no discriminator
     //'TestBasicInformation',
-    'TestGeneralCommissioning',
+    // TestGeneralCommissioning does reboots that need to have side-effects, so
+    // can't be tested in this test framework.
+    //'TestGeneralCommissioning',
     'TestGroupsCluster',
     'TestGroupKeyManagementCluster',
     'TestIdentifyCluster',

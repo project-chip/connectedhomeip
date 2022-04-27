@@ -108,14 +108,12 @@ public:
 #endif
     virtual CHIP_ERROR GetRegulatoryLocation(uint8_t & location)                       = 0;
     virtual CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)    = 0;
-    virtual CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb)                            = 0;
     virtual CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen)  = 0;
     virtual CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) = 0;
     virtual CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer)                      = 0;
     virtual CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer)                      = 0;
     virtual CHIP_ERROR StoreRegulatoryLocation(uint8_t location)                       = 0;
     virtual CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen)             = 0;
-    virtual CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb)                            = 0;
     virtual CHIP_ERROR GetRebootCount(uint32_t & rebootCount)                          = 0;
     virtual CHIP_ERROR StoreRebootCount(uint32_t rebootCount)                          = 0;
     virtual CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours)      = 0;

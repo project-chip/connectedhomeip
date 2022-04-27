@@ -70,7 +70,6 @@ const ZephyrConfig::Key ZephyrConfig::kConfigKey_LastUsedEpochKeyId = CONFIG_KEY
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_FailSafeArmed      = CONFIG_KEY(NAMESPACE_CONFIG "fail-safe-armed");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_RegulatoryLocation = CONFIG_KEY(NAMESPACE_CONFIG "regulatory-location");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_CountryCode        = CONFIG_KEY(NAMESPACE_CONFIG "country-code");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_Breadcrumb         = CONFIG_KEY(NAMESPACE_CONFIG "breadcrumb");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_UniqueId           = CONFIG_KEY(NAMESPACE_CONFIG "unique-id");
 
 // Keys stored in the counters namespace
@@ -84,7 +83,7 @@ constexpr const char * sAllResettableConfigKeys[] = {
     ZephyrConfig::kConfigKey_ServiceConfig, ZephyrConfig::kConfigKey_PairedAccountId,
     ZephyrConfig::kConfigKey_ServiceId,     ZephyrConfig::kConfigKey_LastUsedEpochKeyId,
     ZephyrConfig::kConfigKey_FailSafeArmed, ZephyrConfig::kConfigKey_RegulatoryLocation,
-    ZephyrConfig::kConfigKey_CountryCode,   ZephyrConfig::kConfigKey_Breadcrumb,
+    ZephyrConfig::kConfigKey_CountryCode,
 };
 
 // Data structure to be passed as a parameter of Zephyr's settings_load_subtree_direct() function

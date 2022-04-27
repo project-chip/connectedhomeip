@@ -63,7 +63,6 @@ public:
     static const Key kConfigKey_WiFiStationSecType;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
-    static const Key kConfigKey_Breadcrumb;
     static const Key kConfigKey_KVS_key;   // special key for KVS system, key storage
     static const Key kConfigKey_KVS_value; // special key for KVS system, value storage
     static const Key kConfigKey_Spake2pIterationCount;

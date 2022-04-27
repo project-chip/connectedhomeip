@@ -40695,11 +40695,13 @@ class TestGeneralCommissioningSuite : public TestCommand
 {
 public:
     TestGeneralCommissioningSuite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("TestGeneralCommissioning", 6, credsIssuerConfig)
+        TestCommand("TestGeneralCommissioning", 31, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("discriminator", 0, UINT16_MAX, &mDiscriminator);
+        AddArgument("payload", &mPayload);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
@@ -40714,6 +40716,8 @@ private:
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mDiscriminator;
+    chip::Optional<chip::CharSpan> mPayload;
     chip::Optional<uint16_t> mTimeout;
 
     chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
@@ -40755,6 +40759,175 @@ private:
             }
             break;
         case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint64_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("breadcrumb", value, 0ULL));
+            }
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint64_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("breadcrumb", value, 1ULL));
+            }
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 3));
+            }
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint64_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("breadcrumb", value, 1ULL));
+            }
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 4));
+            }
+            break;
+        case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint64_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("breadcrumb", value, 1ULL));
+            }
+            break;
+        case 15:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 16:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 17:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 18:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 0));
+            }
+            break;
+        case 19:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint64_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("breadcrumb", value, 2ULL));
+            }
+            break;
+        case 20:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 4));
+            }
+            break;
+        case 21:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint64_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("breadcrumb", value, 2ULL));
+            }
+            break;
+        case 22:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 2));
+            }
+            break;
+        case 23:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint64_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("breadcrumb", value, 2ULL));
+            }
+            break;
+        case 24:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 0));
+            }
+            break;
+        case 25:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint64_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("breadcrumb", value, 0ULL));
+            }
+            break;
+        case 26:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 0));
+            }
+            break;
+        case 27:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint64_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("breadcrumb", value, 3ULL));
+            }
+            break;
+        case 28:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 0));
+            }
+            break;
+        case 29:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint64_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("breadcrumb", value, 0ULL));
+            }
+            break;
+        case 30:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 bool value;
@@ -40807,7 +40980,158 @@ private:
                                  GeneralCommissioning::Attributes::Breadcrumb::Id);
         }
         case 5: {
-            LogStep(5, "Validate presence of SupportsConcurrentConnection");
+            LogStep(5, "Reboot to reset Breadcrumb");
+            SetIdentity(kIdentityAlpha);
+            return Reboot();
+        }
+        case 6: {
+            LogStep(6, "Connect to the device again");
+            SetIdentity(kIdentityAlpha);
+            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        }
+        case 7: {
+            LogStep(7, "Read back Breadcrumb after reboot and ensure it was not persisted");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
+                                 GeneralCommissioning::Attributes::Breadcrumb::Id);
+        }
+        case 8: {
+            LogStep(8, "Set Breadcrumb to nonzero value");
+            uint64_t value;
+            value = 1ULL;
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
+                                  GeneralCommissioning::Attributes::Breadcrumb::Id, value);
+        }
+        case 9: {
+            LogStep(9, "Check Breadcrumb set worked");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
+                                 GeneralCommissioning::Attributes::Breadcrumb::Id);
+        }
+        case 10: {
+            LogStep(10, "Send CommissioningComplete without armed fail-safe");
+            chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type value;
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
+                               GeneralCommissioning::Commands::CommissioningComplete::Id, value);
+        }
+        case 11: {
+            LogStep(11, "Check Breadcrumb was not touched by invalid CommissioningComplete");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
+                                 GeneralCommissioning::Attributes::Breadcrumb::Id);
+        }
+        case 12: {
+            LogStep(12, "Open Commissioning Window from alpha");
+            chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
+            value.commissioningTimeout = 180U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
+                               AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
+                               chip::Optional<uint16_t>(10000));
+        }
+        case 13: {
+            LogStep(13, "Try to arm fail-safe");
+            chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type value;
+            value.expiryLengthSeconds = 10U;
+            value.breadcrumb          = 5000ULL;
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
+                               GeneralCommissioning::Commands::ArmFailSafe::Id, value);
+        }
+        case 14: {
+            LogStep(14, "Check Breadcrumb was not touched by ArmFailSafe with commissioning window open");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
+                                 GeneralCommissioning::Attributes::Breadcrumb::Id);
+        }
+        case 15: {
+            LogStep(15, "Reset Breadcrumb to 0 so we can commission");
+            uint64_t value;
+            value = 0ULL;
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
+                                  GeneralCommissioning::Attributes::Breadcrumb::Id, value);
+        }
+        case 16: {
+            LogStep(16, "Commission from beta");
+            SetIdentity(kIdentityBeta);
+            return PairWithQRCode(
+                74565, mPayload.HasValue() ? mPayload.Value() : chip::CharSpan::fromCharString("MT:-24J0AFN00KA0648G00"));
+        }
+        case 17: {
+            LogStep(17, "Wait for the commissioned device to be retrieved for beta");
+            SetIdentity(kIdentityBeta);
+            return WaitForCommissionee(74565);
+        }
+        case 18: {
+            LogStep(18, "Arm fail-safe");
+            chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type value;
+            value.expiryLengthSeconds = 500U;
+            value.breadcrumb          = 2ULL;
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
+                               GeneralCommissioning::Commands::ArmFailSafe::Id, value);
+        }
+        case 19: {
+            LogStep(19, "Check Breadcrumb was properly set by ArmFailSafe");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
+                                 GeneralCommissioning::Attributes::Breadcrumb::Id);
+        }
+        case 20: {
+            LogStep(20, "Try to arm fail-safe from wrong fabric");
+            chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type value;
+            value.expiryLengthSeconds = 10U;
+            value.breadcrumb          = 5000ULL;
+            return SendCommand(kIdentityBeta, GetEndpoint(0), GeneralCommissioning::Id,
+                               GeneralCommissioning::Commands::ArmFailSafe::Id, value);
+        }
+        case 21: {
+            LogStep(21, "Check Breadcrumb was not touched by ArmFailSafe with existing fail-safe armed");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
+                                 GeneralCommissioning::Attributes::Breadcrumb::Id);
+        }
+        case 22: {
+            LogStep(22, "Send CommissioningComplete from wrong fabric");
+            chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type value;
+            return SendCommand(kIdentityBeta, GetEndpoint(0), GeneralCommissioning::Id,
+                               GeneralCommissioning::Commands::CommissioningComplete::Id, value);
+        }
+        case 23: {
+            LogStep(23, "Check Breadcrumb was not touched by CommissioningComplete from wrong fabric");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
+                                 GeneralCommissioning::Attributes::Breadcrumb::Id);
+        }
+        case 24: {
+            LogStep(24, "Close out the fail-safe gracefully");
+            chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type value;
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
+                               GeneralCommissioning::Commands::CommissioningComplete::Id, value);
+        }
+        case 25: {
+            LogStep(25, "Check Breadcrumb was reset to 0 by CommissioningComplete");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
+                                 GeneralCommissioning::Attributes::Breadcrumb::Id);
+        }
+        case 26: {
+            LogStep(26, "Arm fail-safe again");
+            chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type value;
+            value.expiryLengthSeconds = 500U;
+            value.breadcrumb          = 3ULL;
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
+                               GeneralCommissioning::Commands::ArmFailSafe::Id, value);
+        }
+        case 27: {
+            LogStep(27, "Check Breadcrumb was set by arming fail-safe again");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
+                                 GeneralCommissioning::Attributes::Breadcrumb::Id);
+        }
+        case 28: {
+            LogStep(28, "Force-expire the fail-safe");
+            chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type value;
+            value.expiryLengthSeconds = 0U;
+            value.breadcrumb          = 4ULL;
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
+                               GeneralCommissioning::Commands::ArmFailSafe::Id, value);
+        }
+        case 29: {
+            LogStep(29, "Check Breadcrumb was reset by expiring the fail-safe");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
+                                 GeneralCommissioning::Attributes::Breadcrumb::Id);
+        }
+        case 30: {
+            LogStep(30, "Validate presence of SupportsConcurrentConnection");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
                                  GeneralCommissioning::Attributes::SupportsConcurrentConnection::Id);
         }

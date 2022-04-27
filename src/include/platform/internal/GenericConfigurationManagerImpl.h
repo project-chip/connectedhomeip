@@ -96,8 +96,6 @@ public:
     CHIP_ERROR StoreRegulatoryLocation(uint8_t location) override;
     CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen) override;
     CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen) override;
-    CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb) override;
-    CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb) override;
     CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
     CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;

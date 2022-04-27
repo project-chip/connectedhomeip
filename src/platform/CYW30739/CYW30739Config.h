@@ -65,7 +65,6 @@ public:
     static constexpr Key kConfigKey_CountryCode        = 18;
     static constexpr Key kConfigKey_HourFormat         = 20;
     static constexpr Key kConfigKey_CalendarType       = 21;
-    static constexpr Key kConfigKey_Breadcrumb         = 22;
     static constexpr Key kConfigKey_UniqueId           = 23;
 
     // Set key id limits for each group.

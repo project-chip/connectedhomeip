@@ -68,7 +68,6 @@ public:
     GeneralCommissioningAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralCommissioning::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 private:
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &), AttributeValueEncoder & aEncoder);
@@ -100,35 +99,11 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
     case SupportsConcurrentConnection::Id: {
         return ReadSupportsConcurrentConnection(aEncoder);
     }
-    case Breadcrumb::Id: {
-        return aEncoder.Encode(DeviceLayer::DeviceControlServer::DeviceControlSvr().GetBreadcrumb());
-    }
     default: {
         break;
     }
     }
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR GeneralCommissioningAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    // TODO: There was discussion about moving the breadcrumb to the attribute store, which would make this function obsolete
-
-    if (aPath.mClusterId != GeneralCommissioning::Id)
-    {
-        // We shouldn't have been called at all.
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    switch (aPath.mAttributeId)
-    {
-    case Attributes::Breadcrumb::Id:
-        Attributes::Breadcrumb::TypeInfo::DecodableType value;
-        ReturnErrorOnFailure(aDecoder.Decode(value));
-        return DeviceLayer::DeviceControlServer::DeviceControlSvr().SetBreadcrumb(value);
-    default:
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
 }
 
 CHIP_ERROR GeneralCommissioningAttrAccess::ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &),
@@ -208,6 +183,8 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
         {
             // Force the timer to expire immediately.
             failSafeContext.ForceFailSafeTimerExpiry();
+            // Don't set the breadcrumb, since expiring the failsafe should
+            // reset it anyway.
             response.errorCode = CommissioningError::kOk;
             commandObj->AddResponse(commandPath, response);
         }
@@ -216,10 +193,10 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
             CheckSuccess(
                 failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
                 Failure);
+            Breadcrumb::Set(commandPath.mEndpointId, commandData.breadcrumb);
             response.errorCode = CommissioningError::kOk;
             commandObj->AddResponse(commandPath, response);
         }
-        DeviceLayer::DeviceControlServer::DeviceControlSvr().SetBreadcrumb(commandData.breadcrumb);
     }
     else
     {
@@ -265,11 +242,11 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
             CheckSuccess(server->CommissioningComplete(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()),
                          Failure);
 
+            Breadcrumb::Set(commandPath.mEndpointId, 0);
             response.errorCode = CommissioningError::kOk;
         }
     }
 
-    DeviceLayer::DeviceControlServer::DeviceControlSvr().SetBreadcrumb(0);
     commandObj->AddResponse(commandPath, response);
 
     return true;
@@ -282,9 +259,8 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
     MATTER_TRACE_EVENT_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
 
-    CheckSuccess(server->SetRegulatoryConfig(to_underlying(commandData.newRegulatoryConfig), commandData.countryCode,
-                                             commandData.breadcrumb),
-                 Failure);
+    CheckSuccess(server->SetRegulatoryConfig(to_underlying(commandData.newRegulatoryConfig), commandData.countryCode), Failure);
+    Breadcrumb::Set(commandPath.mEndpointId, commandData.breadcrumb);
 
     Commands::SetRegulatoryConfigResponse::Type response;
     response.errorCode = CommissioningError::kOk;
@@ -293,8 +269,21 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
     return true;
 }
 
+namespace {
+void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
+    {
+        // Spec says to reset Breadcrumb attribute to 0.
+        Breadcrumb::Set(0, 0);
+    }
+}
+
+} // anonymous namespace
+
 void MatterGeneralCommissioningPluginServerInitCallback()
 {
-    DeviceLayer::DeviceControlServer::DeviceControlSvr().SetBreadcrumb(0);
+    Breadcrumb::Set(0, 0);
     registerAttributeAccessOverride(&gAttrAccess);
+    DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler);
 }

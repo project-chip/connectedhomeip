@@ -85,9 +85,8 @@ const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_RegulatoryLocation = 
                                                                                     .itemID   = 0x001a } };
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_CountryCode        = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
                                                                              .itemID   = 0x001b } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Breadcrumb         = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
-                                                                            .itemID   = 0x001c } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_UniqueId           = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
+// itemID 0x001c is unused (used to be breadcrumb).
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_UniqueId = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
                                                                           .itemID   = 0x001d } };
 
 /* Internal for the KVS interface. */

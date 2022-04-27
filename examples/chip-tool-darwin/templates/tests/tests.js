@@ -277,7 +277,8 @@ function getTests()
     'TestDescriptorCluster',
     // TestBasicInformation needs Reboot
     //'TestBasicInformation',
-    'TestGeneralCommissioning',
+    // TestGeneralCommissioning needs Reboot
+    //'TestGeneralCommissioning',
     'TestGroupsCluster',
     'TestGroupKeyManagementCluster',
     'TestIdentifyCluster',

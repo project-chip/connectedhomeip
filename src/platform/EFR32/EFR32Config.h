@@ -110,7 +110,6 @@ public:
     static constexpr Key kConfigKey_HardwareVersion    = EFR32ConfigKey(kMatterConfig_KeyBase, 0x08);
     static constexpr Key kConfigKey_RegulatoryLocation = EFR32ConfigKey(kMatterConfig_KeyBase, 0x09);
     static constexpr Key kConfigKey_CountryCode        = EFR32ConfigKey(kMatterConfig_KeyBase, 0x0A);
-    static constexpr Key kConfigKey_Breadcrumb         = EFR32ConfigKey(kMatterConfig_KeyBase, 0x0B);
     static constexpr Key kConfigKey_WiFiSSID           = EFR32ConfigKey(kMatterConfig_KeyBase, 0x0C);
     static constexpr Key kConfigKey_WiFiPSK            = EFR32ConfigKey(kMatterConfig_KeyBase, 0x0D);
     static constexpr Key kConfigKey_WiFiSEC            = EFR32ConfigKey(kMatterConfig_KeyBase, 0x0E);
