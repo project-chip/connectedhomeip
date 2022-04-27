@@ -32,9 +32,9 @@ tests:
       command: "readAttribute"
       attribute: "CommissionedFabrics"
       response:
+          value: 1
           constraints:
               type: uint8
-              value: 1
 
     - label: "Read current fabric index"
       command: "readAttribute"

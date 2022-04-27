@@ -63850,6 +63850,11 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("CommissionedFabrics", actualValue, 1));
+            }
+
             VerifyOrReturn(CheckConstraintType("commissionedFabrics", "", "uint8"));
             NextTest();
         }];
