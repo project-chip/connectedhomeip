@@ -34,14 +34,14 @@ public:
         mContext(context), mPendingNotificationContextReleaseHandler(contextReleaseHandler)
     {}
     void * GetContext() { return mContext; };
-    uint8_t GetConsumersNumber() { return mConsumersNumber; }
+    uint32_t GetConsumersNumber() { return mConsumersNumber; }
     void IncrementConsumersNumber() { mConsumersNumber++; }
     void DecrementConsumersNumber()
     {
         VerifyOrDie(mConsumersNumber > 0);
         if (--mConsumersNumber == 0)
         {
-            // Release the context only if there is no pending notification pointing to it context.
+            // Release the context only if there is no pending notification pointing to us.
             if (mPendingNotificationContextReleaseHandler != nullptr)
             {
                 mPendingNotificationContextReleaseHandler(mContext);
@@ -52,7 +52,7 @@ public:
 
 private:
     void * mContext;
-    uint8_t mConsumersNumber = 0;
+    uint32_t mConsumersNumber = 0;
     PendingNotificationContextReleaseHandler mPendingNotificationContextReleaseHandler;
 };
 
