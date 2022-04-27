@@ -77,7 +77,7 @@ void TestCommand::Exit(std::string message, CHIP_ERROR err)
 {
     mContinueProcessing = false;
 
-    LogEnd(err);
+    LogEnd(message, err);
 
     if (CHIP_NO_ERROR == err)
     {

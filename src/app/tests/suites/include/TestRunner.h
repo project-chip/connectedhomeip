@@ -33,15 +33,15 @@ public:
         ChipLogProgress(chipTool, " ***** Test Step %u : %s\n", stepNumber, stepName);
     }
 
-    void LogEnd(CHIP_ERROR err)
+    void LogEnd(std::string message, CHIP_ERROR err)
     {
         if (CHIP_NO_ERROR == err)
         {
-            ChipLogProgress(chipTool, " **** Test Complete: %s\n", mTestName);
+            ChipLogProgress(chipTool, " **** Test Complete: %s\n", message.c_str());
         }
         else
         {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", mTestName);
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", message.c_str());
         }
     }
 
@@ -59,7 +59,6 @@ public:
 
         if (mTestCount == mTestIndex)
         {
-            LogEnd(CHIP_NO_ERROR);
             Exit(mTestName, CHIP_NO_ERROR);
             return;
         }
