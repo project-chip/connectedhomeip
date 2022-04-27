@@ -107,17 +107,17 @@ CHIP_ERROR AccessControlAttribute::Read(const ConcreteReadAttributePath & aPath,
     case AccessControlCluster::Attributes::SubjectsPerAccessControlEntry::Id: {
         size_t value = 0;
         ReturnErrorOnFailure(GetAccessControl().GetMaxSubjectsPerEntry(value));
-        return aEncoder.Encode(value);
+        return aEncoder.Encode(static_cast<uint16_t>(value));
     }
     case AccessControlCluster::Attributes::TargetsPerAccessControlEntry::Id: {
         size_t value = 0;
         ReturnErrorOnFailure(GetAccessControl().GetMaxTargetsPerEntry(value));
-        return aEncoder.Encode(value);
+        return aEncoder.Encode(static_cast<uint16_t>(value));
     }
     case AccessControlCluster::Attributes::AccessControlEntriesPerFabric::Id: {
         size_t value = 0;
         ReturnErrorOnFailure(GetAccessControl().GetMaxEntriesPerFabric(value));
-        return aEncoder.Encode(value);
+        return aEncoder.Encode(static_cast<uint16_t>(value));
     }
     case AccessControlCluster::Attributes::ClusterRevision::Id:
         return aEncoder.Encode(kClusterRevision);
