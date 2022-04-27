@@ -57,6 +57,7 @@ target_sources(app PRIVATE
                main/main.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
                ${GEN_DIR}/all-clusters-app/zap-generated/callback-stub.cpp
                ${GEN_DIR}/all-clusters-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp)

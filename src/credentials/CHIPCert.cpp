@@ -1233,7 +1233,7 @@ CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues &
             cats.values[catCount++] = static_cast<CASEAuthTag>(rdn.mChipVal);
         }
     }
-    for (uint8_t i = catCount; i < cats.size(); ++i)
+    for (size_t i = catCount; i < cats.size(); ++i)
     {
         cats.values[i] = kUndefinedCAT;
     }

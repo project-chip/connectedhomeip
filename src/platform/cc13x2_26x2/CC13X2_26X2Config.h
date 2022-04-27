@@ -55,18 +55,14 @@ public:
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
     static const Key kConfigKey_SetupDiscriminator;
-    static const Key kConfigKey_FabricId;
     static const Key kConfigKey_ServiceConfig;
     static const Key kConfigKey_PairedAccountId;
     static const Key kConfigKey_ServiceId;
-    static const Key kConfigKey_FabricSecret;
-    static const Key kConfigKey_GroupKeyIndex;
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
     static const Key kConfigKey_WiFiStationSecType;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
-    static const Key kConfigKey_Breadcrumb;
     static const Key kConfigKey_KVS_key;   // special key for KVS system, key storage
     static const Key kConfigKey_KVS_value; // special key for KVS system, value storage
     static const Key kConfigKey_Spake2pIterationCount;

@@ -1,13 +1,15 @@
-{{#chip_tests tests}}
+{{#chip_tests tests useSynthesizeWaitForReport=true}}
 {{#chip_tests_items}}
 {{#if async}}
 bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase command}}_Fulfilled = false;
 {{/if}}
+{{#chip_tests_item_responses}}
 {{#chip_tests_item_response_parameters}}
 {{#if saveAs}}
 {{asObjectiveCType type ../cluster}} {{saveAs}};
 {{/if}}
 {{/chip_tests_item_response_parameters}}
+{{/chip_tests_item_responses}}
 
 {{~#*inline "subscribeDataCallback"}}
 test_{{parent.filename}}_{{attribute}}_Reported
@@ -86,7 +88,8 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
     {{/chip_tests_item_parameters}}
     [cluster writeAttribute{{asUpperCamelCase attribute}}WithValue:{{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument{{/chip_tests_item_parameters}} completionHandler:^(NSError * _Nullable err) {
     {{/if}}
-        NSLog(@"{{label}} Error: %@", err);
+        {{#chip_tests_item_responses}}
+        NSLog(@"{{../label}} Error: %@", err);
 
         {{#if optional}}
         if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
@@ -95,8 +98,8 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
         }
         {{/if}}
 
-        {{#if response.error}}
-          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], {{response.error}});
+        {{#if error}}
+          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], {{error}});
           [expectation fulfill];
         {{else}}
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -211,7 +214,7 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
         {{#unless async}}
         [expectation fulfill];
         {{else}}
-        testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase command}}_Fulfilled = true;
+        testSendCluster{{parent.filename}}_{{asTestIndex ../index}}_{{asUpperCamelCase command}}_Fulfilled = true;
         {{/unless}}
         {{else}}
           {{! We're a subscription }}
@@ -222,6 +225,7 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
           }
         {{/unless}}
         {{/if}}
+        {{/chip_tests_item_responses}}
     }{{#unless isWaitForReport}}]{{/unless}};
 
 {{/if}}

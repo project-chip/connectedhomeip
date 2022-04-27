@@ -56,13 +56,13 @@ void TargetNavigatorManager::HandleNavigateTarget(CommandResponseHelper<Navigate
     if (target == kNoCurrentTarget || target > mTargets.size())
     {
         response.data   = chip::MakeOptional(CharSpan::fromCharString("error"));
-        response.status = StatusEnum::kTargetNotFound;
+        response.status = TargetNavigatorStatusEnum::kTargetNotFound;
         helper.Success(response);
         return;
     }
     mCurrentTarget = static_cast<uint8_t>(target);
 
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
-    response.status = StatusEnum::kSuccess;
+    response.status = TargetNavigatorStatusEnum::kSuccess;
     helper.Success(response);
 }

@@ -43,8 +43,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     CHIP_ERROR err;
 
     // Initialize the configuration system.
+#if !CHIP_DISABLE_PLATFORM_KVS
     err = Internal::PosixConfig::Init();
     SuccessOrExit(err);
+#endif // CHIP_DISABLE_PLATFORM_KVS
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
     SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());

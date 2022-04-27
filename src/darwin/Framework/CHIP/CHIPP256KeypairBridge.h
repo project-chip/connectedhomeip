@@ -49,7 +49,7 @@ public:
     const chip::Crypto::P256PublicKey & Pubkey() const override { return mPubkey; };
 
 private:
-    id<CHIPKeypair> mKeypair;
+    id<CHIPKeypair> _Nullable mKeypair;
     chip::Crypto::P256PublicKey mPubkey;
 
     CHIP_ERROR setPubkey();

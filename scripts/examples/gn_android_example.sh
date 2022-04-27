@@ -66,8 +66,6 @@ if [ -z "$TARGET_CPU" ]; then
     exit 1
 fi
 
-# Set up JARs
-python3 "$(dirname "$0")"/../../build/chip/java/tests/generate_jars_for_test.py
 python3 "$(dirname "$0")"/../../third_party/android_deps/set_up_android_deps.py
 
 gn gen --check --fail-on-unused-args --root="$EXAMPLE_DIR" "$OUTPUT_DIR" --args="target_os=\"android\" target_cpu=\"$TARGET_CPU\" android_ndk_root=\"$ANDROID_NDK_HOME\" android_sdk_root=\"$ANDROID_HOME\" ${GN_ARGS[*]}"

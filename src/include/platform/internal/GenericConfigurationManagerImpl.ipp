@@ -388,12 +388,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimaryWiFiMACAddres
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StorePrimaryWiFiMACAddress(const uint8_t * buf)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimaryMACAddress(MutableByteSpan buf)
 {
     if (buf.size() != ConfigurationManager::kPrimaryMACAddressLength)
@@ -426,12 +420,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimary802154MACAddr
 #else
     return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StorePrimary802154MACAddress(const uint8_t * buf)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ConfigClass>
@@ -554,18 +542,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreCountryCode(const 
     return WriteConfigValueStr(ConfigClass::kConfigKey_CountryCode, code, codeLen);
 }
 
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetBreadcrumb(uint64_t & breadcrumb)
-{
-    return ReadConfigValue(ConfigClass::kConfigKey_Breadcrumb, breadcrumb);
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreBreadcrumb(uint64_t breadcrumb)
-{
-    return WriteConfigValue(ConfigClass::kConfigKey_Breadcrumb, breadcrumb);
-}
-
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetRebootCount(uint32_t & rebootCount)
 {
@@ -603,18 +579,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreBootReason(uint32_t 
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetNodeLabel(char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreNodeLabel(const char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPartNumber(char * buf, size_t bufSize)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -628,18 +592,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductURL(char * bu
 
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductLabel(char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetLocalConfigDisabled(bool & disabled)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetReachable(bool & reachable)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

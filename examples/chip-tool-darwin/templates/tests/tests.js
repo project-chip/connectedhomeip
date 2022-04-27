@@ -275,8 +275,10 @@ function getTests()
     'TestConstraints',
     'TestDelayCommands',
     'TestDescriptorCluster',
-    'TestBasicInformation',
-    'TestGeneralCommissioning',
+    // TestBasicInformation needs Reboot
+    //'TestBasicInformation',
+    // TestGeneralCommissioning needs Reboot
+    //'TestGeneralCommissioning',
     'TestGroupsCluster',
     'TestGroupKeyManagementCluster',
     'TestIdentifyCluster',

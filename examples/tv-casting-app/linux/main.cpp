@@ -678,16 +678,15 @@ LinuxCommissionableDataProvider gCommissionableDataProvider;
 
 int main(int argc, char * argv[])
 {
+    VerifyOrDie(CHIP_NO_ERROR == chip::Platform::MemoryInit());
+    VerifyOrDie(CHIP_NO_ERROR == chip::DeviceLayer::PlatformMgr().InitChipStack());
+
 #if defined(ENABLE_CHIP_SHELL)
     Engine::Root().Init();
     std::thread shellThread([]() { Engine::Root().RunMainLoop(); });
     Shell::RegisterCastingCommands();
 #endif
-
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    SuccessOrExit(err = chip::Platform::MemoryInit());
-    SuccessOrExit(err = chip::DeviceLayer::PlatformMgr().InitChipStack());
 
     // Init the commissionable data provider based on command line options
     // to handle custom verifiers, discriminators, etc.

@@ -57,11 +57,9 @@ const BL602Config::Key BL602Config::kConfigKey_Spake2pSalt           = { "salt" 
 const BL602Config::Key BL602Config::kConfigKey_Spake2pVerifier       = { "verifier" };
 
 // Keys stored in the chip-config namespace
-const BL602Config::Key BL602Config::kConfigKey_FabricId                    = { "fabric-id" };
 const BL602Config::Key BL602Config::kConfigKey_ServiceConfig               = { "service-config" };
 const BL602Config::Key BL602Config::kConfigKey_PairedAccountId             = { "account-id" };
 const BL602Config::Key BL602Config::kConfigKey_ServiceId                   = { "service-id" };
-const BL602Config::Key BL602Config::kConfigKey_GroupKeyIndex               = { "group-key-index" };
 const BL602Config::Key BL602Config::kConfigKey_LastUsedEpochKeyId          = { "last-ek-id" };
 const BL602Config::Key BL602Config::kConfigKey_FailSafeArmed               = { "fail-safe-armed" };
 const BL602Config::Key BL602Config::kConfigKey_WiFiStationSecType          = { "sta-sec-type" };
@@ -71,11 +69,7 @@ const BL602Config::Key BL602Config::kConfigKey_OperationalDeviceICACerts   = { "
 const BL602Config::Key BL602Config::kConfigKey_OperationalDevicePrivateKey = { "op-device-key" };
 const BL602Config::Key BL602Config::kConfigKey_RegulatoryLocation          = { "regulatory-location" };
 const BL602Config::Key BL602Config::kConfigKey_CountryCode                 = { "country-code" };
-const BL602Config::Key BL602Config::kConfigKey_Breadcrumb                  = { "breadcrumb" };
 const BL602Config::Key BL602Config::kConfigKey_UniqueId                    = { "unique-id" };
-
-// Prefix used for Easyflash keys that contain Chip group encryption keys.
-const char BL602Config::kGroupKeyNamePrefix[] = "gk-";
 
 CHIP_ERROR BL602Config::Init()
 {

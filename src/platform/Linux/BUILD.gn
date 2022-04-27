@@ -64,6 +64,7 @@ static_library("Linux") {
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
     "NetworkCommissioningDriver.h",
+    "NetworkCommissioningEthernetDriver.cpp",
     "NetworkCommissioningThreadDriver.cpp",
     "NetworkCommissioningWiFiDriver.cpp",
     "PlatformManagerImpl.cpp",

@@ -39,6 +39,17 @@ std::string GetHostNameWithoutDomain(const char * hostnameWithDomain)
     return hostname;
 }
 
+std::string GetFullTypeWithoutSubTypes(std::string fullType)
+{
+    size_t position = fullType.find(",");
+    if (position != std::string::npos)
+    {
+        fullType.erase(position);
+    }
+
+    return fullType;
+}
+
 void GetTextEntries(DnssdService & service, const unsigned char * data, uint16_t len)
 {
     uint16_t recordCount   = TXTRecordGetCount(len, data);
@@ -246,7 +257,7 @@ RegisterContext::RegisterContext(const char * sType, DnssdPublishCallback cb, vo
     context  = cbContext;
     callback = cb;
 
-    Platform::CopyString(mType, sType);
+    mType = sType;
 }
 
 void RegisterContext::DispatchFailure(DNSServiceErrorType err)
@@ -258,7 +269,8 @@ void RegisterContext::DispatchFailure(DNSServiceErrorType err)
 
 void RegisterContext::DispatchSuccess()
 {
-    callback(context, mType, CHIP_NO_ERROR);
+    std::string typeWithoutSubTypes = GetFullTypeWithoutSubTypes(mType);
+    callback(context, typeWithoutSubTypes.c_str(), CHIP_NO_ERROR);
 }
 
 BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServiceProtocol cbContextProtocol)
