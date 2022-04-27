@@ -103,7 +103,7 @@ public:
         // Clear bits overlayed by the mask
         mValue = static_cast<IntegerType>(mValue & ~bitMask);
         // Set the right bits
-        mValue |= static_cast<IntegerType>(((value & bitMask) << shift));
+        mValue |= static_cast<IntegerType>(bitMask & (value << shift));
 
         return *this;
     }
