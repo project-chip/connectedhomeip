@@ -212,7 +212,10 @@ void OperationalStateSet(chip::EndpointId endpoint, const chip::BitFlags<Operati
         }
 
         if (status != prevStatus)
+        {
+            emberAfWindowCoveringClusterPrint("Attr update %u %x %x", static_cast<uint8_t>(state), status.Raw(), prevStatus.Raw());
             Attributes::OperationalStatus::Set(endpoint, status);
+        }
     }
 }
 
