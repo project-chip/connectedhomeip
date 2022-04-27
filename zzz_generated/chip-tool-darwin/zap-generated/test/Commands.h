@@ -28453,7 +28453,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 7;
+    const uint16_t mTestCount = 10;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -28922,7 +28922,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 10;
+    const uint16_t mTestCount = 7;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -35241,7 +35241,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 7;
+    const uint16_t mTestCount = 5;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -35291,14 +35291,6 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("AttributeList", [actualValue count], static_cast<uint32_t>(3)));
-                VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
-                VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
-                VerifyOrReturn(CheckValue("", actualValue[2], 2UL));
-            }
-
             VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
             NextTest();
         }];
@@ -35318,11 +35310,6 @@ private:
             NSLog(@"TH reads the AcceptedCommandList attribute from the DUT Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("AcceptedCommandList", [actualValue count], static_cast<uint32_t>(0)));
-            }
 
             VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
             NextTest();
@@ -35454,7 +35441,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 7;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -35487,6 +35474,14 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("AttributeList", [actualValue count], static_cast<uint32_t>(3)));
+                VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
+                VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
+                VerifyOrReturn(CheckValue("", actualValue[2], 2UL));
+            }
+
             VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
             NextTest();
         }];
@@ -35512,6 +35507,11 @@ private:
             NSLog(@"Read the global attribute: AcceptedCommandList Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("AcceptedCommandList", [actualValue count], static_cast<uint32_t>(0)));
+            }
 
             VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
             NextTest();

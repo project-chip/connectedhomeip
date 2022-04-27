@@ -23257,7 +23257,7 @@ private:
         case 3:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint16_t value;
+                chip::app::DataModel::Nullable<uint16_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "int16"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 1U));
