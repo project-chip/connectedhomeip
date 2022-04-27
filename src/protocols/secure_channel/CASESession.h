@@ -162,7 +162,7 @@ public:
     void Clear();
 
 private:
-    enum State : uint8_t
+    enum class State : uint8_t
     {
         kInitialized      = 0,
         kSentSigma1       = 1,

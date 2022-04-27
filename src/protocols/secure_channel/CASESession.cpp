@@ -157,7 +157,7 @@ void CASESession::Clear()
     mCASESessionEstablished = false;
     PairingSession::Clear();
 
-    mState = kInitialized;
+    mState = State::kInitialized;
     Crypto::ClearSecretData(mIPK);
 
     AbortExchange();
@@ -273,7 +273,8 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
 {
     VerifyOrReturn(ec != nullptr, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout was called by null exchange"));
     VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
-    ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %u", mState);
+    ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %u",
+                 to_underlying(mState));
     // Discard the exchange so that Clear() doesn't try closing it.  The
     // exchange will handle that.
     DiscardExchange();
@@ -435,7 +436,7 @@ CHIP_ERROR CASESession::SendSigma1()
     ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma1, std::move(msg_R1),
                                                     SendFlags(SendMessageFlags::kExpectResponse)));
 
-    mState = resuming ? kSentSigma1Resume : kSentSigma1;
+    mState = resuming ? State::kSentSigma1Resume : State::kSentSigma1;
 
     ChipLogProgress(SecureChannel, "Sent Sigma1 msg");
 
@@ -593,12 +594,12 @@ exit:
     if (err == CHIP_ERROR_KEY_NOT_FOUND)
     {
         SendStatusReport(mExchangeCtxt, kProtocolCodeNoSharedRoot);
-        mState = kInitialized;
+        mState = State::kInitialized;
     }
     else if (err != CHIP_NO_ERROR)
     {
         SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
-        mState = kInitialized;
+        mState = State::kInitialized;
     }
     return err;
 }
@@ -650,7 +651,7 @@ CHIP_ERROR CASESession::SendSigma2Resume(const ByteSpan & initiatorRandom)
     ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma2Resume, std::move(msg_R2_resume),
                                                     SendFlags(SendMessageFlags::kExpectResponse)));
 
-    mState = kSentSigma2Resume;
+    mState = State::kSentSigma2Resume;
 
     ChipLogDetail(SecureChannel, "Sent Sigma2Resume msg");
 
@@ -780,7 +781,7 @@ CHIP_ERROR CASESession::SendSigma2()
     ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma2, std::move(msg_R2),
                                                     SendFlags(SendMessageFlags::kExpectResponse)));
 
-    mState = kSentSigma2;
+    mState = State::kSentSigma2;
 
     ChipLogProgress(SecureChannel, "Sent Sigma2 msg");
 
@@ -1138,14 +1139,14 @@ CHIP_ERROR CASESession::SendSigma3()
     err = mCommissioningHash.Finish(messageDigestSpan);
     SuccessOrExit(err);
 
-    mState = kSentSigma3;
+    mState = State::kSentSigma3;
 
 exit:
 
     if (err != CHIP_NO_ERROR)
     {
         SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
-        mState = kInitialized;
+        mState = State::kInitialized;
     }
     return err;
 }
@@ -1495,7 +1496,7 @@ void CASESession::OnSuccessStatusReport()
             ChipLogError(SecureChannel, "Unable to save session resumption state: %" CHIP_ERROR_FORMAT, err2.Format());
     }
 
-    mState = kInitialized;
+    mState = State::kInitialized;
     Finish();
 }
 
@@ -1516,7 +1517,7 @@ CHIP_ERROR CASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralS
         err = CHIP_ERROR_INTERNAL;
         break;
     };
-    mState = kInitialized;
+    mState = State::kInitialized;
     ChipLogError(SecureChannel, "Received error (protocol code %d) during pairing process. %s", protocolCode, ErrorStr(err));
     return err;
 }
@@ -1644,13 +1645,13 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
 
     switch (mState)
     {
-    case kInitialized:
+    case State::kInitialized:
         if (msgType == Protocols::SecureChannel::MsgType::CASE_Sigma1)
         {
             err = HandleSigma1_and_SendSigma2(std::move(msg));
         }
         break;
-    case kSentSigma1:
+    case State::kSentSigma1:
         switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
         {
         case Protocols::SecureChannel::MsgType::CASE_Sigma2:
@@ -1666,7 +1667,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
             break;
         };
         break;
-    case kSentSigma1Resume:
+    case State::kSentSigma1Resume:
         switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
         {
         case Protocols::SecureChannel::MsgType::CASE_Sigma2:
@@ -1686,7 +1687,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
             break;
         };
         break;
-    case kSentSigma2:
+    case State::kSentSigma2:
         switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
         {
         case Protocols::SecureChannel::MsgType::CASE_Sigma3:
@@ -1702,8 +1703,8 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
             break;
         };
         break;
-    case kSentSigma3:
-    case kSentSigma2Resume:
+    case State::kSentSigma3:
+    case State::kSentSigma2Resume:
         if (msgType == Protocols::SecureChannel::MsgType::StatusReport)
         {
             err = HandleStatusReport(std::move(msg), /* successExpected*/ true);
@@ -1718,7 +1719,8 @@ exit:
 
     if (err == CHIP_ERROR_INVALID_MESSAGE_TYPE)
     {
-        ChipLogError(SecureChannel, "Received message (type %d) cannot be handled in %d state.", to_underlying(msgType), mState);
+        ChipLogError(SecureChannel, "Received message (type %d) cannot be handled in %d state.", to_underlying(msgType),
+                     to_underlying(mState));
     }
 
     // Call delegate to indicate session establishment failure.
