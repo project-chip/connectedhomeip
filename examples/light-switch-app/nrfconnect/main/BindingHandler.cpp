@@ -57,9 +57,13 @@ void BindingHandler::OnInvokeCommandFailure(DeviceProxy * aDevice, BindingData &
         // Set flag to not try recover session multiple times.
         BindingHandler::GetInstance().mCaseSessionRecovered = true;
 
+        // Allocate new object to make sure its life time will be appropriate.
+        BindingHandler::BindingData * data = Platform::New<BindingHandler::BindingData>();
+        *data                              = aBindingData;
+
         // Establish new CASE session and retrasmit command that was not applied.
         error = BindingManager::GetInstance().NotifyBoundClusterChanged(aBindingData.EndpointId, aBindingData.ClusterId,
-                                                                        static_cast<void *>(&aBindingData));
+                                                                        static_cast<void *>(data));
     }
     else
     {
@@ -222,6 +226,13 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & bi
     }
 }
 
+void BindingHandler::LightSwitchContextReleaseHandler(void * context)
+{
+    VerifyOrReturn(context != nullptr, LOG_ERR("Invalid context for Light switch context release handler"););
+
+    Platform::Delete(static_cast<BindingData *>(context));
+}
+
 void BindingHandler::InitInternal(intptr_t aArg)
 {
     LOG_INF("Initialize binding Handler");
@@ -234,6 +245,7 @@ void BindingHandler::InitInternal(intptr_t aArg)
     }
 
     BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
+    BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
     BindingHandler::GetInstance().PrintBindingTable();
 }
 
@@ -298,6 +310,4 @@ void BindingHandler::SwitchWorkerHandler(intptr_t aContext)
     BindingData * data = reinterpret_cast<BindingData *>(aContext);
     LOG_INF("Notify Bounded Cluster | endpoint: %d cluster: %d", data->EndpointId, data->ClusterId);
     BindingManager::GetInstance().NotifyBoundClusterChanged(data->EndpointId, data->ClusterId, static_cast<void *>(data));
-
-    Platform::Delete(data);
 }
