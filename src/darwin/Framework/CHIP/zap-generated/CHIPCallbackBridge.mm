@@ -20043,42 +20043,18 @@ void CHIPNullableChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBr
     }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::TargetNavigator::TargetNavigatorStatusEnum value)
-=======
-void CHIPTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TargetNavigator::StatusEnumTargetNavigator value)
->>>>>>> Changes for cleaner regen
-=======
-void CHIPTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TargetNavigator::TargetNavigatorStatusEnum value)
->>>>>>> Renaming StatusEnums with cluster name prefix
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
     auto * self = static_cast<CHIPTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge *>(context);
-=======
-void CHIPTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self = static_cast<CHIPTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallbackSubscriptionBridge *>(context);
->>>>>>> Changes for cleaner regen
-=======
-void CHIPTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self = static_cast<CHIPTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge *>(context);
->>>>>>> Renaming StatusEnums with cluster name prefix
     if (!self->mQueue) {
         return;
     }
@@ -20092,18 +20068,8 @@ void CHIPTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscri
     }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TargetNavigator::TargetNavigatorStatusEnum> & value)
-=======
-void CHIPNullableTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TargetNavigator::StatusEnumTargetNavigator> & value)
->>>>>>> Changes for cleaner regen
-=======
-void CHIPNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TargetNavigator::TargetNavigatorStatusEnum> & value)
->>>>>>> Renaming StatusEnums with cluster name prefix
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20114,27 +20080,11 @@ void CHIPNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbac
     DispatchSuccess(context, objCValue);
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
     auto * self
         = static_cast<CHIPNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge *>(context);
-=======
-void CHIPNullableTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self
-        = static_cast<CHIPNullableTargetNavigatorClusterStatusEnumTargetNavigatorAttributeCallbackSubscriptionBridge *>(context);
->>>>>>> Changes for cleaner regen
-=======
-void CHIPNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self
-        = static_cast<CHIPNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge *>(context);
->>>>>>> Renaming StatusEnums with cluster name prefix
     if (!self->mQueue) {
         return;
     }
@@ -20202,39 +20152,17 @@ void CHIPNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSub
     }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum value)
-=======
-void CHIPMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::MediaPlayback::StatusEnumMediaPlayback value)
->>>>>>> Changes for cleaner regen
-=======
-void CHIPMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum value)
->>>>>>> Renaming StatusEnums with cluster name prefix
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge *>(context);
-=======
-void CHIPMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallbackSubscriptionBridge *>(context);
->>>>>>> Changes for cleaner regen
-=======
-void CHIPMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge *>(context);
->>>>>>> Renaming StatusEnums with cluster name prefix
     if (!self->mQueue) {
         return;
     }
@@ -20248,18 +20176,8 @@ void CHIPMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridg
     }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::PlaybackStateEnum> & value)
-=======
-void CHIPNullableMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::StatusEnumMediaPlayback> & value)
->>>>>>> Changes for cleaner regen
-=======
-void CHIPNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::PlaybackStateEnum> & value)
->>>>>>> Renaming StatusEnums with cluster name prefix
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20270,23 +20188,9 @@ void CHIPNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge *>(context);
-=======
-void CHIPNullableMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self
-        = static_cast<CHIPNullableMediaPlaybackClusterStatusEnumMediaPlaybackAttributeCallbackSubscriptionBridge *>(context);
->>>>>>> Changes for cleaner regen
-=======
-void CHIPNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge *>(context);
->>>>>>> Renaming StatusEnums with cluster name prefix
     if (!self->mQueue) {
         return;
     }
@@ -20404,39 +20308,17 @@ void CHIPNullableKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge
     }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::KeypadInput::KeypadInputStatusEnum value)
-=======
-void CHIPKeypadInputClusterStatusEnumKeypadInputAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::KeypadInput::StatusEnumKeypadInput value)
->>>>>>> Changes for cleaner regen
-=======
-void CHIPKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::KeypadInput::KeypadInputStatusEnum value)
->>>>>>> Renaming StatusEnums with cluster name prefix
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge *>(context);
-=======
-void CHIPKeypadInputClusterStatusEnumKeypadInputAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPKeypadInputClusterStatusEnumKeypadInputAttributeCallbackSubscriptionBridge *>(context);
->>>>>>> Changes for cleaner regen
-=======
-void CHIPKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge *>(context);
->>>>>>> Renaming StatusEnums with cluster name prefix
     if (!self->mQueue) {
         return;
     }
@@ -20450,18 +20332,8 @@ void CHIPKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBri
     }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::KeypadInputStatusEnum> & value)
-=======
-void CHIPNullableKeypadInputClusterStatusEnumKeypadInputAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::StatusEnumKeypadInput> & value)
->>>>>>> Changes for cleaner regen
-=======
-void CHIPNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::KeypadInputStatusEnum> & value)
->>>>>>> Renaming StatusEnums with cluster name prefix
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20472,24 +20344,10 @@ void CHIPNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
     auto * self = static_cast<CHIPNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge *>(context);
-=======
-void CHIPNullableKeypadInputClusterStatusEnumKeypadInputAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self = static_cast<CHIPNullableKeypadInputClusterStatusEnumKeypadInputAttributeCallbackSubscriptionBridge *>(context);
->>>>>>> Changes for cleaner regen
-=======
-void CHIPNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self = static_cast<CHIPNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge *>(context);
->>>>>>> Renaming StatusEnums with cluster name prefix
     if (!self->mQueue) {
         return;
     }
@@ -20609,40 +20467,17 @@ void CHIPNullableContentLauncherClusterMetricTypeEnumAttributeCallbackSubscripti
     }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPContentLauncherClusterParameterEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::ContentLauncher::ParameterEnum value)
-=======
-void CHIPContentLauncherClusterStatusEnumContentLauncherAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ContentLauncher::StatusEnumContentLauncher value)
->>>>>>> Changes for cleaner regen
-=======
-void CHIPContentLauncherClusterParameterEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ContentLauncher::ParameterEnum value)
->>>>>>> Renaming StatusEnums with cluster name prefix
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge *>(context);
-=======
-void CHIPContentLauncherClusterStatusEnumContentLauncherAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self = static_cast<CHIPContentLauncherClusterStatusEnumContentLauncherAttributeCallbackSubscriptionBridge *>(context);
->>>>>>> Changes for cleaner regen
-=======
-void CHIPContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge *>(context);
->>>>>>> Renaming StatusEnums with cluster name prefix
     if (!self->mQueue) {
         return;
     }
@@ -20656,18 +20491,8 @@ void CHIPContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge:
     }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPNullableContentLauncherClusterParameterEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ParameterEnum> & value)
-=======
-void CHIPNullableContentLauncherClusterStatusEnumContentLauncherAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::StatusEnumContentLauncher> & value)
->>>>>>> Changes for cleaner regen
-=======
-void CHIPNullableContentLauncherClusterParameterEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ParameterEnum> & value)
->>>>>>> Renaming StatusEnums with cluster name prefix
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20678,23 +20503,9 @@ void CHIPNullableContentLauncherClusterParameterEnumAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPNullableContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPNullableContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge *>(context);
-=======
-void CHIPNullableContentLauncherClusterStatusEnumContentLauncherAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self
-        = static_cast<CHIPNullableContentLauncherClusterStatusEnumContentLauncherAttributeCallbackSubscriptionBridge *>(context);
->>>>>>> Changes for cleaner regen
-=======
-void CHIPNullableContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPNullableContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge *>(context);
->>>>>>> Renaming StatusEnums with cluster name prefix
     if (!self->mQueue) {
         return;
     }
@@ -20760,45 +20571,19 @@ void CHIPNullableAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBr
     }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum value)
-=======
-void CHIPApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ApplicationLauncher::StatusEnumApplicationLauncher value)
->>>>>>> Changes for cleaner regen
-=======
-void CHIPApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum value)
->>>>>>> Renaming StatusEnums with cluster name prefix
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
     auto * self
         = static_cast<CHIPApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge *>(context);
-=======
-void CHIPApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self
-        = static_cast<CHIPApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallbackSubscriptionBridge *>(context);
->>>>>>> Changes for cleaner regen
-=======
-void CHIPApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self
-        = static_cast<CHIPApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge *>(context);
->>>>>>> Renaming StatusEnums with cluster name prefix
     if (!self->mQueue) {
         return;
     }
@@ -20812,18 +20597,8 @@ void CHIPApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbac
     }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum> & value)
-=======
-void CHIPNullableApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::StatusEnumApplicationLauncher> & value)
->>>>>>> Changes for cleaner regen
-=======
-void CHIPNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum> & value)
->>>>>>> Renaming StatusEnums with cluster name prefix
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20834,27 +20609,11 @@ void CHIPNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttribut
     DispatchSuccess(context, objCValue);
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished(void * context)
 {
     auto * self
         = static_cast<CHIPNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge *>(
-=======
-void CHIPNullableApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished(void * context)
-{
-    auto * self
-        = static_cast<CHIPNullableApplicationLauncherClusterStatusEnumApplicationLauncherAttributeCallbackSubscriptionBridge *>(
->>>>>>> Changes for cleaner regen
-=======
-void CHIPNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished(void * context)
-{
-    auto * self
-        = static_cast<CHIPNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge *>(
->>>>>>> Renaming StatusEnums with cluster name prefix
             context);
     if (!self->mQueue) {
         return;

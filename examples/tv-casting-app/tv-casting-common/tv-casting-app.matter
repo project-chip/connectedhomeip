@@ -141,15 +141,7 @@ client cluster ApplicationBasic = 1293 {
 }
 
 client cluster ApplicationLauncher = 1292 {
-<<<<<<< HEAD
-<<<<<<< HEAD
   enum ApplicationLauncherStatusEnum : ENUM8 {
-=======
-  enum StatusEnumApplicationLauncher : ENUM8 {
->>>>>>> Changes for cleaner regen
-=======
-  enum ApplicationLauncherStatusEnum : ENUM8 {
->>>>>>> Renaming StatusEnums with cluster name prefix
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
@@ -381,18 +373,6 @@ client cluster ContentLauncher = 1290 {
     kType = 12;
   }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-  enum StatusEnumContentLauncher : ENUM8 {
-    kSuccess = 0;
-    kUrlNotAvailable = 1;
-    kAuthFailed = 2;
-  }
-
->>>>>>> Changes for cleaner regen
-=======
->>>>>>> Renaming StatusEnums with cluster name prefix
   bitmap ContentLauncherFeature : BITMAP32 {
     kContentSearch = 0x1;
     kURLPlayback = 0x2;
@@ -970,15 +950,7 @@ client cluster KeypadInput = 1289 {
     kData = 118;
   }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   enum KeypadInputStatusEnum : ENUM8 {
-=======
-  enum StatusEnumKeypadInput : ENUM8 {
->>>>>>> Changes for cleaner regen
-=======
-  enum KeypadInputStatusEnum : ENUM8 {
->>>>>>> Renaming StatusEnums with cluster name prefix
     kSuccess = 0;
     kUnsupportedKey = 1;
     kInvalidKeyInCurrentState = 2;
@@ -1223,22 +1195,7 @@ client cluster MediaInput = 1287 {
 }
 
 client cluster MediaPlayback = 1286 {
-<<<<<<< HEAD
-<<<<<<< HEAD
   enum MediaPlaybackStatusEnum : ENUM8 {
-=======
-  enum PlaybackStateEnum : ENUM8 {
-    kPlaying = 0;
-    kPaused = 1;
-    kNotPlaying = 2;
-    kBuffering = 3;
-  }
-
-  enum StatusEnumMediaPlayback : ENUM8 {
->>>>>>> Changes for cleaner regen
-=======
-  enum MediaPlaybackStatusEnum : ENUM8 {
->>>>>>> Renaming StatusEnums with cluster name prefix
     kSuccess = 0;
     kInvalidStateForCommand = 1;
     kNotAllowed = 2;
@@ -1851,15 +1808,7 @@ server cluster Switch = 59 {
 }
 
 client cluster TargetNavigator = 1285 {
-<<<<<<< HEAD
-<<<<<<< HEAD
   enum TargetNavigatorStatusEnum : ENUM8 {
-=======
-  enum StatusEnumTargetNavigator : ENUM8 {
->>>>>>> Changes for cleaner regen
-=======
-  enum TargetNavigatorStatusEnum : ENUM8 {
->>>>>>> Renaming StatusEnums with cluster name prefix
     kSuccess = 0;
     kTargetNotFound = 1;
     kNotAllowed = 2;

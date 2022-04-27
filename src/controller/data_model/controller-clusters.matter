@@ -163,15 +163,7 @@ client cluster ApplicationBasic = 1293 {
 }
 
 client cluster ApplicationLauncher = 1292 {
-<<<<<<< HEAD
-<<<<<<< HEAD
   enum ApplicationLauncherStatusEnum : ENUM8 {
-=======
-  enum StatusEnumApplicationLauncher : ENUM8 {
->>>>>>> Changes for cleaner regen
-=======
-  enum ApplicationLauncherStatusEnum : ENUM8 {
->>>>>>> Renaming StatusEnums with cluster name prefix
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
@@ -212,23 +204,7 @@ client cluster ApplicationLauncher = 1292 {
   }
 
   response struct LauncherResponse = 3 {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     ApplicationLauncherStatusEnum status = 0;
-=======
-    StatusEnum status = 0;
-=======
-  response struct LauncherResponse {
-    StatusEnumApplicationLauncher status = 0;
->>>>>>> Changes for cleaner regen
->>>>>>> Changes for cleaner regen
-=======
-    StatusEnumApplicationLauncher status = 0;
->>>>>>> Regening after rebase
-=======
-    ApplicationLauncherStatusEnum status = 0;
->>>>>>> Renaming StatusEnums with cluster name prefix
     OCTET_STRING data = 1;
   }
 
@@ -628,19 +604,7 @@ client cluster Channel = 1284 {
   }
 
   response struct ChangeChannelResponse = 1 {
-<<<<<<< HEAD
-<<<<<<< HEAD
     ChannelStatusEnum status = 0;
-=======
-    StatusEnum status = 0;
-=======
-  response struct ChangeChannelResponse {
-    ChannelStatusEnum status = 0;
->>>>>>> Changes for cleaner regen
->>>>>>> Changes for cleaner regen
-=======
-    ChannelStatusEnum status = 0;
->>>>>>> Regening after rebase
     optional CHAR_STRING data = 1;
   }
 
@@ -973,18 +937,6 @@ client cluster ContentLauncher = 1290 {
     kType = 12;
   }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-  enum StatusEnumContentLauncher : ENUM8 {
-    kSuccess = 0;
-    kUrlNotAvailable = 1;
-    kAuthFailed = 2;
-  }
-
->>>>>>> Changes for cleaner regen
-=======
->>>>>>> Renaming StatusEnums with cluster name prefix
   bitmap ContentLauncherFeature : BITMAP32 {
     kContentSearch = 0x1;
     kURLPlayback = 0x2;
@@ -1051,23 +1003,7 @@ client cluster ContentLauncher = 1290 {
   }
 
   response struct LaunchResponse = 2 {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     ContentLaunchStatusEnum status = 0;
-=======
-    StatusEnum status = 0;
-=======
-  response struct LaunchResponse {
-    StatusEnumContentLauncher status = 0;
->>>>>>> Changes for cleaner regen
->>>>>>> Changes for cleaner regen
-=======
-    StatusEnumContentLauncher status = 0;
->>>>>>> Regening after rebase
-=======
-    ContentLaunchStatusEnum status = 0;
->>>>>>> Renaming StatusEnums with cluster name prefix
     optional CHAR_STRING data = 1;
   }
 
@@ -2282,15 +2218,7 @@ client cluster KeypadInput = 1289 {
     kData = 118;
   }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   enum KeypadInputStatusEnum : ENUM8 {
-=======
-  enum StatusEnumKeypadInput : ENUM8 {
->>>>>>> Changes for cleaner regen
-=======
-  enum KeypadInputStatusEnum : ENUM8 {
->>>>>>> Renaming StatusEnums with cluster name prefix
     kSuccess = 0;
     kUnsupportedKey = 1;
     kInvalidKeyInCurrentState = 2;
@@ -2312,23 +2240,7 @@ client cluster KeypadInput = 1289 {
   }
 
   response struct SendKeyResponse = 1 {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     KeypadInputStatusEnum status = 0;
-=======
-    StatusEnum status = 0;
-=======
-  response struct SendKeyResponse {
-    StatusEnumKeypadInput status = 0;
->>>>>>> Changes for cleaner regen
->>>>>>> Changes for cleaner regen
-=======
-    StatusEnumKeypadInput status = 0;
->>>>>>> Regening after rebase
-=======
-    KeypadInputStatusEnum status = 0;
->>>>>>> Renaming StatusEnums with cluster name prefix
   }
 
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
@@ -2491,22 +2403,7 @@ client cluster MediaInput = 1287 {
 }
 
 client cluster MediaPlayback = 1286 {
-<<<<<<< HEAD
-<<<<<<< HEAD
   enum MediaPlaybackStatusEnum : ENUM8 {
-=======
-  enum PlaybackStateEnum : ENUM8 {
-    kPlaying = 0;
-    kPaused = 1;
-    kNotPlaying = 2;
-    kBuffering = 3;
-  }
-
-  enum StatusEnumMediaPlayback : ENUM8 {
->>>>>>> Changes for cleaner regen
-=======
-  enum MediaPlaybackStatusEnum : ENUM8 {
->>>>>>> Renaming StatusEnums with cluster name prefix
     kSuccess = 0;
     kInvalidStateForCommand = 1;
     kNotAllowed = 2;
@@ -2552,23 +2449,7 @@ client cluster MediaPlayback = 1286 {
   }
 
   response struct PlaybackResponse = 10 {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     MediaPlaybackStatusEnum status = 0;
-=======
-    StatusEnum status = 0;
-=======
-  response struct PlaybackResponse {
-    StatusEnumMediaPlayback status = 0;
->>>>>>> Changes for cleaner regen
->>>>>>> Changes for cleaner regen
-=======
-    StatusEnumMediaPlayback status = 0;
->>>>>>> Regening after rebase
-=======
-    MediaPlaybackStatusEnum status = 0;
->>>>>>> Renaming StatusEnums with cluster name prefix
     optional CHAR_STRING data = 1;
   }
 
@@ -3519,15 +3400,7 @@ client cluster Switch = 59 {
 }
 
 client cluster TargetNavigator = 1285 {
-<<<<<<< HEAD
-<<<<<<< HEAD
   enum TargetNavigatorStatusEnum : ENUM8 {
-=======
-  enum StatusEnumTargetNavigator : ENUM8 {
->>>>>>> Changes for cleaner regen
-=======
-  enum TargetNavigatorStatusEnum : ENUM8 {
->>>>>>> Renaming StatusEnums with cluster name prefix
     kSuccess = 0;
     kTargetNotFound = 1;
     kNotAllowed = 2;
@@ -3551,23 +3424,7 @@ client cluster TargetNavigator = 1285 {
   }
 
   response struct NavigateTargetResponse = 1 {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     TargetNavigatorStatusEnum status = 0;
-=======
-    StatusEnum status = 0;
-=======
-  response struct NavigateTargetResponse {
-    StatusEnumTargetNavigator status = 0;
->>>>>>> Changes for cleaner regen
->>>>>>> Changes for cleaner regen
-=======
-    StatusEnumTargetNavigator status = 0;
->>>>>>> Regening after rebase
-=======
-    TargetNavigatorStatusEnum status = 0;
->>>>>>> Renaming StatusEnums with cluster name prefix
     optional CHAR_STRING data = 1;
   }
 

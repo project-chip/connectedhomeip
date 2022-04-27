@@ -22572,10 +22572,6 @@ typedef NS_ENUM(uint16_t, CHIPIasAceIasZoneType) {
     CHIPIasAceIasZoneTypeInvalidZoneType = 0xFFFF,
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> xml cleanup, Regen and zap repo update
 typedef NS_OPTIONS(uint16_t, CHIPIasAceIasZoneStatus) {
     CHIPIasAceIasZoneStatusAlarm1 = 0x1,
     CHIPIasAceIasZoneStatusAlarm2 = 0x2,
@@ -22601,11 +22597,6 @@ typedef NS_OPTIONS(uint8_t, CHIPIasWdWarningInfo) {
     CHIPIasWdWarningInfoSirenLevel = 0x3,
 };
 
-<<<<<<< HEAD
-=======
->>>>>>> Changes for cleaner regen
-=======
->>>>>>> xml cleanup, Regen and zap repo update
 typedef NS_ENUM(uint8_t, CHIPChannelStatus) {
     CHIPChannelStatusSuccess = 0x00,
     CHIPChannelStatusMultipleMatches = 0x01,
@@ -22636,15 +22627,6 @@ typedef NS_ENUM(uint8_t, CHIPMediaPlaybackStatus) {
     CHIPMediaPlaybackStatusSeekOutOfRange = 0x05,
 };
 
-<<<<<<< HEAD
-typedef NS_ENUM(uint8_t, CHIPMediaPlaybackStatus) {
-    CHIPMediaPlaybackStatusSuccess = 0x00,
-    CHIPMediaPlaybackStatusInvalidStateForCommand = 0x01,
-    CHIPMediaPlaybackStatusNotAllowed = 0x02,
-    CHIPMediaPlaybackStatusNotActive = 0x03,
-    CHIPMediaPlaybackStatusSpeedOutOfRange = 0x04,
-    CHIPMediaPlaybackStatusSeekOutOfRange = 0x05,
-=======
 typedef NS_ENUM(uint8_t, CHIPMediaPlaybackPlaybackState) {
     CHIPMediaPlaybackPlaybackStatePlaying = 0x00,
     CHIPMediaPlaybackPlaybackStatePaused = 0x01,
@@ -22652,26 +22634,6 @@ typedef NS_ENUM(uint8_t, CHIPMediaPlaybackPlaybackState) {
     CHIPMediaPlaybackPlaybackStateBuffering = 0x03,
 };
 
-<<<<<<< HEAD
-typedef NS_ENUM(uint8_t, CHIPMediaPlaybackStatusEnumMediaPlayback) {
-    CHIPMediaPlaybackStatusEnumMediaPlaybackSuccess = 0x00,
-    CHIPMediaPlaybackStatusEnumMediaPlaybackInvalidStateForCommand = 0x01,
-    CHIPMediaPlaybackStatusEnumMediaPlaybackNotAllowed = 0x02,
-    CHIPMediaPlaybackStatusEnumMediaPlaybackNotActive = 0x03,
-    CHIPMediaPlaybackStatusEnumMediaPlaybackSpeedOutOfRange = 0x04,
-    CHIPMediaPlaybackStatusEnumMediaPlaybackSeekOutOfRange = 0x05,
->>>>>>> Changes for cleaner regen
-};
-
-typedef NS_ENUM(uint8_t, CHIPMediaPlaybackPlaybackState) {
-    CHIPMediaPlaybackPlaybackStatePlaying = 0x00,
-    CHIPMediaPlaybackPlaybackStatePaused = 0x01,
-    CHIPMediaPlaybackPlaybackStateNotPlaying = 0x02,
-    CHIPMediaPlaybackPlaybackStateBuffering = 0x03,
-};
-
-=======
->>>>>>> Renaming StatusEnums with cluster name prefix
 typedef NS_ENUM(uint8_t, CHIPMediaInputInputType) {
     CHIPMediaInputInputTypeInternal = 0x00,
     CHIPMediaInputInputTypeAux = 0x01,
@@ -22819,18 +22781,6 @@ typedef NS_ENUM(uint8_t, CHIPContentLauncherParameter) {
     CHIPContentLauncherParameterType = 0x0C,
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-typedef NS_ENUM(uint8_t, CHIPContentLauncherStatusEnumContentLauncher) {
-    CHIPContentLauncherStatusEnumContentLauncherSuccess = 0x00,
-    CHIPContentLauncherStatusEnumContentLauncherUrlNotAvailable = 0x01,
-    CHIPContentLauncherStatusEnumContentLauncherAuthFailed = 0x02,
-};
-
->>>>>>> Changes for cleaner regen
-=======
->>>>>>> Renaming StatusEnums with cluster name prefix
 typedef NS_OPTIONS(uint32_t, CHIPContentLauncherFeature) {
     CHIPContentLauncherFeatureContentSearch = 0x1,
     CHIPContentLauncherFeatureURLPlayback = 0x2,
