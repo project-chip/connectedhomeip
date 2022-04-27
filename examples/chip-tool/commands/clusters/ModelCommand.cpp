@@ -50,7 +50,7 @@ CHIP_ERROR ModelCommand::RunCommand()
     return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
-void ModelCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
+void ModelCommand::OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device)
 {
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectedFn: context is null"));
